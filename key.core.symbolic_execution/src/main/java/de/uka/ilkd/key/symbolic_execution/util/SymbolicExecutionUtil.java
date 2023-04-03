@@ -1,39 +1,8 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import de.uka.ilkd.key.nparser.DebugKeyLexer;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
@@ -43,58 +12,18 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.BranchStatement;
-import de.uka.ilkd.key.java.statement.Catch;
-import de.uka.ilkd.key.java.statement.Do;
-import de.uka.ilkd.key.java.statement.EmptyStatement;
-import de.uka.ilkd.key.java.statement.EnhancedFor;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.Try;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.ContainsStatementVisitor;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.IntIterator;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabel;
-import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
-import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.label.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -105,19 +34,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
-import de.uka.ilkd.key.rule.AbstractBlockContractBuiltInRuleApp;
-import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
-import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.BlockContractExternalBuiltInRuleApp;
-import de.uka.ilkd.key.rule.BlockContractInternalBuiltInRuleApp;
-import de.uka.ilkd.key.rule.ContractRuleApp;
-import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
-import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -143,6 +60,12 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.CollectionUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1160,7 +1083,7 @@ public final class SymbolicExecutionUtil {
         // filter out: open goal node which has no applied rule, statements where source code is
         // missing, empty statements, empty blocks
         return ruleApp != null && posInfo != null && posInfo.getEndPosition() != Position.UNDEFINED
-                && posInfo.getEndPosition().getLine() >= 0 && !(statement instanceof EmptyStatement)
+                && posInfo.getEndPosition().line() >= 0 && !(statement instanceof EmptyStatement)
                 && !(statement instanceof StatementBlock && ((StatementBlock) statement).isEmpty());
     }
 
@@ -1357,12 +1280,7 @@ public final class SymbolicExecutionUtil {
         if (term != null) {
             term = TermBuilder.goBelowUpdates(term);
             return (SymbolicExecutionTermLabel) CollectionUtil.search(term.getLabels(),
-                new IFilter<TermLabel>() {
-                    @Override
-                    public boolean select(TermLabel element) {
-                        return element instanceof SymbolicExecutionTermLabel;
-                    }
-                });
+                element -> element instanceof SymbolicExecutionTermLabel);
         } else {
             return null;
         }
@@ -1724,12 +1642,8 @@ public final class SymbolicExecutionUtil {
                             if (element instanceof StatementBlock) {
                                 StatementBlock b = (StatementBlock) block.program();
                                 ImmutableArray<ProgramPrefix> prefix = b.getPrefixElements();
-                                result = CollectionUtil.count(prefix, new IFilter<ProgramPrefix>() {
-                                    @Override
-                                    public boolean select(ProgramPrefix element) {
-                                        return element instanceof MethodFrame;
-                                    }
-                                });
+                                result = CollectionUtil.count(prefix,
+                                    element1 -> element1 instanceof MethodFrame);
                             }
                         }
                     }
@@ -2739,12 +2653,8 @@ public final class SymbolicExecutionUtil {
      */
     private static Term findReplacement(Semisequent semisequent,
             final PosInOccurrence posInOccurrence, final Term replaceTerm) {
-        SequentFormula sf = CollectionUtil.search(semisequent, new IFilter<SequentFormula>() {
-            @Override
-            public boolean select(SequentFormula element) {
-                return checkReplaceTerm(element.formula(), posInOccurrence, replaceTerm);
-            }
-        });
+        SequentFormula sf = CollectionUtil.search(semisequent,
+            element -> checkReplaceTerm(element.formula(), posInOccurrence, replaceTerm));
         return sf != null ? sf.formula() : null;
     }
 
@@ -3831,12 +3741,8 @@ public final class SymbolicExecutionUtil {
             OneStepSimplifierRuleApp simplifierApp = (OneStepSimplifierRuleApp) ruleApp;
             if (simplifierApp.getProtocol() != null) {
                 RuleApp terminationApp =
-                    CollectionUtil.search(simplifierApp.getProtocol(), new IFilter<RuleApp>() {
-                        @Override
-                        public boolean select(RuleApp element) {
-                            return isLoopBodyTermination(node, element);
-                        }
-                    });
+                    CollectionUtil.search(simplifierApp.getProtocol(),
+                        element -> isLoopBodyTermination(node, element));
                 result = terminationApp != null;
             }
         } else if (hasLoopBodyTerminationLabel(ruleApp)) {
@@ -3863,12 +3769,8 @@ public final class SymbolicExecutionUtil {
     public static boolean isHeap(Operator op, HeapLDT heapLDT) {
         if (op instanceof SortedOperator) {
             final Sort opSort = ((SortedOperator) op).sort();
-            return CollectionUtil.search(heapLDT.getAllHeaps(), new IFilter<LocationVariable>() {
-                @Override
-                public boolean select(LocationVariable element) {
-                    return opSort == element.sort();
-                }
-            }) != null;
+            return CollectionUtil.search(heapLDT.getAllHeaps(),
+                element -> opSort == element.sort()) != null;
         } else {
             return false;
         }
@@ -3971,20 +3873,11 @@ public final class SymbolicExecutionUtil {
     public static String formatTerm(Term term, Services services, boolean useUnicode,
             boolean usePrettyPrinting) {
         if ((useUnicode || usePrettyPrinting) && services != null) {
-            StringBuffer result;
             NotationInfo ni = new NotationInfo();
-            LogicPrinter logicPrinter =
-                new LogicPrinter(new ProgramPrinter(null), ni, services, true);
+            LogicPrinter logicPrinter = LogicPrinter.purePrinter(ni, services);
             logicPrinter.getNotationInfo().refresh(services, usePrettyPrinting, useUnicode);
-            try {
-                logicPrinter.printTerm(term);
-            } catch (IOException ioe) {
-                LOGGER.debug("", ioe);
-            }
-            result = logicPrinter.result();
-            if (result.charAt(result.length() - 1) == '\n')
-                result.deleteCharAt(result.length() - 1);
-            return result.toString();
+            logicPrinter.printTerm(term);
+            return logicPrinter.result();
         } else {
             return term != null ? TermLabel.removeIrrelevantLabels(term, services).toString()
                     : null;
@@ -4087,7 +3980,7 @@ public final class SymbolicExecutionUtil {
             } else {
                 // Compare all source elements including ints position info
                 return first.equals(second)
-                        && ObjectUtil.equals(first.getPositionInfo(), second.getPositionInfo());
+                        && Objects.equals(first.getPositionInfo(), second.getPositionInfo());
             }
         } else {
             return first == null && second == null;
@@ -4212,12 +4105,8 @@ public final class SymbolicExecutionUtil {
                     if (!leaf.isClosed()) {
                         final Term toSearch = predicate;
                         SequentFormula topLevelPredicate = CollectionUtil
-                                .search(leaf.sequent().succedent(), new IFilter<SequentFormula>() {
-                                    @Override
-                                    public boolean select(SequentFormula element) {
-                                        return toSearch.op() == element.formula().op();
-                                    }
-                                });
+                                .search(leaf.sequent().succedent(),
+                                    element -> toSearch.op() == element.formula().op());
                         if (topLevelPredicate == null) {
                             verified = false;
                         }
@@ -4254,13 +4143,9 @@ public final class SymbolicExecutionUtil {
                         for (Term term : additinalPredicates) {
                             additinalOperatos.add(term.op());
                         }
-                        SequentFormula topLevelPredicate = CollectionUtil
-                                .search(leaf.sequent().succedent(), new IFilter<SequentFormula>() {
-                                    @Override
-                                    public boolean select(SequentFormula element) {
-                                        return additinalOperatos.contains(element.formula().op());
-                                    }
-                                });
+                        SequentFormula topLevelPredicate =
+                            CollectionUtil.search(leaf.sequent().succedent(),
+                                element -> additinalOperatos.contains(element.formula().op()));
                         if (topLevelPredicate == null) {
                             verified = false;
                         }
@@ -4332,7 +4217,7 @@ public final class SymbolicExecutionUtil {
         ImmutableArray<Term> result = null;
         if (term.op() instanceof ElementaryUpdate) {
             ElementaryUpdate update = (ElementaryUpdate) term.op();
-            if (ObjectUtil.equals(variable, update.lhs())) {
+            if (Objects.equals(variable, update.lhs())) {
                 result = term.subs();
             }
         } else if (term.op() instanceof UpdateJunctor) {

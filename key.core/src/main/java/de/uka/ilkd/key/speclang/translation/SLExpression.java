@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.speclang.translation;
 
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
-
-import javax.annotation.Nonnull;
 
 /**
  * This class represents the translation of an expression of an arbitrary specification language,

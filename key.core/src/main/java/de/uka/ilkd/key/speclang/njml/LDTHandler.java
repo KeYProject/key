@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.speclang.njml;
 
+import java.util.Map;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -10,9 +13,6 @@ import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
 import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperatorHandler;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-
-import javax.annotation.Nullable;
-import java.util.Map;
 
 public abstract class LDTHandler implements JMLOperatorHandler {
     /**

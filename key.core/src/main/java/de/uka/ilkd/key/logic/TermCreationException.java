@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.logic;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.util.collection.ImmutableArray;
 
 public class TermCreationException extends RuntimeException {
 

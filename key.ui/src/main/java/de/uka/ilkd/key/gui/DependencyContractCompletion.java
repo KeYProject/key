@@ -1,9 +1,7 @@
 package de.uka.ilkd.key.gui;
 
-import java.io.IOException;
 import java.util.List;
-
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -13,6 +11,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
@@ -60,8 +59,8 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
 
         // prepare array of possible base heaps
         final TermStringWrapper[] heaps = new TermStringWrapper[steps.size()];
-        final LogicPrinter lp = new LogicPrinter(null, new NotationInfo(), services);
-        lp.setLineWidth(120);
+        final LogicPrinter lp =
+            new LogicPrinter(new NotationInfo(), services, PosTableLayouter.pure(120));
 
         extractHeaps(heapContext, steps, heaps, lp);
 
@@ -71,7 +70,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
             final TermStringWrapper heapWrapper =
                 (TermStringWrapper) JOptionPane.showInputDialog(MainWindow.getInstance(),
                     "Please select base heap configuration:", "Instantiation",
-                    JOptionPane.QUESTION_MESSAGE, null, heaps, heaps.length > 0 ? heaps[0] : null);
+                    JOptionPane.QUESTION_MESSAGE, null, heaps, heaps[0]);
 
             if (heapWrapper == null) {
                 return null;
@@ -114,23 +113,19 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
                     ? ((IObserverFunction) op).getStateCount() * heapContext.size()
                     : 1;
             final Term[] heapTerms = new Term[size];
-            String prettyprint = "<html><tt>" + (size > 1 ? "[" : "");
+            StringBuilder prettyPrint = new StringBuilder("<html><tt>").append(size > 1 ? "[" : "");
             for (int j = 0; j < size; j++) {
                 // TODO: there may still be work to do
                 // what if we have a heap term, where the base heap lies deeper?
                 final Term heap = step.subTerm().sub(j);
                 heapTerms[j] = heap;
                 lp.reset();
-                try {
-                    lp.printTerm(heap);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                prettyprint +=
-                    (j > 0 ? ", " : "") + LogicPrinter.escapeHTML(lp.toString().trim(), true);
+                lp.printTerm(heap);
+                prettyPrint.append(j > 0 ? ", " : "")
+                        .append(LogicPrinter.escapeHTML(lp.result().trim(), true));
             }
-            prettyprint += (size > 1 ? "]" : "") + "</tt></html>";
-            heaps[i++] = new TermStringWrapper(heapTerms, prettyprint);
+            prettyPrint.append(size > 1 ? "]" : "").append("</tt></html>");
+            heaps[i++] = new TermStringWrapper(heapTerms, prettyPrint.toString());
         }
     }
 

@@ -12,19 +12,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipFile;
-
-import org.key_project.util.Filenames;
-import org.key_project.util.Strings;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.KeYCollections;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -59,6 +50,15 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+
+import org.key_project.util.Filenames;
+import org.key_project.util.Strings;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.KeYCollections;
+
 import recoder.io.ArchiveDataLocation;
 import recoder.io.DataFileLocation;
 import recoder.io.DataLocation;
@@ -258,37 +258,6 @@ public final class MiscTools {
         return result;
     }
 
-
-    /**
-     * True if both are <code>null</code> or <code>a.equals(b)</code> with <code>equals</code> from
-     * type T. You should use {@link Objects#equals(Object, Object)} directly.
-     */
-    @Deprecated
-    public static <T> boolean equalsOrNull(T a, Object b) {
-        return Objects.equals(a, b);
-        /*
-         * if (a == null) { return b == null; } else { return a.equals(b); }
-         */
-    }
-
-    /**
-     * {@code true} iff all are <code>null</code> or <code>a.equals(b)</code> with
-     * <code>equals</code> from type T for every {@code b}.
-     *
-     * @param a an object.
-     * @param bs other object.
-     * @param <T> type of {@code a} and result value.
-     * @return {@code true} iff all are <code>null</code> or <code>a.equals(b)</code> with
-     *         <code>equals</code> from type T for every {@code b}.
-     */
-    public static <T> boolean equalsOrNull(T a, Object... bs) {
-        boolean result = true;
-        for (Object b : bs) {
-            result = result && equalsOrNull(a, b);
-        }
-        return result;
-    }
-
     // =======================================================
     // Methods operating on Arrays
     // =======================================================
@@ -363,6 +332,22 @@ public final class MiscTools {
     public static Name toValidTacletName(String s) {
         s = s.replaceAll("\\s|\\.|::\\$|::|<|>|/", "_");
         return new Name(s);
+    }
+
+    /**
+     * Remove the file extension (.key, .proof) from the given filename.
+     *
+     * @param filename file name
+     * @return file name without .key or .proof extension
+     */
+    public static String removeFileExtension(String filename) {
+        if (filename.endsWith(".key")) {
+            return filename.substring(0, filename.length() - ".key".length());
+        } else if (filename.endsWith(".proof")) {
+            return filename.substring(0, filename.length() - ".proof".length());
+        } else {
+            return filename;
+        }
     }
 
     public static String toValidFileName(String s) {
@@ -571,22 +556,20 @@ public final class MiscTools {
      * @return The renamed variable
      */
     public static ProgramVariable findActualVariable(ProgramVariable originalVar, Node node) {
-        ProgramVariable actualVar = originalVar;
         if (node != null) {
-            outer: do {
+            do {
                 if (node.getRenamingTable() != null) {
                     for (RenamingTable rt : node.getRenamingTable()) {
-                        ProgramVariable renamedVar = (ProgramVariable) rt.getRenaming(actualVar);
-                        if (renamedVar != null || !node.getLocalProgVars().contains(actualVar)) {
-                            actualVar = renamedVar;
-                            break outer;
+                        ProgramVariable renamedVar = (ProgramVariable) rt.getRenaming(originalVar);
+                        if (renamedVar != null || !node.getLocalProgVars().contains(originalVar)) {
+                            return renamedVar;
                         }
                     }
                 }
                 node = node.parent();
             } while (node != null);
         }
-        return actualVar;
+        return originalVar;
     }
 
     // -------------------------------------------------------------------------

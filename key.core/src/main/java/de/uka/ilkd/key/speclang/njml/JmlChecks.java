@@ -1,13 +1,14 @@
 package de.uka.ilkd.key.speclang.njml;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.speclang.PositionedString;
-import org.antlr.v4.runtime.ParserRuleContext;
-
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import javax.annotation.Nonnull;
+
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.speclang.PositionedString;
+
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Facade for implementing syntactical JML syntax checks.
@@ -50,7 +51,7 @@ class AbstractCheck extends JmlParserBaseVisitor<Void> implements JmlCheck {
 
     protected void addWarning(ParserRuleContext ctx, String text) {
         PositionedString ps = new PositionedString(text, ctx.start.getTokenSource().getSourceName(),
-            new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine()));
+            Position.fromToken(ctx.start));
         warnings.add(ps);
     }
 }

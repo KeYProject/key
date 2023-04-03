@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.pp;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.util.Pair;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.util.Pair;
 
 public class AbbrevMap {
 

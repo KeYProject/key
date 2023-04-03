@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.java;
 
+import org.antlr.v4.runtime.Token;
+import recoder.java.SourceElement;
+
 /**
  * The position of a source element, given by its line and column number. Depending on the
  * implementation, the valid range of defined line and column numbers may be limited and cut off if
@@ -9,15 +12,13 @@ package de.uka.ilkd.key.java;
 public class Position implements Comparable<Position> {
 
     /**
-     * The line number.
+     * The line number, 1-based.
      */
-
     private final int line;
 
     /**
-     * The column number.
+     * The column number, 1-based.
      */
-
     private final int column;
 
     /**
@@ -29,7 +30,7 @@ public class Position implements Comparable<Position> {
     /**
      * Constructs a new invalid source code position object.
      */
-    Position() {
+    private Position() {
         line = column = -1;
     }
 
@@ -39,10 +40,78 @@ public class Position implements Comparable<Position> {
      * @param line the line number.
      * @param column the column number.
      */
-
-    public Position(int line, int column) {
+    private Position(int line, int column) {
+        if (line < 1 || column < 1) {
+            throw new IllegalArgumentException();
+        }
         this.line = line;
         this.column = column;
+    }
+
+    /**
+     * Creates a new Location with 1-based line and 1-based column numbers.
+     *
+     * @param line_1 1-based line of the Location
+     * @param column_0 1-based column of the Location
+     */
+    public static Position newOneBased(int line_1, int column_0) {
+        return new Position(line_1, column_0);
+    }
+
+    /**
+     * Creates a new Location with 1-based line and 0-based column numbers.
+     * This format is used by most parsers so this deserves an explicit method call.
+     *
+     * @param line_1 1-based line of the Location
+     * @param column_0 0-based column of the Location
+     */
+    public static Position fromOneZeroBased(int line_1, int column_0) {
+        return new Position(line_1, column_0 + 1);
+    }
+
+    /**
+     * Creates a new location from a token.
+     *
+     * @param token the token
+     */
+    public static Position fromToken(Token token) {
+        return fromOneZeroBased(token.getLine(), token.getCharPositionInLine());
+    }
+
+    /**
+     * Creates a new location from a token.
+     *
+     * @param token the token
+     */
+    public static Position fromToken(de.uka.ilkd.key.parser.proofjava.Token token) {
+        return new Position(token.beginLine, token.beginColumn);
+    }
+
+    /**
+     * Creates a new location from a SourceElement position.
+     *
+     * @param pos the position
+     */
+    public static Position fromSEPosition(SourceElement.Position pos) {
+        if (pos == SourceElement.Position.UNDEFINED) {
+            return UNDEFINED;
+        } else if (pos.getColumn() == 0) {
+            // This is a hack, some recoder positions have column 0 (not set)
+            // even though the column is 0-based *and* -1 is the unset value
+            // return new Position(pos.getLine(), 1);
+            throw new IllegalArgumentException("ProofJava produced column 0");
+        } else {
+            return new Position(pos.getLine(), pos.getColumn());
+        }
+    }
+
+    /**
+     * Creates a new Position with the offset added to the line.
+     *
+     * @param offset the offset
+     */
+    public Position offsetLine(int offset) {
+        return new Position(line + offset, column);
     }
 
     /**
@@ -50,8 +119,7 @@ public class Position implements Comparable<Position> {
      *
      * @return the line number of this position.
      */
-
-    public int getLine() {
+    public int line() {
         return line;
     }
 
@@ -60,8 +128,7 @@ public class Position implements Comparable<Position> {
      *
      * @return the column number of this position.
      */
-
-    public int getColumn() {
+    public int column() {
         return column;
     }
 
@@ -112,7 +179,7 @@ public class Position implements Comparable<Position> {
      * @return true iff either line or column are negative
      */
     public boolean isNegative() {
-        return line < 0 || column < 0;
+        return line <= 0 || column <= 0;
     }
 
     /**
@@ -120,12 +187,9 @@ public class Position implements Comparable<Position> {
      */
     public String toString() {
         if (this != UNDEFINED) {
-            StringBuffer buf = new StringBuffer();
-            buf.append(line).append('/').append(column - 1);
-            return buf.toString();
+            return String.valueOf(line) + '/' + column;
         } else {
             return "??/??";
         }
     }
-
 }

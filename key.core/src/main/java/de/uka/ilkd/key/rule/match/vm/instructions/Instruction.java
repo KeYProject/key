@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -18,6 +16,8 @@ import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /** enum encoding the instructions of the matching vm */
 public abstract class Instruction<OP extends Operator> implements MatchInstruction {

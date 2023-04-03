@@ -1,5 +1,20 @@
 package de.uka.ilkd.key.gui;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.EventObject;
+import java.util.List;
+import java.util.WeakHashMap;
+import javax.swing.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -14,34 +29,18 @@ import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.prooftree.DisableGoal;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.util.Debug;
+
 import org.key_project.util.collection.ImmutableList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.EventObject;
-import java.util.List;
-import java.util.WeakHashMap;
 
 public class GoalList extends JList<Goal> implements TabPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoalList.class);
 
     public static final Icon GOAL_LIST_ICON = IconFontSwing
-            .buildIcon(FontAwesomeSolid.FLAG_CHECKERED, MainWindowTabbedPane.TAB_ICON_SIZE);
+            .buildIcon(FontAwesomeSolid.FLAG_CHECKERED, MainWindow.TAB_ICON_SIZE);
     /**
      *
      */
@@ -221,10 +220,10 @@ public class GoalList extends JList<Goal> implements TabPanel {
     private String seqToString(Sequent seq) {
         String res = seqToString.get(seq);
         if (res == null) {
-            LogicPrinter sp = new LogicPrinter(new ProgramPrinter(null),
-                mediator().getNotationInfo(), mediator().getServices(), true);
+            LogicPrinter sp =
+                LogicPrinter.purePrinter(mediator().getNotationInfo(), mediator().getServices());
             sp.printSequent(seq);
-            res = sp.toString().replace('\n', ' ');
+            res = sp.result().replace('\n', ' ');
             res = res.substring(0, Math.min(MAX_DISPLAYED_SEQUENT_LENGTH, res.length()));
 
             seqToString.put(seq, res);
@@ -399,9 +398,6 @@ public class GoalList extends JList<Goal> implements TabPanel {
                     return;
                 clear();
                 add(e.getSource().openGoals());
-            }
-
-            public void smtDataUpdate(ProofTreeEvent e) {
             }
 
             @Override

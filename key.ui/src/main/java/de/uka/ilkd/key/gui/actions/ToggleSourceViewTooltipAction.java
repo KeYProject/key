@@ -1,9 +1,7 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.EventObject;
-
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -28,12 +26,7 @@ public class ToggleSourceViewTooltipAction extends MainWindowAction {
     // private static final long serialVersionUID = -3352122484627890921L;
 
     /** Listens to changes to the view settings to call {@link #updateSelectedState()}. */
-    private final SettingsListener viewSettingsListener = new SettingsListener() {
-        @Override
-        public void settingsChanged(EventObject e) {
-            updateSelectedState();
-        }
-    };
+    private final SettingsListener viewSettingsListener = e -> updateSelectedState();
 
     /**
      * Create a new action.

@@ -9,19 +9,10 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.nparser.KeyIO;
 import javax.annotation.Nonnull;
-
-import de.uka.ilkd.key.util.*;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.JavaProgramElement;
@@ -30,6 +21,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -56,9 +48,9 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
-import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -71,6 +63,13 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.*;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * This class encapsulates static methods used in the MergeRule implementation. The methods are
@@ -108,11 +107,11 @@ public class MergeRuleUtils {
      * @param obj The object to wrap.
      * @return None iff obj is null, Some(obj) otherwise.
      */
-    public static <T> Option<T> wrapOption(T obj) {
+    public static <T> Optional<T> wrapOption(T obj) {
         if (obj == null) {
-            return new Option.None<T>();
+            return Optional.empty();
         } else {
-            return new Option.Some<T>(obj);
+            return Optional.of(obj);
         }
     }
 
@@ -320,7 +319,7 @@ public class MergeRuleUtils {
      * @return The right side in the update for the given left side. Returns a None value if the
      *         right side could not be determined.
      */
-    public static Option<Term> getUpdateRightSideForSafe(Term update, LocationVariable leftSide) {
+    public static Optional<Term> getUpdateRightSideForSafe(Term update, LocationVariable leftSide) {
         return wrapOption(getUpdateRightSideFor(update, leftSide));
     }
 
@@ -945,7 +944,7 @@ public class MergeRuleUtils {
      *         are contradicting, does not imply pathCondition2, and (2) the "rest" of
      *         pathCondition1 that is common with pathCondition2.
      */
-    public static Option<Pair<Term, Term>> getDistinguishingFormula(Term pathCondition1,
+    public static Optional<Pair<Term, Term>> getDistinguishingFormula(Term pathCondition1,
             Term pathCondition2, Services services) {
 
         return getDistinguishingFormula(getConjunctiveElementsFor(pathCondition1),
@@ -956,7 +955,7 @@ public class MergeRuleUtils {
     /**
      * @see #getDistinguishingFormula(Term, Term, Services)
      */
-    public static Option<Pair<Term, Term>> getDistinguishingFormula(
+    public static Optional<Pair<Term, Term>> getDistinguishingFormula(
             ArrayList<Term> conjElemsPathCond1, ArrayList<Term> conjElemsPathCond2,
             Services services) {
 
@@ -970,7 +969,7 @@ public class MergeRuleUtils {
         final LinkedHashSet<Term> equalElements = commonAndSpecific.common;
 
         if (cond1SpecificElems.isEmpty() || cond2SpecificElems.isEmpty()) {
-            return new Option.None<>();
+            return Optional.empty();
         }
 
         Term theOneDistinguishingTerm = null;
@@ -985,7 +984,7 @@ public class MergeRuleUtils {
             }
         }
 
-        return new Option.Some<Pair<Term, Term>>(new Pair<Term, Term>(
+        return Optional.of(new Pair<>(
             theOneDistinguishingTerm != null ? theOneDistinguishingTerm
                     : joinConjuctiveElements(cond1SpecificElems, services),
             joinConjuctiveElements(equalElements, services)));
@@ -1002,12 +1001,13 @@ public class MergeRuleUtils {
      */
     public static boolean pathConditionsAreDistinguishable(Term pathCondition1, Term pathCondition2,
             Services services) {
-        Option<Pair<Term, Term>> distinguishingAndEqualFormula1 =
+        Optional<Pair<Term, Term>> distinguishingAndEqualFormula1 =
             getDistinguishingFormula(pathCondition1, pathCondition2, services);
-        Option<Pair<Term, Term>> distinguishingAndEqualFormula2 =
+        Optional<Pair<Term, Term>> distinguishingAndEqualFormula2 =
             getDistinguishingFormula(pathCondition2, pathCondition1, services);
 
-        return distinguishingAndEqualFormula1.isSome() || distinguishingAndEqualFormula2.isSome();
+        return distinguishingAndEqualFormula1.isPresent()
+                || distinguishingAndEqualFormula2.isPresent();
     }
 
     /**
@@ -1800,73 +1800,6 @@ public class MergeRuleUtils {
             }
 
             return target;
-        }
-    }
-
-    /**
-     * A simple Scala-like option type: Either Some(value) or None.
-     *
-     * @author Dominic Scheurer
-     *
-     * @param <T> Type for the content of the option.
-     */
-    public static abstract class Option<T> {
-        static class Some<T> extends Option<T> {
-            private T value;
-
-            public Some(T value) {
-                assert value != null
-                        : "Wrappign null values in a Some is not allowed. Consider a None instead.";
-
-                this.value = value;
-            }
-
-            @Override
-            public T getValue() {
-                return value;
-            }
-        }
-
-        static class None<T> extends Option<T> {
-        }
-
-        public boolean isSome() {
-            return this instanceof Some;
-        }
-
-        /**
-         * Returns the value of this object if is a Some; otherwise, an exception is thrown.
-         *
-         * @return The value of this object.
-         * @throws IllegalAccessError If this object is a None.
-         */
-        public T getValue() {
-            if (isSome()) {
-                return ((Some<T>) this).getValue();
-            } else {
-                throw new IllegalAccessError("Cannot otain a value from a None object.");
-            }
-        }
-
-        /**
-         * For Some values, the equality of the wrapped objects is used. A None value is not equal
-         * to any other object besides itself.
-         */
-        @Override
-        public boolean equals(Object obj) {
-            if (!(obj instanceof Option)) {
-                return false;
-            }
-
-            @SuppressWarnings("unchecked")
-            final Option<T> opt = (Option<T>) obj;
-
-            if (!isSome() || !opt.isSome()) {
-                // A None is not equal to anything besides itself.
-                return this == obj;
-            }
-
-            return (getValue().equals(opt.getValue()));
         }
     }
 

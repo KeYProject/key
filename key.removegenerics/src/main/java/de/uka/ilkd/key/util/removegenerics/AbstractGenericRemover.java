@@ -8,11 +8,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.util.removegenerics.monitor.GenericRemoverMonitor;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.io.PathList;
 import recoder.java.CompilationUnit;
-import de.uka.ilkd.key.util.removegenerics.monitor.GenericRemoverMonitor;
 
 public abstract class AbstractGenericRemover {
     private final GenericRemoverMonitor monitor;

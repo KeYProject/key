@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.settings;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public final class ProofIndependentSMTSettings
         implements de.uka.ilkd.key.settings.Settings, Cloneable {

@@ -1,7 +1,18 @@
 package de.uka.ilkd.key.gui;
 
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CDropDownButton;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -21,24 +32,16 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.ui.MediatorProofControl;
-import net.miginfocom.layout.CC;
-import net.miginfocom.swing.MigLayout;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
+import bibliothek.gui.dock.common.action.CAction;
+import bibliothek.gui.dock.common.action.CDropDownButton;
+import net.miginfocom.layout.CC;
+import net.miginfocom.swing.MigLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.util.List;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * TODO Add documentation!
@@ -52,8 +55,10 @@ import java.util.stream.Collectors;
 public class KeyboardTacletExtension implements KeYGuiExtension, KeYGuiExtension.LeftPanel {
     private KeyboardTacletPanel panel;
 
+    @Nonnull
     @Override
-    public Collection<TabPanel> getPanels(MainWindow window, KeYMediator mediator) {
+    public Collection<TabPanel> getPanels(@Nonnull MainWindow window,
+            @Nonnull KeYMediator mediator) {
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
@@ -138,7 +143,8 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
             }
         });
 
-        mainWindow.currentGoalView.addPropertyChangeListener(SequentView.PROP_LAST_MOUSE_POSITION,
+        mainWindow.getCurrentGoalView().addPropertyChangeListener(
+            SequentView.PROP_LAST_MOUSE_POSITION,
             e -> {
                 if (actionFilterUsingMouse.isSelected())
                     buildModel();
@@ -284,7 +290,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
 
         long time = System.currentTimeMillis();
         List<RuleApp> taclets = new LinkedList<>();
-        PosInSequent pos = mainWindow.currentGoalView.getLastPosInSequent();
+        PosInSequent pos = mainWindow.getCurrentGoalView().getLastPosInSequent();
 
         if (actionFilterUsingMouse.isSelected() && pos == null) {
             pCenter.add(

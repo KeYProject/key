@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.notification.actions;
 
 import java.awt.Frame;
-
 import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.IssueDialog;

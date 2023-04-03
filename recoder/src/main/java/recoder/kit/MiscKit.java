@@ -2,6 +2,8 @@
 
 package recoder.kit;
 
+import java.util.Map;
+
 import recoder.ProgramFactory;
 import recoder.convenience.TreeWalker;
 import recoder.java.*;
@@ -12,8 +14,6 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.ChangeHistory;
 import recoder.util.Debug;
-
-import java.util.Map;
 
 /**
  * This utility class provides queries, factory methods and transformations on abstract entities
@@ -428,4 +428,3 @@ public class MiscKit {
     }
 
 }
-

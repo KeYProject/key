@@ -17,7 +17,7 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <statement name="classWrite=classRead;" pathCondition="true" pathConditionChanged="false">
+      <statement name="classWrite = classRead;" pathCondition="true" pathConditionChanged="false">
          <variable name="self" isArrayIndex="false">
             <value name="self {true}" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
             </value>
@@ -26,7 +26,7 @@
             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
-         <statement name="this.fieldWrite=this.fieldRead;" pathCondition="true" pathConditionChanged="false">
+         <statement name="this.fieldWrite = this.fieldRead;" pathCondition="true" pathConditionChanged="false">
             <variable name="self" isArrayIndex="false">
                <value name="self {true}" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                </value>
@@ -39,7 +39,7 @@
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <statement name="return classWrite+this.fieldWrite;" pathCondition="true" pathConditionChanged="false">
+            <statement name="return classWrite + this.fieldWrite;" pathCondition="true" pathConditionChanged="false">
                <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="fieldWrite" isArrayIndex="false">

@@ -1,10 +1,10 @@
 package org.key_project.exploration;
 
-import de.uka.ilkd.key.proof.Node;
-
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Objects;
+
+import de.uka.ilkd.key.proof.Node;
 
 /**
  * Information on exploration that is attached to nodes. If such an object is attached to a node,

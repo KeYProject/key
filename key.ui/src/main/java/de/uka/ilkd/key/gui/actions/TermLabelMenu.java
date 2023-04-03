@@ -1,15 +1,10 @@
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.Font;
-import java.util.ArrayList;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
-
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
+import javax.swing.*;
 
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerEvent;
@@ -40,12 +35,7 @@ public class TermLabelMenu extends JMenu {
      * Observes changes on {@link #visibleTermLabels}.
      */
     private final TermLabelVisibilityManagerListener termLabelVisibilityManagerListener =
-        new TermLabelVisibilityManagerListener() {
-            @Override
-            public void visibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
-                handleVisibleLabelsChanged(e);
-            }
-        };
+        e -> handleVisibleLabelsChanged(e);
 
     public TermLabelMenu(final MainWindow mainWindow) {
         this.mainWindow = mainWindow;

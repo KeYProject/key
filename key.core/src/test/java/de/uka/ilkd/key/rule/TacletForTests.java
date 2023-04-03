@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.rule;
 
+import java.io.File;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;
@@ -21,9 +23,8 @@ import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.KeYFileForTests;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.key_project.util.collection.ImmutableSLList;
 
-import java.io.File;
+import org.key_project.util.collection.ImmutableSLList;
 
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 import static org.junit.jupiter.api.Assertions.fail;

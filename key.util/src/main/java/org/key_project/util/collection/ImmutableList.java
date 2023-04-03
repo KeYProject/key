@@ -1,12 +1,12 @@
 package org.key_project.util.collection;
 
-import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import javax.annotation.Nonnull;
 
 /**
  * List interface to be implemented by non-destructive lists
@@ -274,13 +274,13 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
         return result;
     }
 
-    /*
+    /**
      * Returns an immutable list consisting of the elements of this list that match
      * the given predicate.
      *
      * @param predicate a non-interfering, stateless
-     * predicate to apply to each element to determine if it
-     * should be included
+     *        predicate to apply to each element to determine if it
+     *        should be included
      *
      * @returns the filtered list
      */
@@ -298,6 +298,58 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      */
     default <R> ImmutableList<R> map(Function<T, R> function) {
         return Immutables.map(this, function);
+    }
+
+    /**
+     * @param other prefix to check for
+     * @return whether this list starts with the elements of the provided prefix
+     */
+    default boolean hasPrefix(ImmutableList<T> other) {
+        if (other.size() > this.size()) {
+            return false;
+        }
+        if (other.size() == 0) {
+            return true;
+        }
+        if (Objects.equals(head(), other.head())) {
+            return tail().hasPrefix(other.tail());
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Remove a prefix from this list.
+     *
+     * @param prefix prefix to remove
+     * @return new list with the prefix removed
+     * @throws IllegalArgumentException if the provided prefix is not a prefix of this list
+     */
+    default ImmutableList<T> stripPrefix(ImmutableList<T> prefix) {
+        if (prefix.isEmpty()) {
+            return this;
+        }
+        if (!Objects.equals(head(), prefix.head())) {
+            throw new IllegalArgumentException("not a prefix of this list");
+        }
+        return this.tail().stripPrefix(prefix.tail());
+    }
+
+    /**
+     * Get the last element of this list.
+     * Time complexity: O(n).
+     *
+     * @return last element of this list
+     */
+    default T last() {
+        if (isEmpty()) {
+            throw new IllegalStateException("last() called on empty list");
+        }
+        ImmutableList<T> remainder = this;
+        while (!remainder.tail().isEmpty()) {
+            remainder = remainder.tail();
+        }
+        return remainder.head();
     }
 
 }

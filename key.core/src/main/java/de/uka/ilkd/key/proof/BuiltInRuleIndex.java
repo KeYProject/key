@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.proof;
 
+import de.uka.ilkd.key.rule.BuiltInRule;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.rule.BuiltInRule;
 
 /**
  * Index for managing built-in-rules usch as integer decision or update simplification rule.

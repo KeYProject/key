@@ -7,7 +7,7 @@ plugins {
     // Used to create a single executable jar file with all dependencies
     // see task "shadowJar" below
     // https://imperceptiblethoughts.com/shadow/
-    id 'com.github.johnrengelman.shadow' version "7.1.1"
+    id 'com.github.johnrengelman.shadow' version "8.1.1"
 }
 
 dependencies {
@@ -21,13 +21,15 @@ dependencies {
     api 'com.miglayout:miglayout-swing:11.0'
 
     //logging implementation used by the slf4j
-    implementation 'ch.qos.logback:logback-classic:1.2.10'
+    implementation 'ch.qos.logback:logback-classic:1.4.6'
 
     api 'org.dockingframes:docking-frames-common:1.1.3p1'
     api 'org.dockingframes:docking-frames-core:1.1.3p1'
 
     runtimeOnly project(":keyext.ui.testgen")
+    runtimeOnly project(":keyext.action_history")
     runtimeOnly project(":keyext.exploration")
+    runtimeOnly project(":keyext.slicing")
 }
 
 task createExamplesZip(type: Zip) {

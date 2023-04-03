@@ -7,16 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.key_project.util.LRUCache;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.Immutables;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -40,13 +35,32 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.util.LRUCache;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Immutables;
+
 
 public final class OneStepSimplifier implements BuiltInRule {
+
+    /**
+     * If true, the OneStepSimplifier has access to the entire sequent during replay.
+     * If false, it is restricted to the formulas specified in the proof file.
+     *
+     * Only activate when loading old proof files (that do not contain this information)!
+     *
+     * @see #apply(Goal, Services, RuleApp)
+     */
+    public static boolean disableOSSRestriction = false;
 
     private static final int APPLICABILITY_CACHE_SIZE = 1000;
     private static final int DEFAULT_CACHE_SIZE = 10000;
 
-    public final static class Protocol extends ArrayList<RuleApp> {
+    /**
+     * Represents a list of rule applications performed in one OSS step.
+     */
+    public static final class Protocol extends ArrayList<RuleApp> {
         private static final long serialVersionUID = 8788009073806993077L;
     }
 
@@ -570,9 +584,37 @@ public final class OneStepSimplifier implements BuiltInRule {
 
         Protocol protocol = new Protocol();
 
+        Sequent seq = goal.sequent();
+        // restrict sequent view to the formulas specified in the rule application
+        // this avoids different simplification results if a proof is reloaded
+        if (((OneStepSimplifierRuleApp) ruleApp).shouldRestrictAssumeInsts()
+                && !disableOSSRestriction) {
+            ImmutableList<PosInOccurrence> ifInsts = ((OneStepSimplifierRuleApp) ruleApp).ifInsts();
+            ImmutableList<SequentFormula> anteFormulas = ImmutableSLList.nil();
+            ImmutableList<SequentFormula> succFormulas = ImmutableSLList.nil();
+            if (ifInsts != null) {
+                for (PosInOccurrence it : ifInsts) {
+                    if (it.isInAntec()) {
+                        anteFormulas = anteFormulas.prepend(it.sequentFormula());
+                    } else {
+                        succFormulas = succFormulas.prepend(it.sequentFormula());
+                    }
+                }
+            }
+            if (pos.isInAntec()) {
+                anteFormulas = anteFormulas.prepend(pos.sequentFormula());
+            } else {
+                succFormulas = succFormulas.prepend(pos.sequentFormula());
+            }
+            Semisequent antecedent = anteFormulas.isEmpty() ? Semisequent.EMPTY_SEMISEQUENT
+                    : new Semisequent(anteFormulas);
+            Semisequent succedent = succFormulas.isEmpty() ? Semisequent.EMPTY_SEMISEQUENT
+                    : new Semisequent(succFormulas);
+            seq = Sequent.createSequent(antecedent, succedent);
+        }
         // get instantiation
         final Instantiation inst =
-            computeInstantiation(services, pos, goal.sequent(), protocol, goal, ruleApp);
+            computeInstantiation(services, pos, seq, protocol, goal, ruleApp);
 
         ((OneStepSimplifierRuleApp) ruleApp).setProtocol(protocol);
 
@@ -582,7 +624,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         resultGoal.changeFormula(inst.getCf(), pos);
         goal.setBranchLabel(
             inst.getNumAppliedRules() + (inst.getNumAppliedRules() > 1 ? " rules" : " rule"));
-        ruleApp = ((IBuiltInRuleApp) ruleApp).setIfInsts(inst.getIfInsts());
+        ((IBuiltInRuleApp) ruleApp).setIfInsts(inst.getIfInsts());
 
 
         return result;

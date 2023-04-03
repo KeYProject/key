@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.rule;
 
+import java.util.Optional;
+
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -18,9 +20,8 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
 import de.uka.ilkd.key.util.MiscTools;
-import org.key_project.util.collection.ImmutableList;
 
-import java.util.Optional;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * A rule for JML assert/assume statements.

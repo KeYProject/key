@@ -69,7 +69,7 @@ length(l_33) >= 0
    (rule "impRight" (formula "1") (userinteraction))
    (rule "lengthCons" (formula "2") (term "0") (userinteraction))
    (rule "andLeft" (formula "1") (userinteraction))
-   (rule "inChar" (formula "1"))
+   (rule "expandInChar" (formula "1"))
    (rule "true_left" (formula "1"))
    (rule "inEqSimp_geqRight" (formula "3"))
    (rule "times_zero_1" (formula "1") (term "1,0,0"))

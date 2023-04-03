@@ -1,16 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.ObjectUtil;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -27,6 +17,9 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Extracts the current state and represents it as {@link IExecutionVariable}s.
@@ -352,8 +345,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         public boolean equals(Object obj) {
             if (obj instanceof ParentDef) {
                 ParentDef other = (ParentDef) obj;
-                return ObjectUtil.equals(parent, other.parent)
-                        && ObjectUtil.equals(goalNode, other.goalNode);
+                return Objects.equals(parent, other.parent)
+                        && Objects.equals(goalNode, other.goalNode);
             } else {
                 return false;
             }
@@ -408,7 +401,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             if (obj instanceof LocationDef) {
                 LocationDef other = (LocationDef) obj;
                 return programVariable == other.programVariable
-                        && ObjectUtil.equals(arrayIndex, other.arrayIndex);
+                        && Objects.equals(arrayIndex, other.arrayIndex);
             } else {
                 return false;
             }

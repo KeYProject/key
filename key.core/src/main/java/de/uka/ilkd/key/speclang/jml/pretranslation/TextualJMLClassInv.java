@@ -1,8 +1,10 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.JmlParser;
-import org.antlr.v4.runtime.ParserRuleContext;
+
 import org.key_project.util.collection.ImmutableList;
+
+import org.antlr.v4.runtime.ParserRuleContext;
 
 
 /**
@@ -23,6 +25,7 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
             JmlParser.Class_invariantContext ctx) {
         super(mods, null);
         inv = ctx;
+        setPosition(ctx);
     }
 
     public ParserRuleContext getInv() {

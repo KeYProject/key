@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.gui.smt.settings;
 
+import java.awt.*;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
-import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
-
-import javax.swing.*;
-import java.awt.*;
 
 /**
  * @author Alexander Weigl

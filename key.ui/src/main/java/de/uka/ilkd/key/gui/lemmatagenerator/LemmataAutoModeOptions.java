@@ -1,15 +1,16 @@
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
+import java.io.File;
+import java.util.Collection;
+import java.util.LinkedList;
+
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.util.Collection;
-import java.util.LinkedList;
 
 public class LemmataAutoModeOptions {
     public static final int DEFAULT_TIMEOUT = -1;

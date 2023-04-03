@@ -1,10 +1,11 @@
 package de.uka.ilkd.key.java;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.net.URI;
 
+import de.uka.ilkd.key.pp.PrettyPrinter;
+
 import org.key_project.util.ExtList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,19 +105,9 @@ public abstract class JavaSourceElement implements SourceElement {
         return this;
     }
 
-
-
     /**
-     * Pretty printing the source element.
+     * Creates a syntactical representation of the source element using the pretty printer.
      */
-
-    public abstract void prettyPrint(PrettyPrinter w) throws IOException;
-
-    /**
-     * Creates a syntactical representation of the source element using the {@link #prettyPrint}
-     * method.
-     */
-
     public String toSource() {
         return toString();
     }
@@ -148,7 +139,7 @@ public abstract class JavaSourceElement implements SourceElement {
      *
      * @return the relative position of the primary token.
      */
-    public Position getRelativePosition() {
+    public recoder.java.SourceElement.Position getRelativePosition() {
         return posInfo.getRelativePosition();
     }
 
@@ -161,25 +152,10 @@ public abstract class JavaSourceElement implements SourceElement {
 
     /** toString */
     public String toString() {
-        StringWriter sw = new StringWriter();
-        PrettyPrinter pp = new PrettyPrinter(sw, true);
-        return toString(pp, sw);
+        PrettyPrinter pp = PrettyPrinter.purePrinter();
+        pp.print(this);
+        return pp.result();
     }
-
-    /* Sometimes CompilableJavaPP must be given as argument instead of the ordinary PrettyPrinter */
-    public String toString(PrettyPrinter pp, StringWriter sw) {
-        try {
-            pp.setIndentationLevel(0);
-            prettyPrint(pp);
-        } catch (IOException e) {
-            LOGGER.error("Pretty printing of JavaSourceElement failed", e);
-        }
-        String r = sw.toString();
-        r = r.replace('\n', ' ');
-        r = r.replace('\t', ' ');
-        return r;
-    }
-
 
     /**
      * this violates immutability, but the method is only called right after the object is

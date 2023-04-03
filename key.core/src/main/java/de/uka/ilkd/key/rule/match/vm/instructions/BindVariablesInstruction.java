@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.Term;
@@ -10,6 +8,8 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * This instructions matches the variable below a binder (e.g. a quantifier).

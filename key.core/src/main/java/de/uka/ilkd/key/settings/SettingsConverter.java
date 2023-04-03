@@ -1,14 +1,14 @@
 package de.uka.ilkd.key.settings;
 
-import org.key_project.util.Streams;
-
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+
+import org.key_project.util.Streams;
 
 /**
  * Utility class providing various methods to read properties.
@@ -59,7 +59,26 @@ public final class SettingsConverter {
     /**
      * The class doesn't need to be instantiated as it only contains static methods.
      */
-    private SettingsConverter() {
+    private SettingsConverter() {}
+
+    /**
+     * Replace occurrences of Strings in {@link #ENCODINGS} by their corresponding encoding String.
+     *
+     * @param str the String to be encoded
+     * @return the encoded String
+     */
+    public static String encodeString(String str) {
+        return convert(str, true);
+    }
+
+    /**
+     * Replace occurrences of Strings in {@link #ENCODINGS} by their corresponding decoding String.
+     *
+     * @param str the String to be decoded
+     * @return the decoded String
+     */
+    public static String decodeString(String str) {
+        return convert(str, false);
     }
 
     /**
@@ -76,7 +95,7 @@ public final class SettingsConverter {
      * @param encode true if the String should be encoded, false if it should be decoded
      * @return the encoded/decoded String
      */
-    public static String convert(String str, boolean encode) {
+    private static String convert(String str, boolean encode) {
         String result = str;
         for (int i = 0; i < ENCODINGS.length; i++) {
             // The order of replacements has to be reversed when decoding the String.
@@ -119,7 +138,7 @@ public final class SettingsConverter {
         }
         i = str.lastIndexOf(POSTFIX);
         str = str.substring(0, i);
-        return convert(str, false);
+        return decodeString(str);
     }
 
     /**
@@ -144,7 +163,7 @@ public final class SettingsConverter {
      * @return the encoded version of str
      */
     public static String encode(@Nonnull String str) {
-        return PREFIX + convert(str, true) + POSTFIX;
+        return PREFIX + encodeString(str) + POSTFIX;
     }
 
 

@@ -2,6 +2,7 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.util.pp.Layouter;
 
 
 /**
@@ -20,9 +21,8 @@ public final class UpdateSV extends AbstractSV {
         return toString("update");
     }
 
-
     @Override
-    public String proofToString() {
-        return "\\schemaVar \\update " + name() + ";\n";
+    public void layout(Layouter<?> l) {
+        l.print("\\schemaVar \\update ").print(name().toString());
     }
 }

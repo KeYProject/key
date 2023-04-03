@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.proof.init;
 
+import java.io.*;
+import java.util.*;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -31,16 +34,15 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.io.PathList;
 import recoder.io.ProjectSettings;
-
-import java.io.*;
-import java.util.*;
 
 
 public final class ProblemInitializer {
@@ -624,6 +626,14 @@ public final class ProblemInitializer {
         this.fileRepo = fileRepo;
     }
 
+    public ProblemInitializerListener getListener() {
+        return listener;
+    }
+
+    public ProgressMonitor getProgMon() {
+        return progMon;
+    }
+
     public interface ProblemInitializerListener {
         void proofCreated(ProblemInitializer sender, ProofAggregate proofAggregate);
 
@@ -640,13 +650,5 @@ public final class ProblemInitializer {
         void reportException(Object sender, ProofOblInput input, Exception e);
 
         default void showIssueDialog(Collection<PositionedString> issues) {}
-    }
-
-    public ProblemInitializerListener getListener() {
-        return listener;
-    }
-
-    public ProgressMonitor getProgMon() {
-        return progMon;
     }
 }

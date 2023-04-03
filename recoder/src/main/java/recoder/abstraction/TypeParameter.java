@@ -6,9 +6,9 @@
  */
 package recoder.abstraction;
 
-import recoder.service.ProgramModelInfo;
-
 import java.util.List;
+
+import recoder.service.ProgramModelInfo;
 
 /**
  * @author Tobias Gutzmann

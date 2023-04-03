@@ -1,12 +1,11 @@
 package de.uka.ilkd.key.settings;
 
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * A base class for own settings based on properties.
@@ -59,7 +58,7 @@ public abstract class AbstractPropertiesSettings implements Settings {
      */
     private static @Nonnull List<String> parseStringList(@Nonnull String str) {
         // escape special chars (in particular the comma)
-        return Arrays.stream(str.split(SET_DELIMITER)).map(s -> SettingsConverter.convert(s, true))
+        return Arrays.stream(str.split(SET_DELIMITER)).map(SettingsConverter::decodeString)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -69,7 +68,7 @@ public abstract class AbstractPropertiesSettings implements Settings {
      */
     private static @Nonnull String stringListToString(@Nonnull List<String> seq) {
         // escape special chars (in particular the comma)
-        return seq.stream().map(s -> SettingsConverter.convert(s, false))
+        return seq.stream().map(SettingsConverter::encodeString)
                 .collect(Collectors.joining(SET_DELIMITER));
     }
 

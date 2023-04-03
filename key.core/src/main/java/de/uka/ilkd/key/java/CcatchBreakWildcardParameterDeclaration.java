@@ -1,10 +1,8 @@
 package de.uka.ilkd.key.java;
 
-import java.io.IOException;
+import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.visitor.Visitor;
 
 /**
  * A "\Break *" parameter declaration of a ccatch clause.
@@ -29,11 +27,6 @@ public class CcatchBreakWildcardParameterDeclaration extends CcatchNonstandardPa
     @Override
     public void visit(Visitor v) {
         v.performActionOnCcatchBreakWildcardParameterDeclaration(this);
-    }
-
-    @Override
-    public void prettyPrint(PrettyPrinter w) throws IOException {
-        w.printCcatchBreakWildcardParameterDeclaration(this);
     }
 
 }

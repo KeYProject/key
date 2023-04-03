@@ -94,7 +94,7 @@ public class FormulaTermLabel implements TermLabel {
         this.majorId = majorId;
         this.minorId = minorId;
         if (beforeIds != null && !beforeIds.isEmpty()) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             boolean afterFirst = false;
             for (String id : beforeIds) {
                 if (id != null) {

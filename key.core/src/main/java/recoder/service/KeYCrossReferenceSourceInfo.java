@@ -9,6 +9,28 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.recoderext.ClassFileDeclarationBuilder;
+import de.uka.ilkd.key.java.recoderext.EnumClassDeclaration;
+import de.uka.ilkd.key.java.recoderext.EscapeExpression;
+import de.uka.ilkd.key.java.recoderext.ExecutionContext;
+import de.uka.ilkd.key.java.recoderext.MethodCallStatement;
+import de.uka.ilkd.key.java.recoderext.adt.AllFields;
+import de.uka.ilkd.key.java.recoderext.adt.AllObjects;
+import de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral;
+import de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral;
+import de.uka.ilkd.key.java.recoderext.adt.Intersect;
+import de.uka.ilkd.key.java.recoderext.adt.SeqConcat;
+import de.uka.ilkd.key.java.recoderext.adt.SeqIndexOf;
+import de.uka.ilkd.key.java.recoderext.adt.SeqLength;
+import de.uka.ilkd.key.java.recoderext.adt.SeqReverse;
+import de.uka.ilkd.key.java.recoderext.adt.SeqSingleton;
+import de.uka.ilkd.key.java.recoderext.adt.SeqSub;
+import de.uka.ilkd.key.java.recoderext.adt.SetMinus;
+import de.uka.ilkd.key.java.recoderext.adt.SetUnion;
+import de.uka.ilkd.key.java.recoderext.adt.Singleton;
+import de.uka.ilkd.key.util.ExceptionHandlerException;
+import de.uka.ilkd.key.util.SpecDataLocation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.ParserException;
@@ -39,28 +61,6 @@ import recoder.java.reference.UncollatedReferenceQualifier;
 import recoder.java.reference.VariableReference;
 import recoder.java.statement.Case;
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.java.recoderext.ClassFileDeclarationBuilder;
-import de.uka.ilkd.key.java.recoderext.EnumClassDeclaration;
-import de.uka.ilkd.key.java.recoderext.EscapeExpression;
-import de.uka.ilkd.key.java.recoderext.ExecutionContext;
-import de.uka.ilkd.key.java.recoderext.MethodCallStatement;
-import de.uka.ilkd.key.java.recoderext.adt.AllFields;
-import de.uka.ilkd.key.java.recoderext.adt.AllObjects;
-import de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral;
-import de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral;
-import de.uka.ilkd.key.java.recoderext.adt.Intersect;
-import de.uka.ilkd.key.java.recoderext.adt.SeqConcat;
-import de.uka.ilkd.key.java.recoderext.adt.SeqIndexOf;
-import de.uka.ilkd.key.java.recoderext.adt.SeqLength;
-import de.uka.ilkd.key.java.recoderext.adt.SeqReverse;
-import de.uka.ilkd.key.java.recoderext.adt.SeqSingleton;
-import de.uka.ilkd.key.java.recoderext.adt.SeqSub;
-import de.uka.ilkd.key.java.recoderext.adt.SetMinus;
-import de.uka.ilkd.key.java.recoderext.adt.SetUnion;
-import de.uka.ilkd.key.java.recoderext.adt.Singleton;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExceptionHandlerException;
-import de.uka.ilkd.key.util.SpecDataLocation;
 
 
 public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo {

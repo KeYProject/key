@@ -1,15 +1,15 @@
 package de.uka.ilkd.key.settings;
 
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYResourceManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.*;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+
+import de.uka.ilkd.key.util.KeYResourceManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is used to load and save settings for proofs such as which data type models are used

@@ -6,6 +6,9 @@
  */
 package recoder.kit.transformation.java5to4;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ModelException;
 import recoder.ProgramFactory;
@@ -25,9 +28,6 @@ import recoder.kit.TypeKit;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.DefaultSourceInfo;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This transformation does not work yet!

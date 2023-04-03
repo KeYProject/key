@@ -3,11 +3,9 @@ package de.uka.ilkd.key.gui;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
 import javax.swing.*;
-
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -51,6 +49,8 @@ import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ThreadUtilities;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Implementation of {@link UserInterfaceControl} which controls the {@link MainWindow} with the
@@ -316,14 +316,15 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @Override
     public AbstractProblemLoader load(Profile profile, File file, List<File> classPath,
             File bootClassPath, List<File> includes, Properties poPropertiesToForce,
-            boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
+            boolean forceNewProfileOfNewProofs, Consumer<Proof> callback)
+            throws ProblemLoaderException {
         if (file != null) {
             mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
         }
         try {
             getMediator().stopInterface(true);
             return super.load(profile, file, classPath, bootClassPath, includes,
-                poPropertiesToForce, forceNewProfileOfNewProofs);
+                poPropertiesToForce, forceNewProfileOfNewProofs, callback);
         } finally {
             getMediator().startInterface(true);
         }
@@ -473,7 +474,6 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException {
         super.loadingFinished(loader, poContainer, proofList, result);
         if (proofList != null) {
-            getMediator().setProof(loader.getProof());
             if (result != null) {
                 if ("".equals(result.getStatus())) {
                     this.resetStatus(this);
@@ -552,7 +552,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             main.setVisible(true);
         }
         AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths,
-            bootClassPath, includes, null, forceNewProfileOfNewProofs);
+            bootClassPath, includes, null, forceNewProfileOfNewProofs, null);
         InitConfig initConfig = loader.getInitConfig();
         return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig,
             loader.getProof(), loader.getProofScript(), loader.getResult());

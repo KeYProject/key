@@ -3,9 +3,6 @@ package de.uka.ilkd.key.proof;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -14,6 +11,9 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Class to manage the tags of the formulas of a sequent (node). Instances of this class are stored
@@ -148,9 +148,8 @@ public class FormulaTagManager {
         final Sequent seq = p_goal.sequent();
         final Semisequent ss = p_antec ? seq.antecedent() : seq.succedent();
 
-        for (Object s : ss) {
-            final PosInOccurrence pio =
-                new PosInOccurrence((SequentFormula) s, PosInTerm.getTopLevel(), p_antec);
+        for (SequentFormula s : ss) {
+            final PosInOccurrence pio = new PosInOccurrence(s, PosInTerm.getTopLevel(), p_antec);
             createNewTag(pio, p_goal);
         }
     }

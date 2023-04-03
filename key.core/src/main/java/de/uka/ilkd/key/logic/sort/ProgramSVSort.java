@@ -4,9 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.expression.operator.BinaryOperator;
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.DefaultImmutableSet;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.NamedProgramElement;
@@ -49,6 +46,10 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.DefaultImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

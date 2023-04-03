@@ -15,9 +15,8 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashMap;
 
-import de.uka.ilkd.key.nparser.DebugKeyLexer;
 import de.uka.ilkd.key.settings.GeneralSettings;
-import de.uka.ilkd.key.util.Debug;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -355,4 +354,3 @@ public final class DiskFileRepo extends AbstractFileRepo {
         }
     }
 }
-

@@ -8,16 +8,7 @@
 package de.uka.ilkd.key.prover.impl;
 
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.ProofTreeListener;
-import de.uka.ilkd.key.proof.RuleAppListener;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.StopCondition;
@@ -25,10 +16,12 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * Applies rules in an automated fashion. The caller should ensure that the strategy runs in its own
@@ -129,7 +122,7 @@ public class ApplyStrategy extends AbstractProverCore {
         time = System.currentTimeMillis();
         SingleRuleApplicationInfo srInfo = null;
         try {
-            LOGGER.debug("Strategy started.");
+            LOGGER.trace("Strategy started.");
             boolean shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof, time,
                 countApplied, srInfo);
 
@@ -164,9 +157,7 @@ public class ApplyStrategy extends AbstractProverCore {
                 System.currentTimeMillis() - time, countApplied, closedGoals);
         } finally {
             time = (System.currentTimeMillis() - time);
-            LOGGER.debug("Strategy stopped.");
-            LOGGER.debug("Applied {} steps", countApplied);
-            LOGGER.debug("Time elapsed: {} ms", time);
+            LOGGER.trace("Strategy stopped, applied {} steps in {}ms", countApplied, time);
         }
         assert srInfo != null;
         return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(), time,

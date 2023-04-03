@@ -2,13 +2,6 @@ package de.uka.ilkd.key.rule.inst;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -16,6 +9,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermImpl;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -24,6 +18,13 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.DefaultImmutableMap;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableMapEntry;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This class wraps a ImmMap<SchemaVariable,InstantiationEntry<?>> and is used to store
@@ -552,7 +553,12 @@ public class SVInstantiations {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
             final Object inst = e.value().getInstantiation();
             assert inst != null : "Illegal null instantiation.";
-            if (!inst.equals(cmp.getInstantiation(e.key()))) {
+            if (inst instanceof TermImpl) {
+                if (!((TermImpl) inst)
+                        .equalsModIrrelevantTermLabels(cmp.getInstantiation(e.key()))) {
+                    return false;
+                }
+            } else if (!inst.equals(cmp.getInstantiation(e.key()))) {
                 return false;
             }
         }
@@ -566,6 +572,12 @@ public class SVInstantiations {
             pairIterator();
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
+            if (e.value().getInstantiation() instanceof TermLabel) {
+                TermLabel termLabel = (TermLabel) e.value().getInstantiation();
+                if (!termLabel.isProofRelevant()) {
+                    continue;
+                }
+            }
             result = 37 * result + e.value().getInstantiation().hashCode() + e.key().hashCode();
         }
         return result;

@@ -3,6 +3,7 @@ package de.uka.ilkd.key.parser.schemajava;
 
 import de.uka.ilkd.key.util.parsing.LocatableException;
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.java.Position;
 import java.net.URL;
 
 /**
@@ -325,7 +326,7 @@ public class JavaCharStream
         }
         catch(java.io.IOException e)
         {
-           throw new LocatableException("Invalid unicode escape character", new Location((URL) null, line, column));
+           throw new LocatableException("Invalid unicode escape character", new Location((URL) null, Position.fromOneZeroBased(line, column)));
         }
 
         if (backSlashCnt == 1)

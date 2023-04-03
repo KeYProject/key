@@ -7,12 +7,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -42,6 +36,11 @@ import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * <p>
@@ -2225,16 +2224,12 @@ public class TermLabelManager {
         if (rejectedTerm.hasLabels()) {
             // Search existing SequentFormula
             Semisequent s = currentSequent.getSemisequentChangeInfo(inAntecedent).semisequent();
-            SequentFormula existingSF = CollectionUtil.search(s, new IFilter<SequentFormula>() {
-                @Override
-                public boolean select(SequentFormula element) {
-                    return element.formula().equalsModRenaming(rejectedTerm);
-                }
-            });
+            SequentFormula existingSF = CollectionUtil.search(s,
+                element -> element.formula().equalsModRenaming(rejectedTerm));
             if (existingSF != null) {
                 // Create list of new labels
                 Term existingTerm = existingSF.formula();
-                List<TermLabel> mergedLabels = new LinkedList<TermLabel>();
+                List<TermLabel> mergedLabels = new LinkedList<>();
                 CollectionUtil.addAll(mergedLabels, existingTerm.getLabels());
                 boolean labelsChanged = false;
                 // Merge all labels of the rejected term with those of the existing one

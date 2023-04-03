@@ -18,7 +18,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -30,12 +29,12 @@ import javax.swing.text.Document;
 
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.util.Debug;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +56,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
     private final Observer observer = (o, arg) -> publish(arg);
 
     public ProofScriptWorker(KeYMediator mediator, File file) throws IOException {
-        this.initialLocation = new Location(file.toURI().toURL(), 1, 1);
+        this.initialLocation = new Location(file.toURI().toURL(), Position.newOneBased(1, 1));
         this.script = new String(Files.readAllBytes(file.toPath()));
         this.mediator = mediator;
         this.initiallySelectedGoal = null;

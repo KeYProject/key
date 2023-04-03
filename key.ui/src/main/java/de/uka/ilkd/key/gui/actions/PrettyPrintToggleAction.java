@@ -2,8 +2,7 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.EventObject;
-
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -26,12 +25,7 @@ public class PrettyPrintToggleAction extends MainWindowAction {
      * Such changes can occur in the Eclipse context when settings are changed in for instance the
      * KeYIDE.
      */
-    private final SettingsListener viewSettingsListener = new SettingsListener() {
-        @Override
-        public void settingsChanged(EventObject e) {
-            handleViewSettingsChanged(e);
-        }
-    };
+    private final SettingsListener viewSettingsListener = e -> handleViewSettingsChanged(e);
 
     public PrettyPrintToggleAction(MainWindow mainWindow) {
         super(mainWindow);

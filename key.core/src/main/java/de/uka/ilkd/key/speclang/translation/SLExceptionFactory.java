@@ -1,18 +1,15 @@
 package de.uka.ilkd.key.speclang.translation;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.util.Debug;
-import org.antlr.runtime.*;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
-
-import javax.annotation.Nonnull;
-
 import java.util.LinkedList;
 import java.util.List;
+import javax.annotation.Nonnull;
+
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.speclang.PositionedString;
+
+import org.antlr.runtime.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.text.MessageFormat.format;
 
@@ -27,12 +24,17 @@ public class SLExceptionFactory {
     public static final Logger LOGGER = LoggerFactory.getLogger(SLExceptionFactory.class);
 
     private String fileName;
-    private final int offsetLine, offsetColumn, offsetIndex;
+    private final int offsetLine, offsetColumn;
+    /**
+     * line, 1-based
+     */
     private int line;
+    /**
+     * column, 0-based
+     */
     private int column;
-    private int index;
 
-    private List<PositionedString> warnings = new LinkedList<>();
+    private final List<PositionedString> warnings = new LinkedList<>();
 
     // -------------------------------------------------------------------------
     // constructors
@@ -42,36 +44,22 @@ public class SLExceptionFactory {
         this.line = parser.input.LT(1).getLine();
         this.column = parser.input.LT(1).getCharPositionInLine();
         this.fileName = fileName;
-        this.offsetColumn = offsetPos.getColumn();
-        this.offsetIndex = 0;
-        this.offsetLine = offsetPos.getLine();
+        this.offsetColumn = offsetPos.column();
+        this.offsetLine = offsetPos.line();
     }
 
-    public SLExceptionFactory(String fileName, int line, int column, int index) {
+    public SLExceptionFactory(String fileName, int line, int column) {
         this.fileName = fileName;
         this.offsetColumn = column;
-        this.offsetIndex = index;
         this.offsetLine = line;
         this.line = 0;
         this.column = 0;
     }
 
-    public SLExceptionFactory updatePosition(ParserRuleContext context) {
-        return updatePosition(context.start);
-    }
-
     public SLExceptionFactory updatePosition(org.antlr.v4.runtime.Token start) {
         fileName = start.getTokenSource().getSourceName();
-        index = start.getStartIndex();
         line = start.getLine();
         column = start.getCharPositionInLine();
-        return this;
-    }
-
-    private SLExceptionFactory updatePosition(Token token) {
-        index = 0;
-        line = token.getLine();
-        column = token.getCharPositionInLine();
         return this;
     }
 
@@ -80,12 +68,8 @@ public class SLExceptionFactory {
     // -------------------------------------------------------------------------
     private Position createAbsolutePosition(int relativeLine, int relativeColumn) {
         int absoluteLine = offsetLine + relativeLine - 1;
-        int absoluteColumn = (relativeLine == 1 ? offsetColumn : 1) + relativeColumn - 1;
-        return new Position(absoluteLine, absoluteColumn);
-    }
-
-    private Position createAbsolutePosition(final Position pos) {
-        return this.createAbsolutePosition(pos.getLine(), pos.getColumn());
+        int absoluteColumn = (relativeLine == 1 ? offsetColumn : 1) + relativeColumn;
+        return Position.fromOneZeroBased(absoluteLine, absoluteColumn);
     }
 
     // -------------------------------------------------------------------------
@@ -149,38 +133,10 @@ public class SLExceptionFactory {
     }
     // endregion
 
-    /**
-     * Creates a string with the position information of the passed token.
-     */
-    public PositionedString createPositionedString(String text, Token t) {
-        return new PositionedString(text, fileName,
-            createAbsolutePosition(t.getLine(), t.getCharPositionInLine()));
-    }
-
     public PositionedString createPositionedString(String msg, org.antlr.v4.runtime.Token t) {
         return new PositionedString(msg, fileName,
             createAbsolutePosition(t.getLine(), t.getCharPositionInLine()));
     }
-
-    /**
-     * Creates a string with position information from the given relative position.
-     *
-     * @param text the {@link String}
-     * @param pos the {@link Position}
-     * @return <code>text</code> as {@link PositionedString} with absolute position in the current
-     *         file
-     */
-    public PositionedString createPositionedString(final String text, final Position pos) {
-        return new PositionedString(text, fileName, createAbsolutePosition(pos));
-    }
-
-    /**
-     * Creates a string with the current absolute position information
-     */
-    public PositionedString createPositionedString(String text) {
-        return new PositionedString(text, fileName, createAbsolutePosition(this.line, this.column));
-    }
-
 
     /**
      * Creates an SLTranslationException with current absolute position information.
@@ -244,10 +200,6 @@ public class SLExceptionFactory {
             createAbsolutePosition(this.line, this.column));
     }
 
-    public SLTranslationException createWarningException(String message, Token t) {
-        return new SLWarningException(new PositionedString(message, t));
-    }
-
     /**
      * Create a message from a {@link RecognitionException}. This needs to be done manually because
      * antlr exceptions are not designed to provide error messages, see:
@@ -264,7 +216,7 @@ public class SLExceptionFactory {
              */
 
             // Convert the error position into a string
-            String errorPosition = pos.getLine() + ":" + pos.getColumn();
+            String errorPosition = pos.toString();
             String token = e.token != null ? "'" + e.token.getText() + "'" : "";
 
             if (e instanceof NoViableAltException) {

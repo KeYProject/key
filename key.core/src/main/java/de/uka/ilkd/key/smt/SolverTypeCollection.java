@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.smt;
 
-import de.uka.ilkd.key.smt.solvertypes.SolverType;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 /**
  * Stores a set of solver types. This class can be used in order to encapsulate multiple solvers.

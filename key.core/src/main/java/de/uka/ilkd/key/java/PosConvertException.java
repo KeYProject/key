@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.java;
 
 
+import java.net.MalformedURLException;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
+
 import recoder.java.CompilationUnit;
 import recoder.kit.UnitKit;
 import recoder.service.UnresolvedReferenceException;
-
-import javax.annotation.Nullable;
-import java.net.MalformedURLException;
 
 /**
  * A convert exception enriched with a location within a file/source.
@@ -25,26 +26,19 @@ public class PosConvertException extends ConvertException implements HasLocation
     private String file;
 
     /**
-     * The line
+     * The position
      */
-    private final int line;
-
-    /**
-     * The column
-     */
-    private int column;
+    private final Position position;
 
     /**
      * Instantiates a new exception with position information.
      *
      * @param message the message, not null
-     * @param line the line to point to
-     * @param column the column to point to
+     * @param position the position
      */
-    public PosConvertException(String message, int line, int column) {
+    public PosConvertException(String message, Position position) {
         super(message);
-        this.line = line;
-        this.column = column;
+        this.position = position;
         this.file = null;
     }
 
@@ -52,48 +46,22 @@ public class PosConvertException extends ConvertException implements HasLocation
      * Instantiates a new exception with position and file information.
      *
      * @param message the message, not null
-     * @param line the line to point to
-     * @param column the column to point to
+     * @param position the position
      * @param file the file that contains the error
      */
-    public PosConvertException(String message, int line, int column, String file) {
+    public PosConvertException(String message, Position position, String file) {
         super(message);
-        this.line = line;
-        this.column = column;
+        this.position = position;
         this.file = file;
     }
 
     /**
-     * Instantiates a new exception with position information.
+     * Gets the position of the exception location.
      *
-     * @param cause the exception causing this instance.
-     * @param line the line to point to
-     * @param column the column to point to
+     * @return the position
      */
-    public PosConvertException(Throwable cause, int line, int column) {
-        super(cause);
-        this.line = line;
-        this.column = column;
-        this.file = null;
-    }
-
-
-    /**
-     * Gets the line of the exception location.
-     *
-     * @return the line
-     */
-    public int getLine() {
-        return line;
-    }
-
-    /**
-     * Gets the column of the exception location.
-     *
-     * @return the column
-     */
-    public int getColumn() {
-        return column;
+    public Position getPosition() {
+        return position;
     }
 
     @Nullable
@@ -106,10 +74,8 @@ public class PosConvertException extends ConvertException implements HasLocation
                 CompilationUnit cu = UnitKit.getCompilationUnit(ure.getUnresolvedReference());
                 String dataloc = cu.getDataLocation().toString();
                 this.file = dataloc.substring(dataloc.indexOf(':') + 1);
-            } else {
-                this.file = "";
             }
         }
-        return new Location(file, getLine(), getColumn());
+        return new Location(file, position);
     }
 }

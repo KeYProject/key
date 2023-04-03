@@ -1,13 +1,8 @@
 package de.uka.ilkd.key.logic;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import javax.annotation.Nullable;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -19,12 +14,20 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.EqualsModProofIrrelevancyUtil;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
 
 /**
  * The currently only class implementing the Term interface. TermFactory should be the only class
  * dealing directly with the TermImpl class.
  */
-public class TermImpl implements Term {
+public class TermImpl implements Term, EqualsModProofIrrelevancy {
 
     /**
      * A static empty list of terms used for memory reasons.
@@ -63,7 +66,14 @@ public class TermImpl implements Term {
      */
     private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN;
     private ImmutableSet<QuantifiableVariable> freeVars = null;
+    /**
+     * Cached {@link #hashCode()} value.
+     */
     private int hashcode = -1;
+    /**
+     * Cached {@link #hashCodeModProofIrrelevancy()} value.
+     */
+    private int hashcode2 = -1;
 
     /**
      * This flag indicates that the {@link Term} itself or one of its children contains a non empty
@@ -528,6 +538,62 @@ public class TermImpl implements Term {
         return true;
     }
 
+    @Override
+    public boolean equalsModProofIrrelevancy(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof TermImpl)) {
+            return false;
+        }
+
+        final TermImpl t = (TermImpl) o;
+
+        boolean opResult = op.equalsModProofIrrelevancy(t.op);
+        if (!(opResult
+                && EqualsModProofIrrelevancyUtil.compareImmutableArrays(boundVars, t.boundVars)
+                && javaBlock.equalsModProofIrrelevancy(t.javaBlock))) {
+            return false;
+        }
+
+        Term other = (Term) o;
+
+        for (TermLabel label : getLabels()) {
+            if (label.isProofRelevant() && !other.getLabels().contains(label)) {
+                return false;
+            }
+        }
+
+        for (TermLabel label : other.getLabels()) {
+            if (label.isProofRelevant() && !getLabels().contains(label)) {
+                return false;
+            }
+        }
+
+        for (int i = 0; i < subs.size(); ++i) {
+            if (!subs.get(i).equalsModProofIrrelevancy(t.subs.get(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        if (hashcode2 == -1) {
+            // compute into local variable first to be thread-safe.
+            this.hashcode2 = Objects.hash(op(),
+                EqualsModProofIrrelevancyUtil
+                        .hashCodeIterable(subs()),
+                EqualsModProofIrrelevancyUtil.hashCodeIterable(boundVars()), javaBlock());
+            if (hashcode2 == -1) {
+                hashcode2 = 0;
+            }
+        }
+        return hashcode2;
+    }
 
     @Override
     public final int hashCode() {

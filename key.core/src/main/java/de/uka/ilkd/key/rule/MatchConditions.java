@@ -1,14 +1,18 @@
 package de.uka.ilkd.key.rule;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.util.EqualsModProofIrrelevancy;
 
 
 /**
  * Simple container class containing the information resulting from a Taclet.match-call
  */
-public class MatchConditions {
+public class MatchConditions implements EqualsModProofIrrelevancy {
 
     public static final MatchConditions EMPTY_MATCHCONDITIONS =
         new MatchConditions(SVInstantiations.EMPTY_SVINSTANTIATIONS, RenameTable.EMPTY_TABLE);
@@ -56,4 +60,17 @@ public class MatchConditions {
     }
 
 
+    @Override
+    public boolean equalsModProofIrrelevancy(Object obj) {
+        if (!(obj instanceof MatchConditions)) {
+            return false;
+        }
+        MatchConditions that = (MatchConditions) obj;
+        return instantiations.equals(that.instantiations) && renameTable.equals(that.renameTable);
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        return Objects.hash(instantiations, renameTable);
+    }
 }

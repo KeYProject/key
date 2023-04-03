@@ -5,8 +5,7 @@ package de.uka.ilkd.key.gui.notification;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 
@@ -59,12 +58,7 @@ public abstract class NotificationTask {
         } else {
             final NotificationEvent eventObject = event;
             final NotificationManager notManager = manager;
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    executeActions(eventObject, notManager);
-                }
-            });
+            SwingUtilities.invokeLater(() -> executeActions(eventObject, notManager));
         }
     }
 

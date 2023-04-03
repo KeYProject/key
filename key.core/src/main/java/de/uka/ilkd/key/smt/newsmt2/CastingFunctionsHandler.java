@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
+import java.util.Properties;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
-
-import java.util.Properties;
 
 /**
  * This SMT translation handler takes care of those sort-depending functions f whose return type is

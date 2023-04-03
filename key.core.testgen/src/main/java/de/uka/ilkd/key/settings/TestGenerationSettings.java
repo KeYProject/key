@@ -1,13 +1,12 @@
 package de.uka.ilkd.key.settings;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import java.io.File;
 import java.util.Collection;
 import java.util.EventObject;
 import java.util.LinkedHashSet;
 import java.util.Properties;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class TestGenerationSettings implements Settings, Cloneable {
     // region Default Values for option fields

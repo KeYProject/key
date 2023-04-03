@@ -2,6 +2,9 @@
 
 package recoder.kit.transformation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
 import recoder.abstraction.Type;
@@ -13,9 +16,6 @@ import recoder.java.reference.VariableReference;
 import recoder.kit.*;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Transformation that ensures that the given expression is evaluated first during execution of the

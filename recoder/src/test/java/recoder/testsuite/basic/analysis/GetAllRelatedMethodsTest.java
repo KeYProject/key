@@ -1,5 +1,8 @@
 package recoder.testsuite.basic.analysis;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import recoder.abstraction.ClassType;
@@ -9,9 +12,6 @@ import recoder.kit.MethodKit;
 import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.NameInfo;
 import recoder.testsuite.basic.BasicTestsSuite;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;

@@ -17,13 +17,13 @@ plugins {
     //Some Licenses requires an entry in the credits (MIT, BSD)
     id "com.github.hierynomus.license-report" version "0.16.1"
 
-    id "org.sonarqube" version "3.3"
+    id "org.sonarqube" version "4.0.0.2929"
 
     // Gives `gradle dependencyUpdate` to show which dependency has a newer version
     // id "com.github.ben-manes.versions" version "0.39.0"
 
     // Code formatting
-    id "com.diffplug.spotless" version "6.11.0"
+    id "com.diffplug.spotless" version "6.16.0"
 }
 
 // Configure this project for use inside IntelliJ:
@@ -87,18 +87,18 @@ subprojects {
     }
 
     dependencies {
-        implementation("org.slf4j:slf4j-api:1.7.32")
-        testImplementation("ch.qos.logback:logback-classic:1.2.10")
+        implementation("org.slf4j:slf4j-api:2.0.7")
+        testImplementation("ch.qos.logback:logback-classic:1.4.6")
 
         //compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.12.0'
         //compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.12.0'
         implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
-        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-        testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+        testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.2'
         testCompileOnly 'junit:junit:4.13.2'
-        testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.8.2'
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+        testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.9.2'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
 
 
         testImplementation project(':key.util')
@@ -222,11 +222,11 @@ subprojects {
         reports {
             html {
                 enabled true
-                destination file("build/reports/pmd/main_diff.html")
+                outputLocation = file("build/reports/pmd/main_diff.html")
             }
             xml {
                 enabled true
-                destination file("build/reports/pmd/main_diff.xml")
+                outputLocation = file("build/reports/pmd/main_diff.xml")
             }
         }
     }
@@ -252,11 +252,11 @@ subprojects {
         reports {
             html {
                 enabled true
-                destination file("build/reports/checkstyle/main_diff.html")
+                outputLocation = file("build/reports/checkstyle/main_diff.html")
             }
             xml {
                 enabled true
-                destination file("build/reports/checkstyle/main_diff.xml")
+                outputLocation = file("build/reports/checkstyle/main_diff.xml")
             }
         }
     } 
@@ -272,8 +272,8 @@ subprojects {
     // }
      tasks.withType(Pmd) {
          reports {
-             xml.enabled = true
-             html.enabled = true
+             xml.getRequired().set(true)
+             html.getRequired().set(true)
          }
      }
     
@@ -399,9 +399,14 @@ subprojects {
             // allows us to use spotless:off / spotless:on to keep pre-formatted sections
             toggleOffOn()
 
+            removeUnusedImports()
             eclipse().configFile("$rootDir/scripts/tools/checkstyle/keyCodeStyle.xml")
             trimTrailingWhitespace()        // not sure how to set this in the xml file ...
             //googleJavaFormat().aosp().reflowLongStrings()
+
+            // note: you can use an empty string for all the imports you didn't specify explicitly,
+            // '|' to join group without blank line, and '\\#` prefix for static imports
+            importOrder('java|javax', 'de.uka', 'org.key_project', '', '\\#')
 
             // specific delimiter: normally just 'package', but spotless crashes for files in default package
             // (see https://github.com/diffplug/spotless/issues/30), therefore 'import' is needed. '//' is for files

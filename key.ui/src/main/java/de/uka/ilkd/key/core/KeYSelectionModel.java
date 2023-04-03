@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.core;
 
+import java.util.*;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 public class KeYSelectionModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeYSelectionModel.class);
@@ -85,6 +86,10 @@ public class KeYSelectionModel {
      * @param n the selected node
      */
     public void setSelectedNode(Node n) {
+        // switch proof if needed
+        if (n.proof() != getSelectedProof()) {
+            setSelectedProof(n.proof());
+        }
         goalIsValid = false;
         selectedNode = n;
         fireSelectedNodeChanged();
@@ -300,14 +305,14 @@ public class KeYSelectionModel {
 
     public void addKeYSelectionListener(KeYSelectionListener listener) {
         synchronized (listenerList) {
-            LOGGER.debug("Adding {}", listener.getClass());
+            LOGGER.trace("Adding {}", listener.getClass());
             listenerList.add(listener);
         }
     }
 
     public void removeKeYSelectionListener(KeYSelectionListener listener) {
         synchronized (listenerList) {
-            LOGGER.debug("Removing {}", listener.getClass());
+            LOGGER.trace("Removing {}", listener.getClass());
             listenerList.remove(listener);
         }
     }
@@ -322,11 +327,11 @@ public class KeYSelectionModel {
 
     public synchronized void fireSelectedProofChanged() {
         synchronized (listenerList) {
-            LOGGER.info("Selected Proof changed, firing...");
+            LOGGER.debug("Selected Proof changed, firing...");
             for (final KeYSelectionListener listener : listenerList) {
                 listener.selectedProofChanged(selectionEvent);
             }
-            LOGGER.info("Selected Proof changed, done firing.");
+            LOGGER.trace("Selected Proof changed, done firing.");
         }
     }
 

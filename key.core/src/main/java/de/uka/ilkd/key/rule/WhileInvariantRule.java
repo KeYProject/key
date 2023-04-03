@@ -5,11 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
@@ -65,6 +60,11 @@ import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 public final class WhileInvariantRule implements BuiltInRule {
     /**
@@ -870,7 +870,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         // \replacewith (==> #atPreEqs(anon1)
         // -> #introNewAnonUpdate(#modifies, #locDepFunc(anon1,
         // \[{.. while (#e) #s ...}\]post) & inv ->
-        // (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]#v1=TRUE ->
+        // (\[{ method-frame(#ex){#typeof(#e) #v1 = #e;} }\]#v1=TRUE ->
         // #whileInvRule(\[{.. while (#e) #s ...}\]post,
         // #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post)
         // & inv)),
@@ -895,7 +895,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         // "Use Case":
         // \replacewith (==> #introNewAnonUpdate(#modifies, inv ->
-        // (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]
+        // (\[{ method-frame(#ex){#typeof(#e) #v1 = #e;} }\]
         // (#v1=FALSE -> \[{.. ...}\]post)),anon2))
         prepareUseCaseBranch(termLabelState, services, ruleApp, inst, wellFormedAnon, useGoal,
             guardJb, guardFalseTerm, uAnon, uAnonInv);

@@ -2,8 +2,7 @@ package de.uka.ilkd.key.proof_references.reference;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
-
-import org.key_project.util.java.ObjectUtil;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -95,9 +94,9 @@ public class DefaultProofReference<T> implements IProofReference<T> {
     public boolean equals(Object obj) {
         if (obj instanceof IProofReference<?>) {
             IProofReference<?> other = (IProofReference<?>) obj;
-            return ObjectUtil.equals(getKind(), other.getKind())
-                    && ObjectUtil.equals(getSource(), other.getSource())
-                    && ObjectUtil.equals(getTarget(), other.getTarget());
+            return Objects.equals(getKind(), other.getKind())
+                    && Objects.equals(getSource(), other.getSource())
+                    && Objects.equals(getTarget(), other.getTarget());
         } else {
             return false;
         }

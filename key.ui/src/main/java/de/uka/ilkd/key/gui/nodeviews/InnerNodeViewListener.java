@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.MouseEvent;
-
 import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.pp.PosInSequent;

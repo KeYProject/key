@@ -2,6 +2,11 @@
 
 package recoder;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.List;
+
 import recoder.java.*;
 import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.*;
@@ -12,11 +17,6 @@ import recoder.java.expression.operator.*;
 import recoder.java.reference.*;
 import recoder.java.statement.*;
 import recoder.list.generic.ASTList;
-
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.List;
 
 public interface ProgramFactory extends Service {
 

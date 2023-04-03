@@ -1,9 +1,10 @@
 package de.uka.ilkd.key.logic.op;
 
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.util.pp.Layouter;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Schema variable matching modal operators.
@@ -40,21 +41,18 @@ public final class ModalOperatorSV extends AbstractSV {
         return toString(" (modal operator)");
     }
 
-
     @Override
-    public String proofToString() {
-        StringBuffer result = new StringBuffer();
-        result.append("\\schemaVar \\modalOperator {");
+    public void layout(Layouter<?> l) {
+        l.beginC(0).beginC().print("\\schemaVar \\formula {").brk(0);
         boolean first = true;
         for (Modality modality : modalities) {
             if (!first) {
-                result.append(", ");
+                l.print(",").brk();
             } else {
                 first = false;
             }
-            result.append(modality);
+            l.print(modality.name().toString());
         }
-        result.append("} ").append(name()).append(";\n");
-        return result.toString();
+        l.end().brk(0).print("}").end().print(" ").print(name().toString());
     }
 }

@@ -1,12 +1,10 @@
 package de.uka.ilkd.key.gui;
 
 import java.util.Properties;
-
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
@@ -56,9 +54,9 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
         super(taclet.displayName());
         this.rule = taclet;
         altName = taclet.name().toString();
-        LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), null, true);
+        LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), null);
         lp.printTaclet(taclet);
-        description = lp.toString() + "\n\n Defined at:" + taclet.getOrigin()
+        description = lp.result() + "\n\n Defined at:" + taclet.getOrigin()
             + "\n\n under options:" + taclet.getChoices();
     }
 

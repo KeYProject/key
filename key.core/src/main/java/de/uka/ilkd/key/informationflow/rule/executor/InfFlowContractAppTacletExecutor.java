@@ -1,15 +1,8 @@
 package de.uka.ilkd.key.informationflow.rule.executor;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.informationflow.rule.InfFlowContractAppTaclet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
@@ -18,6 +11,9 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
 import de.uka.ilkd.key.util.properties.Properties;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 public class InfFlowContractAppTacletExecutor
         extends RewriteTacletExecutor<InfFlowContractAppTaclet> {
@@ -66,15 +62,11 @@ public class InfFlowContractAppTacletExecutor
             applFormulas = ImmutableSLList.<Term>nil();
         }
         applFormulas = applFormulas.append(applFormula);
-        StrategyInfoUndoMethod undo = new StrategyInfoUndoMethod() {
-
-            @Override
-            public void undo(Properties strategyInfos) {
-                ImmutableList<Term> applFormulas =
-                    strategyInfos.get(INF_FLOW_CONTRACT_APPL_PROPERTY);
-                strategyInfos.put(INF_FLOW_CONTRACT_APPL_PROPERTY,
-                    applFormulas.removeAll(applFormula));
-            }
+        StrategyInfoUndoMethod undo = strategyInfos -> {
+            ImmutableList<Term> applFormulas1 =
+                strategyInfos.get(INF_FLOW_CONTRACT_APPL_PROPERTY);
+            strategyInfos.put(INF_FLOW_CONTRACT_APPL_PROPERTY,
+                applFormulas1.removeAll(applFormula));
         };
         goal.addStrategyInfo(INF_FLOW_CONTRACT_APPL_PROPERTY, applFormulas, undo);
 

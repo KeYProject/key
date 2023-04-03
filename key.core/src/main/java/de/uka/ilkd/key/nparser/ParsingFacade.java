@@ -1,15 +1,5 @@
 package de.uka.ilkd.key.nparser;
 
-import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
-import de.uka.ilkd.key.proof.io.RuleSource;
-import org.antlr.v4.runtime.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.antlr.v4.runtime.tree.TerminalNode;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +10,16 @@ import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
 import java.nio.file.Path;
 import java.util.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
+import de.uka.ilkd.key.proof.io.RuleSource;
+
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.TerminalNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This facade provides low-level access to the ANTLR4 Parser and Lexer.

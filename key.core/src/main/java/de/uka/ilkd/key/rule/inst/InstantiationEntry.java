@@ -34,7 +34,7 @@ public abstract class InstantiationEntry<E> {
     @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object o) {
-        if (o.getClass() == getClass()) {
+        if (o != null && o.getClass() == getClass()) {
             return (instantiation.equals(((InstantiationEntry<E>) o).instantiation));
         }
         return false;

@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.gui.actions;
 
+import java.awt.event.ActionEvent;
+
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -7,10 +9,6 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
-
-import java.awt.event.ActionEvent;
-import java.util.EventObject;
 
 /**
  * Saves the currently selected proof as a zip archive with file extension "zproof". The bundle
@@ -36,12 +34,7 @@ public final class SaveBundleAction extends MainWindowAction {
 
         // react to setting changes
         GeneralSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-        settings.addSettingsListener(new SettingsListener() {
-            @Override
-            public void settingsChanged(EventObject e) {
-                updateStatus();
-            }
-        });
+        settings.addSettingsListener(e -> updateStatus());
 
         // react to changes of proof selection
         mainWindow.getMediator().addKeYSelectionListener(new KeYSelectionListener() {

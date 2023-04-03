@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.smt.test;
 
+import java.io.File;
+
 import de.uka.ilkd.key.util.HelperClassForTests;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
 
 public abstract class TestSMTSolver extends TestCommons {
     public static final String testFile =

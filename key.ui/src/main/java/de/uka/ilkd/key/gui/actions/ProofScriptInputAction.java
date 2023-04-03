@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.net.URL;
-
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -13,6 +12,7 @@ import javax.swing.JTextArea;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofScriptWorker;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 
 /**
@@ -55,7 +55,8 @@ public class ProofScriptInputAction extends AbstractAction {
 
             okButton.addActionListener(event -> {
                 ProofScriptWorker psw = new ProofScriptWorker(mediator, textArea.getText(),
-                    new Location((URL) null, 0, 0), mediator.getSelectedGoal());
+                    new Location((URL) null, Position.newOneBased(1, 1)),
+                    mediator.getSelectedGoal());
 
                 dispose();
 

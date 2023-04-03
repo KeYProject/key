@@ -1,19 +1,18 @@
 package de.uka.ilkd.key.gui.help;
 
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CButton;
-import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+
+import bibliothek.gui.dock.common.action.CAction;
+import bibliothek.gui.dock.common.action.CButton;
 
 /**
  * A gate to the KeY documentation system.
@@ -115,7 +114,7 @@ public class HelpFacade {
      * @return
      */
     public static CAction createHelpButton(String s) {
-        CButton btn = new CButton("", IconFactory.HELP.get());
+        CButton btn = new CButton("Open online help...", IconFactory.HELP.get());
         btn.addActionListener(e -> openHelp(s));
         return btn;
     }

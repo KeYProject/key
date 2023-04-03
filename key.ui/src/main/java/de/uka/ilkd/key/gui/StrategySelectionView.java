@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.gui;
 
+import java.awt.*;
+import java.util.*;
+import java.util.List;
+import java.util.Map.Entry;
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -17,21 +23,9 @@ import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.definition.*;
 import de.uka.ilkd.key.util.Triple;
-import org.key_project.util.java.ObjectUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.List;
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * <p>
@@ -205,11 +199,9 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
             MaxRuleAppSlider maxSlider =
                 new MaxRuleAppSlider(mediator, DEFINITION.getMaxRuleApplicationsLabel());
             components.setMaxRuleAppSlider(maxSlider);
-            maxSlider.addChangeListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent e) {
-                    predefChanged = true;
-                    refreshDefaultButton();
-                }
+            maxSlider.addChangeListener(e -> {
+                predefChanged = true;
+                refreshDefaultButton();
             });
             maxSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
             box.add(maxSlider);
@@ -352,14 +344,11 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     private JRadioButton newButton(String text, final String key, final String command,
             boolean selected, boolean enabled, final StrategyFactory factory) {
         JRadioButton result = new JRadioButton(text);
-        result.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                predefChanged = true;
-                StrategyProperties props = getProperties();
-                updateStrategySettings(
-                    mediator.getSelectedProof().getActiveStrategy().name().toString(), props);
-            }
+        result.addActionListener(e -> {
+            predefChanged = true;
+            StrategyProperties props = getProperties();
+            updateStrategySettings(
+                mediator.getSelectedProof().getActiveStrategy().name().toString(), props);
         });
         result.setEnabled(enabled);
         result.setActionCommand(command);
@@ -426,39 +415,33 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         strategyPredefSettingsCmb.setSelectedIndex(0);
         components.setPredefsChoiceCmb(strategyPredefSettingsCmb);
 
-        defaultButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                int newMaxSteps = 0;
-                StrategyProperties newProps = null;
+        defaultButton.addActionListener(e -> {
+            int newMaxSteps = 0;
+            StrategyProperties newProps = null;
 
-                final int selIndex = strategyPredefSettingsCmb.getSelectedIndex();
-                if (selIndex == 0) {
-                    newMaxSteps = DEFINITION.getDefaultMaxRuleApplications();
-                    newProps =
-                        DEFINITION.getDefaultPropertiesFactory().createDefaultStrategyProperties();
-                } else {
-                    Triple<String, Integer, IDefaultStrategyPropertiesFactory> chosenDefault =
-                        DEFINITION.getFurtherDefaults().get(selIndex - 1);
-                    newMaxSteps = chosenDefault.second;
-                    newProps = chosenDefault.third.createDefaultStrategyProperties();
-                }
-
-                mediator.getSelectedProof().getSettings().getStrategySettings()
-                        .setMaxSteps(newMaxSteps);
-                updateStrategySettings(JAVACARDDL_STRATEGY_NAME, newProps);
-
-                predefChanged = false;
-                refresh(mediator.getSelectedProof());
-
+            final int selIndex = strategyPredefSettingsCmb.getSelectedIndex();
+            if (selIndex == 0) {
+                newMaxSteps = DEFINITION.getDefaultMaxRuleApplications();
+                newProps =
+                    DEFINITION.getDefaultPropertiesFactory().createDefaultStrategyProperties();
+            } else {
+                Triple<String, Integer, IDefaultStrategyPropertiesFactory> chosenDefault =
+                    DEFINITION.getFurtherDefaults().get(selIndex - 1);
+                newMaxSteps = chosenDefault.second;
+                newProps = chosenDefault.third.createDefaultStrategyProperties();
             }
+
+            mediator.getSelectedProof().getSettings().getStrategySettings()
+                    .setMaxSteps(newMaxSteps);
+            updateStrategySettings(JAVACARDDL_STRATEGY_NAME, newProps);
+
+            predefChanged = false;
+            refresh(mediator.getSelectedProof());
+
         });
 
-        strategyPredefSettingsCmb.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                defaultButton.getActionListeners()[0].actionPerformed(null);
-            }
-        });
+        strategyPredefSettingsCmb
+                .addItemListener(e -> defaultButton.getActionListeners()[0].actionPerformed(null));
 
         panel.add(strategyPredefSettingsCmb);
         panel.add(defaultButton);
@@ -495,7 +478,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                     .entrySet()) {
                 String value = sp.getProperty(entry.getKey());
                 for (JRadioButton button : entry.getValue()) {
-                    button.setSelected(ObjectUtil.equals(button.getActionCommand(), value));
+                    button.setSelected(Objects.equals(button.getActionCommand(), value));
                 }
             }
             enableAll(true);
@@ -597,7 +580,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
 
     @Override
     public Icon getIcon() {
-        return IconFactory.PROOF_SEARCH_STRATEGY.get(MainWindowTabbedPane.TAB_ICON_SIZE);
+        return IconFactory.PROOF_SEARCH_STRATEGY.get(MainWindow.TAB_ICON_SIZE);
     }
 
     /**

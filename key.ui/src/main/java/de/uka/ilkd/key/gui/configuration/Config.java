@@ -3,7 +3,6 @@ package de.uka.ilkd.key.gui.configuration;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.UIManager;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;

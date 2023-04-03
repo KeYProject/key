@@ -2,6 +2,7 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.util.pp.Layouter;
 
 
 /**
@@ -27,9 +28,9 @@ public final class TermSV extends AbstractSV {
         return toString(sort().toString() + " term");
     }
 
-
     @Override
-    public String proofToString() {
-        return "\\schemaVar \\term " + sort().name() + " " + name() + ";\n";
+    public void layout(Layouter<?> l) {
+        l.print("\\schemaVar \\term ").print(sort().name().toString()).print(" ")
+                .print(name().toString());
     }
 }

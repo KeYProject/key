@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.originlabels;
 
 import java.awt.event.ActionEvent;
-
 import javax.swing.AbstractAction;
 
 import de.uka.ilkd.key.gui.MainWindow;

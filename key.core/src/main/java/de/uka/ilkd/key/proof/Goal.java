@@ -1,10 +1,16 @@
 package de.uka.ilkd.key.proof;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
@@ -18,13 +24,9 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.properties.MapProperties;
 import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * A proof is represented as a tree of nodes containing sequents. The initial proof consists of just
@@ -620,14 +622,15 @@ public final class Goal {
 
         proof.getServices().saveNameRecorder(n);
 
-        if (goalList != null) {
+        if (goalList != null) { // TODO: can goalList be null?
             if (goalList.isEmpty()) {
                 proof.closeGoal(this);
             } else {
                 proof.replace(this, goalList);
-                if (ruleApp instanceof TacletApp && ((TacletApp) ruleApp).taclet().closeGoal())
+                if (ruleApp instanceof TacletApp && ((TacletApp) ruleApp).taclet().closeGoal()) {
                     // the first new goal is the one to be closed
                     proof.closeGoal(goalList.head());
+                }
             }
         }
 
@@ -670,11 +673,9 @@ public final class Goal {
     }
 
     public String toString() {
-        de.uka.ilkd.key.pp.LogicPrinter lp =
-            (new de.uka.ilkd.key.pp.LogicPrinter(new de.uka.ilkd.key.pp.ProgramPrinter(null),
-                new NotationInfo(), proof().getServices()));
+        LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), proof().getServices());
         lp.printSequent(node.sequent());
-        return lp.toString();
+        return lp.result();
     }
 
     public <T> T getStrategyInfo(Property<T> property) {

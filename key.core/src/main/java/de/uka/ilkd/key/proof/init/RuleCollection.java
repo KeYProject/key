@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.proof.init;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.rule.BuiltInRule;
+
+import org.key_project.util.collection.ImmutableList;
 
 
 /**

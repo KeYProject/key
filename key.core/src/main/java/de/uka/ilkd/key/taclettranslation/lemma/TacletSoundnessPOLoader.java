@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
+import java.util.*;
+
 import de.uka.ilkd.key.proof.CompoundProof;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -10,11 +12,10 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.Taclet;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.*;
 
 public class TacletSoundnessPOLoader {
     private final boolean loadAsLemmata;
@@ -223,12 +224,8 @@ public class TacletSoundnessPOLoader {
 
     private ImmutableSet<Taclet> computeCommonTaclets(ImmutableList<Taclet> taclets,
             ImmutableSet<Taclet> reference) {
-        TreeSet<Taclet> treeSet = new TreeSet<Taclet>(new Comparator<Taclet>() {
-            @Override
-            public int compare(Taclet o1, Taclet o2) {
-                return o1.name().toString().compareTo(o2.name().toString());
-            }
-        });
+        TreeSet<Taclet> treeSet =
+            new TreeSet<Taclet>((o1, o2) -> o1.name().toString().compareTo(o2.name().toString()));
         for (Taclet taclet : reference) {
             treeSet.add(taclet);
         }

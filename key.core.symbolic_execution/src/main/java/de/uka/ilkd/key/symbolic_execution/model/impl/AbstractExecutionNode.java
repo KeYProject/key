@@ -5,11 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -20,16 +15,14 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeSymbolicLayoutExtractor;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLink;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
-import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
+import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * Provides a basic implementation of {@link IExecutionNode}.
@@ -538,12 +531,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      */
     @Override
     public IExecutionLink getOutgoingLink(final IExecutionNode<?> target) {
-        return CollectionUtil.search(outgoingLinks, new IFilter<IExecutionLink>() {
-            @Override
-            public boolean select(IExecutionLink element) {
-                return element.getTarget() == target;
-            }
-        });
+        return CollectionUtil.search(outgoingLinks, element -> element.getTarget() == target);
     }
 
     /**
@@ -559,12 +547,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      */
     @Override
     public IExecutionLink getIncomingLink(final IExecutionNode<?> source) {
-        return CollectionUtil.search(incomingLinks, new IFilter<IExecutionLink>() {
-            @Override
-            public boolean select(IExecutionLink element) {
-                return element.getSource() == source;
-            }
-        });
+        return CollectionUtil.search(incomingLinks, element -> element.getSource() == source);
     }
 
     /**

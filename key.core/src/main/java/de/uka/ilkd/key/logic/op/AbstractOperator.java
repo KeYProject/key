@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.TermCreationException;
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermCreationException;
+
+import org.key_project.util.collection.ImmutableArray;
 
 
 /**

@@ -1,22 +1,5 @@
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.gui.sourceview.JavaDocument;
-import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.util.ExceptionTools;
-import org.key_project.util.java.IOUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.SimpleAttributeSet;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,6 +13,26 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.annotation.Nullable;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.SimpleAttributeSet;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.sourceview.JavaDocument;
+import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.ExceptionTools;
+
+import org.key_project.util.java.IOUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Used by {@link de.uka.ilkd.key.gui.IssueDialog} to open the source file containing an error for
@@ -83,7 +86,9 @@ public class EditSourceFileAction extends KeyAction {
      * Moves the caret in a {@link JTextArea} to the specified position. Assumes the first position
      * in the textarea is in line 1 column 1.
      */
-    private static void textAreaGoto(JTextComponent textArea, int line, int col) {
+    private static void textAreaGoto(JTextComponent textArea, Position position) {
+        int line = position.line();
+        int col = position.column();
         String text = textArea.getText();
         int i = 0;
         while (i < text.length() && line > 1) {
@@ -126,7 +131,7 @@ public class EditSourceFileAction extends KeyAction {
             public void addNotify() {
                 super.addNotify();
                 requestFocus();
-                textAreaGoto(this, location.getLine(), location.getColumn());
+                textAreaGoto(this, location.getPosition());
             }
         };
         String source = IOUtil.readFrom(location.getFileURL());

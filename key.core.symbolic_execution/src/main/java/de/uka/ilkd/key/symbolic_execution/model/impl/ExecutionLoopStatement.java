@@ -1,14 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import java.io.IOException;
-import java.io.StringWriter;
-
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.statement.Do;
-import de.uka.ilkd.key.java.statement.EnhancedFor;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
@@ -40,35 +33,27 @@ public class ExecutionLoopStatement extends AbstractExecutionBlockStartNode<Loop
     @Override
     protected String lazyComputeName() {
         LoopStatement ls = getActiveStatement();
-        try {
-            if (ls.getGuardExpression() != null) {
-                if (ls instanceof While) {
-                    StringWriter sw = new StringWriter();
-                    PrettyPrinter sb = new PrettyPrinter(sw, true);
-                    sb.printWhile((While) ls, false);
-                    return sw.toString();
-                } else if (ls instanceof For) {
-                    StringWriter sw = new StringWriter();
-                    PrettyPrinter sb = new PrettyPrinter(sw, true);
-                    sb.printFor((For) ls, false);
-                    return sw.toString();
-                } else if (ls instanceof EnhancedFor) {
-                    StringWriter sw = new StringWriter();
-                    PrettyPrinter sb = new PrettyPrinter(sw, true);
-                    sb.printEnhancedFor((EnhancedFor) ls, false);
-                    return sw.toString();
-                } else if (ls instanceof Do) {
-                    StringWriter sw = new StringWriter();
-                    PrettyPrinter sb = new PrettyPrinter(sw, true);
-                    sb.printDo((Do) ls, false);
-                    return sw.toString();
-                } else {
-                    return ls.toString();
-                }
+        if (ls.getGuardExpression() != null) {
+            if (ls instanceof While) {
+                PrettyPrinter p = PrettyPrinter.purePrinter();
+                p.performActionOnWhile((While) ls, false);
+                return p.result();
+            } else if (ls instanceof For) {
+                PrettyPrinter p = PrettyPrinter.purePrinter();
+                p.performActionOnFor((For) ls, false);
+                return p.result();
+            } else if (ls instanceof EnhancedFor) {
+                PrettyPrinter p = PrettyPrinter.purePrinter();
+                p.performActionOnEnhancedFor((EnhancedFor) ls, false);
+                return p.result();
+            } else if (ls instanceof Do) {
+                PrettyPrinter p = PrettyPrinter.purePrinter();
+                p.performActionOnDo((Do) ls, false);
+                return p.result();
             } else {
                 return ls.toString();
             }
-        } catch (IOException e) {
+        } else {
             return ls.toString();
         }
     }
