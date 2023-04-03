@@ -22,6 +22,6 @@ public interface InstantiationProposer {
      * @param previousProposals a list of other proposals which should be taken into account (e.g.
      *        for name uniqueness), or null
      */
-    public String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
+    String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
             ImmutableList<String> previousProposals);
 }

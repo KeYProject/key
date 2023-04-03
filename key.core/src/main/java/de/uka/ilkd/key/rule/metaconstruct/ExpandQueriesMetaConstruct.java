@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -50,9 +52,10 @@ public class ExpandQueriesMetaConstruct extends AbstractTermTransformer {
         final StrategyProperties props =
             services.getProof().getSettings().getStrategySettings().getActiveStrategyProperties();
         final boolean queryTreatmenIsOn =
-            props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY) == StrategyProperties.QUERY_ON;
-        if (queryTreatmenIsOn || props.getProperty(
-            StrategyProperties.QUERY_OPTIONS_KEY) == StrategyProperties.QUERY_RESTRICTED) {
+            Objects.equals(props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY),
+                StrategyProperties.QUERY_ON);
+        if (queryTreatmenIsOn || Objects.equals(props.getProperty(
+            StrategyProperties.QUERY_OPTIONS_KEY), StrategyProperties.QUERY_RESTRICTED)) {
             result = QueryExpand.INSTANCE.evaluateQueries(services, arg1, positiveContext,
                 queryTreatmenIsOn);
         } else {

@@ -178,8 +178,8 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
                 exTypes[i] = si.getType(ex);
             }
             String[] varNames = VariableKit.getNewVariableNames(si, exTypes, expression);
-            tempVarDecls = new ArrayList<Statement>(exSize);
-            tempVarRefs = new ArrayList<VariableReference>(exSize);
+            tempVarDecls = new ArrayList<>(exSize);
+            tempVarRefs = new ArrayList<>(exSize);
 
             for (int i = 0; i < exSize; i += 1) {
                 // create local temporary variable declarations for remaining
@@ -235,8 +235,7 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
                 // logic contained in loop control
             }
             // insert variable declarations into statement block
-            for (int i = 0; i < tempSize; i += 1) {
-                Statement child = tempVarDecls.get(i);
+            for (Statement child : tempVarDecls) {
                 destination.add(destIndex, child);
                 child.setStatementContainer(((Statement) parent).getStatementContainer());
                 if (isVisible()) {

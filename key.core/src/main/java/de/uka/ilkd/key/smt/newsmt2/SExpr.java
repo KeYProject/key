@@ -71,7 +71,7 @@ public class SExpr implements Writable {
     private final Type type;
 
     /** The collection of the direct child s-expr of this object. Not null */
-    private List<SExpr> children;
+    private final List<SExpr> children;
 
     /**
      * Create a new s-expr without children, but with a given type.

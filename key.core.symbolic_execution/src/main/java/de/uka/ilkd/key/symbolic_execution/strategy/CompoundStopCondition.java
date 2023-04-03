@@ -22,7 +22,7 @@ public class CompoundStopCondition implements StopCondition {
     /**
      * The child {@link StopCondition}s to use.
      */
-    private List<StopCondition> children = new LinkedList<StopCondition>();
+    private final List<StopCondition> children = new LinkedList<>();
 
     /**
      * The last {@link StopCondition} treated in

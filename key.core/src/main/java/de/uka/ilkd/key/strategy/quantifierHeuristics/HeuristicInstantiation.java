@@ -30,7 +30,7 @@ public class HeuristicInstantiation implements TermGenerator {
     }
 
 
-    private class HIIterator implements Iterator<Term> {
+    private static class HIIterator implements Iterator<Term> {
         private final Iterator<Term> instances;
 
         private final QuantifiableVariable quantifiedVar;

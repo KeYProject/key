@@ -5,5 +5,5 @@ package de.uka.ilkd.key.macros.scripts.meta;
  * @version 1 (21.04.17)
  */
 public enum Type {
-    INT, BOOLEAN, FLOAT, TERM, STRING;
+    INT, BOOLEAN, FLOAT, TERM, STRING
 }

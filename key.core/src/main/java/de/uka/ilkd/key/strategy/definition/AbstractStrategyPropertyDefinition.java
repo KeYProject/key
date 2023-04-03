@@ -46,7 +46,7 @@ public abstract class AbstractStrategyPropertyDefinition {
         this.apiKey = apiKey;
         this.name = name;
         this.tooltip = tooltip;
-        this.subProperties = new ImmutableArray<AbstractStrategyPropertyDefinition>(subProperties);
+        this.subProperties = new ImmutableArray<>(subProperties);
     }
 
     /**

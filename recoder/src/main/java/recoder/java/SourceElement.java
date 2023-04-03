@@ -303,11 +303,7 @@ public interface SourceElement {
 
         public String toString() {
             if (this != UNDEFINED) {
-                return new StringBuilder()
-                        .append(line)
-                        .append('/')
-                        .append(column)
-                        .toString();
+                return String.valueOf(line) + '/' + (column - 1);
             } else {
                 return "??/??";
             }

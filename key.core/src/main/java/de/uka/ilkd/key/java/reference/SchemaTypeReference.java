@@ -16,7 +16,7 @@ public class SchemaTypeReference extends TypeReferenceImp implements AbstractPro
 
     public SchemaTypeReference(ProgramElementName name, int dimension, ReferencePrefix prefix) {
         super(name, dimension, prefix);
-        final StringBuffer sb = new StringBuffer("");
+        final StringBuilder sb = new StringBuilder();
 
         // as no inner classes prefix must be package reference
         PackageReference rp = (PackageReference) prefix;

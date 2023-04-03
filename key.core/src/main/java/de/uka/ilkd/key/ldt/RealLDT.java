@@ -54,7 +54,7 @@ public final class RealLDT extends LDT {
     @Override
     public Term translateLiteral(Literal lit, Services services) {
         // return skolem term
-        final Function sk = new Function(new Name("" + NAME + lit), targetSort());
+        final Function sk = new Function(new Name(String.valueOf(NAME) + lit), targetSort());
         return services.getTermBuilder().func(sk);
     }
 
@@ -94,7 +94,7 @@ public final class RealLDT extends LDT {
 
 
     @Override
-    public final Type getType(Term t) {
+    public Type getType(Term t) {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_REAL;
         } else {

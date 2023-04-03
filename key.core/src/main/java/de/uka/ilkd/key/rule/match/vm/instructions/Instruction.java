@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableArray;
 public abstract class Instruction<OP extends Operator> implements MatchInstruction {
 
     public static Instruction<Operator> matchOp(Operator op) {
-        return new MatchOpIdentityInstruction<Operator>(op);
+        return new MatchOpIdentityInstruction<>(op);
     }
 
     public static Instruction<SortDependingFunction> matchSortDependingFunction(

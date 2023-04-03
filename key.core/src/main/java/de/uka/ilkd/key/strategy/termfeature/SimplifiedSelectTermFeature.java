@@ -23,7 +23,7 @@ public final class SimplifiedSelectTermFeature extends BinaryTermFeature {
 
     @Override
     protected boolean filter(Term t, Services services) {
-        Boolean isSelectOp = heapLDT.getSortOfSelect(t.op()) != null;
+        boolean isSelectOp = heapLDT.getSortOfSelect(t.op()) != null;
         return // either the operator is not a select operator
         !isSelectOp ||
         // or the heap term of the select operator is the base heap

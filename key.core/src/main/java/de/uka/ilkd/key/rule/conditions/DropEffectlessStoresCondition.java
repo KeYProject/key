@@ -40,7 +40,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
             final Term objTerm = heapTerm.sub(1);
             final Term fieldTerm = heapTerm.sub(2);
             final Term valueTerm = heapTerm.sub(3);
-            final Pair<Term, Term> loc = new Pair<Term, Term>(objTerm, fieldTerm);
+            final Pair<Term, Term> loc = new Pair<>(objTerm, fieldTerm);
             final Term newSubHeapTerm =
                 dropEffectlessStoresHelper(subHeapTerm, services, overwrittenLocs.add(loc), store);
             if (overwrittenLocs.contains(loc)) {
@@ -59,7 +59,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     private static Term dropEffectlessStores(Term t, Services services) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         assert t.sort() == heapLDT.targetSort();
-        return dropEffectlessStoresHelper(t, services, DefaultImmutableSet.<Pair<Term, Term>>nil(),
+        return dropEffectlessStoresHelper(t, services, DefaultImmutableSet.nil(),
             heapLDT.getStore());
     }
 

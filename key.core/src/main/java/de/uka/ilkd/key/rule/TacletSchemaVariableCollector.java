@@ -45,7 +45,7 @@ public class TacletSchemaVariableCollector extends DefaultVisitor {
 
 
     public TacletSchemaVariableCollector() {
-        varList = ImmutableSLList.<SchemaVariable>nil();
+        varList = ImmutableSLList.nil();
     }
 
 
@@ -54,7 +54,7 @@ public class TacletSchemaVariableCollector extends DefaultVisitor {
      *        constructs to determine which labels are needed)
      */
     public TacletSchemaVariableCollector(SVInstantiations svInsts) {
-        varList = ImmutableSLList.<SchemaVariable>nil();
+        varList = ImmutableSLList.nil();
         instantiations = svInsts;
     }
 

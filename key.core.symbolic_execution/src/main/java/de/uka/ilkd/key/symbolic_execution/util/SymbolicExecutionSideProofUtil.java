@@ -111,13 +111,13 @@ public final class SymbolicExecutionSideProofUtil {
             methodTreatment, loopTreatment, queryTreatment, splittingOption);
         try {
             // Extract results and conditions from side proof
-            List<Pair<Term, Node>> conditionsAndResultsMap = new LinkedList<Pair<Term, Node>>();
+            List<Pair<Term, Node>> conditionsAndResultsMap = new LinkedList<>();
             for (Goal resultGoal : info.getProof().openGoals()) {
                 if (SymbolicExecutionUtil.hasApplicableRules(resultGoal)) {
                     throw new IllegalStateException("Not all applicable rules are applied.");
                 }
                 Sequent sequent = resultGoal.sequent();
-                List<Term> results = new LinkedList<Term>();
+                List<Term> results = new LinkedList<>();
                 for (SequentFormula sf : sequent.antecedent()) {
                     if (sf.formula().containsLabel(label)) {
                         Term result = sf.formula();
@@ -137,7 +137,7 @@ public final class SymbolicExecutionSideProofUtil {
                 } else {
                     result = services.getTermBuilder().or(results);
                 }
-                conditionsAndResultsMap.add(new Pair<Term, Node>(result, resultGoal.node()));
+                conditionsAndResultsMap.add(new Pair<>(result, resultGoal.node()));
             }
             return conditionsAndResultsMap;
         } finally {
@@ -180,14 +180,14 @@ public final class SymbolicExecutionSideProofUtil {
                 extractRelevantThings(info.getProof().getServices(), sequentToProve);
             // Extract results and conditions from side proof
             List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap =
-                new LinkedList<Triple<Term, Set<Term>, Node>>();
+                new LinkedList<>();
             for (Goal resultGoal : info.getProof().openGoals()) {
                 if (SymbolicExecutionUtil.hasApplicableRules(resultGoal)) {
                     throw new IllegalStateException("Not all applicable rules are applied.");
                 }
                 Sequent sequent = resultGoal.sequent();
                 boolean newPredicateIsSequentFormula = isOperatorASequentFormula(sequent, operator);
-                Set<Term> resultConditions = new LinkedHashSet<Term>();
+                Set<Term> resultConditions = new LinkedHashSet<>();
                 Term result = null;
                 for (SequentFormula sf : sequent.antecedent()) {
                     if (newPredicateIsSequentFormula) {
@@ -243,7 +243,7 @@ public final class SymbolicExecutionSideProofUtil {
                     result = services.getTermBuilder().ff();
                 }
                 conditionsAndResultsMap.add(
-                    new Triple<Term, Set<Term>, Node>(result, resultConditions, resultGoal.node()));
+                    new Triple<>(result, resultConditions, resultGoal.node()));
             }
             return conditionsAndResultsMap;
         } finally {
@@ -268,7 +268,7 @@ public final class SymbolicExecutionSideProofUtil {
                 i++;
             }
             if (result != null) {
-                List<Term> newSubs = new LinkedList<Term>();
+                List<Term> newSubs = new LinkedList<>();
                 for (int j = 0; j < term.arity(); j++) {
                     if (j == i - 1) {
                         newSubs.add(result);
@@ -277,7 +277,7 @@ public final class SymbolicExecutionSideProofUtil {
                     }
                 }
                 result = services.getTermFactory().createTerm(term.op(),
-                    new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(),
+                    new ImmutableArray<>(newSubs), term.boundVars(), term.javaBlock(),
                     term.getLabels());
             }
             return result;
@@ -380,7 +380,7 @@ public final class SymbolicExecutionSideProofUtil {
      */
     public static Set<Operator> extractRelevantThings(final Services services,
             Sequent sequentToProve) {
-        final Set<Operator> result = new HashSet<Operator>();
+        final Set<Operator> result = new HashSet<>();
         for (SequentFormula sf : sequentToProve) {
             sf.formula().execPreOrder(new DefaultVisitor() {
                 @Override
@@ -406,7 +406,7 @@ public final class SymbolicExecutionSideProofUtil {
      * @param term The {@link Term} to check.
      * @return {@code true} is relevant thing, {@code false} is not relevant.
      */
-    protected static boolean isRelevantThing(Services services, Term term) {
+    private static boolean isRelevantThing(Services services, Term term) {
         if (term.op() instanceof IProgramVariable) {
             return true;
         } else if (term.op() instanceof Function) {
@@ -495,12 +495,12 @@ public final class SymbolicExecutionSideProofUtil {
         /**
          * The {@link Services} to use.
          */
-        private Services services;
+        private final Services services;
 
         /**
          * The relevant things.
          */
-        private Set<Operator> relevantThings;
+        private final Set<Operator> relevantThings;
 
         /**
          * The result.

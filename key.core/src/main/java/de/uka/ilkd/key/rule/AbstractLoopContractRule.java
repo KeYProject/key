@@ -102,7 +102,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
      */
     protected static ImmutableSet<LoopContract> filterAppliedContracts(
             final ImmutableSet<LoopContract> collectedContracts, final Goal goal) {
-        ImmutableSet<LoopContract> result = DefaultImmutableSet.<LoopContract>nil();
+        ImmutableSet<LoopContract> result = DefaultImmutableSet.nil();
         for (LoopContract contract : collectedContracts) {
             if (!contractApplied(contract, goal)) {
                 result = result.add(contract);
@@ -212,7 +212,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
     protected Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(
             final Iterable<LocationVariable> variables, final LoopContract contract,
             final TermServices services) {
-        Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>(40);
+        Map<LocationVariable, Function> result = new LinkedHashMap<>(40);
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable variable : variables) {
             if (contract.hasModifiesClause(variable)) {

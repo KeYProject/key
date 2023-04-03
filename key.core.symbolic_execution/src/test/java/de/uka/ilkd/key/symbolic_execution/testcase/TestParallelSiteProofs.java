@@ -111,8 +111,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
         for (SiteProofThread<?> thread : threads) {
             // Make sure that no exception is thrown.
             if (thread.getException() != null) {
-                thread.getException().printStackTrace();
-                Assertions.fail(thread.getException().getMessage());
+                Assertions.fail(thread.getException());
             }
             // Make sure that something was computed in site proofs.
             Assertions.assertNotNull(thread.getResult());

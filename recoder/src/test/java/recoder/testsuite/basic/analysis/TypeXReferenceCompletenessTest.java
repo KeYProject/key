@@ -18,11 +18,9 @@ public class TypeXReferenceCompletenessTest extends XReferenceCompletenessTest {
         NameInfo ni = BasicTestsSuite.getConfig().getNameInfo();
 
         List<Type> types = ni.getTypes();
-        for (int i = 0; i < types.size(); i += 1) {
-            Type x = types.get(i);
+        for (Type x : types) {
             List<TypeReference> list = xrsi.getReferences(x);
-            for (int j = 0; j < list.size(); j += 1) {
-                TypeReference r = list.get(j);
+            for (TypeReference r : list) {
                 Type y = xrsi.getType(r);
                 if (x != y) {
                     Assert.fail(makeResolutionError(r, x, y));

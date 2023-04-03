@@ -63,7 +63,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
      * The thrown exception leading to cancellation of the task
      */
     private Exception exception;
-    private List<InteractionListener> interactionListeners = new ArrayList<>();
+    private final List<InteractionListener> interactionListeners = new ArrayList<>();
 
     /**
      * Instantiates a new proof macro worker.

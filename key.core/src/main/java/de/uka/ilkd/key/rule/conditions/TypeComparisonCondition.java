@@ -9,7 +9,6 @@ import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
@@ -25,7 +24,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  */
 public final class TypeComparisonCondition extends VariableConditionAdapter {
 
-    public static enum Mode {
+    public enum Mode {
         NOT_SAME, /* checks if sorts are not same */
         SAME, /* checks if sorts are same */
         IS_SUBTYPE, /* checks subtype relationship */
@@ -185,7 +184,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
         }
 
         if (map == null) {
-            map = new WeakHashMap<Sort, Boolean>();
+            map = new WeakHashMap<>();
             map.put(s2, b);
         } else {
             synchronized (map) {
@@ -245,8 +244,8 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
                 // otherwise, we just check whether *currently* there is
                 // some common subsort
                 result = true;
-                for (Named n : services.getNamespaces().sorts().allElements()) {
-                    final Sort s = (Sort) n;
+                for (Sort n : services.getNamespaces().sorts().allElements()) {
+                    final Sort s = n;
                     if (!(s instanceof NullSort) && s.extendsTrans(fstSort)
                             && s.extendsTrans(sndSort)) {
                         result = false;

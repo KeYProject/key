@@ -17,7 +17,7 @@ public class Bean implements IBean {
     /**
      * The used {@link PropertyChangeSupport}.
      */
-    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     /**
      * Returns the used {@link PropertyChangeSupport}.

@@ -36,7 +36,7 @@ public final class AbstractOrInterfaceType extends VariableConditionAdapter {
 
         final boolean isAbstractOrInterface = sort.isAbstract();
 
-        return negated ? !isAbstractOrInterface : isAbstractOrInterface;
+        return negated != isAbstractOrInterface;
     }
 
 

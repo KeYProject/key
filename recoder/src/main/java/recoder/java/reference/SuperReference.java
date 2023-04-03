@@ -186,8 +186,9 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
 
     public ProgramElement getChildAt(int index) {
         if (accessPath != null) {
-            if (index == 0)
+            if (index == 0) {
                 return accessPath;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

@@ -106,6 +106,6 @@ public class CharLiteral extends Literal {
     }
 
     public Object getEquivalentJavaType() {
-        return Character.valueOf(value.charAt(0));
+        return value.charAt(0);
     }
 }

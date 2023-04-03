@@ -39,11 +39,8 @@ public abstract class AbstractDomainLattice
      */
     public AbstractDomainElement abstractFrom(SymbolicExecutionState state, Term term,
             Services services) {
-        Iterator<AbstractDomainElement> it = iterator();
 
-        while (it.hasNext()) {
-            AbstractDomainElement elem = it.next();
-
+        for (AbstractDomainElement elem : this) {
             Term toProve = getSideConditionForAxiom(state, term, elem, services);
 
             if (isProvableWithSplitting(toProve, services, AXIOM_PROVE_TIMEOUT_MS)) {
@@ -121,9 +118,7 @@ public abstract class AbstractDomainLattice
      * @throws RuntimeException if s cannot be parsed.
      */
     public AbstractDomainElement fromString(String s, Services services) {
-        final Iterator<AbstractDomainElement> it = iterator();
-        while (it.hasNext()) {
-            final AbstractDomainElement elem = it.next();
+        for (AbstractDomainElement elem : this) {
             if (elem.toParseableString(services).equals(s)) {
                 return elem;
             }

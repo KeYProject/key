@@ -105,7 +105,7 @@ public class ProofObligationVars {
             newLabels[labels.size()] = ParameterlessTermLabel.ANON_HEAP_LABEL;
             StateVars newPre =
                 new StateVars(pre.self, pre.guard, pre.localVars, pre.result, pre.exception,
-                    tb.label(pre.heap, new ImmutableArray<TermLabel>(newLabels)), pre.mbyAtPre);
+                    tb.label(pre.heap, new ImmutableArray<>(newLabels)), pre.mbyAtPre);
             return new ProofObligationVars(newPre, post, exceptionParameter, formalParams, tb);
         } else {
             return this;
@@ -133,7 +133,7 @@ public class ProofObligationVars {
      */
     private ImmutableList<Term> buildFormalParamVars(Services services)
             throws IllegalArgumentException {
-        ImmutableList<Term> formalParamVars = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> formalParamVars = ImmutableSLList.nil();
         for (Term param : pre.localVars) {
             ProgramVariable paramVar = param.op(ProgramVariable.class);
             ProgramElementName pen = new ProgramElementName("_" + paramVar.name());

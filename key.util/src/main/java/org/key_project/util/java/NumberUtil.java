@@ -145,7 +145,7 @@ public class NumberUtil {
             if (text.startsWith("+")) {
                 text = text.substring(1);
             }
-            return Integer.valueOf(text);
+            return Integer.parseInt(text);
         } else {
             throw new NumberFormatException("Text not defined.");
         }
@@ -162,7 +162,7 @@ public class NumberUtil {
             if (text.startsWith("+")) {
                 text = text.substring(1);
             }
-            return Long.valueOf(text);
+            return Long.parseLong(text);
         } else {
             throw new NumberFormatException("Text not defined.");
         }

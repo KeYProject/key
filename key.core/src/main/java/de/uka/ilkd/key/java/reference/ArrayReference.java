@@ -46,7 +46,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
      */
     public ArrayReference(ReferencePrefix accessPath, Expression[] initializers) {
         this.prefix = accessPath;
-        this.inits = new ImmutableArray<Expression>(initializers);
+        this.inits = new ImmutableArray<>(initializers);
     }
 
     /**
@@ -67,10 +67,10 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
             this.prefix = new ArrayReference(e1, accessPath);
             e1 = new Expression[1];
             e1[0] = e[e.length - 1];
-            this.inits = new ImmutableArray<Expression>(e1);
+            this.inits = new ImmutableArray<>(e1);
         } else {
             this.prefix = accessPath;
-            this.inits = new ImmutableArray<Expression>(e);
+            this.inits = new ImmutableArray<>(e);
         }
     }
 
@@ -93,10 +93,10 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
             System.arraycopy(e, 0, e1, 0, e1.length);
             this.prefix = new ArrayReference(e1, accessPath);
             e1[0] = e[e.length - 1];
-            this.inits = new ImmutableArray<Expression>(e1);
+            this.inits = new ImmutableArray<>(e1);
         } else {
             this.prefix = accessPath;
-            this.inits = new ImmutableArray<Expression>(e);
+            this.inits = new ImmutableArray<>(e);
         }
     }
 
@@ -107,10 +107,12 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
      */
     public int getExpressionCount() {
         int c = 0;
-        if (prefix instanceof Expression)
+        if (prefix instanceof Expression) {
             c += 1;
-        if (inits != null)
+        }
+        if (inits != null) {
             c += inits.size();
+        }
         return c;
     }
 
@@ -126,8 +128,9 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     public Expression getExpressionAt(int index) {
         if (prefix instanceof Expression) {
-            if (index == 0)
+            if (index == 0) {
                 return (Expression) prefix;
+            }
             index--;
         }
         if (inits != null) {
@@ -180,10 +183,12 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
      */
     public int getChildCount() {
         int result = 0;
-        if (prefix != null)
+        if (prefix != null) {
             result++;
-        if (inits != null)
+        }
+        if (inits != null) {
             result += inits.size();
+        }
         return result;
     }
 
@@ -196,8 +201,9 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0)
+            if (index == 0) {
                 return prefix;
+            }
             index--;
         }
         if (inits != null) {

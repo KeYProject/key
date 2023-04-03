@@ -6,8 +6,8 @@ import de.uka.ilkd.key.logic.Term;
 
 public class ModifiesSetTranslator {
 
-    private Services services;
-    private OracleGenerator gen;
+    private final Services services;
+    private final OracleGenerator gen;
 
 
     public boolean isSingleTon(Term t) {

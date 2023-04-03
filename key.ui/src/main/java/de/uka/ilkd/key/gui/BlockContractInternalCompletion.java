@@ -3,7 +3,6 @@ package de.uka.ilkd.key.gui;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule.Instantiation;
@@ -53,7 +52,7 @@ public class BlockContractInternalCompletion implements InteractiveRuleApplicati
         if (configurator.wasSuccessful()) {
             final List<LocationVariable> heaps =
                 HeapContext.getModHeaps(services, instantiation.isTransactional());
-            result.update((StatementBlock) instantiation.statement, configurator.getContract(),
+            result.update(instantiation.statement, configurator.getContract(),
                 heaps);
         }
         return result;

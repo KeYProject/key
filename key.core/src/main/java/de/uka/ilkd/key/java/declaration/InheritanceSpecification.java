@@ -40,7 +40,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      */
 
     public InheritanceSpecification(TypeReference supertype) {
-        this.supertypes = new ImmutableArray<TypeReference>(supertype);
+        this.supertypes = new ImmutableArray<>(supertype);
     }
 
     /**
@@ -50,7 +50,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      */
 
     public InheritanceSpecification(TypeReference[] supertypes) {
-        this.supertypes = new ImmutableArray<TypeReference>(supertypes);
+        this.supertypes = new ImmutableArray<>(supertypes);
     }
 
     /**
@@ -61,7 +61,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      */
     protected InheritanceSpecification(ExtList children) {
         super(children);
-        this.supertypes = new ImmutableArray<TypeReference>(children.collect(TypeReference.class));
+        this.supertypes = new ImmutableArray<>(children.collect(TypeReference.class));
     }
 
 
@@ -81,8 +81,9 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
 
     public int getChildCount() {
         int result = 0;
-        if (supertypes != null)
+        if (supertypes != null) {
             result += supertypes.size();
+        }
         return result;
     }
 

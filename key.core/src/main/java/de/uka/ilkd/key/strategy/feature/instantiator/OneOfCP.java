@@ -11,7 +11,7 @@ import de.uka.ilkd.key.strategy.feature.Feature;
 public class OneOfCP implements Feature {
 
     private final BackTrackingManager manager;
-    private final Feature features[];
+    private final Feature[] features;
 
     private int theChosenOne;
     private final ChoicePoint cp = new CP();

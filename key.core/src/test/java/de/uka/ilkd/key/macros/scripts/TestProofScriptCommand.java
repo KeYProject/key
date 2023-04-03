@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * see {@link MasterHandlerTest} from where I copied quite a bit.
  */
 public class TestProofScriptCommand {
-    public static Stream<Arguments> data() throws IOException, URISyntaxException {
+    public static List<Arguments> data() throws IOException, URISyntaxException {
         URL url = TestProofScriptCommand.class.getResource("cases");
         if (url == null) {
             throw new FileNotFoundException("Cannot find resource 'cases'.");
@@ -47,7 +47,10 @@ public class TestProofScriptCommand {
 
         Path directory = Paths.get(url.toURI());
         assertTrue(Files.isDirectory(directory));
-        return Files.list(directory).map(f -> Arguments.of(f.getFileName().toString(), f));
+        try (var s = Files.list(directory)) {
+            return s.map(f -> Arguments.of(f.getFileName().toString(), f))
+                    .collect(Collectors.toList());
+        }
     }
 
     @ParameterizedTest

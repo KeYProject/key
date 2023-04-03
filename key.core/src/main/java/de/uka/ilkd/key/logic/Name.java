@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.logic;
 
+import java.util.Objects;
+
 /**
  * A Name object is created to represent the name of an object which usually implements the
  * interface {@link Named}.
@@ -34,7 +36,7 @@ public class Name implements Comparable<Name> {
         }
         // since ALL nameStrings are interned, equality can be safely reduced to
         // identity in THIS case:
-        return nameString == ((Name) o).nameString;
+        return Objects.equals(nameString, ((Name) o).nameString);
     }
 
     @Override

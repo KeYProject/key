@@ -1,11 +1,7 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 
@@ -65,18 +61,10 @@ public final class ProofCollection {
         }
 
         Set<String> enabledTestCaseNames = settings.getEnabledTestCaseNames();
-        if (enabledTestCaseNames == null) {
-            return ret;
-        } else {
-            Iterator<RunAllProofsTestUnit> iterator = ret.iterator();
-            while (iterator.hasNext()) {
-                RunAllProofsTestUnit unit = iterator.next();
-                if (!enabledTestCaseNames.contains(unit.getTestName())) {
-                    iterator.remove();
-                }
-            }
-            return ret;
+        if (enabledTestCaseNames != null) {
+            ret.removeIf(unit -> !enabledTestCaseNames.contains(unit.getTestName()));
         }
+        return ret;
     }
 
     public ProofCollectionSettings getSettings() {

@@ -46,7 +46,7 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
                 originalLabel != null ? originalLabel : formulaLabel;
             // May change sub ID if logical operators like junctors are used
             boolean newLabelIdRequired = false;
-            Set<String> originalLabelIds = new LinkedHashSet<String>();
+            Set<String> originalLabelIds = new LinkedHashSet<>();
             if (hint instanceof TacletLabelHint) {
                 TacletLabelHint tacletHint = (TacletLabelHint) hint;
                 if (isBelowIfThenElse(tacletHint.getTacletTermStack())) {

@@ -283,7 +283,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
             includes, poPropertiesToForce, forceNewProfileOfNewProofs, callbackProofLoaded);
         InitConfig initConfig = loader.getInitConfig();
 
-        return new KeYEnvironment<DefaultUserInterfaceControl>(ui, initConfig, loader.getProof(),
+        return new KeYEnvironment<>(ui, initConfig, loader.getProof(),
             loader.getProofScript(), loader.getResult());
     }
 

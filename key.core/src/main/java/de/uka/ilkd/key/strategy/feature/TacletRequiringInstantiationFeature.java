@@ -23,8 +23,9 @@ public class TacletRequiringInstantiationFeature extends BinaryTacletAppFeature 
         final ImmutableSet<SchemaVariable> neededVars = app.uninstantiatedVars();
         final ImmutableSet<SchemaVariable> ifFindVars = app.taclet().getIfFindVariables();
         for (SchemaVariable neededVar : neededVars) {
-            if (!ifFindVars.contains(neededVar))
+            if (!ifFindVars.contains(neededVar)) {
                 return true;
+            }
         }
         return false;
     }

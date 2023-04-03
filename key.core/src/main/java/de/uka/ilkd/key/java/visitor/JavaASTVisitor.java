@@ -77,7 +77,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
         } else if (node instanceof MergePointStatement && services != null) {
             ImmutableSet<MergeContract> mcs =
                 services.getSpecificationRepository().getMergeContracts((MergePointStatement) node);
-            mcs.forEach(mc -> performActionOnMergeContract(mc));
+            mcs.forEach(this::performActionOnMergeContract);
         }
     }
 

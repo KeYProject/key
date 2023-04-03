@@ -13,6 +13,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
@@ -92,7 +93,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
      */
     public void save() {
         LOGGER.info("Save color settings to: " + SETTINGS_FILE.getAbsolutePath());
-        try (Writer writer = new FileWriter(SETTINGS_FILE)) {
+        try (Writer writer = new FileWriter(SETTINGS_FILE, StandardCharsets.UTF_8)) {
             Properties props = new Properties();
             for (Map.Entry<String, Object> entry : properties.entrySet()) {
                 props.setProperty(entry.getKey(), entry.getValue().toString());
@@ -108,7 +109,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
             config.save(writer, "KeY's Colors");
             writer.flush();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.error("Failed to save color settings", ex);
         }
     }
 
@@ -146,8 +147,9 @@ public class ColorSettings extends AbstractPropertiesSettings {
 
         @Override
         public String value() {
-            if (currentValue != null)
+            if (currentValue != null) {
                 return toHex(currentValue);
+            }
 
             String v = properties.get(key).toString();
 
@@ -185,15 +187,16 @@ public class ColorSettings extends AbstractPropertiesSettings {
 
         @Override
         public Color get() {
-            if (currentValue != null)
+            if (currentValue != null) {
                 return currentValue;
+            }
 
             String v = (String) properties.get(key);
 
             try {
                 return currentValue = fromHex(v);
             } catch (NumberFormatException e) {
-                e.printStackTrace();
+                LOGGER.error("Failed to parse color, using magenta", e);
                 return Color.MAGENTA;
             }
         }

@@ -13,12 +13,12 @@ public interface ProofDisposedListener {
      *
      * @param e The event.
      */
-    public void proofDisposing(ProofDisposedEvent e);
+    void proofDisposing(ProofDisposedEvent e);
 
     /**
      * When a {@link Proof} was disposed via {@link Proof#dispose()}.
      *
      * @param e The event.
      */
-    public void proofDisposed(ProofDisposedEvent e);
+    void proofDisposed(ProofDisposedEvent e);
 }

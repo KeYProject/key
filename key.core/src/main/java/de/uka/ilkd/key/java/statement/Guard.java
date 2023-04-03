@@ -13,7 +13,7 @@ import org.key_project.util.ExtList;
 
 public class Guard extends JavaNonTerminalProgramElement implements IGuard {
 
-    Expression expr;
+    final Expression expr;
 
     public Guard(Expression expression) {
         expr = expression;
@@ -36,8 +36,9 @@ public class Guard extends JavaNonTerminalProgramElement implements IGuard {
     }
 
     public ProgramElement getChildAt(int index) {
-        if (index == 0)
+        if (index == 0) {
             return expr;
+        }
         return null;
     }
 

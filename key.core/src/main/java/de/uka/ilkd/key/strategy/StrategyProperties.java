@@ -339,7 +339,7 @@ public final class StrategyProperties extends Properties {
         if (o == null) {
             o = (String) DEFAULT_MAP.get(key);
             // remove this line if always satisfied. add another assignment if not.
-            assert o == getUniqueString(o);
+            assert o.equals(getUniqueString(o));
         }
         return o;
     }
@@ -349,7 +349,7 @@ public final class StrategyProperties extends Properties {
      *           <code>stringPool</code>.
      * @return Returns the same string but possibly with a different but unique object identity.
      */
-    private final static String getUniqueString(String in) {
+    private static String getUniqueString(String in) {
         for (String id : STRING_POOL) {
             if (id.equals(in)) {
                 return id;

@@ -19,7 +19,7 @@ public class Then extends BranchImp {
      * Body.
      */
 
-    protected Statement body;
+    protected final Statement body;
 
 
     /**
@@ -76,8 +76,9 @@ public class Then extends BranchImp {
 
     public ProgramElement getChildAt(int index) {
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

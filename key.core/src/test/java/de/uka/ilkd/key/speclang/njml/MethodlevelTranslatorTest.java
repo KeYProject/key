@@ -29,8 +29,9 @@ public class MethodlevelTranslatorTest {
         JmlParser parser = new JmlParser(new CommonTokenStream(lexer));
         try {
             JmlParser.Methodlevel_commentContext ctx = parser.methodlevel_comment();
-            if (parser.getNumberOfSyntaxErrors() != 0)
+            if (parser.getNumberOfSyntaxErrors() != 0) {
                 debugLexer(expr);
+            }
         } catch (Exception e) {
             debugLexer(expr);
         }

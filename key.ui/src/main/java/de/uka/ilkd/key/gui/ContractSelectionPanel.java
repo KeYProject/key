@@ -71,7 +71,7 @@ public class ContractSelectionPanel extends JPanel {
         add(scrollPane);
 
         // create contract list
-        contractList = new JList<Contract>();
+        contractList = new JList<>();
         contractList
                 .setSelectionMode(multipleSelection ? ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
                         : ListSelectionModel.SINGLE_SELECTION);
@@ -306,7 +306,7 @@ public class ContractSelectionPanel extends JPanel {
             return selection.get(0);
         } else {
             ImmutableSet<FunctionalOperationContract> contracts =
-                DefaultImmutableSet.<FunctionalOperationContract>nil();
+                DefaultImmutableSet.nil();
             for (Contract contract : selection) {
                 if (contract instanceof FunctionalOperationContract) {
                     contracts = contracts.add((FunctionalOperationContract) contract);

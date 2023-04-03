@@ -24,15 +24,14 @@ import org.junit.jupiter.api.*;
 public final class RunAllProofsInfFlow extends RunAllProofsTest {
     private static final String SKIP_INF_FLOW_PROPERTY = "key.runallproofs.skipInfFlow";
     public static final String INDEX_FILE = "index/automaticInfFlow.txt";
-    private static ProofCollection proofCollection = getProofCollection();
+    private static final ProofCollection proofCollection = getProofCollection();
 
     private static ProofCollection getProofCollection() {
         if (!Boolean.getBoolean(SKIP_INF_FLOW_PROPERTY)) {
             try {
                 return parseIndexFile(INDEX_FILE);
             } catch (IOException e) {
-                e.printStackTrace();
-                Assertions.fail();
+                Assertions.fail(e);
             }
         }
         return null;

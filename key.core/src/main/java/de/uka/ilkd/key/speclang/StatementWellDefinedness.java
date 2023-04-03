@@ -65,7 +65,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @return a list of the parameter variables
      */
     final static ImmutableList<ProgramVariable> convertParams(ImmutableSet<ProgramVariable> set) {
-        ImmutableList<ProgramVariable> list = ImmutableSLList.<ProgramVariable>nil();
+        ImmutableList<ProgramVariable> list = ImmutableSLList.nil();
         for (ProgramVariable pv : set) {
             list = list.append(pv);
         }
@@ -126,7 +126,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
             Services services) {
         final ImmutableList<ProgramVariable> params = convertParams(ps);
         final Map<LocationVariable, ProgramVariable> atPres =
-            new LinkedHashMap<LocationVariable, ProgramVariable>();
+            new LinkedHashMap<>();
         atPres.put(heap, heapAtPre);
         final Variables vars =
             new Variables(self, result, exception, atPres, params, heap, anonHeap);

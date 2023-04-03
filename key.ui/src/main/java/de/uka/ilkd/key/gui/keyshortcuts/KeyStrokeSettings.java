@@ -129,8 +129,9 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         super(""); // no category, separate file
         this.properties.putAll(DEFAULT_KEYSTROKES);
         init.forEach((key, value) -> {
-            if (value != null && !value.toString().isEmpty())
+            if (value != null && !value.toString().isEmpty()) {
                 this.properties.put(key.toString(), value);
+            }
         });
         save();
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
@@ -191,8 +192,9 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     KeyStroke getKeyStroke(String key, KeyStroke defaultValue) {
         try {
             KeyStroke ks = KeyStroke.getKeyStroke(properties.get(key).toString());
-            if (ks != null)
+            if (ks != null) {
                 return ks;
+            }
         } catch (Exception ignored) {
         }
         return defaultValue;
@@ -201,7 +203,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     public void save() {
         LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE.getAbsolutePath());
         SETTINGS_FILE.getParentFile().mkdirs();
-        try (Writer writer = new FileWriter(SETTINGS_FILE)) {
+        try (Writer writer = new FileWriter(SETTINGS_FILE, StandardCharsets.UTF_8)) {
             Properties props = new Properties();
             for (Map.Entry<String, Object> entry : properties.entrySet()) {
                 props.setProperty(entry.getKey(), entry.getValue().toString());
@@ -218,7 +220,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
             config.save(writer, "KeY's Colors");
             writer.flush();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Failed to save", ex);
         }
     }
 }

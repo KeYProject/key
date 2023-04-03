@@ -35,18 +35,14 @@ public class KeYProjectHomepageAction extends MainWindowAction {
         return Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
     }
 
-    @SuppressWarnings("finally")
     private static URI getURI() {
         URI res = null;
         try {
             res = (new URL(url)).toURI();
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | URISyntaxException e) {
             // todo Auto-generated catch block
-        } catch (URISyntaxException e) {
-            // todo Auto-generated catch block
-        } finally {
-            return res;
         }
+        return res;
     }
 
     @Override

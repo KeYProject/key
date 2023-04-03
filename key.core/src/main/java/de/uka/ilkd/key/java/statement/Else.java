@@ -16,7 +16,7 @@ public class Else extends BranchImp {
     /**
      * Body.
      */
-    protected Statement body;
+    protected final Statement body;
 
 
     /**
@@ -64,8 +64,9 @@ public class Else extends BranchImp {
      */
     public ProgramElement getChildAt(int index) {
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

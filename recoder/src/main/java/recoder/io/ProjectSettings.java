@@ -121,7 +121,7 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
     }
 
     public final boolean java5Allowed() {
-        return Boolean.valueOf(properties.getProperty(JAVA_5)).booleanValue();
+        return Boolean.valueOf(properties.getProperty(JAVA_5));
     }
 
     /**
@@ -201,8 +201,8 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
         if (pathlist == null) {
             return null;
         }
-        Set<String> alreadyExisting = new HashSet<String>();
-        StringBuffer newpathlist = new StringBuffer();
+        Set<String> alreadyExisting = new HashSet<>();
+        StringBuilder newpathlist = new StringBuilder();
         pathlist = pathlist.replace('/', File.separatorChar);
         pathlist = pathlist.replace('\\', File.separatorChar);
         StringTokenizer paths = new StringTokenizer(pathlist, File.pathSeparator);
@@ -262,17 +262,17 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
         }
         String oldpath = getProperty(INPUT_PATH);
         String extPath = extDir.getPath();
-        if (oldpath.indexOf(extPath) != -1) {
+        if (oldpath.contains(extPath)) {
             return;
         }
 
         // add all the jars from extDir in the path
-        StringBuffer additions = null;
+        StringBuilder additions = null;
         File[] jars = extDir.listFiles(ProjectSettings.jarFilter);
         if (jars.length > 0) {
-            additions = new StringBuffer();
-            for (int i = 0; i < jars.length; i++) {
-                additions.append(File.pathSeparator + jars[i].getPath());
+            additions = new StringBuilder();
+            for (File jar : jars) {
+                additions.append(File.pathSeparator + jar.getPath());
             }
         }
         setProperty(INPUT_PATH, oldpath + File.pathSeparator + additions);

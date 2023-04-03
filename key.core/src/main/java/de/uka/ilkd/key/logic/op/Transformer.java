@@ -29,7 +29,7 @@ public class Transformer extends Function {
     }
 
     public Transformer(Name name, Sort argSort) {
-        this(name, Sort.FORMULA, new ImmutableArray<Sort>(argSort));
+        this(name, Sort.FORMULA, new ImmutableArray<>(argSort));
     }
 
     /**
@@ -45,7 +45,7 @@ public class Transformer extends Function {
     public static Transformer getTransformer(Name name, Sort sort, ImmutableArray<Sort> argSorts,
             TermServices services) {
         final Named f = services.getNamespaces().functions().lookup(name);
-        if (f != null && f instanceof Transformer) {
+        if (f instanceof Transformer) {
             Transformer t = (Transformer) f;
             assert t.sort() == sort;
             assert t.argSorts().size() == argSorts.size();
@@ -106,8 +106,9 @@ public class Transformer extends Function {
             while (it.next() != -1) {
                 final Term t = it.getSubTerm();
                 op = t.op();
-                if (op instanceof Transformer)
+                if (op instanceof Transformer) {
                     return (Transformer) op;
+                }
             }
         }
         return null;

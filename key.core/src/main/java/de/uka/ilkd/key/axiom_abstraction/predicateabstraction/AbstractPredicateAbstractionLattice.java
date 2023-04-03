@@ -94,11 +94,11 @@ public abstract class AbstractPredicateAbstractionLattice extends AbstractDomain
      *
      * @author Dominic Scheurer
      */
-    protected abstract class AbstractPredicateLatticeIterator
+    protected abstract static class AbstractPredicateLatticeIterator
             implements Iterator<AbstractDomainElement> {
 
         private final ArrayList<ArrayList<ImmutableFixedLengthBitSet>> bitSetsByNumZeroes =
-            new ArrayList<ArrayList<ImmutableFixedLengthBitSet>>();
+            new ArrayList<>();
 
         /**
          * Constructs a new {@link AbstractPredicateLatticeIterator}; initializes the bit sets for
@@ -114,7 +114,7 @@ public abstract class AbstractPredicateAbstractionLattice extends AbstractDomain
 
             // Initialize the list.
             for (int i = 0; i < numApplPreds + 1; i++) {
-                bitSetsByNumZeroes.add(new ArrayList<ImmutableFixedLengthBitSet>());
+                bitSetsByNumZeroes.add(new ArrayList<>());
             }
 
             // bitSet initially represents the number 0.

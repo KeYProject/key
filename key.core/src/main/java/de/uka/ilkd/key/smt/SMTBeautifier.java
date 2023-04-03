@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.smt;
 
-
 import java.util.ArrayList;
 import java.util.List;
 

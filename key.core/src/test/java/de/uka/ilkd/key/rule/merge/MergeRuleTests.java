@@ -323,8 +323,7 @@ public class MergeRuleTests {
 
             return proof;
         } catch (ProblemLoaderException e) {
-            e.printStackTrace();
-            Assertions.fail("Proof could not be loaded:\n" + e.getMessage());
+            Assertions.fail("Proof could not be loaded", e);
             return null;
         }
     }

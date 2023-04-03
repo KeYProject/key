@@ -8,8 +8,8 @@ public class UnfittingReplacewithException extends RecognitionException {
      *
      */
     private static final long serialVersionUID = -497885048593588941L;
-    private String description;
-    private String filename;
+    private final String description;
+    private final String filename;
 
     public UnfittingReplacewithException(String description, String filename, int line,
             int column) {

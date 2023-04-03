@@ -76,7 +76,7 @@ public class TranscendentalFloatSMTMacro extends SequentialProofMacro {
 
     private static class TranscendentalMacro extends AbstractPropositionalExpansionMacro {
 
-        private static Set<String> ADMITTED_RULES = makeAdmitted();
+        private static final Set<String> ADMITTED_RULES = makeAdmitted();
 
         @Override
         protected Set<String> getAdmittedRuleNames() {

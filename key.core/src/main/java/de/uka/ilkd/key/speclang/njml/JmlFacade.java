@@ -80,8 +80,9 @@ public final class JmlFacade {
         } else {
             c = ctx.storeref();
         }
-        if (c == null)
+        if (c == null) {
             throw new NullPointerException();
+        }
         return c;
     }
 

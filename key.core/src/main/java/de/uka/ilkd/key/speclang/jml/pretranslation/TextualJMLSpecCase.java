@@ -122,8 +122,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName,
             LabeledParserRuleContext ctx) {
-        if (heapName == null)
+        if (heapName == null) {
             heapName = HeapLDT.BASE_HEAP_NAME;
+        }
         clauses.add(new Entry(clause, ctx, heapName));
         return this;
     }
@@ -245,10 +246,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof TextualJMLSpecCase))
+        }
+        if (!(o instanceof TextualJMLSpecCase)) {
             return false;
+        }
         TextualJMLSpecCase that = (TextualJMLSpecCase) o;
         return getBehavior() == that.getBehavior() && clauses.equals(that.clauses);
     }

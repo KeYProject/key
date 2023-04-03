@@ -20,7 +20,7 @@ public class ShowOriginAction extends MainWindowAction {
 
     private static final long serialVersionUID = 4557953425770258852L;
 
-    private PosInSequent pos;
+    private final PosInSequent pos;
 
     /**
      * Creates a new {@link ShowOriginAction}.

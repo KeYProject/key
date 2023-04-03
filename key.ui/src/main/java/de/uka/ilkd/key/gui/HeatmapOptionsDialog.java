@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
+import java.util.Objects;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.NumberFormatter;
@@ -131,9 +132,8 @@ public class HeatmapOptionsDialog extends JDialog {
             dispose();
         });
 
-        getRootPane().registerKeyboardAction(e -> {
-            dispose();
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().registerKeyboardAction(e -> dispose(),
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         JPanel radioBoxes = setupRadioPanel(radioButtons, panel.getBackground(), this);
         JPanel spPanel = setupSpinnerPanel(valueSpinner, panel.getBackground());
@@ -313,23 +313,23 @@ public class HeatmapOptionsDialog extends JDialog {
                 boolean sf = VS.isHeatmapSF();
                 boolean newest = VS.isHeatmapNewest();
                 int ma = VS.getMaxAgeForHeatmap();
-                if (command == COMMANDS[0]) {
+                if (Objects.equals(command, COMMANDS[0])) {
                     VS.setHeatmapOptions(false, sf, newest, ma);
                     dispose();
                     return;
-                } else if (command == COMMANDS[1]) {
+                } else if (Objects.equals(command, COMMANDS[1])) {
                     showHm = true;
                     sf = true;
                     newest = false;
-                } else if (command == COMMANDS[2]) {
+                } else if (Objects.equals(command, COMMANDS[2])) {
                     showHm = true;
                     sf = true;
                     newest = true;
-                } else if (command == COMMANDS[3]) {
+                } else if (Objects.equals(command, COMMANDS[3])) {
                     showHm = true;
                     sf = false;
                     newest = false;
-                } else if (command == COMMANDS[4]) {
+                } else if (Objects.equals(command, COMMANDS[4])) {
                     showHm = true;
                     sf = false;
                     newest = true;
@@ -347,7 +347,7 @@ public class HeatmapOptionsDialog extends JDialog {
      *
      * @author jschiffl a small dialog that explains an option in more detail
      */
-    class InfoDialog extends JDialog {
+    static class InfoDialog extends JDialog {
 
         /** serial version id */
         private static final long serialVersionUID = 479715116105454400L;
@@ -390,9 +390,8 @@ public class HeatmapOptionsDialog extends JDialog {
             });
 
             // exit on escape button
-            getRootPane().registerKeyboardAction(e -> {
-                dispose();
-            }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+            getRootPane().registerKeyboardAction(e -> dispose(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         }
     }
 }

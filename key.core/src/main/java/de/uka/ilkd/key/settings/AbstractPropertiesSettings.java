@@ -34,9 +34,9 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
 
 
     /**
-     *
+     * Collection of listeners to notify when a setting changes its value.
      */
-    protected List<PropertyEntry<?>> propertyEntries = new LinkedList<>();
+    protected final List<PropertyEntry<?>> propertyEntries = new LinkedList<>();
 
     public AbstractPropertiesSettings(String category) {
         this.category = category;

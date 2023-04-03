@@ -9,8 +9,8 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 
 public class ParserConfig {
 
-    private Services services;
-    private NamespaceSet nss;
+    private final Services services;
+    private final NamespaceSet nss;
 
 
     public ParserConfig(Services services, NamespaceSet nss) {

@@ -13,6 +13,9 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkedTestFileRunner;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A single unit that will be tested during {@link RunAllProofsTest} run.
  *
@@ -20,11 +23,12 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
  */
 public final class RunAllProofsTestUnit implements Serializable {
     private static final long serialVersionUID = -2406881153415390252L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(RunAllProofsTestUnit.class);
 
     /**
      * The name of this test.
      */
-    private String testName;
+    private final String testName;
 
     private final ProofCollectionSettings settings;
     private final List<TestFile> testFiles;
@@ -68,13 +72,13 @@ public final class RunAllProofsTestUnit implements Serializable {
 
         boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
         if (verbose) {
-            System.out.println("Running test " + testName);
+            LOGGER.info("Running test " + testName);
         }
 
         boolean ignoreTest = "true".equals(settings.get(RunAllProofsTest.IGNORE_KEY));
         if (ignoreTest) {
             if (verbose) {
-                System.out.println("... ignoring this test due to 'ignore=true' in file");
+                LOGGER.info("... ignoring this test due to 'ignore=true' in file");
             }
             return new TestResult("Test case has been ignored", true);
         }
@@ -107,7 +111,7 @@ public final class RunAllProofsTestUnit implements Serializable {
         }
 
         if (verbose) {
-            System.out.println("Returning from test " + testName);
+            LOGGER.info("Returning from test " + testName);
         }
 
         /*
@@ -120,12 +124,12 @@ public final class RunAllProofsTestUnit implements Serializable {
         }
 
         boolean success = true;
-        String message = "group " + testName + ":\n";
+        StringBuilder message = new StringBuilder("group " + testName + ":\n");
         for (TestResult testResult : testResults) {
             success &= testResult.success;
-            message += testResult.message + "\n";
+            message.append(testResult.message).append("\n");
         }
-        return new TestResult(message, success);
+        return new TestResult(message.toString(), success);
     }
 
     public String getTestName() {

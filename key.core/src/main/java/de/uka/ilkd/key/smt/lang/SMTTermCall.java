@@ -48,7 +48,7 @@ public class SMTTermCall extends SMTTerm {
 
         this.func = func;
 
-        List<SMTTerm> args = new LinkedList<SMTTerm>();
+        List<SMTTerm> args = new LinkedList<>();
         args.add(arg);
         arg.upp = this;
         this.args = args;
@@ -76,9 +76,9 @@ public class SMTTermCall extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getQuantVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
-        for (int i = 0; i < args.size(); i++) {
-            vars.addAll(args.get(i).getQuantVars());
+        List<SMTTermVariable> vars = new LinkedList<>();
+        for (SMTTerm arg : args) {
+            vars.addAll(arg.getQuantVars());
         }
         return vars;
     }
@@ -86,9 +86,9 @@ public class SMTTermCall extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getUQVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
-        for (int i = 0; i < args.size(); i++) {
-            vars.addAll(args.get(i).getUQVars());
+        List<SMTTermVariable> vars = new LinkedList<>();
+        for (SMTTerm arg : args) {
+            vars.addAll(arg.getUQVars());
         }
         return vars;
     }
@@ -96,9 +96,9 @@ public class SMTTermCall extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getEQVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
-        for (int i = 0; i < args.size(); i++) {
-            vars.addAll(args.get(i).getEQVars());
+        List<SMTTermVariable> vars = new LinkedList<>();
+        for (SMTTerm arg : args) {
+            vars.addAll(arg.getEQVars());
         }
         return vars;
     }
@@ -106,10 +106,10 @@ public class SMTTermCall extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> vars = new LinkedList<>();
 
-        for (int i = 0; i < args.size(); i++) {
-            vars.addAll(args.get(i).getVars());
+        for (SMTTerm arg : args) {
+            vars.addAll(arg.getVars());
         }
         return vars;
     }
@@ -124,8 +124,9 @@ public class SMTTermCall extends SMTTerm {
     @Override
     public boolean occurs(SMTTermVariable a) {
         for (SMTTerm arg : args) {
-            if (arg.occurs(a))
+            if (arg.occurs(a)) {
                 return true;
+            }
         }
         return false;
     }
@@ -133,11 +134,13 @@ public class SMTTermCall extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public boolean occurs(String id) {
-        if (func.getId().equals(id))
+        if (func.getId().equals(id)) {
             return true;
+        }
         for (SMTTerm arg : args) {
-            if (arg.occurs(id))
+            if (arg.occurs(id)) {
                 return true;
+            }
         }
         return false;
     }
@@ -145,7 +148,7 @@ public class SMTTermCall extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public SMTTerm substitute(SMTTermVariable a, SMTTerm b) {
-        LinkedList<SMTTerm> newArgs = new LinkedList<SMTTerm>();
+        LinkedList<SMTTerm> newArgs = new LinkedList<>();
         for (SMTTerm arg : args) {
             newArgs.add(arg.substitute(a, b));
         }
@@ -156,10 +159,11 @@ public class SMTTermCall extends SMTTerm {
     @Override
     public SMTTerm substitute(SMTTerm a, SMTTerm b) {
 
-        if (this.equals(a))
+        if (this.equals(a)) {
             return b;
+        }
 
-        LinkedList<SMTTerm> newArgs = new LinkedList<SMTTerm>();
+        LinkedList<SMTTerm> newArgs = new LinkedList<>();
         for (SMTTerm arg : args) {
             newArgs.add(arg.substitute(a, b));
         }
@@ -170,10 +174,11 @@ public class SMTTermCall extends SMTTerm {
     @Override
     public SMTTerm replace(SMTTermCall a, SMTTerm b) {
 
-        if (this.equals(a))
+        if (this.equals(a)) {
             return b;
+        }
 
-        LinkedList<SMTTerm> newArgs = new LinkedList<SMTTerm>();
+        LinkedList<SMTTerm> newArgs = new LinkedList<>();
         for (SMTTerm arg : args) {
             newArgs.add(arg.replace(a, b));
         }
@@ -183,7 +188,7 @@ public class SMTTermCall extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public SMTTerm instantiate(SMTTermVariable a, SMTTerm b) {
-        LinkedList<SMTTerm> newArgs = new LinkedList<SMTTerm>();
+        LinkedList<SMTTerm> newArgs = new LinkedList<>();
         for (SMTTerm arg : args) {
             newArgs.add(arg.instantiate(a, b));
         }
@@ -196,7 +201,7 @@ public class SMTTermCall extends SMTTerm {
 
         SMTFunction f = new SMTFunction(func.getId(), func.getDomainSorts(), func.getImageSort());
 
-        List<SMTTerm> newArgs = new LinkedList<SMTTerm>();
+        List<SMTTerm> newArgs = new LinkedList<>();
         for (SMTTerm t : args) {
             newArgs.add(t.copy());
         }
@@ -208,25 +213,31 @@ public class SMTTermCall extends SMTTerm {
     @Override
     public boolean equals(Object term) {
 
-        if (this == term)
+        if (this == term) {
             return true;
+        }
 
-        if (term == null)
+        if (term == null) {
             return false;
+        }
 
-        if (!(term instanceof SMTTermCall))
+        if (!(term instanceof SMTTermCall)) {
             return false;
+        }
         SMTTermCall tc = (SMTTermCall) term;
 
-        if (!this.func.equals(tc.func))
+        if (!this.func.equals(tc.func)) {
             return false;
+        }
 
-        if (this.args.size() != tc.args.size())
+        if (this.args.size() != tc.args.size()) {
             return false;
+        }
 
         for (int i = 0; i < this.args.size(); i++) {
-            if (!this.args.get(i).equals(tc.args.get(i)))
+            if (!this.args.get(i).equals(tc.args.get(i))) {
                 return false;
+            }
         }
 
         return true;
@@ -304,16 +315,17 @@ public class SMTTermCall extends SMTTerm {
             tab = tab.append(" ");
         }
 
-        if (args.isEmpty())
+        if (args.isEmpty()) {
             return tab + func.getId();
+        }
 
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append(tab);
 
-        buff.append("(" + func.getId());
+        buff.append("(").append(func.getId());
 
         for (SMTTerm arg : args) {
-            buff.append(" " + arg.toString(0));
+            buff.append(" ").append(arg.toString(0));
         }
         buff.append(")");
 

@@ -9,7 +9,7 @@ public class GenericSupersortException extends Exception {
      *
      */
     private static final long serialVersionUID = -5897308261866997061L;
-    Sort illegalSort;
+    final Sort illegalSort;
 
     public GenericSupersortException(String description, Sort illegalSort) {
         super(description);

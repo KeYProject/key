@@ -130,10 +130,10 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
                 result = settings.getMaxInteger();
             }
             try {
-                result = (long) maxField.getValue();
-                maxField.setForeground(Color.BLACK);
-            } catch (Throwable ex) {
-                maxField.setForeground(Color.RED);
+            max.setValue((long) Integer.MAX_VALUE);
+            max.setForeground(Color.BLACK);
+        } catch (IllegalArgumentException e) {
+            max.setForeground(Color.RED);
             }
             settings.setMaxInteger(result);
         });

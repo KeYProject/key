@@ -77,12 +77,12 @@ public final class OneStepSimplifier implements BuiltInRule {
 
     private static final boolean[] bottomUp = { false, false, true, true, true, false };
     private final Map<SequentFormula, Boolean> applicabilityCache =
-        new LRUCache<SequentFormula, Boolean>(APPLICABILITY_CACHE_SIZE);
+        new LRUCache<>(APPLICABILITY_CACHE_SIZE);
 
     private Proof lastProof;
     private ImmutableList<NoPosTacletApp> appsTakenOver;
     private TacletIndex[] indices;
-    private Map<Term, Term> notSimplifiableCaches[];
+    private Map<Term, Term>[] notSimplifiableCaches;
     private boolean active;
 
     // -------------------------------------------------------------------------
@@ -111,7 +111,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     private ImmutableList<Taclet> tacletsForRuleSet(Proof proof, String ruleSetName,
             ImmutableList<String> excludedRuleSetNames) {
         assert !proof.openGoals().isEmpty();
-        ImmutableList<Taclet> result = ImmutableSLList.<Taclet>nil();
+        ImmutableList<Taclet> result = ImmutableSLList.nil();
 
         // collect apps present in all open goals
         Set<NoPosTacletApp> allApps =
@@ -180,15 +180,15 @@ public final class OneStepSimplifier implements BuiltInRule {
         if (proof != lastProof) {
             shutdownIndices();
             lastProof = proof;
-            appsTakenOver = ImmutableSLList.<NoPosTacletApp>nil();
+            appsTakenOver = ImmutableSLList.nil();
             indices = new TacletIndex[ruleSets.size()];
             notSimplifiableCaches = (Map<Term, Term>[]) new LRUCache[indices.length];
             int i = 0;
-            ImmutableList<String> done = ImmutableSLList.<String>nil();
+            ImmutableList<String> done = ImmutableSLList.nil();
             for (String ruleSet : ruleSets) {
                 ImmutableList<Taclet> taclets = tacletsForRuleSet(proof, ruleSet, done);
                 indices[i] = TacletIndexKit.getKit().createTacletIndex(taclets);
-                notSimplifiableCaches[i] = new LRUCache<Term, Term>(DEFAULT_CACHE_SIZE);
+                notSimplifiableCaches[i] = new LRUCache<>(DEFAULT_CACHE_SIZE);
                 i++;
                 done = done.prepend(ruleSet);
             }
@@ -457,7 +457,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             Sequent seq, Protocol protocol, Goal goal, RuleApp ruleApp) {
         // collect context formulas (potential if-insts for replace-known)
         final Map<TermReplacementKey, PosInOccurrence> context =
-            new LinkedHashMap<TermReplacementKey, PosInOccurrence>();
+            new LinkedHashMap<>();
         final SequentFormula cf = ossPIO.sequentFormula();
         for (SequentFormula ante : seq.antecedent()) {
             if (!ante.equals(cf) && ante.formula().op() != Junctor.TRUE) {
@@ -471,10 +471,10 @@ public final class OneStepSimplifier implements BuiltInRule {
                     new PosInOccurrence(succ, PosInTerm.getTopLevel(), false));
             }
         }
-        final List<PosInOccurrence> ifInsts = new ArrayList<PosInOccurrence>(seq.size());
+        final List<PosInOccurrence> ifInsts = new ArrayList<>(seq.size());
 
         // simplify as long as possible
-        ImmutableList<SequentFormula> list = ImmutableSLList.<SequentFormula>nil();
+        ImmutableList<SequentFormula> list = ImmutableSLList.nil();
         SequentFormula simplifiedCf = cf;
         while (true) {
             simplifiedCf = simplifyConstrainedFormula(services, simplifiedCf, ossPIO.isInAntec(),
@@ -501,13 +501,13 @@ public final class OneStepSimplifier implements BuiltInRule {
             boolean inAntecedent, Goal goal, RuleApp ruleApp) {
         final Boolean b = applicabilityCache.get(cf);
         if (b != null) {
-            return b.booleanValue();
+            return b;
         } else {
             // try one simplification step without replace-known
             final SequentFormula simplifiedCf = simplifyConstrainedFormula(services, cf,
                 inAntecedent, null, null, null, goal, ruleApp);
             final boolean result = simplifiedCf != null && !simplifiedCf.equals(cf);
-            applicabilityCache.put(cf, Boolean.valueOf(result));
+            applicabilityCache.put(cf, result);
             return result;
         }
     }
@@ -654,10 +654,10 @@ public final class OneStepSimplifier implements BuiltInRule {
      * @return the captured taclets (as NoPosTacletApps)
      */
     public Set<NoPosTacletApp> getCapturedTaclets() {
-        Set<NoPosTacletApp> result = new LinkedHashSet<NoPosTacletApp>();
+        Set<NoPosTacletApp> result = new LinkedHashSet<>();
         synchronized (this) {
-            for (int i = 0; i < indices.length; i++) {
-                result.addAll(indices[i].allNoPosTacletApps());
+            for (TacletIndex index : indices) {
+                result.addAll(index.allNoPosTacletApps());
             }
         }
         return result;

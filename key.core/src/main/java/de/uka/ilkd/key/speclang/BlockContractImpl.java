@@ -286,13 +286,13 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             }
 
             final BlockContract head = contracts[0];
-            String baseName = head.getBaseName();
+            StringBuilder baseName = new StringBuilder(head.getBaseName());
 
             for (int i = 1; i < contracts.length; i++) {
                 assert contracts[i].getBlock().equals(head.getBlock());
 
-                baseName += SpecificationRepository.CONTRACT_COMBINATION_MARKER
-                        + contracts[i].getBaseName();
+                baseName.append(SpecificationRepository.CONTRACT_COMBINATION_MARKER)
+                        .append(contracts[i].getBaseName());
             }
 
             placeholderVariables = head.getPlaceholderVariables();
@@ -306,7 +306,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 functionalContracts = functionalContracts.union(contract.getFunctionalContracts());
             }
 
-            Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<LocationVariable, Boolean>();
+            Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 boolean hm = false;
 
@@ -316,7 +316,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 hasMod.put(heap, hm);
             }
 
-            BlockContractImpl result = new BlockContractImpl(baseName, head.getBlock(),
+            BlockContractImpl result = new BlockContractImpl(baseName.toString(), head.getBlock(),
                 head.getLabels(), head.getMethod(), head.getModality(), preconditions,
                 freePreconditions, contracts[0].getMby(), postconditions, freePostconditions,
                 modifiesClauses, head.getInfFlowSpecs(), placeholderVariables,

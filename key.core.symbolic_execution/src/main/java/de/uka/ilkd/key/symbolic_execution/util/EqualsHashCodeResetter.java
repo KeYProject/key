@@ -27,7 +27,7 @@ public class EqualsHashCodeResetter<T> {
      * The wrapped elements on that {@link #equals(Object)} and {@link #hashCode()} is reset to
      * default Java implementation.
      */
-    private T wrappedElement;
+    private final T wrappedElement;
 
     /**
      * Constructor
