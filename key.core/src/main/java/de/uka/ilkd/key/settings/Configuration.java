@@ -210,11 +210,25 @@ public class Configuration {
         }
 
         public ConfigurationWriter printConfiguration(Configuration c) {
+            return printConfiguration(c, true);
+        }
+
+        public ConfigurationWriter printConfiguration(Configuration c, boolean section) {
             c.data.forEach((k, v) -> {
-                if (v != null)
-                    printKeyValue(k, v).newline().reset();
+                if (v != null) {
+                    if (section && v instanceof Configuration)
+                        printSection(k, (Configuration) v);
+                    else
+                        printKeyValue(k, v).newline().reset();
+                }
             });
             return this;
+        }
+
+        private void printSection(String k, Configuration v) {
+            reset();
+            out.format("\n[%s]\n", k);
+            printConfiguration(v, false);
         }
 
         private ConfigurationWriter reset() {
@@ -309,7 +323,7 @@ public class Configuration {
         }
 
         private ConfigurationWriter printKey(String key) {
-            if (key.contains(" ") || key.contains("(") || key.contains(")")) {
+            if (key.contains(" ") || key.contains("(") || key.contains(")") || key.contains("[s")) {
                 printValue(key);
                 equalSignPos += key.length() + 5;
             } else {
