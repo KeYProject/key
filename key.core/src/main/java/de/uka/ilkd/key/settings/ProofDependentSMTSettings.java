@@ -1,23 +1,24 @@
 package de.uka.ilkd.key.settings;
 
 
-import java.util.Properties;
-
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
+
+import java.util.Properties;
 
 
 public class ProofDependentSMTSettings extends AbstractSettings {
+    public static final String CATEGORY = "SMTSettings";
 
     public static final String EXPLICIT_TYPE_HIERARCHY = "[SMTSettings]explicitTypeHierarchy";
     public static final String INSTANTIATE_NULL_PREDICATES =
-        "[SMTSettings]instantiateHierarchyAssumptions";
+            "[SMTSettings]instantiateHierarchyAssumptions";
     public static final String MAX_GENERIC_SORTS = "[SMTSettings]maxGenericSorts";
     public static final String TACLET_SELECTION = "[SMTSettings]SelectedTaclets";
     public static final String USE_BUILT_IN_UNIQUENESS = "[SMTSettings]UseBuiltUniqueness";
     public static final String USE_UNINTERPRETED_MULTIPLICATION =
-        "[SMTSettings]useUninterpretedMultiplication";
+            "[SMTSettings]useUninterpretedMultiplication";
     public static final String USE_CONSTANTS_FOR_BIGSMALL_INTEGERS =
-        "[SMTSettings]useConstantsForBigOrSmallIntegers";
+            "[SMTSettings]useConstantsForBigOrSmallIntegers";
     public static final String INTEGERS_MAXIMUM = "[SMTSettings]integersMaximum";
     public static final String INTEGERS_MINIMUM = "[SMTSettings]integersMinimum";
     public static final String INVARIANT_FORALL = "[SMTSettings]invariantForall";
@@ -32,8 +33,8 @@ public class ProofDependentSMTSettings extends AbstractSettings {
     private boolean useConstantsForIntegers = true;
     private boolean invariantForall = false;
     private int maxGenericSorts = 2;
-    private long maxInteger = 2147483645;
-    private long minInteger = -2147483645;
+    private int maxInteger = 2147483645;
+    private int minInteger = -2147483645;
     private boolean useLegacyTranslation = false;
 
 
@@ -49,7 +50,7 @@ public class ProofDependentSMTSettings extends AbstractSettings {
 
     public void copy(ProofDependentSMTSettings data) {
         setSupportedTaclets(
-            new SupportedTaclets(data.supportedTaclets.getNamesOfSelectedTaclets()));
+                new SupportedTaclets(data.supportedTaclets.getNamesOfSelectedTaclets()));
         setUseExplicitTypeHierarchy(data.useExplicitTypeHierarchy);
         setUseNullInstantiation(data.useNullInstantiation);
         setMaxGenericSorts(data.maxGenericSorts);
@@ -77,40 +78,77 @@ public class ProofDependentSMTSettings extends AbstractSettings {
 
     @Override
     public void readSettings(Properties props) {
+        var prefix = "[" + CATEGORY + "]";
         setUseExplicitTypeHierarchy(
-            SettingsConverter.read(props, EXPLICIT_TYPE_HIERARCHY, useExplicitTypeHierarchy));
+                SettingsConverter.read(props, prefix + EXPLICIT_TYPE_HIERARCHY, useExplicitTypeHierarchy));
         setUseNullInstantiation(
-            SettingsConverter.read(props, INSTANTIATE_NULL_PREDICATES, useNullInstantiation));
+                SettingsConverter.read(props, prefix + INSTANTIATE_NULL_PREDICATES, useNullInstantiation));
         setUseBuiltInUniqueness(
-            SettingsConverter.read(props, USE_BUILT_IN_UNIQUENESS, useBuiltInUniqueness));
-        setMaxGenericSorts(SettingsConverter.read(props, MAX_GENERIC_SORTS, maxGenericSorts));
+                SettingsConverter.read(props, prefix + USE_BUILT_IN_UNIQUENESS, useBuiltInUniqueness));
+        setMaxGenericSorts(SettingsConverter.read(props, prefix + MAX_GENERIC_SORTS, maxGenericSorts));
         setUseUIMultiplication(
-            SettingsConverter.read(props, USE_UNINTERPRETED_MULTIPLICATION, useUIMultiplication));
+                SettingsConverter.read(props, prefix + USE_UNINTERPRETED_MULTIPLICATION, useUIMultiplication));
         setUseConstantsForIntegers(
-            SettingsConverter.read(props, USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,
-                useConstantsForIntegers));
+                SettingsConverter.read(props, prefix + USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,
+                        useConstantsForIntegers));
 
-        setMaxInteger(SettingsConverter.read(props, INTEGERS_MAXIMUM, maxInteger));
-        setMinInteger(SettingsConverter.read(props, INTEGERS_MINIMUM, minInteger));
-        setInvariantForall(SettingsConverter.read(props, INVARIANT_FORALL, invariantForall));
-        supportedTaclets.selectTaclets(SettingsConverter.read(props, TACLET_SELECTION,
-            supportedTaclets.getNamesOfSelectedTaclets()));
+        setMaxInteger(SettingsConverter.read(props, prefix + INTEGERS_MAXIMUM, maxInteger));
+        setMinInteger(SettingsConverter.read(props, prefix + INTEGERS_MINIMUM, minInteger));
+        setInvariantForall(SettingsConverter.read(props, prefix + INVARIANT_FORALL, invariantForall));
+        supportedTaclets.selectTaclets(SettingsConverter.read(props, prefix + TACLET_SELECTION,
+                supportedTaclets.getNamesOfSelectedTaclets()));
     }
 
     @Override
     public void writeSettings(Properties props) {
-        SettingsConverter.store(props, EXPLICIT_TYPE_HIERARCHY, useExplicitTypeHierarchy);
-        SettingsConverter.store(props, INSTANTIATE_NULL_PREDICATES, useNullInstantiation);
-        SettingsConverter.store(props, MAX_GENERIC_SORTS, maxGenericSorts);
-        SettingsConverter.store(props, TACLET_SELECTION,
-            supportedTaclets.getNamesOfSelectedTaclets());
-        SettingsConverter.store(props, USE_BUILT_IN_UNIQUENESS, useBuiltInUniqueness);
-        SettingsConverter.store(props, USE_UNINTERPRETED_MULTIPLICATION, useUIMultiplication);
-        SettingsConverter.store(props, USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,
-            useConstantsForIntegers);
-        SettingsConverter.store(props, INTEGERS_MAXIMUM, maxInteger);
-        SettingsConverter.store(props, INTEGERS_MINIMUM, minInteger);
-        SettingsConverter.store(props, INVARIANT_FORALL, invariantForall);
+        var prefix = "[" + CATEGORY + "]";
+        SettingsConverter.store(props, prefix + EXPLICIT_TYPE_HIERARCHY, useExplicitTypeHierarchy);
+        SettingsConverter.store(props, prefix + INSTANTIATE_NULL_PREDICATES, useNullInstantiation);
+        SettingsConverter.store(props, prefix + MAX_GENERIC_SORTS, maxGenericSorts);
+        SettingsConverter.store(props, prefix + TACLET_SELECTION,
+                supportedTaclets.getNamesOfSelectedTaclets());
+        SettingsConverter.store(props, prefix + USE_BUILT_IN_UNIQUENESS, useBuiltInUniqueness);
+        SettingsConverter.store(props, prefix + USE_UNINTERPRETED_MULTIPLICATION, useUIMultiplication);
+        SettingsConverter.store(props, prefix + USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,
+                useConstantsForIntegers);
+        SettingsConverter.store(props, prefix + INTEGERS_MAXIMUM, maxInteger);
+        SettingsConverter.store(props, prefix + INTEGERS_MINIMUM, minInteger);
+        SettingsConverter.store(props, prefix + INVARIANT_FORALL, invariantForall);
+    }
+
+    @Override
+    public void readSettings(Configuration props) {
+        props = props.getSection(CATEGORY);
+
+        if (props == null) return;
+
+        setUseExplicitTypeHierarchy(props.getBool(EXPLICIT_TYPE_HIERARCHY, useExplicitTypeHierarchy));
+        setUseNullInstantiation(props.getBool(INSTANTIATE_NULL_PREDICATES, useNullInstantiation));
+        setUseBuiltInUniqueness(props.getBool(USE_BUILT_IN_UNIQUENESS, useBuiltInUniqueness));
+        setMaxGenericSorts(props.getInt(MAX_GENERIC_SORTS, maxGenericSorts));
+        setUseUIMultiplication(props.getBool(USE_UNINTERPRETED_MULTIPLICATION, useUIMultiplication));
+        setUseConstantsForIntegers(props.getBool(USE_CONSTANTS_FOR_BIGSMALL_INTEGERS, useConstantsForIntegers));
+        setMaxInteger(props.getInt(INTEGERS_MAXIMUM, maxInteger));
+        setMinInteger(props.getInt(INTEGERS_MINIMUM, minInteger));
+        setInvariantForall(props.getBool(INVARIANT_FORALL, invariantForall));
+        supportedTaclets.selectTaclets(
+                props.getStringArray(TACLET_SELECTION, supportedTaclets.getNamesOfSelectedTaclets()));
+
+    }
+
+    @Override
+    public void writeSettings(Configuration props) {
+        props = props.getOrCreateSection(CATEGORY);
+        props.set(EXPLICIT_TYPE_HIERARCHY, useExplicitTypeHierarchy);
+        props.set(INSTANTIATE_NULL_PREDICATES, useNullInstantiation);
+        props.set(MAX_GENERIC_SORTS, maxGenericSorts);
+        props.set(TACLET_SELECTION, supportedTaclets.getNamesOfSelectedTaclets());
+        props.set(USE_BUILT_IN_UNIQUENESS, useBuiltInUniqueness);
+        props.set(USE_UNINTERPRETED_MULTIPLICATION, useUIMultiplication);
+        props.set(USE_CONSTANTS_FOR_BIGSMALL_INTEGERS, useConstantsForIntegers);
+        props.set(INTEGERS_MAXIMUM, maxInteger);
+        props.set(INTEGERS_MINIMUM, minInteger);
+        props.set(INVARIANT_FORALL, invariantForall);
     }
 
     public boolean isUseExplicitTypeHierarchy() {
@@ -189,7 +227,7 @@ public class ProofDependentSMTSettings extends AbstractSettings {
 
     public void setMaxInteger(long maxInteger) {
         var old = this.maxInteger;
-        this.maxInteger = maxInteger;
+        this.maxInteger = (int) maxInteger;
         firePropertyChange(INTEGERS_MAXIMUM, old, maxInteger);
     }
 
@@ -199,7 +237,7 @@ public class ProofDependentSMTSettings extends AbstractSettings {
 
     public void setMinInteger(long minInteger) {
         var old = this.minInteger;
-        this.minInteger = minInteger;
+        this.minInteger = (int) minInteger;
         firePropertyChange(INTEGERS_MINIMUM, old, minInteger);
     }
 

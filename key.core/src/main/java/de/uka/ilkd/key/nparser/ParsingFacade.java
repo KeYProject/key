@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.proof.io.RuleSource;
 
+import de.uka.ilkd.key.settings.Configuration;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.slf4j.Logger;
@@ -174,4 +175,30 @@ public final class ParsingFacade {
         String value = docComment.getText();
         return value.substring(3, value.length() - 2);// remove leading "/*!" and trailing "*/"
     }
+
+
+    //region configuration
+    public static KeyAst.ConfigurationFile parseConfigurationFile(Path file) throws IOException {
+        return parseConfigurationFile(CharStreams.fromPath(file));
+    }
+
+    public static KeyAst.ConfigurationFile parseConfigurationFile(File file) throws IOException {
+        return parseConfigurationFile(file.toPath());
+    }
+
+    public static KeyAst.ConfigurationFile parseConfigurationFile(CharStream stream) {
+        KeYParser p = createParser(stream);
+        var ctx = p.cfile();
+        p.getErrorReporter().throwException();
+        return new KeyAst.ConfigurationFile(ctx);
+    }
+
+    public static Configuration readConfigurationFile(Path file) throws IOException {
+        return parseConfigurationFile(CharStreams.fromPath(file)).asConfiguration();
+    }
+
+    public static Configuration readConfigurationFile(File file) throws IOException {
+        return readConfigurationFile(file.toPath());
+    }
+    //endregion
 }

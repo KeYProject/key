@@ -1,23 +1,18 @@
 package de.uka.ilkd.key.settings;
 
 
-
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Properties;
 
 /**
  * A collection of settings for the new (= 2021) SMT translation.
- *
+ * <p>
  * Unlike the other settings, these settings do not have a fixed set of keys but are driven by
  * arbitrary keys.
- *
+ * <p>
  * Hence, all that this class here does, is to essentially delegate methods to the underlying hash
  * map.
- *
+ * <p>
  * The list of available settings can be retrieved from
  * {@link de.uka.ilkd.key.smt.newsmt2.SMTHandlerServices#getSMTProperties()}.
  *
@@ -77,6 +72,25 @@ public class NewSMTTranslationSettings extends AbstractSettings {
         }
     }
 
+    @Override
+    public void readSettings(Configuration props) {
+        var newSmt = props.getSection("NewSMT");
+        if (newSmt == null) return;
+        for (var entry : newSmt.getEntries()) {
+            final var value = entry.getValue();
+            assert value instanceof String;
+            map.put(entry.getKey(), value.toString());
+        }
+    }
+
+    @Override
+    public void writeSettings(Configuration props) {
+        var newSmt = props.getOrCreateSection("NewSMT");
+        for (Entry<String, String> en : map.entrySet()) {
+            newSmt.set(en.getKey(), en.getValue());
+        }
+    }
+
 
     /**
      * Retreive an immutable view onto the underlying hash map
@@ -100,7 +114,7 @@ public class NewSMTTranslationSettings extends AbstractSettings {
     /**
      * Set a key-value-pair. All listeners are informed after the internal hashmap has been updated.
      *
-     * @param key the non-null key to set
+     * @param key   the non-null key to set
      * @param value the non-null value to set
      * @return the value that was in the map prior to the call (see {@link Map#put(Object, Object)}.
      */

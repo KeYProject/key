@@ -1,21 +1,22 @@
 package de.uka.ilkd.key.gui.colors;
 
+import de.uka.ilkd.key.gui.settings.SettingsManager;
+import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
+import de.uka.ilkd.key.settings.Configuration;
+import de.uka.ilkd.key.settings.PathConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
-
-import de.uka.ilkd.key.gui.settings.SettingsManager;
-import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
-import de.uka.ilkd.key.settings.PathConfig;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Configurable colors for KeY.
@@ -28,18 +29,37 @@ import org.slf4j.LoggerFactory;
 public class ColorSettings extends AbstractPropertiesSettings {
     public static final String SETTINGS_FILENAME = "colors.properties";
     public static final File SETTINGS_FILE =
-        new File(PathConfig.getKeyConfigDir(), SETTINGS_FILENAME);
+            new File(PathConfig.getKeyConfigDir(), SETTINGS_FILENAME);
+
+    public static final File SETTINGS_FILE_NEW =
+            new File(PathConfig.getKeyConfigDir(), "colors.toml");
     private static final Logger LOGGER = LoggerFactory.getLogger(ColorSettings.class);
     private static ColorSettings INSTANCE;
 
     private ColorSettings(Properties settings) {
+        super("");
         readSettings(settings);
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
     }
 
+    public ColorSettings(Configuration load) {
+        super("");
+        readSettings(load);
+        Runtime.getRuntime().addShutdownHook(new Thread(this::save));
+    }
+
     public static ColorSettings getInstance() {
-        if (INSTANCE == null)
-            INSTANCE = new ColorSettings(SettingsManager.loadProperties(SETTINGS_FILE));
+        if (INSTANCE == null) {
+            if (SETTINGS_FILE.exists()) {
+                try {
+                    LOGGER.info("Use new configuration format at {}", SETTINGS_FILE_NEW);
+                    return INSTANCE = new ColorSettings(Configuration.load(SETTINGS_FILE_NEW));
+                } catch (IOException e) {
+                    LOGGER.error("Could not read {}", SETTINGS_FILE_NEW, e);
+                }
+            }
+            return INSTANCE = new ColorSettings(SettingsManager.loadProperties(SETTINGS_FILE));
+        }
         return INSTANCE;
     }
 
@@ -58,7 +78,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
     public static Color fromHex(String s) {
         long i = Long.decode(s);
         return new Color((int) ((i >> 16) & 0xFF), (int) ((i >> 8) & 0xFF), (int) (i & 0xFF),
-            (int) ((i >> 24) & 0xFF));
+                (int) ((i >> 24) & 0xFF));
     }
 
     public static Color invert(Color c) {
@@ -73,7 +93,19 @@ public class ColorSettings extends AbstractPropertiesSettings {
     public void save() {
         LOGGER.info("Save color settings to: " + SETTINGS_FILE.getAbsolutePath());
         try (Writer writer = new FileWriter(SETTINGS_FILE)) {
-            properties.store(writer, "KeY's Colors");
+            Properties props = new Properties();
+            for (Map.Entry<String, Object> entry : properties.entrySet()) {
+                props.setProperty(entry.getKey(), entry.getValue().toString());
+            }
+            props.store(writer, "KeY's Colors");
+            writer.flush();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        try (Writer writer = new FileWriter(SETTINGS_FILE_NEW)) {
+            var config = new Configuration(properties);
+            config.save(writer, "KeY's Colors");
             writer.flush();
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -82,7 +114,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
 
     private ColorProperty createColorProperty(String key, String description, Color defaultValue) {
         Optional<ColorProperty> item =
-            getProperties().filter(it -> it.getKey().equals(key)).findFirst();
+                getProperties().filter(it -> it.getKey().equals(key)).findFirst();
         if (item.isPresent()) {
             return item.get();
         }
@@ -117,7 +149,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
             if (currentValue != null)
                 return toHex(currentValue);
 
-            String v = properties.getProperty(key);
+            String v = properties.get(key).toString();
 
             try {
                 return v;
@@ -131,7 +163,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
             final var old = value();
             if (!Objects.equals(old, v)) {
                 currentValue = fromHex(v);
-                properties.setProperty(getKey(), v);
+                properties.put(getKey(), v);
                 firePropertyChange(getKey(), old, currentValue);
             }
         }
@@ -146,7 +178,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
             if (currentValue != value) {
                 var old = currentValue;
                 currentValue = value;
-                properties.setProperty(getKey(), toHex(value));
+                properties.put(getKey(), toHex(value));
                 firePropertyChange(getKey(), old, value);
             }
         }
@@ -156,7 +188,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
             if (currentValue != null)
                 return currentValue;
 
-            String v = properties.getProperty(key);
+            String v = (String) properties.get(key);
 
             try {
                 return currentValue = fromHex(v);
@@ -173,6 +205,6 @@ public class ColorSettings extends AbstractPropertiesSettings {
 
     @Override
     public void readSettings(Properties props) {
-        this.properties.putAll(props);
+        props.forEach((k, v) -> this.properties.put(k.toString(), v));
     }
 }
