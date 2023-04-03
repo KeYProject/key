@@ -1,17 +1,19 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.LinkedList;
+import java.util.ListIterator;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 import org.key_project.util.ExtList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.LinkedList;
-import java.util.ListIterator;
 
 /**
  * Walks through a java AST in depth-left-fist-order. This walker is used to transform a loop (not

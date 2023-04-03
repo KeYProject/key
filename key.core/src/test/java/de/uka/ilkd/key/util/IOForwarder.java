@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A simple i/o forwarding thread which maps {@link InputStream}s to {@link OutputStream}s.

@@ -1,10 +1,6 @@
 package de.uka.ilkd.key.strategy;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -24,6 +20,9 @@ import de.uka.ilkd.key.strategy.feature.instantiator.SVInstantiationCP;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 public abstract class AbstractFeatureStrategy extends StaticFeatureCollection implements Strategy {
 

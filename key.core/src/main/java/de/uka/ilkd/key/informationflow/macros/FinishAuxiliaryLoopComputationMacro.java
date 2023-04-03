@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.informationflow.macros;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.LoopInvExecutionPO;
@@ -20,6 +18,8 @@ import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+
+import org.key_project.util.collection.ImmutableList;
 
 public class FinishAuxiliaryLoopComputationMacro extends AbstractFinishAuxiliaryComputationMacro {
 

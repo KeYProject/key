@@ -4,12 +4,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -36,6 +30,12 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.PredictCostProver;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Substitution;
+
+import org.key_project.util.collection.DefaultImmutableMap;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 public class TriggeredInstantiations implements TermGenerator {
 

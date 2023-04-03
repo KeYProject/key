@@ -6,6 +6,9 @@
  */
 package recoder.java.declaration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.ModelException;
 import recoder.java.Identifier;
 import recoder.java.ProgramElement;
@@ -14,9 +17,6 @@ import recoder.java.declaration.modifier.Abstract;
 import recoder.java.declaration.modifier.Final;
 import recoder.list.generic.ASTList;
 import recoder.service.IllegalModifierException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Tobias Gutzmann

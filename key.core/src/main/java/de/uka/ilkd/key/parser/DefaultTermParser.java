@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.parser;
 
+import java.io.IOException;
+import java.io.Reader;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -11,11 +14,9 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.AbbrevMap;
+
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.RecognitionException;
-
-import java.io.IOException;
-import java.io.Reader;
 
 
 /**

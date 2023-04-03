@@ -3,7 +3,6 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.Map;
-
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;

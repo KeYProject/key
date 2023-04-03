@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.util.removegenerics;
 
+import java.util.Collection;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.CrossReferenceServiceConfiguration;
@@ -13,8 +15,6 @@ import recoder.java.ProgramElement;
 import recoder.java.declaration.MethodDeclaration;
 import recoder.java.declaration.TypeParameterDeclaration;
 import recoder.kit.TwoPassTransformation;
-
-import java.util.Collection;
 
 /**
  * This is the base class to all transformations used in the generics removal process.

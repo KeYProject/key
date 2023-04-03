@@ -2,6 +2,8 @@
 
 package recoder.service;
 
+import java.util.*;
+
 import recoder.AbstractService;
 import recoder.ServiceConfiguration;
 import recoder.convenience.Format;
@@ -21,8 +23,6 @@ import recoder.kit.UnitKit;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.util.Debug;
-
-import java.util.*;
 
 /**
  * Keeps records on the syntactical changes that occured after the last validation of the model. All

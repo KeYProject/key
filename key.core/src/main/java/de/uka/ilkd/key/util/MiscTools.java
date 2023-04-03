@@ -1,5 +1,19 @@
 package de.uka.ilkd.key.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.ZipFile;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.Assignment;
@@ -25,26 +39,14 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+
 import org.key_project.util.Filenames;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.*;
+
 import recoder.io.ArchiveDataLocation;
 import recoder.io.DataFileLocation;
 import recoder.io.DataLocation;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.ZipFile;
 
 /**
  * Collection of some common, stateless functionality. Stolen from the weissInvariants side branch.

@@ -2,8 +2,10 @@ package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.collection.ImmutableList;
+
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

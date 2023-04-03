@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.control;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
@@ -13,6 +11,8 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * A {@link ProofControl} provides the user interface independent logic to apply rules on a proof.

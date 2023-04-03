@@ -2,6 +2,8 @@
 
 package recoder.kit;
 
+import java.util.List;
+
 import recoder.ProgramFactory;
 import recoder.abstraction.PrimitiveType;
 import recoder.abstraction.Type;
@@ -19,8 +21,6 @@ import recoder.service.ChangeHistory;
 import recoder.service.NameInfo;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
-
-import java.util.List;
 
 public class ExpressionKit {
 

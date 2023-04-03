@@ -1,5 +1,12 @@
 package de.uka.ilkd.key.gui.smt;
 
+import java.awt.*;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.Timer;
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.useractions.ProofSMTApplyUserAction;
@@ -25,13 +32,6 @@ import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.Timer;
-import java.util.*;
 
 public class SolverListener implements SolverLauncherListener {
     private ProgressDialog progressDialog;

@@ -1,13 +1,14 @@
 package de.uka.ilkd.key.nparser.builder;
 
+import java.util.List;
+import java.util.Objects;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.ProblemInformation;
-import org.key_project.util.java.StringUtil;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.Objects;
+import org.key_project.util.java.StringUtil;
 
 /**
  * The visitor for extracting the {@link ProblemInformation}.

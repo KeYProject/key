@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.gui.testgen;
 
+import java.awt.event.ActionEvent;
+import javax.swing.*;
+
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -8,9 +11,6 @@ import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
 
 
 /**

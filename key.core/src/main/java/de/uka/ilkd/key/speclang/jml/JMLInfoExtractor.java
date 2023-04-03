@@ -1,18 +1,18 @@
 package de.uka.ilkd.key.speclang.jml;
 
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.speclang.njml.SpecMathMode;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 import de.uka.ilkd.key.util.MiscTools;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Helper class used by the JML translation. Provides methods that look for certain keywords (such

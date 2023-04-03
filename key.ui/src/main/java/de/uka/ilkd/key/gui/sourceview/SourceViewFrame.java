@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.sourceview;
 
 import java.awt.event.ActionEvent;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;

@@ -1,17 +1,5 @@
 package org.key_project.util.testcase.java;
 
-import org.junit.jupiter.api.Test;
-import org.key_project.util.helper.HelperClassForUtilityTests;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.IOUtil.IFileVisitor;
-import org.key_project.util.java.IOUtil.LineInformation;
-import org.key_project.util.java.XMLUtil;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -20,6 +8,19 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Predicate;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.key_project.util.helper.HelperClassForUtilityTests;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.IOUtil.IFileVisitor;
+import org.key_project.util.java.IOUtil.LineInformation;
+import org.key_project.util.java.XMLUtil;
+
+import org.junit.jupiter.api.Test;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import static org.junit.jupiter.api.Assertions.*;
 

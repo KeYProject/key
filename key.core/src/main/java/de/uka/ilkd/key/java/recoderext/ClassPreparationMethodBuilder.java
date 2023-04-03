@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.CrossReferenceServiceConfiguration;
@@ -16,10 +20,6 @@ import recoder.java.reference.FieldReference;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Each class is prepared before it is initialised. The preparation of a class consists of

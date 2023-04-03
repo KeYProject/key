@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.logic;
 
-import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nonnull;
 
 /**
  * A ChoiceExpr is a boolean expression that determines whether a taclet or a goal should be

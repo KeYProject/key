@@ -1,12 +1,12 @@
 package org.key_project.util.collection;
 
-import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import javax.annotation.Nonnull;
 
 /**
  * List interface to be implemented by non-destructive lists

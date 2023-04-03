@@ -1,21 +1,22 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.text.html.HTMLDocument;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.text.html.HTMLDocument;
+
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.util.UnicodeHelper.*;
 

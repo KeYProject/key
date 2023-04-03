@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.informationflow.po;
 
+import java.util.LinkedList;
+import java.util.TreeSet;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
@@ -14,11 +17,9 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.Pair;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.LinkedList;
-import java.util.TreeSet;
 
 public class InfFlowProofSymbols {
 

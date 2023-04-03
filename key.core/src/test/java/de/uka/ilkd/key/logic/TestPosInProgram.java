@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.logic;
 
+import java.util.Arrays;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -9,11 +11,10 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 

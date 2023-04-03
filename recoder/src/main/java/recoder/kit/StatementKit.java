@@ -2,6 +2,11 @@
 
 package recoder.kit;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import recoder.ProgramFactory;
 import recoder.abstraction.Type;
 import recoder.abstraction.Variable;
@@ -19,11 +24,6 @@ import recoder.service.ChangeHistory;
 import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class StatementKit {
 
@@ -438,4 +438,3 @@ public class StatementKit {
     }
 
 }
-

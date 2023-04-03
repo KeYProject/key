@@ -1,10 +1,13 @@
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.recoderext.adt.EmptyMapLiteral;
 import de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral;
 import de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral;
 import de.uka.ilkd.key.java.recoderext.expression.literal.RealLiteral;
 import de.uka.ilkd.key.util.Debug;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.*;
 import recoder.java.*;
@@ -17,8 +20,6 @@ import recoder.java.reference.TypeReference;
 import recoder.java.reference.VariableReference;
 import recoder.kit.TwoPassTransformation;
 import recoder.service.DefaultCrossReferenceSourceInfo;
-
-import java.util.*;
 
 /**
  * The Java DL requires some implicit fields, that are available in each Java class. The name of the

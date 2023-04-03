@@ -1,11 +1,12 @@
 package de.uka.ilkd.key.java;
 
+import java.io.File;
+
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
 
 public class TestJavaCardDLJavaExtensions {
 

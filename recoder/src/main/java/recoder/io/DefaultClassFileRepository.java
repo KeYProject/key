@@ -2,15 +2,6 @@
 
 package recoder.io;
 
-import recoder.AbstractService;
-import recoder.ParserException;
-import recoder.ServiceConfiguration;
-import recoder.bytecode.ByteCodeParser;
-import recoder.bytecode.ClassFile;
-import recoder.convenience.Naming;
-import recoder.service.ErrorHandler;
-import recoder.util.Debug;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -19,6 +10,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import recoder.AbstractService;
+import recoder.ParserException;
+import recoder.ServiceConfiguration;
+import recoder.bytecode.ByteCodeParser;
+import recoder.bytecode.ClassFile;
+import recoder.convenience.Naming;
+import recoder.service.ErrorHandler;
+import recoder.util.Debug;
 
 /**
  * @author RN

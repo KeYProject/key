@@ -6,6 +6,9 @@
  */
 package recoder.kit.transformation.java5to4;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
@@ -20,9 +23,6 @@ import recoder.kit.MiscKit;
 import recoder.kit.ProblemReport;
 import recoder.kit.TwoPassTransformation;
 import recoder.kit.UnitKit;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Removes static imports from a given Compilation Unit and adds qualfication prefixes to (possible)

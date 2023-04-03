@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.java.visitor;
 
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
@@ -10,12 +15,8 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import org.key_project.util.ExtList;
 
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import org.key_project.util.ExtList;
 
 public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
 

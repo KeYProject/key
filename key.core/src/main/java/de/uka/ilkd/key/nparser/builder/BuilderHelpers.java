@@ -1,8 +1,9 @@
 package de.uka.ilkd.key.nparser.builder;
 
+import javax.annotation.Nullable;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import javax.annotation.Nullable;
 
 /**
  * @author Alexander Weigl

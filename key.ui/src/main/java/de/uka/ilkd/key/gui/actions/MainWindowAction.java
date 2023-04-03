@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.gui.actions;
 
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
-
-import javax.swing.*;
 
 /**
  * {@link KeyAction} extended to automatically override the accelerator key after the default is

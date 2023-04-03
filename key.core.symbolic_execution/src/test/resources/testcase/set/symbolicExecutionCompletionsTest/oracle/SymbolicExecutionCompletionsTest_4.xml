@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call SymbolicExecutionCompletionsTest.magic(x)&gt;" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (x&gt;=0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+      <branchStatement name="if (x &gt;= 0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return x;" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false">
                <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of SymbolicExecutionCompletionsTest.magic(x)&gt;" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="gt(x,Z(neglit(1(#))))">

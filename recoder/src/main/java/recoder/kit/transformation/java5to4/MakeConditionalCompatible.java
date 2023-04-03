@@ -6,6 +6,9 @@
  */
 package recoder.kit.transformation.java5to4;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
 import recoder.abstraction.IntersectionType;
@@ -21,9 +24,6 @@ import recoder.java.reference.MethodReference;
 import recoder.kit.ProblemReport;
 import recoder.kit.TwoPassTransformation;
 import recoder.kit.TypeKit;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Deals with uses of the conditional(c-like trinary) operator which create intersection types.

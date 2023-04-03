@@ -4,6 +4,8 @@
  */
 package recoder.java.statement;
 
+import java.util.List;
+
 import recoder.java.LoopInitializer;
 import recoder.java.SourceVisitor;
 import recoder.java.Statement;
@@ -11,8 +13,6 @@ import recoder.java.VariableScope;
 import recoder.java.declaration.LocalVariableDeclaration;
 import recoder.java.declaration.VariableSpecification;
 import recoder.util.Debug;
-
-import java.util.List;
 
 /**
  * @author gutzmann

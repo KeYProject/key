@@ -1,11 +1,13 @@
 package de.uka.ilkd.key.pp;
 
-import de.uka.ilkd.key.util.pp.Layouter;
-import de.uka.ilkd.key.util.pp.StringBackend;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayDeque;
+
+import de.uka.ilkd.key.util.pp.Layouter;
+import de.uka.ilkd.key.util.pp.StringBackend;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
     private static final Logger LOGGER = LoggerFactory.getLogger(PosTableLayouter.class);

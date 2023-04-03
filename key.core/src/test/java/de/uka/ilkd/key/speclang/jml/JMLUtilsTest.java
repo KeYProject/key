@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.speclang.jml;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static de.uka.ilkd.key.speclang.jml.JMLUtils.isJmlCommentStarter;
 import static de.uka.ilkd.key.speclang.jml.JMLUtils.splitJmlMarker;

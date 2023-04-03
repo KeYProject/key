@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.api;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -8,12 +13,8 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.KeYTypeUtil;
-import org.key_project.util.collection.ImmutableSet;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * This class serves as a facade to all functionalities that are needed for proof management, i.e.,

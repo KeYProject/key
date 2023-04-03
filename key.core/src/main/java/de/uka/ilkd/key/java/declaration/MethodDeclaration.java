@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 

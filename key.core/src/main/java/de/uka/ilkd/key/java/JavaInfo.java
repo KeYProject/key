@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java;
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -13,14 +15,14 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
+
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 /**
  * an instance serves as representation of a Java model underlying a DL formula. This class provides

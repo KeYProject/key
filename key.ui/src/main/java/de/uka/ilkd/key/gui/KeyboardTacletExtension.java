@@ -1,7 +1,18 @@
 package de.uka.ilkd.key.gui;
 
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CDropDownButton;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -21,25 +32,16 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.ui.MediatorProofControl;
-import net.miginfocom.layout.CC;
-import net.miginfocom.swing.MigLayout;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
+import bibliothek.gui.dock.common.action.CAction;
+import bibliothek.gui.dock.common.action.CDropDownButton;
+import net.miginfocom.layout.CC;
+import net.miginfocom.swing.MigLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.util.List;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * TODO Add documentation!

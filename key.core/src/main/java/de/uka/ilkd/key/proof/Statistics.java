@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.proof;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.SideProofStatistics;
 import de.uka.ilkd.key.rule.*;
@@ -7,11 +12,6 @@ import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.util.EnhancedStringBuffer;
 import de.uka.ilkd.key.util.Pair;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Instances of this class encapsulate statistical information about proofs, such as the number of

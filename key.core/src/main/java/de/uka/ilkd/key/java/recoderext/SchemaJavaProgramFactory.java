@@ -8,13 +8,13 @@ import java.io.Reader;
 import java.util.List;
 
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.parser.schemajava.ParseException;
 import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
+
 import recoder.ParserException;
 import recoder.convenience.TreeWalker;
 import recoder.java.*;

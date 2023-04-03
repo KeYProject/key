@@ -5,7 +5,6 @@ package de.uka.ilkd.key.gui.notification;
 
 import java.util.EnumMap;
 import java.util.Map;
-
 import javax.swing.JFrame;
 
 import de.uka.ilkd.key.control.AutoModeListener;

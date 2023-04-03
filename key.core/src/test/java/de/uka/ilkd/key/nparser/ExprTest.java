@@ -1,17 +1,18 @@
 package de.uka.ilkd.key.nparser;
 
+import java.io.IOException;
+import java.net.URL;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.parsing.BuildingException;
+
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 

@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.symbolic_execution;
 
+import java.util.*;
+import java.util.Map.Entry;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.statement.If;
@@ -31,12 +34,10 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 import de.uka.ilkd.key.util.Pair;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.ArrayUtil;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * <p>

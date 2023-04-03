@@ -2,13 +2,13 @@
 
 package recoder.java.declaration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.java.Declaration;
 import recoder.java.JavaNonTerminalProgramElement;
 import recoder.java.declaration.modifier.*;
 import recoder.list.generic.ASTList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Java declaration.

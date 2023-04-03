@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.gui.actions;
 
+import java.awt.event.ActionEvent;
+
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -7,8 +9,6 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-
-import java.awt.event.ActionEvent;
 
 /**
  * Saves the currently selected proof as a zip archive with file extension "zproof". The bundle

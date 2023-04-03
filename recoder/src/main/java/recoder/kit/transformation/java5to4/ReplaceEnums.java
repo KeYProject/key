@@ -6,6 +6,8 @@
  */
 package recoder.kit.transformation.java5to4;
 
+import java.util.*;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ModelException;
 import recoder.ProgramFactory;
@@ -19,8 +21,6 @@ import recoder.java.reference.FieldReference;
 import recoder.java.statement.*;
 import recoder.kit.*;
 import recoder.list.generic.ASTArrayList;
-
-import java.util.*;
 
 /**
  * untested for enum declarations nested within enum declarations

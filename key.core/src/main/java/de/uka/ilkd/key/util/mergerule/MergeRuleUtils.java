@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.util.mergerule;
 
+import java.io.StringReader;
+import java.util.*;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
@@ -26,14 +31,11 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 import de.uka.ilkd.key.util.Triple;
+
 import org.key_project.util.collection.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import java.io.StringReader;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This class encapsulates static methods used in the MergeRule implementation. The methods are

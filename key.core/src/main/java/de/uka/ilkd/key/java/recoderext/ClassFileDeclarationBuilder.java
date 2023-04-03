@@ -1,6 +1,10 @@
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.uka.ilkd.key.java.ConvertException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.ParserException;
@@ -19,9 +23,6 @@ import recoder.java.reference.TypeReference;
 import recoder.kit.TypeKit;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Make a ClassDeclaration out of a class file.

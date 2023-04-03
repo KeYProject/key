@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.util.pp;
 
-import javax.annotation.Nonnull;
 import java.util.*;
+import javax.annotation.Nonnull;
 
 /**
  * This class pretty-prints information using line breaks and indentation. For instance, it can be

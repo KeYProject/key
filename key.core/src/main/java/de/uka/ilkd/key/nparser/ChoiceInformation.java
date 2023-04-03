@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.nparser;
 
+import java.util.*;
+
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
-
-import java.util.*;
 
 /**
  * A POJO representing the information on choices in ASTs.

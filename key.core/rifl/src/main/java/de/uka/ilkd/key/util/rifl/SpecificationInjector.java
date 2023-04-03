@@ -1,16 +1,17 @@
 package de.uka.ilkd.key.util.rifl;
 
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.util.rifl.SpecificationEntity.Type;
+
 import recoder.abstraction.ClassType;
 import recoder.java.*;
 import recoder.java.declaration.*;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.SourceInfo;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 /**
  * Writes JML* translation of RIFL specifications to Java files. This is a manipulating Recoder

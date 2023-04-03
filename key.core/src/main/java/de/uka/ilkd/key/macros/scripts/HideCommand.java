@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -12,8 +14,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-
-import java.util.Map;
 
 /**
  * Proof script command to hide a formula from the sequent.

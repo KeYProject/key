@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.testgen;
 
+import java.util.Set;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -15,10 +17,9 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Set;
 
 public class ProofInfo {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofInfo.class);

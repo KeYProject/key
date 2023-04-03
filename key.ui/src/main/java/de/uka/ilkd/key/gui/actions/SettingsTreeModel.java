@@ -2,7 +2,6 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.util.Map.Entry;
 import java.util.Properties;
-
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -158,5 +157,3 @@ public class SettingsTreeModel extends DefaultTreeModel {
 
 
 }
-
-

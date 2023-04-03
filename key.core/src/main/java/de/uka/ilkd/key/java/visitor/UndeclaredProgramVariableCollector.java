@@ -1,11 +1,7 @@
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -15,6 +11,9 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * <p>

@@ -1,12 +1,5 @@
 package de.uka.ilkd.key.smt.solvertypes;
 
-import de.uka.ilkd.key.settings.SettingsConverter;
-import de.uka.ilkd.key.smt.communication.Z3Socket;
-import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
-import org.key_project.util.reflection.ClassLoaderUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +8,15 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.settings.SettingsConverter;
+import de.uka.ilkd.key.smt.communication.Z3Socket;
+import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
+
+import org.key_project.util.reflection.ClassLoaderUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides static SolverType objects to be reused and saves the properties to .props files. Used to

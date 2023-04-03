@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
+import java.util.ArrayList;
+
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -21,9 +23,6 @@ import de.uka.ilkd.key.strategy.termfeature.ContainsLabelFeature;
 import de.uka.ilkd.key.symbolic_execution.rule.ModalitySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.util.Triple;
-
-import java.util.ArrayList;
 
 /**
  * {@link Strategy} to use for symbolic execution.

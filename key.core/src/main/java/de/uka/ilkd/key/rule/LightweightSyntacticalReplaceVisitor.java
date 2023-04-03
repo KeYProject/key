@@ -5,6 +5,10 @@
  */
 package de.uka.ilkd.key.rule;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Stack;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
@@ -15,11 +19,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor;
-import org.key_project.util.collection.ImmutableArray;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Stack;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A lightweight version of {@link SyntacticalReplaceVisitor} which does not replace labels. This

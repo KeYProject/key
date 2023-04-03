@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.smt.communication;
 
-import javax.annotation.Nonnull;
 import java.io.*;
+import javax.annotation.Nonnull;
 
 /**
  * This class is responsible for starting external processes:

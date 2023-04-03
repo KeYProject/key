@@ -1,9 +1,6 @@
 package de.uka.ilkd.key.macros;
 
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -13,6 +10,9 @@ import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * The Class TryCloseMacro tries to close goals. Goals are either closed or left untouched.

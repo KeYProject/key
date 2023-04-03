@@ -3,13 +3,13 @@ package de.uka.ilkd.key.logic;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import javax.annotation.Nonnull;
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * The TermFactory is the <em>only</em> way to create terms using constructors of class Term or any

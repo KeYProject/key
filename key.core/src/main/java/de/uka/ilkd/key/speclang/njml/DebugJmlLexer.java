@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.speclang.njml;
 
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonToken;
-import org.antlr.v4.runtime.Token;
-
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonToken;
+import org.antlr.v4.runtime.Token;
 
 /**
  * This program is a little for debugging KeY Lexer.

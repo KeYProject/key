@@ -1,5 +1,8 @@
 package recoder.kit.transformation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.CompilationUnit;
 import recoder.java.Import;
@@ -9,9 +12,6 @@ import recoder.kit.UnitKit;
 import recoder.service.CrossReferenceSourceInfo;
 import recoder.util.ProgressListener;
 import recoder.util.ProgressListenerManager;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Transformation that removes all superfluous import statements from a compilation unit.

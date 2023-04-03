@@ -12,12 +12,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import recoder.io.DataLocation;
 import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.FileCollection;
 import de.uka.ilkd.key.util.KeYResourceManager;
+
+import recoder.io.DataLocation;
 
 /**
  * This is a special {@link FileCollection} which allows to retrieve the internally stored java boot

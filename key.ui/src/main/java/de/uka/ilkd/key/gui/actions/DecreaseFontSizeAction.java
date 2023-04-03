@@ -2,11 +2,11 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 public class DecreaseFontSizeAction extends MainWindowAction implements ConfigChangeListener {
 

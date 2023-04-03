@@ -1,9 +1,11 @@
 package recoder.testsuite.basic.analysis;
 
+import java.util.List;
+
 import junit.framework.Assert;
 import org.junit.Test;
-import recoder.abstraction.Package;
 import recoder.abstraction.*;
+import recoder.abstraction.Package;
 import recoder.convenience.Format;
 import recoder.convenience.TreeWalker;
 import recoder.io.SourceFileRepository;
@@ -13,8 +15,6 @@ import recoder.java.Reference;
 import recoder.java.reference.*;
 import recoder.service.CrossReferenceSourceInfo;
 import recoder.testsuite.basic.BasicTestsSuite;
-
-import java.util.List;
 
 /**
  * This test checks if all references in all compilation units are resolved and contained in the

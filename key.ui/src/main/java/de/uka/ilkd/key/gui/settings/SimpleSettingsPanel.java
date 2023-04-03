@@ -1,22 +1,24 @@
 package de.uka.ilkd.key.gui.settings;
 
 
-import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
-import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import java.awt.*;
+import java.text.Format;
 import javax.annotation.Nullable;
-import org.key_project.util.java.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
-import java.awt.*;
-import java.text.Format;
+
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
+import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+
+import org.key_project.util.java.StringUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A simple panel for using inside of the {@link SettingsUi}.

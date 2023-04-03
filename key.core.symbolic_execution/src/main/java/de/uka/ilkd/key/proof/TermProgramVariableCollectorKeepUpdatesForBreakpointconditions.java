@@ -4,7 +4,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.AbstractConditionalBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;

@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.gui;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -10,9 +13,6 @@ import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class InspectorForDecisionPredicates implements CheckedUserInputInspector {
 

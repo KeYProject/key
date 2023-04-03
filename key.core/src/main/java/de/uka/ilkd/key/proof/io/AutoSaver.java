@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.proof.io;
 
+import java.io.File;
+
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
@@ -7,11 +9,11 @@ import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.util.KeYConstants;
+
 import org.key_project.util.java.IOUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
 
 /**
  * Saves intermediate proof artifacts during strategy execution. An {@link AutoSaver} instance saves

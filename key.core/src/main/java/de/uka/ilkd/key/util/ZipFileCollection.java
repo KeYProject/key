@@ -1,11 +1,5 @@
 package de.uka.ilkd.key.util;
 
-import de.uka.ilkd.key.java.recoderext.URLDataLocation;
-import de.uka.ilkd.key.proof.io.consistency.FileRepo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import recoder.io.DataLocation;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +11,13 @@ import java.util.NoSuchElementException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
+
+import de.uka.ilkd.key.java.recoderext.URLDataLocation;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.io.DataLocation;
 
 
 /**

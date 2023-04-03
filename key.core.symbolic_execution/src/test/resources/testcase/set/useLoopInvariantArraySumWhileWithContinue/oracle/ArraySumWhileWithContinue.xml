@@ -7,18 +7,18 @@
             <callStackEntry path="/0"/>
             <loopInvariant name="invariant: (  (i &gt;= 0
  &amp; i &lt;= array.length)&lt;&lt;SC&gt;&gt;
- &amp; result = javaCastInt(bsum{int j;}(0, i, array[j])))&lt;&lt;SC&gt;&gt;;
-variant: javaSubInt(array.length, i)
+ &amp; result = bsum{int j;}(0, i, array[j]))&lt;&lt;SC&gt;&gt;;
+variant: array.length - i
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>
                <branchCondition name="and(or(lt(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_0))),not(equals(array,null)))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_0)))" pathConditionChanged="true" branchCondition="and(or(lt(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_0))),not(equals(array,null)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <callStackEntry path="/0"/>
                   <branchCondition name="not(equals(array,null))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_0)))" pathConditionChanged="true" branchCondition="not(equals(array,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <loopCondition name="i&lt;array.length" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_0)))" pathConditionChanged="false" blockOpened="false">
+                     <loopCondition name="i &lt; array.length;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_0)))" pathConditionChanged="false" blockOpened="false">
                         <callStackEntry path="/0"/>
-                        <statement name="result+=array[i];" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_0)))" pathConditionChanged="false">
+                        <statement name="result += array[i];" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_0)))" pathConditionChanged="false">
                            <callStackEntry path="/0"/>
-                           <branchStatement name="if (i&gt;=0)" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_0)))" pathConditionChanged="false" blockOpened="true">
+                           <branchStatement name="if (i &gt;= 0)" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_0)))" pathConditionChanged="false" blockOpened="true">
                               <callStackEntry path="/0"/>
                               <statement name="break inner_label;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_0)))" pathConditionChanged="false">
                                  <callStackEntry path="/0"/>
@@ -32,7 +32,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                      </loopCondition>
                   </branchCondition>
                   <branchCondition name="equals(array,null)" pathCondition="lt(length(array),Z(0(#)))" pathConditionChanged="true" branchCondition="equals(array,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <loopCondition name="i&lt;array.length" pathCondition="lt(length(array),Z(0(#)))" pathConditionChanged="false" blockOpened="false">
+                     <loopCondition name="i &lt; array.length;" pathCondition="lt(length(array),Z(0(#)))" pathConditionChanged="false" blockOpened="false">
                         <callStackEntry path="/0"/>
                         <termination name="&lt;loop body end&gt;" pathCondition="lt(length(array),Z(0(#)))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
                            <exceptionalMethodReturn name="&lt;throw java.lang.Throwable&gt;" signature="&lt;exceptional return of &lt;call ArraySumWhileWithContinue.sum(array)&gt;&gt;" pathCondition="lt(length(array),Z(0(#)))" pathConditionChanged="false" methodReturnCondition="false">

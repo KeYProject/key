@@ -1,5 +1,7 @@
 package recoder.testsuite.basic.syntax;
 
+import java.util.List;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import recoder.convenience.Format;
@@ -9,8 +11,6 @@ import recoder.java.CompilationUnit;
 import recoder.java.ProgramElement;
 import recoder.java.SourceElement.Position;
 import recoder.testsuite.basic.BasicTestsSuite;
-
-import java.util.List;
 
 public class WalkPositionTest extends TestCase {
 
@@ -39,4 +39,3 @@ public class WalkPositionTest extends TestCase {
         }
     }
 }
-

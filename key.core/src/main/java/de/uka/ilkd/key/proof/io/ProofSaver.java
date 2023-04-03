@@ -1,17 +1,18 @@
 package de.uka.ilkd.key.proof.io;
 
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.event.ProofSaverEvent;
-import de.uka.ilkd.key.proof.io.event.ProofSaverListener;
-import de.uka.ilkd.key.util.KeYConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.io.event.ProofSaverEvent;
+import de.uka.ilkd.key.proof.io.event.ProofSaverListener;
+import de.uka.ilkd.key.util.KeYConstants;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Saves a proof and provides useful methods for pretty printing terms or programs.

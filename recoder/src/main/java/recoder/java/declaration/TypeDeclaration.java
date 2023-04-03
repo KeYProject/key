@@ -2,19 +2,19 @@
 
 package recoder.java.declaration;
 
-import recoder.abstraction.Package;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import recoder.abstraction.*;
+import recoder.abstraction.Package;
 import recoder.convenience.Naming;
 import recoder.java.*;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.ProgramModelInfo;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Type declaration.

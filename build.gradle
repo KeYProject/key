@@ -222,11 +222,11 @@ subprojects {
         reports {
             html {
                 enabled true
-                destination file("build/reports/pmd/main_diff.html")
+                outputLocation = file("build/reports/pmd/main_diff.html")
             }
             xml {
                 enabled true
-                destination file("build/reports/pmd/main_diff.xml")
+                outputLocation = file("build/reports/pmd/main_diff.xml")
             }
         }
     }
@@ -252,11 +252,11 @@ subprojects {
         reports {
             html {
                 enabled true
-                destination file("build/reports/checkstyle/main_diff.html")
+                outputLocation = file("build/reports/checkstyle/main_diff.html")
             }
             xml {
                 enabled true
-                destination file("build/reports/checkstyle/main_diff.xml")
+                outputLocation = file("build/reports/checkstyle/main_diff.xml")
             }
         }
     } 
@@ -272,8 +272,8 @@ subprojects {
     // }
      tasks.withType(Pmd) {
          reports {
-             xml.enabled = true
-             html.enabled = true
+             xml.getRequired().set(true)
+             html.getRequired().set(true)
          }
      }
     
@@ -399,9 +399,14 @@ subprojects {
             // allows us to use spotless:off / spotless:on to keep pre-formatted sections
             toggleOffOn()
 
+            removeUnusedImports()
             eclipse().configFile("$rootDir/scripts/tools/checkstyle/keyCodeStyle.xml")
             trimTrailingWhitespace()        // not sure how to set this in the xml file ...
             //googleJavaFormat().aosp().reflowLongStrings()
+
+            // note: you can use an empty string for all the imports you didn't specify explicitly,
+            // '|' to join group without blank line, and '\\#` prefix for static imports
+            importOrder('java|javax', 'de.uka', 'org.key_project', '', '\\#')
 
             // specific delimiter: normally just 'package', but spotless crashes for files in default package
             // (see https://github.com/diffplug/spotless/issues/30), therefore 'import' is needed. '//' is for files

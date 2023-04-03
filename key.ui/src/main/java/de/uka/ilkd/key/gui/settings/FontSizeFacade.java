@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.gui.settings;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.*;
 
 /**
  * @author Alexander Weigl

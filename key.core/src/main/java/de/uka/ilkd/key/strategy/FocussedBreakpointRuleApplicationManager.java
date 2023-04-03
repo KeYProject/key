@@ -2,9 +2,6 @@ package de.uka.ilkd.key.strategy;
 
 import java.util.Optional;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -13,6 +10,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * A rule app manager that ensures that rules are only applied to a certain subterm within the proof

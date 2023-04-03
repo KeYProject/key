@@ -2,12 +2,12 @@
 
 package recoder.util;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.kit.pattern.FactoryMethod;
-
-import java.lang.reflect.Field;
-import java.util.HashMap;
 
 /**
  * This class can be used either as a template or as a base class for building RECODER command line

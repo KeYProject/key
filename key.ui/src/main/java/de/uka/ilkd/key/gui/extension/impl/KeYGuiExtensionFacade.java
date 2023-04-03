@@ -1,5 +1,14 @@
 package de.uka.ilkd.key.gui.extension.impl;
 
+import java.awt.*;
+import java.util.*;
+import java.util.List;
+import java.util.function.ToIntFunction;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
@@ -7,15 +16,6 @@ import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.pp.PosInSequent;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
-import java.util.*;
-import java.util.function.ToIntFunction;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Facade for retrieving the GUI extensions.

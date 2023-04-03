@@ -1,5 +1,14 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
+import java.awt.*;
+import java.awt.dnd.Autoscroll;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DropTarget;
+import java.util.EventObject;
+import java.util.LinkedList;
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ApplyTacletDialog;
 import de.uka.ilkd.key.gui.GUIListener;
@@ -11,17 +20,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.dnd.Autoscroll;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DragSource;
-import java.awt.dnd.DropTarget;
-import java.util.EventObject;
-import java.util.LinkedList;
 
 /**
  * This sequent view displays the sequent of an open goal and allows selection of formulas as well

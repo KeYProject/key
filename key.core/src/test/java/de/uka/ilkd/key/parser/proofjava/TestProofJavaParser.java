@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.parser.proofjava;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.ParserException;
 import recoder.ServiceConfiguration;
 import recoder.java.Expression;

@@ -2,12 +2,12 @@
 
 package recoder.abstraction;
 
+import java.util.List;
+
 import recoder.ModelException;
 import recoder.convenience.Naming;
 import recoder.service.ProgramModelInfo;
 import recoder.util.Debug;
-
-import java.util.List;
 
 /**
  * Default constructor of class types.

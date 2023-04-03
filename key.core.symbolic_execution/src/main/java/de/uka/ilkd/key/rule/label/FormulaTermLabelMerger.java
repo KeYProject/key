@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.rule.label;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * The {@link TermLabelMerger} used to merge {@link FormulaTermLabel}s.

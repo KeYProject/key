@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.settings;
 
+import java.util.*;
+
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.*;
 
 public class ChoiceSettings implements Settings, Cloneable {
 

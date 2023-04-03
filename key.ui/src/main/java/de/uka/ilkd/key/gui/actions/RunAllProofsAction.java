@@ -1,17 +1,5 @@
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.Main;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.ProblemLoader;
-import de.uka.ilkd.key.ui.MediatorProofControl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.awt.event.ActionEvent;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -19,6 +7,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.Main;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.io.ProblemLoader;
+import de.uka.ilkd.key.ui.MediatorProofControl;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class provides an action for KeY UI which runs a set of specified proof files automatically.

@@ -1,6 +1,12 @@
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+
 import de.uka.ilkd.key.util.Debug;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Field;
@@ -17,11 +23,6 @@ import recoder.java.reference.ThisReference;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 /**
  * Creates the preparation method for pre-initilizing the object fields with their default settings.

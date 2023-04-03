@@ -1,11 +1,12 @@
 package de.uka.ilkd.key.rule;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import org.key_project.util.EqualsModProofIrrelevancy;
 
-import java.util.Objects;
+import org.key_project.util.EqualsModProofIrrelevancy;
 
 
 /**

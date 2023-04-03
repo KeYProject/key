@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.key_project.util.java.StringUtil;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.MethodReference;
@@ -35,6 +33,8 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.java.StringUtil;
 
 /**
  * The default implementation of {@link IExecutionMethodReturn}.

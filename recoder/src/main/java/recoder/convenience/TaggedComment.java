@@ -2,13 +2,13 @@
 
 package recoder.convenience;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.*;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Vector;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * this class represents a java style structured comment. Such a comment has an introductionary

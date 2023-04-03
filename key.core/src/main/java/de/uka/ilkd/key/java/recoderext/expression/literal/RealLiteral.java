@@ -1,14 +1,16 @@
 package de.uka.ilkd.key.java.recoderext.expression.literal;
 
+import java.math.BigDecimal;
+
 import de.uka.ilkd.key.java.recoderext.KeYRecoderExtension;
+
 import org.key_project.util.ExtList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Literal;
-
-import java.math.BigDecimal;
 
 /**
  * Literal for JML \real type;

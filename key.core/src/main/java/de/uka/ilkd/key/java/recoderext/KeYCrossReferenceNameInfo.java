@@ -1,6 +1,10 @@
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 import de.uka.ilkd.key.java.ConvertException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.ServiceConfiguration;
@@ -9,9 +13,6 @@ import recoder.abstraction.Type;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.kit.UnitKit;
 import recoder.service.DefaultNameInfo;
-
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 
 

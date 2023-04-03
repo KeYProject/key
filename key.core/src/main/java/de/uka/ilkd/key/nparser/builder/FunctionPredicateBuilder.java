@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.nparser.builder;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -9,9 +11,8 @@ import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeYParser;
-import org.key_project.util.collection.ImmutableArray;
 
-import java.util.List;
+import org.key_project.util.collection.ImmutableArray;
 
 
 /**

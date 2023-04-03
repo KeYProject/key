@@ -1,5 +1,7 @@
 package recoder.testsuite.basic.analysis;
 
+import java.util.List;
+
 import junit.framework.Assert;
 import org.junit.Test;
 import recoder.abstraction.ClassType;
@@ -13,8 +15,6 @@ import recoder.java.reference.MethodReference;
 import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.NameInfo;
 import recoder.testsuite.basic.BasicTestsSuite;
-
-import java.util.List;
 
 public class MemberXReferenceCompletenessTest extends XReferenceCompletenessTest {
 

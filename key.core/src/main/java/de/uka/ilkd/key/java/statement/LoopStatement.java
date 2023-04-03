@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ExpressionContainer;
 import de.uka.ilkd.key.java.LoopInitializer;
@@ -11,6 +8,9 @@ import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementContainer;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Loop statement.
@@ -440,7 +440,7 @@ public abstract class LoopStatement extends JavaStatement
         LoopStatement cmp = (LoopStatement) o;
         return super.equals(cmp) && (this.getStartPosition().equals(Position.UNDEFINED)
                 || cmp.getStartPosition().equals(Position.UNDEFINED)
-                || this.getStartPosition().getLine() == cmp.getStartPosition().getLine());
+                || this.getStartPosition().line() == cmp.getStartPosition().line());
     }
 
 }

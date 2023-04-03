@@ -1,12 +1,11 @@
 package de.uka.ilkd.key.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
-
 import javax.swing.SwingUtilities;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class ThreadUtilities {
     private static final Logger LOGGER = LoggerFactory.getLogger(ThreadUtilities.class);

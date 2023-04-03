@@ -1,18 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.core.InterruptListener;
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.macros.scripts.ScriptException;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.Goal;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.Dialog.ModalityType;
 import java.io.File;
@@ -22,6 +9,20 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Observer;
 import java.util.concurrent.*;
+import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+
+import de.uka.ilkd.key.core.InterruptListener;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
+import de.uka.ilkd.key.macros.scripts.ScriptException;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.Goal;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ProofScriptWorker extends SwingWorker<Object, Object> implements InterruptListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofScriptWorker.class);
@@ -41,7 +42,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
     private final Observer observer = (o, arg) -> publish(arg);
 
     public ProofScriptWorker(KeYMediator mediator, File file) throws IOException {
-        this.initialLocation = new Location(file.toURI().toURL(), new Position(1, 1));
+        this.initialLocation = new Location(file.toURI().toURL(), Position.newOneBased(1, 1));
         this.script = Files.readString(file.toPath());
         this.mediator = mediator;
         this.initiallySelectedGoal = null;

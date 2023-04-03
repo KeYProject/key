@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -13,11 +16,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.*;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Command that applies a calculus rule All parameters are passed as strings and converted by the

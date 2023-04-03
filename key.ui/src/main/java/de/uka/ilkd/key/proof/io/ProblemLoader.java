@@ -3,7 +3,6 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.util.List;
 import java.util.Properties;
-
 import javax.swing.SwingWorker;
 
 import de.uka.ilkd.key.core.KeYMediator;

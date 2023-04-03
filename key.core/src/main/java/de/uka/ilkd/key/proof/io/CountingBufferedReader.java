@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.proof.io;
 
-import de.uka.ilkd.key.util.ProgressMonitor;
-import org.key_project.util.java.IOUtil;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import de.uka.ilkd.key.util.ProgressMonitor;
+
+import org.key_project.util.java.IOUtil;
 
 public class CountingBufferedReader extends BufferedReader {
 

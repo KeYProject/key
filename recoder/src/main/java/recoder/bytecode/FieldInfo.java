@@ -2,11 +2,11 @@
 
 package recoder.bytecode;
 
+import java.util.List;
+
 import recoder.abstraction.Field;
 import recoder.abstraction.Type;
 import recoder.convenience.Naming;
-
-import java.util.List;
 
 public class FieldInfo extends MemberInfo implements Field {
 

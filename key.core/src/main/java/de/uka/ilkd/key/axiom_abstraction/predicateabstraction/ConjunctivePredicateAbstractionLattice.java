@@ -1,15 +1,16 @@
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+
 import org.key_project.util.bitops.ImmutableFixedLengthBitSet;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.NotUniqueException;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * A lattice for all predicates accepting the given sort. This lattice consists of 2^n + 1 elements,

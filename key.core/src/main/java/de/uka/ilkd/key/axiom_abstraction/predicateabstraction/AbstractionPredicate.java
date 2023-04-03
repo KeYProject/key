@@ -1,5 +1,12 @@
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.naming.NameAlreadyBoundException;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -10,13 +17,6 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
-
-import javax.naming.NameAlreadyBoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Interface for predicates used for predicate abstraction. An abstraction predicate is a mapping

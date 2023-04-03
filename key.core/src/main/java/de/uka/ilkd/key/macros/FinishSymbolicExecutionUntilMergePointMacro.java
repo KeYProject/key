@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.macros;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.statement.*;
@@ -15,11 +18,9 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-
-import java.util.HashSet;
-import java.util.LinkedList;
 
 /**
  * The macro FinishSymbolicExecutionUntilJionPointMacro continues automatic rule application until a

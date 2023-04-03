@@ -1,6 +1,18 @@
 package de.uka.ilkd.key.gui.prooftree;
 
-import bibliothek.gui.dock.common.action.CAction;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.swing.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.plaf.TreeUI;
+import javax.swing.plaf.basic.BasicTreeUI;
+import javax.swing.plaf.metal.MetalTreeUI;
+import javax.swing.tree.*;
+
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -21,23 +33,13 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.RuleApp;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import bibliothek.gui.dock.common.action.CAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.swing.*;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.plaf.TreeUI;
-import javax.swing.plaf.basic.BasicTreeUI;
-import javax.swing.plaf.metal.MetalTreeUI;
-import javax.swing.tree.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.List;
-import java.util.*;
 
 /**
  * The proof tree view, showing the nodes of the proof.

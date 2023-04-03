@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
+import java.util.Collection;
+
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
-
-import java.util.Collection;
 
 public class AssumptionFormula implements TacletFormula {
 

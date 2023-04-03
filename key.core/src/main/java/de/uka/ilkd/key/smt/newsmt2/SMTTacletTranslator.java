@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.FormulaSV;
@@ -14,12 +19,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.taclettranslation.DefaultTacletTranslator;
 import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
-import org.key_project.util.collection.ImmutableArray;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * This class uses the existing taclet translation technology to translate taclets to smt axioms.

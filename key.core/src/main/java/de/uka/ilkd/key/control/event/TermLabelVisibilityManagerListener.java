@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.control.event;
 
-import de.uka.ilkd.key.control.TermLabelVisibilityManager;
-
 import java.util.EventListener;
+
+import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 
 /**
  * Observes changes on a {@link TermLabelVisibilityManager}.

@@ -2,6 +2,8 @@
 
 package recoder.kit;
 
+import java.util.List;
+
 import recoder.ProgramFactory;
 import recoder.java.DocComment;
 import recoder.java.declaration.*;
@@ -9,8 +11,6 @@ import recoder.java.reference.TypeReference;
 import recoder.service.NameInfo;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
-
-import java.util.List;
 
 public class CommentKit {
 

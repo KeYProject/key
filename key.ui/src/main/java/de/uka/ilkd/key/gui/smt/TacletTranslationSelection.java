@@ -1,5 +1,12 @@
 package de.uka.ilkd.key.gui.smt;
 
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Set;
+import javax.swing.*;
+import javax.swing.tree.TreeNode;
+
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.proof.TacletIndex;
@@ -8,13 +15,6 @@ import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem.SelectionMode;
-
-import javax.swing.*;
-import javax.swing.tree.TreeNode;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.Set;
 
 
 abstract class TreePanel extends JPanel {

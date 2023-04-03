@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
@@ -11,11 +15,9 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestProperty;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 

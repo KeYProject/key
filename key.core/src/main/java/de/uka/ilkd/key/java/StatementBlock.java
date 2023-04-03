@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java;
 
+import java.util.ArrayList;
+
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclarationContainer;
 import de.uka.ilkd.key.java.statement.JavaStatement;
@@ -8,10 +10,9 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.util.Debug;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.ArrayList;
 
 /**
  * Statement block. taken from COMPOST and changed to achieve an immutable structure
@@ -77,7 +78,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
                                                                           // about position info and
                                                                           // nowhere else?
                         se.getStartPosition().equals(Position.UNDEFINED)
-                        || this.getStartPosition().getLine() == se.getStartPosition().getLine());
+                        || this.getStartPosition().line() == se.getStartPosition().line());
     }
 
     /** computes the prefix elements for the given array of statment block */

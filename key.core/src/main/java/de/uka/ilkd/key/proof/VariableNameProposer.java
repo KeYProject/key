@@ -3,8 +3,6 @@ package de.uka.ilkd.key.proof;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -19,6 +17,8 @@ import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.TacletApp;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Proposes names for variables (except program variables).

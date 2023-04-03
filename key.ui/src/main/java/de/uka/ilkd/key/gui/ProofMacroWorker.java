@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.gui;
 
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.*;
+
 import de.uka.ilkd.key.control.InteractionListener;
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -12,12 +16,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The Class ProofMacroWorker is a swing worker for the application of proof macros.

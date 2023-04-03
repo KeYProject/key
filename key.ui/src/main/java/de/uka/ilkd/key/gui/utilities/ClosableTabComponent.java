@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.gui.utilities;
 
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 /**
  * Tab component for {@link JTabbedPane} with a close button.

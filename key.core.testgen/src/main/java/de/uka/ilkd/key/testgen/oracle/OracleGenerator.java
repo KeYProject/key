@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.testgen.oracle;
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -10,11 +12,11 @@ import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.testgen.ReflectionClassCreator;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
 import de.uka.ilkd.key.testgen.oracle.OracleUnaryTerm.Op;
+
 import org.key_project.util.collection.ImmutableArray;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 public class OracleGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(OracleGenerator.class);

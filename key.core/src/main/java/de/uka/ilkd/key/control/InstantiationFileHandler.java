@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.control;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
 import de.uka.ilkd.key.control.instantiation_model.TacletFindModel;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.PathConfig;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
 
 public class InstantiationFileHandler {
     private static final String INSTANTIATION_DIR =

@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.informationflow.macros;
 
 
+import java.util.Map;
+
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -17,10 +19,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.Map;
 
 /**
  * The abstract class ExhaustiveProofMacro can be used to create compound macros which either apply

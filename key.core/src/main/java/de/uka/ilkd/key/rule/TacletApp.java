@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.rule;
 
+import java.util.*;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.TypeReference;
@@ -13,12 +16,10 @@ import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.rule.inst.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.util.Debug;
+
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.*;
-
-import javax.annotation.Nullable;
-import java.util.*;
 
 /**
  * A TacletApp object contains information required for a concrete application. These information

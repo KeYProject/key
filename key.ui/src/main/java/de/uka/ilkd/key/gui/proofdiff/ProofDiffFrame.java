@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.gui.proofdiff;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.Iterator;
+import java.util.LinkedList;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -7,12 +13,6 @@ import de.uka.ilkd.key.gui.proofdiff.diff_match_patch.Diff;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.Iterator;
-import java.util.LinkedList;
 
 /**
  * Proof-of-concept implementation of a textual sequent comparison.

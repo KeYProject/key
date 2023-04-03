@@ -4,7 +4,6 @@ package de.uka.ilkd.key.gui.prooftree;
 import java.lang.ref.WeakReference;
 import java.util.Enumeration;
 import java.util.LinkedList;
-
 import javax.annotation.Nonnull;
 import javax.swing.tree.TreeNode;
 

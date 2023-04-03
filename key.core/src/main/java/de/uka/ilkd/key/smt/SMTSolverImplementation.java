@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.smt;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Sequent;
@@ -12,14 +18,9 @@ import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Represents a concrete instance of a running solver process on the KeY side. Amongst others

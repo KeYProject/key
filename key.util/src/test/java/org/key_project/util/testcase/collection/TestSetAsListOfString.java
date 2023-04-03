@@ -1,10 +1,11 @@
 package org.key_project.util.testcase.collection;
 
-import org.junit.jupiter.api.Test;
+import java.util.Iterator;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-import java.util.Iterator;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 

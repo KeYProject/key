@@ -1,13 +1,5 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
-import de.uka.ilkd.key.proof.runallproofs.TestResult;
-import de.uka.ilkd.key.settings.PathConfig;
-import de.uka.ilkd.key.util.IOForwarder;
-import org.junit.jupiter.api.Assertions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,6 +7,15 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
+import de.uka.ilkd.key.proof.runallproofs.TestResult;
+import de.uka.ilkd.key.settings.PathConfig;
+import de.uka.ilkd.key.util.IOForwarder;
+
+import org.junit.jupiter.api.Assertions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 

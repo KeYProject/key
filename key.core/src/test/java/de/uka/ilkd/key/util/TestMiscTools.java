@@ -1,14 +1,6 @@
 package de.uka.ilkd.key.util;
 
 
-import de.uka.ilkd.key.java.recoderext.URLDataLocation;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.key_project.util.java.IOUtil;
-import recoder.io.ArchiveDataLocation;
-import recoder.io.DataFileLocation;
-import recoder.io.DataLocation;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -22,6 +14,16 @@ import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+
+import de.uka.ilkd.key.java.recoderext.URLDataLocation;
+
+import org.key_project.util.java.IOUtil;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import recoder.io.ArchiveDataLocation;
+import recoder.io.DataFileLocation;
+import recoder.io.DataLocation;
 
 import static de.uka.ilkd.key.util.MiscTools.containsWholeWord;
 import static de.uka.ilkd.key.util.MiscTools.isJMLComment;

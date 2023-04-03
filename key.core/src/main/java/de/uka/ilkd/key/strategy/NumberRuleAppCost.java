@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.strategy;
 
-import org.key_project.util.LRUCache;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.util.Debug;
 
-import javax.annotation.Nonnull;
+import org.key_project.util.LRUCache;
 
 public abstract class NumberRuleAppCost implements RuleAppCost {
 

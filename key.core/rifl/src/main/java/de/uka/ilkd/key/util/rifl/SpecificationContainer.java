@@ -4,6 +4,7 @@ package de.uka.ilkd.key.util.rifl;
 import java.util.Set;
 
 import de.uka.ilkd.key.util.rifl.SpecificationEntity.Type;
+
 import recoder.java.declaration.FieldDeclaration;
 import recoder.java.declaration.MethodDeclaration;
 

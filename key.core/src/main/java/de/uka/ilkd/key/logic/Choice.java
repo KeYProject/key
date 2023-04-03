@@ -1,10 +1,9 @@
 package de.uka.ilkd.key.logic;
 
 
-import javax.annotation.Nonnull;
-
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 
 /**
  * A choice is an option in a category.

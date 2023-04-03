@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.proof.init;
 
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -23,14 +29,9 @@ import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.UpdatesBuilder;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.VariablesCreatorAndRegistrar;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.MiscTools;
+
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
-
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * A proof obligation for a {@link FunctionalBlockContract}.

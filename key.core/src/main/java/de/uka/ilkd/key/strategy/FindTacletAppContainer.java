@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.strategy;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -14,6 +12,8 @@ import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Instances of this class are immutable

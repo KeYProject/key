@@ -9,16 +9,17 @@
 package de.uka.ilkd.key.java.recoderext;
 
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import de.uka.ilkd.key.logic.op.ProgramSV;
+
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
 import recoder.java.Statement;
 import recoder.java.StatementContainer;
 import recoder.java.statement.JavaStatement;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public class RKeYMetaConstruct extends JavaStatement
         implements StatementContainer, KeYRecoderExtension {

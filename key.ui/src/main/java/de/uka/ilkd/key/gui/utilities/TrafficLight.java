@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.gui.utilities;
 
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
-import java.awt.*;
 
 
 /**

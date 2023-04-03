@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
-
 import java.io.IOException;
 import java.util.*;
+
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 
 /**
  * Data structure for parse results of {@link ProofCollectionParser}. Method

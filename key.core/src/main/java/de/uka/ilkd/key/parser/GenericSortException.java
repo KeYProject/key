@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.parser;
 
-import org.antlr.runtime.RecognitionException;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 import antlr.Token;
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.antlr.runtime.RecognitionException;
 
 public class GenericSortException extends RecognitionException {
     /**

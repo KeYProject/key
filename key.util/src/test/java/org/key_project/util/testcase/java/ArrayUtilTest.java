@@ -1,10 +1,11 @@
 package org.key_project.util.testcase.java;
 
-import org.junit.jupiter.api.Test;
+import java.util.function.Predicate;
+
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.StringUtil;
 
-import java.util.function.Predicate;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 

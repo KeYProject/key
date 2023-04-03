@@ -2,11 +2,11 @@
 
 package recoder.testsuite.basic;
 
+import java.io.File;
+import javax.annotation.Nonnull;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.service.DefaultErrorHandler;
-
-import javax.annotation.Nonnull;
-import java.io.File;
 
 /**
  * Call example: java test.TransformationTests standard.tst collections.prj
@@ -44,5 +44,3 @@ public class BasicTestsSuite {
         }
     }
 }
-
-

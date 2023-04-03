@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.util.removegenerics;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+
 import de.uka.ilkd.key.util.removegenerics.monitor.GenericRemoverMonitor;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.io.PathList;
 import recoder.java.CompilationUnit;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
 
 public abstract class AbstractGenericRemover {
     private final GenericRemoverMonitor monitor;

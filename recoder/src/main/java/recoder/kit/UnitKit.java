@@ -2,6 +2,11 @@
 
 package recoder.kit;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import recoder.ProgramFactory;
 import recoder.abstraction.ArrayType;
 import recoder.abstraction.ClassType;
@@ -25,11 +30,6 @@ import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
 import recoder.util.Order;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class UnitKit {
 

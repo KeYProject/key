@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.gui.mergerule.predicateabstraction;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.stream.StreamSupport;
+
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.gui.mergerule.MergeProcedureCompletion;
 import de.uka.ilkd.key.java.Services;
@@ -12,11 +16,8 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactor
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
-import org.key_project.util.collection.ImmutableList;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.stream.StreamSupport;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Completion class for {@link MergeWithPredicateAbstraction}.

@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.symbolic_execution.object_model;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutExtractor;
 import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader;
 import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutWriter;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicLayout;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * <p>

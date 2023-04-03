@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.java;
 
 
+import java.net.MalformedURLException;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
+
 import recoder.java.CompilationUnit;
 import recoder.kit.UnitKit;
 import recoder.service.UnresolvedReferenceException;
-
-import javax.annotation.Nullable;
-import java.net.MalformedURLException;
 
 /**
  * A convert exception enriched with a location within a file/source.

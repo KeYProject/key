@@ -1,16 +1,16 @@
 package de.uka.ilkd.key.gui.actions;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.nio.file.Path;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofSelectionDialog;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.nio.file.Path;
 
 public class OpenFileAction extends MainWindowAction {
 

@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.speclang;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
@@ -11,6 +8,9 @@ import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Extracts specifications from comments.

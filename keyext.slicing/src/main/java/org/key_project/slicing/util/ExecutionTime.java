@@ -1,11 +1,11 @@
 package org.key_project.slicing.util;
 
-import de.uka.ilkd.key.util.Pair;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Simple class to measure the running time of various 'activities'.

@@ -3,12 +3,12 @@ package de.uka.ilkd.key.logic;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**

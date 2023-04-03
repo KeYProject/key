@@ -1,5 +1,7 @@
 package org.key_project.exploration;
 
+import java.io.File;
+
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.nparser.KeyIO;
@@ -7,13 +9,13 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+
+import org.key_project.util.collection.ImmutableList;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.key_project.util.collection.ImmutableList;
-
-import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
 

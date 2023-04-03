@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.java.Services;
-
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import de.uka.ilkd.key.java.Services;
 
 /**
  * A generic {@link Term} replace visitor based on a filter predicate and a replacement function for

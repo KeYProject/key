@@ -2,6 +2,7 @@ package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

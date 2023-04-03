@@ -5,11 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.MapUtil;
-
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -23,6 +18,11 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.MapUtil;
 
 /**
  * Default implementation of {@link BlockContract}.
@@ -123,10 +123,10 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
     @Override
     public String getUniqueName() {
         if (getTarget() != null) {
-            return "Block Contract " + getBlock().getStartPosition().getLine() + " "
+            return "Block Contract " + getBlock().getStartPosition().line() + " "
                 + getTarget().getUniqueName();
         } else {
-            return "Block Contract " + getBlock().getStartPosition().getLine() + " "
+            return "Block Contract " + getBlock().getStartPosition().line() + " "
                 + Math.abs(getBlock().hashCode());
         }
     }

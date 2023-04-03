@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.smt;
 
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
@@ -11,13 +13,13 @@ import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.assumptions.DefaultTacletSetTranslation;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 import de.uka.ilkd.key.util.Debug;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 import static de.uka.ilkd.key.smt.SMTProblem.sequentToTerm;
 

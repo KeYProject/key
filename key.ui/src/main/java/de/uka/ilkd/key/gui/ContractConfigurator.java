@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.speclang.Contract;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.speclang.Contract;
 
 
 public class ContractConfigurator extends JDialog {

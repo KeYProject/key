@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.smt;
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -13,11 +15,11 @@ import de.uka.ilkd.key.smt.hierarchy.SortNode;
 import de.uka.ilkd.key.smt.hierarchy.TypeHierarchy;
 import de.uka.ilkd.key.smt.lang.*;
 import de.uka.ilkd.key.util.Debug;
+
 import org.key_project.util.collection.ImmutableArray;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 import static de.uka.ilkd.key.smt.SMTProblem.sequentToTerm;
 

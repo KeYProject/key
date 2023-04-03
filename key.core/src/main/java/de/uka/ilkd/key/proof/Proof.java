@@ -1,5 +1,13 @@
 package de.uka.ilkd.key.proof;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.function.Predicate;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.swing.*;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -25,17 +33,10 @@ import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.lookup.Lookup;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.swing.*;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.function.Predicate;
 
 
 /**

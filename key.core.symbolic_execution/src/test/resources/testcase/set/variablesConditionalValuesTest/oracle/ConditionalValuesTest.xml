@@ -12,7 +12,7 @@
       <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
       </value>
    </variable>
-   <methodCall name="&lt;call ConditionalValuesTest.main(x,y)&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call ConditionalValuesTest.main(x, y)&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="x" isArrayIndex="false">
          <value name="x {equals(x,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(x,null)">
          </value>
@@ -29,7 +29,7 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <statement name="x.value=2;" pathCondition="true" pathConditionChanged="false">
+      <statement name="x.value = 2;" pathCondition="true" pathConditionChanged="false">
          <variable name="x" isArrayIndex="false">
             <value name="x {equals(x,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(x,null)">
             </value>
@@ -65,7 +65,7 @@
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <statement name="y.value=3;" pathCondition="not(equals(x,null))" pathConditionChanged="false">
+            <statement name="y.value = 3;" pathCondition="not(equals(x,null))" pathConditionChanged="false">
                <variable name="x" isArrayIndex="false">
                   <value name="x {true}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="value" isArrayIndex="false">
@@ -113,7 +113,7 @@
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <statement name="return x.value+y.value;" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false">
+                  <statement name="return x.value + y.value;" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false">
                      <variable name="x" isArrayIndex="false">
                         <value name="x {true}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="value" isArrayIndex="false">
@@ -142,7 +142,7 @@
                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of ConditionalValuesTest.main(x,y)&gt;" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(not(equals(x,null)),not(equals(y,null)))">
+                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of ConditionalValuesTest.main(x, y)&gt;" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(not(equals(x,null)),not(equals(y,null)))">
                         <variable name="x" isArrayIndex="false">
                            <value name="x {true}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <variable name="value" isArrayIndex="false">
@@ -233,7 +233,7 @@
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call ConditionalValuesTest.main(x,y)&gt;&gt;" pathCondition="and(not(equals(x,null)),equals(y,null))" pathConditionChanged="false" methodReturnCondition="and(not(equals(x,null)),equals(y,null))">
+                  <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call ConditionalValuesTest.main(x, y)&gt;&gt;" pathCondition="and(not(equals(x,null)),equals(y,null))" pathConditionChanged="false" methodReturnCondition="and(not(equals(x,null)),equals(y,null))">
                      <variable name="x" isArrayIndex="false">
                         <value name="x {true}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="value" isArrayIndex="false">
@@ -319,7 +319,7 @@
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call ConditionalValuesTest.main(x,y)&gt;&gt;" pathCondition="equals(x,null)" pathConditionChanged="false" methodReturnCondition="equals(x,null)">
+            <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call ConditionalValuesTest.main(x, y)&gt;&gt;" pathCondition="equals(x,null)" pathConditionChanged="false" methodReturnCondition="equals(x,null)">
                <variable name="x" isArrayIndex="false">
                   <value name="x {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>

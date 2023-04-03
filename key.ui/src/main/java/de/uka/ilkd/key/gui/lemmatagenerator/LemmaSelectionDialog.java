@@ -1,17 +1,18 @@
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
+import java.awt.*;
+import java.util.List;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.lemmatagenerator.ItemChooser.ItemFilter;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
 
 /**
  * The core of the Selection-Dialog is the class SelectionPanel which extends JPanel. It contains a

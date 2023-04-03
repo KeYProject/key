@@ -1,18 +1,5 @@
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.gui.KeYFileChooser;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.Statistics;
-import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
@@ -22,6 +9,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.KeYFileChooser;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.Statistics;
+import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ShowProofStatistics extends MainWindowAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(ShowProofStatistics.class);

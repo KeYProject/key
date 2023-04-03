@@ -2,12 +2,12 @@
 
 package recoder.service;
 
+import java.util.List;
+
 import recoder.abstraction.ClassType;
 import recoder.abstraction.DefaultConstructor;
 import recoder.abstraction.ImplicitEnumMethod;
 import recoder.java.declaration.EnumDeclaration;
-
-import java.util.List;
 
 /**
  * Handles requests for implicitly defined program model elements. In particular these are

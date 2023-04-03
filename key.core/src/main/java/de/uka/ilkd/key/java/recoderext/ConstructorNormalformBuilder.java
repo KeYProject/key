@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.*;
+
 import de.uka.ilkd.key.util.Debug;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.*;
 import recoder.java.*;
@@ -13,8 +16,6 @@ import recoder.java.reference.*;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-
-import java.util.*;
 
 /**
  * Transforms the constructors of the given class to their normalform. The constructor normalform

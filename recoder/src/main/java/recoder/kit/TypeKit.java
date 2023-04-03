@@ -2,9 +2,12 @@
 
 package recoder.kit;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.ProgramFactory;
-import recoder.abstraction.Package;
 import recoder.abstraction.*;
+import recoder.abstraction.Package;
 import recoder.convenience.TreeWalker;
 import recoder.java.Identifier;
 import recoder.java.NonTerminalProgramElement;
@@ -17,9 +20,6 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.*;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * this class implements basic functions for type handling.

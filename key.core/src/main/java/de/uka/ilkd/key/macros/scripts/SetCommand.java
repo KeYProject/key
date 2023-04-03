@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import de.uka.ilkd.key.macros.scripts.meta.Option;

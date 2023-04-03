@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.rule.label;
 
+import java.util.Deque;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -13,12 +17,9 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.CollectionUtil;
-
-import java.util.Deque;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 /**
  * This {@link TermLabelPolicy} maintains a {@link FormulaTermLabel} on predicates.

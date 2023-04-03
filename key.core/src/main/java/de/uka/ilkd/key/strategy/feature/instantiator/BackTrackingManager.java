@@ -1,11 +1,12 @@
 package de.uka.ilkd.key.strategy.feature.instantiator;
 
-import de.uka.ilkd.key.rule.RuleApp;
-import org.key_project.util.collection.ImmutableSLList;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**

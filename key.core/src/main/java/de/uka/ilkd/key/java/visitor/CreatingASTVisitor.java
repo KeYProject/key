@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.java.visitor;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.ClassInitializer;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -15,11 +18,9 @@ import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 /**
  * Walks through a java AST in depth-left-fist-order.

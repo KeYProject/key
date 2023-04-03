@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import de.uka.ilkd.key.gui.colors.ColorSettings;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
@@ -9,9 +7,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.util.Map;
-
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
+
+import de.uka.ilkd.key.gui.colors.ColorSettings;
 
 /**
  * A special purpose border that prints a warning window if the search bar filtering removes

@@ -3,12 +3,12 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.io.File;
 import java.util.Collections;
 
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AbstractEnvInput;
 import de.uka.ilkd.key.speclang.PositionedString;
+
+import org.key_project.util.collection.ImmutableSet;
 
 public class EmptyEnvInput extends AbstractEnvInput {
 

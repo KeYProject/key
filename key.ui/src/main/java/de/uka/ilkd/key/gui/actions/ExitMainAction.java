@@ -5,13 +5,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowListener;
 import java.util.EventObject;
+import javax.swing.*;
 
-import javax.swing.JOptionPane;
-
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

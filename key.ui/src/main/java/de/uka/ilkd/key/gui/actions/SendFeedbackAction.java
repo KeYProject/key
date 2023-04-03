@@ -1,26 +1,5 @@
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.IssueDialog;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.pp.SearchSequentPrintFilter;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
-import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.util.ExceptionTools;
-import de.uka.ilkd.key.util.KeYConstants;
-import de.uka.ilkd.key.util.KeYResourceManager;
-import org.key_project.util.Streams;
-import org.key_project.util.java.IOUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,6 +15,28 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.text.html.HTMLEditorKit;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.IssueDialog;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
+import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.util.ExceptionTools;
+import de.uka.ilkd.key.util.KeYConstants;
+import de.uka.ilkd.key.util.KeYResourceManager;
+
+import org.key_project.util.Streams;
+import org.key_project.util.java.IOUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Action that executes if "Send Feedback..." was pressed. There are currently two locations: In

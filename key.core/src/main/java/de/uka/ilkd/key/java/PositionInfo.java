@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.java;
 
-import recoder.java.SourceElement;
-
 import java.net.URI;
 import java.nio.file.Paths;
+
+import recoder.java.SourceElement;
 
 /**
  * represents a group of three Positions: relativePosition, startPosition, endPosition

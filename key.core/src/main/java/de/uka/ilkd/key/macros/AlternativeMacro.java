@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.macros;
 
+import java.util.List;
+
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -7,9 +9,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
-import org.key_project.util.collection.ImmutableList;
 
-import java.util.List;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The abstract class AlternativeMacro can be used to create compound macros which apply the first

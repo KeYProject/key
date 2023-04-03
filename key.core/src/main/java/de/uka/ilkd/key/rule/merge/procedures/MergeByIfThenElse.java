@@ -1,17 +1,9 @@
 package de.uka.ilkd.key.rule.merge.procedures;
 
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.countAtoms;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getDistinguishingFormula;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateRightSideFor;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.trySimplify;
-
 import java.util.LinkedHashSet;
 import java.util.Optional;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -20,6 +12,13 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Quadruple;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.countAtoms;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getDistinguishingFormula;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateRightSideFor;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.trySimplify;
 
 /**
  * Rule that merges two sequents based on the if-then-else construction: If two locations are

@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.java.abstraction;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * A program model element representing primitive types.

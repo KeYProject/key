@@ -1,15 +1,15 @@
 package de.uka.ilkd.key.smt.communication;
 
 
-import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
-import de.uka.ilkd.key.smt.communication.SolverCommunication.MessageType;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
+import de.uka.ilkd.key.smt.communication.SolverCommunication.MessageType;
 
 /**
  * On each side of the pipe there are sender and receivers: **** Receiver ====<=Output======= Sender

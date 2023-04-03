@@ -2,8 +2,6 @@ package de.uka.ilkd.key.rule.match.vm;
 
 import java.util.ArrayList;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -23,6 +21,8 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.instructions.Instruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Instances of this class represent programs for matching a term against a given pattern. The

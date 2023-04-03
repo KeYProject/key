@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution;
 
+import java.util.*;
+
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -19,13 +21,12 @@ import de.uka.ilkd.key.symbolic_execution.object_model.impl.*;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.ProofStarter;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.CollectionUtil;
-
-import java.util.*;
 
 /**
  * <p>

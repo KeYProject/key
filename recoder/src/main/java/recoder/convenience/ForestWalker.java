@@ -2,11 +2,11 @@
 
 package recoder.convenience;
 
+import java.util.List;
+
 import recoder.java.CompilationUnit;
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.ProgramElement;
-
-import java.util.List;
 
 /**
  * Walks all syntax trees from a list of compilation units in depth-first order.

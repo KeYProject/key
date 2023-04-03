@@ -1,19 +1,20 @@
 package de.uka.ilkd.key.gui.help;
 
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CButton;
-import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+
+import bibliothek.gui.dock.common.action.CAction;
+import bibliothek.gui.dock.common.action.CButton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A gate to the KeY documentation system.

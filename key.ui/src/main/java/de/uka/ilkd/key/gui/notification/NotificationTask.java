@@ -3,11 +3,11 @@
  */
 package de.uka.ilkd.key.gui.notification;
 
-import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
-
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 
 /**
  * A notification task maps a {@link de.uka.ilkd.key.gui.notification.events.NotificationEvent} to a

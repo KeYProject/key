@@ -5,10 +5,10 @@
  */
 package recoder.bytecode;
 
+import java.util.List;
+
 import recoder.abstraction.AnnotationUse;
 import recoder.abstraction.ElementValuePair;
-
-import java.util.List;
 
 /**
  * @author gutzmann

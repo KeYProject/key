@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.testgen;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -24,13 +28,11 @@ import de.uka.ilkd.key.testgen.oracle.OracleGenerator;
 import de.uka.ilkd.key.testgen.oracle.OracleMethod;
 import de.uka.ilkd.key.testgen.oracle.OracleMethodCall;
 import de.uka.ilkd.key.util.KeYConstants;
+
 import org.key_project.util.java.StringUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
 
 /**
  * @author gladisch

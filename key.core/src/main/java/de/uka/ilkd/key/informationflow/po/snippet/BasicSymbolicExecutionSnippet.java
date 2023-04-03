@@ -2,10 +2,6 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -31,6 +27,10 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  *

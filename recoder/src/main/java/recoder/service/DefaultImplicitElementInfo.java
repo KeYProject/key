@@ -2,16 +2,16 @@
 
 package recoder.service;
 
-import recoder.ServiceConfiguration;
-import recoder.abstraction.Package;
-import recoder.abstraction.*;
-import recoder.java.declaration.EnumDeclaration;
-import recoder.util.Debug;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import recoder.ServiceConfiguration;
+import recoder.abstraction.*;
+import recoder.abstraction.Package;
+import recoder.java.declaration.EnumDeclaration;
+import recoder.util.Debug;
 
 /**
  * Handles requests for implicitely defined program model elements. In particular these are

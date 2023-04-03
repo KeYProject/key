@@ -1,8 +1,8 @@
 package org.key_project.slicing.util;
 
-import javax.swing.*;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
+import javax.swing.*;
 
 /**
  * Generic background thread worker.

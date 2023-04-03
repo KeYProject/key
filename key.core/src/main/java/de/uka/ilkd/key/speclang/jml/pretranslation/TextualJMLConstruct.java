@@ -1,18 +1,20 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
-import org.antlr.v4.runtime.ParserRuleContext;
-import javax.annotation.Nonnull;
+
 import org.key_project.util.collection.ImmutableList;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Objects of this type represent the various JML specification constructs in textual, unprocessed

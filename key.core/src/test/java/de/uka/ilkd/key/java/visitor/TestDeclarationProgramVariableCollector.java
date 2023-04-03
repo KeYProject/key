@@ -1,19 +1,19 @@
 package de.uka.ilkd.key.java.visitor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.rule.TacletForTests;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashSet;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

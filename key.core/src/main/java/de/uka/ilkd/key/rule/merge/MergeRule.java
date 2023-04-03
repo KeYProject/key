@@ -1,24 +1,9 @@
 package de.uka.ilkd.key.rule.merge;
 
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.closeMergePartnerGoal;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getConjunctiveElementsFor;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getLocationVariables;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateLeftSideLocations;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateRightSideFor;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isProvableWithSplitting;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isUpdateNormalForm;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -53,6 +38,21 @@ import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.closeMergePartnerGoal;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getConjunctiveElementsFor;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getLocationVariables;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateLeftSideLocations;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateRightSideFor;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isProvableWithSplitting;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isUpdateNormalForm;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
 
 /**
  * Base for implementing merge rules. Extend this class, implement method mergeValuesInStates(...)

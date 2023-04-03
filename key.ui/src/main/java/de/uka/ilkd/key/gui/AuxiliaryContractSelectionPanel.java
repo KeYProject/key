@@ -1,16 +1,16 @@
 package de.uka.ilkd.key.gui;
 
+import java.awt.*;
+import java.awt.event.MouseListener;
+import java.util.List;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.BlockContractImpl;
 import de.uka.ilkd.key.speclang.LoopContractImpl;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import java.awt.*;
-import java.awt.event.MouseListener;
-import java.util.List;
 
 /**
  * This panel used to select which {@code T}(s) to use for a {@link AbstractAuxiliaryContractRule}.

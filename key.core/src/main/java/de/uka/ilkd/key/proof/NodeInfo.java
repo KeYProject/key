@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.proof;
 
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -22,17 +28,12 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.uka.ilkd.key.util.MiscTools;
+
 import org.key_project.util.collection.ImmutableList;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**

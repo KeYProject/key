@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.macros;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -9,6 +7,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  *

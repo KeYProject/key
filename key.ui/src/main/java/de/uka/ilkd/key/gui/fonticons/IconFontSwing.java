@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.gui.fonticons;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import javax.swing.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class IconFontSwing {
     private static final Logger LOGGER = LoggerFactory.getLogger(IconFontSwing.class);

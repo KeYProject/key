@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -12,11 +14,10 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
+
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
-
-import java.util.Iterator;
 
 public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeature {
 

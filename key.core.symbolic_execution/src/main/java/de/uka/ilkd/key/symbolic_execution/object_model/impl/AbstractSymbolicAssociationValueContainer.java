@@ -1,16 +1,17 @@
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociationValueContainer;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
-
-import java.util.Objects;
 
 /**
  * Default implementation of {@link ISymbolicAssociationValueContainer}.

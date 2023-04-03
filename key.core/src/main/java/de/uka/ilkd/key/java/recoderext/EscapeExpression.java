@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.List;
+
 import de.uka.ilkd.key.speclang.njml.JmlIO;
+
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
 import recoder.list.generic.ASTArrayList;
-
-import java.util.List;
 
 /**
  * Handles JML expressions that begin with an escape character '\'.

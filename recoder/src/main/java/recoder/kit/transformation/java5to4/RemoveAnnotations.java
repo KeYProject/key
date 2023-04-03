@@ -6,6 +6,9 @@
  */
 package recoder.kit.transformation.java5to4;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
 import recoder.convenience.TreeWalker;
@@ -17,9 +20,6 @@ import recoder.kit.ProblemReport;
 import recoder.kit.TwoPassTransformation;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Deals with annotations. Removes all annotation use specification and all annotation types, except

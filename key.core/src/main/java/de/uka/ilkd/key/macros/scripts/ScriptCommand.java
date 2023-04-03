@@ -1,11 +1,12 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import de.uka.ilkd.key.macros.scripts.meta.Option;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.nio.file.NoSuchFileException;
+
+import de.uka.ilkd.key.macros.scripts.meta.Option;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
     private static final Logger LOGGER =

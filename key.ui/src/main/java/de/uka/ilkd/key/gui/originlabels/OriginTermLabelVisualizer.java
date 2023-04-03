@@ -1,6 +1,18 @@
 package de.uka.ilkd.key.gui.originlabels;
 
-import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.Objects;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
+import javax.swing.plaf.basic.BasicTreeUI;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
+
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -15,22 +27,12 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
-import javax.swing.plaf.basic.BasicTreeUI;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.Objects;
+import bibliothek.gui.dock.common.DefaultSingleCDockable;
 
 /**
  * This UI component visualizes the {@link OriginTermLabel}s of a term and its sub-terms.

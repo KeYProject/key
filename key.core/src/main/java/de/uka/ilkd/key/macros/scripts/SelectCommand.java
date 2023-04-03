@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -16,6 +14,8 @@ import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
+import org.key_project.util.collection.ImmutableList;
 
 public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     public SelectCommand() {

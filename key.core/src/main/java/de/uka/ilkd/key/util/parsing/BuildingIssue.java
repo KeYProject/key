@@ -1,9 +1,11 @@
 package de.uka.ilkd.key.util.parsing;
 
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.Position;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import javax.annotation.Nullable;
 
 public class BuildingIssue {
     private final String message;

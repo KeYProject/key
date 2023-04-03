@@ -1,12 +1,5 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkMode;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkedTestFileRunner;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -14,6 +7,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkMode;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkedTestFileRunner;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A single unit that will be tested during {@link RunAllProofsTest} run.

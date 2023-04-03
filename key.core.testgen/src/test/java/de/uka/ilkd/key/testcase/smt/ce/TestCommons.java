@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.testcase.smt.ce;
 
+import java.io.File;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
@@ -13,11 +18,6 @@ import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.util.HelperClassForTests;
-
-import java.io.File;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -176,4 +176,3 @@ public abstract class TestCommons {
         return result;
     }
 }
-

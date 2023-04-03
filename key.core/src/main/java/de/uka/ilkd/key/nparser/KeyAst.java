@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.nparser;
 
+import java.net.URL;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
@@ -7,16 +11,14 @@ import de.uka.ilkd.key.nparser.builder.IncludeFinder;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Triple;
+
+import org.key_project.util.java.StringUtil;
+
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
-import org.key_project.util.java.StringUtil;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.net.URL;
 
 /**
  * This is a monad around the parse tree. We use this class to hide the

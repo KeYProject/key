@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.java;
 
+import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
+import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
+import de.uka.ilkd.key.util.SpecDataLocation;
+
 import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
-import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.util.SpecDataLocation;
 
 /**
  * this class stores recoder related contextinformation used to parse in program parts in which

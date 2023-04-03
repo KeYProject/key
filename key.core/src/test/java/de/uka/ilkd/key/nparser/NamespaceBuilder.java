@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nparser;
 
+
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;

@@ -2,6 +2,10 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <variable name="self" isArrayIndex="false">
       <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+      </value>
+   </variable>
+   <variable name="self" isArrayIndex="false">
+      <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
          <variable name="something" isArrayIndex="false">
             <value name="something {true}" typeString="SomethingElse" valueString="SomethingElse::select(heap,self,VariablesSimpleCycle::$something)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
             </value>
@@ -15,6 +19,10 @@
    <methodCall name="&lt;call self.main()&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="self" isArrayIndex="false">
          <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+         </value>
+      </variable>
+      <variable name="self" isArrayIndex="false">
+         <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
             <variable name="something" isArrayIndex="false">
                <value name="something {true}" typeString="SomethingElse" valueString="SomethingElse::select(heap,self,VariablesSimpleCycle::$something)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                </value>
@@ -25,7 +33,11 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <statement name="this.next=this;" pathCondition="true" pathConditionChanged="false">
+      <statement name="this.next = this;" pathCondition="true" pathConditionChanged="false">
+         <variable name="self" isArrayIndex="false">
+            <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
          <variable name="self" isArrayIndex="false">
             <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                <variable name="something" isArrayIndex="false">
@@ -38,15 +50,19 @@
             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
-         <statement name="this.something.root=this;" pathCondition="true" pathConditionChanged="false">
+         <statement name="this.something.root = this;" pathCondition="true" pathConditionChanged="false">
+            <variable name="self" isArrayIndex="false">
+               <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  <variable name="next" isArrayIndex="false">
+                     <value name="next {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+               </value>
+            </variable>
             <variable name="self" isArrayIndex="false">
                <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="something" isArrayIndex="false">
                      <value name="something {true}" typeString="SomethingElse" valueString="SomethingElse::select(heap,self,VariablesSimpleCycle::$something)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                     </value>
-                  </variable>
-                  <variable name="next" isArrayIndex="false">
-                     <value name="next {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                </value>
@@ -55,28 +71,38 @@
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <statement name="this.value=42;" pathCondition="true" pathConditionChanged="false">
+            <branchCondition name="not(equals(SomethingElse::select(heap,self,VariablesSimpleCycle::$something),null))" pathCondition="not(equals(SomethingElse::select(heap,self,VariablesSimpleCycle::$something),null))" pathConditionChanged="true" branchCondition="not(equals(SomethingElse::select(heap,self,VariablesSimpleCycle::$something),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="something" isArrayIndex="false">
                         <value name="something {true}" typeString="SomethingElse" valueString="SomethingElse::select(heap,self,VariablesSimpleCycle::$something)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                           <variable name="root" isArrayIndex="false">
-                              <value name="root {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                              </value>
-                           </variable>
                         </value>
                      </variable>
                      <variable name="next" isArrayIndex="false">
-                        <value name="next {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <value name="next {equals(VariablesSimpleCycle::select(heap,self,VariablesSimpleCycle::$next),null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(VariablesSimpleCycle::select(heap,self,VariablesSimpleCycle::$next),null)">
+                        </value>
+                        <value name="next {not(equals(VariablesSimpleCycle::select(heap,self,VariablesSimpleCycle::$next),null))}" typeString="VariablesSimpleCycle" valueString="VariablesSimpleCycle::select(heap,self,VariablesSimpleCycle::$next)" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(VariablesSimpleCycle::select(heap,self,VariablesSimpleCycle::$next),null))">
                         </value>
                      </variable>
+                  </value>
+               </variable>
+               <variable name="self" isArrayIndex="false">
+                  <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="something" isArrayIndex="false">
+                        <value name="something {true}" typeString="SomethingElse" valueString="SomethingElse::select(heap,self,VariablesSimpleCycle::$something)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="s" isArrayIndex="false">
+                  <value name="s {true}" typeString="SomethingElse" valueString="SomethingElse::select(heap,self,VariablesSimpleCycle::$something)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <variable name="exc" isArrayIndex="false">
                   <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <statement name="return this.value;" pathCondition="true" pathConditionChanged="false">
+               <statement name="this.value = 42;" pathCondition="not(equals(SomethingElse::select(heap,self,VariablesSimpleCycle::$something),null))" pathConditionChanged="false">
                   <variable name="self" isArrayIndex="false">
                      <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="something" isArrayIndex="false">
@@ -87,12 +113,16 @@
                               </variable>
                            </value>
                         </variable>
-                        <variable name="value" isArrayIndex="false">
-                           <value name="value {true}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                           </value>
-                        </variable>
                         <variable name="next" isArrayIndex="false">
                            <value name="next {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="self" isArrayIndex="false">
+                     <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="something" isArrayIndex="false">
+                           <value name="something {true}" typeString="SomethingElse" valueString="SomethingElse::select(heap,self,VariablesSimpleCycle::$something)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
@@ -101,7 +131,7 @@
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                  <statement name="return this.value;" pathCondition="not(equals(SomethingElse::select(heap,self,VariablesSimpleCycle::$something),null))" pathConditionChanged="false">
                      <variable name="self" isArrayIndex="false">
                         <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="something" isArrayIndex="false">
@@ -122,11 +152,19 @@
                            </variable>
                         </value>
                      </variable>
+                     <variable name="self" isArrayIndex="false">
+                        <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="something" isArrayIndex="false">
+                              <value name="something {true}" typeString="SomethingElse" valueString="SomethingElse::select(heap,self,VariablesSimpleCycle::$something)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
                      <variable name="exc" isArrayIndex="false">
                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main()&gt;" pathCondition="not(equals(SomethingElse::select(heap,self,VariablesSimpleCycle::$something),null))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="not(equals(SomethingElse::select(heap,self,VariablesSimpleCycle::$something),null))">
                         <variable name="self" isArrayIndex="false">
                            <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <variable name="something" isArrayIndex="false">
@@ -147,29 +185,203 @@
                               </variable>
                            </value>
                         </variable>
+                        <variable name="self" isArrayIndex="false">
+                           <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="something" isArrayIndex="false">
+                                 <value name="something {true}" typeString="SomethingElse" valueString="SomethingElse::select(heap,self,VariablesSimpleCycle::$something)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
                         <variable name="exc" isArrayIndex="false">
                            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                     </termination>
-                     <callStateVariable name="self" isArrayIndex="false">
+                        <termination name="&lt;end&gt;" pathCondition="not(equals(SomethingElse::select(heap,self,VariablesSimpleCycle::$something),null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                           <variable name="self" isArrayIndex="false">
+                              <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 <variable name="something" isArrayIndex="false">
+                                    <value name="something {true}" typeString="SomethingElse" valueString="SomethingElse::select(heap,self,VariablesSimpleCycle::$something)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                       <variable name="root" isArrayIndex="false">
+                                          <value name="root {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                          </value>
+                                       </variable>
+                                    </value>
+                                 </variable>
+                                 <variable name="value" isArrayIndex="false">
+                                    <value name="value {true}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                                 <variable name="next" isArrayIndex="false">
+                                    <value name="next {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </variable>
+                           <variable name="self" isArrayIndex="false">
+                              <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 <variable name="something" isArrayIndex="false">
+                                    <value name="something {true}" typeString="SomethingElse" valueString="SomethingElse::select(heap,self,VariablesSimpleCycle::$something)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </variable>
+                           <variable name="exc" isArrayIndex="false">
+                              <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </termination>
+                        <callStateVariable name="self" isArrayIndex="false">
+                           <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="something" isArrayIndex="false">
+                                 <value name="something {true}" typeString="SomethingElse" valueString="SomethingElse::select(heap,self,VariablesSimpleCycle::$something)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="self" isArrayIndex="false">
+                           <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="something" isArrayIndex="false">
+                                 <value name="something {true}" typeString="SomethingElse" valueString="SomethingElse::select(heap,self,VariablesSimpleCycle::$something)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="exc" isArrayIndex="false">
+                           <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
+                     </methodReturn>
+                  </statement>
+               </statement>
+            </branchCondition>
+            <branchCondition name="equals(SomethingElse::select(heap,self,VariablesSimpleCycle::$something),null)" pathCondition="equals(SomethingElse::select(heap,self,VariablesSimpleCycle::$something),null)" pathConditionChanged="true" branchCondition="equals(SomethingElse::select(heap,self,VariablesSimpleCycle::$something),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <variable name="self" isArrayIndex="false">
+                  <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="something" isArrayIndex="false">
+                        <value name="something {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="next" isArrayIndex="false">
+                        <value name="next {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="s" isArrayIndex="false">
+                  <value name="s {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="self" isArrayIndex="false">
+                  <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="something" isArrayIndex="false">
+                        <value name="something {true}" typeString="SomethingElse" valueString="SomethingElse::select(heap,self,VariablesSimpleCycle::$something)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call self.main()&gt;&gt;" pathCondition="equals(SomethingElse::select(heap,self,VariablesSimpleCycle::$something),null)" pathConditionChanged="false" methodReturnCondition="equals(SomethingElse::select(heap,self,VariablesSimpleCycle::$something),null)">
+                  <variable name="self" isArrayIndex="false">
+                     <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="something" isArrayIndex="false">
+                           <value name="something {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="next" isArrayIndex="false">
+                           <value name="next {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="self" isArrayIndex="false">
+                     <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="something" isArrayIndex="false">
+                           <value name="something {true}" typeString="SomethingElse" valueString="SomethingElse::select(heap,self,VariablesSimpleCycle::$something)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="n" isArrayIndex="false">
+                     <value name="n {true}" typeString="java.lang.NullPointerException" valueString="n_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <variable name="message" isArrayIndex="false">
+                           <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="cause" isArrayIndex="false">
+                           <value name="cause {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(SomethingElse::select(heap,self,VariablesSimpleCycle::$something),null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                     <variable name="self" isArrayIndex="false">
+                        <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="something" isArrayIndex="false">
+                              <value name="something {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="next" isArrayIndex="false">
+                              <value name="next {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <variable name="self" isArrayIndex="false">
                         <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="something" isArrayIndex="false">
                               <value name="something {true}" typeString="SomethingElse" valueString="SomethingElse::select(heap,self,VariablesSimpleCycle::$something)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>
-                     </callStateVariable>
-                     <callStateVariable name="exc" isArrayIndex="false">
-                        <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </variable>
+                     <variable name="exc" isArrayIndex="false">
+                        <value name="exc {true}" typeString="java.lang.NullPointerException" valueString="n_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <variable name="message" isArrayIndex="false">
+                              <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="cause" isArrayIndex="false">
+                              <value name="cause {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
                         </value>
-                     </callStateVariable>
-                  </methodReturn>
-               </statement>
-            </statement>
+                     </variable>
+                  </termination>
+                  <callStateVariable name="self" isArrayIndex="false">
+                     <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="something" isArrayIndex="false">
+                           <value name="something {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="self" isArrayIndex="false">
+                     <value name="self {true}" typeString="VariablesSimpleCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="something" isArrayIndex="false">
+                           <value name="something {true}" typeString="SomethingElse" valueString="SomethingElse::select(heap,self,VariablesSimpleCycle::$something)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+               </exceptionalMethodReturn>
+            </branchCondition>
          </statement>
       </statement>
-      <methodReturnEntry path="/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/1/0"/>
    </methodCall>
-   <terminationEntry path="/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/1/0/0"/>
 </start>

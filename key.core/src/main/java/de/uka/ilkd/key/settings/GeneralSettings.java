@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.settings;
 
-import de.uka.ilkd.key.proof.io.AutoSaver;
-
 import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.Properties;
+
+import de.uka.ilkd.key.proof.io.AutoSaver;
 
 
 public class GeneralSettings implements Settings, Cloneable {

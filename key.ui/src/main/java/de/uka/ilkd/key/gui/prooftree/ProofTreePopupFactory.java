@@ -1,5 +1,12 @@
 package de.uka.ilkd.key.gui.prooftree;
 
+import java.awt.event.ActionEvent;
+import java.util.Iterator;
+import java.util.function.Predicate;
+import javax.swing.*;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -17,13 +24,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Pair;
-
-import javax.swing.*;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-import java.awt.event.ActionEvent;
-import java.util.Iterator;
-import java.util.function.Predicate;
 
 public class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;

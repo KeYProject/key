@@ -1,15 +1,15 @@
 package de.uka.ilkd.key.gui.proofdiff;
 
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.Triple;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl

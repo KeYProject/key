@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.nparser.builder;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
@@ -9,14 +14,11 @@ import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.rule.RuleSet;
-import org.antlr.v4.runtime.Token;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import org.antlr.v4.runtime.Token;
 
 /**
  * This visitor evaluates all basic (level 0) declarations. This includes:
@@ -28,7 +30,7 @@ import java.util.Map;
  * <li>Rulesets</li>
  * </ul>
  * <p>
- * These information are registered into the given {@link NamespaceSet}.
+ * This information is registered into the given {@link NamespaceSet}.
  *
  * @author Alexander Weigl
  * @version 1 (12/4/19)

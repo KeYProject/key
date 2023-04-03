@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -8,11 +11,8 @@ import de.uka.ilkd.key.prover.StopCondition;
 import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooser;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import org.key_project.util.collection.ImmutableList;
 
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * <p>

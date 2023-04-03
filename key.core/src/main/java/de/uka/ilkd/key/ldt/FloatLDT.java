@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
+
 import org.key_project.util.ExtList;
 
 public final class FloatLDT extends LDT implements FloatingPointLDT {

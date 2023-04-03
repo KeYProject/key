@@ -7,7 +7,7 @@ plugins {
     // Used to create a single executable jar file with all dependencies
     // see task "shadowJar" below
     // https://imperceptiblethoughts.com/shadow/
-    id 'com.github.johnrengelman.shadow' version "7.1.1"
+    id 'com.github.johnrengelman.shadow' version "8.1.1"
 }
 
 dependencies {

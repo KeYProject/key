@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.gui;
 
+import java.awt.*;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.tree.*;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -12,12 +17,8 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.Pair;
-import org.key_project.util.collection.ImmutableSet;
 
-import javax.swing.*;
-import javax.swing.tree.*;
-import java.awt.*;
-import java.util.*;
+import org.key_project.util.collection.ImmutableSet;
 
 
 public class ClassTree extends JTree {

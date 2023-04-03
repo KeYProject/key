@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.LinkedHashMap;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
@@ -14,15 +18,13 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.LinkedHashMap;
 
 /**
  * Walks through a java AST in depth-left-fist-order. This walker is used to transform a loop (not

@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.gui.smt;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+
 import de.uka.ilkd.key.gui.smt.SolverListener.InternSMTProblem;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -11,14 +16,9 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
-import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 
 /**
  * Compute unsat core from SMT problems and hide all irrelevant formulas from sequent.

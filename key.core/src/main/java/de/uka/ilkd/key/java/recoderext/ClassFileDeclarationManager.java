@@ -11,6 +11,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.ConvertException;
+import de.uka.ilkd.key.util.DirectoryFileCollection;
+import de.uka.ilkd.key.util.FileCollection;
+import de.uka.ilkd.key.util.FileCollection.Walker;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.ProgramFactory;
@@ -21,11 +27,6 @@ import recoder.io.DataLocation;
 import recoder.java.CompilationUnit;
 import recoder.java.JavaProgramFactory;
 import recoder.service.KeYCrossReferenceSourceInfo;
-import de.uka.ilkd.key.java.ConvertException;
-import de.uka.ilkd.key.util.DirectoryFileCollection;
-import de.uka.ilkd.key.util.FileCollection;
-import de.uka.ilkd.key.util.FileCollection.Walker;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 /**
  * This class provides an infrastructure to read in multiple class files and to manufacture

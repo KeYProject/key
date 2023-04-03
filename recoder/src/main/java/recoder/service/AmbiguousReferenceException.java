@@ -2,12 +2,12 @@
 
 package recoder.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.ModelException;
 import recoder.abstraction.ProgramModelElement;
 import recoder.java.Reference;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Exception indicating that a particular reference is ambiguous.

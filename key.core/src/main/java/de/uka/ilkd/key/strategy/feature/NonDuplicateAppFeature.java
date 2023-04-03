@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.strategy.feature;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Binary feature that returns zero iff a certain Taclet app has not already been performed

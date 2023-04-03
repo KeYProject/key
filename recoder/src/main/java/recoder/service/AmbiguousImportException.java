@@ -2,12 +2,12 @@
 
 package recoder.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.ModelException;
 import recoder.abstraction.ClassType;
 import recoder.java.Import;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Exception indicating that a particular import is ambiguous.

@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
@@ -8,11 +13,6 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 

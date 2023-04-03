@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
+
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 /**

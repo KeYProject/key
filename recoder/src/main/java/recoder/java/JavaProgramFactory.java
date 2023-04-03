@@ -2,6 +2,14 @@
 
 package recoder.java;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.*;
+import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.DefaultServiceConfiguration;
@@ -24,14 +32,6 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.parser.JavaCCParser;
 import recoder.util.StringUtils;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.*;
-import java.nio.CharBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 
 public class JavaProgramFactory implements ProgramFactory, PropertyChangeListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaProgramFactory.class);

@@ -6,7 +6,6 @@ import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 import java.util.function.Function;
-
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;

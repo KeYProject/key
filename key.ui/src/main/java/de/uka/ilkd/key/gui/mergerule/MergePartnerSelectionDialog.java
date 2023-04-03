@@ -1,5 +1,17 @@
 package de.uka.ilkd.key.gui.mergerule;
 
+import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.text.html.HTMLDocument;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.utilities.WrapLayout;
 import de.uka.ilkd.key.java.Services;
@@ -12,20 +24,9 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.text.html.HTMLDocument;
-import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * JDialog for selecting a subset of candidate goals as partners for a {@link MergeRule}

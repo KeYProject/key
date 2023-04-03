@@ -3,10 +3,7 @@ package de.uka.ilkd.key.gui.nodeviews;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.TreeSet;
-
 import javax.swing.JFrame;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
@@ -15,6 +12,8 @@ import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * This menu item groups all taclets which allow to insert class invariants

@@ -3,16 +3,17 @@
  */
 package de.uka.ilkd.key.gui.nodeviews;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.io.ProofSaver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.io.ProofSaver;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class in an implementation of the {@link Transferable} interface and allows to transfer a

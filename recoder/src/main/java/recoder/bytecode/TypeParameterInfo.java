@@ -6,13 +6,13 @@
  */
 package recoder.bytecode;
 
+import java.util.List;
+
 import recoder.ModelException;
-import recoder.abstraction.Package;
 import recoder.abstraction.*;
+import recoder.abstraction.Package;
 import recoder.convenience.Naming;
 import recoder.service.ProgramModelInfo;
-
-import java.util.List;
 
 /**
  * @author Tobias Gutzmann

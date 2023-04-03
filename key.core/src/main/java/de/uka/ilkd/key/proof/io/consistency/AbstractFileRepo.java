@@ -1,11 +1,5 @@
 package de.uka.ilkd.key.proof.io.consistency;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
-import de.uka.ilkd.key.proof.io.RuleSource;
-import de.uka.ilkd.key.util.KeYResourceManager;
-
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -19,6 +13,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.io.RuleSource;
+import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
  * Abstract repo implementation to perform tasks independent from the concrete way the files are

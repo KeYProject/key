@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -12,10 +14,9 @@ import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletTranslator;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.*;
 
 interface VariablePool {
     LogicVariable getInstantiationOfLogicVar(Sort instantiation, LogicVariable lv);

@@ -3,18 +3,18 @@ package de.uka.ilkd.key.proof.proofevent;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.GoalListener;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.util.collection.DefaultImmutableMap;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableMapEntry;
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**

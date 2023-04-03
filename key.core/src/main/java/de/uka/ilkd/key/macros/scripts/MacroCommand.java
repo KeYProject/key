@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ServiceLoader;
+
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -13,10 +17,6 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ServiceLoader;
 
 public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
     private static final Map<String, ProofMacro> macroMap = loadMacroMap();

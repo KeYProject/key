@@ -1,13 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
-import de.uka.ilkd.key.proof.event.ProofDisposedListener;
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -15,6 +7,14 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 
 /**
  * Traces the proof nodes selected by the user. Allows navigating forwards and backwards to

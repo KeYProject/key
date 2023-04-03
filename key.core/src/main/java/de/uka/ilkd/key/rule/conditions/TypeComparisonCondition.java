@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.rule.conditions;
 
 
+import java.util.Map;
+import java.util.WeakHashMap;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
@@ -14,9 +17,6 @@ import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-
-import java.util.Map;
-import java.util.WeakHashMap;
 
 
 /**

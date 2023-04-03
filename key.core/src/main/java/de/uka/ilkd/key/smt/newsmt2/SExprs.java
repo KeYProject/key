@@ -1,14 +1,14 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.smt.SMTTranslationException;
-import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.smt.SMTTranslationException;
+import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 /**
  * This class is a collection of static functions to construct SExpr objects.

@@ -5,11 +5,11 @@ package de.uka.ilkd.key.speclang.jml.translation;
 
 import java.util.Map;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * A collection of all program variables needed to translate a textual JML specification case.

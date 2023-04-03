@@ -2,7 +2,6 @@ package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Color;
 import java.util.ArrayList;
-
 import javax.swing.table.AbstractTableModel;
 
 /**

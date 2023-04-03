@@ -2,11 +2,6 @@ package de.uka.ilkd.key.rule.match.legacy;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -34,6 +29,11 @@ import de.uka.ilkd.key.rule.TacletMatcher;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * This class encapsulates the matching logic for taclet's.

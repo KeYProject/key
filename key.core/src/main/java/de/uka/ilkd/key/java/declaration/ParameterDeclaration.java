@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.java.declaration;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Formal parameters require a VariableSpecificationList of size() <= 1 (size() == 0 for abstract

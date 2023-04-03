@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.pp;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is an interface for filters that are used to modify the sequent view, improving the search

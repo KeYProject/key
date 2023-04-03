@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -9,8 +11,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
-
-import java.util.Iterator;
 
 
 public class HeuristicInstantiation implements TermGenerator {

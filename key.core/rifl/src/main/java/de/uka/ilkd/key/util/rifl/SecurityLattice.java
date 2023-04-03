@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.util.rifl;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A lattice of security domains in RIFL. While the lattice is not necessarily complete, there are

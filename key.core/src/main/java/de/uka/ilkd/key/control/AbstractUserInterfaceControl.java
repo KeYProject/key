@@ -1,11 +1,17 @@
 package de.uka.ilkd.key.control;
 
+import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+import java.util.function.Consumer;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
@@ -16,13 +22,8 @@ import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
-import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
-import java.util.function.Consumer;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides a basic implementation of {@link UserInterfaceControl}.

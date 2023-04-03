@@ -1,8 +1,6 @@
 package de.uka.ilkd.key.gui.utilities;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -12,7 +10,9 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Document;
 import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.JTextComponent;
-import java.awt.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Class BracketMatchingTextArea provides a GUI TextArea component which automatically

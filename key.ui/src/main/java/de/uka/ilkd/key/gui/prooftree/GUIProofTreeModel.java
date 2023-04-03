@@ -1,12 +1,6 @@
 package de.uka.ilkd.key.gui.prooftree;
 
-import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter.NodeFilter;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.proof.*;
-import org.key_project.util.collection.ImmutableList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.util.*;
 import javax.annotation.Nonnull;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeModelEvent;
@@ -14,7 +8,15 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import java.util.*;
+
+import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter.NodeFilter;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.proof.*;
+
+import org.key_project.util.collection.ImmutableList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of TreeModel that can be displayed using the JTree class framework and reflects

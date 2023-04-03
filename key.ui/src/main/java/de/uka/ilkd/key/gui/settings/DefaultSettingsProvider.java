@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.gui.settings;
 
-import de.uka.ilkd.key.gui.MainWindow;
-
-import javax.swing.*;
 import java.util.List;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.MainWindow;
 
 /**
  * @author Alexander Weigl

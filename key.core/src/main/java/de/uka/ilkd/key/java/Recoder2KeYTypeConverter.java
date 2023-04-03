@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.java;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.List;
+
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.Final;
@@ -21,12 +21,14 @@ import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.util.Debug;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.ServiceConfiguration;
 import recoder.service.NameInfo;
-
-import java.util.List;
 
 /**
  * provide means to convert recoder types to the corresponding KeY type structures.

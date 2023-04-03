@@ -3,12 +3,12 @@
  */
 package de.uka.ilkd.key.smt.lang;
 
-import de.uka.ilkd.key.smt.lang.SMTTermMultOp.Op;
-import de.uka.ilkd.key.smt.lang.SMTTermQuant.Quant;
-
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import de.uka.ilkd.key.smt.lang.SMTTermMultOp.Op;
+import de.uka.ilkd.key.smt.lang.SMTTermQuant.Quant;
 
 /**
  *

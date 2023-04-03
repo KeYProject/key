@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.control.instantiation_model;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -8,11 +11,9 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SortException;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.ArrayList;
-import java.util.Iterator;
 
 public class TacletInstantiationModel {
 

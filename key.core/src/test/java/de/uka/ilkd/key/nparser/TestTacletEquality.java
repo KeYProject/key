@@ -1,22 +1,5 @@
 package de.uka.ilkd.key.nparser;
 
-import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-
-import javax.annotation.Nonnull;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -26,6 +9,24 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
+
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.util.HelperClassForTests;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * This class provides regression tests for KeY Taclets.
@@ -101,6 +102,7 @@ public class TestTacletEquality {
         }
     }
 
+    @SuppressWarnings("unused")
     public static void createNewOracle() {
         var path = Paths.get("src/test/resources/de/uka/ilkd/key/nparser/taclets.new.txt");
         var taclets = new ArrayList<>(initConfig.activatedTaclets());

@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.statement.JmlAssert;
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.statement.JmlAssert;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -22,6 +20,8 @@ import de.uka.ilkd.key.speclang.MergeContract;
 import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
 import de.uka.ilkd.key.speclang.UnparameterizedMergeContract;
 import de.uka.ilkd.key.util.InfFlowSpec;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Walks through a java AST in depth-left-fist-order. This walker is used collect all

@@ -2,13 +2,13 @@
 
 package recoder.java.declaration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.java.*;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Local variable declaration.

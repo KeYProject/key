@@ -3,11 +3,11 @@ package de.uka.ilkd.key.logic.label;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
+import de.uka.ilkd.key.logic.Term;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.logic.Term;
 
 /**
  * A collection of static methods to deal with {@link TermLabel}.

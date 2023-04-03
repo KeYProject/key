@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.control;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
@@ -15,6 +13,8 @@ import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.util.ProofStarter;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The default implementation of {@link ProofControl}.

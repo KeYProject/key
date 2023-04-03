@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.strategy.definition;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.strategy.StrategyProperties;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Provides the basic function definition of user interface controls to edit a single key-value-pair
