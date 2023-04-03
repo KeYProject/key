@@ -1,10 +1,29 @@
 package de.uka.ilkd.key.gui;
 
-import bibliothek.gui.dock.StackDockStation;
-import bibliothek.gui.dock.common.CControl;
-import bibliothek.gui.dock.common.SingleCDockable;
-import bibliothek.gui.dock.common.intern.CDockable;
-import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.List;
+import java.util.function.Function;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
+import java.util.stream.Stream;
+import javax.annotation.Nonnull;
+import javax.swing.*;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import javax.swing.event.MouseInputAdapter;
+
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -41,28 +60,14 @@ import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.*;
+
+import bibliothek.gui.dock.StackDockStation;
+import bibliothek.gui.dock.common.CControl;
+import bibliothek.gui.dock.common.SingleCDockable;
+import bibliothek.gui.dock.common.intern.CDockable;
+import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import javax.swing.event.MouseInputAdapter;
-import java.awt.*;
-import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.*;
-import java.util.function.Function;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
-import java.util.stream.Stream;
 
 @HelpInfo()
 public final class MainWindow extends JFrame {

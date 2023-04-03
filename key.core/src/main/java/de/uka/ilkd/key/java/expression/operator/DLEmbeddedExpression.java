@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+
 import org.key_project.util.ExtList;
 
 public class DLEmbeddedExpression extends Operator {

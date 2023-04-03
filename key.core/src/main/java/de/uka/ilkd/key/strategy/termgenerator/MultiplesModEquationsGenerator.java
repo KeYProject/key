@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -19,6 +16,9 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Try to rewrite a monomial (term) <code>source</code> so that it becomes a multiple of another

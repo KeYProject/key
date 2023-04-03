@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.proof;
 
-import org.key_project.util.collection.*;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -16,6 +14,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.*;
 
 /**
  * Class whose objects represent an index of taclet apps for one particular position within a

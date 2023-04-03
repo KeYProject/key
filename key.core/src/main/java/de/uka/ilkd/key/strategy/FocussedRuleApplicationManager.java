@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.strategy;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.FormulaTag;
@@ -10,6 +7,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.BinaryFeature;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * A rule app manager that ensures that rules are only applied to a certain subterm within the proof

@@ -1,6 +1,16 @@
 package de.uka.ilkd.key.proof.io;
 
-import de.uka.ilkd.key.java.Position;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.nparser.*;
 import de.uka.ilkd.key.nparser.builder.ContractsAndInvariantsFinder;
 import de.uka.ilkd.key.nparser.builder.ProblemFinder;
@@ -16,21 +26,12 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 
 /**

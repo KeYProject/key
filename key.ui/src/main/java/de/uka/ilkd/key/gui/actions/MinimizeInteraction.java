@@ -3,10 +3,9 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.beans.PropertyChangeListener;
 import java.util.EventObject;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-
-import java.util.EventObject;
 
 /*
  * Is this a legacy option? Finding instantiations seems to be done by the prover, even if this

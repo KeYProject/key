@@ -1,11 +1,12 @@
 package de.uka.ilkd.key.java.statement;
 
+import java.util.Optional;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import org.key_project.util.ExtList;
 
-import java.util.Optional;
+import org.key_project.util.ExtList;
 
 /**
  * Ccatch.

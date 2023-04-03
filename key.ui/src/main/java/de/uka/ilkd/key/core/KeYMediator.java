@@ -1,5 +1,14 @@
 package de.uka.ilkd.key.core;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EventObject;
+import java.util.function.Consumer;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.swing.*;
+import javax.swing.event.EventListenerList;
+
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.gui.GUIListener;
@@ -41,17 +50,9 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ThreadUtilities;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.lookup.Lookup;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.swing.*;
-import javax.swing.event.EventListenerList;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EventObject;
-import java.util.function.Consumer;
 
 /**
  * The {@link KeYMediator} provides control logic for the user interface implemented in Swing.

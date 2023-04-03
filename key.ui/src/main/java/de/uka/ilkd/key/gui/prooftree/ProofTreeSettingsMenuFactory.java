@@ -1,16 +1,17 @@
 package de.uka.ilkd.key.gui.prooftree;
 
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CButton;
-import bibliothek.gui.dock.common.action.CCheckBox;
-import bibliothek.gui.dock.common.action.CMenu;
+import java.util.function.Supplier;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.docking.DynamicCMenu;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 
-import java.util.function.Supplier;
+import bibliothek.gui.dock.common.action.CAction;
+import bibliothek.gui.dock.common.action.CButton;
+import bibliothek.gui.dock.common.action.CCheckBox;
+import bibliothek.gui.dock.common.action.CMenu;
 
 import static de.uka.ilkd.key.gui.prooftree.ProofTreePopupFactory.ICON_SIZE;
 

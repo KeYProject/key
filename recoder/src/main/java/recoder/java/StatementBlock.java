@@ -2,6 +2,11 @@
 
 package recoder.java;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import recoder.abstraction.ClassType;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.java.declaration.TypeDeclarationContainer;
@@ -9,11 +14,6 @@ import recoder.java.declaration.VariableSpecification;
 import recoder.java.statement.JavaStatement;
 import recoder.list.generic.ASTList;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Statement block.

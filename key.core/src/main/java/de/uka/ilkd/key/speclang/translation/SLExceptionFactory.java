@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.speclang.translation;
 
+import java.util.LinkedList;
+import java.util.List;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
+
 import org.antlr.runtime.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import java.util.LinkedList;
-import java.util.List;
 
 import static java.text.MessageFormat.format;
 
@@ -43,8 +44,8 @@ public class SLExceptionFactory {
         this.line = parser.input.LT(1).getLine();
         this.column = parser.input.LT(1).getCharPositionInLine();
         this.fileName = fileName;
-        this.offsetColumn = offsetPos.getColumn();
-        this.offsetLine = offsetPos.getLine();
+        this.offsetColumn = offsetPos.column();
+        this.offsetLine = offsetPos.line();
     }
 
     public SLExceptionFactory(String fileName, int line, int column) {
@@ -68,7 +69,7 @@ public class SLExceptionFactory {
     private Position createAbsolutePosition(int relativeLine, int relativeColumn) {
         int absoluteLine = offsetLine + relativeLine - 1;
         int absoluteColumn = (relativeLine == 1 ? offsetColumn : 1) + relativeColumn;
-        return Position.newOneZeroBased(absoluteLine, absoluteColumn);
+        return Position.fromOneZeroBased(absoluteLine, absoluteColumn);
     }
 
     // -------------------------------------------------------------------------

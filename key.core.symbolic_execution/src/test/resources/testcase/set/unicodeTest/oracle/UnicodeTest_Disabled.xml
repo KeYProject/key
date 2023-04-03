@@ -4,12 +4,12 @@
       <value name="heapAtPre {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
       </value>
    </variable>
-   <methodCall name="&lt;call UnicodeTest.magic(x,y)&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call UnicodeTest.magic(x, y)&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="exc" isArrayIndex="false">
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <branchStatement name="if (x&amp;y)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+      <branchStatement name="if (x &amp; y)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <variable name="x" isArrayIndex="false">
             <value name="x {true}" typeString="boolean" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
@@ -59,8 +59,8 @@
                   </value>
                </variable>
                <callStackEntry path="/0"/>
-               <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of UnicodeTest.magic(x,y)&gt;" pathCondition="(  (x&lt;&lt;origin(&quot;requires (implicit)&quot;, &quot;[]&quot;)&gt;&gt; = TRUE)&lt;&lt;origin(&quot;requires (implicit)&quot;,&quot;[requires (implicit)]&quot;)&gt;&gt;
- &amp; (y&lt;&lt;origin(&quot;requires (implicit)&quot;, &quot;[]&quot;)&gt;&gt; = TRUE)&lt;&lt;origin(&quot;requires (implicit)&quot;,&quot;[requires (implicit)]&quot;)&gt;&gt;)&lt;&lt;origin(&quot;requires (implicit)&quot;,&quot;[requires (implicit)]&quot;)&gt;&gt;" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 1 as result of magic&gt;" signatureIncludingReturnValue="&lt;return 1 as result of UnicodeTest.magic(x,y)&gt;" isReturnValueComputed="true" methodReturnCondition="(  (x&lt;&lt;origin(&quot;requires (implicit)&quot;, &quot;[]&quot;)&gt;&gt; = TRUE)&lt;&lt;origin(&quot;requires (implicit)&quot;,&quot;[requires (implicit)]&quot;)&gt;&gt;
+               <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of UnicodeTest.magic(x, y)&gt;" pathCondition="(  (x&lt;&lt;origin(&quot;requires (implicit)&quot;, &quot;[]&quot;)&gt;&gt; = TRUE)&lt;&lt;origin(&quot;requires (implicit)&quot;,&quot;[requires (implicit)]&quot;)&gt;&gt;
+ &amp; (y&lt;&lt;origin(&quot;requires (implicit)&quot;, &quot;[]&quot;)&gt;&gt; = TRUE)&lt;&lt;origin(&quot;requires (implicit)&quot;,&quot;[requires (implicit)]&quot;)&gt;&gt;)&lt;&lt;origin(&quot;requires (implicit)&quot;,&quot;[requires (implicit)]&quot;)&gt;&gt;" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 1 as result of magic&gt;" signatureIncludingReturnValue="&lt;return 1 as result of UnicodeTest.magic(x, y)&gt;" isReturnValueComputed="true" methodReturnCondition="(  (x&lt;&lt;origin(&quot;requires (implicit)&quot;, &quot;[]&quot;)&gt;&gt; = TRUE)&lt;&lt;origin(&quot;requires (implicit)&quot;,&quot;[requires (implicit)]&quot;)&gt;&gt;
  &amp; (y&lt;&lt;origin(&quot;requires (implicit)&quot;, &quot;[]&quot;)&gt;&gt; = TRUE)&lt;&lt;origin(&quot;requires (implicit)&quot;,&quot;[requires (implicit)]&quot;)&gt;&gt;)&lt;&lt;origin(&quot;requires (implicit)&quot;,&quot;[requires (implicit)]&quot;)&gt;&gt;">
                   <methodReturnValue name="1" returnValueString="1" hasCondition="false">
                   </methodReturnValue>
@@ -153,8 +153,8 @@
                   </value>
                </variable>
                <callStackEntry path="/0"/>
-               <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of UnicodeTest.magic(x,y)&gt;" pathCondition="!(  (y&lt;&lt;origin(&quot;requires (implicit)&quot;, &quot;[]&quot;)&gt;&gt; = TRUE)&lt;&lt;origin(&quot;requires (implicit)&quot;,&quot;[requires (implicit)]&quot;)&gt;&gt;
-  &amp; (x&lt;&lt;origin(&quot;requires (implicit)&quot;, &quot;[]&quot;)&gt;&gt; = TRUE)&lt;&lt;origin(&quot;requires (implicit)&quot;,&quot;[requires (implicit)]&quot;)&gt;&gt;)" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -1 as result of magic&gt;" signatureIncludingReturnValue="&lt;return -1 as result of UnicodeTest.magic(x,y)&gt;" isReturnValueComputed="true" methodReturnCondition="!(  (y&lt;&lt;origin(&quot;requires (implicit)&quot;, &quot;[]&quot;)&gt;&gt; = TRUE)&lt;&lt;origin(&quot;requires (implicit)&quot;,&quot;[requires (implicit)]&quot;)&gt;&gt;
+               <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of UnicodeTest.magic(x, y)&gt;" pathCondition="!(  (y&lt;&lt;origin(&quot;requires (implicit)&quot;, &quot;[]&quot;)&gt;&gt; = TRUE)&lt;&lt;origin(&quot;requires (implicit)&quot;,&quot;[requires (implicit)]&quot;)&gt;&gt;
+  &amp; (x&lt;&lt;origin(&quot;requires (implicit)&quot;, &quot;[]&quot;)&gt;&gt; = TRUE)&lt;&lt;origin(&quot;requires (implicit)&quot;,&quot;[requires (implicit)]&quot;)&gt;&gt;)" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -1 as result of magic&gt;" signatureIncludingReturnValue="&lt;return -1 as result of UnicodeTest.magic(x, y)&gt;" isReturnValueComputed="true" methodReturnCondition="!(  (y&lt;&lt;origin(&quot;requires (implicit)&quot;, &quot;[]&quot;)&gt;&gt; = TRUE)&lt;&lt;origin(&quot;requires (implicit)&quot;,&quot;[requires (implicit)]&quot;)&gt;&gt;
   &amp; (x&lt;&lt;origin(&quot;requires (implicit)&quot;, &quot;[]&quot;)&gt;&gt; = TRUE)&lt;&lt;origin(&quot;requires (implicit)&quot;,&quot;[requires (implicit)]&quot;)&gt;&gt;)">
                   <methodReturnValue name="-1" returnValueString="-1" hasCondition="false">
                   </methodReturnValue>

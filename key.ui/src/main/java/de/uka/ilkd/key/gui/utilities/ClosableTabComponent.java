@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.utilities;
 
 import java.awt.Dimension;
-
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JLabel;

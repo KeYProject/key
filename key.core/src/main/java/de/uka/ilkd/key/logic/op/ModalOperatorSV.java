@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.util.pp.Layouter;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.util.pp.Layouter;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Schema variable matching modal operators.

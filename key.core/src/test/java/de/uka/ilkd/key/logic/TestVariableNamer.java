@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.logic;
 
+import java.util.Collections;
+import java.util.Iterator;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -16,12 +19,11 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 
-import java.util.Collections;
-import java.util.Iterator;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 

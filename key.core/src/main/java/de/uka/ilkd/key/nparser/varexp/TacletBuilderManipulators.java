@@ -1,5 +1,12 @@
 package de.uka.ilkd.key.nparser.varexp;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.ServiceLoader;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -9,13 +16,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.conditions.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
-import javax.annotation.Nonnull;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.ServiceLoader;
-import java.util.stream.Collectors;
 
 import static de.uka.ilkd.key.nparser.varexp.ArgumentType.SORT;
 import static de.uka.ilkd.key.nparser.varexp.ArgumentType.TYPE_RESOLVER;

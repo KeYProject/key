@@ -5,12 +5,11 @@ import java.util.*;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 

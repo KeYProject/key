@@ -1,21 +1,11 @@
 package de.uka.ilkd.key.rule.merge;
 
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getLocationVariables;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateLeftSideLocations;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.substConstantsByFreshVars;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -40,6 +30,16 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
+
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getLocationVariables;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateLeftSideLocations;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.substConstantsByFreshVars;
 
 /**
  * Rule for closing a partner goal after a merge operation. It does so by adding a formula

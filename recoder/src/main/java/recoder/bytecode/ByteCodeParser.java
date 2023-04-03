@@ -2,12 +2,6 @@
 
 package recoder.bytecode;
 
-import recoder.ParserException;
-import recoder.abstraction.ElementValuePair;
-import recoder.abstraction.TypeArgument;
-import recoder.abstraction.TypeArgument.WildcardMode;
-import recoder.convenience.Naming;
-
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -16,6 +10,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import recoder.ParserException;
+import recoder.abstraction.ElementValuePair;
+import recoder.abstraction.TypeArgument;
+import recoder.abstraction.TypeArgument.WildcardMode;
+import recoder.convenience.Naming;
 
 /**
  * Simple ByteCode parser.

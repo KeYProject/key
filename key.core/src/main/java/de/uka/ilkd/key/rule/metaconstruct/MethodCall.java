@@ -1,9 +1,5 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -40,9 +36,13 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * Symbolically executes a method invocation

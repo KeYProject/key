@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -13,6 +11,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
 
 /**
  * This dialog allows the user to select the proof to load from a proof bundle.

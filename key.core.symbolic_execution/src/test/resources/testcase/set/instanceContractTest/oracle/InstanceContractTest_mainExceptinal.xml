@@ -4,7 +4,7 @@
       <statement name="return exceptinal(x);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_exceptinal = self.exceptinal(x) catch(exc_0)
 pre: self.&lt;inv&gt;&lt;&lt;impl&gt;&gt;
-post: !(exc_0 = null)&lt;&lt;impl&gt;&gt;
+post:   !(exc_0 = null)&lt;&lt;impl&gt;&gt;
 &amp; (  ((   java.lang.Throwable::instance(exc_0) = TRUE
        -&gt; self.&lt;inv&gt;)&lt;&lt;impl&gt;&gt;)
    &amp; java.lang.Exception::instance(exc_0) = TRUE)

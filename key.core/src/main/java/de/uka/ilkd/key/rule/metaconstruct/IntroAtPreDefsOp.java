@@ -1,5 +1,12 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -27,16 +34,10 @@ import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
 import de.uka.ilkd.key.speclang.UnparameterizedMergeContract;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Transformer that introduces concrete prestate variables

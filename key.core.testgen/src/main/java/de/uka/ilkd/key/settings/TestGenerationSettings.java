@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.settings;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Properties;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class TestGenerationSettings extends AbstractSettings {
     // region Default Values for option fields

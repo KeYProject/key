@@ -2,8 +2,11 @@
 
 package recoder.java.declaration;
 
-import recoder.abstraction.Package;
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.abstraction.*;
+import recoder.abstraction.Package;
 import recoder.convenience.Naming;
 import recoder.java.*;
 import recoder.java.reference.TypeReference;
@@ -11,9 +14,6 @@ import recoder.java.reference.TypeReferenceContainer;
 import recoder.list.generic.ASTList;
 import recoder.service.ProgramModelInfo;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Method declaration.

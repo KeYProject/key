@@ -2,6 +2,9 @@
 
 package recoder.kit;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.ProgramFactory;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Package;
@@ -10,9 +13,6 @@ import recoder.java.reference.PackageReference;
 import recoder.service.ChangeHistory;
 import recoder.service.CrossReferenceSourceInfo;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * this class implements basic functions for package handling.

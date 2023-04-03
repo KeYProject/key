@@ -5,9 +5,6 @@
 
 package de.uka.ilkd.key.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.*;
 import java.net.URL;
 import java.nio.channels.Channels;
@@ -16,6 +13,9 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * KeYResourceManager controls the access to the properties and resources used in the KeY system.

@@ -1,17 +1,5 @@
 package org.key_project.slicing.ui;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import org.key_project.slicing.analysis.AnalysisResults;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.util.ArrayDeque;
@@ -25,6 +13,20 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.swing.*;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+
+import org.key_project.slicing.analysis.AnalysisResults;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dialog to monitor slicing progress.

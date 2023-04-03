@@ -1,11 +1,7 @@
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.logic.*;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -19,6 +15,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * A RewriteTaclet represents a taclet, whose find can be matched against any term in the sequent no

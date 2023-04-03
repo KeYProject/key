@@ -2,8 +2,6 @@ package de.uka.ilkd.key.informationflow.macros;
 
 import java.util.Set;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.informationflow.po.AbstractInfFlowPO;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -21,6 +19,8 @@ import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The macro SelfcompositionStateExpansionMacro applies rules to extract the self-composed states

@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.symbolic_execution.testcase.strategy;
 
+import java.io.IOException;
+import java.util.Map;
+import javax.xml.parsers.ParserConfigurationException;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -8,12 +12,9 @@ import de.uka.ilkd.key.symbolic_execution.strategy.StepReturnSymbolicExecutionTr
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * Tests for {@link StepReturnSymbolicExecutionTreeNodesStopCondition} and

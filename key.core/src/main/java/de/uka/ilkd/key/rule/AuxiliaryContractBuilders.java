@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.rule;
 
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -32,15 +36,12 @@ import de.uka.ilkd.key.speclang.BlockWellDefinedness;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.MiscTools;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 /**
  * This contains various builders used in building formulae and terms for block and loop contracts.

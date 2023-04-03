@@ -1,12 +1,9 @@
 package de.uka.ilkd.key.settings;
 
 
-import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
-
-import java.util.Collection;
-import java.util.EventObject;
-import java.util.LinkedHashSet;
 import java.util.Properties;
+
+import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 
 
 public class ProofDependentSMTSettings extends AbstractSettings {

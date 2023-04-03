@@ -3,16 +3,16 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.PositionedString;
+
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**

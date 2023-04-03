@@ -1,10 +1,9 @@
 package de.uka.ilkd.key.nparser;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import java.util.LinkedList;
 import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * This POJO represents the static information of a KeY problem. It can be extracted directly via

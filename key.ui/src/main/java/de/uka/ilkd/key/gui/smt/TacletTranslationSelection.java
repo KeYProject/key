@@ -1,5 +1,13 @@
 package de.uka.ilkd.key.gui.smt;
 
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.EventObject;
+import java.util.Set;
+import javax.swing.*;
+import javax.swing.tree.*;
+
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.proof.TacletIndex;
@@ -122,6 +130,7 @@ public class TacletTranslationSelection {
     }
 
 }
+
 
 abstract class TreePanel extends JPanel {
 

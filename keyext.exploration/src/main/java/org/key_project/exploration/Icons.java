@@ -1,9 +1,9 @@
 package org.key_project.exploration;
 
-import de.uka.ilkd.key.gui.fonticons.*;
-
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.fonticons.*;
 
 /**
  * Icons of the Exploration Extension

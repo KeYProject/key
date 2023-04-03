@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.gui.configuration;
 
+import java.awt.*;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-
+import javax.swing.*;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -20,23 +21,14 @@ import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.ObjectUtil;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.settings.ChoiceSettings;
+
 import org.key_project.util.java.ArrayUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import java.awt.*;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
 
 public class ChoiceSelector extends JDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChoiceSelector.class);

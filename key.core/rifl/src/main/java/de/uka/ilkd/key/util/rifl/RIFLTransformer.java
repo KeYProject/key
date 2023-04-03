@@ -1,9 +1,16 @@
 package de.uka.ilkd.key.util.rifl;
 
+import java.io.*;
+import java.util.*;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.DirectoryFileCollection;
 import de.uka.ilkd.key.util.FileCollection.Walker;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -16,12 +23,6 @@ import recoder.java.JavaProgramFactory;
 import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.MethodDeclaration;
 import recoder.java.declaration.ParameterDeclaration;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import java.io.*;
-import java.util.*;
 
 /**
  * Facet class for interpreting RIFL specifications. The Requirements for Information Flow Language

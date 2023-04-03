@@ -1,13 +1,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.util.*;
-
-import de.uka.ilkd.key.rule.*;
 import javax.annotation.Nonnull;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
@@ -26,8 +20,14 @@ import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationByAddRules;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * an instance of this class describes the initial configuration of the prover. This includes sorts,

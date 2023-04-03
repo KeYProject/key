@@ -1,10 +1,11 @@
 package de.uka.ilkd.key.parser;
 
+import java.io.IOException;
+
 import de.uka.ilkd.key.logic.Term;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

@@ -3,19 +3,10 @@
  */
 package de.uka.ilkd.key.util;
 
-import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.helper.FindResources;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -43,6 +34,14 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.helper.FindResources;
+import org.key_project.util.java.CollectionUtil;
+
+import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 
 public class HelperClassForTests {
 

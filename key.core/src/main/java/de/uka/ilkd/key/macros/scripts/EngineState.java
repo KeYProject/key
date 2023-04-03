@@ -6,8 +6,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Observer;
 import java.util.Optional;
-
-import org.key_project.util.collection.ImmutableList;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
@@ -22,7 +21,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
 
-import javax.annotation.Nonnull;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * @author Alexander Weigl

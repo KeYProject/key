@@ -4,8 +4,8 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.*;
+import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
@@ -24,7 +24,9 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
+
 import org.key_project.util.collection.ImmutableArray;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

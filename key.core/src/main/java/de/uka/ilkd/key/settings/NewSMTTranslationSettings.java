@@ -1,14 +1,9 @@
 package de.uka.ilkd.key.settings;
 
 
-import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty;
-import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
 
 import java.util.Collections;
-import java.util.EventObject;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;

@@ -6,11 +6,11 @@
  */
 package recoder.abstraction;
 
+import java.util.List;
+
 import recoder.ModelException;
 import recoder.convenience.Naming;
 import recoder.service.ProgramModelInfo;
-
-import java.util.List;
 
 /**
  * @author Tobias Gutzmann

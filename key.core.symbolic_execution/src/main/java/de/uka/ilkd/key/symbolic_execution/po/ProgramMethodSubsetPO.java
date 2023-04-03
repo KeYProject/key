@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.symbolic_execution.po;
 
+import java.io.IOException;
+import java.util.*;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -16,11 +19,9 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.InitConfig;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.io.IOException;
-import java.util.*;
 
 /**
  * <p>
@@ -297,12 +298,12 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     public void fillSaveProperties(Properties properties) {
         super.fillSaveProperties(properties);
         if (getStartPosition() != null) {
-            properties.setProperty("startLine", getStartPosition().getLine() + "");
-            properties.setProperty("startColumn", getStartPosition().getColumn() + "");
+            properties.setProperty("startLine", getStartPosition().line() + "");
+            properties.setProperty("startColumn", getStartPosition().column() + "");
         }
         if (getEndPosition() != null) {
-            properties.setProperty("endLine", getEndPosition().getLine() + "");
-            properties.setProperty("endColumn", getEndPosition().getColumn() + "");
+            properties.setProperty("endLine", getEndPosition().line() + "");
+            properties.setProperty("endColumn", getEndPosition().column() + "");
         }
     }
 
@@ -357,7 +358,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
         if (columnValue < 0) {
             throw new IOException("Start column \"" + column + "\" is a negative integer.");
         }
-        return new Position(lineValue, columnValue);
+        return Position.newOneBased(lineValue, columnValue);
     }
 
     /**
@@ -394,6 +395,6 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
         if (columnValue <= 0) {
             throw new IOException("End column \"" + column + "\" is a negative integer.");
         }
-        return new Position(lineValue, columnValue);
+        return Position.newOneBased(lineValue, columnValue);
     }
 }

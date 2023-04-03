@@ -2,6 +2,11 @@
 
 package recoder.kit;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import recoder.ProgramFactory;
 import recoder.ServiceConfiguration;
 import recoder.abstraction.ClassType;
@@ -24,11 +29,6 @@ import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.NameInfo;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * this class implements basic functions for type reference handling.
@@ -361,4 +361,3 @@ public class VariableKit {
     }
 
 }
-

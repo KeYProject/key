@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

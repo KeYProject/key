@@ -67,4 +67,3 @@ public interface ByteCodeInfo extends ProgramModelInfo {
     Type getAnnotationType(AnnotationUseInfo au);
 
 }
-

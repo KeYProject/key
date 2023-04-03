@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.gui;
 
+import java.util.*;
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.ProofScriptFromFileAction;
@@ -9,10 +12,8 @@ import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Node;
-import org.key_project.util.reflection.ClassLoaderUtil;
 
-import javax.swing.*;
-import java.util.*;
+import org.key_project.util.reflection.ClassLoaderUtil;
 
 /**
  * This class provides the user interface to the macro extensions.

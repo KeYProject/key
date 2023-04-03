@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.speclang;
 
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.UnaryOperator;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -20,14 +24,11 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.MapUtil;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.UnaryOperator;
 
 import static de.uka.ilkd.key.util.Assert.assertEqualSort;
 import static de.uka.ilkd.key.util.Assert.assertSubSort;

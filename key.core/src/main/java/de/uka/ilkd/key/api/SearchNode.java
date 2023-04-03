@@ -4,6 +4,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.MatchConditions;
+
 import org.key_project.util.collection.ImmutableList;
 
 /**

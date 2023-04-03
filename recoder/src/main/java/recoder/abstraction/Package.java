@@ -2,13 +2,13 @@
 
 package recoder.abstraction;
 
+import java.util.List;
+
 import recoder.ModelException;
 import recoder.bytecode.ClassFile;
 import recoder.java.CompilationUnit;
 import recoder.service.ProgramModelInfo;
 import recoder.util.Debug;
-
-import java.util.List;
 
 /**
  * A program model element representing packages.

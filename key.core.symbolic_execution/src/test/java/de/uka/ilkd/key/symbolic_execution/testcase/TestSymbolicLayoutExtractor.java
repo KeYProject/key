@@ -1,5 +1,12 @@
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutExtractor;
 import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader;
@@ -9,16 +16,11 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.object_model.*;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import org.junit.jupiter.api.*;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 

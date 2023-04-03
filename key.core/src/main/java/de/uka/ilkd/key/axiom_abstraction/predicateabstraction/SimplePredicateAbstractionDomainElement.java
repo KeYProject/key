@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * An abstract domain element for a predicate abstraction lattice encapsulating exactly one

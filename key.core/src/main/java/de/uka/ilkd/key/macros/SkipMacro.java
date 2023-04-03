@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.macros;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * This macro does nothing and is not applicable. It can be used to create compound macros, e.g. as

@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.java.expression.operator;
 
 import de.uka.ilkd.key.java.visitor.Visitor;
+
 import org.key_project.util.ExtList;
 
 /**

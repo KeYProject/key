@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.symbolic_execution;
 
+import java.util.*;
+import java.util.Map.Entry;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
@@ -18,13 +21,11 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionAllArrayIndicesVar
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.CollectionUtil;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * Provides the basic functionality to extract values from updates.

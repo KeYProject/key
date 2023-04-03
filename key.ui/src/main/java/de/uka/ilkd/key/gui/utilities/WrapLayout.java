@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.gui.utilities;
 
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 /**
  * FlowLayout subclass that fully supports wrapping of components.

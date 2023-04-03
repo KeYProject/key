@@ -1,17 +1,13 @@
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.util.EventObject;
-
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.util.EventObject;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 public final class HidePackagePrefixToggleAction extends MainWindowAction {
     public static final String NAME = "Hide Package Prefix";

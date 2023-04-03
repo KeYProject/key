@@ -7,15 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Objects;
-
-import org.key_project.util.EqualsModProofIrrelevancy;
-import org.key_project.util.EqualsModProofIrrelevancyUtil;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -23,7 +15,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
@@ -40,7 +31,14 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.util.Debug;
 
-import javax.annotation.Nullable;
+import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.EqualsModProofIrrelevancyUtil;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMapEntry;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * A TacletApp object contains information required for a concrete application. These information

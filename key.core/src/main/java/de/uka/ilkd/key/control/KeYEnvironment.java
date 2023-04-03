@@ -9,7 +9,6 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;

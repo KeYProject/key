@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.gui.utilities;
 
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.util.LinkedList;
 import java.util.List;
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 
 /**

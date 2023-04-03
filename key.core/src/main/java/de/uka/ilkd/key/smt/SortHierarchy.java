@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.smt;
 
 
+import java.util.*;
+import java.util.Map.Entry;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 
 class SortWrapper {

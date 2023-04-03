@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.ui;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.control.RuleCompletionHandler;
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -29,11 +33,9 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ThreadUtilities;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 
 /**

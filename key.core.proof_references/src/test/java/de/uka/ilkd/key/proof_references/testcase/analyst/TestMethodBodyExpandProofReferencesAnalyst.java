@@ -3,6 +3,7 @@ package de.uka.ilkd.key.proof_references.testcase.analyst;
 import de.uka.ilkd.key.proof_references.analyst.MethodBodyExpandProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.proof_references.testcase.AbstractProofReferenceTestCase;
+
 import org.junit.jupiter.api.Test;
 
 /**

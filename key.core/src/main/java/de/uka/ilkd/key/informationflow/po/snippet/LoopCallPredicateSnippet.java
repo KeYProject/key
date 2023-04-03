@@ -11,7 +11,7 @@ public class LoopCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
             LoopSpecification loopInv) {
         final String nameString = MiscTools
                 .toValidTacletName("RELATED_BY_LOOP_" + "at_line_"
-                    + loopInv.getLoop().getStartPosition().getLine() + "_in_" + pm.getUniqueName())
+                    + loopInv.getLoop().getStartPosition().line() + "_in_" + pm.getUniqueName())
                 .toString();
         return nameString;
     }

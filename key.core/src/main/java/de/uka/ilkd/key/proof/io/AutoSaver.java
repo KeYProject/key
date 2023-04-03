@@ -1,22 +1,25 @@
 package de.uka.ilkd.key.proof.io;
 
+import java.beans.PropertyChangeListener;
+import java.io.File;
+
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.KeYConstants;
+
 import org.key_project.util.java.IOUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.beans.PropertyChangeListener;
-import java.io.IOException;
 
 
 /**
  * Saves intermediate proof artifacts during strategy execution. An {@link AutoSaver} instance saves
  * periodically and the final proof state if it is closed. The default save interval can be set
- * using the static {@code init(int, boolean)} method. Before the saver is registered as a
+ * using the static {@link #init(int, boolean)} method. Before the saver is registered as a
  * listener, <b>a proof must be set</b> with <code>setProof()</code>. AutoSaver writes .key files to
  * a temporary location (i.e., "/tmp" on most Linux machines). These are possibly overwritten on
  * each strategy run. Write errors (e.g., missing permissions) are silently ignored.

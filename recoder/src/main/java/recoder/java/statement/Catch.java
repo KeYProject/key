@@ -2,13 +2,13 @@
 
 package recoder.java.statement;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.java.*;
 import recoder.java.declaration.ParameterDeclaration;
 import recoder.java.declaration.VariableSpecification;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Catch.

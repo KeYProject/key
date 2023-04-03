@@ -1,19 +1,20 @@
 package de.uka.ilkd.key.smt.solvertypes;
 
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.communication.Z3Socket;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Paths;
-import java.util.Arrays;
 
 /**
  * Final SolverType implementation that uses building blocks for the various methods. This can be

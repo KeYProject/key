@@ -1,5 +1,14 @@
 package de.uka.ilkd.key.java;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
+
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
@@ -24,10 +33,12 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.CrossReferenceServiceConfiguration;
@@ -37,15 +48,6 @@ import recoder.io.DataLocation;
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTList;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
 
 import static java.lang.String.format;
 
@@ -375,8 +377,8 @@ public class Recoder2KeYConverter {
      */
     private PositionInfo positionInfo(recoder.java.SourceElement se) {
         var relPos = se.getRelativePosition();
-        var startPos = Position.fromPosition(se.getStartPosition());
-        var endPos = Position.fromPosition(se.getEndPosition());
+        var startPos = Position.fromSEPosition(se.getStartPosition());
+        var endPos = Position.fromSEPosition(se.getEndPosition());
         if ((!inLoopInit))
             return new PositionInfo(relPos, startPos, endPos, currentClassURI);
         else
@@ -1329,7 +1331,7 @@ public class Recoder2KeYConverter {
         }
         throw new PosConvertException(
             "recoder2key: Qualifier " + urq.getName() + " not resolvable.",
-            Position.fromPosition(urq.getFirstElement().getStartPosition()));
+            Position.fromSEPosition(urq.getFirstElement().getStartPosition()));
     }
 
     /**

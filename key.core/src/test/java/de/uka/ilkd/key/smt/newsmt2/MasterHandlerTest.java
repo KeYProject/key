@@ -1,27 +1,5 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
-import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.settings.DefaultSMTSettings;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.smt.SMTSettings;
-import de.uka.ilkd.key.smt.solvertypes.SolverType;
-import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
-import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
-import de.uka.ilkd.key.util.LineProperties;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.key_project.util.Streams;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -34,8 +12,32 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.Properties;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.smt.SMTSettings;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
+import de.uka.ilkd.key.util.LineProperties;
+
+import org.key_project.util.Streams;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;

@@ -7,11 +7,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Observer;
-import java.util.Optional;
-import java.util.ServiceLoader;
+import java.util.*;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Position;
@@ -19,6 +15,7 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +42,7 @@ public class ProofScriptEngine {
     private Observer commandMonitor;
 
     public ProofScriptEngine(File file) throws IOException {
-        this.initialLocation = new Location(file.toURI().toURL(), new Position(1, 1));
+        this.initialLocation = new Location(file.toURI().toURL(), Position.newOneBased(1, 1));
         this.script = new String(Files.readAllBytes(file.toPath()));
         this.initiallySelectedGoal = null;
     }

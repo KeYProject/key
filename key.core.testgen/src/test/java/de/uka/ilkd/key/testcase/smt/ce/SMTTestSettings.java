@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.testcase.smt.ce;
 
+import java.io.File;
+import java.util.Collection;
+
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
-
-import java.io.File;
-import java.util.Collection;
 
 public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings {
 

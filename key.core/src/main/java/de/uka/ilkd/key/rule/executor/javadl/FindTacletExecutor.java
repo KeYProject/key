@@ -2,8 +2,6 @@ package de.uka.ilkd.key.rule.executor.javadl;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -19,6 +17,8 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+
+import org.key_project.util.collection.ImmutableList;
 
 public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
         extends TacletExecutor<TacletKind> {

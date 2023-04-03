@@ -1,13 +1,8 @@
 package de.uka.ilkd.key.symbolic_execution.testcase.strategy;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
-
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -18,6 +13,9 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointSt
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.MethodBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+
+import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
 
 public class TestMethodBreakpointWithConditions extends AbstractSymbolicExecutionTestCase {
     @Test // weigl not prev. activated

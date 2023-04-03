@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.speclang.jml.translation;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -37,14 +43,10 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
-import org.antlr.v4.runtime.Token;
+
 import org.key_project.util.collection.*;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import org.antlr.v4.runtime.Token;
 
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.DIVERGES;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.SIGNALS;

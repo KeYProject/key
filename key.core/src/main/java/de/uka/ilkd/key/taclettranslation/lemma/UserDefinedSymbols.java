@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
+import java.util.*;
+
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -11,9 +13,8 @@ import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
-import org.key_project.util.collection.ImmutableSet;
 
-import java.util.*;
+import org.key_project.util.collection.ImmutableSet;
 
 public class UserDefinedSymbols {
     static class NamedComparator implements Comparator<Named> {

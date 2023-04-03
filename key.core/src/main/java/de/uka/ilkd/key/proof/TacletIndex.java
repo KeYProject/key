@@ -7,11 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -39,6 +34,11 @@ import de.uka.ilkd.key.rule.SuccTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * manages all applicable Taclets (more precisely: Taclets with instantiations but without position

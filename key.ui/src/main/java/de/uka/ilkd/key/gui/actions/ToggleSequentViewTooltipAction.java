@@ -2,15 +2,13 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
-import java.util.EventObject;
+import javax.swing.*;
 import javax.swing.JCheckBoxMenuItem;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
 
 /**
  * Toggles the tooltips on the sequent view.

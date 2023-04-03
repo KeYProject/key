@@ -1,12 +1,5 @@
 package org.key_project.slicing.util;
 
-import org.key_project.slicing.SlicingSettings;
-import org.key_project.slicing.SlicingSettingsProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -14,6 +7,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+
+import org.key_project.slicing.SlicingSettings;
+import org.key_project.slicing.SlicingSettingsProvider;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides facilities to launch graphviz, forward the graph input data and parse the resulting

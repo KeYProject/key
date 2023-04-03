@@ -1,21 +1,22 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import javax.swing.*;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class InsertionTacletBrowserMenuItem extends JMenu implements TacletMenuItem {
     private static final Logger LOGGER =

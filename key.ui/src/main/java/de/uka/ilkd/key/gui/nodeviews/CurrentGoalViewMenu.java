@@ -1,5 +1,19 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -32,22 +46,9 @@ import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * The menu shown by a {@link CurrentGoalViewListener} when the user clicks on a

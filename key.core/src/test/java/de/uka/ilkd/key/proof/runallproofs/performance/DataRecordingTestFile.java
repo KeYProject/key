@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
+import java.io.File;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.parser.Location;
@@ -11,8 +13,6 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.Pair;
-
-import java.io.File;
 
 @SuppressWarnings("serial")
 class DataRecordingTestFile extends TestFile {

@@ -2,8 +2,6 @@ package de.uka.ilkd.key.rule.executor.javadl;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
@@ -17,6 +15,8 @@ import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+
+import org.key_project.util.collection.ImmutableList;
 
 public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
 

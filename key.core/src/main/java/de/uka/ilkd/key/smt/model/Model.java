@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.ProblemTypeInformation;
 import de.uka.ilkd.key.smt.SMTObjTranslator;
 import de.uka.ilkd.key.smt.lang.SMTSort;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

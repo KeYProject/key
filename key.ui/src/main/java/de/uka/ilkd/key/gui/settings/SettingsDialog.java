@@ -1,15 +1,15 @@
 package de.uka.ilkd.key.gui.settings;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.KeyAction;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.KeyAction;
 
 /**
  * The settings dialog.

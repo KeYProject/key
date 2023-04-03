@@ -11,7 +11,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;

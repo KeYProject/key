@@ -36,6 +36,7 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;

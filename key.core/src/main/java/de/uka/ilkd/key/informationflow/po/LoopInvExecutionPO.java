@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.informationflow.po;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
@@ -18,11 +22,8 @@ import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
-import org.key_project.util.collection.ImmutableList;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import org.key_project.util.collection.ImmutableList;
 
 public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowCompositePO {
 
@@ -60,7 +61,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
         super(initConfig,
             ContractFactory.generateContractName(loopInv.getName(), loopInv.getKJT(),
                 loopInv.getTarget(), loopInv.getTarget().getContainerType(),
-                loopInv.getLoop().getStartPosition().getLine()));
+                loopInv.getLoop().getStartPosition().line()));
         this.loopInvariant = loopInv;
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;

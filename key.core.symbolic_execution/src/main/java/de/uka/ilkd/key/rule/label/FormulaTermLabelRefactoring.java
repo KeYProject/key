@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.rule.label;
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
@@ -11,10 +13,9 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.CollectionUtil;
-
-import java.util.*;
 
 /**
  * The {@link TermLabelRefactoring} used to label predicates with a {@link FormulaTermLabel} on

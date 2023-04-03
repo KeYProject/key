@@ -7,7 +7,6 @@ import java.awt.Dimension;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
