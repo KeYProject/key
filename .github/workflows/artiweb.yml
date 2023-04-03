@@ -67,7 +67,7 @@ jobs:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ steps.rpn.pr-number }}
           body: |
-            Test artifacts will be available on [Artiweb](https://keyproject.github.io/artiweb/${steps.rpn.pr-number}/).
+            Test artifacts are available on [Artiweb](https://keyproject.github.io/artiweb/${steps.rpn.pr-number}/).
             
             The newest artifact is [here](https://keyproject.github.io/artiweb/${steps.rpn.pr-number}/${steps.da.test-artifact-id}/).
           edit-mode: replace
