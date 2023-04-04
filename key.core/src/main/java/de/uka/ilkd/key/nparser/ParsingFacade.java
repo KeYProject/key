@@ -52,8 +52,8 @@ public final class ParsingFacade {
 
     public static List<KeyAst.File> parseFiles(URL url) throws IOException {
         List<KeyAst.File> ctxs = new LinkedList<>();
-        Stack<URL> queue = new Stack<>();
-        queue.add(url);
+        ArrayDeque<URL> queue = new ArrayDeque<>();
+        queue.push(url);
         Set<URL> reached = new HashSet<>();
 
         while (!queue.isEmpty()) {
@@ -64,7 +64,7 @@ public final class ParsingFacade {
             Collection<RuleSource> includes = ctx.getIncludes(url).getRuleSets();
             for (RuleSource u : includes) {
                 if (!reached.contains(u.url())) {
-                    queue.add(u.url());
+                    queue.push(u.url());
                 }
             }
         }

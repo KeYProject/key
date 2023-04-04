@@ -41,17 +41,17 @@ public class OptionManager {
     /**
      * the registered possible options
      */
-    Vector options = new Vector();
+    final Vector options = new Vector();
 
     /**
      * maps strings to their according option objects
      */
-    java.util.Map str2opt = new HashMap();
+    final java.util.Map str2opt = new HashMap();
 
     /**
      * the mandatory options
      */
-    Vector mandatories = new Vector();
+    final Vector mandatories = new Vector();
 
     /**
      * adds the given option to the registered ones
@@ -138,7 +138,7 @@ public class OptionManager {
             break;
         case NUM:
             try {
-                optval = new Integer(sval);
+                optval = Integer.valueOf(sval);
             } catch (NumberFormatException nfe) {
                 throw new IllegalOptionValueException(opt, sval);
             }
@@ -300,7 +300,7 @@ public class OptionManager {
         } else {
             try {
                 Integer i = (Integer) v; // may raise ClassCastException
-                return i.intValue(); // may raise NullPointerException
+                return i; // may raise NullPointerException
             } catch (Exception e) {
                 // nothing to de here
             }
@@ -330,7 +330,7 @@ public class OptionManager {
     /**
      * describes a single command line option.
      */
-    private class OptionDescription {
+    private static class OptionDescription {
         int type;
 
         int multiplicity;
@@ -341,7 +341,7 @@ public class OptionManager {
 
         String description;
 
-        Vector values = new Vector();
+        final Vector values = new Vector();
     }
 
 }

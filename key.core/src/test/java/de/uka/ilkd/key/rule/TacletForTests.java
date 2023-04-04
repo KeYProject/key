@@ -52,12 +52,12 @@ public class TacletForTests {
     private static Namespace<QuantifiableVariable> variables = null;
     private static Namespace<SchemaVariable> schemaVariables;
 
-    public static Profile profile = new JavaProfile() {
+    public static final Profile profile = new JavaProfile() {
         // we do not want normal standard rules, but ruleSetsDeclarations is needed for string
         // library (HACK)
         public RuleCollection getStandardRules() {
             return new RuleCollection(RuleSourceFactory.fromDefaultLocation(ldtFile),
-                ImmutableSLList.<BuiltInRule>nil());
+                ImmutableSLList.nil());
         }
     };
 
@@ -90,14 +90,16 @@ public class TacletForTests {
     }
 
     public static InitConfig initConfig() {
-        if (initConfig == null)
+        if (initConfig == null) {
             parse();
+        }
         return initConfig.deepCopy();
     }
 
     public static Services services() {
-        if (services == null)
+        if (services == null) {
             parse();
+        }
         return services;
     }
 
@@ -181,24 +183,25 @@ public class TacletForTests {
     }
 
     public static Term parseTerm(String termstr, Services services) {
-        if (termstr.equals(""))
+        if (termstr.equals("")) {
             return null;
+        }
 
         try {
             KeyIO io = new KeyIO(services, nss);
             // TacletForTests.getAbbrevs()
             return io.parseExpression(termstr);
         } catch (Exception e) {
-            e.printStackTrace();
-            fail("Exception occurred while parsing of " + termstr);
+            fail("Exception occurred while parsing of " + termstr, e);
             return null;
         }
 
     }
 
     public static Term parseTerm(String termstr, NamespaceSet set) {
-        if (termstr.equals(""))
+        if (termstr.equals("")) {
             return null;
+        }
         return new KeyIO(services(), set).parseExpression(termstr);
     }
 

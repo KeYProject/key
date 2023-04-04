@@ -14,7 +14,7 @@ import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
  * @version 1 (21.04.17)
  */
 public class ProofScriptCommandApi {
-    private Map<String, ProofScriptCommand> commandMap = new HashMap<>();
+    private final Map<String, ProofScriptCommand> commandMap = new HashMap<>();
 
     public ProofScriptCommandApi() {
         initialize();

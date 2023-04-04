@@ -80,8 +80,9 @@ public class DLEmbeddedExpression extends Operator {
 
     public void check(Services javaServ, KeYJavaType containingClass) throws ConvertException {
 
-        if (functionSymbol == null)
+        if (functionSymbol == null) {
             throw new ConvertException("null function symbol");
+        }
 
         int expected = functionSymbol.arity();
         int actual = children.size();

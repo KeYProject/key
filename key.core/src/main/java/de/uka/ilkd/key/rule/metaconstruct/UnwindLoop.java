@@ -72,7 +72,7 @@ public class UnwindLoop extends ProgramTransformer {
      */
     @Override
     public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
-        ImmutableList<SchemaVariable> ret = ImmutableSLList.<SchemaVariable>nil();
+        ImmutableList<SchemaVariable> ret = ImmutableSLList.nil();
 
         if (innerLabel != null) {
             ret = ret.prepend(innerLabel);

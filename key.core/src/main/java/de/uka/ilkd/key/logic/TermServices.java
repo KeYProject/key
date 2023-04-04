@@ -12,14 +12,14 @@ public interface TermServices {
      *
      * @return the proof specific namespaces
      */
-    public abstract NamespaceSet getNamespaces();
+    NamespaceSet getNamespaces();
 
     /**
      * Returns the {@link TermBuilder} used to create {@link Term}s.
      *
      * @return The {@link TermBuilder} used to create {@link Term}s.
      */
-    public abstract TermBuilder getTermBuilder();
+    TermBuilder getTermBuilder();
 
     /**
      *
@@ -30,13 +30,13 @@ public interface TermServices {
      *
      * @return The {@link TermBuilder} used to create {@link Term}s.
      */
-    public abstract TermBuilder getTermBuilder(boolean withCache);
+    TermBuilder getTermBuilder(boolean withCache);
 
     /**
      * Returns the {@link TermBuilder} used to create {@link Term}s.
      *
      * @return The {@link TermBuilder} used to create {@link Term}s.
      */
-    public abstract TermFactory getTermFactory();
+    TermFactory getTermFactory();
 
 }

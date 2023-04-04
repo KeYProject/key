@@ -16,7 +16,7 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
     /**
      * The position of the only sub-formula to show.
      */
-    private PosInOccurrence pos;
+    private final PosInOccurrence pos;
 
     /**
      * Create a new {@link ShowSelectedSequentPrintFilter}.
@@ -35,7 +35,7 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
         if (pos.isInAntec()) {
             return ImmutableSLList.<SequentPrintFilterEntry>nil().append(new Entry(pos));
         } else {
-            return ImmutableSLList.<SequentPrintFilterEntry>nil();
+            return ImmutableSLList.nil();
         }
     }
 
@@ -44,7 +44,7 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
         if (!pos.isInAntec()) {
             return ImmutableSLList.<SequentPrintFilterEntry>nil().append(new Entry(pos));
         } else {
-            return ImmutableSLList.<SequentPrintFilterEntry>nil();
+            return ImmutableSLList.nil();
         }
     }
 
@@ -62,12 +62,12 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
         /**
          * The filtered formula, i.e., the formula at {@code pos}.
          */
-        private SequentFormula filtered;
+        private final SequentFormula filtered;
 
         /**
          * The origin formula, i.e., the formula at {@code pos.getTopLevel()}.
          */
-        private SequentFormula original;
+        private final SequentFormula original;
 
         private Entry(PosInOccurrence pos) {
             filtered = new SequentFormula(pos.subTerm());

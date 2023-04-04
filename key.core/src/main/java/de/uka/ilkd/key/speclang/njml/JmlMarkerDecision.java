@@ -88,8 +88,9 @@ public class JmlMarkerDecision {
 
         try {
             // matching the expected start of the comment
-            if (consume(expectedCommentStart))
+            if (consume(expectedCommentStart)) {
                 return false;
+            }
 
             // consume until '@' is hit, or else it is not a JML comment
             StringBuilder markerBuilder = new StringBuilder();

@@ -17,7 +17,7 @@ package de.uka.ilkd.key.smt.newsmt2;
  */
 class VerbatimSMT implements Writable {
 
-    private String string;
+    private final String string;
 
     public VerbatimSMT(String string) {
         this.string = string;

@@ -18,8 +18,8 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
  */
 public class ProofMacroListener implements ProverTaskListener {
     private int numOfInvokedMacros;
-    private ProverTaskListener superordinateListener;
-    private String macroName;
+    private final ProverTaskListener superordinateListener;
+    private final String macroName;
 
     public ProofMacroListener(String macroName, ProverTaskListener listener) {
         this.macroName = macroName;

@@ -2,6 +2,7 @@ package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -110,9 +111,10 @@ public class GenerateUnitTests {
 
         if (false) {// disabled
             int globalTimeout = 0;
-            if (globalTimeout > 0)
+            if (globalTimeout > 0) {
                 vars.put("timeout",
                     "@Rule public Timeout globalTimeout = Timeout.seconds(" + globalTimeout + ");");
+            }
         }
 
         StringBuilder methods = new StringBuilder();
@@ -170,6 +172,6 @@ public class GenerateUnitTests {
         File folder = new File(outputFolder, packageName.replace('.', '/'));
         folder.mkdirs();
         Files.write(Paths.get(folder.getAbsolutePath(), className + ".java"),
-            sb.toString().getBytes());
+            sb.toString().getBytes(StandardCharsets.UTF_8));
     }
 }

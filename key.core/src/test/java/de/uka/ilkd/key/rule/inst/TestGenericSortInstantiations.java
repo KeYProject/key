@@ -178,8 +178,9 @@ public class TestGenericSortInstantiations {
         Iterator<GenericSortCondition> it = p_conditions.iterator();
         ImmutableList<GenericSort> res = ImmutableSLList.nil();
 
-        while (it.hasNext())
+        while (it.hasNext()) {
             res = res.prepend(it.next().getGenericSort());
+        }
 
         return res;
     }

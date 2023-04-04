@@ -14,7 +14,7 @@ import de.uka.ilkd.key.macros.ProofMacro;
  * @version 1 (09.05.17)
  */
 public class ProofMacroApi {
-    private Map<String, ProofMacro> commandMap = new HashMap<>();
+    private final Map<String, ProofMacro> commandMap = new HashMap<>();
 
     public ProofMacroApi() {
         initialize();
@@ -23,8 +23,9 @@ public class ProofMacroApi {
     private void initialize() {
         ServiceLoader<ProofMacro> loader = ServiceLoader.load(ProofMacro.class);
         loader.forEach(psc -> {
-            if (psc.getScriptCommandName() != null)
+            if (psc.getScriptCommandName() != null) {
                 commandMap.put(psc.getScriptCommandName(), psc);
+            }
         });
     }
 

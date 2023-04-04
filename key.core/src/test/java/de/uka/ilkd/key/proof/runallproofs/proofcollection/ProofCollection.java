@@ -64,18 +64,10 @@ public final class ProofCollection {
         }
 
         Set<String> enabledTestCaseNames = settings.getEnabledTestCaseNames();
-        if (enabledTestCaseNames == null) {
-            return ret;
-        } else {
-            Iterator<RunAllProofsTestUnit> iterator = ret.iterator();
-            while (iterator.hasNext()) {
-                RunAllProofsTestUnit unit = iterator.next();
-                if (!enabledTestCaseNames.contains(unit.getTestName())) {
-                    iterator.remove();
-                }
-            }
-            return ret;
+        if (enabledTestCaseNames != null) {
+            ret.removeIf(unit -> !enabledTestCaseNames.contains(unit.getTestName()));
         }
+        return ret;
     }
 
     public ProofCollectionSettings getSettings() {

@@ -105,7 +105,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         return this.inv;
     }
 
-    public final void addInv(Term inv) {
+    public void addInv(Term inv) {
         addRequires(inv);
         addEnsures(inv);
     }

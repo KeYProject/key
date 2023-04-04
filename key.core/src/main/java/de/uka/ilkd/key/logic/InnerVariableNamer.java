@@ -27,7 +27,7 @@ public class InnerVariableNamer extends VariableNamer {
         int maxInGlobals = getMaxCounterInGlobals(basename, globals);
         int maxInProgram = getMaxCounterInProgram(basename, program, posOfDeclaration);
 
-        return (maxInGlobals > maxInProgram ? maxInGlobals : maxInProgram);
+        return (Math.max(maxInGlobals, maxInProgram));
     }
 
     public ProgramVariable rename(ProgramVariable var, Goal goal, PosInOccurrence posOfFind) {

@@ -43,7 +43,7 @@ public class ApplyStrategy extends AbstractProverCore {
      * The default {@link GoalChooser} to choose goals to which rules are applied if the
      * {@link StrategySettings} of the proof provides no customized one.
      */
-    private GoalChooser defaultGoalChooser;
+    private final GoalChooser defaultGoalChooser;
 
     private long time;
 
@@ -144,7 +144,7 @@ public class ApplyStrategy extends AbstractProverCore {
                 return new ApplyStrategyInfo(
                     stopCondition.getStopMessage(maxApplications, timeout, proof, time,
                         countApplied, srInfo),
-                    proof, null, (Goal) null, System.currentTimeMillis() - time, countApplied,
+                    proof, null, null, System.currentTimeMillis() - time, countApplied,
                     closedGoals);
             }
         } catch (InterruptedException e) {
@@ -152,7 +152,7 @@ public class ApplyStrategy extends AbstractProverCore {
             return new ApplyStrategyInfo("Interrupted.", proof, null, goalChooser.getNextGoal(),
                 System.currentTimeMillis() - time, countApplied, closedGoals);
         } catch (Throwable t) { // treated later in finished()
-            t.printStackTrace();
+            LOGGER.warn("doWork exception", t);
             return new ApplyStrategyInfo("Error.", proof, t, null,
                 System.currentTimeMillis() - time, countApplied, closedGoals);
         } finally {
@@ -340,7 +340,7 @@ public class ApplyStrategy extends AbstractProverCore {
         final GoalChooser goalChooser = getGoalChooserForProof(proof);
         proof = null;
         if (goalChooser != null) {
-            goalChooser.init(null, ImmutableSLList.<Goal>nil());
+            goalChooser.init(null, ImmutableSLList.nil());
         }
     }
 

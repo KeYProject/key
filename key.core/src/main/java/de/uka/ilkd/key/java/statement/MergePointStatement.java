@@ -81,8 +81,9 @@ public class MergePointStatement extends JavaStatement implements ExpressionCont
      */
     public int getChildCount() {
         int result = 0;
-        if (identifier != null)
+        if (identifier != null) {
             result++;
+        }
         return result;
     }
 
@@ -95,8 +96,9 @@ public class MergePointStatement extends JavaStatement implements ExpressionCont
      */
     public ProgramElement getChildAt(int index) {
         if (identifier != null) {
-            if (index == 0)
+            if (index == 0) {
                 return identifier;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();

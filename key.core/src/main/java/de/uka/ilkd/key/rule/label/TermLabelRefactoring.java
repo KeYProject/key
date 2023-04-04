@@ -53,7 +53,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      *        created.
      * @return whether any refactorings should be applied on an application of the given rule.
      */
-    public static boolean shouldRefactorOnBuiltInRule(Rule rule, Goal goal, Object hint) {
+    static boolean shouldRefactorOnBuiltInRule(Rule rule, Goal goal, Object hint) {
         if (goal != null) {
             Proof proof = goal.proof();
             if ((rule instanceof WhileInvariantRule
@@ -102,7 +102,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      * @param tacletTerm The optional taclet {@link Term}.
      * @return The required {@link RefactoringScope}.
      */
-    public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
+    RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm);
 
@@ -124,7 +124,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      * @param term The {@link Term} which is now refactored.
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
-    public void refactorLabels(TermLabelState state, Services services,
+    void refactorLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Term term, List<TermLabel> labels);
 
@@ -133,7 +133,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      *
      * @author Martin Hentschel
      */
-    public static enum RefactoringScope {
+    enum RefactoringScope {
         /**
          * No refactoring required.
          */

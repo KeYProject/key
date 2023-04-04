@@ -12,7 +12,7 @@ import org.key_project.util.collection.ImmutableSet;
 public class BoundVarsVisitor extends DefaultVisitor {
 
     private ImmutableSet<QuantifiableVariable> bdVars =
-        DefaultImmutableSet.<QuantifiableVariable>nil();
+        DefaultImmutableSet.nil();
 
 
     /**

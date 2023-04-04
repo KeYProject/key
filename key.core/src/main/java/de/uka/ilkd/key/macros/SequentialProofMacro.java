@@ -1,8 +1,6 @@
 package de.uka.ilkd.key.macros;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -76,8 +74,8 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
-            throws InterruptedException, Exception {
-        final List<Node> initNodes = new ArrayList<Node>(goals.size());
+            throws Exception {
+        final List<Node> initNodes = new ArrayList<>(goals.size());
         for (Goal goal : goals) {
             initNodes.add(goal.node());
         }
@@ -114,6 +112,6 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
             assert proofMacros != null;
             assert proofMacros.length > 0;
         }
-        return Collections.unmodifiableList(Arrays.asList(proofMacros));
+        return List.of(proofMacros);
     }
 }

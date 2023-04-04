@@ -87,8 +87,9 @@ public class Import extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int result = 0;
-        if (reference != null)
+        if (reference != null) {
             result++;
+        }
         return result;
     }
 
@@ -101,8 +102,9 @@ public class Import extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (reference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return reference;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

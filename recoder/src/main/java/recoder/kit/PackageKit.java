@@ -37,8 +37,9 @@ public class PackageKit {
         PackageReference result = null;
         String name = p.getFullName();
         /* Fix by T.Gutzmann */
-        if (name.equals(""))
+        if (name.equals("")) {
             return null; // null is admissible as prefix
+        }
         int i, j = -1;
         do {
             i = j + 1;
@@ -57,7 +58,7 @@ public class PackageKit {
      *         {@link recoder.java.declaration.TypeDeclaration}s.
      */
     public static List<ClassType> getNonSourcePackageTypes(Package pkg) {
-        List<ClassType> result = new ArrayList<ClassType>();
+        List<ClassType> result = new ArrayList<>();
         List<? extends ClassType> classes = pkg.getTypes();
         for (int i = classes.size() - 1; i >= 0; i -= 1) {
             ClassType ct = classes.get(i);

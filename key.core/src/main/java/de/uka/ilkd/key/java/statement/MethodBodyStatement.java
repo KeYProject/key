@@ -159,12 +159,15 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int i = 0;
-        if (bodySource != null)
+        if (bodySource != null) {
             i++;
-        if (resultVar != null)
+        }
+        if (resultVar != null) {
             i++;
-        if (methodReference != null)
+        }
+        if (methodReference != null) {
             i++;
+        }
         return i;
     }
 

@@ -123,7 +123,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      */
     public IExecutionVariable[] analyse() throws ProofInputException {
         Collection<StateExecutionVariable> variables = allStateVariables.values();
-        return variables.toArray(new StateExecutionVariable[variables.size()]);
+        return variables.toArray(new StateExecutionVariable[0]);
     }
 
     /**
@@ -480,7 +480,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                 assert variable != null;
                 createValues(variable, pairsList, firstPair, childrenInfo, values,
                     ImmutableSLList.nil());
-                variable.values = values.toArray(new IExecutionValue[values.size()]);
+                variable.values = values.toArray(new IExecutionValue[0]);
             }
             return values;
         }
@@ -551,7 +551,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          */
         @Override
         public IExecutionValue[] getValues() throws ProofInputException {
-            return values.toArray(new IExecutionValue[values.size()]);
+            return values.toArray(new IExecutionValue[0]);
         }
 
         /**
@@ -703,7 +703,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          */
         @Override
         public ExtractedExecutionVariable[] getChildVariables() {
-            return childVariables.toArray(new ExtractedExecutionVariable[childVariables.size()]);
+            return childVariables.toArray(new ExtractedExecutionVariable[0]);
         }
 
         /**

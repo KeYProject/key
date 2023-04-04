@@ -158,7 +158,6 @@ public class ProofDiffFrame extends JFrame {
             to.setText(Integer.toString(node.serialNr()));
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            return;
         }
     }
 
@@ -323,8 +322,9 @@ public class ProofDiffFrame extends JFrame {
             Node n = it.next();
             if (n.serialNr() <= number) {
                 Node result = findNode(n, number);
-                if (result != null)
+                if (result != null) {
                     return result;
+                }
             }
         }
 

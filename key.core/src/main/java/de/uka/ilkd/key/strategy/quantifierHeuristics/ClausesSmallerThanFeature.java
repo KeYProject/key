@@ -58,10 +58,12 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
         final int t1Def = quanAnalyser.eliminableDefinition(t1, focus);
         final int t2Def = quanAnalyser.eliminableDefinition(t2, focus);
 
-        if (t1Def > t2Def)
+        if (t1Def > t2Def) {
             return true;
-        if (t1Def < t2Def)
+        }
+        if (t1Def < t2Def) {
             return false;
+        }
 
         if (t1.op() == Junctor.OR) {
             if (t2.op() == Junctor.OR) {
@@ -78,7 +80,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
         }
     }
 
-    private class ClauseCollector extends Collector {
+    private static class ClauseCollector extends Collector {
         protected void collect(Term te) {
             final Operator op = te.op();
             if (op == Junctor.AND) {

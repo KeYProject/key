@@ -135,7 +135,7 @@ public class ProgramContextAdder {
          * __{putIn;....}__ }moreStmnts;}</code> Attention: we have not yet added the enclosing
          * braces or even the <code>moreStmnts</code>
          */
-        return new StatementBlock(new ImmutableArray<Statement>(body));
+        return new StatementBlock(new ImmutableArray<>(body));
     }
 
     /**
@@ -159,7 +159,7 @@ public class ProgramContextAdder {
             if (childrenCount - 1 > 0) {
                 wrapper.getBody().arraycopy(1, body, 1, childrenCount - 1);
             }
-            return new StatementBlock(new ImmutableArray<Statement>(body));
+            return new StatementBlock(new ImmutableArray<>(body));
         }
     }
 

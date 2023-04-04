@@ -155,7 +155,7 @@ public class InitArrayCreation extends InitArray {
     private ProgramElement arrayCreationWithoutInitializers(Expression newObject, NewArray na,
             Services services) {
 
-        final LinkedList<Statement> bodyStmnts = new LinkedList<Statement>();
+        final LinkedList<Statement> bodyStmnts = new LinkedList<>();
 
         final ProgramVariable[] dimensions =
             evaluateAndCheckDimensionExpressions(bodyStmnts, na.getArguments(), services);

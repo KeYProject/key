@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.Properties;
 
 public class LemmaGeneratorSettings implements de.uka.ilkd.key.settings.Settings, Cloneable {
-    private LinkedList<SettingsListener> listeners = new LinkedList<SettingsListener>();
+    private final LinkedList<SettingsListener> listeners = new LinkedList<>();
     private boolean showDialogAddingAxioms = true;
     private boolean showDialogUsingAxioms = true;
     private static final String SHOW_DIALOG_ADDING_AXIOMS =

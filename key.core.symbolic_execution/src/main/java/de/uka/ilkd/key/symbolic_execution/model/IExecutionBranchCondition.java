@@ -26,7 +26,7 @@ public interface IExecutionBranchCondition extends IExecutionNode<SourceElement>
      *
      * @return The additional branch label if available or {@code null} if not available.
      */
-    public String getAdditionalBranchLabel();
+    String getAdditionalBranchLabel();
 
     /**
      * Checks if the value of {@link #getBranchCondition()} is already computed.
@@ -34,7 +34,7 @@ public interface IExecutionBranchCondition extends IExecutionNode<SourceElement>
      * @return {@code true} value of {@link #getBranchCondition()} is already computed,
      *         {@code false} value of {@link #getBranchCondition()} needs to be computed.
      */
-    public boolean isBranchConditionComputed();
+    boolean isBranchConditionComputed();
 
     /**
      * <p>
@@ -47,21 +47,21 @@ public interface IExecutionBranchCondition extends IExecutionNode<SourceElement>
      *
      * @return The branch condition as {@link Term}.
      */
-    public Term getBranchCondition() throws ProofInputException;
+    Term getBranchCondition() throws ProofInputException;
 
     /**
      * Returns the human readable branch condition as string.
      *
      * @return The human readable branch condition.
      */
-    public String getFormatedBranchCondition() throws ProofInputException;
+    String getFormatedBranchCondition() throws ProofInputException;
 
     /**
      * Checks if this branch condition is a merged one.
      *
      * @return {@code true} is merged branch condition, {@code false} is normal branch condition.
      */
-    public boolean isMergedBranchCondition();
+    boolean isMergedBranchCondition();
 
     /**
      * <p>
@@ -74,12 +74,12 @@ public interface IExecutionBranchCondition extends IExecutionNode<SourceElement>
      *
      * @return The merged proof nodes.
      */
-    public Node[] getMergedProofNodes();
+    Node[] getMergedProofNodes();
 
     /**
      * Returns the branch condition {@link Term}s.
      *
      * @return The branch condition {@link Term}s.
      */
-    public Term[] getMergedBranchCondtions() throws ProofInputException;
+    Term[] getMergedBranchCondtions() throws ProofInputException;
 }

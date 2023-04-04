@@ -18,7 +18,7 @@ public class DefaultConstructor implements Constructor {
 
     protected ProgramModelInfo service;
 
-    protected ClassType ownerClass;
+    protected final ClassType ownerClass;
 
     /**
      * Create a new default constructor for the given class type. The name of the constructor is set

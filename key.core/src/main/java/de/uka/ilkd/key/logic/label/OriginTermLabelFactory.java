@@ -181,8 +181,8 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
      */
     private void matchEnd(StringTokenizer tokenizer, String line) throws TermLabelException {
         if (tokenizer.hasMoreTokens()) {
-            throw new TermLabelException("Unexpected token \'" + tokenizer.nextToken() + "\', "
-                + "expected: \'\"\'" + "\nin line \"" + line + "\"");
+            throw new TermLabelException("Unexpected token '" + tokenizer.nextToken() + "', "
+                + "expected: '\"'" + "\nin line \"" + line + "\"");
         }
     }
 }

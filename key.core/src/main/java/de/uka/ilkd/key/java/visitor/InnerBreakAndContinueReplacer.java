@@ -1,15 +1,8 @@
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
@@ -43,9 +36,9 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
      */
     private final Break breakInner;
 
-    private final Stack<ExtList> stack = new Stack<ExtList>();
-    private final Stack<Label> loopLabels = new Stack<Label>();
-    private final Stack<MethodFrame> frames = new Stack<MethodFrame>();
+    private final ArrayDeque<ExtList> stack = new ArrayDeque<>();
+    private final ArrayDeque<Label> loopLabels = new ArrayDeque<>();
+    private final ArrayDeque<MethodFrame> frames = new ArrayDeque<>();
     private int loopAndSwitchCascadeDepth;
 
     private StatementBlock result;
@@ -63,7 +56,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
             final Services services) {
         super(block, services);
         for (Label label : loopLabels) {
-            this.loopLabels.add(label);
+            this.loopLabels.push(label);
         }
 
         this.breakOuter = new Break(breakLabel);

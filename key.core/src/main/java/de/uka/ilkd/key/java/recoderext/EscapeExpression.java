@@ -36,7 +36,7 @@ public abstract class EscapeExpression extends Operator {
 
     protected EscapeExpression(String functionName, List<Expression> arguments) {
         this.functionName = functionName;
-        children = new ASTArrayList<Expression>(arguments);
+        children = new ASTArrayList<>(arguments);
     }
 
     public static EscapeExpression getEscapeExpression(String functionName,

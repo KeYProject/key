@@ -11,16 +11,16 @@ import de.uka.ilkd.key.logic.PosInProgram;
 public class ContextStatementBlockInstantiation {
 
     /** the end position of the prefix omega */
-    private PosInProgram prefixEnd;
+    private final PosInProgram prefixEnd;
 
     /** the start position of the suffix omega */
-    private PosInProgram suffixStart;
+    private final PosInProgram suffixStart;
 
     /** the execution context of the first active statement */
-    private ExecutionContext activeStatementContext;
+    private final ExecutionContext activeStatementContext;
 
     /** the whole program element this context term inst refers to */
-    private ProgramElement programElement;
+    private final ProgramElement programElement;
 
     /**
      * creates a ContextStatementBlockInstantiation of a context term
@@ -78,14 +78,17 @@ public class ContextStatementBlockInstantiation {
         }
         final ContextStatementBlockInstantiation inst = (ContextStatementBlockInstantiation) o;
 
-        if (isDifferent(suffixStart, inst.suffixStart))
+        if (isDifferent(suffixStart, inst.suffixStart)) {
             return false;
+        }
 
-        if (isDifferent(prefixEnd, inst.prefixEnd))
+        if (isDifferent(prefixEnd, inst.prefixEnd)) {
             return false;
+        }
 
-        if (isDifferent(activeStatementContext, inst.activeStatementContext))
+        if (isDifferent(activeStatementContext, inst.activeStatementContext)) {
             return false;
+        }
 
         return !isDifferent(programElement, inst.programElement);
 
@@ -93,12 +96,10 @@ public class ContextStatementBlockInstantiation {
 
     private boolean isDifferent(Object self, Object other) {
         if (self != null && other != null) {
-            if (!self.equals(other))
-                return true;
-        } else if (self != other) {
-            return true;
+            return !self.equals(other);
+        } else {
+            return self != other;
         }
-        return false;
     }
 
     public int hashCode() {

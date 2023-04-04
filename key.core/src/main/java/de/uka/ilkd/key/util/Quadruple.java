@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.util;
 
+import java.util.Objects;
+
 /**
  * Simple 4-tuple data object.
  *
@@ -34,23 +36,27 @@ public class Quadruple<T1, T2, T3, T4> implements Comparable<Quadruple<T1, T2, T
             return false;
         }
         Quadruple<?, ?, ?, ?> p = (Quadruple<?, ?, ?, ?>) o;
-        return (first == null ? p.first == null : first.equals(p.first))
-                && (second == null ? p.second == null : second.equals(p.second))
-                && (third == null ? p.third == null : third.equals(p.third))
-                && (fourth == null ? p.fourth == null : fourth.equals(p.fourth));
+        return (Objects.equals(first, p.first))
+                && (Objects.equals(second, p.second))
+                && (Objects.equals(third, p.third))
+                && (Objects.equals(fourth, p.fourth));
     }
 
 
     public int hashCode() {
         int res = 0;
-        if (first != null)
+        if (first != null) {
             res += 666 * first.hashCode();
-        if (second != null)
+        }
+        if (second != null) {
             res += 42 * second.hashCode();
-        if (third != null)
+        }
+        if (third != null) {
             res += 23 * third.hashCode();
-        if (fourth != null)
+        }
+        if (fourth != null) {
             res += 37 * fourth.hashCode();
+        }
         return res;
     }
 

@@ -57,14 +57,17 @@ public class SMTTermVariable extends SMTTerm {
 
     @Override
     public boolean equals(Object term) {
-        if (term == null)
+        if (term == null) {
             return false;
+        }
 
-        if (this == term)
+        if (this == term) {
             return true;
+        }
 
-        if (!(term instanceof SMTTermVariable))
+        if (!(term instanceof SMTTermVariable)) {
             return false;
+        }
         SMTTermVariable tv = (SMTTermVariable) term;
 
         return this.sort.equals(tv.sort) && this.id.equals(tv.id);
@@ -116,7 +119,7 @@ public class SMTTermVariable extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> vars = new LinkedList<>();
         vars.add(this);
         return vars;
     }

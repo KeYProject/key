@@ -49,7 +49,7 @@ public class MakeConditionalCompatible extends TwoPassTransformation {
 
     @Override
     public ProblemReport analyze() {
-        list = new ArrayList<Item>();
+        list = new ArrayList<>();
         setProblemReport(NO_PROBLEM);
         TreeWalker tw = new TreeWalker(root);
         while (tw.next()) {
@@ -78,8 +78,9 @@ public class MakeConditionalCompatible extends TwoPassTransformation {
                 }
             }
         }
-        if (list.isEmpty())
+        if (list.isEmpty()) {
             return IDENTITY;
+        }
         return NO_PROBLEM;
     }
 
@@ -96,8 +97,8 @@ public class MakeConditionalCompatible extends TwoPassTransformation {
     }
 
     private static class Item {
-        Conditional c;
-        Type t;
+        final Conditional c;
+        final Type t;
 
         Item(Conditional c, Type t) {
             this.c = c;

@@ -217,8 +217,8 @@ public abstract class AbstractSlicer {
             ReferencePrefix thisReference = ec != null ? ec.getRuntimeInstance() : null;
             // Compute aliases
             Map<Location, SortedSet<Location>> aliases =
-                new HashMap<Location, SortedSet<Location>>();
-            Map<ProgramVariable, Term> localValues = new HashMap<ProgramVariable, Term>();
+                new HashMap<>();
+            Map<ProgramVariable, Term> localValues = new HashMap<>();
             analyzeEquivalenceClasses(services, sec, aliases, thisReference);
             analyzeSequent(services, node.sequent(), aliases, thisReference);
             analyzeUpdates(pair.first, services, heapLDT, aliases, localValues, ec, thisReference);
@@ -243,7 +243,7 @@ public abstract class AbstractSlicer {
         if (sec != null) {
             for (ISymbolicEquivalenceClass eq : sec) {
                 ImmutableList<Term> terms = eq.getTerms();
-                List<Location> locations = new ArrayList<Location>(terms.size());
+                List<Location> locations = new ArrayList<>(terms.size());
                 for (Term term : terms) {
                     if (SymbolicExecutionUtil.hasReferenceSort(services, term)) {
                         Location location = toLocation(services, term);
@@ -502,9 +502,9 @@ public abstract class AbstractSlicer {
                 try {
                     // Create location terms
                     List<Location> resultLocations =
-                        new ArrayList<Location>(relevantLocations.size());
-                    List<Term> resultTerms = new ArrayList<Term>(relevantLocations.size());
-                    List<Sort> resultSorts = new ArrayList<Sort>(relevantLocations.size());
+                        new ArrayList<>(relevantLocations.size());
+                    List<Term> resultTerms = new ArrayList<>(relevantLocations.size());
+                    List<Sort> resultSorts = new ArrayList<>(relevantLocations.size());
                     for (Location location : relevantLocations) {
                         Term locationTerm =
                             location.toTerm(sideProofEnv.getServicesForEnvironment());
@@ -521,11 +521,11 @@ public abstract class AbstractSlicer {
                         Function newPredicate = new Function(
                             new Name(sideProofEnv.getServicesForEnvironment().getTermBuilder()
                                     .newName("ResultPredicate")),
-                            Sort.FORMULA, new ImmutableArray<Sort>(resultSorts));
+                            Sort.FORMULA, new ImmutableArray<>(resultSorts));
                         // Create formula which contains the value interested in.
                         Term newTerm =
                             sideProofEnv.getServicesForEnvironment().getTermBuilder().func(
-                                newPredicate, resultTerms.toArray(new Term[resultTerms.size()]));
+                                newPredicate, resultTerms.toArray(new Term[0]));
 
                         Sequent sequentToProve =
                             SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node,
@@ -569,9 +569,9 @@ public abstract class AbstractSlicer {
                 try {
                     // Create location terms
                     List<Location> resultLocations =
-                        new ArrayList<Location>(relevantLocations.size());
-                    List<Term> resultTerms = new ArrayList<Term>(relevantLocations.size());
-                    List<Sort> resultSorts = new ArrayList<Sort>(relevantLocations.size());
+                        new ArrayList<>(relevantLocations.size());
+                    List<Term> resultTerms = new ArrayList<>(relevantLocations.size());
+                    List<Sort> resultSorts = new ArrayList<>(relevantLocations.size());
                     for (Location location : relevantLocations) {
                         Term locationTerm =
                             location.toTerm(sideProofEnv.getServicesForEnvironment());
@@ -588,11 +588,11 @@ public abstract class AbstractSlicer {
                         Function newPredicate = new Function(
                             new Name(sideProofEnv.getServicesForEnvironment().getTermBuilder()
                                     .newName("ResultPredicate")),
-                            Sort.FORMULA, new ImmutableArray<Sort>(resultSorts));
+                            Sort.FORMULA, new ImmutableArray<>(resultSorts));
                         // Create formula which contains the value interested in.
                         TermBuilder tb = sideProofEnv.getServicesForEnvironment().getTermBuilder();
                         Term newTerm = tb.func(newPredicate,
-                            resultTerms.toArray(new Term[resultTerms.size()]));
+                            resultTerms.toArray(new Term[0]));
                         newTerm = tb.apply(
                             tb.elementary(heapLDT.getHeapForName(HeapLDT.BASE_HEAP_NAME), term),
                             newTerm);
@@ -648,7 +648,7 @@ public abstract class AbstractSlicer {
         // Try to get Set for key
         SortedSet<Location> firstValues = aliases.get(first);
         SortedSet<Location> secondValues = aliases.get(second);
-        SortedSet<Location> values = null;
+        SortedSet<Location> values;
         if (firstValues == null && secondValues == null) {
             values = createSortedSet();
             aliases.put(first, values);
@@ -679,7 +679,7 @@ public abstract class AbstractSlicer {
      * @return The new created {@link SortedSet}.
      */
     protected SortedSet<Location> createSortedSet() {
-        return new TreeSet<Location>(new Comparator<Location>() {
+        return new TreeSet<>(new Comparator<>() {
             /**
              * {@inheritDoc}
              */
@@ -757,7 +757,7 @@ public abstract class AbstractSlicer {
             }
             newTerms[i] = oldTerm;
         }
-        return new Access(new ImmutableArray<Term>(newTerms));
+        return new Access(new ImmutableArray<>(newTerms));
     }
 
     /**
@@ -876,7 +876,7 @@ public abstract class AbstractSlicer {
     protected Location toLocation(Services services, ReferencePrefix prefix, ExecutionContext ec,
             ReferencePrefix thisReference) {
         ImmutableList<Access> accesses =
-            toLocationRecursive(services, prefix, ec, thisReference, ImmutableSLList.<Access>nil());
+            toLocationRecursive(services, prefix, ec, thisReference, ImmutableSLList.nil());
         return new Location(accesses);
     }
 
@@ -942,7 +942,7 @@ public abstract class AbstractSlicer {
             terms[i] = AbstractSlicer.toTerm(services, expression, ec);
             i++;
         }
-        return new ImmutableArray<Term>(terms);
+        return new ImmutableArray<>(terms);
     }
 
     /**
@@ -984,7 +984,7 @@ public abstract class AbstractSlicer {
                 }
             } else {
                 String name = term.op().name().toString();
-                int index = name.toString().indexOf("::");
+                int index = name.indexOf("::");
                 if (index >= 0) {
                     String fullTypeName = name.substring(0, index);
                     String fieldName = name.substring(index + 3);

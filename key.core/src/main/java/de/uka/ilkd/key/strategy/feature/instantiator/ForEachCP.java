@@ -52,10 +52,11 @@ public class ForEachCP implements Feature {
         manager.passChoicePoint(new CP(app, pos, goal), this);
 
         final RuleAppCost res;
-        if (var.getContent() != null)
+        if (var.getContent() != null) {
             res = body.computeCost(app, pos, goal);
-        else
+        } else {
             res = NumberRuleAppCost.getZeroCost();
+        }
 
         var.setContent(outerVarContent);
         return res;

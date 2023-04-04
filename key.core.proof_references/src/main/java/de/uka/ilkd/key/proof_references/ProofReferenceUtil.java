@@ -114,7 +114,7 @@ public final class ProofReferenceUtil {
          * The result.
          */
         private final LinkedHashSet<IProofReference<?>> result =
-            new LinkedHashSet<IProofReference<?>>();
+            new LinkedHashSet<>();
 
         /**
          * Constructor.
@@ -168,7 +168,7 @@ public final class ProofReferenceUtil {
      */
     public static LinkedHashSet<IProofReference<?>> computeProofReferences(Node node,
             Services services, ImmutableList<IProofReferencesAnalyst> analysts) {
-        LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
+        LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<>();
         if (node != null && analysts != null) {
             for (IProofReferencesAnalyst analyst : analysts) {
                 LinkedHashSet<IProofReference<?>> analystResult =

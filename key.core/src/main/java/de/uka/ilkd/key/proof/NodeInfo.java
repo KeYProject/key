@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 public class NodeInfo {
     private static final Logger LOGGER = LoggerFactory.getLogger(NodeInfo.class);
 
-    private static Set<Name> symbolicExecNames = new HashSet<>(9);
+    private static final Set<Name> symbolicExecNames = new HashSet<>(9);
 
     /** firstStatement stripped of method frames */
     private SourceElement activeStatement = null;
@@ -307,9 +307,9 @@ public class NodeInfo {
         determineFirstAndActiveStatement();
         if (firstStatement != null) {
             if (firstStatementString == null) {
-                firstStatementString = "" + firstStatement;
+                firstStatementString = String.valueOf(firstStatement);
             }
-            firstStatementString = "" + activeStatement;
+            firstStatementString = String.valueOf(activeStatement);
             return firstStatementString;
         }
         return null;

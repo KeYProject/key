@@ -67,7 +67,7 @@ public class SymbolicLayoutReader {
     public ISymbolicLayout read(InputStream in)
             throws ParserConfigurationException, SAXException, IOException {
         if (in != null) {
-            try {
+            try (in) {
                 // Parse XML file
                 SAXParserFactory factory = SAXParserFactory.newInstance();
                 factory.setNamespaceAware(true);
@@ -78,8 +78,6 @@ public class SymbolicLayoutReader {
                 ISymbolicLayout root = handler.getRoot();
                 // Return result
                 return root;
-            } finally {
-                in.close();
             }
         } else {
             return null;
@@ -100,19 +98,19 @@ public class SymbolicLayoutReader {
         /**
          * The hierarchy in building phase.
          */
-        private Deque<Object> parentStack = new LinkedList<Object>();
+        private final Deque<Object> parentStack = new LinkedList<>();
 
         /**
          * Maps each unique object ID to the instantiated {@link ISymbolicObject}.
          */
-        private Map<String, ISymbolicObject> objectIdMapping =
-            new LinkedHashMap<String, ISymbolicObject>();
+        private final Map<String, ISymbolicObject> objectIdMapping =
+            new LinkedHashMap<>();
 
         /**
          * Maps a {@link KeYlessAssociation} to its target object ID.
          */
-        private Map<KeYlessAssociation, String> associationTargetMapping =
-            new LinkedHashMap<KeYlessAssociation, String>();
+        private final Map<KeYlessAssociation, String> associationTargetMapping =
+            new LinkedHashMap<>();
 
         /**
          * {@inheritDoc}
@@ -574,7 +572,7 @@ public class SymbolicLayoutReader {
         /**
          * The name.
          */
-        private String name;
+        private final String name;
 
         /**
          * Constructor.
@@ -624,12 +622,12 @@ public class SymbolicLayoutReader {
         /**
          * The name.
          */
-        private String nameString;
+        private final String nameString;
 
         /**
          * The type.
          */
-        private String typeString;
+        private final String typeString;
 
         /**
          * Constructor.
@@ -712,37 +710,37 @@ public class SymbolicLayoutReader {
         /**
          * The program variable.
          */
-        private String programVariableString;
+        private final String programVariableString;
 
         /**
          * The value.
          */
-        private String valueString;
+        private final String valueString;
 
         /**
          * The type.
          */
-        private String typeString;
+        private final String typeString;
 
         /**
          * The name.
          */
-        private String name;
+        private final String name;
 
         /**
          * The is array index flag.
          */
-        private boolean isArrayIndex;
+        private final boolean isArrayIndex;
 
         /**
          * The array index.
          */
-        private String arrayIndexString;
+        private final String arrayIndexString;
 
         /**
          * The optional condition under which this value is valid.
          */
-        private String conditionString;
+        private final String conditionString;
 
         /**
          * Constructor.
@@ -884,7 +882,7 @@ public class SymbolicLayoutReader {
         /**
          * The program variable.
          */
-        private String programVariableString;
+        private final String programVariableString;
 
         /**
          * The target.
@@ -894,22 +892,22 @@ public class SymbolicLayoutReader {
         /**
          * The name.
          */
-        private String name;
+        private final String name;
 
         /**
          * The is array index flag.
          */
-        private boolean isArrayIndex;
+        private final boolean isArrayIndex;
 
         /**
          * The array index.
          */
-        private String arrayIndexString;
+        private final String arrayIndexString;
 
         /**
          * The optional condition under which this association is valid.
          */
-        private String conditionString;
+        private final String conditionString;
 
         /**
          * Constructor.
@@ -1053,7 +1051,7 @@ public class SymbolicLayoutReader {
         /**
          * The representative term.
          */
-        private String representativeString;
+        private final String representativeString;
 
         /**
          * Constructor.
@@ -1061,7 +1059,7 @@ public class SymbolicLayoutReader {
          * @param representativeString The representative term.
          */
         public KeYlessEquivalenceClass(String representativeString) {
-            this(ImmutableSLList.<String>nil(), representativeString);
+            this(ImmutableSLList.nil(), representativeString);
         }
 
         /**

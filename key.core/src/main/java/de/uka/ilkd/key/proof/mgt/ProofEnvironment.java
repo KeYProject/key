@@ -21,10 +21,10 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 public class ProofEnvironment {
 
     private final InitConfig initConfig;
-    private final Set<ProofAggregate> proofs = new LinkedHashSet<ProofAggregate>(); // of ProofList
+    private final Set<ProofAggregate> proofs = new LinkedHashSet<>(); // of ProofList
 
     private final List<ProofEnvironmentListener> listeners =
-        new LinkedList<ProofEnvironmentListener>();
+        new LinkedList<>();
 
     /**
      * constructs a proof environment with the given initial configuration of the proofs contained
@@ -89,7 +89,7 @@ public class ProofEnvironment {
     }
 
     public ProofEnvironmentListener[] getProofEnvironmentListeners() {
-        return listeners.toArray(new ProofEnvironmentListener[listeners.size()]);
+        return listeners.toArray(new ProofEnvironmentListener[0]);
     }
 
     protected void fireProofRegistered(ProofEnvironmentEvent e) {

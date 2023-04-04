@@ -49,10 +49,7 @@ public abstract class LDTHandler implements JMLOperatorHandler {
             return null;
         }
         var jop = opMap.get(op);
-        if (jop == null) {
-            // TODO should that perhaps be an exception?
-            return null;
-        }
+        // TODO should that perhaps be an exception?
         return jop;
     }
 

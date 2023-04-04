@@ -26,10 +26,10 @@ public class Includes {
     private final List<File> files;
 
     public Includes() {
-        includes = new LinkedList<String>();
-        ldtIncludes = new LinkedList<String>();
-        name2Source = new LinkedHashMap<String, RuleSource>();
-        files = new LinkedList<File>();
+        includes = new LinkedList<>();
+        ldtIncludes = new LinkedList<>();
+        name2Source = new LinkedHashMap<>();
+        files = new LinkedList<>();
     }
 
     private void put(String name, RuleSource source, List<String> list) {

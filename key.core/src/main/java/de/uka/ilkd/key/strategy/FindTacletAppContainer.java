@@ -58,10 +58,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
     @Override
     protected boolean isStillApplicable(Goal p_goal) {
         PosInOccurrence topPos = p_goal.getFormulaTagManager().getPosForTag(positionTag);
-        if (topPos == null || subformulaOrPreceedingUpdateHasChanged(p_goal)) {
-            return false;
-        }
-        return true;
+        return topPos != null && !subformulaOrPreceedingUpdateHasChanged(p_goal);
     }
 
 

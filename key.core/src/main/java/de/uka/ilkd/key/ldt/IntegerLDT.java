@@ -162,7 +162,7 @@ public final class IntegerLDT extends LDT {
         // initialise caches for function symbols from integerHeader.key
         sharp = addFunction(services, "#");
         for (int i = 0; i < 10; i++) {
-            numberSymbol[i] = addFunction(services, "" + i);
+            numberSymbol[i] = addFunction(services, String.valueOf(i));
         }
         neglit = addFunction(services, NEGATIVE_LITERAL_STRING);
         numbers = addFunction(services, NUMBERS_NAME.toString());
@@ -782,7 +782,7 @@ public final class IntegerLDT extends LDT {
     }
 
     public String toNumberString(Term t) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         Operator f = t.op();
         while (isNumberLiteral(f)) {
             sb.insert(0, f.name().toString().charAt(0));
@@ -817,7 +817,7 @@ public final class IntegerLDT extends LDT {
 
 
     @Override
-    public final Type getType(Term t) {
+    public Type getType(Term t) {
         assert false : "IntegerLDT: Cannot get Java type for term: " + t;
         return null;
     }

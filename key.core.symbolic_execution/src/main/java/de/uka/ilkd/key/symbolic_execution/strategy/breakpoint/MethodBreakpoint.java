@@ -33,12 +33,12 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     /**
      * The start of the method containing the associated Breakpoint
      */
-    protected int methodStart;
+    protected final int methodStart;
 
     /**
      * The end of the method containing the associated Breakpoint
      */
-    protected int methodEnd;
+    protected final int methodEnd;
 
     /**
      * The path of the class this {@link LineBreakpoint} is associated with.
@@ -108,9 +108,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
             Contract contract = methodRuleApp.getInstantiation();
             if (contract instanceof FunctionalOperationContract) {
                 FunctionalOperationContract methodContract = (FunctionalOperationContract) contract;
-                if (methodContract.getTarget().equals(getPm())) {
-                    return true;
-                }
+                return methodContract.getTarget().equals(getPm());
             }
         }
         return false;
@@ -131,9 +129,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
             Contract contract = methodRuleApp.getInstantiation();
             if (contract instanceof FunctionalOperationContract) {
                 FunctionalOperationContract methodContract = (FunctionalOperationContract) contract;
-                if (methodContract.getTarget().equals(getPm())) {
-                    return true;
-                }
+                return methodContract.getTarget().equals(getPm());
             }
         }
         return false;

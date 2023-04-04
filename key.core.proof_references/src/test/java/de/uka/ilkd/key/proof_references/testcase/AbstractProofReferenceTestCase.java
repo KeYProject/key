@@ -156,7 +156,7 @@ public abstract class AbstractProofReferenceTestCase {
             // Filter references
             if (currentReferenceFilter != null) {
                 LinkedHashSet<IProofReference<?>> filteredReferences =
-                    new LinkedHashSet<IProofReference<?>>();
+                    new LinkedHashSet<>();
                 for (IProofReference<?> reference : references) {
                     if (currentReferenceFilter.test(reference)) {
                         filteredReferences.add(reference);
@@ -179,7 +179,7 @@ public abstract class AbstractProofReferenceTestCase {
      */
     protected LinkedHashSet<IProofReference<?>> findReferences(
             LinkedHashSet<IProofReference<?>> references, Node node) {
-        LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
+        LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<>();
         for (IProofReference<?> reference : references) {
             if (reference.getNodes().contains(node)) {
                 result.add(reference);

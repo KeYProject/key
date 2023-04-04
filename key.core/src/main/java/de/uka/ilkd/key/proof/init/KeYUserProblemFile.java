@@ -233,7 +233,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      *         is defined by the file.
      * @throws Exception Occurred Exception.
      */
-    protected Profile readProfileFromFile() throws Exception {
+    private Profile readProfileFromFile() throws Exception {
         @Nonnull
         ProblemInformation pi = getProblemInformation();
         String profileName = pi.getProfile();
@@ -249,7 +249,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      *
      * @return The default {@link Profile}.
      */
-    protected Profile getDefaultProfile() {
+    private Profile getDefaultProfile() {
         return super.getProfile();
     }
 

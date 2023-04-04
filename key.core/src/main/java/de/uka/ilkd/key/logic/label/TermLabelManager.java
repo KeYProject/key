@@ -82,78 +82,78 @@ public class TermLabelManager {
      * {@link Map}s the {@link Name} of a {@link TermLabel} to its {@link TermLabelFactory}.
      */
     private final Map<Name, TermLabelFactory<?>> factoryMap =
-        new LinkedHashMap<Name, TermLabelFactory<?>>();
+        new LinkedHashMap<>();
 
     /**
      * {@link Map}s the {@link Name} of a {@link TermLabel} to its {@link TermLabelPolicy} applied
      * on the application {@link Term}.
      */
     private final Map<Name, TermLabelPolicy> applicationTermPolicyMap =
-        new LinkedHashMap<Name, TermLabelPolicy>();
+        new LinkedHashMap<>();
 
     /**
      * {@link Map}s the {@link Name} of a {@link TermLabel} to its {@link TermLabelPolicy} applied
      * on the modality {@link Term}.
      */
     private final Map<Name, TermLabelPolicy> modalityTermPolicyMap =
-        new LinkedHashMap<Name, TermLabelPolicy>();
+        new LinkedHashMap<>();
 
     /**
      * All rule specific direct {@link ChildTermLabelPolicy}s.
      */
     private final Map<Name, Map<Name, ChildTermLabelPolicy>> ruleSpecificDirectChildTermLabelPolicies =
-        new LinkedHashMap<Name, Map<Name, ChildTermLabelPolicy>>();
+        new LinkedHashMap<>();
 
     /**
      * All rule independent direct {@link ChildTermLabelPolicy}s.
      */
     private final Map<Name, ChildTermLabelPolicy> allRulesDirectChildTermLabelPolicies =
-        new LinkedHashMap<Name, ChildTermLabelPolicy>();
+        new LinkedHashMap<>();
 
     /**
      * All rule specific child and grandchild {@link ChildTermLabelPolicy}s.
      */
     private final Map<Name, Map<Name, ChildTermLabelPolicy>> ruleSpecificChildAndGrandchildTermLabelPolicies =
-        new LinkedHashMap<Name, Map<Name, ChildTermLabelPolicy>>();
+        new LinkedHashMap<>();
 
     /**
      * All rule independent child and grandchild {@link ChildTermLabelPolicy}s.
      */
     private final Map<Name, ChildTermLabelPolicy> allRulesChildAndGrandchildTermLabelPolicies =
-        new LinkedHashMap<Name, ChildTermLabelPolicy>();
+        new LinkedHashMap<>();
 
     /**
      * All rule independent {@link TermLabelUpdate}s.
      */
     private final Map<Name, ImmutableList<TermLabelUpdate>> ruleSpecificUpdates =
-        new LinkedHashMap<Name, ImmutableList<TermLabelUpdate>>();
+        new LinkedHashMap<>();
 
     /**
      * All rule independent {@link TermLabelUpdate}s.
      */
-    private ImmutableList<TermLabelUpdate> allRulesUpdates = ImmutableSLList.<TermLabelUpdate>nil();
+    private ImmutableList<TermLabelUpdate> allRulesUpdates = ImmutableSLList.nil();
 
     /**
      * All rule specific {@link TermLabelRefactoring}s.
      */
     private final Map<Name, ImmutableList<TermLabelRefactoring>> ruleSpecificRefactorings =
-        new LinkedHashMap<Name, ImmutableList<TermLabelRefactoring>>();
+        new LinkedHashMap<>();
 
     /**
      * All rule independent {@link TermLabelRefactoring}s.
      */
     private ImmutableList<TermLabelRefactoring> allRulesRefactorings =
-        ImmutableSLList.<TermLabelRefactoring>nil();
+        ImmutableSLList.nil();
 
     /**
      * The {@link Name}s of all supported {@link TermLabel}s.
      */
-    private ImmutableList<Name> supportedTermLabelnames = ImmutableSLList.<Name>nil();
+    private ImmutableList<Name> supportedTermLabelnames = ImmutableSLList.nil();
 
     /**
      * {@link Map}s the {@link Name} of a {@link TermLabel} to its {@link TermLabelMerger}.
      */
-    private final Map<Name, TermLabelMerger> mergerMap = new LinkedHashMap<Name, TermLabelMerger>();
+    private final Map<Name, TermLabelMerger> mergerMap = new LinkedHashMap<>();
 
     /**
      * Constructor.
@@ -243,7 +243,7 @@ public class TermLabelManager {
                     for (Name rule : supportedRules) {
                         Map<Name, ChildTermLabelPolicy> ruleMap = ruleSpecificPolicyMap.get(rule);
                         if (ruleMap == null) {
-                            ruleMap = new LinkedHashMap<Name, ChildTermLabelPolicy>();
+                            ruleMap = new LinkedHashMap<>();
                             ruleSpecificPolicyMap.put(rule, ruleMap);
                         }
                         ruleMap.put(termLabelName, policy);
@@ -574,7 +574,7 @@ public class TermLabelManager {
                 applicationTerm, rule, ruleApp, goal, hint, tacletTerm, newTermOp, newTermSubs,
                 newTermBoundVars, newTermJavaBlock, newTermOriginalLabels);
         } else {
-            return new ImmutableArray<TermLabel>();
+            return new ImmutableArray<>();
         }
     }
 
@@ -692,7 +692,7 @@ public class TermLabelManager {
                         ? TermBuilder.goBelowUpdates(applicationTerm)
                         : null;
         // Instantiate empty result
-        Set<TermLabel> newLabels = new LinkedHashSet<TermLabel>();
+        Set<TermLabel> newLabels = new LinkedHashSet<>();
         // Add labels from taclet
         if (tacletTerm != null && tacletTerm.hasLabels()) {
             performTacletTerm(tacletTerm, newLabels);
@@ -719,7 +719,7 @@ public class TermLabelManager {
                 newTermBoundVars, newTermJavaBlock, allRulesUpdates, newLabels);
         }
         // Return result
-        return new ImmutableArray<TermLabel>(newLabels.toArray(new TermLabel[newLabels.size()]));
+        return new ImmutableArray<>(newLabels.toArray(new TermLabel[0]));
     }
 
     /**
@@ -882,7 +882,7 @@ public class TermLabelManager {
             Map<Name, Map<Name, ChildTermLabelPolicy>> ruleSpecificPolicies,
             Map<Name, ChildTermLabelPolicy> ruleIndependentPolicies) {
         Map<Name, ChildTermLabelPolicy> activeDirectChildPolicies =
-            new LinkedHashMap<Name, ChildTermLabelPolicy>();
+            new LinkedHashMap<>();
         if (rule != null) {
             Map<Name, ChildTermLabelPolicy> rulePolicies = ruleSpecificPolicies.get(rule.name());
             if (rulePolicies != null) {
@@ -1391,7 +1391,7 @@ public class TermLabelManager {
                 }
                 Term[] newSubs = newTerm.subs().toArray(new Term[newTerm.arity()]);
                 newSubs[childIndex] = newChild;
-                ImmutableArray<Term> newSubsImmutable = new ImmutableArray<Term>(newSubs);
+                ImmutableArray<Term> newSubsImmutable = new ImmutableArray<>(newSubs);
 
                 if (!newSubsImmutable.equals(newTerm.subs())
                         || !newLabels.equals(newTerm.getLabels())) {
@@ -1960,7 +1960,7 @@ public class TermLabelManager {
             Object hint, Term tacletTerm, Term term,
             ImmutableList<TermLabelRefactoring> activeRefactorings) {
         // Create list with all old labels
-        List<TermLabel> newLabels = new LinkedList<TermLabel>();
+        List<TermLabel> newLabels = new LinkedList<>();
         for (TermLabel oldLabel : term.getLabels()) {
             newLabels.add(oldLabel);
         }
@@ -1970,7 +1970,7 @@ public class TermLabelManager {
             refactoring.refactorLabels(state, services, applicationPosInOccurrence, applicationTerm,
                 rule, goal, hint, tacletTerm, term, newLabels);
         }
-        return new ImmutableArray<TermLabel>(newLabels);
+        return new ImmutableArray<>(newLabels);
     }
 
     /**
@@ -2248,7 +2248,7 @@ public class TermLabelManager {
                 if (labelsChanged) {
                     Term newTerm = services.getTermFactory().createTerm(existingTerm.op(),
                         existingTerm.subs(), existingTerm.boundVars(), existingTerm.javaBlock(),
-                        new ImmutableArray<TermLabel>(mergedLabels));
+                        new ImmutableArray<>(mergedLabels));
                     SequentChangeInfo sci =
                         currentSequent.sequent().changeFormula(new SequentFormula(newTerm),
                             new PosInOccurrence(existingSF, PosInTerm.getTopLevel(), inAntecedent));

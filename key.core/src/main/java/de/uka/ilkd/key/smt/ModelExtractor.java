@@ -786,8 +786,9 @@ public class ModelExtractor {
 
         for (String objectID : getAllIDs((int) types.getSettings().getObjectBound())) {
 
-            if (objectID.equals("#o0"))
+            if (objectID.equals("#o0")) {
                 continue;
+            }
 
 
             Sort s = objectSorts.get(objectID);

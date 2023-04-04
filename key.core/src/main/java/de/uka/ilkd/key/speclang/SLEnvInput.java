@@ -280,7 +280,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         // sort types alphabetically (necessary for deterministic names)
         final Set<KeYJavaType> allKeYJavaTypes = javaInfo.getAllKeYJavaTypes();
         final KeYJavaType[] kjts =
-            sortKJTs(allKeYJavaTypes.toArray(new KeYJavaType[allKeYJavaTypes.size()]));
+            sortKJTs(allKeYJavaTypes.toArray(new KeYJavaType[0]));
 
         // create specifications for all types
         for (KeYJavaType kjt : kjts) {

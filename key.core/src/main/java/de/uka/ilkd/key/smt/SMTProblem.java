@@ -27,7 +27,7 @@ public class SMTProblem {
     private final Collection<SMTSolver> solvers = new LinkedList<>();
     private final Goal goal;
     private Sequent sequent;
-    private String name;
+    private final String name;
 
     /* ############# public interface ############# */
     /**

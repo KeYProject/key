@@ -3,6 +3,7 @@
 package recoder.io;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * This class implements a data location that describes aJava source code file.
@@ -96,7 +97,7 @@ public class DataFileLocation implements DataLocation {
      *         input stream from the according data object.
      */
     public Reader getReader() throws IOException {
-        return new FileReader(file);
+        return new FileReader(file, StandardCharsets.UTF_8);
     }
 
     /**
@@ -152,7 +153,7 @@ public class DataFileLocation implements DataLocation {
      *         output stream from the according data object.
      */
     public Writer getWriter() throws IOException {
-        return new FileWriter(file);
+        return new FileWriter(file, StandardCharsets.UTF_8);
     }
 
     /**

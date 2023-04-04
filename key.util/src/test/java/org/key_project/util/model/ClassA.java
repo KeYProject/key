@@ -2,7 +2,7 @@ package org.key_project.util.model;
 
 @SuppressWarnings("unused")
 public class ClassA {
-    private int privateField = 1;
+    private final int privateField = 1;
 
     protected int protectedField = 2;
 
@@ -10,9 +10,9 @@ public class ClassA {
 
     int defaultField = 4;
 
-    private String onlyInA = "A";
+    private final String onlyInA = "A";
 
-    private boolean booleanField = true;
+    private final boolean booleanField = true;
 
     public static int staticField = -42;
 

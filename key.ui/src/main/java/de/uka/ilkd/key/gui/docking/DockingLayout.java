@@ -25,6 +25,8 @@ import de.uka.ilkd.key.settings.PathConfig;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.util.IconManager;
 import bibliothek.gui.dock.util.Priority;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Extension for working with layouts.
@@ -36,14 +38,15 @@ import bibliothek.gui.dock.util.Priority;
     priority = 1)
 public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Startup,
         KeYGuiExtension.MainMenu, KeYGuiExtension.Toolbar {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DockingLayout.class);
 
-    public static float SIZE_ICON_DOCK = 12f;
+    public static final float SIZE_ICON_DOCK = 12f;
     public static final File LAYOUT_FILE = new File(PathConfig.getKeyConfigDir(), "layout.xml");
 
     public static final String[] LAYOUT_NAMES = new String[] { "Default", "Slot 1", "Slot 2" };
     public static final int[] LAYOUT_KEYS = new int[] { KeyEvent.VK_F11, KeyEvent.VK_F12 };
 
-    private List<Action> actions = new LinkedList<>();
+    private final List<Action> actions = new LinkedList<>();
     private MainWindow window;
 
     private void installIcons(MainWindow mw) {
@@ -83,7 +86,7 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
                 globalPort.readXML(LAYOUT_FILE);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to load layouts", e);
         }
     }
 
@@ -121,7 +124,7 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
                 try {
                     window.getDockControl().writeXML(LAYOUT_FILE);
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    LOGGER.warn("Failed to save layouts", ex);
                 }
             }
         });
@@ -139,7 +142,7 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
         JToolBar toolBar = new JToolBar("Docking Layout");
-        JComboBox<String> comboLayouts = new JComboBox<String>();
+        JComboBox<String> comboLayouts = new JComboBox<>();
 
         class SaveAction extends MainWindowAction {
             private static final long serialVersionUID = -2688272657370615595L;
@@ -171,8 +174,9 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
         }
 
         toolBar.add(new JLabel("Layouts: "));
-        for (String s : LAYOUT_NAMES)
+        for (String s : LAYOUT_NAMES) {
             comboLayouts.addItem(s);
+        }
         toolBar.add(comboLayouts);
         toolBar.add(new LoadAction(mainWindow));
         toolBar.add(new SaveAction(mainWindow));

@@ -19,11 +19,6 @@ public class SolverException extends RuntimeException {
     }
 
     @Override
-    public void printStackTrace() {
-        System.err.println(toString());
-    }
-
-    @Override
     public String toString() {
         StringBuilder s = new StringBuilder("\n");
         for (SMTSolver solver : solvers) {

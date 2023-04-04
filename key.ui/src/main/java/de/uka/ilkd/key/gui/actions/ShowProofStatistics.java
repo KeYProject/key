@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -59,22 +60,22 @@ public class ShowProofStatistics extends MainWindowAction {
      */
     public static String getCSVStatisticsMessage(Proof proof) {
         final int openGoals = proof.openGoals().size();
-        String stats = "";
-        stats += "open goals," + openGoals + "\n";
+        StringBuilder stats = new StringBuilder();
+        stats.append("open goals,").append(openGoals).append("\n");
 
         final Statistics s = proof.getStatistics();
 
         for (Pair<String, String> x : s.getSummary()) {
             if ("".equals(x.second)) {
-                stats += x.first + "\n";
+                stats.append(x.first).append("\n");
             } else {
-                stats += x.first + "," + x.second + "\n";
+                stats.append(x.first).append(",").append(x.second).append("\n");
             }
         }
 
         if (s.interactiveSteps > 0) {
             SortedSet<Map.Entry<String, Integer>> sortedEntries =
-                new TreeSet<Map.Entry<String, Integer>>(
+                new TreeSet<>(
                     (o1, o2) -> {
                         int cmpRes = o2.getValue().compareTo(o1.getValue());
                         if (cmpRes == 0) {
@@ -85,43 +86,45 @@ public class ShowProofStatistics extends MainWindowAction {
             sortedEntries.addAll(s.getInteractiveAppsDetails().entrySet());
 
             for (Map.Entry<String, Integer> entry : sortedEntries) {
-                stats += "interactive," + entry.getKey() + "," + entry.getValue() + "\n";
+                stats.append("interactive,").append(entry.getKey()).append(",")
+                        .append(entry.getValue()).append("\n");
             }
         }
 
-        return stats;
+        return stats.toString();
     }
 
     public static String getHTMLStatisticsMessage(Proof proof) {
         final int openGoals = proof.openGoals().size();
-        String stats = "<html><head>" + "<style type=\"text/css\">"
+        StringBuilder stats = new StringBuilder("<html><head>" + "<style type=\"text/css\">"
             + "body {font-weight: normal; text-align: center;}" + "td {padding: 1px;}"
-            + "th {padding: 2px; font-weight: bold;}" + "</style></head><body>";
+            + "th {padding: 2px; font-weight: bold;}" + "</style></head><body>");
 
         if (openGoals > 0) {
-            stats +=
-                "<strong>" + openGoals + " open goal" + (openGoals > 1 ? "s." : ".") + "</strong>";
+            stats.append("<strong>").append(openGoals).append(" open goal")
+                    .append(openGoals > 1 ? "s." : ".").append("</strong>");
         } else {
-            stats += "<strong>Proved.</strong>";
+            stats.append("<strong>Proved.</strong>");
         }
 
-        stats += "<br/><br/><table>";
+        stats.append("<br/><br/><table>");
 
         final Statistics s = proof.getStatistics();
 
         for (Pair<String, String> x : s.getSummary()) {
             if ("".equals(x.second)) {
-                stats += "<tr><th colspan=\"2\">" + x.first + "</th></tr>";
+                stats.append("<tr><th colspan=\"2\">").append(x.first).append("</th></tr>");
             } else {
-                stats += "<tr><td>" + x.first + "</td><td>" + x.second + "</td></tr>";
+                stats.append("<tr><td>").append(x.first).append("</td><td>").append(x.second)
+                        .append("</td></tr>");
             }
         }
 
         if (s.interactiveSteps > 0) {
-            stats += "<tr><th colspan=\"2\">" + "Details on Interactive Apps" + "</th></tr>";
+            stats.append("<tr><th colspan=\"2\">" + "Details on Interactive Apps" + "</th></tr>");
 
             SortedSet<Map.Entry<String, Integer>> sortedEntries =
-                new TreeSet<Map.Entry<String, Integer>>(
+                new TreeSet<>(
                     (o1, o2) -> {
                         int cmpRes = o2.getValue().compareTo(o1.getValue());
 
@@ -134,14 +137,14 @@ public class ShowProofStatistics extends MainWindowAction {
             sortedEntries.addAll(s.getInteractiveAppsDetails().entrySet());
 
             for (Map.Entry<String, Integer> entry : sortedEntries) {
-                stats +=
-                    "<tr><td>" + entry.getKey() + "</td><td>" + entry.getValue() + "</td></tr>";
+                stats.append("<tr><td>").append(entry.getKey()).append("</td><td>")
+                        .append(entry.getValue()).append("</td></tr>");
             }
         }
 
-        stats += "</table></body></html>";
+        stats.append("</table></body></html>");
 
-        return stats;
+        return stats.toString();
     }
 
     /**
@@ -188,21 +191,17 @@ public class ShowProofStatistics extends MainWindowAction {
             JPanel buttonPane = new JPanel();
 
             JButton okButton = new JButton("Close");
-            okButton.addActionListener(event -> {
-                dispose();
-            });
+            okButton.addActionListener(event -> dispose());
 
             JButton csvButton = new JButton("Export as CSV");
-            csvButton.addActionListener(event -> {
-                export("csv", MiscTools.toValidFileName(proof.name().toString()),
-                    ShowProofStatistics.getCSVStatisticsMessage(proof));
-            });
+            csvButton.addActionListener(
+                event -> export("csv", MiscTools.toValidFileName(proof.name().toString()),
+                    ShowProofStatistics.getCSVStatisticsMessage(proof)));
 
             JButton htmlButton = new JButton("Export as HTML");
-            htmlButton.addActionListener(event -> {
-                export("html", MiscTools.toValidFileName(proof.name().toString()),
-                    ShowProofStatistics.getHTMLStatisticsMessage(proof));
-            });
+            htmlButton.addActionListener(
+                event -> export("html", MiscTools.toValidFileName(proof.name().toString()),
+                    ShowProofStatistics.getHTMLStatisticsMessage(proof)));
 
             buttonPane.add(okButton);
             buttonPane.add(csvButton);
@@ -248,10 +247,11 @@ public class ShowProofStatistics extends MainWindowAction {
             if (result == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 try (BufferedWriter writer =
-                    new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));) {
+                    new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),
+                        StandardCharsets.UTF_8))) {
                     writer.write(text);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.warn("Failed to write", e);
                     assert false;
                 }
             }

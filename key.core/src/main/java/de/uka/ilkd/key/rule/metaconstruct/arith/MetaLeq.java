@@ -26,9 +26,10 @@ public class MetaLeq extends AbstractTermTransformer {
         bigIntArg2 = new BigInteger(convertToDecimalString(arg2, services));
         boolean result = bigIntArg1.compareTo(bigIntArg2) <= 0;
 
-        if (result)
+        if (result) {
             return services.getTermBuilder().tt();
-        else
+        } else {
             return services.getTermBuilder().ff();
+        }
     }
 }

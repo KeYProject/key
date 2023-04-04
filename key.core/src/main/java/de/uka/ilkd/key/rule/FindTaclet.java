@@ -20,7 +20,7 @@ import org.key_project.util.collection.ImmutableSet;
 public abstract class FindTaclet extends Taclet {
 
     /** contains the find term */
-    protected Term find;
+    protected final Term find;
 
     /** Set of schemavariables of the if and the (optional) find part */
     private ImmutableSet<SchemaVariable> ifFindVariables = null;

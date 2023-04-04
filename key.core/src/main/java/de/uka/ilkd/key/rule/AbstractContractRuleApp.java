@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Goal;
@@ -21,7 +20,7 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
     }
 
     protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio, Contract contract) {
-        this(rule, pio, ImmutableSLList.<PosInOccurrence>nil(), contract);
+        this(rule, pio, ImmutableSLList.nil(), contract);
     }
 
     protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio,
@@ -47,7 +46,7 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
 
                 if (!specRepo.getOverridingTargets(observerFunctionAtPos.getContainerType(),
                     observerFunctionAtPos).contains(
-                        new Pair<KeYJavaType, IObserverFunction>(target.getContainerType(),
+                        new Pair<>(target.getContainerType(),
                             target))) {
                     return null;
                 }

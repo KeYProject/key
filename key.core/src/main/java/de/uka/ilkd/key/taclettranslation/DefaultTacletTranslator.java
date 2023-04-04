@@ -32,7 +32,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
     static private final int SUCC = 1;
 
 
-    private static enum TacletSections {
+    private enum TacletSections {
         REPLACE, ADD, ASSUM, FIND;
 
         public Term getDefaultValue(TermServices services) {
@@ -59,10 +59,12 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
         }
         Term add = template.sequent() != null ? translate(template.sequent(), services)
                 : TacletSections.ADD.getDefaultValue(services);
-        if (add == null)
+        if (add == null) {
             add = TacletSections.ADD.getDefaultValue(services);
-        if (replace == null)
+        }
+        if (replace == null) {
             replace = TacletSections.REPLACE.getDefaultValue(services);
+        }
 
         Term term = tb.imp(tb.equals(find, replace), add);
         return term;
@@ -90,10 +92,12 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 
         Term add = template.sequent() != null ? translate(template.sequent(), services)
                 : TacletSections.ADD.getDefaultValue(services);
-        if (add == null)
+        if (add == null) {
             add = TacletSections.ADD.getDefaultValue(services);
-        if (replace == null)
+        }
+        if (replace == null) {
             replace = TacletSections.REPLACE.getDefaultValue(services);
+        }
 
         assert polarity == 0 || add == TacletSections.ADD.getDefaultValue(services)
                 : "add() commands not allowed in polarity rules (syntactically forbidden)";
@@ -158,8 +162,9 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
         // translate the find pattern.
         if (taclet instanceof FindTaclet) {
             FindTaclet findTaclet = (FindTaclet) taclet;
-            if (getFindFromTaclet(findTaclet) != null)
+            if (getFindFromTaclet(findTaclet) != null) {
                 find = getFindFromTaclet(findTaclet);
+            }
         }
 
         // translate the replace and add patterns of the taclet.

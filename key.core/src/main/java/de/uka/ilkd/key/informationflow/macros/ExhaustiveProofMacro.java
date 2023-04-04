@@ -104,7 +104,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
-            throws InterruptedException, Exception {
+            throws Exception {
 
         final Map<Node, PosInOccurrence> applicableOnNodeAtPos =
             proof.getServices().getCaches().getExhaustiveMacroCache();

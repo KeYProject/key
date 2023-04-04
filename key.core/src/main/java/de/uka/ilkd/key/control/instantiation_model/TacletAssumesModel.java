@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.control.instantiation_model;
 
-
 import java.util.Iterator;
 import javax.swing.*;
 

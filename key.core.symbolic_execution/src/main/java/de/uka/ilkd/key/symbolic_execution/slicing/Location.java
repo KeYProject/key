@@ -89,7 +89,7 @@ public class Location {
      */
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         boolean afterFirst = false;
         for (Access access : accesses) {
             if (afterFirst) {

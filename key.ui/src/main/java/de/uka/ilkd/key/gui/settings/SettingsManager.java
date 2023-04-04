@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,11 +22,16 @@ import de.uka.ilkd.key.gui.smt.settings.SMTSettingsProvider;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
 public class SettingsManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SettingsManager.class);
+
     public static final ExtensionManager EXTENSION_MANAGER = new ExtensionManager();
     public static final SettingsProvider SMT_SETTINGS = new SMTSettingsProvider();
     public static final TacletOptionsSettings TACLET_OPTIONS_SETTINGS = new TacletOptionsSettings();
@@ -34,7 +40,7 @@ public class SettingsManager {
     public static final ColorSettingsProvider COLOR_SETTINGS = new ColorSettingsProvider();
 
     private static SettingsManager INSTANCE;
-    private List<SettingsProvider> settingsProviders = new LinkedList<>();
+    private final List<SettingsProvider> settingsProviders = new LinkedList<>();
 
     static SettingsManager createWithExtensions() {
         SettingsManager sm = new SettingsManager();
@@ -92,10 +98,10 @@ public class SettingsManager {
     public static Properties loadProperties(File settingsFile) {
         Properties props = new Properties();
         if (settingsFile.exists()) {
-            try (FileReader reader = new FileReader(settingsFile)) {
+            try (FileReader reader = new FileReader(settingsFile, StandardCharsets.UTF_8)) {
                 props.load(reader);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("Failed to load settings", e);
             }
         }
         return props;

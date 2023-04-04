@@ -32,9 +32,9 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
         implements StatementContainer, Statement, Expression, TypeReference {
 
     /** the name of the meta construct */
-    private Name name;
+    private final Name name;
     /** the encapsulated program element */
-    private ProgramElement body;
+    private final ProgramElement body;
 
     /**
      * creates a ProgramTransformer
@@ -228,7 +228,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @return a list of schema variables relevant for this entity;
      */
     public ImmutableList<SchemaVariable> needs() {
-        return ImmutableSLList.<SchemaVariable>nil();
+        return ImmutableSLList.nil();
     }
 
     /**
@@ -239,7 +239,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @return a list of schema variables relevant for this entity;
      */
     public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
-        return ImmutableSLList.<SchemaVariable>nil();
+        return ImmutableSLList.nil();
     }
 
 }

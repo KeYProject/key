@@ -19,7 +19,7 @@ public interface IBreakpoint {
      *
      * @return true if Breakpoint is enabled
      */
-    public boolean isEnabled();
+    boolean isEnabled();
 
     /**
      * This method is called from
@@ -36,7 +36,7 @@ public interface IBreakpoint {
      * @param countApplied The number of already applied rules.
      * @param goal The current {@link Goal} on which the next rule will be applied.
      */
-    public void updateState(int maxApplications, long timeout, Proof proof, long startTime,
+    void updateState(int maxApplications, long timeout, Proof proof, long startTime,
             int countApplied, Goal goal);
 
     /**
@@ -49,6 +49,6 @@ public interface IBreakpoint {
      * @param node the current node
      * @return true if execution should hold
      */
-    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
+    boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
             Node node);
 }

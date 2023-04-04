@@ -13,18 +13,18 @@ public interface InfFlowPO extends ProofOblInput {
      *
      * @return the information flow proof obligation variables.
      */
-    public IFProofObligationVars getLeafIFVars();
+    IFProofObligationVars getLeafIFVars();
 
-    public InfFlowProofSymbols getIFSymbols();
+    InfFlowProofSymbols getIFSymbols();
 
-    public void addIFSymbol(Term t);
+    void addIFSymbol(Term t);
 
-    public void addIFSymbol(Named n);
+    void addIFSymbol(Named n);
 
-    public void addLabeledIFSymbol(Term t);
+    void addLabeledIFSymbol(Term t);
 
-    public void addLabeledIFSymbol(Named n);
+    void addLabeledIFSymbol(Named n);
 
-    public void unionLabeledIFSymbols(InfFlowProofSymbols symbols);
+    void unionLabeledIFSymbols(InfFlowProofSymbols symbols);
 
 }

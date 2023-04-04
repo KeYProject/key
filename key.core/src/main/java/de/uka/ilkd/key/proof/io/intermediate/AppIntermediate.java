@@ -28,7 +28,7 @@ public abstract class AppIntermediate {
      * @return The line number of this application in the loaded proof file.
      */
     public String getLineNr() {
-        return "" + lineNr;
+        return String.valueOf(lineNr);
     }
 
     /**

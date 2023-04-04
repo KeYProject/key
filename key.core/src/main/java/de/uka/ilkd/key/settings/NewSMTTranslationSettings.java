@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.settings;
 
 
-
 import java.util.Collections;
 import java.util.EventObject;
 import java.util.LinkedHashMap;

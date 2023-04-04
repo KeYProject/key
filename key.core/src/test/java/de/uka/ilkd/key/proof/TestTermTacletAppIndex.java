@@ -105,8 +105,9 @@ public class TestTermTacletAppIndex {
 
     @Test
     public void testIndex0WithCache() {
-        for (int i = 0; i != 3; ++i)
+        for (int i = 0; i != 3; ++i) {
             doTestIndex0(realCache);
+        }
     }
 
     private void doTestIndex0(TermTacletAppIndexCacheSet cache) {

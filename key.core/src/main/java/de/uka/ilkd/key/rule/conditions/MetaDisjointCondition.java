@@ -37,14 +37,13 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
             final ImmutableSet<Term> t1set = services.getTermBuilder().unionToSet(t1);
             final ImmutableSet<Term> t2set = services.getTermBuilder().unionToSet(t2);
 
-            ImmutableSet<Operator> t1Ops = DefaultImmutableSet.<Operator>nil();
-            ImmutableSet<Operator> t2Ops = DefaultImmutableSet.<Operator>nil();
+            ImmutableSet<Operator> t1Ops = DefaultImmutableSet.nil();
+            ImmutableSet<Operator> t2Ops = DefaultImmutableSet.nil();
             for (Term t : t1set) {
                 if (t.op().equals(setLDT.getSingleton()) && t.sub(0).op() instanceof Function
                         && ((Function) t.sub(0).op()).isUnique()) {
                     t1Ops = t1Ops.add(t.op());
                 } else if (t.op().equals(setLDT.getEmpty())) {
-                    continue;
                 } else {
                     return false;
                 }
@@ -54,7 +53,6 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
                         && ((Function) t.sub(0).op()).isUnique()) {
                     t2Ops = t2Ops.add(t.op());
                 } else if (t.op().equals(setLDT.getEmpty())) {
-                    continue;
                 } else {
                     return false;
                 }

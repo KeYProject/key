@@ -56,7 +56,7 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
-            throws InterruptedException, Exception {
+            throws Exception {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         int steps = getMaxSteps(proof);
         final ProofMacro macro = getProofMacro();

@@ -35,15 +35,15 @@ public class RealLiteral extends Literal {
     }
 
     public RealLiteral(int value) {
-        this("" + value + ".0");
+        this(value + ".0");
     }
 
     public RealLiteral(double value) {
-        this.value = "" + value;
+        this.value = String.valueOf(value);
     }
 
     public RealLiteral(java.math.BigDecimal value) {
-        this.value = "" + value;
+        this.value = String.valueOf(value);
     }
 
     public RealLiteral(ExtList children, String value) {

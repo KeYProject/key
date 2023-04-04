@@ -24,7 +24,7 @@ class ReplacerOfQuanVariablesWithMetavariables {
 
     public static Substitution createSubstitutionForVars(Term allTerm, TermServices services) {
         ImmutableMap<QuantifiableVariable, Term> res =
-            DefaultImmutableMap.<QuantifiableVariable, Term>nilMap();
+            DefaultImmutableMap.nilMap();
         Term t = allTerm;
         Operator op = t.op();
         while (op instanceof Quantifier) {

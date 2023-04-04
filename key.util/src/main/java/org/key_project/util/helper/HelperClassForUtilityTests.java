@@ -3,6 +3,7 @@ package org.key_project.util.helper;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class HelperClassForUtilityTests {
     public static final File RESOURCE_DIRECTORY = FindResources.getTestResourcesDirectory();
@@ -14,8 +15,9 @@ public class HelperClassForUtilityTests {
      * @return The created folder.
      */
     public static File createFolder(File folder) {
-        if (!folder.exists())
+        if (!folder.exists()) {
             folder.mkdirs();
+        }
         /*
          * TestCase.assertEquals(!folder.exists(), folder.mkdirs());
          * TestCase.assertTrue(folder.exists()); TestCase.assertTrue(folder.isDirectory());
@@ -32,7 +34,7 @@ public class HelperClassForUtilityTests {
      * @throws IOException Occurred Exception.
      */
     public static File createFile(File file, String content) throws IOException {
-        try (FileWriter writer = new FileWriter(file)) {
+        try (FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8)) {
             writer.write(content);
             // TestCase.assertTrue(file.exists());
             // TestCase.assertTrue(file.isFile());

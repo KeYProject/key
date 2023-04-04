@@ -42,12 +42,12 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
     /**
      * List of PosInOcc that haven't been successfully replaced
      */
-    private List<PosInOccurrence> failposInOccs = new ArrayList<>();
+    private final List<PosInOccurrence> failposInOccs = new ArrayList<>();
 
     /**
      * List of PosInOcc that successfully replaced
      */
-    private List<PosInOccurrence> succposInOccs = new ArrayList<>();
+    private final List<PosInOccurrence> succposInOccs = new ArrayList<>();
 
     /**
      * Constructs this rewrite command.
@@ -187,7 +187,6 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
             failposInOccs.remove(pta.posInOccurrence());
             succposInOccs.add(pta.posInOccurrence());
             goalold.apply(pta);
-            return;
         } else {
             throw new IllegalArgumentException(
                 "Unsuccessful application of rewrite taclet " + pta.taclet().displayName());

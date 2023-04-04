@@ -66,7 +66,7 @@ public final class ProgramMethod extends ObserverFunction
             result[i] = md.getParameterDeclarationAt(i).getVariableSpecification()
                     .getProgramVariable().getKeYJavaType();
         }
-        return new ImmutableArray<KeYJavaType>(result);
+        return new ImmutableArray<>(result);
     }
 
     // -------------------------------------------------------------------------
@@ -260,7 +260,7 @@ public final class ProgramMethod extends ObserverFunction
      */
     @Override
     public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        if (se == null || !(se instanceof IProgramMethod)) {
+        if (!(se instanceof IProgramMethod)) {
             return false;
         }
 
@@ -450,7 +450,7 @@ public final class ProgramMethod extends ObserverFunction
 
     @Override
     public ImmutableList<LocationVariable> collectParameters() {
-        ImmutableList<LocationVariable> paramVars = ImmutableSLList.<LocationVariable>nil();
+        ImmutableList<LocationVariable> paramVars = ImmutableSLList.nil();
         int numParams = getParameterDeclarationCount();
         for (int i = numParams - 1; i >= 0; i--) {
             ParameterDeclaration pd = getParameterDeclarationAt(i);
