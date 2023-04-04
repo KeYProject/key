@@ -3,6 +3,7 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.expression.operator.BinaryOperator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -146,14 +147,17 @@ public abstract class TypeResolver {
                 Term gsTerm = null;
                 if (inst instanceof Term) {
                     gsTerm = (Term) inst;
+                    s = gsTerm.sort();
+                } else if (inst instanceof BinaryOperator) {
+                    s = services.getTypeConverter().getKeYJavaType((BinaryOperator) inst).getSort();
                 } else if (inst instanceof ProgramElement) {
                     gsTerm = services.getTypeConverter().convertToLogicElement(
                         (ProgramElement) inst, instMap.getExecutionContext());
+                    s = gsTerm.sort();
                 } else {
                     Debug.fail("Unexpected substitution for sv " + resolveSV + ":" + inst);
                     return null;
                 }
-                s = gsTerm.sort();
             }
             return s;
         }

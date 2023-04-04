@@ -3,7 +3,9 @@ package de.uka.ilkd.key.logic.sort;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.expression.operator.BinaryOperator;
+import de.uka.ilkd.key.java.expression.Operator;
+import de.uka.ilkd.key.java.expression.operator.*;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.NamedProgramElement;
@@ -21,12 +23,6 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
-import de.uka.ilkd.key.java.expression.operator.DLEmbeddedExpression;
-import de.uka.ilkd.key.java.expression.operator.Instanceof;
-import de.uka.ilkd.key.java.expression.operator.Intersect;
-import de.uka.ilkd.key.java.expression.operator.Negative;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.expression.operator.NewArray;
 import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.Catch;
@@ -1100,7 +1096,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 
     /**
      * A schema variable for a binary operation in which at least one floating
-     * point type is involved.
+     * point type is involved and both arguments are simple expressions.
      * Needed for numeric promotion with floating point types.
      *
      * @see de.uka.ilkd.key.rule.conditions.FloatingPointBalancedCondition
@@ -1113,10 +1109,16 @@ public abstract class ProgramSVSort extends AbstractSort {
 
         @Override
         public boolean canStandFor(ProgramElement check, ExecutionContext ec, Services services) {
-            if (!(check instanceof BinaryOperator)) {
+            if (!(check instanceof BinaryOperator || check instanceof ComparativeOperator)) {
                 return false;
             }
-            BinaryOperator bin = (BinaryOperator) check;
+            Operator bin = (Operator) check;
+            if (
+                    !SIMPLEEXPRESSION.canStandFor(bin.getChildAt(0), ec, services) ||
+                    !SIMPLEEXPRESSION.canStandFor(bin.getChildAt(1), ec, services)
+            ) {
+                return false;
+            }
             KeYJavaType t1 = getKeYJavaType(bin.getChildAt(0), ec, services);
             KeYJavaType t2 = getKeYJavaType(bin.getChildAt(1), ec, services);
 
