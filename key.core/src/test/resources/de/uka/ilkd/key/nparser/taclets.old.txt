@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Mon Mar 20 13:56:02 CET 2023
+# Date: Tue Apr 04 18:24:45 CEST 2023
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -1229,6 +1229,7 @@ assignment {
 \find(#allmodal ( (modal operator))\[{ ..
   #loc = #se;
 ... }\] (post))
+\varcond(\sub(\typeof(#se (program SimpleExpression)), \typeof(#loc (program Variable))), )
 \replacewith(update-application(elem-update(#loc (program Variable))(#se),#allmodal(post))) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
@@ -1256,7 +1257,7 @@ assignmentAdditionDouble {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seDouble0 + #seDouble1;
 ... }\] (post))
-\varcond(\not\isStrictFp, )
+\varcond(\not\isStrictFp, \sub(\typeof(#loc (program Variable)), double), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaAddDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1266,7 +1267,7 @@ assignmentAdditionDoubleStrictFP {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seDouble0 + #seDouble1;
 ... }\] (post))
-\varcond(\isStrictFp, )
+\varcond(\isStrictFp, \sub(\typeof(#loc (program Variable)), double), )
 \replacewith(update-application(elem-update(#loc (program Variable))(addDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
 \heuristics(executeDoubleAssignment)
 Choices: programRules:Java}
@@ -1276,7 +1277,7 @@ assignmentAdditionFloat {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seFloat0 + #seFloat1;
 ... }\] (post))
-\varcond(\not\isStrictFp, )
+\varcond(\not\isStrictFp, \sub(\typeof(#loc (program Variable)), float), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaAddFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1286,7 +1287,7 @@ assignmentAdditionFloatStrictFP {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seFloat0 + #seFloat1;
 ... }\] (post))
-\varcond(\isStrictFp, )
+\varcond(\isStrictFp, \sub(\typeof(#loc (program Variable)), float), )
 \replacewith(update-application(elem-update(#loc (program Variable))(addFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1296,6 +1297,7 @@ assignmentAdditionInt {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seCharByteShortInt0 + #seCharByteShortInt1;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaAddInt(#seCharByteShortInt0,#seCharByteShortInt1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1305,6 +1307,7 @@ assignmentAdditionLong {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seCharByteShortInt + #seLong;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaAddLong(#seCharByteShortInt,#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1314,6 +1317,7 @@ assignmentAdditionLong2 {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seLong + #seCharByteShortInt;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaAddLong(#seLong,#seCharByteShortInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1323,6 +1327,7 @@ assignmentAdditionLong3 {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seLong0 + #seLong1;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaAddLong(#seLong0,#seLong1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1332,6 +1337,7 @@ assignmentBitwiseAndInt {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seCharByteShortInt0 & #seCharByteShortInt1;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseAndInt(#seCharByteShortInt0,#seCharByteShortInt1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1341,6 +1347,7 @@ assignmentBitwiseAndLong {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seCharByteShortInt & #seLong;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseAndLong(#seCharByteShortInt,#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1350,6 +1357,7 @@ assignmentBitwiseAndLong2 {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seLong & #seCharByteShortInt;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseAndLong(#seLong,#seCharByteShortInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1359,6 +1367,7 @@ assignmentBitwiseAndLong3 {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seLong0 & #seLong1;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseAndLong(#seLong0,#seLong1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1368,6 +1377,7 @@ assignmentBitwiseOrInt {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seCharByteShortInt0 | #seCharByteShortInt1;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseOrInt(#seCharByteShortInt0,#seCharByteShortInt1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1377,6 +1387,7 @@ assignmentBitwiseOrLong {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seCharByteShortInt | #seLong;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseOrLong(#seCharByteShortInt,#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1386,6 +1397,7 @@ assignmentBitwiseOrLong2 {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seLong | #seCharByteShortInt;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseOrLong(#seLong,#seCharByteShortInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1395,6 +1407,7 @@ assignmentBitwiseOrLong3 {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seLong0 | #seLong1;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseOrLong(#seLong0,#seLong1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1404,6 +1417,7 @@ assignmentBitwiseXOrInt {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seCharByteShortInt0 ^ #seCharByteShortInt1;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseXOrInt(#seCharByteShortInt0,#seCharByteShortInt1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1413,6 +1427,7 @@ assignmentBitwiseXOrLong {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seCharByteShortInt ^ #seLong;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseXOrLong(#seCharByteShortInt,#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1422,6 +1437,7 @@ assignmentBitwiseXOrLong2 {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seLong ^ #seCharByteShortInt;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseXOrLong(#seLong,#seCharByteShortInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1431,6 +1447,7 @@ assignmentBitwiseXOrLong3 {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seLong0 ^ #seLong1;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseXOrLong(#seLong0,#seLong1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1460,7 +1477,7 @@ assignmentDivisionDouble {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seDouble0 / #seDouble1;
 ... }\] (post))
-\varcond(\not\isStrictFp, )
+\varcond(\not\isStrictFp, \sub(\typeof(#loc (program Variable)), double), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaDivDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1470,7 +1487,7 @@ assignmentDivisionDoubleStrictFP {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seDouble0 / #seDouble1;
 ... }\] (post))
-\varcond(\isStrictFp, )
+\varcond(\isStrictFp, \sub(\typeof(#loc (program Variable)), double), )
 \replacewith(update-application(elem-update(#loc (program Variable))(divDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
 \heuristics(executeDoubleAssignment)
 Choices: programRules:Java}
@@ -1480,7 +1497,7 @@ assignmentDivisionFloat {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seFloat0 / #seFloat1;
 ... }\] (post))
-\varcond(\not\isStrictFp, )
+\varcond(\not\isStrictFp, \sub(\typeof(#loc (program Variable)), float), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaDivFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1490,7 +1507,7 @@ assignmentDivisionFloatStrictFP {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seFloat0 / #seFloat1;
 ... }\] (post))
-\varcond(\isStrictFp, )
+\varcond(\isStrictFp, \sub(\typeof(#loc (program Variable)), float), )
 \replacewith(update-application(elem-update(#loc (program Variable))(divFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1500,6 +1517,7 @@ assignmentDivisionInt {
 \find(==>#normalassign ( (modal operator))\[{ ..
   #loc = #seCharByteShortInt0 / #seCharByteShortInt1;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith([]==>[not(equals(#seCharByteShortInt1,Z(0(#))))]) ;
 \replacewith([]==>[update-application(elem-update(#loc (program Variable))(javaDivInt(#seCharByteShortInt0,#seCharByteShortInt1)),#normalassign(post))]) 
 \heuristics(executeIntegerAssignment)
@@ -1510,6 +1528,7 @@ assignmentDivisionLong {
 \find(==>#normalassign ( (modal operator))\[{ ..
   #loc = #se / #seLong;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith([]==>[not(equals(#seLong,Z(0(#))))]) ;
 \replacewith([]==>[update-application(elem-update(#loc (program Variable))(javaDivLong(#se,#seLong)),#normalassign(post))]) 
 \heuristics(executeIntegerAssignment)
@@ -1520,6 +1539,7 @@ assignmentDivisionLong2 {
 \find(==>#normalassign ( (modal operator))\[{ ..
   #loc = #seLong / #seCharByteShortInt;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith([]==>[not(equals(#seCharByteShortInt,Z(0(#))))]) ;
 \replacewith([]==>[update-application(elem-update(#loc (program Variable))(javaDivLong(#seLong,#seCharByteShortInt)),#normalassign(post))]) 
 \heuristics(executeIntegerAssignment)
@@ -1530,6 +1550,7 @@ assignmentModDouble {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seDouble0 % #seDouble1;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), double), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaModDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1539,6 +1560,7 @@ assignmentModFloat {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seFloat0 % #seFloat1;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), float), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaModFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1548,6 +1570,7 @@ assignmentModulo {
 \find(==>#normalassign ( (modal operator))\[{ ..
   #loc = #se0 % #se1;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), \sub(\typeof(#loc (program Variable)), int), )
 \replacewith([]==>[not(equals(#se1,Z(0(#))))]) ;
 \replacewith([]==>[update-application(elem-update(#loc (program Variable))(javaMod(#se0,#se1)),#normalassign(post))]) 
 \heuristics(executeIntegerAssignment)
@@ -1596,7 +1619,7 @@ assignmentMultiplicationDouble {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seDouble0 * #seDouble1;
 ... }\] (post))
-\varcond(\not\isStrictFp, )
+\varcond(\not\isStrictFp, \sub(\typeof(#loc (program Variable)), double), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaMulDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1606,7 +1629,7 @@ assignmentMultiplicationDoubleStrictFP {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seDouble0 * #seDouble1;
 ... }\] (post))
-\varcond(\isStrictFp, )
+\varcond(\isStrictFp, \sub(\typeof(#loc (program Variable)), double), )
 \replacewith(update-application(elem-update(#loc (program Variable))(mulDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
 \heuristics(executeDoubleAssignment)
 Choices: programRules:Java}
@@ -1616,7 +1639,7 @@ assignmentMultiplicationFloat {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seFloat0 * #seFloat1;
 ... }\] (post))
-\varcond(\not\isStrictFp, )
+\varcond(\not\isStrictFp, \sub(\typeof(#loc (program Variable)), float), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaMulFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1626,7 +1649,7 @@ assignmentMultiplicationFloatStrictFP {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seFloat0 * #seFloat1;
 ... }\] (post))
-\varcond(\isStrictFp, )
+\varcond(\isStrictFp, \sub(\typeof(#loc (program Variable)), float), )
 \replacewith(update-application(elem-update(#loc (program Variable))(mulFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1636,6 +1659,7 @@ assignmentMultiplicationInt {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seCharByteShortInt0 * #seCharByteShortInt1;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaMulInt(#seCharByteShortInt0,#seCharByteShortInt1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1645,6 +1669,7 @@ assignmentMultiplicationLong {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seCharByteShortInt * #seLong;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaMulLong(#seCharByteShortInt,#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1654,6 +1679,7 @@ assignmentMultiplicationLong2 {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seLong * #seCharByteShortInt;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaMulLong(#seLong,#seCharByteShortInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1663,6 +1689,7 @@ assignmentMultiplicationLong3 {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seLong0 * #seLong1;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaMulLong(#seLong0,#seLong1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1672,6 +1699,7 @@ assignmentShiftLeftInt {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seCharByteShortInt0 << #se;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaShiftLeftInt(#seCharByteShortInt0,#se)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1681,6 +1709,7 @@ assignmentShiftLeftLong {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seLong0 << #se;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaShiftLeftLong(#seLong0,#se)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1690,6 +1719,7 @@ assignmentShiftRightInt {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seCharByteShortInt0 >> #se;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaShiftRightInt(#seCharByteShortInt0,#se)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1699,6 +1729,7 @@ assignmentShiftRightLong {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seLong0 >> #se;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaShiftRightLong(#seLong0,#se)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1726,7 +1757,7 @@ assignmentSubtractionDouble {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seDouble0 - #seDouble1;
 ... }\] (post))
-\varcond(\not\isStrictFp, )
+\varcond(\not\isStrictFp, \sub(\typeof(#loc (program Variable)), double), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaSubDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1736,7 +1767,7 @@ assignmentSubtractionDoubleStrictFP {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seDouble0 - #seDouble1;
 ... }\] (post))
-\varcond(\isStrictFp, )
+\varcond(\isStrictFp, \sub(\typeof(#loc (program Variable)), double), )
 \replacewith(update-application(elem-update(#loc (program Variable))(subDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
 \heuristics(executeDoubleAssignment)
 Choices: programRules:Java}
@@ -1746,7 +1777,7 @@ assignmentSubtractionFloat {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seFloat0 - #seFloat1;
 ... }\] (post))
-\varcond(\not\isStrictFp, )
+\varcond(\not\isStrictFp, \sub(\typeof(#loc (program Variable)), float), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaSubFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1756,7 +1787,7 @@ assignmentSubtractionFloatStrictFP {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seFloat0 - #seFloat1;
 ... }\] (post))
-\varcond(\isStrictFp, )
+\varcond(\isStrictFp, \sub(\typeof(#loc (program Variable)), float), )
 \replacewith(update-application(elem-update(#loc (program Variable))(subFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -1766,6 +1797,7 @@ assignmentSubtractionInt {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seCharByteShortInt0 - #seCharByteShortInt1;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaSubInt(#seCharByteShortInt0,#seCharByteShortInt1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1775,6 +1807,7 @@ assignmentSubtractionLong {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seCharByteShortInt - #seLong;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaSubLong(#seCharByteShortInt,#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1784,6 +1817,7 @@ assignmentSubtractionLong2 {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seLong - #seCharByteShortInt;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaSubLong(#seLong,#seCharByteShortInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1793,6 +1827,7 @@ assignmentSubtractionLong3 {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seLong0 - #seLong1;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaSubLong(#seLong0,#seLong1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1802,6 +1837,7 @@ assignmentUnsignedShiftRightInt {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seCharByteShortInt0 >>> #se;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaUnsignedShiftRightInt(#seCharByteShortInt0,#se)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -1811,6 +1847,7 @@ assignmentUnsignedShiftRightLong {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = #seLong0 >>> #se;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaUnsignedShiftRightLong(#seLong0,#se)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -2422,6 +2459,7 @@ bitwiseNegationInt {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = ~#seCharByteShortInt;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseNegateInt(#se)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -2431,6 +2469,7 @@ bitwiseNegationLong {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = ~#se;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseNegateLong(#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -3430,15 +3469,6 @@ castDel2 {
 
 Choices: true}
 -----------------------------------------------------
-== castLongToFloatAddition2 (float addition) =========================================
-castLongToFloatAddition2 {
-\find(#normalassign ( (modal operator))\[{ ..
-  #loc = #seFloat + #seLong;
-... }\] (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaAddFloat(#seFloat,float::cast(#seLong))),#normalassign(post))) 
-\heuristics(executeFloatAssignment)
-Choices: programRules:Java}
------------------------------------------------------
 == castToBoolean (castToBoolean) =========================================
 castToBoolean {
 \find(#allmodal ( (modal operator))\[{ ..
@@ -4417,7 +4447,7 @@ compound_double_cast_expression {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = (double) #nse;
 ... }\] (post))
-\varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
+\varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))), \sub(\typeof(#loc (program Variable)), double), )
 \replacewith(#normalassign ( (modal operator))\[{ ..
   #typeof(#nse) #v = #nse;
   #loc = (double) #v;
@@ -4457,7 +4487,7 @@ compound_float_cast_expression {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = (float) #nse;
 ... }\] (post))
-\varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
+\varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))), \sub(\typeof(#loc (program Variable)), float), )
 \replacewith(#normalassign ( (modal operator))\[{ ..
   #typeof(#nse) #v = #nse;
   #loc = (float) #v;
@@ -9207,6 +9237,34 @@ expIsZero {
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
+== expandInByte (expandInByte) =========================================
+expandInByte {
+\find(inByte(i))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== expandInChar (expandInChar) =========================================
+expandInChar {
+\find(inChar(i))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== expandInInt (expandInInt) =========================================
+expandInInt {
+\find(inInt(i))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== expandInLong (expandInLong) =========================================
+expandInLong {
+\find(inLong(i))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
 == expandInRangeByte (expandInRangeByte) =========================================
 expandInRangeByte {
 \find(inRangeByte(i))
@@ -9242,6 +9300,13 @@ expandInRangeShort {
 \heuristics(delayedExpansion, defOps_expandRanges)
 Choices: true}
 -----------------------------------------------------
+== expandInShort (expandInShort) =========================================
+expandInShort {
+\find(inShort(i))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
 == expand_addJint (expand_addJint) =========================================
 expand_addJint {
 \find(addJint(i,i1))
@@ -9269,41 +9334,6 @@ expand_divJlong {
 \replacewith(moduloLong(jdiv(i,i1))) 
 \heuristics(defOps_expandJNumericOp)
 Choices: true}
------------------------------------------------------
-== expandInByte (expandInByte) =========================================
-expandInByte {
-\find(inByte(i))
-\replacewith(true) 
-\heuristics(concrete)
-Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
------------------------------------------------------
-== expandInChar (expandInChar) =========================================
-expandInChar {
-\find(inChar(i))
-\replacewith(true) 
-\heuristics(concrete)
-Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
------------------------------------------------------
-== expandInInt (expandInInt) =========================================
-expandInInt {
-\find(inInt(i))
-\replacewith(true) 
-\heuristics(concrete)
-Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
------------------------------------------------------
-== expandInLong (expandInLong) =========================================
-expandInLong {
-\find(inLong(i))
-\replacewith(true) 
-\heuristics(concrete)
-Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
------------------------------------------------------
-== expandInShort (expandInShort) =========================================
-expandInShort {
-\find(inShort(i))
-\replacewith(true) 
-\heuristics(concrete)
-Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
 == expand_modJint (expand_modJint) =========================================
 expand_modJint {
@@ -9860,6 +9890,7 @@ identityCastDouble {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = (double) #seDouble;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), double), )
 \replacewith(#normalassign ( (modal operator))\[{ ..
   #loc = #seDouble;
 ... }\] (post)) 
@@ -9871,6 +9902,7 @@ identityCastFloat {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = (float) #seFloat;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), float), )
 \replacewith(#normalassign ( (modal operator))\[{ ..
   #loc = #seFloat;
 ... }\] (post)) 
@@ -11446,24 +11478,6 @@ intDivRem {
 \add [imp(not(equals(divDenom,Z(0(#)))),equals(divNum,add(mul(jdiv(divNum,divDenom),divDenom),jmod(divNum,divDenom))))]==>[] 
 
 Choices: true}
------------------------------------------------------
-== intLongToFloatAddition1 (float addition) =========================================
-intLongToFloatAddition1 {
-\find(#normalassign ( (modal operator))\[{ ..
-  #loc = #seLong + #seFloat;
-... }\] (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaAddFloat(float::cast(#seLong),#seFloat)),#normalassign(post))) 
-\heuristics(executeFloatAssignment)
-Choices: programRules:Java}
------------------------------------------------------
-== intToFloatAddition (float addition) =========================================
-intToFloatAddition {
-\find(#normalassign ( (modal operator))\[{ ..
-  #loc = #seCharByteShortInt + #seFloat;
-... }\] (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaAddFloat(float::cast(#seCharByteShortInt),#seFloat)),#normalassign(post))) 
-\heuristics(executeFloatAssignment)
-Choices: programRules:Java}
 -----------------------------------------------------
 == int_diff_minus_eq (int_diff_minus_eq) =========================================
 int_diff_minus_eq {
@@ -13464,6 +13478,7 @@ narrowingByteCastInt {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = (byte) #seInt;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaCastByte(#seInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -13473,6 +13488,7 @@ narrowingByteCastLong {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = (byte) #seLong;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaCastByte(#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -13482,8 +13498,19 @@ narrowingByteCastShort {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = (byte) #seShort;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaCastByte(#seShort)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
+Choices: programRules:Java}
+-----------------------------------------------------
+== narrowingCastDoubleToFloat (cast) =========================================
+narrowingCastDoubleToFloat {
+\find(#normalassign ( (modal operator))\[{ ..
+  #loc = (float) #seDouble;
+... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), float), )
+\replacewith(update-application(elem-update(#loc (program Variable))(float::cast(#seDouble)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
 == narrowingCastFloatToInt (cast) =========================================
@@ -13491,6 +13518,7 @@ narrowingCastFloatToInt {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = (int) #seFloat;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(int::cast(#seFloat)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -13500,6 +13528,7 @@ narrowingCastFloatToLong {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = (long) #seFloat;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(int::cast(#seFloat)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
@@ -13518,6 +13547,7 @@ narrowingCharCastByte {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = (char) #seByte;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaCastChar(#seByte)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -13527,6 +13557,7 @@ narrowingCharCastInt {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = (char) #seInt;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaCastChar(#seInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -13536,6 +13567,7 @@ narrowingCharCastLong {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = (char) #seLong;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaCastChar(#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -13545,6 +13577,7 @@ narrowingCharCastShort {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = (char) #seShort;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaCastChar(#seShort)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -13563,6 +13596,7 @@ narrowingIntCastLong {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = (int) #seLong;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaCastInt(#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -13590,6 +13624,7 @@ narrowingShortCastInt {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = (short) #seInt;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaCastShort(#seInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -13599,6 +13634,7 @@ narrowingShortCastLong {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = (short) #seLong;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaCastShort(#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -18110,7 +18146,20 @@ unaryMinusDouble {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = -#seDouble;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), double), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaUnaryMinusDouble(#seDouble)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: programRules:Java}
+-----------------------------------------------------
+== unaryMinusDouble_cast (cast) =========================================
+unaryMinusDouble_cast {
+\find(#normalassign ( (modal operator))\[{ ..
+  #loc = -#se;
+... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), double), \not\sub(\typeof(#se (program SimpleExpression)), double), )
+\replacewith(#normalassign ( (modal operator))\[{ ..
+  #loc = (double) (-#se);
+... }\] (post)) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18119,7 +18168,20 @@ unaryMinusFloat {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = -#seFloat;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), float), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaUnaryMinusFloat(#seFloat)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: programRules:Java}
+-----------------------------------------------------
+== unaryMinusFloat_cast (cast) =========================================
+unaryMinusFloat_cast {
+\find(#normalassign ( (modal operator))\[{ ..
+  #loc = -#se;
+... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), float), \not\sub(\typeof(#se (program SimpleExpression)), float), )
+\replacewith(#normalassign ( (modal operator))\[{ ..
+  #loc = (float) (-#se);
+... }\] (post)) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18128,6 +18190,7 @@ unaryMinusInt {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = -#seCharByteShortInt;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaUnaryMinusInt(#seCharByteShortInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
@@ -18137,8 +18200,83 @@ unaryMinusLong {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = -#seLong;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), int), )
 \replacewith(update-application(elem-update(#loc (program Variable))(javaUnaryMinusLong(#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
+Choices: programRules:Java}
+-----------------------------------------------------
+== unbalanced_float_expression (cast) =========================================
+unbalanced_float_expression {
+\find(#normalassign ( (modal operator))\[{ ..
+  #loc = #unbalancedFloat;
+... }\] (post))
+\varcond(\floatingPointBalanced(#unbalancedFloat (program FloatingPointBinaryExpression), #balancedFloat (program FloatingPointBinaryExpression)), )
+\replacewith(#normalassign ( (modal operator))\[{ ..
+  #loc = #balancedFloat;
+... }\] (post)) 
+\heuristics(simplify_prog)
+Choices: programRules:Java}
+-----------------------------------------------------
+== unbalanced_nonsimple_nonfloat_to_double_assignment (cast) =========================================
+unbalanced_nonsimple_nonfloat_to_double_assignment {
+\find(#normalassign ( (modal operator))\[{ ..
+  #loc = #nse;
+... }\] (post))
+\varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))), \sub(\typeof(#loc (program Variable)), double), \not\sub(\typeof(#nse (program NonSimpleExpression)), double), )
+\replacewith(#normalassign ( (modal operator))\[{ ..
+  #typeof(#nse) #v = #nse;
+  #loc = (double) #v;
+... }\] (post)) 
+\heuristics(simplify_prog)
+Choices: programRules:Java}
+-----------------------------------------------------
+== unbalanced_nonsimple_nonfloat_to_float_assignment (cast) =========================================
+unbalanced_nonsimple_nonfloat_to_float_assignment {
+\find(#normalassign ( (modal operator))\[{ ..
+  #loc = #nse;
+... }\] (post))
+\varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))), \sub(\typeof(#loc (program Variable)), float), \not\sub(\typeof(#nse (program NonSimpleExpression)), float), )
+\replacewith(#normalassign ( (modal operator))\[{ ..
+  #typeof(#nse) #v = #nse;
+  #loc = (float) #v;
+... }\] (post)) 
+\heuristics(simplify_prog)
+Choices: programRules:Java}
+-----------------------------------------------------
+== unbalanced_simple_double_assignment (cast) =========================================
+unbalanced_simple_double_assignment {
+\find(#normalassign ( (modal operator))\[{ ..
+  #loc = #se;
+... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), double), \sub(\typeof(#se (program SimpleExpression)), int), )
+\replacewith(#normalassign ( (modal operator))\[{ ..
+  #loc = (double) #se;
+... }\] (post)) 
+\heuristics(simplify_prog)
+Choices: programRules:Java}
+-----------------------------------------------------
+== unbalanced_simple_float_assignment (cast) =========================================
+unbalanced_simple_float_assignment {
+\find(#normalassign ( (modal operator))\[{ ..
+  #loc = #se;
+... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), float), \sub(\typeof(#se (program SimpleExpression)), int), )
+\replacewith(#normalassign ( (modal operator))\[{ ..
+  #loc = (float) #se;
+... }\] (post)) 
+\heuristics(simplify_prog)
+Choices: programRules:Java}
+-----------------------------------------------------
+== unbalanced_simple_float_to_double_assignment (cast) =========================================
+unbalanced_simple_float_to_double_assignment {
+\find(#normalassign ( (modal operator))\[{ ..
+  #loc = #seFloat;
+... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), double), )
+\replacewith(#normalassign ( (modal operator))\[{ ..
+  #loc = (double) #seFloat;
+... }\] (post)) 
+\heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
 == unionEqualsEmpty (unionEqualsEmpty) =========================================
@@ -18467,12 +18605,43 @@ wellFormedStorePrimitiveEQ {
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
+== wideningCastFloatToDouble (cast) =========================================
+wideningCastFloatToDouble {
+\find(#normalassign ( (modal operator))\[{ ..
+  #loc = (double) #seFloat;
+... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), double), )
+\replacewith(update-application(elem-update(#loc (program Variable))(double::cast(#seFloat)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: programRules:Java}
+-----------------------------------------------------
+== wideningCastIntToDouble (cast) =========================================
+wideningCastIntToDouble {
+\find(#normalassign ( (modal operator))\[{ ..
+  #loc = (double) #seCharByteShortInt;
+... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), double), )
+\replacewith(update-application(elem-update(#loc (program Variable))(double::cast(#seCharByteShortInt)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: programRules:Java}
+-----------------------------------------------------
 == wideningCastIntToFloat (cast) =========================================
 wideningCastIntToFloat {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = (float) #seCharByteShortInt;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), float), )
 \replacewith(update-application(elem-update(#loc (program Variable))(float::cast(#seCharByteShortInt)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: programRules:Java}
+-----------------------------------------------------
+== wideningCastLongToDouble (cast) =========================================
+wideningCastLongToDouble {
+\find(#normalassign ( (modal operator))\[{ ..
+  #loc = (double) #seLong;
+... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), double), )
+\replacewith(update-application(elem-update(#loc (program Variable))(double::cast(#seLong)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18481,6 +18650,7 @@ wideningCastLongToFloat {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = (float) #seLong;
 ... }\] (post))
+\varcond(\sub(\typeof(#loc (program Variable)), float), )
 \replacewith(update-application(elem-update(#loc (program Variable))(float::cast(#seLong)),#normalassign(post))) 
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
