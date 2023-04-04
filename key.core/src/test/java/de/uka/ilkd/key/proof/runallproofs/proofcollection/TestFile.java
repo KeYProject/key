@@ -13,7 +13,6 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -40,8 +39,6 @@ public class TestFile implements Serializable {
     private final TestProperty testProperty;
     private final String path;
     private final ProofCollectionSettings settings;
-
-    public final RunAllProofsDirectories directories;
 
     /**
      * In order to ensure that the implementation is independent of working directory, this method
@@ -80,19 +77,16 @@ public class TestFile implements Serializable {
         return ret;
     }
 
-    protected TestFile(TestProperty testProperty, String path, ProofCollectionSettings settings,
-            RunAllProofsDirectories directories) throws IOException {
+    protected TestFile(TestProperty testProperty, String path, ProofCollectionSettings settings) throws IOException {
         this.path = path;
         this.testProperty = testProperty;
         this.settings = settings;
-        this.directories = directories;
         getKeYFile();
     }
 
     public static TestFile createInstance(TestProperty testProperty, String path,
             ProofCollectionSettings settings) throws IOException {
-        return new TestFile(testProperty, path, settings,
-            new RunAllProofsDirectories(settings.runStart));
+        return new TestFile(testProperty, path, settings);
     }
 
     /**

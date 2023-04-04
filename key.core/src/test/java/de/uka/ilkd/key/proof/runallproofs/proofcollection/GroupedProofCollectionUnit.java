@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
@@ -38,29 +37,29 @@ public class GroupedProofCollectionUnit extends ProofCollectionUnit {
     }
 
     public TestFile provable(String path) throws IOException {
-        var tf = new TestFile(TestProperty.PROVABLE, path, settings,
-            new RunAllProofsDirectories(new Date()));
+        RunAllProofsDirectories.init();
+        var tf = new TestFile(TestProperty.PROVABLE, path, settings);
         testFiles.add(tf);
         return tf;
     }
 
     public TestFile notprovable(String path) throws IOException {
-        var tf = new TestFile(TestProperty.NOTPROVABLE, path, settings,
-            new RunAllProofsDirectories(new Date()));
+        RunAllProofsDirectories.init();
+        var tf = new TestFile(TestProperty.NOTPROVABLE, path, settings);
         testFiles.add(tf);
         return tf;
     }
 
     public TestFile loadable(String path) throws IOException {
-        var tf = new TestFile(TestProperty.LOADABLE, path, settings,
-            new RunAllProofsDirectories(new Date()));
+        RunAllProofsDirectories.init();
+        var tf = new TestFile(TestProperty.LOADABLE, path, settings);
         testFiles.add(tf);
         return tf;
     }
 
     public TestFile notloadable(String path) throws IOException {
-        var tf = new TestFile(TestProperty.NOTLOADABLE, path, settings,
-            new RunAllProofsDirectories(new Date()));
+        RunAllProofsDirectories.init();
+        var tf = new TestFile(TestProperty.NOTLOADABLE, path, settings);
         testFiles.add(tf);
         return tf;
     }

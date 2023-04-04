@@ -16,9 +16,12 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.Pair;
 
 class DataRecordingTestFile extends TestFile {
+    public final ProfilingDirectories directories;
+
     public DataRecordingTestFile(TestProperty testProperty, String path,
             ProofCollectionSettings settings) throws IOException {
-        super(testProperty, path, settings, new ProfilingDirectories(settings.runStart));
+        super(testProperty, path, settings);
+        this.directories = new ProfilingDirectories(settings.runStart);
     }
 
     @Override
@@ -49,6 +52,6 @@ class DataRecordingTestFile extends TestFile {
     }
 
     public final ProfilingDirectories getProfileDirectories() {
-        return (ProfilingDirectories) directories;
+        return directories;
     }
 }
