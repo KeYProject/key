@@ -122,7 +122,7 @@ public class ProofCollections {
         comprehensions.provable("heap/comprehensions/bsum_neg2.key");
         comprehensions.provable("heap/comprehensions/bsumSplit.key");
         comprehensions.provable("heap/comprehensions/bprodSplit.key");
-        comprehensions.provable("heap/comprehensions/bsumSplitInvalid.key");
+        comprehensions.notprovable("heap/comprehensions/bsumSplitInvalid.key");
 
 
         // Performance tests
