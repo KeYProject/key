@@ -18,7 +18,7 @@
             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
-         <statement name="multiArray[0]=new int[]{1,2 };" pathCondition="true" pathConditionChanged="false">
+         <statement name="multiArray[0] = new int[]{1, 2};" pathCondition="true" pathConditionChanged="false">
             <variable name="self" isArrayIndex="false">
                <value name="self {true}" typeString="VariablesArrayTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                </value>
@@ -43,7 +43,7 @@
                   </variable>
                </value>
             </variable>
-            <statement name="multiArray[1]=new int[]{3,4,5 };" pathCondition="true" pathConditionChanged="false">
+            <statement name="multiArray[1] = new int[]{3, 4, 5};" pathCondition="true" pathConditionChanged="false">
                <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="VariablesArrayTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   </value>
@@ -80,7 +80,10 @@
                      </variable>
                   </value>
                </variable>
-               <statement name="return multiArray[0][0]+multiArray[0][1]+multiArray[1][0]+multiArray[1][1]+multiArray[1][2];" pathCondition="true" pathConditionChanged="false">
+               <statement name="return
+multiArray[0][0] + multiArray[0][1] + multiArray[1][0] +
+  multiArray[1][1] +
+  multiArray[1][2];" pathCondition="true" pathConditionChanged="false">
                   <variable name="self" isArrayIndex="false">
                      <value name="self {true}" typeString="VariablesArrayTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      </value>

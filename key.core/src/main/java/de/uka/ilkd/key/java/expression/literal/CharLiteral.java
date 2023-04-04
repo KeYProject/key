@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
 import org.key_project.util.ExtList;
 
 /**
@@ -81,7 +82,7 @@ public class CharLiteral extends AbstractIntegerLiteral {
     @Override
     public String getValueString() {
         // the char value as a decimal number (without single-quotes)
-        return "" + (int) charVal;
+        return String.valueOf((int) charVal);
     }
 
     /**

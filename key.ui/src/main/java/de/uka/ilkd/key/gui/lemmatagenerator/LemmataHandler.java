@@ -6,9 +6,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -25,6 +22,10 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,7 +119,7 @@ public class LemmataHandler implements TacletFilter {
     }
 
     private Collection<File> createFilesForAxioms(Collection<String> filenames) {
-        Collection<File> list = new LinkedList<File>();
+        Collection<File> list = new LinkedList<>();
         for (String filename : filenames) {
             list.add(new File(filename));
         }

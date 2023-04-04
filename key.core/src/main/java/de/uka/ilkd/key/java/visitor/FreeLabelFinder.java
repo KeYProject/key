@@ -26,9 +26,7 @@ public class FreeLabelFinder {
                     }
                 }
             } else if (node instanceof Label) {
-                if (node.equals(label)) {
-                    return true;
-                }
+                return node.equals(label);
             }
         }
         return false;

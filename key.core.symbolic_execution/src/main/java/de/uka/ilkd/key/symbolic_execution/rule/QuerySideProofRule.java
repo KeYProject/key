@@ -3,8 +3,6 @@ package de.uka.ilkd.key.symbolic_execution.rule;
 import java.util.List;
 import java.util.Set;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PIOPathIterator;
@@ -35,6 +33,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Triple;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * <p>
@@ -162,7 +162,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
      * @param pio The {@link PosInOccurrence} in the {@link Goal}.
      * @return {@code true} is applicable, {@code false} is not applicable
      */
-    protected boolean isApplicableQuery(Goal goal, Term pmTerm, PosInOccurrence pio) {
+    private boolean isApplicableQuery(Goal goal, Term pmTerm, PosInOccurrence pio) {
         if (pmTerm.op() instanceof IProgramMethod && pmTerm.freeVars().isEmpty()) {
             IProgramMethod pm = (IProgramMethod) pmTerm.op();
             final Sort nullSort = goal.proof().getJavaInfo().nullSort();
@@ -257,8 +257,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                 Term resultFunctionTerm = tb.func(resultFunction);
                 resultGoal.addFormula(
                     replace(pio,
-                        varFirst ? tb.equals(resultFunctionTerm, varTerm)
-                                : tb.equals(resultFunctionTerm, varTerm),
+                        tb.equals(resultFunctionTerm, varTerm),
                         services),
                     pio.isInAntec(), false);
                 for (Triple<Term, Set<Term>, Node> conditionsAndResult : conditionsAndResultsMap) {

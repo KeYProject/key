@@ -3,7 +3,6 @@ package de.uka.ilkd.key.gui.configuration;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.UIManager;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -26,10 +25,10 @@ public class Config {
     private int sizeIndex = readSizeIndex();
 
     /** cached ConfigChange event */
-    private ConfigChangeEvent configChangeEvent = new ConfigChangeEvent(this);
+    private final ConfigChangeEvent configChangeEvent = new ConfigChangeEvent(this);
 
     /** the listeners to this Config */
-    private final List<ConfigChangeListener> listenerList = new ArrayList<ConfigChangeListener>(5);
+    private final List<ConfigChangeListener> listenerList = new ArrayList<>(5);
 
     private Config() {
         setDefaultFonts();

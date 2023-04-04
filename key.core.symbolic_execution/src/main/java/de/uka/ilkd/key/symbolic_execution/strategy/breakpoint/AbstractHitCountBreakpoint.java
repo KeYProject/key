@@ -28,7 +28,7 @@ public abstract class AbstractHitCountBreakpoint extends AbstractBreakpoint {
      * Map to save the nodes that already have been reached, so nodes are not counted twice for the
      * hitcount
      */
-    private final Map<Integer, Boolean> hittedNodes = new HashMap<Integer, Boolean>();
+    private final Map<Integer, Boolean> hittedNodes = new HashMap<>();
 
     /**
      * Creates a new {@link AbstractHitCountBreakpoint}.

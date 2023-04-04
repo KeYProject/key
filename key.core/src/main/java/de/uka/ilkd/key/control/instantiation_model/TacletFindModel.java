@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.control.instantiation_model;
 
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Iterator;
+import javax.swing.table.AbstractTableModel;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -22,15 +27,12 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.*;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.Pair;
-import org.antlr.v4.runtime.CharStreams;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 
-import javax.swing.table.AbstractTableModel;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Iterator;
+import org.antlr.v4.runtime.CharStreams;
 
 public class TacletFindModel extends AbstractTableModel {
 
@@ -101,7 +103,7 @@ public class TacletFindModel extends AbstractTableModel {
 
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry = it.next();
-            rowVec.add(new Pair<SchemaVariable, String>(entry.key(),
+            rowVec.add(new Pair<>(entry.key(),
                 ProofSaver.printAnything(entry.value(), services)));
             count++;
         }
@@ -189,7 +191,7 @@ public class TacletFindModel extends AbstractTableModel {
     }
 
     private static Position createPosition(int irow) {
-        return new Position(irow + 1, 1);
+        return Position.newOneBased(irow + 1, 1);
     }
 
     /**
@@ -204,7 +206,8 @@ public class TacletFindModel extends AbstractTableModel {
 
         if ((getValueAt(irow, icol) == null || ((String) getValueAt(irow, icol)).length() == 0)
                 && !originalApp.complete()) {
-            throw new MissingInstantiationException("" + getValueAt(irow, 0), createPosition(irow),
+            throw new MissingInstantiationException(String.valueOf(getValueAt(irow, 0)),
+                createPosition(irow),
                 false);
         }
     }
@@ -351,7 +354,8 @@ public class TacletFindModel extends AbstractTableModel {
                         try {
                             sort = result.getRealSort(sv, services);
                         } catch (SortException e) {
-                            throw new MissingSortException("" + sv, createPosition(irow));
+                            throw new MissingSortException(String.valueOf(sv),
+                                createPosition(irow));
                         }
                     }
 
@@ -416,7 +420,8 @@ public class TacletFindModel extends AbstractTableModel {
                             result = result.addCheckedInstantiation(sv, addOrigin(instance),
                                 services, true);
                         } catch (RigidnessException e) {
-                            throw new SVRigidnessException("" + sv, createPosition(irow));
+                            throw new SVRigidnessException(String.valueOf(sv),
+                                createPosition(irow));
                         } catch (IllegalInstantiationException iae) {
                             throw new SVInstantiationParserException((String) getValueAt(irow, 1),
                                 createPosition(irow), iae.getMessage(), false);
@@ -425,7 +430,7 @@ public class TacletFindModel extends AbstractTableModel {
                 }
             }
         } catch (SortException e) {
-            throw new SortMismatchException("" + sv, sort, createPosition(irow));
+            throw new SortMismatchException(String.valueOf(sv), sort, createPosition(irow));
         }
 
         return result;

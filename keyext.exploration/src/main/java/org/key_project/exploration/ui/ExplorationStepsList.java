@@ -1,28 +1,28 @@
 package org.key_project.exploration.ui;
 
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CButton;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.*;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.swing.*;
+import javax.swing.tree.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.help.HelpFacade;
 import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppListener;
+
 import org.key_project.exploration.ExplorationNodeData;
 import org.key_project.exploration.Icons;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.swing.*;
-import javax.swing.tree.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.List;
-import java.util.*;
+import bibliothek.gui.dock.common.action.CAction;
 
 /**
  * A view that summaries the exploration steps inside a proof.
@@ -66,8 +66,9 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         if (currentProof != null) {
             currentProof.removeRuleAppListener(ruleAppListener);
         }
-        if (proof != null)
+        if (proof != null) {
             proof.addRuleAppListener(ruleAppListener);
+        }
         currentProof = proof;
         createModel(proof);
     }
@@ -117,9 +118,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
     @Override
     public @Nonnull Collection<CAction> getTitleCActions() {
-        CButton helpButton = new CButton(null, IconFactory.HELP.get());
-        helpButton.addActionListener(e -> HelpFacade.openHelp("/Using%20KeY/Exploration/"));
-        return Collections.singleton(helpButton);
+        return Collections.singleton(HelpFacade.createHelpButton("user/Exploration/"));
     }
 
     /**
@@ -156,8 +155,9 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
             reached.add(n);
             for (Node child : n) {
-                if (!reached.contains(child))
+                if (!reached.contains(child)) {
                     nodes.push(child);
+                }
             }
         }
     }

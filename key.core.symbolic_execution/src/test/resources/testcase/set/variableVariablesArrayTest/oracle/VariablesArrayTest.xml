@@ -19,7 +19,7 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <statement name="a[10]=2;" pathCondition="true" pathConditionChanged="false">
+      <statement name="a[10] = 2;" pathCondition="true" pathConditionChanged="false">
          <variable name="a" isArrayIndex="false">
             <value name="a {equals(a,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(a,null)">
             </value>
@@ -47,7 +47,7 @@
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <statement name="a[20]=4;" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(1(#))))))" pathConditionChanged="false">
+            <statement name="a[20] = 4;" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(1(#))))))" pathConditionChanged="false">
                <variable name="a" isArrayIndex="false">
                   <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="length" isArrayIndex="false">
@@ -85,7 +85,7 @@
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <statement name="return a[10]+a[20];" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(2(#))))))" pathConditionChanged="false">
+                  <statement name="return a[10] + a[20];" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(2(#))))))" pathConditionChanged="false">
                      <variable name="a" isArrayIndex="false">
                         <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="length" isArrayIndex="false">

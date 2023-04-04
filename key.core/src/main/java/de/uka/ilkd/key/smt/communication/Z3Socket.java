@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.smt.communication;
 
+import java.io.IOException;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.SMTSolverResult;
-
-import javax.annotation.Nonnull;
-import java.io.IOException;
 
 public class Z3Socket extends AbstractSolverSocket {
 

@@ -11,10 +11,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.rule.metaconstruct.arith.*;
-import de.uka.ilkd.key.util.Debug;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * Abstract class factoring out commonalities of typical term transformer implementations. The
@@ -30,7 +29,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 
     /** A map from String names to meta operators **/
     public static final Map<String, AbstractTermTransformer> NAME_TO_META_OP =
-        new LinkedHashMap<String, AbstractTermTransformer>(70);
+        new LinkedHashMap<>(70);
 
     // TODO: This seems to be better handled using a ServiceLoader
 

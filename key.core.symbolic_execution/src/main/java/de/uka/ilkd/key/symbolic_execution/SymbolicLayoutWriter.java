@@ -137,13 +137,11 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      */
     public void write(ISymbolicLayout model, String encoding, OutputStream out) throws IOException {
         if (out != null) {
-            try {
+            try (out) {
                 Charset charset =
                     encoding != null ? Charset.forName(encoding) : Charset.defaultCharset();
                 String xml = toXML(model, charset.displayName());
                 out.write(xml.getBytes(charset));
-            } finally {
-                out.close();
             }
         }
     }
@@ -171,7 +169,7 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      */
     protected void appendModel(int level, ISymbolicLayout model, StringBuilder sb) {
-        Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+        Map<String, String> attributeValues = new LinkedHashMap<>();
         appendStartTag(level, TAG_MODEL, attributeValues, sb);
         for (ISymbolicEquivalenceClass ec : model.getEquivalenceClasses()) {
             appendEquivalenceClass(level + 1, ec, sb);
@@ -193,11 +191,11 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      */
     protected void appendEquivalenceClass(int level, ISymbolicEquivalenceClass ec,
             StringBuilder sb) {
-        Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+        Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_REPRESENTATIVE, ec.getRepresentativeString());
         appendStartTag(level, TAG_EQUIVALENCE_CLASS, attributeValues, sb);
         for (String term : ec.getTermStrings()) {
-            Map<String, String> termAttributeValues = new LinkedHashMap<String, String>();
+            Map<String, String> termAttributeValues = new LinkedHashMap<>();
             termAttributeValues.put(ATTRIBUTE_TERM, term);
             appendEmptyTag(level + 1, TAG_TERM, termAttributeValues, sb);
         }
@@ -215,7 +213,7 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      */
     protected void appendState(int level, ISymbolicLayout model, ISymbolicState state,
             StringBuilder sb) {
-        Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+        Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, state.getName());
         appendStartTag(level, TAG_STATE, attributeValues, sb);
         for (ISymbolicValue value : state.getValues()) {
@@ -238,7 +236,7 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      */
     protected void appendObject(int level, ISymbolicLayout model, ISymbolicObject object,
             StringBuilder sb) {
-        Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+        Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_XML_ID, computeObjectId(model, object));
         attributeValues.put(ATTRIBUTE_NAME, object.getNameString());
         attributeValues.put(ATTRIBUTE_TYPE, object.getTypeString());
@@ -261,7 +259,7 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      */
     protected void appendValue(int level, ISymbolicValue value, StringBuilder sb) {
-        Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+        Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, value.getName());
         attributeValues.put(ATTRIBUTE_PROGRAM_VARIABLE, value.getProgramVariableString());
         attributeValues.put(ATTRIBUTE_IS_ARRAY_INDEX, value.isArrayIndex() + "");
@@ -285,7 +283,7 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      */
     protected void appendAssociation(int level, ISymbolicLayout model,
             ISymbolicAssociation association, StringBuilder sb) {
-        Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+        Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, association.getName());
         attributeValues.put(ATTRIBUTE_PROGRAM_VARIABLE, association.getProgramVariableString());
         attributeValues.put(ATTRIBUTE_IS_ARRAY_INDEX, association.isArrayIndex() + "");

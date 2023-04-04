@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
@@ -12,14 +18,9 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -146,7 +147,7 @@ public class TestFile implements Serializable {
         // Name resolution for the available KeY file.
         File keyFile = getKeYFile();
         if (verbose) {
-            LOGGER.debug("Now processing file {}", keyFile);
+            LOGGER.info("Now processing file {}", keyFile);
         }
         // File that the created proof will be saved to.
         File proofFile = new File(keyFile.getAbsolutePath() + ".proof");
@@ -178,9 +179,11 @@ public class TestFile implements Serializable {
 
             replayResult = env.getReplayResult();
             if (replayResult.hasErrors() && verbose) {
-                LOGGER.info("... error(s) while loading");
-                for (Throwable error : replayResult.getErrorList()) {
-                    error.printStackTrace();
+                LOGGER.warn("... error(s) while loading");
+                List<Throwable> errors = replayResult.getErrorList();
+                for (int i = 0; i < errors.size(); i++) {
+                    Throwable error = errors.get(i);
+                    LOGGER.warn("Error " + (i + 1) + ":", error);
                 }
             }
 
@@ -292,7 +295,7 @@ public class TestFile implements Serializable {
             if (result.hasErrors()) {
                 List<Throwable> errorList = result.getErrorList();
                 for (Throwable ex : errorList) {
-                    ex.printStackTrace();
+                    LOGGER.warn("Replay exception", ex);
                 }
                 throw errorList.get(0);
             }

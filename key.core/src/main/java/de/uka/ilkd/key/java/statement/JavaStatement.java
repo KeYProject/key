@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Statement;
+
+import org.key_project.util.ExtList;
 
 /**
  * Default implementation for non-terminal Java statements.

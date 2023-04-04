@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import javax.xml.parsers.ParserConfigurationException;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.*;
@@ -36,6 +41,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.KeYConstants;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -43,14 +49,10 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.StringUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -216,7 +218,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             // Order of children is not relevant.
             ExecutionNodePreorderIterator expectedIter =
                 new ExecutionNodePreorderIterator(expected);
-            Set<IExecutionNode<?>> currentVisitedNodes = new LinkedHashSet<IExecutionNode<?>>();
+            Set<IExecutionNode<?>> currentVisitedNodes = new LinkedHashSet<>();
             while (expectedIter.hasNext()) {
                 IExecutionNode<?> expectedNext = expectedIter.next();
                 IExecutionNode<?> currentNext = searchExecutionNode(current, expectedNext);
@@ -252,7 +254,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         assertNotNull(toSearchIn);
         assertNotNull(childToSearch);
         // Collect parents
-        Deque<IExecutionNode<?>> parents = new LinkedList<IExecutionNode<?>>();
+        Deque<IExecutionNode<?>> parents = new LinkedList<>();
         IExecutionNode<?> parent = childToSearch;
         while (parent != null) {
             parents.addFirst(parent);
@@ -1381,7 +1383,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         SymbolicExecutionUtil.initializeStrategy(builder);
         builder.analyse();
         assertNotNull(builder.getStartNode());
-        return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
+        return new SymbolicExecutionEnvironment<>(environment, builder);
     }
 
     /**
@@ -1448,7 +1450,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         SymbolicExecutionUtil.initializeStrategy(builder);
         builder.analyse();
         assertNotNull(builder.getStartNode());
-        return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
+        return new SymbolicExecutionEnvironment<>(environment, builder);
     }
 
     private static void setupTacletOptions(KeYEnvironment<?> env) {
@@ -1519,7 +1521,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         SymbolicExecutionUtil.initializeStrategy(builder);
         builder.analyse();
         assertNotNull(builder.getStartNode());
-        return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
+        return new SymbolicExecutionEnvironment<>(environment, builder);
     }
 
     /**
@@ -1589,7 +1591,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         SymbolicExecutionUtil.initializeStrategy(builder);
         builder.analyse();
         assertNotNull(builder.getStartNode());
-        return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
+        return new SymbolicExecutionEnvironment<>(environment, builder);
     }
 
     /**
@@ -1729,11 +1731,11 @@ public abstract class AbstractSymbolicExecutionTestCase {
             throws ProofInputException, IOException, ParserConfigurationException, SAXException,
             ProblemLoaderException {
         assertNotNull(maximalNumberOfExecutedSetNodesPerRun);
-        for (int i = 0; i < maximalNumberOfExecutedSetNodesPerRun.length; i++) {
+        for (int j : maximalNumberOfExecutedSetNodesPerRun) {
             SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(baseDir,
                 javaPathInBaseDir, containerTypeName, methodFullName, precondition,
                 oraclePathInBaseDirFile, includeConstraints, includeVariables, includeCallStack,
-                includeReturnValues, maximalNumberOfExecutedSetNodesPerRun[i],
+                includeReturnValues, j,
                 mergeBranchConditions, useOperationContracts, useLoopInvariants,
                 blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode,
                 usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
@@ -1917,7 +1919,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             boolean simplifyConditions) throws ProofInputException, IOException,
             ParserConfigurationException, SAXException, ProblemLoaderException {
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
-        SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
+        SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env;
         try {
             // Make sure that parameter are valid.
             assertNotNull(proofFilePathInBaseDir);
@@ -2167,8 +2169,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
             Map<Goal, Integer> executedSetNodesPerGoal = stopCondition.getExectuedSetNodesPerGoal();
             for (Integer value : executedSetNodesPerGoal.values()) {
                 assertNotNull(value);
-                assertTrue(value.intValue() <= maximalNumberOfExecutedSetNodes,
-                    value.intValue() + " is not less equal to " + maximalNumberOfExecutedSetNodes);
+                assertTrue(value <= maximalNumberOfExecutedSetNodes,
+                    value + " is not less equal to " + maximalNumberOfExecutedSetNodes);
             }
         } while (stopCondition.wasSetNodeExecuted() && nodeCount != env.getProof().countNodes());
         // Create new oracle file if required in a temporary directory

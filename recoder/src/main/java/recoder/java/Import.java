@@ -120,16 +120,18 @@ public class Import extends JavaNonTerminalProgramElement
      */
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (staticIdentifier != null)
+        if (staticIdentifier != null) {
             staticIdentifier.setParent(this);
+        }
         if (reference instanceof TypeReference) {
             ((TypeReference) reference).setParent(this);
         } else if (reference instanceof PackageReference) {
             ((PackageReference) reference).setParent(this);
         } else if (reference instanceof UncollatedReferenceQualifier) {
             ((UncollatedReferenceQualifier) reference).setParent(this);
-        } else
+        } else {
             throw new IllegalStateException("Unknown reference type encountered");
+        }
     }
 
     /**
@@ -205,10 +207,12 @@ public class Import extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int result = 0;
-        if (reference != null)
+        if (reference != null) {
             result++;
-        if (staticIdentifier != null)
+        }
+        if (staticIdentifier != null) {
             result++;
+        }
         return result;
     }
 
@@ -221,12 +225,14 @@ public class Import extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (reference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return reference;
+            }
             index--;
         }
-        if (index == 0 && staticIdentifier != null)
+        if (index == 0 && staticIdentifier != null) {
             return staticIdentifier;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

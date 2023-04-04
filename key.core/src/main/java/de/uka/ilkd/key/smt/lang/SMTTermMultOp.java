@@ -22,11 +22,11 @@ public class SMTTermMultOp extends SMTTerm {
     private static HashMap<Op, String> bvSymbols;
     private static HashMap<Op, String> intSymbols;
 
-    public static enum OpProperty {
+    public enum OpProperty {
         NONE, LEFTASSOC, RIGHTASSOC, FULLASSOC, CHAINABLE, PAIRWISE
     }
 
-    public static enum Op {
+    public enum Op {
         // Bool/Int operator
         IFF, IMPLIES, EQUALS, MUL, DIV, REM, LT, LTE, GT, GTE, PLUS, MINUS, AND, OR, XOR, DISTINCT,
 
@@ -49,12 +49,14 @@ public class SMTTermMultOp extends SMTTerm {
         public Op sign(boolean pol) {
             switch (this) {
             case AND:
-                if (pol)
+                if (pol) {
                     return this;
+                }
                 return OR;
             case OR:
-                if (pol)
+                if (pol) {
                     return this;
+                }
                 return AND;
             default:
                 throw new RuntimeException(
@@ -89,7 +91,7 @@ public class SMTTermMultOp extends SMTTerm {
 
     private static void initMaps() {
         // bitvec
-        bvSymbols = new HashMap<Op, String>();
+        bvSymbols = new HashMap<>();
         bvSymbols.put(Op.IFF, "iff");
         bvSymbols.put(Op.IMPLIES, "=>");
         bvSymbols.put(Op.EQUALS, "=");
@@ -123,7 +125,7 @@ public class SMTTermMultOp extends SMTTerm {
         bvSymbols.put(Op.BVSGE, "bvsge");
         bvSymbols.put(Op.BVSDIV, "bvsdiv");
         // int
-        intSymbols = new HashMap<Op, String>();
+        intSymbols = new HashMap<>();
         intSymbols.put(Op.IFF, "iff");
         intSymbols.put(Op.IMPLIES, "=>");
         intSymbols.put(Op.EQUALS, "=");
@@ -178,9 +180,9 @@ public class SMTTermMultOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getQuantVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
-        for (int i = 0; i < subs.size(); i++) {
-            vars.addAll(subs.get(i).getQuantVars());
+        List<SMTTermVariable> vars = new LinkedList<>();
+        for (SMTTerm sub : subs) {
+            vars.addAll(sub.getQuantVars());
         }
         return vars;
     }
@@ -188,9 +190,9 @@ public class SMTTermMultOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getUQVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
-        for (int i = 0; i < subs.size(); i++) {
-            vars.addAll(subs.get(i).getUQVars());
+        List<SMTTermVariable> vars = new LinkedList<>();
+        for (SMTTerm sub : subs) {
+            vars.addAll(sub.getUQVars());
         }
         return vars;
     }
@@ -198,9 +200,9 @@ public class SMTTermMultOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getEQVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
-        for (int i = 0; i < subs.size(); i++) {
-            vars.addAll(subs.get(i).getEQVars());
+        List<SMTTermVariable> vars = new LinkedList<>();
+        for (SMTTerm sub : subs) {
+            vars.addAll(sub.getEQVars());
         }
         return vars;
     }
@@ -208,10 +210,10 @@ public class SMTTermMultOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> vars = new LinkedList<>();
 
-        for (int i = 0; i < subs.size(); i++) {
-            vars.addAll(subs.get(i).getVars());
+        for (SMTTerm sub : subs) {
+            vars.addAll(sub.getVars());
         }
         return vars;
     }
@@ -252,9 +254,10 @@ public class SMTTermMultOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public boolean occurs(SMTTermVariable a) {
-        for (int i = 0; i < subs.size(); i++) {
-            if (subs.get(i).occurs(a))
+        for (SMTTerm sub : subs) {
+            if (sub.occurs(a)) {
                 return true;
+            }
         }
         return false;
     }
@@ -262,9 +265,10 @@ public class SMTTermMultOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public boolean occurs(String id) {
-        for (int i = 0; i < subs.size(); i++) {
-            if (subs.get(i).occurs(id))
+        for (SMTTerm sub : subs) {
+            if (sub.occurs(id)) {
                 return true;
+            }
         }
         return false;
     }
@@ -278,8 +282,9 @@ public class SMTTermMultOp extends SMTTerm {
         // }
         // return new TermMultOp(operator, newSubs);
 
-        if (subs.isEmpty())
+        if (subs.isEmpty()) {
             return this;
+        }
 
         SMTTerm newTerm = subs.get(0).substitute(a, b);
         for (int i = 1; i < subs.size(); i++) {
@@ -293,11 +298,13 @@ public class SMTTermMultOp extends SMTTerm {
     @Override
     public SMTTerm substitute(SMTTerm a, SMTTerm b) {
 
-        if (subs.isEmpty())
+        if (subs.isEmpty()) {
             return this;
+        }
 
-        if (this.equals(a))
+        if (this.equals(a)) {
             return b;
+        }
 
         // LinkedList<Term> newSubs = new LinkedList<Term>();
         // for(Term sub : subs){
@@ -322,8 +329,9 @@ public class SMTTermMultOp extends SMTTerm {
         // }
         // return new TermMultOp(operator, newSubs);
         //
-        if (subs.isEmpty())
+        if (subs.isEmpty()) {
             return this;
+        }
 
         SMTTerm newTerm = subs.get(0).replace(a, b);
         for (int i = 1; i < subs.size(); i++) {
@@ -341,8 +349,9 @@ public class SMTTermMultOp extends SMTTerm {
         // }
         // return new TermMultOp(operator, newSubs);
 
-        if (subs.isEmpty())
+        if (subs.isEmpty()) {
             return this;
+        }
 
         SMTTerm newTerm = subs.get(0).instantiate(a, b);
         for (int i = 1; i < subs.size(); i++) {
@@ -354,7 +363,7 @@ public class SMTTermMultOp extends SMTTerm {
     @Override
     public SMTTermMultOp copy() {
 
-        List<SMTTerm> newSubs = new LinkedList<SMTTerm>();
+        List<SMTTerm> newSubs = new LinkedList<>();
         for (SMTTerm t : subs) {
             newSubs.add(t.copy());
         }
@@ -366,25 +375,31 @@ public class SMTTermMultOp extends SMTTerm {
     @Override
     public boolean equals(Object term) {
 
-        if (term == null)
+        if (term == null) {
             return false;
+        }
 
-        if (this == term)
+        if (this == term) {
             return true;
+        }
 
-        if (!(term instanceof SMTTermMultOp))
+        if (!(term instanceof SMTTermMultOp)) {
             return false;
+        }
         SMTTermMultOp lt = (SMTTermMultOp) term;
 
-        if (!this.operator.equals(lt.operator))
+        if (!this.operator.equals(lt.operator)) {
             return false;
+        }
 
-        if (this.subs.size() != lt.subs.size())
+        if (this.subs.size() != lt.subs.size()) {
             return false;
+        }
 
         for (int i = 0; i < this.subs.size(); i++) {
-            if (!this.subs.get(i).equals(lt.subs.get(i)))
+            if (!this.subs.get(i).equals(lt.subs.get(i))) {
                 return false;
+            }
         }
 
         return true;
@@ -477,23 +492,25 @@ public class SMTTermMultOp extends SMTTerm {
             tab = tab.append(" ");
         }
 
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append(tab);
 
-        if (subs.size() == 0)
+        if (subs.size() == 0) {
             throw new RuntimeException("Unexpected: Empty args for TermLogicalOp ");
+        }
 
 
-        if (subs.size() == 1 && !this.operator.equals(Op.MINUS))
+        if (subs.size() == 1 && !this.operator.equals(Op.MINUS)) {
             return subs.get(0).toString(nestPos);
+        }
 
         String symbol = getSymbol(operator, subs.get(0));
-        buff.append("(" + symbol);
+        buff.append("(").append(symbol);
         for (SMTTerm f : subs) {
             buff.append("\n");
             buff.append(f.toString(nestPos + 1));
         }
-        buff.append("\n" + tab + ")");
+        buff.append("\n").append(tab).append(")");
         return buff.toString();
 
 

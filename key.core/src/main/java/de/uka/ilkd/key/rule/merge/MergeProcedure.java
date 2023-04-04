@@ -2,10 +2,6 @@ package de.uka.ilkd.key.rule.merge;
 
 import java.util.LinkedHashSet;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -15,6 +11,10 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Defines a concrete merge procedure, in particular the result of merging two terms for a given
@@ -38,7 +38,7 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 public abstract class MergeProcedure {
 
     /** Concrete merge procedures. */
-    static ImmutableList<MergeProcedure> CONCRETE_RULES = ImmutableSLList.<MergeProcedure>nil();
+    static ImmutableList<MergeProcedure> CONCRETE_RULES = ImmutableSLList.nil();
 
     static {
         CONCRETE_RULES =
@@ -112,10 +112,10 @@ public abstract class MergeProcedure {
      * @author Dominic Scheurer
      */
     public static class ValuesMergeResult {
-        private ImmutableSet<Term> newConstraints;
-        private Term mergeVal;
-        private LinkedHashSet<Name> newNames;
-        private LinkedHashSet<Term> sideConditions;
+        private final ImmutableSet<Term> newConstraints;
+        private final Term mergeVal;
+        private final LinkedHashSet<Name> newNames;
+        private final LinkedHashSet<Term> sideConditions;
 
         public ValuesMergeResult(ImmutableSet<Term> newConstraints, Term mergeVal,
                 LinkedHashSet<Name> newNames, LinkedHashSet<Term> sideConditions) {

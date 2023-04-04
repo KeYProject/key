@@ -3,9 +3,6 @@ package de.uka.ilkd.key.rule;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.informationflow.po.SymbolicExecutionPO;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -26,6 +23,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.LoopContract;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * <p>
@@ -102,7 +102,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
      */
     protected static ImmutableSet<LoopContract> filterAppliedContracts(
             final ImmutableSet<LoopContract> collectedContracts, final Goal goal) {
-        ImmutableSet<LoopContract> result = DefaultImmutableSet.<LoopContract>nil();
+        ImmutableSet<LoopContract> result = DefaultImmutableSet.nil();
         for (LoopContract contract : collectedContracts) {
             if (!contractApplied(contract, goal)) {
                 result = result.add(contract);
@@ -212,7 +212,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
     protected Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(
             final Iterable<LocationVariable> variables, final LoopContract contract,
             final TermServices services) {
-        Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>(40);
+        Map<LocationVariable, Function> result = new LinkedHashMap<>(40);
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable variable : variables) {
             if (contract.hasModifiesClause(variable)) {

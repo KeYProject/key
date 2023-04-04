@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
+import java.util.*;
+import java.util.Map.Entry;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -10,9 +13,6 @@ import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
-import de.uka.ilkd.key.speclang.jml.translation.Context;
-import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -22,15 +22,15 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.translation.Context;
+import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * Adds the funtionality to breakpoints to evaluate conditions.
@@ -62,12 +62,12 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * The KeYJavaType of the container of the element associated with the breakpoint.
      */
-    private KeYJavaType containerType;
+    private final KeYJavaType containerType;
 
     /**
      * A list of variables KeY has to hold to evaluate the condition
      */
-    private Set<LocationVariable> toKeep;
+    private final Set<LocationVariable> toKeep;
 
     /**
      * A {@link Map} mapping from relevant variables for the condition to their runtime equivalent
@@ -78,7 +78,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * The list of parameter variables of the method that contains the associated breakpoint
      */
-    private Set<LocationVariable> paramVars;
+    private final Set<LocationVariable> paramVars;
 
     /**
      * A {@link ProgramVariable} representing the instance the class KeY is working on
@@ -109,9 +109,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
             KeYJavaType containerType) {
         super(hitCount, proof, enabled);
         this.setPm(pm);
-        paramVars = new HashSet<LocationVariable>();
-        setVariableNamingMap(new HashMap<SVSubstitute, SVSubstitute>());
-        toKeep = new HashSet<LocationVariable>();
+        paramVars = new HashSet<>();
+        setVariableNamingMap(new HashMap<>());
+        toKeep = new HashSet<>();
         this.containerType = containerType;
         this.conditionEnabled = conditionEnabled;
     }
@@ -160,10 +160,10 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @return the cloned map
      */
     private Map<SVSubstitute, SVSubstitute> getOldMap() {
-        Map<SVSubstitute, SVSubstitute> oldMap = new HashMap<SVSubstitute, SVSubstitute>();
-        Iterator<?> iter = getVariableNamingMap().entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<?, ?> oldEntry = (Entry<?, ?>) iter.next();
+        Map<SVSubstitute, SVSubstitute> oldMap = new HashMap<>();
+        for (Entry<SVSubstitute, SVSubstitute> svSubstituteSVSubstituteEntry : getVariableNamingMap()
+                .entrySet()) {
+            Entry<?, ?> oldEntry = svSubstituteSVSubstituteEntry;
             if (oldEntry.getKey() instanceof SVSubstitute
                     && oldEntry.getValue() instanceof SVSubstitute) {
                 oldMap.put((SVSubstitute) oldEntry.getKey(), (SVSubstitute) oldEntry.getValue());
@@ -208,9 +208,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
             while (itr.hasNext() && !found) {
                 RenamingTable renamingTable = itr.next();
                 // iterate over renamings within table
-                Iterator<?> renameItr = renamingTable.getHashMap().entrySet().iterator();
-                while (renameItr.hasNext()) {
-                    Map.Entry<?, ?> entry = (Entry<?, ?>) renameItr.next();
+                for (Entry<? extends SourceElement, ? extends SourceElement> value : renamingTable
+                        .getHashMap().entrySet()) {
+                    Entry<?, ?> entry = value;
                     if (entry.getKey() instanceof LocationVariable
                             && entry.getValue() instanceof SVSubstitute) {
                         if ((VariableNamer.getBasename(((LocationVariable) entry.getKey()).name()))
@@ -317,9 +317,10 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
                     info.getAllFields((TypeDeclaration) kjtloc.getJavaType());
                 for (Field field : fields) {
                     if ((kjtloc.equals(containerType) || !field.isPrivate())
-                            && !((LocationVariable) field.getProgramVariable()).isImplicit())
+                            && !((LocationVariable) field.getProgramVariable()).isImplicit()) {
                         globalVars =
                             globalVars.append((ProgramVariable) field.getProgramVariable());
+                    }
                 }
             }
         }

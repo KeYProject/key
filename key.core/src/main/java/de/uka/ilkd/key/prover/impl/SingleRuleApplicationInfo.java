@@ -10,10 +10,10 @@ import de.uka.ilkd.key.rule.RuleApp;
  */
 public class SingleRuleApplicationInfo {
 
-    private boolean success;
+    private final boolean success;
     private final String message;
     private final Goal goal;
-    private RuleApp appliedRuleApp;
+    private final RuleApp appliedRuleApp;
 
     SingleRuleApplicationInfo(Goal mayCloseableGoal, RuleApp appliedRuleApp) {
         this.message = "Rule applied successful";

@@ -1,15 +1,16 @@
 package de.uka.ilkd.key.settings;
 
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYResourceManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+
+import de.uka.ilkd.key.util.KeYResourceManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is used to load and save settings for proofs such as which data type models are used
@@ -45,7 +46,7 @@ public class ProofSettings {
     /**
      * all setting objects in the following order: heuristicSettings
      */
-    private List<Settings> settings = new LinkedList<>();
+    private final List<Settings> settings = new LinkedList<>();
 
     /**
      * the default listener to settings
@@ -138,7 +139,7 @@ public class ProofSettings {
             if (!PROVER_CONFIG_FILE.exists()) {
                 PROVER_CONFIG_FILE.getParentFile().mkdirs();
             }
-            try (Writer out = new FileWriter(PROVER_CONFIG_FILE)) {
+            try (Writer out = new FileWriter(PROVER_CONFIG_FILE, StandardCharsets.UTF_8)) {
                 settingsToStream(out);
             }
         } catch (IOException e) {
@@ -184,7 +185,7 @@ public class ProofSettings {
      * Loads the the former settings from configuration file.
      */
     public void loadSettings() {
-        try (FileReader in = new FileReader(PROVER_CONFIG_FILE)) {
+        try (FileReader in = new FileReader(PROVER_CONFIG_FILE, StandardCharsets.UTF_8)) {
             if (Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
                 LOGGER.warn("The settings in {} are *not* read.", PROVER_CONFIG_FILE);
             } else {

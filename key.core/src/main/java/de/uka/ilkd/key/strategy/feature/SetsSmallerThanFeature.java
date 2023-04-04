@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.strategy.feature;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -9,6 +7,8 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+
+import org.key_project.util.collection.ImmutableList;
 
 
 public class SetsSmallerThanFeature extends SmallerThanFeature {

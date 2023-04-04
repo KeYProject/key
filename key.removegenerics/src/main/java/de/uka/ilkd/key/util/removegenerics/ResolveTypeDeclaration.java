@@ -74,8 +74,9 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
             List<Type> ungenericSignature = getUngenericSignature(signature);
 
             // ignore static methods
-            if (method.isStatic())
+            if (method.isStatic()) {
                 continue;
+            }
 
             debugOut("---");
             debugOut("Method", method);
@@ -113,8 +114,9 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
         // has always been there
         for (Method m : getSourceInfo().getAllMethods(declaration)) {
             List<Type> mdSig = m.getSignature();
-            if (m.getName().equals(name) && signature.equals(mdSig))
+            if (m.getName().equals(name) && signature.equals(mdSig)) {
                 return true;
+            }
         }
 
         //
@@ -122,8 +124,9 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
         int i = 0;
         for (MethodDeclaration md : methodsToAdd) {
             List<Type> mdSig = signaturesToAdd.get(i++);
-            if (md.getName().equals(name) && signature.equals(mdSig))
+            if (md.getName().equals(name) && signature.equals(mdSig)) {
                 return true;
+            }
         }
 
         return false;
@@ -178,10 +181,11 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
         List<ClassType> exceptions = new ArrayList<>(origMethod.getExceptions());
         Throws aThrows = createThrows(exceptions);
         TypeReference returnTypeRef;
-        if (returnType != null)
+        if (returnType != null) {
             returnTypeRef = TypeKit.createTypeReference(programFactory, returnType);
-        else
+        } else {
             returnTypeRef = TypeKit.createTypeReference(programFactory, "void");
+        }
         Identifier methodName = programFactory.createIdentifier(name);
 
         //
@@ -220,10 +224,11 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
 
         // if there is a return type, make a return
         ASTList<Statement> stm = new ASTArrayList<>(1);
-        if (returnType != null)
+        if (returnType != null) {
             stm.add(programFactory.createReturn(methodCall));
-        else
+        } else {
             stm.add(methodCall);
+        }
 
         StatementBlock block = programFactory.createStatementBlock(stm);
         methodDecl.setBody(block);
@@ -250,20 +255,25 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
     private ASTList<DeclarationSpecifier> getDeclarationSpecifiers(Method origMethod) {
         ASTList<DeclarationSpecifier> ret = new ASTArrayList<>();
         ProgramFactory programFactory = getProgramFactory();
-        if (origMethod.isFinal())
+        if (origMethod.isFinal()) {
             ret.add(programFactory.createFinal());
+        }
 
-        if (origMethod.isPrivate())
+        if (origMethod.isPrivate()) {
             ret.add(programFactory.createPrivate());
+        }
 
-        if (origMethod.isProtected())
+        if (origMethod.isProtected()) {
             ret.add(programFactory.createProtected());
+        }
 
-        if (origMethod.isPublic())
+        if (origMethod.isPublic()) {
             ret.add(programFactory.createPublic());
+        }
 
-        if (origMethod.isFinal())
+        if (origMethod.isFinal()) {
             ret.add(programFactory.createFinal());
+        }
 
         return ret;
     }
@@ -276,8 +286,9 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
      */
     private Throws createThrows(List<ClassType> exceptions) {
 
-        if (exceptions == null || exceptions.isEmpty())
+        if (exceptions == null || exceptions.isEmpty()) {
             return null;
+        }
 
         ASTList<TypeReference> tr = new ASTArrayList<>(exceptions.size());
 

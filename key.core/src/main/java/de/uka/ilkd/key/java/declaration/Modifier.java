@@ -3,6 +3,7 @@ package de.uka.ilkd.key.java.declaration;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.TerminalProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
 import org.key_project.util.ExtList;
 
 /**

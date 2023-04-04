@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.ldt;
 
-import org.key_project.util.ExtList;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.Expression;
@@ -15,9 +15,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.sort.Sort;
 
-import javax.annotation.Nullable;
+import org.key_project.util.ExtList;
 
 
 public final class CharListLDT extends LDT {
@@ -53,7 +52,7 @@ public final class CharListLDT extends LDT {
     // -------------------------------------------------------------------------
 
     public CharListLDT(TermServices services) {
-        super(NAME, (Sort) services.getNamespaces().sorts().lookup(SeqLDT.NAME), services);
+        super(NAME, services.getNamespaces().sorts().lookup(SeqLDT.NAME), services);
         clIndexOfChar = addFunction(services, "clIndexOfChar");
         clIndexOfCl = addFunction(services, "clIndexOfCl");
         clLastIndexOfChar = addFunction(services, "clLastIndexOfChar");
@@ -80,13 +79,14 @@ public final class CharListLDT extends LDT {
         try {
             intVal = Integer.parseInt(result);
             charVal = (char) intVal;
-            if (intVal - charVal != 0)
+            if (intVal - charVal != 0) {
                 throw new NumberFormatException(); // overflow!
+            }
 
         } catch (NumberFormatException ex) {
             throw new ConvertException(result + " is not of type char");
         }
-        return "" + charVal;
+        return String.valueOf(charVal);
     }
 
 
@@ -228,7 +228,7 @@ public final class CharListLDT extends LDT {
 
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
-        final StringBuffer result = new StringBuffer("");
+        final StringBuilder result = new StringBuilder();
         Term term = t;
         while (term.op().arity() != 0) {
             result.append(translateCharTerm(term.sub(0)));
@@ -239,7 +239,7 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public final Type getType(Term t) {
+    public Type getType(Term t) {
         assert false;
         return null;
     }

@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.speclang;
 
+import java.io.File;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaReduxFileCollection;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -30,15 +36,10 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.util.KeYResourceManager;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.io.File;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -279,7 +280,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         // sort types alphabetically (necessary for deterministic names)
         final Set<KeYJavaType> allKeYJavaTypes = javaInfo.getAllKeYJavaTypes();
         final KeYJavaType[] kjts =
-            sortKJTs(allKeYJavaTypes.toArray(new KeYJavaType[allKeYJavaTypes.size()]));
+            sortKJTs(allKeYJavaTypes.toArray(new KeYJavaType[0]));
 
         // create specifications for all types
         for (KeYJavaType kjt : kjts) {

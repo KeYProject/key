@@ -1,18 +1,19 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.settings.PathConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Properties;
+import javax.swing.*;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.settings.PathConfig;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class offers a mechanism to manage recent files; it adds the necessary menu items to a menu
@@ -73,10 +74,8 @@ public class RecentFileMenu {
                 Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
                 if (proofPath == null) {
                     // canceled by user!
-                    return;
                 } else {
                     mediator.getUI().loadProofFromBundle(file, proofPath.toFile());
-                    return;
                 }
             } else {
                 mediator.getUI().loadProblem(file);
@@ -135,7 +134,7 @@ public class RecentFileMenu {
     }
 
     private void addRecentFileNoSave(final String path) {
-        LOGGER.debug("add file: {}, menu count is {}", path, menu.getItemCount());
+        LOGGER.trace("Adding file: {}", path);
         final RecentFileEntry existingEntry = pathToRecentFile.get(path);
 
         // Add the path to the recentFileList:

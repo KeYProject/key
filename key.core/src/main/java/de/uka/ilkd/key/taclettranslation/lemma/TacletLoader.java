@@ -4,11 +4,6 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -22,6 +17,11 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.util.ProgressMonitor;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 public abstract class TacletLoader {
 
@@ -78,7 +78,7 @@ public abstract class TacletLoader {
     public void manageAvailableTaclets(InitConfig initConfig, Taclet tacletToProve) {
         ImmutableList<Taclet> sysTaclets = initConfig.getTaclets();
 
-        ImmutableList<Taclet> newTaclets = ImmutableSLList.<Taclet>nil();
+        ImmutableList<Taclet> newTaclets = ImmutableSLList.nil();
         HashMap<Taclet, TacletBuilder<? extends Taclet>> map = initConfig.getTaclet2Builder();
         boolean tacletfound = false;
         for (Taclet taclet : sysTaclets) {

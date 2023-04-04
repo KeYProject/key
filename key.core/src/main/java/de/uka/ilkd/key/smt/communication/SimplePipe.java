@@ -1,8 +1,12 @@
 package de.uka.ilkd.key.smt.communication;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class represents a simplified version of the existing pipe. It assumes that the external
@@ -11,6 +15,8 @@ import java.io.*;
  * @author Wolfram Pfeifer
  */
 public class SimplePipe implements Pipe {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimplePipe.class);
+
     /**
      * The Reader that splits incoming messages at the given delimiters.
      */
@@ -66,8 +72,9 @@ public class SimplePipe implements Pipe {
     public SimplePipe(@Nonnull InputStream input, @Nonnull String[] messageDelimiters,
             @Nonnull OutputStream output, @Nonnull SolverCommunication session,
             @Nonnull Process process) {
-        processWriter = new TeeWriter(new OutputStreamWriter(output), stdin);
-        processReader = new TeeReader(new InputStreamReader(input), stdout);
+        processWriter =
+            new TeeWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8), stdin);
+        processReader = new TeeReader(new InputStreamReader(input, StandardCharsets.UTF_8), stdout);
 
         this.session = session;
         this.process = process;
@@ -125,13 +132,14 @@ public class SimplePipe implements Pipe {
     public void close() {
         try {
             processReader.close();
-        } catch (IOException ignore) {
+        } catch (IOException e) {
+            LOGGER.warn("Failed to close process reader", e);
         }
 
         try {
             processWriter.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to close process writer", e);
         }
 
         process.destroy();
@@ -142,7 +150,7 @@ public class SimplePipe implements Pipe {
         try {
             processWriter.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to close process writer", e);
         }
     }
 }

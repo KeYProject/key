@@ -4,13 +4,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
-import de.uka.ilkd.key.smt.*;
-import de.uka.ilkd.key.smt.solvertypes.SolverType;
-import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Sequent;
@@ -20,13 +13,21 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
+import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.model.Model;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,7 @@ public class ModelGenerator implements SolverLauncherListener {
 
     private final Services services;
 
-    private Goal goal;
+    private final Goal goal;
 
     private int count;
 
@@ -50,7 +51,7 @@ public class ModelGenerator implements SolverLauncherListener {
         this.goal = s;
         this.services = services;
         this.target = target;
-        models = new LinkedList<Model>();
+        models = new LinkedList<>();
         this.count = 0;
     }
 

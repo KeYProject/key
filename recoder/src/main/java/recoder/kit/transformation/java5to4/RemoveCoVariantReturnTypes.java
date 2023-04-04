@@ -6,6 +6,9 @@
  */
 package recoder.kit.transformation.java5to4;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ModelException;
 import recoder.ProgramFactory;
@@ -25,9 +28,6 @@ import recoder.kit.TypeKit;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.DefaultSourceInfo;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This transformation does not work yet!
@@ -52,27 +52,29 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
 
     @Override
     public ProblemReport analyze() {
-        this.items = new ArrayList<Item>();
+        this.items = new ArrayList<>();
         TreeWalker tw = new TreeWalker(root);
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
             if (pe instanceof MethodDeclaration) {
                 MethodDeclaration md = (MethodDeclaration) pe;
                 Type returnType = getSourceInfo().getReturnType(md);
-                if (returnType == null || returnType instanceof PrimitiveType)
+                if (returnType == null || returnType instanceof PrimitiveType) {
                     continue;
+                }
                 List<Method> ml = MethodKit.getRedefinedMethods(md);
-                if (ml.size() == 0)
+                if (ml.size() == 0) {
                     continue;
-                List<ClassType> ctml = new ArrayList<ClassType>(ml.size());
-                for (int i = 0; i < ml.size(); i++) {
-                    Type rt = getSourceInfo().getReturnType(ml.get(i));
-                    if (rt instanceof ClassType && ctml.indexOf(rt) == -1)
+                }
+                List<ClassType> ctml = new ArrayList<>(ml.size());
+                for (Method method : ml) {
+                    Type rt = getSourceInfo().getReturnType(method);
+                    if (rt instanceof ClassType && !ctml.contains(rt)) {
                         ctml.add((ClassType) rt);
+                    }
                 }
                 // this list is for debug purposes only:
-                List<ClassType> ctml_copy = new ArrayList<ClassType>();
-                ctml_copy.addAll(ctml);
+                List<ClassType> ctml_copy = new ArrayList<>(ctml);
                 TypeKit.removeCoveredSubtypes(getSourceInfo(), ctml);
                 if (ctml.size() != 1) {
                     // System.err.println("<>1 common supertypes:");
@@ -86,8 +88,9 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
                     // System.err.println(ctml_copy.getClassType(i).getFullName());
                     // }
                     // TODO look into this
-                    if (ctml.size() == 0 && returnType instanceof ArrayType)
+                    if (ctml.size() == 0 && returnType instanceof ArrayType) {
                         continue;
+                    }
                     throw new ModelException(); // semantic error in source program!
                 }
                 Type originalType = ctml.get(0);
@@ -105,8 +108,9 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
                         TypeKit.createTypeReference(getProgramFactory(), returnType);
                     ASTList<TypeArgumentDeclaration> targs =
                         md.getTypeReference().getTypeArguments();
-                    if (targs != null && targs.size() > 0)
+                    if (targs != null && targs.size() > 0) {
                         castToReference.setTypeArguments(targs.deepClone());
+                    }
                     if (originalType instanceof ParameterizedType) {
                         recoder.abstraction.ParameterizedType pt =
                             (recoder.abstraction.ParameterizedType) originalType;
@@ -126,26 +130,29 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
             ParameterizedType pt = (ParameterizedType) originalType;
             ClassType baseType = (ClassType) makeSomething0(pt.getGenericType());
             ASTList<TypeArgumentDeclaration> targs =
-                new ASTArrayList<TypeArgumentDeclaration>(pt.getTypeArgs().size());
+                new ASTArrayList<>(pt.getTypeArgs().size());
             for (TypeArgument ta : pt.getTypeArgs()) {
                 targs.add(makeSomething1(ta));
             }
             return new ParameterizedType(baseType, targs);
-        } else
+        } else {
             return makeSomething0(originalType);
+        }
     }
 
     private Type makeSomething0(Type originalType) {
-        if (!(originalType instanceof TypeParameter))
+        if (!(originalType instanceof TypeParameter)) {
             return originalType;
+        }
         TypeParameter tp = (TypeParameter) originalType;
-        if (tp.getBoundCount() == 0)
+        if (tp.getBoundCount() == 0) {
             originalType = getNameInfo().getJavaLangObject();
-        else {
+        } else {
             String tname = tp.getBoundName(0);
             originalType = getNameInfo().getClassType(tname);
-            if (((ClassType) originalType).isInterface())
+            if (((ClassType) originalType).isInterface()) {
                 originalType = getNameInfo().getJavaLangObject();
+            }
             // TODO check - if not a class type, use interface instead ?!
         }
         return originalType;
@@ -156,7 +163,7 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
         res.setTypeReference(TypeKit.createTypeReference(getProgramFactory(), ta.getTypeName()));
         if (ta.getTypeArguments() != null && ta.getTypeArguments().size() > 0) {
             ASTList<TypeArgumentDeclaration> targs =
-                new ASTArrayList<TypeArgumentDeclaration>(ta.getTypeArguments().size());
+                new ASTArrayList<>(ta.getTypeArguments().size());
             for (TypeArgument t : ta.getTypeArguments()) {
                 targs.add(makeSomething1(t));
             }
@@ -182,10 +189,10 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
     }
 
     private static class Item {
-        MethodDeclaration md;
-        List<MemberReference> mrl;
-        TypeReference t;
-        TypeReference rt;
+        final MethodDeclaration md;
+        final List<MemberReference> mrl;
+        final TypeReference t;
+        final TypeReference rt;
 
         Item(MethodDeclaration md, List<MemberReference> mrl, TypeReference rt, TypeReference t) {
             this.md = md;

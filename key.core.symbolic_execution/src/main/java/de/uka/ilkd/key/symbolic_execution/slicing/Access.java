@@ -1,10 +1,11 @@
 package de.uka.ilkd.key.symbolic_execution.slicing;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import org.key_project.util.collection.ImmutableArray;
 
-import java.util.Objects;
+import org.key_project.util.collection.ImmutableArray;
 
 public class Access {
     /**
@@ -47,7 +48,7 @@ public class Access {
     public Access(Term... dimensionExpressions) {
         assert dimensionExpressions != null;
         this.programVariable = null;
-        this.dimensionExpressions = new ImmutableArray<Term>(dimensionExpressions);
+        this.dimensionExpressions = new ImmutableArray<>(dimensionExpressions);
     }
 
     /**

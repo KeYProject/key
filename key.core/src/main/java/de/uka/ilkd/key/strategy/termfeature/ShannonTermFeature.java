@@ -42,10 +42,11 @@ public class ShannonTermFeature implements TermFeature {
     }
 
     public RuleAppCost compute(Term term, Services services) {
-        if (cond.compute(term, services).equals(trueCost))
+        if (cond.compute(term, services).equals(trueCost)) {
             return thenFeature.compute(term, services);
-        else
+        } else {
             return elseFeature.compute(term, services);
+        }
     }
 
     /**

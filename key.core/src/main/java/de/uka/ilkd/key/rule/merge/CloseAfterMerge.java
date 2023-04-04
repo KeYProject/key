@@ -1,21 +1,11 @@
 package de.uka.ilkd.key.rule.merge;
 
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getLocationVariables;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateLeftSideLocations;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.substConstantsByFreshVars;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -28,7 +18,6 @@ import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -40,6 +29,16 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
+
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getLocationVariables;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateLeftSideLocations;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.substConstantsByFreshVars;
 
 /**
  * Rule for closing a partner goal after a merge operation. It does so by adding a formula
@@ -181,11 +180,11 @@ public class CloseAfterMerge implements BuiltInRule {
         allLocs = allLocs
                 .union(getLocationVariables(closeApp.getMergeState().getPathCondition(), services));
 
-        final LinkedList<Term> origQfdVarTerms = new LinkedList<Term>();
+        final LinkedList<Term> origQfdVarTerms = new LinkedList<>();
 
         // Collect sorts and create logical variables for
         // closing over program variables.
-        final LinkedList<Sort> argSorts = new LinkedList<Sort>();
+        final LinkedList<Sort> argSorts = new LinkedList<>();
         for (LocationVariable var : allLocs) {
             argSorts.add(var.sort());
             origQfdVarTerms.add(tb.var(var));
@@ -195,7 +194,7 @@ public class CloseAfterMerge implements BuiltInRule {
         final Name predicateSymbName = new Name(tb.newName("P"));
 
         final Function predicateSymb =
-            new Function(predicateSymbName, Sort.FORMULA, new ImmutableArray<Sort>(argSorts));
+            new Function(predicateSymbName, Sort.FORMULA, new ImmutableArray<>(argSorts));
 
         final Goal mergedGoal =
             services.getProof().getGoal(closeApp.getMergeState().getCorrespondingNode());
@@ -210,7 +209,7 @@ public class CloseAfterMerge implements BuiltInRule {
         // Obtain set of new Skolem constants in merge state
         HashSet<Function> newConstants = closeApp.getNewNames().stream()
                 .map(name -> isWeakeningGoal.getLocalNamespaces().functions().lookup(name))
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<Function>()));
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
         //@formatter:off
         // Create the formula \forall v1,...,vn. (C2 -> {U2}P(...)) -> (C1 -> {U1}P(...))
@@ -242,7 +241,7 @@ public class CloseAfterMerge implements BuiltInRule {
         TermBuilder tb = services.getTermBuilder();
 
         Term termWithReplConstants = substConstantsByFreshVars(term, constsToReplace,
-            new HashMap<Function, LogicVariable>(), services);
+            new HashMap<>(), services);
 
         return tb.all(termWithReplConstants.freeVars(), termWithReplConstants);
     }

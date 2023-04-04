@@ -78,10 +78,12 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
                 // we currently only support constant polynomials
                 assert leftPoly.getParts().isEmpty();
                 assert rightPoly.getParts().isEmpty();
-                if (leftPoly.getConstantTerm().signum() == 0)
+                if (leftPoly.getConstantTerm().signum() == 0) {
                     return true;
-                if (rightPoly.getConstantTerm().signum() == 0)
+                }
+                if (rightPoly.getConstantTerm().signum() == 0) {
                     return false;
+                }
                 return leftPoly.getConstantTerm().mod(rightPoly.getConstantTerm().abs())
                         .signum() == 0;
             }
@@ -100,11 +102,13 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
         final Services services = goal.proof().getServices();
         final Polynomial poly = Polynomial.create(polyProj.toTerm(app, pos, goal), services);
 
-        if (coeffProj == null)
+        if (coeffProj == null) {
             return poly;
+        }
         final Term coeffT = coeffProj.toTerm(app, pos, goal);
-        if (coeffT == null)
+        if (coeffT == null) {
             return poly;
+        }
 
         final BigInteger coeff =
             new BigInteger(AbstractTermTransformer.convertToDecimalString(coeffT, services));

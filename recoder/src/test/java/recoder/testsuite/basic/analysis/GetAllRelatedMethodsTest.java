@@ -1,5 +1,8 @@
 package recoder.testsuite.basic.analysis;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import recoder.abstraction.ClassType;
@@ -9,9 +12,6 @@ import recoder.kit.MethodKit;
 import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.NameInfo;
 import recoder.testsuite.basic.BasicTestsSuite;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -62,12 +62,12 @@ public class GetAllRelatedMethodsTest {
 
     private void checkRelatedMethodsCount(ClassType ct, String methodName, int expectedNumber) {
         List<Method> ml =
-            MethodKit.getAllRelatedMethods(ni, xrsi, ct, methodName, new ArrayList<Type>(0));
+            MethodKit.getAllRelatedMethods(ni, xrsi, ct, methodName, new ArrayList<>(0));
         if (ml.size() != expectedNumber) {
             System.err.println("Aha");
         }
         assertEquals(methodName, expectedNumber, ml.size());
-        checkSignatures(ml, methodName, new ArrayList<Type>(0));
+        checkSignatures(ml, methodName, new ArrayList<>(0));
     }
 
     private void checkSignatures(List<Method> ml, String methodName, List<Type> signature) {

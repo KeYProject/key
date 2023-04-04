@@ -2,7 +2,6 @@ package de.uka.ilkd.key.proof.mgt;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
@@ -17,7 +16,7 @@ public class TaskTreeModel extends DefaultTreeModel {
     *
     */
     private static final long serialVersionUID = -4168248377205879699L;
-    private Map<Proof, TaskTreeNode> proofToTask = new LinkedHashMap<Proof, TaskTreeNode>();
+    private final Map<Proof, TaskTreeNode> proofToTask = new LinkedHashMap<>();
 
     public TaskTreeModel() {
         super(new DefaultMutableTreeNode("Tasks"));
@@ -42,8 +41,8 @@ public class TaskTreeModel extends DefaultTreeModel {
 
     public void removeTask(TaskTreeNode p) {
         Proof[] allProofs = p.allProofs();
-        for (int i = 0; i < allProofs.length; i++) {
-            proofToTask.remove(allProofs[i]);
+        for (Proof allProof : allProofs) {
+            proofToTask.remove(allProof);
             p.decoupleFromEnv();
         }
         ProofEnvironment env = p.getProofEnv();

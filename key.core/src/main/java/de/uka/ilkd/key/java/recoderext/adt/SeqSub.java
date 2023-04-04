@@ -12,7 +12,7 @@ public class SeqSub extends ADTPrefixConstruct {
     private static final long serialVersionUID = 9034359926577584988L;
 
     public SeqSub(Expression e1, Expression e2, Expression e3) {
-        children = new ASTArrayList<Expression>(getArity());
+        children = new ASTArrayList<>(getArity());
         children.add(e1);
         children.add(e2);
         children.add(e3);

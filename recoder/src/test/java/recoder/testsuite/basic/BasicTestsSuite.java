@@ -2,11 +2,11 @@
 
 package recoder.testsuite.basic;
 
+import java.io.File;
+import javax.annotation.Nonnull;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.service.DefaultErrorHandler;
-
-import javax.annotation.Nonnull;
-import java.io.File;
 
 /**
  * Call example: java test.TransformationTests standard.tst collections.prj
@@ -19,8 +19,9 @@ public class BasicTestsSuite {
 
     @Nonnull
     public static File getProjectFile() {
-        if (projectFile == null)
+        if (projectFile == null) {
             init();
+        }
         return projectFile;
     }
 
@@ -38,9 +39,8 @@ public class BasicTestsSuite {
         // to check if errors are reported correctly
         config.getProjectSettings().setErrorHandler(new DefaultErrorHandler(0));
         projectFile = new File(projectConfig);
-        if (!projectFile.exists())
+        if (!projectFile.exists()) {
             throw new IllegalArgumentException("Project File not found!");
+        }
     }
 }
-
-

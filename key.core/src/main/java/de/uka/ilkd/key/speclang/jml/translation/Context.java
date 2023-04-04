@@ -1,14 +1,14 @@
 package de.uka.ilkd.key.speclang.jml.translation;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Common information that is needed almost everywhere during translation. Class is immutable.

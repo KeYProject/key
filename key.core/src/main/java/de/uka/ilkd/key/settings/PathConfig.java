@@ -2,7 +2,6 @@ package de.uka.ilkd.key.settings;
 
 import java.io.File;
 
-import de.uka.ilkd.key.smt.solvertypes.SolverPropertiesLoader;
 import org.key_project.util.java.IOUtil;
 
 /**

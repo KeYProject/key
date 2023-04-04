@@ -1,5 +1,12 @@
 package de.uka.ilkd.key.gui.smt;
 
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Set;
+import javax.swing.*;
+import javax.swing.tree.TreeNode;
+
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.proof.TacletIndex;
@@ -8,13 +15,6 @@ import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem.SelectionMode;
-
-import javax.swing.*;
-import javax.swing.tree.TreeNode;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.Set;
 
 
 abstract class TreePanel extends JPanel {
@@ -75,12 +75,12 @@ abstract class TreePanel extends JPanel {
 class InnerPanel extends TreePanel {
 
     private static final long serialVersionUID = 1L;
-    private JLabel title = new JLabel();
-    private JRadioButton radioAll = new JRadioButton("all");
-    private JRadioButton radioNothing = new JRadioButton("none");
-    private JRadioButton radioUser = new JRadioButton("custom");
+    private final JLabel title = new JLabel();
+    private final JRadioButton radioAll = new JRadioButton("all");
+    private final JRadioButton radioNothing = new JRadioButton("none");
+    private final JRadioButton radioUser = new JRadioButton("custom");
     private TreeItem currentNode = null;
-    private ButtonGroup buttonGroup = new ButtonGroup();
+    private final ButtonGroup buttonGroup = new ButtonGroup();
 
     public InnerPanel(final SupportedTaclets supportedTaclets) {
         this.setBackground(UIManager.getColor("Tree.textBackground"));
@@ -149,12 +149,12 @@ class InnerPanel extends TreePanel {
 class LeafPanel extends TreePanel {
 
     private static TacletIndex index;
-    private static SelectionListener listener = new SelectionListener();
+    private static final SelectionListener listener = new SelectionListener();
     private static final long serialVersionUID = 1L;
     private TreeItem currentNode = null;
-    private JCheckBox tacletName = new JCheckBox();
-    private JLabel infoButton = new JLabel("<html><U>info</html>");
-    private JLabel genericLabel = new JLabel();
+    private final JCheckBox tacletName = new JCheckBox();
+    private final JLabel infoButton = new JLabel("<html><U>info</html>");
+    private final JLabel genericLabel = new JLabel();
 
     public static KeYSelectionListener getSelectionListener() {
         return listener;

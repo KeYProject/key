@@ -1,13 +1,12 @@
 package de.uka.ilkd.key.gui.sourceview;
 
-import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
-
 import java.awt.Color;
 import java.util.*;
 import java.util.regex.Pattern;
-
 import javax.swing.text.*;
+
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.settings.SettingsListener;
 
 import static de.uka.ilkd.key.speclang.jml.JMLUtils.isJmlCommentStarter;
 
@@ -73,7 +72,7 @@ public class JavaDocument extends DefaultStyledDocument {
         /** parser is currently inside a JML annotation (starting with "&#47;&#42;&#64;") */
         JML,
         /** parser is currently inside a JML keyword */
-        JML_KEYWORD;
+        JML_KEYWORD
     }
 
     /**
@@ -103,7 +102,7 @@ public class JavaDocument extends DefaultStyledDocument {
          */
         JML_ANNOTATION_LINE,
         /** last processed char was "&#42;" */
-        MAYBEEND;
+        MAYBEEND
     }
 
     /**

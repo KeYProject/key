@@ -1,21 +1,22 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import javax.swing.*;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class InsertionTacletBrowserMenuItem extends JMenu implements TacletMenuItem {
     private static final Logger LOGGER =
@@ -31,20 +32,20 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
      */
     private static final int MAX_ITEM_NUMBER = 30;
     /** all taclet apps the user can choose from */
-    private Collection<TacletAppListItem> insertionTaclets;
+    private final Collection<TacletAppListItem> insertionTaclets;
     /** the added action listeners */
-    private List<ActionListener> listenerList = new LinkedList<ActionListener>();
+    private final List<ActionListener> listenerList = new LinkedList<>();
     /** the notation info to pretty print the taclet apps */
-    protected NotationInfo notInfo;
+    protected final NotationInfo notInfo;
     /** the parent frame of the selection dialog to be displayed */
-    protected JFrame parent;
+    protected final JFrame parent;
     /** the selected taclet to be applied */
     private TacletApp selectedTaclet;
     /** the services */
-    protected Services services;
+    protected final Services services;
 
     /** the base title; used title = basetitle + ( nrOfItems ) */
-    private String baseTitle;
+    private final String baseTitle;
 
     public InsertionTacletBrowserMenuItem(String title, JFrame parent, NotationInfo notInfo,
             Services services) {

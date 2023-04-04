@@ -3,9 +3,6 @@ package de.uka.ilkd.key.informationflow.rule.tacletbuilder;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
@@ -24,6 +21,9 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -89,7 +89,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
 
         // create taclet
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder =
-            new RewriteTacletBuilder<RewriteTaclet>();
+            new RewriteTacletBuilder<>();
         tacletBuilder.setName(tacletName);
         tacletBuilder.setFind(schemaFind);
         tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
@@ -131,7 +131,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         Term selfAtPostSV = (poVars.pre.self == poVars.post.self ? selfAtPreSV
                 : createTermSV(poVars.post.self, schemaPrefix, services));
 
-        ImmutableList<Term> localVarsAtPostSVs = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> localVarsAtPostSVs = ImmutableSLList.nil();
         Iterator<Term> appDataPreLocalVarsIt = poVars.pre.localVars.iterator();
         Iterator<Term> schemaLocalVarsAtPreIt = localVarsAtPreSVs.iterator();
         for (Term appDataPostLocalVar : poVars.post.localVars) {
@@ -185,7 +185,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
 
     private static Term replace(Term term, StateVars origVars, StateVars schemaVars,
             Services services) {
-        LinkedHashMap<Term, Term> map = new LinkedHashMap<Term, Term>();
+        LinkedHashMap<Term, Term> map = new LinkedHashMap<>();
 
         Pair<StateVars, StateVars> vars = filter(origVars, schemaVars);
         origVars = vars.first;
@@ -216,7 +216,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
     private static Pair<StateVars, StateVars> filter(StateVars origVars, StateVars schemaVars) {
         schemaVars = filterSchemaVars(origVars, schemaVars);
         origVars = filterSchemaVars(schemaVars, origVars);
-        return new Pair<StateVars, StateVars>(origVars, schemaVars);
+        return new Pair<>(origVars, schemaVars);
     }
 
 
@@ -240,7 +240,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         if (origVars.localVars == null) {
             localVars = null;
         } else if (origVars.localVars.isEmpty()) {
-            localVars = ImmutableSLList.<Term>nil();
+            localVars = ImmutableSLList.nil();
         }
         if (origVars.result == null) {
             result = null;

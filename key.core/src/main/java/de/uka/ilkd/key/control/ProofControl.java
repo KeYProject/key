@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.control;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
@@ -13,6 +11,8 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * A {@link ProofControl} provides the user interface independent logic to apply rules on a proof.
@@ -30,39 +30,39 @@ import de.uka.ilkd.key.rule.TacletApp;
  * @author Martin Hentschel
  */
 public interface ProofControl {
-    public boolean isMinimizeInteraction();
+    boolean isMinimizeInteraction();
 
-    public void setMinimizeInteraction(boolean minimizeInteraction);
+    void setMinimizeInteraction(boolean minimizeInteraction);
 
     /**
      * collects all applicable RewriteTaclets of the current goal (called by the SequentViewer)
      *
      * @return a list of Taclets with all applicable RewriteTaclets
      */
-    public ImmutableList<TacletApp> getRewriteTaclet(Goal focusedGoal, PosInOccurrence pos);
+    ImmutableList<TacletApp> getRewriteTaclet(Goal focusedGoal, PosInOccurrence pos);
 
     /**
      * collects all applicable FindTaclets of the current goal (called by the SequentViewer)
      *
      * @return a list of Taclets with all applicable FindTaclets
      */
-    public ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal, PosInOccurrence pos);
+    ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal, PosInOccurrence pos);
 
     /**
      * collects all applicable NoFindTaclets of the current goal (called by the SequentViewer)
      *
      * @return a list of Taclets with all applicable NoFindTaclets
      */
-    public ImmutableList<TacletApp> getNoFindTaclet(Goal focusedGoal);
+    ImmutableList<TacletApp> getNoFindTaclet(Goal focusedGoal);
 
     /**
      * collects all built-in rules that are applicable at the given sequent position 'pos'.
      *
      * @param pos the PosInSequent where to look for applicable rules
      */
-    public ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence pos);
+    ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence pos);
 
-    public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence pos);
+    boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence pos);
 
     /**
      * Apply a RuleApp and continue with update simplification or strategy application according to
@@ -71,7 +71,7 @@ public interface ProofControl {
      * @param app
      * @param goal
      */
-    public void applyInteractive(RuleApp app, Goal goal);
+    void applyInteractive(RuleApp app, Goal goal);
 
     /**
      * selected rule to apply
@@ -83,7 +83,7 @@ public interface ProofControl {
      *        all (e.g. if a loop invariant is available do not ask the user to provide one)
      * @param interactive whether the rule was applied by the user
      */
-    public void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence pos,
+    void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence pos,
             boolean forced, boolean interactive);
 
     /**
@@ -93,11 +93,11 @@ public interface ProofControl {
      * @return The default {@link ProverTaskListener} which will be added to all started
      *         {@link ApplyStrategy} instances.
      */
-    public ProverTaskListener getDefaultProverTaskListener();
+    ProverTaskListener getDefaultProverTaskListener();
 
-    public void addAutoModeListener(AutoModeListener p);
+    void addAutoModeListener(AutoModeListener p);
 
-    public void removeAutoModeListener(AutoModeListener p);
+    void removeAutoModeListener(AutoModeListener p);
 
     /**
      * Checks if the auto mode of this {@link UserInterfaceControl} supports the given
@@ -165,7 +165,7 @@ public interface ProofControl {
      */
     void startAndWaitForAutoMode(Proof proof);
 
-    public void startFocussedAutoMode(PosInOccurrence focus, Goal goal);
+    void startFocussedAutoMode(PosInOccurrence focus, Goal goal);
 
     /**
      * Runs the given {@link ProofMacro} at the given {@link PosInOccurrence} on the given
@@ -176,5 +176,5 @@ public interface ProofControl {
      * @param posInOcc The exact {@link PosInOccurrence} at which the {@link ProofMacro} is started
      *        at.
      */
-    public void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc);
+    void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc);
 }

@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.ldt;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -12,6 +10,8 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
+
+import org.key_project.util.ExtList;
 
 /**
  * Complete this class if you want to add support for the JML \real type.
@@ -54,7 +54,7 @@ public final class RealLDT extends LDT {
     @Override
     public Term translateLiteral(Literal lit, Services services) {
         // return skolem term
-        final Function sk = new Function(new Name("" + NAME + lit), targetSort());
+        final Function sk = new Function(new Name(String.valueOf(NAME) + lit), targetSort());
         return services.getTermBuilder().func(sk);
     }
 
@@ -94,7 +94,7 @@ public final class RealLDT extends LDT {
 
 
     @Override
-    public final Type getType(Term t) {
+    public Type getType(Term t) {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_REAL;
         } else {

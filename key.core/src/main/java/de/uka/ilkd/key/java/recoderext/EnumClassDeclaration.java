@@ -86,11 +86,11 @@ public class EnumClassDeclaration extends ClassDeclaration {
      * store the EnumConstantDeclarations here. <b>NB: The AST-parent cannot be set to <i>this</i>
      * because it is not a EnumDeclaration.
      */
-    private List<EnumConstantDeclaration> enumConstants;
+    private final List<EnumConstantDeclaration> enumConstants;
 
     public EnumClassDeclaration() {
         super();
-        enumConstants = new ASTArrayList<EnumConstantDeclaration>();
+        enumConstants = new ASTArrayList<>();
     }
 
     /**
@@ -113,10 +113,11 @@ public class EnumClassDeclaration extends ClassDeclaration {
         // Declaration Specs.
         ASTList<DeclarationSpecifier> orgDecls = ed.getDeclarationSpecifiers();
         ASTList<DeclarationSpecifier> decls;
-        if (orgDecls != null)
+        if (orgDecls != null) {
             decls = orgDecls.deepClone();
-        else
-            decls = new ASTArrayList<DeclarationSpecifier>();
+        } else {
+            decls = new ASTArrayList<>();
+        }
 
         if (!ed.isFinal()) {
             decls.add(f.createFinal());
@@ -124,8 +125,9 @@ public class EnumClassDeclaration extends ClassDeclaration {
 
         //
         // Comments
-        if (ed.getComments() != null)
+        if (ed.getComments() != null) {
             setComments(ed.getComments().deepClone());
+        }
 
         //
         // Extends
@@ -134,21 +136,23 @@ public class EnumClassDeclaration extends ClassDeclaration {
         //
         // Implements
         Implements implement = ed.getImplementedTypes();
-        if (implement != null)
+        if (implement != null) {
             setImplementedTypes(implement.deepClone());
+        }
 
         //
         // Members
         // - Make internal fields
         // - Change constructors, create fields from constants, copy the rest
-        ASTList<MemberDeclaration> members = new ASTArrayList<MemberDeclaration>();
+        ASTList<MemberDeclaration> members = new ASTArrayList<>();
         setMembers(members);
         for (MemberDeclaration mem : ed.getMembers()) {
             if (mem instanceof EnumConstantDeclaration) {
                 members.add(makeConstantField((EnumConstantDeclaration) mem, ed));
                 enumConstants.add((EnumConstantDeclaration) mem.deepClone());
-            } else
+            } else {
                 members.add((MemberDeclaration) mem.deepClone());
+            }
 
         }
 
@@ -175,8 +179,9 @@ public class EnumClassDeclaration extends ClassDeclaration {
         // values
         StringBuilder sb = new StringBuilder();
         for (EnumConstantDeclaration ecd : getEnumConstantDeclarations()) {
-            if (sb.length() != 0)
+            if (sb.length() != 0) {
                 sb.append(", ");
+            }
             sb.append(ecd.getEnumConstantSpecification().getIdentifier().getText());
         }
         String valuesString = VALUES_PROTO.replace("$E", getIdentifier().getText());
@@ -217,7 +222,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
 
         ProgramFactory f = getFactory();
 
-        ASTArrayList<DeclarationSpecifier> dsml = new ASTArrayList<DeclarationSpecifier>();
+        ASTArrayList<DeclarationSpecifier> dsml = new ASTArrayList<>();
         dsml.add(f.createPrivate());
         dsml.add(f.createStatic());
 
@@ -254,10 +259,11 @@ public class EnumClassDeclaration extends ClassDeclaration {
      * normal Identifier
      */
     private static Identifier createIdentifier(String string) {
-        if (string.startsWith("<"))
+        if (string.startsWith("<")) {
             return new ImplicitIdentifier(string);
-        else
+        } else {
             return new Identifier(string);
+        }
     }
 
     /**
@@ -279,7 +285,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
         EnumConstantSpecification ecs = ecd.getEnumConstantSpecification();
         ASTList<Expression> args = ecs.getConstructorReference().getArguments();
 
-        ASTArrayList<DeclarationSpecifier> dsml = new ASTArrayList<DeclarationSpecifier>();
+        ASTArrayList<DeclarationSpecifier> dsml = new ASTArrayList<>();
 
         //
         // Make Constructorref

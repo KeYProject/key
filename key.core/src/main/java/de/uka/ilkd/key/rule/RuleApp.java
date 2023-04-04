@@ -3,13 +3,14 @@
  */
 package de.uka.ilkd.key.rule;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 
-public interface RuleApp {
+import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.collection.ImmutableList;
+
+public interface RuleApp extends EqualsModProofIrrelevancy {
 
     /**
      * returns the rule of this rule application

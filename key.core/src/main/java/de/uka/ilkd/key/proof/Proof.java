@@ -4,23 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
-
-import javax.swing.SwingUtilities;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import javax.swing.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -43,6 +33,9 @@ import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.lookup.Lookup;
 
 
@@ -105,13 +98,13 @@ public class Proof implements Named {
      * when different users load and save a proof this vector fills up with Strings containing the
      * usernames.
      */
-    public Vector<String> userLog;
+    public List<String> userLog;
 
     /**
      * when load and save a proof with different versions of key this vector fills up with Strings
      * containing the GIT versions.
      */
-    public Vector<String> keyVersionLog;
+    public List<String> keyVersionLog;
 
     private long autoModeTime = 0;
 
@@ -287,6 +280,8 @@ public class Proof implements Named {
         disposed = true;
         userData = null;
         fireProofDisposed(new ProofDisposedEvent(this));
+        // may now clean up proof disposed listeners too
+        proofDisposedListener.clear();
     }
 
 
@@ -620,6 +615,19 @@ public class Proof implements Named {
         return root.isClosed() && openGoals.isEmpty();
     }
 
+    /**
+     * For all nodes in this proof: set the step index according to their position in the tree.
+     */
+    public void setStepIndices() {
+        int stepIndex = 0;
+        Iterator<Node> nodeIterator = this.root().subtreeIterator();
+        while (nodeIterator.hasNext()) {
+            Node node = nodeIterator.next();
+            node.setStepIndex(stepIndex);
+            stepIndex++;
+        }
+    }
+
 
     /**
      * This class is responsible for pruning a proof tree at a certain cutting point. It has been
@@ -878,11 +886,13 @@ public class Proof implements Named {
         queue.add(root);
         while (!queue.isEmpty()) {
             Node cur = queue.poll();
-            if (pred.test(cur))
+            if (pred.test(cur)) {
                 return cur;
+            }
             Iterator<Node> iter = cur.childrenIterator();
-            while (iter.hasNext())
+            while (iter.hasNext()) {
                 queue.add(iter.next());
+            }
         }
         return null;
     }
@@ -1206,7 +1216,11 @@ public class Proof implements Named {
             result.append("unnamed");
         }
         result.append("\nProoftree:\n");
-        result.append(root.toString());
+        if (countNodes() < 50) {
+            result.append(root.toString());
+        } else {
+            result.append("<too large to include>");
+        }
         return result.toString();
     }
 
@@ -1220,6 +1234,9 @@ public class Proof implements Named {
     }
 
     public void addRuleAppListener(RuleAppListener p) {
+        if (p == null) {
+            return;
+        }
         synchronized (ruleAppListenerList) {
             ruleAppListenerList.add(p);
         }
@@ -1260,7 +1277,7 @@ public class Proof implements Named {
      */
     public ProofDisposedListener[] getProofDisposedListeners() {
         return proofDisposedListener
-                .toArray(new ProofDisposedListener[proofDisposedListener.size()]);
+                .toArray(new ProofDisposedListener[0]);
     }
 
     /**
@@ -1314,6 +1331,18 @@ public class Proof implements Named {
 
     public void saveToFile(File file) throws IOException {
         ProofSaver saver = new ProofSaver(this, file);
+        saver.save();
+    }
+
+    /**
+     * Save this proof to a file whilst omitting all proof steps.
+     * In effect, this only saves the proof obligation.
+     *
+     * @param file file to save proof in
+     * @throws IOException on any I/O error
+     */
+    public void saveProofObligationToFile(File file) throws IOException {
+        ProofSaver saver = new ProofSaver(this, file, false);
         saver.save();
     }
 
@@ -1381,8 +1410,9 @@ public class Proof implements Named {
      * @return the associated lookup
      */
     public @Nonnull Lookup getUserData() {
-        if (userData == null)
+        if (userData == null) {
             userData = new Lookup();
+        }
         return userData;
     }
 }

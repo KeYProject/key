@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ExpressionContainer;
 import de.uka.ilkd.key.java.LoopInitializer;
@@ -11,6 +8,9 @@ import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementContainer;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Loop statement.
@@ -133,9 +133,9 @@ public abstract class LoopStatement extends JavaStatement
             Statement body) {
         this.body = body;
         if (updates != null) {
-            this.updates = new ForUpdates(new ImmutableArray<Expression>(updates));
+            this.updates = new ForUpdates(new ImmutableArray<>(updates));
         } else {
-            this.updates = new ForUpdates(new ImmutableArray<Expression>(new Expression[0]));
+            this.updates = new ForUpdates(new ImmutableArray<>(new Expression[0]));
         }
         this.inits = new LoopInit(inits);
         this.guard = new Guard(guard);
@@ -216,14 +216,18 @@ public abstract class LoopStatement extends JavaStatement
      */
     public int getChildCount() {
         int result = 0;
-        if (inits != null)
+        if (inits != null) {
             result++;
-        if (guard != null)
+        }
+        if (guard != null) {
             result++;
-        if (updates != null)
+        }
+        if (updates != null) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -243,8 +247,9 @@ public abstract class LoopStatement extends JavaStatement
         }
         if (isCheckedBeforeIteration()) {
             if (guard != null) {
-                if (index == 0)
+                if (index == 0) {
                     return guard;
+                }
                 index--;
             }
         }
@@ -255,14 +260,16 @@ public abstract class LoopStatement extends JavaStatement
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         if (!isCheckedBeforeIteration()) {
             if (guard != null) {
-                if (index == 0)
+                if (index == 0) {
                     return guard;
+                }
                 index--;
             }
         }
@@ -276,8 +283,9 @@ public abstract class LoopStatement extends JavaStatement
      */
     public int getExpressionCount() {
         int result = 0;
-        if (guard != null)
+        if (guard != null) {
             result += 1;
+        }
         if (inits != null) {
             result += 1;
         }
@@ -425,14 +433,14 @@ public abstract class LoopStatement extends JavaStatement
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || !(o instanceof LoopStatement)) {
+        if (!(o instanceof LoopStatement)) {
             return false;
         }
 
         LoopStatement cmp = (LoopStatement) o;
         return super.equals(cmp) && (this.getStartPosition().equals(Position.UNDEFINED)
                 || cmp.getStartPosition().equals(Position.UNDEFINED)
-                || this.getStartPosition().getLine() == cmp.getStartPosition().getLine());
+                || this.getStartPosition().line() == cmp.getStartPosition().line());
     }
 
 }

@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -31,9 +32,9 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
         implements StatementContainer, Statement, Expression, TypeReference {
 
     /** the name of the meta construct */
-    private Name name;
+    private final Name name;
     /** the encapsulated program element */
-    private ProgramElement body;
+    private final ProgramElement body;
 
     /**
      * creates a ProgramTransformer
@@ -227,7 +228,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @return a list of schema variables relevant for this entity;
      */
     public ImmutableList<SchemaVariable> needs() {
-        return ImmutableSLList.<SchemaVariable>nil();
+        return ImmutableSLList.nil();
     }
 
     /**
@@ -238,7 +239,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @return a list of schema variables relevant for this entity;
      */
     public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
-        return ImmutableSLList.<SchemaVariable>nil();
+        return ImmutableSLList.nil();
     }
 
 }

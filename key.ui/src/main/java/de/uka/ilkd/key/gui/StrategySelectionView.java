@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.gui;
 
+import java.awt.*;
+import java.util.*;
+import java.util.List;
+import java.util.Map.Entry;
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -17,14 +23,9 @@ import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.definition.*;
 import de.uka.ilkd.key.util.Triple;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * <p>
@@ -235,7 +236,8 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         this.add(box);
     }
 
-    protected int createStrategyProperty(StrategySelectionComponents data, StrategyFactory factory,
+    private int createStrategyProperty(
+            StrategySelectionComponents data, StrategyFactory factory,
             JPanel javaDLOptionsPanel, GridBagLayout javaDLOptionsLayout, int yCoord,
             boolean topLevel, AbstractStrategyPropertyDefinition definition) {
 
@@ -410,7 +412,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
             i++;
         }
 
-        final JComboBox<String> strategyPredefSettingsCmb = new JComboBox<String>(existingPredefs);
+        final JComboBox<String> strategyPredefSettingsCmb = new JComboBox<>(existingPredefs);
         strategyPredefSettingsCmb.setSelectedIndex(0);
         components.setPredefsChoiceCmb(strategyPredefSettingsCmb);
 
@@ -515,10 +517,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
 
     public Strategy getStrategy(String strategyName, Proof proof, StrategyProperties properties) {
         if (mediator != null) {
-            Iterator<StrategyFactory> supportedStrategies =
-                mediator.getProfile().supportedStrategies().iterator();
-            while (supportedStrategies.hasNext()) {
-                final StrategyFactory s = supportedStrategies.next();
+            for (StrategyFactory s : mediator.getProfile().supportedStrategies()) {
                 if (strategyName.equals(s.name().toString())) {
                     return s.create(proof, properties);
                 }
@@ -579,7 +578,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
 
     @Override
     public Icon getIcon() {
-        return IconFactory.PROOF_SEARCH_STRATEGY.get(MainWindowTabbedPane.TAB_ICON_SIZE);
+        return IconFactory.PROOF_SEARCH_STRATEGY.get(MainWindow.TAB_ICON_SIZE);
     }
 
     /**
@@ -593,11 +592,11 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
          * Maps a property key to the {@link JRadioButton}s which defines the values.
          */
         private final Map<String, List<JRadioButton>> propertyButtons =
-            new HashMap<String, List<JRadioButton>>();
+            new HashMap<>();
         /**
          * Maps a property to the used {@link ButtonGroup}.
          */
-        private final Map<String, ButtonGroup> propertyGroups = new HashMap<String, ButtonGroup>();
+        private final Map<String, ButtonGroup> propertyGroups = new HashMap<>();
         /**
          * The {@link MaxRuleAppSlider} in which the maximal number of steps is edited.
          */
@@ -638,11 +637,8 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
          * @param key The key.
          */
         public void addPropertyButton(JRadioButton button, String key) {
-            List<JRadioButton> buttons = propertyButtons.get(key);
-            if (buttons == null) {
-                buttons = new LinkedList<JRadioButton>();
-                propertyButtons.put(key, buttons);
-            }
+            List<JRadioButton> buttons =
+                propertyButtons.computeIfAbsent(key, k -> new LinkedList<>());
             buttons.add(button);
         }
 

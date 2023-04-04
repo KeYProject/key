@@ -11,10 +11,14 @@ import de.uka.ilkd.key.proof.io.event.ProofSaverEvent;
 import de.uka.ilkd.key.proof.io.event.ProofSaverListener;
 import de.uka.ilkd.key.util.KeYConstants;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Saves a proof and provides useful methods for pretty printing terms or programs.
  */
 public class ProofSaver extends OutputStreamProofSaver {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofSaver.class);
 
     private final File file;
 
@@ -28,7 +32,7 @@ public class ProofSaver extends OutputStreamProofSaver {
      * </p>
      * .
      */
-    private static final List<ProofSaverListener> listeners = new LinkedList<ProofSaverListener>();
+    private static final List<ProofSaverListener> listeners = new LinkedList<>();
 
     public ProofSaver(Proof proof, String fileName, String internalVersion) {
         this(proof, new File(fileName), internalVersion);
@@ -40,6 +44,30 @@ public class ProofSaver extends OutputStreamProofSaver {
 
     public ProofSaver(Proof proof, File file, String internalVersion) {
         super(proof, internalVersion);
+        this.file = file;
+    }
+
+    /**
+     * Create a new proof saver.
+     *
+     * @param proof proof to save
+     * @param file file to save proof into
+     * @param saveProofSteps whether to save proof steps (false -> only proof obligation)
+     */
+    public ProofSaver(Proof proof, File file, boolean saveProofSteps) {
+        this(proof, file, KeYConstants.INTERNAL_VERSION, saveProofSteps);
+    }
+
+    /**
+     * Create a new proof saver.
+     *
+     * @param proof proof to save
+     * @param file file to save proof into
+     * @param internalVersion version of KeY to add to the proof log
+     * @param saveProofSteps whether to save proof steps (false -> only proof obligation)
+     */
+    public ProofSaver(Proof proof, File file, String internalVersion, boolean saveProofSteps) {
+        super(proof, internalVersion, saveProofSteps);
         this.file = file;
     }
 
@@ -63,13 +91,14 @@ public class ProofSaver extends OutputStreamProofSaver {
         } catch (IOException ioe) {
             errorMsg = "Could not save \n" + filename() + ".\n";
             errorMsg += ioe.toString();
+            LOGGER.warn("Failed to save", ioe);
         } catch (NullPointerException npe) {
             errorMsg = "Could not save \n" + filename() + "\n";
             errorMsg += "No proof present?";
-            npe.printStackTrace();
+            LOGGER.warn("No proof present?", npe);
         } catch (RuntimeException e) {
             errorMsg = e.toString();
-            e.printStackTrace();
+            LOGGER.warn("Failed to save", e);
         }
         fireProofSaved(new ProofSaverEvent(this, filename(), errorMsg));
         return errorMsg;
@@ -121,7 +150,7 @@ public class ProofSaver extends OutputStreamProofSaver {
      * @param e The event.
      */
     protected static void fireProofSaved(ProofSaverEvent e) {
-        ProofSaverListener[] toInform = listeners.toArray(new ProofSaverListener[listeners.size()]);
+        ProofSaverListener[] toInform = listeners.toArray(new ProofSaverListener[0]);
         for (ProofSaverListener l : toInform) {
             l.proofSaved(e);
         }

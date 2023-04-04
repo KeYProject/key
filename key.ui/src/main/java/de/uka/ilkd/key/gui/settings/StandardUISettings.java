@@ -1,15 +1,15 @@
 package de.uka.ilkd.key.gui.settings;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
-
-import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author Alexander Weigl
@@ -73,7 +73,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
 
         String[] sizes =
             Arrays.stream(Config.SIZES).boxed().map(it -> it + " pt").toArray(String[]::new);
-        spFontSizeTreeSequent = this.<String>createSelection(sizes, emptyValidator());
+        spFontSizeTreeSequent = this.createSelection(sizes, emptyValidator());
         addTitledComponent("Tree and sequent font factor: ", spFontSizeTreeSequent, "");
 
 
@@ -184,7 +184,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         vs.setConfirmExit(chkConfirmExit.isSelected());
         gs.setAutoSave((Integer) spAutoSaveProof.getValue());
         gs.setTacletFilter(chkMinimizeInteraction.isSelected());
-        vs.setFontIndex((Integer) spFontSizeTreeSequent.getSelectedIndex());
+        vs.setFontIndex(spFontSizeTreeSequent.getSelectedIndex());
         FontSizeFacade.resizeFonts(vs.getUIFontSizeFactor());
         Config.DEFAULT.setDefaultFonts();
         Config.DEFAULT.fireConfigChange();

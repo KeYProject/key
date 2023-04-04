@@ -41,5 +41,5 @@ public interface TermLabelFactory<T extends TermLabel> {
      *
      * @throws TermLabelException if the parameters were illegally formatted
      */
-    public T parseInstance(List<String> arguments, TermServices services) throws TermLabelException;
+    T parseInstance(List<String> arguments, TermServices services) throws TermLabelException;
 }

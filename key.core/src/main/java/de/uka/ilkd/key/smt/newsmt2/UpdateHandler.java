@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
@@ -8,10 +12,6 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 
 /**
  * This handler treats KeY updated terms ({x:=5}x>4).

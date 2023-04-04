@@ -13,9 +13,9 @@ public class ProofAggregateTask extends DefaultMutableTreeNode implements TaskTr
      *
      */
     private static final long serialVersionUID = 2292876929382788414L;
-    private TaskTreeNode[] proofs;
-    private ProofAggregate proofList;
-    private String descr;
+    private final TaskTreeNode[] proofs;
+    private final ProofAggregate proofList;
+    private final String descr;
 
     public ProofAggregateTask(ProofAggregate ps) {
         super(ps);

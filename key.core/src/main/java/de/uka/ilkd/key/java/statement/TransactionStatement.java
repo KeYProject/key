@@ -12,7 +12,7 @@ public class TransactionStatement extends JavaStatement {
     public static final String[] names = { "#beginJavaCardTransaction",
         "#commitJavaCardTransaction", "#finishJavaCardTransaction", "#abortJavaCardTransaction" };
 
-    private int type;
+    private final int type;
 
     public TransactionStatement(int type) {
         super();
@@ -49,7 +49,7 @@ public class TransactionStatement extends JavaStatement {
     }
 
     public boolean equals(Object o) {
-        if (o != null && o instanceof TransactionStatement) {
+        if (o instanceof TransactionStatement) {
             return ((TransactionStatement) o).type == this.type;
         }
         return false;

@@ -31,7 +31,9 @@ public abstract class AbstractTacletBuilderCommand implements TacletBuilderComma
             return true;
         }
         if (name.startsWith("\\")) // handling leading backslashes
+        {
             return isSuitableFor(name.substring(1));
+        }
         return false;
     }
 

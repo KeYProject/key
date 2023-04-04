@@ -4,9 +4,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -50,7 +50,7 @@ public final class InStrictFp extends VariableConditionAdapter {
             }
 
             final boolean isInStrictFp = strictfpClass || methodContext.isStrictFp();
-            return negated ? !isInStrictFp : isInStrictFp;
+            return negated != isInStrictFp;
         }
     }
 

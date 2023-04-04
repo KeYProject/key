@@ -1,15 +1,15 @@
 package de.uka.ilkd.key.settings;
 
 
+import java.io.File;
+import java.util.Collection;
+import java.util.LinkedList;
+
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
-
-import java.io.File;
-import java.util.Collection;
-import java.util.LinkedList;
 
 /**
  * The default implementation of {@link SMTSettings}.

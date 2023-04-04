@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
-import org.antlr.runtime.RecognitionException;
-import org.junit.jupiter.api.*;
-
 import java.io.IOException;
 import java.util.stream.Stream;
+
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
+
+import org.junit.jupiter.api.*;
 
 /**
  * This test case captures all functional run-all-proof scenarios.
@@ -32,8 +32,7 @@ public final class RunAllProofsFunctional extends RunAllProofsTest {
             try {
                 return parseIndexFile(INDEX_FILE);
             } catch (IOException e) {
-                e.printStackTrace();
-                Assertions.fail();
+                Assertions.fail(e);
             }
         }
         return null;

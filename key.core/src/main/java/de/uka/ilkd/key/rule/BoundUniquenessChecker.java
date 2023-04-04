@@ -3,13 +3,13 @@ package de.uka.ilkd.key.rule;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * The bound uniqueness checker ensures that schemavariables can be bound at most once in the
@@ -21,8 +21,9 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
  */
 public class BoundUniquenessChecker {
 
-    private HashSet<QuantifiableVariable> boundVars = new LinkedHashSet<QuantifiableVariable>();
-    private ImmutableList<Term> terms = ImmutableSLList.<Term>nil();
+    private final HashSet<QuantifiableVariable> boundVars =
+        new LinkedHashSet<>();
+    private ImmutableList<Term> terms = ImmutableSLList.nil();
 
     public BoundUniquenessChecker(Sequent seq) {
         addAll(seq);
@@ -58,7 +59,7 @@ public class BoundUniquenessChecker {
         /*
          * Note that a term can bound a variable in several subterms.
          */
-        final HashSet<QuantifiableVariable> localVars = new LinkedHashSet<QuantifiableVariable>(10);
+        final HashSet<QuantifiableVariable> localVars = new LinkedHashSet<>(10);
 
         for (int i = 0, ar = t.arity(); i < ar; i++) {
             for (int j = 0, sz = t.varsBoundHere(i).size(); j < sz; j++) {

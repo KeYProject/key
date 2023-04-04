@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
@@ -11,11 +15,9 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestProperty;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -39,14 +41,14 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ProveTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProveTest.class);
 
-    protected boolean verbose = Boolean.getBoolean("prooftests.verbose");
+    protected final boolean verbose = Boolean.getBoolean("prooftests.verbose");
     protected String baseDirectory = "";
-    protected String statisticsFile = "tmp.csv";
+    protected final String statisticsFile = "tmp.csv";
     protected String name = "unnamed_tests";
-    protected boolean reloadEnabled = false;
+    protected final boolean reloadEnabled = false;
     protected String tempDir = "/tmp";
-    protected String globalSettings = "";
-    protected String localSettings = "";
+    protected final String globalSettings = "";
+    protected final String localSettings = "";
     private StatisticsFile statistics;
 
     protected void assertProvability(String file) throws Exception {
@@ -97,7 +99,7 @@ public class ProveTest {
             if (replayResult.hasErrors() && verbose) {
                 LOGGER.info("... error(s) while loading");
                 for (Throwable error : replayResult.getErrorList()) {
-                    error.printStackTrace();
+                    LOGGER.info("Error", error);
                 }
             }
 
@@ -118,8 +120,9 @@ public class ProveTest {
                     success = (testProperty == TestProperty.PROVABLE) == closed;
                     debugOut("... finished proof: " + (closed ? "closed." : "open goal(s)"));
                     appendStatistics(loadedProof, keyFile);
-                    if (success)
+                    if (success) {
                         reload(proofFile, loadedProof);
+                    }
                 }
             }
         } finally {
@@ -202,7 +205,7 @@ public class ProveTest {
             if (result.hasErrors()) {
                 List<Throwable> errorList = result.getErrorList();
                 for (Throwable ex : errorList) {
-                    ex.printStackTrace();
+                    LOGGER.error("Error", ex);
                 }
                 throw errorList.get(0);
             }
@@ -241,7 +244,7 @@ public class ProveTest {
                 statisticsFile.appendStatistics(loadedProof, keyFile);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to append stats", e);
         }
     }
 

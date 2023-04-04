@@ -74,7 +74,7 @@ public class PrepareStatementList extends TwoPassTransformation {
         ProblemReport report = IDENTITY;
         StatementContainer con = statement.getStatementContainer();
         if (con == null) {
-            list = new ASTArrayList<Statement>(statement);
+            list = new ASTArrayList<>(statement);
         } else {
             list = StatementKit.getStatementMutableList(statement);
             if (list == null) {

@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
-import java.text.SimpleDateFormat;
 
 @SuppressWarnings("serial")
 public class ProfilingDirectories extends RunAllProofsDirectories {

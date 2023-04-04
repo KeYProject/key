@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.proof.init;
 
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.proof.Proof;
@@ -11,6 +9,8 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.StrategyFactory;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * <p>

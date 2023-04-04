@@ -2,13 +2,13 @@
 
 package recoder.java.statement;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.java.*;
 import recoder.java.declaration.ParameterDeclaration;
 import recoder.java.declaration.VariableSpecification;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Catch.
@@ -110,10 +110,12 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
 
     public int getChildCount() {
         int result = 0;
-        if (parameter != null)
+        if (parameter != null) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -127,13 +129,15 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
 
     public ProgramElement getChildAt(int index) {
         if (parameter != null) {
-            if (index == 0)
+            if (index == 0) {
                 return parameter;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -296,7 +300,7 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
             return parameter.getVariables();
         }
         // TODO EMPTY_LIST ?!
-        return new ArrayList<VariableSpecification>(0);
+        return new ArrayList<>(0);
     }
 
     public VariableSpecification getVariableInScope(String name) {

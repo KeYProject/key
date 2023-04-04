@@ -32,11 +32,7 @@ public class SetFailOnClosedCommand extends AbstractCommand<SetFailOnClosedComma
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
             throws ScriptException, InterruptedException {
-        if ("off".equalsIgnoreCase(args.command)) {
-            state.setFailOnClosedOn(false);
-        } else {
-            state.setFailOnClosedOn(true);
-        }
+        state.setFailOnClosedOn(!"off".equalsIgnoreCase(args.command));
     }
 
     public static class Parameters {

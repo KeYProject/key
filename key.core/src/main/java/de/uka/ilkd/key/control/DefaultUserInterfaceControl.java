@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.control;
 
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.speclang.PositionedString;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * The {@link DefaultUserInterfaceControl} which allows proving in case that no specific user

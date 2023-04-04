@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.gui.testgen;
 
+import java.util.List;
+import javax.swing.*;
+
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -15,9 +18,6 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.smt.testgen.AbstractTestGenerator;
 import de.uka.ilkd.key.smt.testgen.StopRequest;
-
-import javax.swing.*;
-import java.util.List;
 
 public class TGWorker extends SwingWorker<Void, Void> implements InterruptListener, StopRequest {
     private final TGInfoDialog tgInfoDialog;

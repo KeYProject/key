@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.nparser.varexp;
 
+import java.util.List;
+
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
-
-import java.util.List;
 
 /**
  * A specilized {@link TacletBuilderCommand} for handling {@code \varcond}s.

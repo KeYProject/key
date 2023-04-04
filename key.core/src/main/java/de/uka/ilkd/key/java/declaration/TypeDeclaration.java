@@ -1,12 +1,5 @@
 package de.uka.ilkd.key.java.declaration;
 
-import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
-import de.uka.ilkd.key.speclang.njml.SpecMathMode;
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.NamedProgramElement;
 import de.uka.ilkd.key.java.ParentIsInterfaceDeclaration;
 import de.uka.ilkd.key.java.Services;
@@ -21,6 +14,14 @@ import de.uka.ilkd.key.java.abstraction.Method;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import de.uka.ilkd.key.speclang.njml.SpecMathMode;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -374,7 +375,8 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     public boolean equals(Object o) {
         if (o instanceof TypeDeclaration) {
             return ((TypeDeclaration) o).fullName.equals(fullName);
-        } else
+        } else {
             return false;
+        }
     }
 }

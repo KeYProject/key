@@ -2,10 +2,10 @@ package de.uka.ilkd.key.logic.sort;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.logic.Name;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.logic.Name;
 
 /**
  * Sort used for generic taclets
@@ -50,8 +50,8 @@ public final class GenericSort extends AbstractSort {
 
 
     public GenericSort(Name name) {
-        super(name, DefaultImmutableSet.<Sort>nil(), false);
-        this.oneOf = DefaultImmutableSet.<Sort>nil();
+        super(name, DefaultImmutableSet.nil(), false);
+        this.oneOf = DefaultImmutableSet.nil();
     }
 
 
@@ -62,11 +62,13 @@ public final class GenericSort extends AbstractSort {
             s = it.next();
             if (s instanceof ArraySort) {
                 t = ((ArraySort) s).elementSort();
-                while (t instanceof ArraySort)
+                while (t instanceof ArraySort) {
                     t = ((ArraySort) t).elementSort();
-                if (t instanceof GenericSort)
+                }
+                if (t instanceof GenericSort) {
                     throw new GenericSupersortException(
                         "Illegal supersort " + s + " for generic sort " + name(), s);
+                }
             }
         }
     }
@@ -93,18 +95,20 @@ public final class GenericSort extends AbstractSort {
     /**
      * @return true iff "p_s" is subsort of every non-generic supersort of this sort
      */
-    protected boolean checkNonGenericSupersorts(Sort p_s) {
+    private boolean checkNonGenericSupersorts(Sort p_s) {
         Iterator<Sort> it = extendsSorts().iterator();
         Sort ss;
 
         while (it.hasNext()) {
             ss = it.next();
             if (ss instanceof GenericSort) {
-                if (!((GenericSort) ss).checkNonGenericSupersorts(p_s))
+                if (!((GenericSort) ss).checkNonGenericSupersorts(p_s)) {
                     return false;
+                }
             } else {
-                if (!p_s.extendsTrans(ss))
+                if (!p_s.extendsTrans(ss)) {
                     return false;
+                }
             }
         }
 

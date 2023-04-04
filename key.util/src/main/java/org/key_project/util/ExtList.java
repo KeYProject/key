@@ -1,12 +1,14 @@
 package org.key_project.util;
 
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 
 
 /**
- * extends java.util.LinkedList in order to collect elements according to their type
+ * Extends java.util.LinkedList in order to collect elements according to their type.
+ * Has facilities to get elements of a certain type ({@link #get(Class)}, {@link #collect(Class)}).
  */
 public class ExtList extends LinkedList<Object> {
 
@@ -18,8 +20,7 @@ public class ExtList extends LinkedList<Object> {
 
     public ExtList(Object[] a) {
         super();
-        for (Object o : a)
-            add(o);
+        this.addAll(Arrays.asList(a));
     }
 
     /** copies list to array (array has type of cl) */
@@ -38,7 +39,7 @@ public class ExtList extends LinkedList<Object> {
      */
     @SuppressWarnings("unchecked")
     public <T> T[] collect(Class<T> cl) {
-        LinkedList<T> colls = new LinkedList<T>();
+        LinkedList<T> colls = new LinkedList<>();
         for (Object next : this) {
             if (cl.isInstance(next) && (next != null)) {
                 colls.add((T) next);
@@ -57,9 +58,7 @@ public class ExtList extends LinkedList<Object> {
      */
     @SuppressWarnings("unchecked")
     public <T> T get(Class<T> cl) {
-        Iterator<Object> it = iterator();
-        while (it.hasNext()) {
-            Object next = it.next();
+        for (Object next : this) {
             if (cl.isInstance(next) && (next != null)) {
                 return (T) next;
             }

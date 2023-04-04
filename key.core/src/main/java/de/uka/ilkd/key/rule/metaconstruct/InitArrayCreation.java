@@ -2,8 +2,6 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.LinkedList;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -28,6 +26,8 @@ import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Split an array creation expression with explicit array initializer, creating a creation
@@ -155,7 +155,7 @@ public class InitArrayCreation extends InitArray {
     private ProgramElement arrayCreationWithoutInitializers(Expression newObject, NewArray na,
             Services services) {
 
-        final LinkedList<Statement> bodyStmnts = new LinkedList<Statement>();
+        final LinkedList<Statement> bodyStmnts = new LinkedList<>();
 
         final ProgramVariable[] dimensions =
             evaluateAndCheckDimensionExpressions(bodyStmnts, na.getArguments(), services);

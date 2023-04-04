@@ -30,11 +30,11 @@ public class ParseException extends recoder.ParserException {
      * This variable determines which constructor was used to create this object and thereby affects
      * the semantics of the "getMessage" method (see below).
      */
-    protected boolean specialConstructor;
+    protected final boolean specialConstructor;
     /**
      * The end of line string for this machine.
      */
-    protected String eol = System.getProperty("line.separator", "\n");
+    protected final String eol = System.getProperty("line.separator", "\n");
 
     /**
      * This constructor is used by the method "generateParseException" in the generated parser.
@@ -83,42 +83,43 @@ public class ParseException extends recoder.ParserException {
         if (!specialConstructor) {
             return super.getMessage();
         }
-        String expected = "";
+        StringBuilder expected = new StringBuilder();
         int maxSize = 0;
-        for (int i = 0; i < expectedTokenSequences.length; i++) {
-            if (maxSize < expectedTokenSequences[i].length) {
-                maxSize = expectedTokenSequences[i].length;
+        for (int[] expectedTokenSequence : expectedTokenSequences) {
+            if (maxSize < expectedTokenSequence.length) {
+                maxSize = expectedTokenSequence.length;
             }
-            for (int j = 0; j < expectedTokenSequences[i].length; j++) {
-                expected += tokenImage[expectedTokenSequences[i][j]] + " ";
+            for (int j = 0; j < expectedTokenSequence.length; j++) {
+                expected.append(tokenImage[expectedTokenSequence[j]]).append(" ");
             }
-            if (expectedTokenSequences[i][expectedTokenSequences[i].length - 1] != 0) {
-                expected += "...";
+            if (expectedTokenSequence[expectedTokenSequence.length - 1] != 0) {
+                expected.append("...");
             }
-            expected += eol + "    ";
+            expected.append(eol).append("    ");
         }
-        String retval = "Encountered \"";
+        StringBuilder retval = new StringBuilder("Encountered \"");
         Token tok = currentToken.next;
         for (int i = 0; i < maxSize; i++) {
-            if (i != 0)
-                retval += " ";
+            if (i != 0) {
+                retval.append(" ");
+            }
             if (tok.kind == 0) {
-                retval += tokenImage[0];
+                retval.append(tokenImage[0]);
                 break;
             }
-            retval += add_escapes(tok.image);
+            retval.append(add_escapes(tok.image));
             tok = tok.next;
         }
-        retval += "\" at line " + currentToken.next.beginLine + ", column "
-            + currentToken.next.beginColumn;
-        retval += "." + eol;
+        retval.append("\" at line ").append(currentToken.next.beginLine).append(", column ")
+                .append(currentToken.next.beginColumn);
+        retval.append(".").append(eol);
         if (expectedTokenSequences.length == 1) {
-            retval += "Was expecting:" + eol + "    ";
+            retval.append("Was expecting:").append(eol).append("    ");
         } else {
-            retval += "Was expecting one of:" + eol + "    ";
+            retval.append("Was expecting one of:").append(eol).append("    ");
         }
-        retval += expected;
-        return retval;
+        retval.append(expected);
+        return retval.toString();
     }
 
     /**
@@ -126,7 +127,7 @@ public class ParseException extends recoder.ParserException {
      * as part of an ASCII string literal.
      */
     protected String add_escapes(String str) {
-        StringBuffer retval = new StringBuffer();
+        StringBuilder retval = new StringBuilder();
         char ch;
         for (int i = 0; i < str.length(); i++) {
             switch (str.charAt(i)) {
@@ -159,11 +160,10 @@ public class ParseException extends recoder.ParserException {
             default:
                 if ((ch = str.charAt(i)) < 0x20 || ch > 0x7e) {
                     String s = "0000" + Integer.toString(ch, 16);
-                    retval.append("\\u" + s.substring(s.length() - 4));
+                    retval.append("\\u").append(s.substring(s.length() - 4));
                 } else {
                     retval.append(ch);
                 }
-                continue;
             }
         }
         return retval.toString();

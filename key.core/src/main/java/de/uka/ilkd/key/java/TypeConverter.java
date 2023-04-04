@@ -1,6 +1,10 @@
 package de.uka.ilkd.key.java;
 
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
@@ -17,18 +21,13 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.service.ConstantEvaluator;
-import recoder.service.KeYCrossReferenceSourceInfo;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 public final class TypeConverter {
     public static final Logger LOGGER = LoggerFactory.getLogger(TypeConverter.class);
@@ -193,8 +192,9 @@ public final class TypeConverter {
 
     public Term findThisForSortExact(Sort s, ExecutionContext ec) {
         ProgramElement pe = ec.getRuntimeInstance();
-        if (pe == null)
+        if (pe == null) {
             return null;
+        }
         Term inst = convertToLogicElement(pe, ec);
         return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), true);
 
@@ -202,8 +202,9 @@ public final class TypeConverter {
 
     public Term findThisForSort(Sort s, ExecutionContext ec) {
         ProgramElement pe = ec.getRuntimeInstance();
-        if (pe == null)
+        if (pe == null) {
             return null;
+        }
         Term inst = convertToLogicElement(pe, ec);
         return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), false);
     }
@@ -308,7 +309,6 @@ public final class TypeConverter {
 
 
     public Term convertToLogicElement(ProgramElement pe, ExecutionContext ec) {
-        LOGGER.debug("called for: {} {}", pe, pe.getClass());
         if (pe instanceof ProgramVariable) {
             return tb.var((ProgramVariable) pe);
         } else if (pe instanceof FieldReference) {
@@ -332,8 +332,8 @@ public final class TypeConverter {
         } else if (pe instanceof recoder.abstraction.PrimitiveType) {
             throw new IllegalArgumentException(
                 "TypeConverter could not handle" + " this primitive type");
-        } else if (pe instanceof MetaClassReference) {
-            assert false : "not supported";
+        } else {
+            assert !(pe instanceof MetaClassReference) : "not supported";
         }
         throw new IllegalArgumentException(
             "TypeConverter: Unknown or not convertable ProgramElement " + pe + " of type "
@@ -362,15 +362,13 @@ public final class TypeConverter {
     }
 
     public static boolean isArithmeticOperator(de.uka.ilkd.key.java.expression.Operator op) {
-        if (op instanceof Divide || op instanceof Times || op instanceof Plus || op instanceof Minus
+        return op instanceof Divide || op instanceof Times || op instanceof Plus
+                || op instanceof Minus
                 || op instanceof Modulo || op instanceof ShiftLeft || op instanceof ShiftRight
                 || op instanceof BinaryAnd || op instanceof BinaryNot || op instanceof BinaryOr
                 || op instanceof BinaryXOr || op instanceof Negative || op instanceof PreIncrement
                 || op instanceof PostIncrement || op instanceof PreDecrement
-                || op instanceof PostDecrement) {
-            return true;
-        }
-        return false;
+                || op instanceof PostDecrement;
     }
 
 
@@ -383,9 +381,9 @@ public final class TypeConverter {
         final Type t2 = type2.getJavaType();
 
         if ((t1 == PrimitiveType.JAVA_REAL && isNumericalType(t2)
-                || (isNumericalType(t1) && t2 == PrimitiveType.JAVA_REAL)))
+                || (isNumericalType(t1) && t2 == PrimitiveType.JAVA_REAL))) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
-        else if ((t1 == PrimitiveType.JAVA_BOOLEAN && t2 == PrimitiveType.JAVA_BOOLEAN)) {
+        } else if ((t1 == PrimitiveType.JAVA_BOOLEAN && t2 == PrimitiveType.JAVA_BOOLEAN)) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
         } else if ((t1 == PrimitiveType.JAVA_BYTE || t1 == PrimitiveType.JAVA_SHORT
                 || t1 == PrimitiveType.JAVA_CHAR || t1 == PrimitiveType.JAVA_INT)
@@ -449,27 +447,29 @@ public final class TypeConverter {
     public KeYJavaType getPromotedType(KeYJavaType type1) {
         final Type t1 = type1.getJavaType();
         if (t1 == PrimitiveType.JAVA_BOOLEAN)
-            // not really numeric ...
+        // not really numeric ...
+        {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
-        else if (t1 == PrimitiveType.JAVA_BYTE || t1 == PrimitiveType.JAVA_SHORT
-                || t1 == PrimitiveType.JAVA_CHAR || t1 == PrimitiveType.JAVA_INT)
+        } else if (t1 == PrimitiveType.JAVA_BYTE || t1 == PrimitiveType.JAVA_SHORT
+                || t1 == PrimitiveType.JAVA_CHAR || t1 == PrimitiveType.JAVA_INT) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
-        else if (t1 == PrimitiveType.JAVA_LONG)
+        } else if (t1 == PrimitiveType.JAVA_LONG) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
-        else if (t1 == PrimitiveType.JAVA_LOCSET)
+        } else if (t1 == PrimitiveType.JAVA_LOCSET) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
-        else if (t1 == PrimitiveType.JAVA_SEQ)
+        } else if (t1 == PrimitiveType.JAVA_SEQ) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
-        else if (t1 == PrimitiveType.JAVA_BIGINT)
+        } else if (t1 == PrimitiveType.JAVA_BIGINT) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
-        else if (t1 == PrimitiveType.JAVA_REAL)
+        } else if (t1 == PrimitiveType.JAVA_REAL) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
-        else if (t1 == PrimitiveType.JAVA_FLOAT)
+        } else if (t1 == PrimitiveType.JAVA_FLOAT) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
-        else if (t1 == PrimitiveType.JAVA_DOUBLE)
+        } else if (t1 == PrimitiveType.JAVA_DOUBLE) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
-        else
+        } else {
             throw new RuntimeException("Could not determine promoted type " + "of " + type1);
+        }
     }
 
 
@@ -616,44 +616,57 @@ public final class TypeConverter {
      */
     public boolean isWidening(PrimitiveType from, PrimitiveType to) {
         // we do not handle null's
-        if (from == null || to == null)
+        if (from == null || to == null) {
             return false;
+        }
         // equal types can be coerced
-        if (from == to)
+        if (from == to) {
             return true;
+        }
         // boolean types cannot be coerced into something else
-        if (from == PrimitiveType.JAVA_BOOLEAN || to == PrimitiveType.JAVA_BOOLEAN)
+        if (from == PrimitiveType.JAVA_BOOLEAN || to == PrimitiveType.JAVA_BOOLEAN) {
             return false;
+        }
         // everything else can be coerced to a \real
-        if (to == PrimitiveType.JAVA_REAL)
+        if (to == PrimitiveType.JAVA_REAL) {
             return true;
+        }
         // everything except \real and \bigint can be coerced to a double
-        if (to == PrimitiveType.JAVA_DOUBLE)
+        if (to == PrimitiveType.JAVA_DOUBLE) {
             return from != PrimitiveType.JAVA_BIGINT;
+        }
         // but a double cannot be coerced to anything else
-        if (from == PrimitiveType.JAVA_DOUBLE)
+        if (from == PrimitiveType.JAVA_DOUBLE) {
             return from != PrimitiveType.JAVA_BIGINT;
+        }
         // everything except doubles can be coerced to a float
-        if (to == PrimitiveType.JAVA_FLOAT)
+        if (to == PrimitiveType.JAVA_FLOAT) {
             return true;
+        }
         // but a float cannot be coerced to anything but float or double
-        if (from == PrimitiveType.JAVA_FLOAT)
+        if (from == PrimitiveType.JAVA_FLOAT) {
             return false;
+        }
         // any integral type can be coerced to a \bigint
-        if (to == PrimitiveType.JAVA_BIGINT)
+        if (to == PrimitiveType.JAVA_BIGINT) {
             return true;
+        }
         // everything except the above can be coerced to a long
-        if (to == PrimitiveType.JAVA_LONG)
+        if (to == PrimitiveType.JAVA_LONG) {
             return true;
+        }
         // but a long cannot be coerced to anything but float, double or long
-        if (from == PrimitiveType.JAVA_LONG)
+        if (from == PrimitiveType.JAVA_LONG) {
             return false;
+        }
         // everything except long, float or double can be coerced to an int
-        if (to == PrimitiveType.JAVA_INT)
+        if (to == PrimitiveType.JAVA_INT) {
             return true;
+        }
         // but an int cannot be coerced to the remaining byte, char, short
-        if (from == PrimitiveType.JAVA_INT)
+        if (from == PrimitiveType.JAVA_INT) {
             return false;
+        }
         // between byte, char, short, only one conversion is admissible
         return (from == PrimitiveType.JAVA_BYTE && to == PrimitiveType.JAVA_SHORT);
     }
@@ -678,10 +691,12 @@ public final class TypeConverter {
 
 
     public boolean isWidening(Type from, Type to) {
-        if (from instanceof KeYJavaType)
+        if (from instanceof KeYJavaType) {
             return isWidening((KeYJavaType) from, getKeYJavaType(to));
-        if (to instanceof KeYJavaType)
+        }
+        if (to instanceof KeYJavaType) {
             return isWidening(getKeYJavaType(from), (KeYJavaType) to);
+        }
 
         if (from instanceof ClassType) {
             return isWidening(getKeYJavaType(from), getKeYJavaType(to));
@@ -710,10 +725,11 @@ public final class TypeConverter {
             return from.getSort().extendsTrans(to.getSort())
                     || (a == NullType.JAVA_NULL && b instanceof ArrayType);
         } else {
-            if (b == null)
+            if (b == null) {
                 return to == services.getJavaInfo().getJavaLangObject() && a instanceof ArrayType;
-            else
+            } else {
                 return isWidening(a, b);
+            }
         }
     }
 
@@ -777,18 +793,20 @@ public final class TypeConverter {
                     || (from == services.getJavaInfo().getJavaLangObject()
                             && a instanceof ArrayType);
         } else {
-            if (b == null)
+            if (b == null) {
                 return false;
-            else
+            } else {
                 return isNarrowing(a, b);
+            }
         }
     }
 
 
     public boolean isNarrowing(PrimitiveType from, PrimitiveType to) {
         // we do not handle null's
-        if (from == null || to == null)
+        if (from == null || to == null) {
             return false;
+        }
 
         if (from == PrimitiveType.JAVA_BYTE) {
             return (to == PrimitiveType.JAVA_CHAR);
@@ -841,10 +859,12 @@ public final class TypeConverter {
 
 
     public boolean isNarrowing(Type from, Type to) {
-        if (from instanceof KeYJavaType)
+        if (from instanceof KeYJavaType) {
             return isNarrowing((KeYJavaType) from, getKeYJavaType(to));
-        if (to instanceof KeYJavaType)
+        }
+        if (to instanceof KeYJavaType) {
             return isNarrowing(getKeYJavaType(from), (KeYJavaType) to);
+        }
 
         if (from instanceof ClassType) {
             return isNarrowing(getKeYJavaType(from), getKeYJavaType(to));
@@ -865,16 +885,19 @@ public final class TypeConverter {
         // there is currently no interface handling
 
         // identity conversion
-        if (isIdentical(from, to))
+        if (isIdentical(from, to)) {
             return true;
+        }
 
         // conversions between numeric types are always possible
-        if (isNumericalType(from) && isNumericalType(to))
+        if (isNumericalType(from) && isNumericalType(to)) {
             return true;
+        }
 
         // all widening conversions
-        if (isWidening(from, to))
+        if (isWidening(from, to)) {
             return true;
+        }
 
         // narrowing
         return isNarrowing(from, to);
@@ -882,8 +905,9 @@ public final class TypeConverter {
 
 
     public boolean isNumericalType(Type t) {
-        if (t instanceof KeYJavaType)
+        if (t instanceof KeYJavaType) {
             t = ((KeYJavaType) t).getJavaType();
+        }
         return t == PrimitiveType.JAVA_BYTE || t == PrimitiveType.JAVA_SHORT
                 || t == PrimitiveType.JAVA_INT || t == PrimitiveType.JAVA_CHAR
                 || t == PrimitiveType.JAVA_LONG || t == PrimitiveType.JAVA_BIGINT
@@ -893,8 +917,9 @@ public final class TypeConverter {
 
 
     public boolean isIntegralType(Type t) {
-        if (t instanceof KeYJavaType)
+        if (t instanceof KeYJavaType) {
             t = ((KeYJavaType) t).getJavaType();
+        }
         return t == PrimitiveType.JAVA_BYTE || t == PrimitiveType.JAVA_SHORT
                 || t == PrimitiveType.JAVA_INT || t == PrimitiveType.JAVA_CHAR
                 || t == PrimitiveType.JAVA_LONG || t == PrimitiveType.JAVA_BIGINT;
@@ -902,8 +927,9 @@ public final class TypeConverter {
 
 
     public boolean isReferenceType(Type t) {
-        if (t instanceof KeYJavaType)
+        if (t instanceof KeYJavaType) {
             t = ((KeYJavaType) t).getJavaType();
+        }
         return
         // there is currently no interface handling
         t == null || (t instanceof ClassType && !(t instanceof NullType)) || t instanceof ArrayType;
@@ -911,15 +937,17 @@ public final class TypeConverter {
 
 
     public boolean isNullType(Type t) {
-        if (t instanceof KeYJavaType)
+        if (t instanceof KeYJavaType) {
             t = ((KeYJavaType) t).getJavaType();
+        }
         return t == NullType.JAVA_NULL;
     }
 
 
     public boolean isBooleanType(Type t) {
-        if (t instanceof KeYJavaType)
+        if (t instanceof KeYJavaType) {
             t = ((KeYJavaType) t).getJavaType();
+        }
         return t == PrimitiveType.JAVA_BOOLEAN;
     }
 

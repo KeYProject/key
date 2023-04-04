@@ -1,13 +1,8 @@
 package de.uka.ilkd.key.logic;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import javax.annotation.Nullable;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -19,31 +14,39 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.EqualsModProofIrrelevancyUtil;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
 
 /**
  * The currently only class implementing the Term interface. TermFactory should be the only class
  * dealing directly with the TermImpl class.
  */
-public class TermImpl implements Term {
+public class TermImpl implements Term, EqualsModProofIrrelevancy {
 
     /**
      * A static empty list of terms used for memory reasons.
      */
-    private static final ImmutableArray<Term> EMPTY_TERM_LIST = new ImmutableArray<Term>();
+    private static final ImmutableArray<Term> EMPTY_TERM_LIST = new ImmutableArray<>();
 
     /**
      * A static empty list of quantifiable variables used for memory reasons.
      */
     private static final ImmutableArray<QuantifiableVariable> EMPTY_VAR_LIST =
-        new ImmutableArray<QuantifiableVariable>();
+        new ImmutableArray<>();
 
     /**
      * A static empty list of term labels used for memory reasons.
      */
     private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST =
-        new ImmutableArray<TermLabel>();
+        new ImmutableArray<>();
 
-    private static AtomicInteger serialNumberCounter = new AtomicInteger();
+    private static final AtomicInteger serialNumberCounter = new AtomicInteger();
     private final int serialNumber = serialNumberCounter.incrementAndGet();
 
     // content
@@ -53,7 +56,7 @@ public class TermImpl implements Term {
     private final JavaBlock javaBlock;
 
     // caches
-    private static enum ThreeValuedTruth {
+    private enum ThreeValuedTruth {
         TRUE, FALSE, UNKNOWN
     }
 
@@ -63,7 +66,14 @@ public class TermImpl implements Term {
      */
     private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN;
     private ImmutableSet<QuantifiableVariable> freeVars = null;
+    /**
+     * Cached {@link #hashCode()} value.
+     */
     private int hashcode = -1;
+    /**
+     * Cached {@link #hashCodeModProofIrrelevancy()} value.
+     */
+    private int hashcode2 = -1;
 
     /**
      * This flag indicates that the {@link Term} itself or one of its children contains a non empty
@@ -106,7 +116,7 @@ public class TermImpl implements Term {
 
     private ImmutableSet<QuantifiableVariable> determineFreeVars() {
         ImmutableSet<QuantifiableVariable> localFreeVars =
-            DefaultImmutableSet.<QuantifiableVariable>nil();
+            DefaultImmutableSet.nil();
 
         if (op instanceof QuantifiableVariable) {
             localFreeVars = localFreeVars.add((QuantifiableVariable) op);
@@ -274,8 +284,8 @@ public class TermImpl implements Term {
         if (o == this) {
             return true;
         }
-        return unifyHelp(this, o, ImmutableSLList.<QuantifiableVariable>nil(),
-            ImmutableSLList.<QuantifiableVariable>nil(), null);
+        return unifyHelp(this, o, ImmutableSLList.nil(),
+            ImmutableSLList.nil(), null);
     }
 
     //
@@ -367,19 +377,16 @@ public class TermImpl implements Term {
     private boolean handleQuantifiableVariable(Term t0, Term t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars) {
-        if (!((t1.op() instanceof QuantifiableVariable)
+        return (t1.op() instanceof QuantifiableVariable)
                 && compareBoundVariables((QuantifiableVariable) t0.op(),
-                    (QuantifiableVariable) t1.op(), ownBoundVars, cmpBoundVars))) {
-            return false;
-        }
-        return true;
+                    (QuantifiableVariable) t1.op(), ownBoundVars, cmpBoundVars);
     }
 
     /**
      * used to encode that <tt>handleJava</tt> results in an unsatisfiable constraint (faster than
      * using exceptions)
      */
-    private static NameAbstractionTable FAILED = new NameAbstractionTable();
+    private static final NameAbstractionTable FAILED = new NameAbstractionTable();
 
     private static NameAbstractionTable handleJava(Term t0, Term t1, NameAbstractionTable nat) {
 
@@ -471,7 +478,7 @@ public class TermImpl implements Term {
             return true;
         }
 
-        if (o == null || !(o instanceof TermImpl)) {
+        if (!(o instanceof TermImpl)) {
             return false;
         }
 
@@ -528,6 +535,62 @@ public class TermImpl implements Term {
         return true;
     }
 
+    @Override
+    public boolean equalsModProofIrrelevancy(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof TermImpl)) {
+            return false;
+        }
+
+        final TermImpl t = (TermImpl) o;
+
+        boolean opResult = op.equalsModProofIrrelevancy(t.op);
+        if (!(opResult
+                && EqualsModProofIrrelevancyUtil.compareImmutableArrays(boundVars, t.boundVars)
+                && javaBlock.equalsModProofIrrelevancy(t.javaBlock))) {
+            return false;
+        }
+
+        Term other = (Term) o;
+
+        for (TermLabel label : getLabels()) {
+            if (label.isProofRelevant() && !other.getLabels().contains(label)) {
+                return false;
+            }
+        }
+
+        for (TermLabel label : other.getLabels()) {
+            if (label.isProofRelevant() && !getLabels().contains(label)) {
+                return false;
+            }
+        }
+
+        for (int i = 0; i < subs.size(); ++i) {
+            if (!subs.get(i).equalsModProofIrrelevancy(t.subs.get(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        if (hashcode2 == -1) {
+            // compute into local variable first to be thread-safe.
+            this.hashcode2 = Objects.hash(op(),
+                EqualsModProofIrrelevancyUtil
+                        .hashCodeIterable(subs()),
+                EqualsModProofIrrelevancyUtil.hashCodeIterable(boundVars()), javaBlock());
+            if (hashcode2 == -1) {
+                hashcode2 = 0;
+            }
+        }
+        return hashcode2;
+    }
 
     @Override
     public final int hashCode() {
@@ -562,7 +625,7 @@ public class TermImpl implements Term {
      */
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (!javaBlock.isEmpty()) {
             if (op() == Modality.DIA) {
                 sb.append("\\<").append(javaBlock).append("\\> ");

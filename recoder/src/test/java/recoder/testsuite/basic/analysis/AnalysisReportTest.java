@@ -1,5 +1,10 @@
 package recoder.testsuite.basic.analysis;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.zip.GZIPOutputStream;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import recoder.abstraction.ProgramModelElement;
@@ -20,10 +25,6 @@ import recoder.util.HashCode;
 import recoder.util.Index;
 import recoder.util.Order;
 import recoder.util.Sorting;
-
-import java.io.*;
-import java.util.List;
-import java.util.zip.GZIPOutputStream;
 
 import static org.junit.Assert.fail;
 
@@ -62,7 +63,7 @@ public class AnalysisReportTest {
     public void testAnalysisReport() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(10000);
         GZIPOutputStream gzip = new GZIPOutputStream(baos);
-        OutputStreamWriter osw = new OutputStreamWriter(gzip);
+        OutputStreamWriter osw = new OutputStreamWriter(gzip, StandardCharsets.UTF_8);
         createReport(osw);
         osw.close();
         byte[] buffer = baos.toByteArray();
@@ -144,7 +145,7 @@ public class AnalysisReportTest {
                 n += 1;
             }
         }
-        StringBuffer line = new StringBuffer(1024);
+        StringBuilder line = new StringBuilder(1024);
         int number = 1;
         for (CompilationUnit unit : uarray) {
             TreeWalker tw = new TreeWalker(unit);

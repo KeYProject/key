@@ -1,10 +1,5 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
-import de.uka.ilkd.key.proof.runallproofs.TestResult;
-import de.uka.ilkd.key.settings.PathConfig;
-import de.uka.ilkd.key.util.IOForwarder;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,6 +7,15 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
+import de.uka.ilkd.key.proof.runallproofs.TestResult;
+import de.uka.ilkd.key.settings.PathConfig;
+import de.uka.ilkd.key.util.IOForwarder;
+
+import org.junit.jupiter.api.Assertions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Kai Wallisch
  */
 public abstract class ForkedTestFileRunner implements Serializable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ForkedTestFileRunner.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -135,8 +140,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
         Path exceptionFile = getLocationOfSerializedException(pathToTempDir);
         if (exceptionFile.toFile().exists()) {
             Throwable t = ForkedTestFileRunner.readObject(exceptionFile, Throwable.class);
-            throw new Exception(
-                "Subprocess returned exception (see cause for details):\n" + t.getMessage(), t);
+            Assertions.fail("Subprocess returned exception", t);
         }
 
         /*
@@ -171,7 +175,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
                     testResults.add(testFile.runKey());
                 } catch (Exception e) {
                     error = true;
-                    e.printStackTrace();
+                    LOGGER.warn("Run failed", e);
                 }
             }
             writeObject(getLocationOfSerializedTestResults(tempDirectory),
@@ -188,8 +192,9 @@ public abstract class ForkedTestFileRunner implements Serializable {
             }
         }
 
-        if (error)
+        if (error) {
             fail("Exception during the execution of proofs. See log for more details.");
+        }
     }
 
     /**
@@ -231,7 +236,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
             public void run() {
                 try {
                     if (verbose) {
-                        System.err.println("Timeout watcher launched (" + timeout + " secs.)");
+                        LOGGER.info("Timeout watcher launched (" + timeout + " secs.)");
                     }
                     Thread.sleep(timeout * 1000L);
                     InterruptedException ex =
@@ -239,13 +244,12 @@ public abstract class ForkedTestFileRunner implements Serializable {
                     writeObject(getLocationOfSerializedException(tempDirectory), ex);
                     // TODO consider something other than 0 here
                     if (verbose) {
-                        System.err.println("Process timed out");
+                        LOGGER.info("Process timed out");
                     }
                     System.exit(0);
                 } catch (Exception ex) {
-                    System.err.println(
-                        "The watchdog has been interrupted or failed. Timeout cancelled.");
-                    ex.printStackTrace();
+                    LOGGER.warn("The watchdog has been interrupted or failed. Timeout cancelled.",
+                        ex);
                 }
             }
         };

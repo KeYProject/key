@@ -1,5 +1,13 @@
 package de.uka.ilkd.key.gui.smt.settings;
 
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
@@ -10,15 +18,6 @@ import de.uka.ilkd.key.settings.ProofIndependentSMTSettings.ProgressMode;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
-
-
-import javax.swing.*;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
 /**
  * General SMT settings panel in the settings dialog.
@@ -53,7 +52,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     private final JCheckBox solverSupportCheck;
 
     private transient ProofIndependentSMTSettings settings;
-    private transient List<SettingsProvider> children = new ArrayList<>();
+    private final transient List<SettingsProvider> children = new ArrayList<>();
 
 
     public SMTSettingsProvider() {

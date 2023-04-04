@@ -10,11 +10,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 
@@ -50,7 +46,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
         this.postfix = postfix;
         this.goalForVariableRegistration = goalForVariableRegistration;
         if (preInitialisedReplaceMap == null) {
-            this.replaceMap = new HashMap<Term, Term>();
+            this.replaceMap = new HashMap<>();
         } else {
             this.replaceMap = preInitialisedReplaceMap;
         }
@@ -206,7 +202,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private Map<ProgramVariable, ProgramVariable> restrictToProgramVariables(
             Map<Term, Term> replaceMap) {
         Map<ProgramVariable, ProgramVariable> progVarReplaceMap =
-            new HashMap<ProgramVariable, ProgramVariable>();
+            new HashMap<>();
         for (final Term t : replaceMap.keySet()) {
             if (t.op() instanceof ProgramVariable) {
                 progVarReplaceMap.put((ProgramVariable) t.op(),

@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.gui.actions;
 
+import java.awt.event.ActionEvent;
+import java.util.EventObject;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.util.EventObject;
 
 public final class HidePackagePrefixToggleAction extends MainWindowAction {
     public static final String NAME = "Hide Package Prefix";
@@ -23,7 +23,7 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
      * Such changes can occur in the Eclipse context when settings are changed in for instance the
      * KeYIDE.
      */
-    private final SettingsListener viewSettingsListener = e -> handleViewSettingsChanged(e);
+    private final SettingsListener viewSettingsListener = this::handleViewSettingsChanged;
 
     public HidePackagePrefixToggleAction(MainWindow mainWindow) {
         super(mainWindow);
@@ -36,7 +36,7 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
         updateSelectedState();
     }
 
-    protected void updateSelectedState() {
+    private void updateSelectedState() {
         final boolean hidePackage =
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isHidePackagePrefix();
         NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX = hidePackage;
@@ -54,11 +54,11 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
         updateMainWindow();
     }
 
-    protected void updateMainWindow() {
+    private void updateMainWindow() {
         mainWindow.makePrettyView();
     }
 
-    protected void handleViewSettingsChanged(EventObject e) {
+    private void handleViewSettingsChanged(EventObject e) {
         updateSelectedState();
         updateMainWindow();
     }

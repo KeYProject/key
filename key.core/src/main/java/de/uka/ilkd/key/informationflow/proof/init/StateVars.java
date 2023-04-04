@@ -2,10 +2,6 @@ package de.uka.ilkd.key.informationflow.proof.init;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -22,6 +18,10 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -62,7 +62,7 @@ public class StateVars {
         this.heap = heap;
         this.mbyAtPre = mbyAtPre;
 
-        ImmutableList<Term> terms = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> terms = ImmutableSLList.nil();
         terms = appendIfNotNull(terms, heap);
         terms = appendIfNotNull(terms, self);
         terms = appendIfNotNull(terms, guard);
@@ -72,7 +72,7 @@ public class StateVars {
         terms = appendIfNotNull(terms, mbyAtPre);
         termList = terms;
 
-        ImmutableList<Term> allTerms = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> allTerms = ImmutableSLList.nil();
         allTerms = allTerms.append(heap);
         allTerms = allTerms.append(self);
         allTerms = allTerms.append(guard);
@@ -144,7 +144,7 @@ public class StateVars {
 
     private static ImmutableList<Term> copyVariables(ImmutableList<Term> ts, String postfix,
             Services services) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = ImmutableSLList.nil();
         for (Term t : ts) {
             result = result.append(copyVariable(t, postfix, services));
         }
@@ -241,7 +241,7 @@ public class StateVars {
     public static StateVars buildMethodContractPreVars(IProgramMethod pm, KeYJavaType kjt,
             Services services) {
         ImmutableArray<TermLabel> heapLabels =
-            new ImmutableArray<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL);
+            new ImmutableArray<>(ParameterlessTermLabel.ANON_HEAP_LABEL);
         return new StateVars(buildSelfVar(services, pm, kjt, ""), buildParamVars(services, "", pm),
             buildResultVar(pm, services, ""), buildExceptionVar(services, "", pm),
             buildHeapFunc("AtPre", heapLabels, services), buildMbyVar("", services));
@@ -254,7 +254,7 @@ public class StateVars {
         // preVars.localVars: no local out variables
         return new StateVars(buildSelfVar(services, pm, kjt, postfix), preVars.localVars,
             buildResultVar(pm, services, postfix), buildExceptionVar(services, postfix, pm),
-            buildHeapFunc(postfix, new ImmutableArray<TermLabel>(), services), preVars.mbyAtPre);
+            buildHeapFunc(postfix, new ImmutableArray<>(), services), preVars.mbyAtPre);
     }
 
 
@@ -281,7 +281,7 @@ public class StateVars {
         Term mbyAtPre = (origPreVars.mbyAtPre == origPostVars.mbyAtPre) ? preVars.mbyAtPre
                 : copyVariable(origPostVars.mbyAtPre, postfix, services);
 
-        ImmutableList<Term> localPostVars = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> localPostVars = ImmutableSLList.nil();
         Iterator<Term> origPreVarsIt = origPreVars.localVars.iterator();
         Iterator<Term> localPreVarsIt = preVars.localVars.iterator();
         for (Term origPostVar : origPostVars.localVars) {
@@ -391,7 +391,7 @@ public class StateVars {
 
     static <T> ImmutableList<T> ops(ImmutableList<Term> terms, Class<T> opClass)
             throws IllegalArgumentException {
-        ImmutableList<T> ops = ImmutableSLList.<T>nil();
+        ImmutableList<T> ops = ImmutableSLList.nil();
         for (Term t : terms) {
             ops = ops.append(t.op(opClass));
         }

@@ -1,13 +1,8 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -16,6 +11,13 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Generation of test cases (JUnit) for given proof collection files.
@@ -113,9 +115,10 @@ public class GenerateUnitTests {
 
         if (false) {// disabled
             int globalTimeout = 0;
-            if (globalTimeout > 0)
+            if (globalTimeout > 0) {
                 vars.put("timeout",
                     "@Rule public Timeout globalTimeout = Timeout.seconds(" + globalTimeout + ");");
+            }
         }
 
         StringBuilder methods = new StringBuilder();
@@ -173,6 +176,6 @@ public class GenerateUnitTests {
         File folder = new File(outputFolder, packageName.replace('.', '/'));
         folder.mkdirs();
         Files.write(Paths.get(folder.getAbsolutePath(), className + ".java"),
-            sb.toString().getBytes());
+            sb.toString().getBytes(StandardCharsets.UTF_8));
     }
 }

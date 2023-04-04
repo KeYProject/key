@@ -1,12 +1,11 @@
 package de.uka.ilkd.key.settings;
 
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * A base class for own settings based on properties.
@@ -15,26 +14,26 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractPropertiesSettings implements Settings {
     private static final String SET_DELIMITER = ",";
-    private static Function<String, Integer> parseInt = Integer::parseInt;
-    private static Function<String, Float> parseFloat = Float::parseFloat;
-    private static Function<String, Boolean> parseBoolean = Boolean::parseBoolean;
-    private static Function<String, Double> parseDouble = Double::parseDouble;
+    private static final Function<String, Integer> parseInt = Integer::parseInt;
+    private static final Function<String, Float> parseFloat = Float::parseFloat;
+    private static final Function<String, Boolean> parseBoolean = Boolean::parseBoolean;
+    private static final Function<String, Double> parseDouble = Double::parseDouble;
 
     /**
      * Properties stored in this settings object.
      * Updated by each {@link PropertyEntry} when a new non-null value is set.
      */
-    protected Properties properties = new Properties();
+    protected final Properties properties = new Properties();
 
     /**
      *
      */
-    protected List<PropertyEntry<?>> propertyEntries = new LinkedList<>();
+    protected final List<PropertyEntry<?>> propertyEntries = new LinkedList<>();
 
     /**
      * Collection of listeners to notify when a setting changes its value.
      */
-    protected List<SettingsListener> listenerList = new LinkedList<>();
+    protected final List<SettingsListener> listenerList = new LinkedList<>();
 
     private static Set<String> parseStringSet(String o) {
         Set<String> set = new TreeSet<>();

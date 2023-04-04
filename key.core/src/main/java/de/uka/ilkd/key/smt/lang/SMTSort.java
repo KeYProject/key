@@ -207,11 +207,13 @@ public class SMTSort {
     /** Returns true iff ((that is from type sort) and (this.id == that.id)) */
     @Override
     public boolean equals(Object that) {
-        if (this == that)
+        if (this == that) {
             return true;
+        }
 
-        if (!(that instanceof SMTSort))
+        if (!(that instanceof SMTSort)) {
             return false;
+        }
         SMTSort sort = (SMTSort) that;
 
         if (this.isBV() && sort.isBV()) {

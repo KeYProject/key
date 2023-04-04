@@ -1,14 +1,16 @@
 package de.uka.ilkd.key.rule.inst;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.rule.TacletForTests;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.collection.*;
 
-import java.util.Iterator;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -176,8 +178,9 @@ public class TestGenericSortInstantiations {
         Iterator<GenericSortCondition> it = p_conditions.iterator();
         ImmutableList<GenericSort> res = ImmutableSLList.nil();
 
-        while (it.hasNext())
+        while (it.hasNext()) {
             res = res.prepend(it.next().getGenericSort());
+        }
 
         return res;
     }

@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
@@ -17,8 +19,6 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-import java.util.Objects;
-
 public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     /**
      * flag to tell whether to stop on method entry
@@ -33,12 +33,12 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     /**
      * The start of the method containing the associated Breakpoint
      */
-    protected int methodStart;
+    protected final int methodStart;
 
     /**
      * The end of the method containing the associated Breakpoint
      */
-    protected int methodEnd;
+    protected final int methodEnd;
 
     /**
      * The path of the class this {@link LineBreakpoint} is associated with.
@@ -108,9 +108,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
             Contract contract = methodRuleApp.getInstantiation();
             if (contract instanceof FunctionalOperationContract) {
                 FunctionalOperationContract methodContract = (FunctionalOperationContract) contract;
-                if (methodContract.getTarget().equals(getPm())) {
-                    return true;
-                }
+                return methodContract.getTarget().equals(getPm());
             }
         }
         return false;
@@ -131,9 +129,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
             Contract contract = methodRuleApp.getInstantiation();
             if (contract instanceof FunctionalOperationContract) {
                 FunctionalOperationContract methodContract = (FunctionalOperationContract) contract;
-                if (methodContract.getTarget().equals(getPm())) {
-                    return true;
-                }
+                return methodContract.getTarget().equals(getPm());
             }
         }
         return false;
@@ -176,8 +172,8 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
                 NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
             if (activeStatement != null
                     && activeStatement.getStartPosition() != Position.UNDEFINED) {
-                if (activeStatement.getStartPosition().getLine() >= methodStart
-                        && activeStatement.getEndPosition().getLine() <= methodEnd) {
+                if (activeStatement.getStartPosition().line() >= methodStart
+                        && activeStatement.getEndPosition().line() <= methodEnd) {
                     return true;
                 }
                 break;
@@ -195,8 +191,8 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
                 NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
             if (activeStatement != null
                     && activeStatement.getStartPosition() != Position.UNDEFINED) {
-                if (activeStatement.getStartPosition().getLine() >= methodStart
-                        && activeStatement.getEndPosition().getLine() <= methodEnd
+                if (activeStatement.getStartPosition().line() >= methodStart
+                        && activeStatement.getEndPosition().line() <= methodEnd
                         && activeStatement instanceof LocalVariableDeclaration) {
                     return true;
                 }
