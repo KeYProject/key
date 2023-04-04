@@ -97,13 +97,6 @@ public class ProofCollections {
 
         var c = new ProofCollection(settings);
 
-        var qs = c.group("quicksort");
-        qs.setLocalSettings("[Choice]DefaultChoices=moreSeqRules-moreSeqRules:on");
-        qs.setDirectory("heap/quicksort");
-        qs.provable("toplevel.key");
-        qs.provable("sort.key");
-        qs.provable("split.key");
-
         // Examples used in the new book
         var newBook = c.group("newBook");
         newBook.provable("newBook/09.list_modelfield/ArrayList.add.key");
