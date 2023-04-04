@@ -286,13 +286,16 @@ public class SolverListener implements SolverLauncherListener {
 
     private void discardEvent(final SolverLauncher launcher) {
         launcher.stop();
-        progressDialog.setVisible(false);
+        progressDialog.dispose();
     }
 
     private void applyEvent(final SolverLauncher launcher) {
         launcher.stop();
         applyResults();
-        //progressDialog.setVisible(false);
+        /* Previously, the progressDialog was only made invisible which enabled users to
+        click the apply button more than once, each time creating a new SMT goal.
+        Disposing of the dialog is fine as it is created anew each time a SolverLauncher
+        is started anyway (see #launcherStarted(), #prepareDialog()). */
         progressDialog.dispose();
     }
 
