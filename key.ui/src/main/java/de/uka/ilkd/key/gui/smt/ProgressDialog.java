@@ -1,40 +1,18 @@
 package de.uka.ilkd.key.gui.smt;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import de.uka.ilkd.key.gui.IssueDialog;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
+import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
 
-import javax.swing.AbstractCellEditor;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.plaf.basic.BasicProgressBarUI;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.IssueDialog;
-import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
-import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
+import java.awt.*;
 
 
 
@@ -160,18 +138,14 @@ public class ProgressDialog extends JDialog {
     private JButton getStopButton() {
         if (stopButton == null) {
             stopButton = new JButton("Stop");
-            stopButton.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (modus.equals(Modus.discardModus)) {
-                        listener.discardButtonClicked();
-                    }
-                    if (modus.equals(Modus.stopModus)) {
-                        listener.stopButtonClicked();
-                    }
-
+            stopButton.addActionListener(e -> {
+                if (modus.equals(Modus.discardModus)) {
+                    listener.discardButtonClicked();
                 }
+                if (modus.equals(Modus.stopModus)) {
+                    listener.stopButtonClicked();
+                }
+
             });
         }
         return stopButton;
@@ -212,13 +186,7 @@ public class ProgressDialog extends JDialog {
 
         for (int i = 0; i < 1000; i++) {
             final int p = i;
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    model.setProgress(p / 10, 1, 2);
-                }
-            });
+            SwingUtilities.invokeLater(() -> model.setProgress(p / 10, 1, 2));
             Thread.sleep(10);
         }
         model.setText("TIMEOUT", 1, 2);
@@ -352,16 +320,12 @@ class ProgressTable extends JTable {
 
     }
 
-    private final TableCellRenderer renderer = new TableCellRenderer() {
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
+    private final TableCellRenderer renderer =
+        (table, value, isSelected, hasFocus, row, column) -> {
             ProcessData data = (ProcessData) value;
             prepareProgressPanel(progressPanelRenderer, data);
             return progressPanelRenderer;
-        }
-    };
+        };
 
 
     private final TableCellEditor editor = new ProgressCellEditor();
@@ -381,13 +345,8 @@ class ProgressTable extends JTable {
             final ProgressTableListener listener) {
         panel.setFont(font);
         panel.progressBar.setMaximum(resolution);
-        panel.infoButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                listener.infoButtonClicked(currentEditorCell.x - 1, currentEditorCell.y);
-            }
-        });
+        panel.infoButton.addActionListener(
+            e -> listener.infoButtonClicked(currentEditorCell.x - 1, currentEditorCell.y));
 
 
     }

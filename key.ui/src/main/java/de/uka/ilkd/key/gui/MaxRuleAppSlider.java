@@ -3,8 +3,6 @@ package de.uka.ilkd.key.gui;
 import de.uka.ilkd.key.core.KeYMediator;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.util.Hashtable;
 import java.util.LinkedList;
 
@@ -46,13 +44,11 @@ public class MaxRuleAppSlider extends JSlider {
         setPaintTicks(true);
 
         // add change listener
-        addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                int val = getPos();
-                MaxRuleAppSlider.this.mediator.setMaxAutomaticSteps(val);
-                setTitle(val);
-                updateAllSliders();
-            }
+        addChangeListener(e -> {
+            int val = getPos();
+            MaxRuleAppSlider.this.mediator.setMaxAutomaticSteps(val);
+            setTitle(val);
+            updateAllSliders();
         });
 
         setTitle(0);

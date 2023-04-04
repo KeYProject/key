@@ -101,9 +101,7 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
     }
 
     private void loadBookmarks() {
-        viewSettings.getFolderBookmarks().forEach(it ->
-        // make absolute? .getAbsoluteFile())
-        bookmarks.addElement(new File(it)));
+        viewSettings.getFolderBookmarks().forEach(it -> bookmarks.addElement(new File(it)));
     }
 
     private void saveBookmarks() {

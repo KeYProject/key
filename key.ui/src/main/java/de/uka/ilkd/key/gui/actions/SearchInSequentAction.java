@@ -9,6 +9,7 @@ import javax.swing.KeyStroke;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
+import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
 
 /*
  * Menu option for showing the sequent search bar. Keyboard shortcut: STRG+F.
@@ -17,8 +18,11 @@ public class SearchInSequentAction extends MainWindowAction {
 
     private static final long serialVersionUID = -9002009635814787502L;
 
-    public SearchInSequentAction(MainWindow mainWindow) {
+    private final SequentViewSearchBar searchBar;
+
+    public SearchInSequentAction(MainWindow mainWindow, SequentViewSearchBar searchBar) {
         super(mainWindow);
+        this.searchBar = searchBar;
         setName("Search in Sequent View");
         setIcon(IconFactory.search(16));
         setTooltip("Search for strings in the current sequent.");
@@ -30,8 +34,8 @@ public class SearchInSequentAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        SequentView view = mainWindow.sequentViewSearchBar.getSequentView();
+        SequentView view = searchBar.getSequentView();
         String searchString = view.getHighlightedText();
-        mainWindow.sequentViewSearchBar.searchFor(searchString);
+        searchBar.searchFor(searchString);
     }
 }

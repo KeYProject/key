@@ -1,27 +1,13 @@
 package de.uka.ilkd.key.proof.init;
 
-import java.io.IOException;
-import java.util.*;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
@@ -31,12 +17,14 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassWellDefinedness;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.MethodWellDefinedness;
-import de.uka.ilkd.key.speclang.WellDefinednessCheck;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
+import java.util.*;
 
 
 /**
@@ -71,7 +59,7 @@ public abstract class AbstractPO implements IPersistablePO {
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
-    public AbstractPO(InitConfig initConfig, String name) {
+    protected AbstractPO(InitConfig initConfig, String name) {
         this.environmentConfig = initConfig;
         this.environmentServices = initConfig.getServices();
         this.javaInfo = initConfig.getServices().getJavaInfo();
@@ -251,9 +239,8 @@ public abstract class AbstractPO implements IPersistablePO {
      * @return The term representing the general assumption.
      */
     protected Term generateSelfExactType(IProgramMethod pm, Term selfVar, KeYJavaType selfKJT) {
-        final Term selfExactType = selfVar == null || pm.isConstructor() ? tb.tt()
+        return selfVar == null || pm.isConstructor() ? tb.tt()
                 : tb.exactInstance(selfKJT.getSort(), selfVar);
-        return selfExactType;
     }
 
     // ==================================================
@@ -489,8 +476,7 @@ public abstract class AbstractPO implements IPersistablePO {
 
     protected Proof createProofObject(String proofName, String proofHeader, Term poTerm,
             InitConfig proofConfig) {
-        Proof proof = new Proof(proofName, poTerm, proofHeader, proofConfig);
-        return proof;
+        return new Proof(proofName, poTerm, proofHeader, proofConfig);
     }
 
 
@@ -537,7 +523,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * {@inheritDoc}
      */
     @Override
-    public void fillSaveProperties(Properties properties) throws IOException {
+    public void fillSaveProperties(Properties properties) {
         properties.setProperty(IPersistablePO.PROPERTY_CLASS, getClass().getCanonicalName());
         properties.setProperty(IPersistablePO.PROPERTY_NAME, name);
     }

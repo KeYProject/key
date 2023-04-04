@@ -635,6 +635,7 @@ public abstract class Taclet implements Rule, Named {
     @Override
     public String toString() {
         if (tacletAsString == null) {
+            // FIXME this essentially reimplements PrettyPrinter::printTaclet
             StringBuffer sb = new StringBuffer();
             sb = sb.append(name()).append(" {\n");
             sb = toStringIf(sb);

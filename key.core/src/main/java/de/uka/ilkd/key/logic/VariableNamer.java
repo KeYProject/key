@@ -1,20 +1,6 @@
 package de.uka.ilkd.key.logic;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.ContextStatementBlock;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.ScopeDefiningElement;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -41,8 +27,12 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.MiscTools;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 
 /**
@@ -595,7 +585,7 @@ public abstract class VariableNamer implements InstantiationProposer {
                     if (v.hasInitializer()) {
                         ProgramElement rhs = instantiateExpression(v.getInitializer(),
                             app.instantiations(), services);
-                        name = ProofSaver.printProgramElement(rhs).toString();
+                        name = ProofSaver.printProgramElement(rhs);
                         break;
                     } else if (c.getStatementAt(1) instanceof CopyAssignment) {
                         CopyAssignment p2 = (CopyAssignment) c.getStatementAt(1);

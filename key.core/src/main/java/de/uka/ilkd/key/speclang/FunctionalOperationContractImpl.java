@@ -1,22 +1,5 @@
 package de.uka.ilkd.key.speclang;
 
-import static de.uka.ilkd.key.util.Assert.assertEqualSort;
-import static de.uka.ilkd.key.util.Assert.assertSubSort;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.UnaryOperator;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.MapUtil;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -27,31 +10,27 @@ import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.MapUtil;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.UnaryOperator;
+
+import static de.uka.ilkd.key.util.Assert.assertEqualSort;
+import static de.uka.ilkd.key.util.Assert.assertSubSort;
 
 /**
  * Standard implementation of the OperationContract interface.
@@ -761,7 +740,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 sig.append(named.name()).append(", ");
             } else if (subst instanceof Term) {
                 sig.append(LogicPrinter.quickPrintTerm((Term) subst, services, usePrettyPrinting,
-                    useUnicodeSymbols).trim()).append(", ");
+                    useUnicodeSymbols)).append(", ");
             } else {
                 sig.append(subst).append(", ");
             }
@@ -790,7 +769,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         clause = clause + (includeHtmlMarkup ? "<br><b>" : "\n") + text
                 + (h == baseHeap ? "" : "[" + h + "]") + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printClause, false)
-                        : printClause.trim());
+                        : printClause);
         return clause;
     }
 
@@ -918,7 +897,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     @Override
     public String proofToString(Services services) {
         assert toBeSaved;
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final LocationVariable baseHeap = heapLDT.getHeap();
         sb.append(baseName).append(" {\n");
@@ -967,22 +946,14 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             tb.tf().createTerm(UpdateApplication.UPDATE_APPLICATION, update, modalityTerm);
         final Term contractTerm =
             tb.tf().createTerm(Junctor.IMP, originalPres.get(baseHeap), updateTerm);
-        final LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), null);
-        try {
-            lp.printTerm(contractTerm);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        sb.append(lp.toString());
+        final LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), null);
+        lp.printTerm(contractTerm);
+        sb.append(lp.result());
 
         // print modifies
         lp.reset();
-        try {
-            lp.printTerm(originalMods.get(baseHeap));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        sb.append("  \\modifies ").append(lp.toString());
+        lp.printTerm(originalMods.get(baseHeap));
+        sb.append("  \\modifies ").append(lp.result());
 
         sb.append("};\n");
         return sb.toString();

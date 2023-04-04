@@ -32,21 +32,12 @@ public class SLTranslationException extends ProofInputException implements HasLo
         this(message, null, fileName, pos);
     }
 
-    public SLTranslationException(String message, String fileName, int line, int column) {
-        this(message, null, fileName, new Position(line, column));
-    }
-
     public SLTranslationException(String message) {
         this(message, null, "no file", Position.UNDEFINED);
     }
 
-    public SLTranslationException(String message, Throwable cause) {
-        this(message);
-    }
-
     public SLTranslationException(String message, ParserRuleContext expr) {
-        this(message, expr.start.getTokenSource().getSourceName(),
-            new Position(expr.start.getLine(), expr.start.getCharPositionInLine()));
+        this(message, expr.start.getTokenSource().getSourceName(), Position.fromToken(expr.start));
     }
 
     public SLTranslationException(String message, LabeledParserRuleContext expr) {
@@ -61,17 +52,9 @@ public class SLTranslationException extends ProofInputException implements HasLo
         return pos;
     }
 
-    public int getLine() {
-        return pos.getLine();
-    }
-
-    public int getColumn() {
-        return pos.getColumn();
-    }
-
     @Nullable
     @Override
     public Location getLocation() throws MalformedURLException {
-        return new Location(getFileName(), getLine(), getColumn());
+        return new Location(getFileName(), pos);
     }
 }

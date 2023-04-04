@@ -44,7 +44,7 @@ public class ParseExceptionInFile extends ParseException implements HasLocation 
         if (getCause() != null) {
             location = ExceptionTools.getLocation(getCause());
             if (location != null) {
-                location = new Location(getFilename(), location.getLine(), location.getColumn());
+                location = new Location(getFilename(), location.getPosition());
             }
         }
         return location;

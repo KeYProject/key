@@ -3,24 +3,13 @@
  */
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceData;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.TerminalProgramElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.ReferenceSuffix;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.util.Debug;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
 public class ProgramElementName extends Name
         implements TerminalProgramElement, Label, ReferenceSuffix, MethodName {
@@ -107,10 +96,6 @@ public class ProgramElementName extends Name
         return this;
     }
 
-    public void prettyPrint(PrettyPrinter w) throws java.io.IOException {
-        w.printProgramElementName(this);
-    }
-
     /**
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
@@ -149,8 +134,8 @@ public class ProgramElementName extends Name
      *
      * @return the relative position of the primary token.
      */
-    public Position getRelativePosition() {
-        return Position.UNDEFINED;
+    public recoder.java.SourceElement.Position getRelativePosition() {
+        return recoder.java.SourceElement.Position.UNDEFINED;
     }
 
 

@@ -2,8 +2,6 @@ package org.key_project.util.testcase.java;
 
 import org.junit.jupiter.api.Test;
 import org.key_project.util.helper.HelperClassForUtilityTests;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.IFileVisitor;
 import org.key_project.util.java.IOUtil.LineInformation;
@@ -11,6 +9,7 @@ import org.key_project.util.java.XMLUtil;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.*;
@@ -20,6 +19,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -79,7 +79,7 @@ public class IOUtilTest {
             File noFolder = HelperClassForUtilityTests.createFolder(new File(noDir, "yesSub"));
             File noSubFile =
                 HelperClassForUtilityTests.createFile(new File(noFolder, "Hello.txt"), "Hello");
-            List<File> parents = CollectionUtil.toList(yesDir, alsoYesDir);
+            List<File> parents = Arrays.asList(yesDir, alsoYesDir);
             assertFalse(IOUtil.contains((Iterable<File>) null, yesFile));
             assertFalse(IOUtil.contains(parents, null));
             assertFalse(IOUtil.contains((Iterable<File>) null, null));
@@ -327,7 +327,7 @@ public class IOUtilTest {
     }
 
     /**
-     * Tests {@link IOUtil#search(File, org.key_project.util.java.IFilter)}.
+     * Tests {@link IOUtil#search(File, Predicate)}.
      */
     @Test
     public void testSearch() throws IOException {
@@ -349,7 +349,7 @@ public class IOUtilTest {
             File text = new File(tempDir, "Text.txt");
             IOUtil.writeTo(new FileOutputStream(text), "Text.txt");
             // Create filter
-            IFilter<File> filter = element -> element.getName().contains("Sub");
+            Predicate<File> filter = element -> element.getName().contains("Sub");
             // Test null
             List<File> result = IOUtil.search(null, filter);
             assertEquals(0, result.size());

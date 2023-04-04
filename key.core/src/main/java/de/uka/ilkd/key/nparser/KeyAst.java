@@ -53,9 +53,9 @@ public abstract class KeyAst<T extends ParserRuleContext> {
 
         public @Nullable ProofSettings findProofSettings() {
             ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
-            if (ctx.decls() != null && ctx.decls().pref != null) {
+            if (ctx.preferences() != null) {
                 String text =
-                    StringUtil.trim(ctx.decls().pref.s.getText(), '"').replace("\\\\:", ":");
+                    StringUtil.trim(ctx.preferences().s.getText(), '"').replace("\\\\:", ":");
                 settings.loadSettingsFromString(text);
             }
             return settings;
@@ -97,12 +97,16 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         }
 
         /**
-         * Extracts the decls and taclets into a string. This method is required for saving and
-         * loading proofs.
+         * Extracts the decls and taclets into a string.
+         * The problem header may contain the bootstrap classpath,
+         * the regular classpath, the Java source file to load,
+         * include statements to load other files, configuration of options,
+         * declarations of sorts, program variables, schema variables, predicates, and more.
+         * See the grammar (KeYParser.g4) for more possible elements.
          */
         public String getProblemHeader() {
             final KeYParser.DeclsContext decls = ctx.decls();
-            if (decls != null) {
+            if (decls != null && decls.getChildCount() > 0) {
                 final Token start = decls.start;
                 final Token stop = decls.stop;
                 if (start != null && stop != null) {

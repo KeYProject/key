@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.pp;
 
-import java.io.IOException;
-
 import de.uka.ilkd.key.logic.Term;
 
 
@@ -11,7 +9,7 @@ public final class CharListNotation extends Notation {
     }
 
     @Override
-    public void print(Term t, LogicPrinter sp) throws IOException {
+    public void print(Term t, LogicPrinter sp) {
         if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
             sp.printTerm(t);
         } else {
@@ -54,7 +52,7 @@ public final class CharListNotation extends Notation {
      * quotation marks
      */
     private String translateTerm(Term t) {
-        final StringBuffer result = new StringBuffer("");
+        final StringBuilder result = new StringBuilder("");
         Term term = t;
         while (!term.op().name().toString().equals("clEmpty")) {
             if (!term.op().name().toString().equals("clCons"))

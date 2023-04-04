@@ -71,7 +71,7 @@ public class TestDropEffectlessElementary {
             term = tb.apply(t3, t2, null);
         }
         assertEquals("{{i:=i + 1}i:=i}(i = 0)",
-            LogicPrinter.quickPrintTerm(term, TacletForTests.services).trim());
+            LogicPrinter.quickPrintTerm(term, TacletForTests.services));
 
         Term result = applyDrop(term);
         assertEquals(term, result);

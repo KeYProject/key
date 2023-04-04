@@ -1,37 +1,25 @@
 package de.uka.ilkd.key.informationflow.po;
 
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.TreeSet;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.pp.StringBackend;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
+
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.TreeSet;
 
 public class InfFlowProofSymbols {
 
@@ -475,18 +463,14 @@ public class InfFlowProofSymbols {
                 }
             }
             if (!added) {
-                sortContainers.add(new TreeSet<Sort>(new Comparator<Sort>() {
-
-                    @Override
-                    public int compare(Sort s1, Sort s2) {
-                        if (s1.extendsTrans(s2)) {
-                            return 1;
-                        }
-                        if (s2.extendsTrans(s1)) {
-                            return -1;
-                        }
-                        return 0;
+                sortContainers.add(new TreeSet<Sort>((s1, s2) -> {
+                    if (s1.extendsTrans(s2)) {
+                        return 1;
                     }
+                    if (s2.extendsTrans(s1)) {
+                        return -1;
+                    }
+                    return 0;
                 }));
                 sortContainers.getLast().add(sort);
             }
@@ -549,21 +533,18 @@ public class InfFlowProofSymbols {
         return taclets;
     }
 
-    private String printSpace() {
-        StringBuffer result = new StringBuffer();
+    private void printSpace(StringBuilder result) {
         result.append("\n\n");
-        return result.toString();
     }
 
-    private String printSorts() {
+    private void printSorts(StringBuilder result) {
         if (getSorts().isEmpty()) {
-            return "";
+            return;
         }
 
-        StringBuffer result = new StringBuffer();
         result.append("\\sorts{\n");
         LinkedList<Sort> sortsList = ensureRightOrderOfSorts(getSorts());
-        // bugfix (CS): array types need not to be added as sorts
+        // bugfix (CS): array types need not be added as sorts
         // (and they cannot be parsed...)
         sortsList = removeArraySorts(sortsList);
         for (final Sort sort : sortsList) {
@@ -586,133 +567,104 @@ public class InfFlowProofSymbols {
             result.append(";\n");
         }
         result.append("}\n\n");
-        return result.toString();
     }
 
-    private String printPredicates() {
+    private void printPredicate(StringBuilder result, Function f) {
+        result.append(f.name());
+        for (int i = 0; i < f.arity(); i++) {
+            result.append(i == 0 ? "(" : ",");
+            result.append(f.argSort(i));
+            result.append(i == f.arity() - 1 ? ")" : "");
+        }
+        result.append(";\n");
+    }
+
+    private void printPredicates(StringBuilder result) {
         if (getPredicates().isEmpty()) {
-            return "";
+            return;
         }
 
-        StringBuffer result = new StringBuffer();
         result.append("\\predicates{\n");
         for (final Function pred : getPredicates()) {
-            result.append(pred.name());
-            String s = "";
-            for (int i = 0; i < pred.arity(); i++) {
-                s += (i == 0 ? "(" : ",");
-                s += (pred.argSort(i));
-                s += (i == pred.arity() - 1 ? ")" : "");
-            }
-            result.append(s);
-            result.append(";\n");
+            printPredicate(result, pred);
         }
         result.append("}\n\n");
-        return result.toString();
     }
 
-    private String printFunctions() {
+    private void printFunctions(StringBuilder result) {
         if (getFunctions().isEmpty()) {
-            return "";
+            return;
         }
 
-        StringBuffer result = new StringBuffer();
         result.append("\\functions{\n");
         for (final Function f : getFunctions()) {
-            result.append(f.sort().name() + " ");
-            result.append(f.name());
-            String s = "";
-            for (int i = 0; i < f.arity(); i++) {
-                s += (i == 0 ? "(" : ",");
-                s += (f.argSort(i));
-                s += (i == f.arity() - 1 ? ")" : "");
-            }
-            result.append(s);
-            result.append(";\n");
+            result.append(f.sort().name()).append(" ");
+            printPredicate(result, f);
         }
         result.append("}\n\n");
-        return result.toString();
     }
 
-    private String printProgramVariables() {
+    private void printProgramVariables(StringBuilder result) {
         if (getProgramVariables().isEmpty()) {
-            return "";
+            return;
         }
 
-        StringBuffer result = new StringBuffer();
         result.append("\\programVariables{\n");
         for (final ProgramVariable pv : getProgramVariables()) {
-            result.append(pv.sort().name() + " ");
+            result.append(pv.sort().name()).append(" ");
             result.append(pv.name());
             result.append(";\n");
         }
         result.append("}\n\n");
-        return result.toString();
     }
 
     @SuppressWarnings("unused")
-    private String printSchemaVariables() {
+    private void printSchemaVariables(StringBuilder result) {
         if (getSchemaVariables().isEmpty()) {
-            return "";
+            return;
         }
 
-        StringBuffer result = new StringBuffer();
         result.append("\\schemaVariables{\n");
         for (final SchemaVariable sv : getSchemaVariables()) {
             final String prefix = sv instanceof FormulaSV ? "\\formula "
                     : sv instanceof TermSV ? "\\term " : "\\variables ";
             result.append(prefix);
-            result.append(sv.sort().name() + " ");
+            result.append(sv.sort().name()).append(" ");
             result.append(sv.name());
             result.append(";\n");
         }
         result.append("}\n\n");
-        return result.toString();
     }
 
-    private String printTaclets() {
+    private void printTaclets(StringBuilder result) {
         if (getTaclets().isEmpty()) {
-            return "";
+            return;
         }
 
-        NotationInfo info = new NotationInfo();
-        StringBackend backend = new StringBackend(80);
-        LogicPrinter printer = new LogicPrinter(new ProgramPrinter(), info, backend, null, true);
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("\\rules{");
+        result.append("\\rules{");
         for (final Taclet taclet : getTaclets()) {
-            buffer.append("\n\n");
+            result.append("\n\n");
 
-            info = new NotationInfo();
-            backend = new StringBackend(80);
-            printer = new LogicPrinter(new ProgramPrinter(), info, backend, null, true);
+            LogicPrinter printer =
+                new LogicPrinter(new NotationInfo(), null, PosTableLayouter.pure(80));
+
             printer.printTaclet(taclet);
-            final StringBuffer t = new StringBuffer(backend.getString() + ";");
-            buffer.append(t);
+            result.append(printer.result()).append(";");
         }
-        buffer.append("\n}");
-        String string = buffer.toString();
-        // bugfix (CS): the following two lines changed array types to their
-        // base type -- which is no good idea. Thus I removed the lines.
-        // string = string.replaceAll("\\[", "");
-        // string = string.replaceAll("\\]", "");
-        buffer = new StringBuffer();
-        buffer.append(string);
-        buffer.append("\n\n");
-        return buffer.toString();
+        result.append("\n}");
+        result.append("\n\n");
     }
 
     public String printProofSymbols() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
-        result.append(printSpace());
-        result.append(printSorts());
-        result.append(printPredicates());
-        result.append(printFunctions());
-        result.append(printProgramVariables());
-        // result.append(printSchemaVariables());
-        result.append(printTaclets());
+        printSpace(result);
+        printSorts(result);
+        printPredicates(result);
+        printFunctions(result);
+        printProgramVariables(result);
+        // printSchemaVariables(result);
+        printTaclets(result);
 
         return result.toString();
     }

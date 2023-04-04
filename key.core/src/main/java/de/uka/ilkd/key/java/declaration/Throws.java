@@ -1,15 +1,13 @@
 package de.uka.ilkd.key.java.declaration;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Throws.
@@ -140,10 +138,5 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      */
     public void visit(Visitor v) {
         v.performActionOnThrows(this);
-    }
-
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printThrows(this);
     }
 }

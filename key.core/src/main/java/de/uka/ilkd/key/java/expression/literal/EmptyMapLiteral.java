@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java.expression.literal;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -26,11 +25,6 @@ public class EmptyMapLiteral extends Literal {
     @Override
     public void visit(Visitor v) {
         v.performActionOnEmptyMapLiteral(this);
-    }
-
-    @Override
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printEmptyMapLiteral(this);
     }
 
     @Override

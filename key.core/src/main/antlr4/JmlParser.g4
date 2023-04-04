@@ -50,7 +50,7 @@ class_invariant: INVARIANT expression SEMI_TOPLEVEL;
 method_specification: (also_keyword)* spec_case ((also_keyword)+ spec_case)*;
 also_keyword: (ALSO | FOR_EXAMPLE | IMPLIES_THAT);
 spec_case:
-  (modifier)?
+  (modifiers)?
   behavior=(BEHAVIOR | NORMAL_BEHAVIOR | MODEL_BEHAVIOUR | EXCEPTIONAL_BEHAVIOUR
            | BREAK_BEHAVIOR | CONTINUE_BEHAVIOR | RETURN_BEHAVIOR )?
   spec_body
