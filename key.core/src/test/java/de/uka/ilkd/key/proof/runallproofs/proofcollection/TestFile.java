@@ -77,7 +77,8 @@ public class TestFile implements Serializable {
         return ret;
     }
 
-    protected TestFile(TestProperty testProperty, String path, ProofCollectionSettings settings) throws IOException {
+    protected TestFile(TestProperty testProperty, String path, ProofCollectionSettings settings)
+            throws IOException {
         this.path = path;
         this.testProperty = testProperty;
         this.settings = settings;
