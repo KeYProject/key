@@ -72,7 +72,7 @@ jobs:
         uses: peter-evans/find-comment@v2
         id: fc
         with:
-          issue-number: ${{ steps.rpn.pr-number }}
+          issue-number: ${{ steps.rpn.outputs.pr-number }}
           comment-author: 'KiKi'
           body-includes: Artiweb
 
@@ -80,9 +80,9 @@ jobs:
         uses: peter-evans/create-or-update-comment@v2
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
-          issue-number: ${{ steps.rpn.pr-number }}
+          issue-number: ${{ steps.rpn.outputs.pr-number }}
           body: |
-            Test artifacts are available on [Artiweb](https://keyproject.github.io/artiweb/${steps.rpn.pr-number}/).
+            Test artifacts are available on [Artiweb](https://keyproject.github.io/artiweb/${{steps.rpn.outputs.pr-number}}/).
             
-            The newest artifact is [here](https://keyproject.github.io/artiweb/${steps.rpn.pr-number}/${steps.da.test-artifact-id}/).
+            The newest artifact is [here](https://keyproject.github.io/artiweb/${{steps.rpn.outputs.pr-number}}/${{steps.da.outputs.test-artifact-id}}/).
           edit-mode: replace
