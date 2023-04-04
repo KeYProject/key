@@ -23,12 +23,12 @@ public interface IExecutionJoin extends IExecutionNode<SourceElement> {
      *
      * @return {@code true} is verified, {@code false} is not verified.
      */
-    public boolean isWeakeningVerified();
+    boolean isWeakeningVerified();
 
     /**
      * Checks if the weakening verification is supported.
      *
      * @return {@code true} supported, {@code false} not supported.
      */
-    public boolean isWeakeningVerificationSupported();
+    boolean isWeakeningVerificationSupported();
 }

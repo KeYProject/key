@@ -109,7 +109,7 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
 
         if (label != null && !label.getSubtermOrigins().isEmpty()) {
             result += "<b>Origin of (former) sub-terms:</b><br>" + label.getSubtermOrigins()
-                    .stream().map(o -> "" + o + "<br>").reduce("", String::concat);
+                    .stream().map(o -> o + "<br>").reduce("", String::concat);
         }
 
         List<String> resultList = new LinkedList<>();
@@ -121,7 +121,7 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
 
         private static final long serialVersionUID = -2936000510977056583L;
         /** The visualizer shown by this action. */
-        private NodeInfoVisualizer vis;
+        private final NodeInfoVisualizer vis;
 
         private OpenVisualizerAction(NodeInfoVisualizer vis) {
             setName(vis.getLongName());

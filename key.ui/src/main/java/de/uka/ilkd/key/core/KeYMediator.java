@@ -63,24 +63,24 @@ import org.key_project.util.lookup.Lookup;
 public class KeYMediator {
 
     /** The user interface */
-    private AbstractMediatorUserInterfaceControl ui;
+    private final AbstractMediatorUserInterfaceControl ui;
 
     /** the notation info used to print sequents */
     private final NotationInfo notationInfo;
 
     /** listenerList with to gui listeners */
-    private EventListenerList listenerList = new EventListenerList();
+    private final EventListenerList listenerList = new EventListenerList();
 
     /** listens to the proof */
-    private KeYMediatorProofListener proofListener;
+    private final KeYMediatorProofListener proofListener;
 
     /** listens to the ProofTree */
-    private KeYMediatorProofTreeListener proofTreeListener;
+    private final KeYMediatorProofTreeListener proofTreeListener;
 
     /**
      * current proof and node the user works with. All user interaction is relative to this model
      */
-    private KeYSelectionModel keySelectionModel;
+    private final KeYSelectionModel keySelectionModel;
 
     /**
      * Registered proof load listeners.
@@ -685,8 +685,9 @@ public class KeYMediator {
      * @return
      */
     public @Nonnull Lookup getUserData() {
-        if (userData == null)
+        if (userData == null) {
             userData = new Lookup();
+        }
         return userData;
     }
 
@@ -937,7 +938,6 @@ public class KeYMediator {
                 public void eventException(Throwable throwable) {
                     KeYMediator.this.startInterface(true);
 
-                    throwable.printStackTrace();
                     KeYMediator.this.notify(new ExceptionFailureEvent(
                         "The cut could" + "not be processed successfully. In order to "
                             + "preserve consistency the proof is pruned."

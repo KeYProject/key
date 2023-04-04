@@ -66,11 +66,11 @@ public final class ExceptionTools {
     }
 
     @Nullable
-    private static Location getLocation(ParseException exc) throws MalformedURLException {
+    private static Location getLocation(ParseException exc) {
         // JavaCC has 1-based column numbers
         Token token = exc.currentToken;
         return token == null ? null
-                : new Location("", Position.fromToken(token.next));
+                : new Location((URL) null, Position.fromToken(token.next));
     }
 
     private static URL parseFileName(String filename) throws MalformedURLException {

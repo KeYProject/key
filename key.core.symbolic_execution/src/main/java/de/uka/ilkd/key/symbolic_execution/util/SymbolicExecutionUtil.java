@@ -293,7 +293,7 @@ public final class SymbolicExecutionUtil {
             IntegerLDT integerLDT) {
         // Improve children
         boolean subChanged = false;
-        List<Term> newSubs = new LinkedList<Term>();
+        List<Term> newSubs = new LinkedList<>();
         for (Term sub : term.subs()) {
             Term newSub = improveReadabilityRecursive(sub, services, integerLDT);
             if (newSub != sub) {
@@ -305,7 +305,7 @@ public final class SymbolicExecutionUtil {
         }
         if (subChanged) {
             term =
-                services.getTermFactory().createTerm(term.op(), new ImmutableArray<Term>(newSubs),
+                services.getTermFactory().createTerm(term.op(), new ImmutableArray<>(newSubs),
                     term.boundVars(), term.javaBlock(), term.getLabels());
         }
         // Improve readability: a < 1 + b, a < b + 1
@@ -403,9 +403,7 @@ public final class SymbolicExecutionUtil {
                 term = term.sub(0);
                 if (term.op() == integerLDT.getNumberLiteralFor(1)) {
                     term = term.sub(0);
-                    if (term.op() == integerLDT.getNumberTerminator()) {
-                        return true;
-                    }
+                    return term.op() == integerLDT.getNumberTerminator();
                 }
             }
         }
@@ -568,12 +566,12 @@ public final class SymbolicExecutionUtil {
         /**
          * The sequent to prove.
          */
-        private Sequent sequentToProve;
+        private final Sequent sequentToProve;
 
         /**
          * The {@link Operator} which is the predicate that contains the value interested in.
          */
-        private Operator operator;
+        private final Operator operator;
 
         /**
          * Constructor.
@@ -657,7 +655,7 @@ public final class SymbolicExecutionUtil {
     public static IExecutionConstraint[] createExecutionConstraints(IExecutionNode<?> node) {
         if (node != null && !node.isDisposed()) {
             TermBuilder tb = node.getServices().getTermBuilder();
-            List<IExecutionConstraint> constraints = new LinkedList<IExecutionConstraint>();
+            List<IExecutionConstraint> constraints = new LinkedList<>();
             Node proofNode = node.getProofNode();
             Sequent sequent = proofNode.sequent();
             for (SequentFormula sf : sequent.antecedent()) {
@@ -672,7 +670,7 @@ public final class SymbolicExecutionUtil {
                         node.getModalityPIO(), tb.not(sf.formula())));
                 }
             }
-            return constraints.toArray(new IExecutionConstraint[constraints.size()]);
+            return constraints.toArray(new IExecutionConstraint[0]);
         } else {
             return new IExecutionConstraint[0];
         }
@@ -765,7 +763,7 @@ public final class SymbolicExecutionUtil {
     public static IExecutionVariable[] createAllExecutionVariables(IExecutionNode<?> node,
             Node proofNode, PosInOccurrence modalityPIO, Term condition) {
         if (proofNode != null) {
-            List<IProgramVariable> variables = new LinkedList<IProgramVariable>();
+            List<IProgramVariable> variables = new LinkedList<>();
             // Add self variable
             IProgramVariable selfVar = findSelfTerm(proofNode, modalityPIO);
             if (selfVar != null) {
@@ -812,7 +810,7 @@ public final class SymbolicExecutionUtil {
     public static List<IProgramVariable> collectAllElementaryUpdateTerms(Node node) {
         if (node != null) {
             Services services = node.proof().getServices();
-            List<IProgramVariable> result = new LinkedList<IProgramVariable>();
+            List<IProgramVariable> result = new LinkedList<>();
             for (SequentFormula sf : node.sequent().antecedent()) {
                 internalCollectAllElementaryUpdateTerms(services, result, sf.formula());
             }
@@ -839,7 +837,7 @@ public final class SymbolicExecutionUtil {
             if (term.op() instanceof ElementaryUpdate) {
                 if (SymbolicExecutionUtil.isHeapUpdate(services, term)) {
                     // Extract static variables from heap
-                    Set<IProgramVariable> staticAttributes = new LinkedHashSet<IProgramVariable>();
+                    Set<IProgramVariable> staticAttributes = new LinkedHashSet<>();
                     internalCollectStaticProgramVariablesOnHeap(services, staticAttributes, term);
                     result.addAll(staticAttributes);
                 } else {
@@ -1474,14 +1472,14 @@ public final class SymbolicExecutionUtil {
         /**
          * {@code true} search maximal ID, {@code false} search minimal ID.
          */
-        private boolean maximum;
+        private final boolean maximum;
 
         /**
          * The current {@link PosInTerm}.
          */
         private PosInTerm currentPosInTerm = null;
 
-        private Deque<Integer> indexStack = new LinkedList<Integer>();
+        private final Deque<Integer> indexStack = new LinkedList<>();
 
         /**
          * Constructor.
@@ -1578,16 +1576,10 @@ public final class SymbolicExecutionUtil {
                 return true;
             } else if (isLoopInvariant(node, ruleApp)) {
                 return true;
-            } else if (isBlockSpecificationElement(node, ruleApp)) {
-                return true;
-            } else {
-                return false;
-            }
-        } else if (isLoopBodyTermination(node, ruleApp)) {
-            return true;
-        } else {
-            return false;
-        }
+            } else
+                return isBlockSpecificationElement(node, ruleApp);
+        } else
+            return isLoopBodyTermination(node, ruleApp);
     }
 
     /**
@@ -1870,8 +1862,8 @@ public final class SymbolicExecutionUtil {
             ContractPostOrExcPostExceptionVariableResult search =
                 searchContractPostOrExcPostExceptionVariable(node, node.proof().getServices());
 
-            List<Term> normalConditions = new LinkedList<Term>();
-            List<Term> exceptinalConditions = new LinkedList<Term>();
+            List<Term> normalConditions = new LinkedList<>();
+            List<Term> exceptinalConditions = new LinkedList<>();
             collectContractPreconditions(services, search, normalConditions, exceptinalConditions);
             List<Term> relevantConditions = childIndex == 1 ? // Exceptional case
                     exceptinalConditions : normalConditions;
@@ -1919,7 +1911,7 @@ public final class SymbolicExecutionUtil {
                 final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
                         .cloneProofEnvironmentWithOwnOneStepSimplifier(parent.proof(), true);
                 Sequent newSequent =
-                    createSequentToProveWithNewSuccedent(parent, (Term) null, result, true);
+                    createSequentToProveWithNewSuccedent(parent, null, result, true);
                 condition = evaluateInSideProof(services, parent.proof(), sideProofEnv, newSequent,
                     RESULT_LABEL, "Operation contract branch condition computation on node "
                         + parent.serialNr() + " for branch " + node.serialNr() + ".",
@@ -2134,22 +2126,22 @@ public final class SymbolicExecutionUtil {
         /**
          * The working {@link Term}.
          */
-        private Term workingTerm;
+        private final Term workingTerm;
 
         /**
          * The updates.
          */
-        private Pair<ImmutableList<Term>, Term> updatesAndTerm;
+        private final Pair<ImmutableList<Term>, Term> updatesAndTerm;
 
         /**
          * The exception definition.
          */
-        private Term exceptionDefinition;
+        private final Term exceptionDefinition;
 
         /**
          * The equality which contains the equality.
          */
-        private Term exceptionEquality;
+        private final Term exceptionEquality;
 
         /**
          * Constructor.
@@ -2292,7 +2284,7 @@ public final class SymbolicExecutionUtil {
                 // default instance can't be used parallel.
                 final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
                         .cloneProofEnvironmentWithOwnOneStepSimplifier(parent.proof(), true);
-                Sequent newSequent = createSequentToProveWithNewSuccedent(parent, (Term) null,
+                Sequent newSequent = createSequentToProveWithNewSuccedent(parent, null,
                     modalityTerm, pair.first, true);
                 condition = evaluateInSideProof(services, parent.proof(), sideProofEnv, newSequent,
                     RESULT_LABEL, "Loop invariant branch condition computation on node "
@@ -2605,7 +2597,7 @@ public final class SymbolicExecutionUtil {
             // instance can't be used parallel.
             final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
                     .cloneProofEnvironmentWithOwnOneStepSimplifier(parent.proof(), true);
-            Sequent newSequent = createSequentToProveWithNewSuccedent(parent, null, (Term) null,
+            Sequent newSequent = createSequentToProveWithNewSuccedent(parent, null, null,
                 newLeftAndRight, true);
             condition = evaluateInSideProof(services, parent.proof(), sideProofEnv, newSequent,
                 RESULT_LABEL, "Taclet branch condition computation on node " + parent.serialNr()
@@ -2629,7 +2621,7 @@ public final class SymbolicExecutionUtil {
      */
     private static ImmutableList<Term> listNewSemisequentTerms(Semisequent parent,
             Semisequent child) {
-        Set<SequentFormula> parentSFs = new HashSet<SequentFormula>();
+        Set<SequentFormula> parentSFs = new HashSet<>();
         for (SequentFormula sf : parent) {
             parentSFs.add(sf);
         }
@@ -2756,7 +2748,7 @@ public final class SymbolicExecutionUtil {
                                               // scenarios in which a precondition or null pointer
                                               // check can't be shown
                 splittingOption, false);
-        ImmutableList<Term> goalCondtions = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> goalCondtions = ImmutableSLList.nil();
         for (Pair<Term, Node> pair : resultValuesAndConditions) {
             Term goalCondition = pair.first;
             goalCondition = SymbolicExecutionUtil.replaceSkolemConstants(pair.second.sequent(),
@@ -2792,8 +2784,7 @@ public final class SymbolicExecutionUtil {
     public static void setChoiceSetting(String key, String value) {
         HashMap<String, String> settings =
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
-        HashMap<String, String> clone = new LinkedHashMap<String, String>();
-        clone.putAll(settings);
+        HashMap<String, String> clone = new LinkedHashMap<>(settings);
         clone.put(key, value);
         ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
     }
@@ -2965,7 +2956,7 @@ public final class SymbolicExecutionUtil {
         } else if (term.op() instanceof ElementaryUpdate) {
             return ImmutableSLList.<Term>nil().prepend(term);
         } else {
-            return ImmutableSLList.<Term>nil();
+            return ImmutableSLList.nil();
         }
     }
 
@@ -3049,7 +3040,8 @@ public final class SymbolicExecutionUtil {
      * @param factory The {@link TermFactory} to use.
      * @return The modified {@link Sequent}.
      */
-    protected static Sequent labelSkolemConstants(Sequent sequent, Set<Term> constantsToLabel,
+    private static Sequent labelSkolemConstants(
+            Sequent sequent, Set<Term> constantsToLabel,
             TermFactory factory) {
         for (SequentFormula sf : sequent.antecedent()) {
             int skolemEquality = checkSkolemEquality(sf);
@@ -3060,11 +3052,11 @@ public final class SymbolicExecutionUtil {
                         addLabelRecursiveToNonSkolem(factory, equality.sub(1), RESULT_LABEL);
                     Term skolem =
                         addLabelRecursiveToNonSkolem(factory, equality.sub(0), RESULT_LABEL);
-                    List<Term> newSubs = new LinkedList<Term>();
+                    List<Term> newSubs = new LinkedList<>();
                     newSubs.add(definition);
                     newSubs.add(skolem);
                     Term newEquality =
-                        factory.createTerm(equality.op(), new ImmutableArray<Term>(newSubs),
+                        factory.createTerm(equality.op(), new ImmutableArray<>(newSubs),
                             equality.boundVars(), equality.javaBlock(), equality.getLabels());
                     sequent = sequent.changeFormula(new SequentFormula(newEquality),
                         new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)).sequent();
@@ -3076,11 +3068,11 @@ public final class SymbolicExecutionUtil {
                         addLabelRecursiveToNonSkolem(factory, equality.sub(0), RESULT_LABEL);
                     Term skolem =
                         addLabelRecursiveToNonSkolem(factory, equality.sub(1), RESULT_LABEL);
-                    List<Term> newSubs = new LinkedList<Term>();
+                    List<Term> newSubs = new LinkedList<>();
                     newSubs.add(definition);
                     newSubs.add(skolem);
                     Term newEquality =
-                        factory.createTerm(equality.op(), new ImmutableArray<Term>(newSubs),
+                        factory.createTerm(equality.op(), new ImmutableArray<>(newSubs),
                             equality.boundVars(), equality.javaBlock(), equality.getLabels());
                     sequent = sequent.changeFormula(new SequentFormula(newEquality),
                         new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)).sequent();
@@ -3099,23 +3091,23 @@ public final class SymbolicExecutionUtil {
      * @return A new {@link Term} with the given {@link TermLabel}.
      */
     private static Term addLabelRecursiveToNonSkolem(TermFactory tf, Term term, TermLabel label) {
-        List<Term> newSubs = new LinkedList<Term>();
+        List<Term> newSubs = new LinkedList<>();
         for (Term oldSub : term.subs()) {
             newSubs.add(addLabelRecursiveToNonSkolem(tf, oldSub, label));
         }
         if (checkSkolemEquality(term) != 0 || isSkolemConstant(term)) {
             // Do not label skolem equality and skolem terms
-            return tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(),
+            return tf.createTerm(term.op(), new ImmutableArray<>(newSubs), term.boundVars(),
                 term.javaBlock(), term.getLabels());
         } else {
             /// Label term which is not a skolem equality and not a skolem term
-            List<TermLabel> newLabels = new LinkedList<TermLabel>();
+            List<TermLabel> newLabels = new LinkedList<>();
             for (TermLabel oldLabel : term.getLabels()) {
                 newLabels.add(oldLabel);
             }
             newLabels.add(label);
-            return tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(),
-                term.javaBlock(), new ImmutableArray<TermLabel>(newLabels));
+            return tf.createTerm(term.op(), new ImmutableArray<>(newSubs), term.boundVars(),
+                term.javaBlock(), new ImmutableArray<>(newLabels));
         }
     }
 
@@ -3129,21 +3121,21 @@ public final class SymbolicExecutionUtil {
      */
     public static Term removeLabelRecursive(TermFactory tf, Term term, TermLabel label) {
         // Update children
-        List<Term> newSubs = new LinkedList<Term>();
+        List<Term> newSubs = new LinkedList<>();
         ImmutableArray<Term> oldSubs = term.subs();
         for (Term oldSub : oldSubs) {
             newSubs.add(removeLabelRecursive(tf, oldSub, label));
         }
         // Update label
-        List<TermLabel> newLabels = new LinkedList<TermLabel>();
+        List<TermLabel> newLabels = new LinkedList<>();
         ImmutableArray<TermLabel> oldLabels = term.getLabels();
         for (TermLabel oldLabel : oldLabels) {
             if (oldLabel != label) {
                 newLabels.add(oldLabel);
             }
         }
-        return tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(),
-            term.javaBlock(), new ImmutableArray<TermLabel>(newLabels));
+        return tf.createTerm(term.op(), new ImmutableArray<>(newSubs), term.boundVars(),
+            term.javaBlock(), new ImmutableArray<>(newLabels));
     }
 
     /**
@@ -3159,7 +3151,7 @@ public final class SymbolicExecutionUtil {
             // Collect skolem constants in term
             Set<Term> result = collectSkolemConstantsNonRecursive(term);
             // Collect all skolem constants used in skolem constants
-            List<Term> toCheck = new LinkedList<Term>(result);
+            List<Term> toCheck = new LinkedList<>(result);
             while (!toCheck.isEmpty()) {
                 Term skolemConstant = toCheck.remove(0);
                 List<Term> replacements = findSkolemReplacements(sequent, skolemConstant, null);
@@ -3174,7 +3166,7 @@ public final class SymbolicExecutionUtil {
             }
             return result;
         } else {
-            return new HashSet<Term>();
+            return new HashSet<>();
         }
     }
 
@@ -3185,7 +3177,7 @@ public final class SymbolicExecutionUtil {
      * @return The found skolem {@link Term}s.
      */
     private static Set<Term> collectSkolemConstantsNonRecursive(Term term) {
-        final Set<Term> result = new HashSet<Term>();
+        final Set<Term> result = new HashSet<>();
         term.execPreOrder(new DefaultVisitor() {
             @Override
             public void visit(Term visited) {
@@ -3305,7 +3297,7 @@ public final class SymbolicExecutionUtil {
             List<Term> replacements = findSkolemReplacements(sequent, term.sub(0), term);
             if (!replacements.isEmpty()) {
                 Term other = term.sub(1);
-                List<Term> newTerms = new LinkedList<Term>();
+                List<Term> newTerms = new LinkedList<>();
                 for (Term replacement : replacements) {
                     newTerms.add(tb.equals(replacement, other));
                 }
@@ -3320,7 +3312,7 @@ public final class SymbolicExecutionUtil {
             List<Term> replacements = findSkolemReplacements(sequent, term.sub(1), term);
             if (!replacements.isEmpty()) {
                 Term other = term.sub(0);
-                List<Term> newTerms = new LinkedList<Term>();
+                List<Term> newTerms = new LinkedList<>();
                 for (Term replacement : replacements) {
                     newTerms.add(tb.equals(other, replacement));
                 }
@@ -3340,7 +3332,7 @@ public final class SymbolicExecutionUtil {
                 return !replacements.isEmpty() ? replacements.get(0) : term;
             } else {
                 // No skolem term
-                List<Term> newChildren = new LinkedList<Term>();
+                List<Term> newChildren = new LinkedList<>();
                 boolean changed = false;
                 for (int i = 0; i < term.arity(); i++) {
                     Term oldChild = term.sub(i);
@@ -3389,7 +3381,7 @@ public final class SymbolicExecutionUtil {
                     } else {
                         // Create new term in general.
                         return services.getTermFactory().createTerm(term.op(),
-                            new ImmutableArray<Term>(newChildren), term.boundVars(),
+                            new ImmutableArray<>(newChildren), term.boundVars(),
                             term.javaBlock(), term.getLabels());
                     }
                 } else {
@@ -3410,7 +3402,7 @@ public final class SymbolicExecutionUtil {
      */
     private static List<Term> findSkolemReplacements(Sequent sequent, Term skolemConstant,
             Term skolemEquality) {
-        List<Term> result = new LinkedList<Term>();
+        List<Term> result = new LinkedList<>();
         for (SequentFormula sf : sequent) {
             Term term = sf.formula();
             if (term != skolemEquality) {
@@ -3458,7 +3450,7 @@ public final class SymbolicExecutionUtil {
      * @return The found {@link IProgramVariable}s for the given {@link FieldDeclaration}.
      */
     public static Set<IProgramVariable> getProgramVariables(FieldDeclaration fd) {
-        Set<IProgramVariable> result = new LinkedHashSet<IProgramVariable>();
+        Set<IProgramVariable> result = new LinkedHashSet<>();
         if (fd != null) {
             ImmutableArray<FieldSpecification> specifications = fd.getFieldSpecifications();
             for (FieldSpecification spec : specifications) {
@@ -3646,7 +3638,7 @@ public final class SymbolicExecutionUtil {
                             && tryStatement.getBranchList().get(0) instanceof Catch) {
                         Catch catchStatement = (Catch) tryStatement.getBranchList().get(0);
                         if (catchStatement.getBody() instanceof StatementBlock) {
-                            StatementBlock catchBlock = (StatementBlock) catchStatement.getBody();
+                            StatementBlock catchBlock = catchStatement.getBody();
                             if (catchBlock.getBody().size() == 1
                                     && catchBlock.getBody().get(0) instanceof Assignment) {
                                 Assignment assignment = (Assignment) catchBlock.getBody().get(0);
@@ -3924,7 +3916,7 @@ public final class SymbolicExecutionUtil {
         if (ruleApp != null) {
             // Find inner most block
             SourceElement firstStatement = NodeInfo.computeFirstStatement(ruleApp);
-            Deque<StatementBlock> blocks = new LinkedList<StatementBlock>();
+            Deque<StatementBlock> blocks = new LinkedList<>();
             int methodFrameCount = 0;
             if (firstStatement != null) {
                 if (firstStatement instanceof StatementBlock) {
@@ -3949,9 +3941,9 @@ public final class SymbolicExecutionUtil {
                 block = blocks.removeFirst();
             }
             if (block != null && block.getChildCount() >= 2) {
-                return new Pair<Integer, SourceElement>(methodFrameCount, block.getChildAt(1));
+                return new Pair<>(methodFrameCount, block.getChildAt(1));
             } else {
-                return new Pair<Integer, SourceElement>(methodFrameCount, null);
+                return new Pair<>(methodFrameCount, null);
             }
         } else {
             return null;
@@ -4139,7 +4131,7 @@ public final class SymbolicExecutionUtil {
                 while (verified && leafsIter.hasNext()) {
                     Node leaf = leafsIter.next();
                     if (!leaf.isClosed()) {
-                        final Set<Operator> additinalOperatos = new HashSet<Operator>();
+                        final Set<Operator> additinalOperatos = new HashSet<>();
                         for (Term term : additinalPredicates) {
                             additinalOperatos.add(term.op());
                         }
@@ -4212,7 +4204,8 @@ public final class SymbolicExecutionUtil {
      * @param variable The {@link IProgramVariable} for that the value is needed.
      * @return The found value or {@code null} if it is not defined in the given update term.
      */
-    protected static ImmutableArray<Term> extractValueFromUpdate(Term term,
+    private static ImmutableArray<Term> extractValueFromUpdate(
+            Term term,
             IProgramVariable variable) {
         ImmutableArray<Term> result = null;
         if (term.op() instanceof ElementaryUpdate) {

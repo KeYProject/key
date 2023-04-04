@@ -27,17 +27,17 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
     /**
      * The exception to watch for
      */
-    private String exceptionName;
+    private final String exceptionName;
 
     /**
      * a Set of Nodes that represent exceptions
      */
-    private Set<Node> exceptionNodes;
+    private final Set<Node> exceptionNodes;
 
     /**
      * a list of nodes of the Symbolic Execution Tree whose children represent exceptions
      */
-    private Set<Node> exceptionParentNodes;
+    private final Set<Node> exceptionParentNodes;
 
     /**
      * a flag whether to watch for an uncaught exception
@@ -70,8 +70,8 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
             boolean uncaught, boolean suspendOnSubclasses, boolean enabled, int hitCount) {
         super(hitCount, proof, enabled);
         this.exceptionName = exceptionName;
-        exceptionNodes = new HashSet<Node>();
-        exceptionParentNodes = new HashSet<Node>();
+        exceptionNodes = new HashSet<>();
+        exceptionParentNodes = new HashSet<>();
         this.caught = caught;
         this.uncaught = uncaught;
         this.suspendOnSubclasses = suspendOnSubclasses;
@@ -89,7 +89,7 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
             RuleApp ruleApp = goal.getRuleAppManager().peekNext();
             SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
             Node SETParent = SymbolicExecutionUtil.findParentSetNode(node);
-            if (activeStatement != null && activeStatement instanceof Throw && isEnabled()) {
+            if (activeStatement instanceof Throw && isEnabled()) {
                 Throw throwStatement = (Throw) activeStatement;
                 for (int i = 0; i < throwStatement.getChildCount(); i++) {
                     SourceElement childElement = throwStatement.getChildAt(i);

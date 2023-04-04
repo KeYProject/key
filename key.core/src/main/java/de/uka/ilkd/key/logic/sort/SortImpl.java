@@ -24,14 +24,15 @@ public final class SortImpl extends AbstractSort {
 
 
     public SortImpl(Name name) {
-        this(name, DefaultImmutableSet.<Sort>nil());
+        this(name, DefaultImmutableSet.nil());
     }
 
     public boolean equals(Object o) {
         if (o instanceof SortImpl) {
             return ((SortImpl) o).name().equals(name());
-        } else
+        } else {
             return false;
+        }
     }
 
 }

@@ -637,7 +637,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
         extractor.analyse();
         // Test the initial memory layouts (first time with lazy computation)
         List<ISymbolicLayout> initialLayoutsFirstTime =
-            new ArrayList<ISymbolicLayout>(extractor.getLayoutsCount());
+            new ArrayList<>(extractor.getLayoutsCount());
         assertEquals(expectedNumberOfLayouts, extractor.getLayoutsCount());
         for (int i = 0; i < extractor.getLayoutsCount(); i++) {
             ISymbolicLayout current = extractor.getInitialLayout(i);
@@ -659,7 +659,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
         }
         // Test the current memory layouts (first time with lazy computation)
         List<ISymbolicLayout> currentLayoutsFirstTime =
-            new ArrayList<ISymbolicLayout>(extractor.getLayoutsCount());
+            new ArrayList<>(extractor.getLayoutsCount());
         for (int i = 0; i < extractor.getLayoutsCount(); i++) {
             ISymbolicLayout current = extractor.getCurrentLayout(i);
             currentLayoutsFirstTime.add(current);

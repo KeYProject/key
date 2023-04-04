@@ -22,7 +22,7 @@ import de.uka.ilkd.key.proof.io.RuleSource;
  */
 public class TrivialFileRepo implements FileRepo {
     @Override
-    public InputStream getInputStream(Path path) throws FileNotFoundException, IOException {
+    public InputStream getInputStream(Path path) throws IOException {
 
         // wrap path into URL for uniform treatment
         return getInputStream(path.toUri().toURL());

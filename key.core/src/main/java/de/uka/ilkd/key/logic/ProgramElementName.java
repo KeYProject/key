@@ -28,7 +28,7 @@ public class ProgramElementName extends Name
      */
     public ProgramElementName(String name) {
         super(name);
-        this.qualifierString = "".intern();
+        this.qualifierString = "";
         this.shortName = name.intern();
         this.creationInfo = null;
         comments = new Comment[0];
@@ -41,7 +41,7 @@ public class ProgramElementName extends Name
      */
     public ProgramElementName(String name, Comment[] c) {
         super(name);
-        this.qualifierString = "".intern();
+        this.qualifierString = "";
         this.shortName = name.intern();
         this.creationInfo = null;
         comments = c;
@@ -49,7 +49,7 @@ public class ProgramElementName extends Name
 
     public ProgramElementName(String name, NameCreationInfo creationInfo) {
         super(name);
-        this.qualifierString = "".intern();
+        this.qualifierString = "";
         this.shortName = name.intern();
         this.creationInfo = creationInfo;
         comments = new Comment[0];
@@ -57,7 +57,7 @@ public class ProgramElementName extends Name
 
     public ProgramElementName(String name, NameCreationInfo creationInfo, Comment[] c) {
         super(name);
-        this.qualifierString = "".intern();
+        this.qualifierString = "";
         this.shortName = name.intern();
         this.creationInfo = creationInfo;
         comments = c;

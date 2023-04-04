@@ -6,8 +6,12 @@ import java.net.URL;
 
 import org.key_project.util.java.IOUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class WebstartMain {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebstartMain.class);
 
     private static final int BUFFER_SIZE = 4096;
 
@@ -26,7 +30,7 @@ public class WebstartMain {
             }
             return tempDir;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Error setting up examples", e);
             return null;
         }
     }

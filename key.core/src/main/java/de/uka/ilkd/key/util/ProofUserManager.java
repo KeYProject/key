@@ -17,19 +17,20 @@ public final class ProofUserManager {
     /**
      * Stores for each {@link Proof} the registered users.
      */
-    private WeakHashMap<Proof, Set<Object>> proofUsers = new WeakHashMap<Proof, Set<Object>>();
+    private final WeakHashMap<Proof, Set<Object>> proofUsers =
+        new WeakHashMap<>();
 
     /**
      * Stores for each {@link KeYEnvironment} the known {@link Proof}s.
      */
-    private WeakHashMap<KeYEnvironment<?>, Set<Proof>> environmentProofs =
-        new WeakHashMap<KeYEnvironment<?>, Set<Proof>>();
+    private final WeakHashMap<KeYEnvironment<?>, Set<Proof>> environmentProofs =
+        new WeakHashMap<>();
 
     /**
      * Stores for each {@link Proof} the {@link KeYEnvironment} it lives in..
      */
-    private WeakHashMap<Proof, KeYEnvironment<?>> proofEnvironments =
-        new WeakHashMap<Proof, KeYEnvironment<?>>();
+    private final WeakHashMap<Proof, KeYEnvironment<?>> proofEnvironments =
+        new WeakHashMap<>();
 
     /**
      * The only instance of this class.
@@ -59,19 +60,12 @@ public final class ProofUserManager {
             throw new IllegalArgumentException("User not defined.");
         }
         synchronized (this) {
-            Set<Object> users = proofUsers.get(proof);
-            if (users == null) {
-                users = new HashSet<Object>();
-                proofUsers.put(proof, users);
-            }
+            Set<Object> users = proofUsers.computeIfAbsent(proof, k -> new HashSet<>());
             users.add(user);
             if (environment != null) {
                 proofEnvironments.put(proof, environment);
-                Set<Proof> proofs = environmentProofs.get(environment);
-                if (proofs == null) {
-                    proofs = new HashSet<Proof>();
-                    environmentProofs.put(environment, proofs);
-                }
+                Set<Proof> proofs =
+                    environmentProofs.computeIfAbsent(environment, k -> new HashSet<>());
                 proofs.add(proof);
             }
         }
@@ -126,7 +120,7 @@ public final class ProofUserManager {
     public Proof[] getProofs() {
         synchronized (this) {
             Set<Proof> keys = proofUsers.keySet();
-            return keys.toArray(new Proof[keys.size()]);
+            return keys.toArray(new Proof[0]);
         }
     }
 
@@ -140,7 +134,7 @@ public final class ProofUserManager {
         if (proof != null) {
             synchronized (this) {
                 Set<Object> users = proofUsers.get(proof);
-                return users != null ? users.toArray(new Object[users.size()]) : new Object[0];
+                return users != null ? users.toArray(new Object[0]) : new Object[0];
             }
         } else {
             return new Object[0];
@@ -173,7 +167,7 @@ public final class ProofUserManager {
         if (environment != null) {
             synchronized (this) {
                 Set<Proof> proofs = environmentProofs.get(environment);
-                return proofs != null ? proofs.toArray(new Proof[proofs.size()]) : new Proof[0];
+                return proofs != null ? proofs.toArray(new Proof[0]) : new Proof[0];
             }
         } else {
             return new Proof[0];

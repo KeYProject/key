@@ -51,8 +51,9 @@ public class InsertSystemInvariantTacletMenuItem extends InsertionTacletBrowserM
         }
 
         final ImmutableList<TacletGoalTemplate> goalTemplates = t.goalTemplates();
-        if (goalTemplates.size() != 1)
+        if (goalTemplates.size() != 1) {
             return null;
+        }
         return goalTemplates.head().sequent();
     }
 
@@ -60,7 +61,7 @@ public class InsertSystemInvariantTacletMenuItem extends InsertionTacletBrowserM
      * show the taclets sorted
      */
     protected Collection<TacletAppListItem> createInsertionList() {
-        return new TreeSet<TacletAppListItem>(new Lexicographical());
+        return new TreeSet<>(new Lexicographical());
     }
 
 

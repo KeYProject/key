@@ -1,29 +1,15 @@
 package de.uka.ilkd.key.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
+import java.awt.*;
 import java.awt.Dialog.ModalityType;
-import java.awt.FlowLayout;
-import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Observer;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingWorker;
+import java.util.concurrent.*;
+import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
@@ -57,7 +43,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
 
     public ProofScriptWorker(KeYMediator mediator, File file) throws IOException {
         this.initialLocation = new Location(file.toURI().toURL(), Position.newOneBased(1, 1));
-        this.script = new String(Files.readAllBytes(file.toPath()));
+        this.script = Files.readString(file.toPath());
         this.mediator = mediator;
         this.initiallySelectedGoal = null;
     }
@@ -143,7 +129,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
                     doc.insertString(doc.getLength(), "\n---\nExecuting: " + chunk, null);
                 }
             } catch (BadLocationException e) {
-                e.printStackTrace();
+                LOGGER.warn("Failed to insert string", e);
             }
         }
     }
@@ -177,12 +163,8 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
         }
 
         mediator.removeInterruptedListener(this);
-        runWithDeadline(() -> {
-            mediator.startInterface(true);
-        }, 1000);
-        runWithDeadline(() -> {
-            mediator.getUI().getProofControl().stopAndWaitAutoMode();
-        }, 1000);
+        runWithDeadline(() -> mediator.startInterface(true), 1000);
+        runWithDeadline(() -> mediator.getUI().getProofControl().stopAndWaitAutoMode(), 1000);
 
         try {
             if (!mediator.getSelectedProof().closed()) {

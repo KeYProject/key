@@ -10,7 +10,6 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.util.collection.ImmutableList;
 
 
-
 public interface Rule extends HasOrigin {
 
     /**

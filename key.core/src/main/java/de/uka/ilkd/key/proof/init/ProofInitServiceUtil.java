@@ -114,7 +114,7 @@ public final class ProofInitServiceUtil {
      * @return All available {@link DefaultProfileResolver}.
      */
     private static Map<String, DefaultProfileResolver> createDefaultProfileResolver() {
-        Map<String, DefaultProfileResolver> result = new HashMap<String, DefaultProfileResolver>();
+        Map<String, DefaultProfileResolver> result = new HashMap<>();
         Iterator<DefaultProfileResolver> iter =
             ClassLoaderUtil.loadServices(DefaultProfileResolver.class).iterator();
         while (iter.hasNext()) {

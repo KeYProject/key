@@ -32,7 +32,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     public FieldDeclaration(Modifier[] mods, TypeReference typeRef, FieldSpecification[] vars,
             boolean parentIsInterfaceDeclaration) {
         super(mods, typeRef, parentIsInterfaceDeclaration);
-        fieldSpecs = new ImmutableArray<FieldSpecification>(vars);
+        fieldSpecs = new ImmutableArray<>(vars);
     }
 
     /**
@@ -46,7 +46,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     public FieldDeclaration(ExtList children, boolean parentIsInterfaceDeclaration) {
         super(children, parentIsInterfaceDeclaration);
         fieldSpecs =
-            new ImmutableArray<FieldSpecification>(children.collect(FieldSpecification.class));
+            new ImmutableArray<>(children.collect(FieldSpecification.class));
     }
 
     public ImmutableArray<FieldSpecification> getFieldSpecifications() {
@@ -65,12 +65,15 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 
     public int getChildCount() {
         int result = 0;
-        if (modArray != null)
+        if (modArray != null) {
             result += modArray.size();
-        if (typeReference != null)
+        }
+        if (typeReference != null) {
             result++;
-        if (fieldSpecs != null)
+        }
+        if (fieldSpecs != null) {
             result += fieldSpecs.size();
+        }
         return result;
     }
 
@@ -91,8 +94,9 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
             index--;
         }
         if (fieldSpecs != null) {

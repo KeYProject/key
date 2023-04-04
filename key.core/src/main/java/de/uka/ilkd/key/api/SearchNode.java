@@ -11,12 +11,12 @@ import org.key_project.util.collection.ImmutableList;
  * Created by sarah on 5/2/17.
  */
 public class SearchNode {
-    SequentFormula[] pattern;
+    final SequentFormula[] pattern;
     int pos = 0;
     int succAntPos = 0;
-    public MatchConditions mc;
-    ImmutableList<IfFormulaInstantiation> antec;
-    ImmutableList<IfFormulaInstantiation> succ;
+    public final MatchConditions mc;
+    final ImmutableList<IfFormulaInstantiation> antec;
+    final ImmutableList<IfFormulaInstantiation> succ;
 
 
 

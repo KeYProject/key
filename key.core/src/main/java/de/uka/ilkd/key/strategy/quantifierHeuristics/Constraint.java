@@ -91,10 +91,10 @@ public interface Constraint {
      * checks equality of constraints
      */
     @Override
-    public boolean equals(Object obj);
+    boolean equals(Object obj);
 
     @Override
-    public int hashCode();
+    int hashCode();
 
     /**
      * joins the given constraint with this constraint and returns the joint new constraint. Every

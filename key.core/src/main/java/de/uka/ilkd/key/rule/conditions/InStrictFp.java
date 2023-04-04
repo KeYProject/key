@@ -50,7 +50,7 @@ public final class InStrictFp extends VariableConditionAdapter {
             }
 
             final boolean isInStrictFp = strictfpClass || methodContext.isStrictFp();
-            return negated ? !isInStrictFp : isInStrictFp;
+            return negated != isInStrictFp;
         }
     }
 

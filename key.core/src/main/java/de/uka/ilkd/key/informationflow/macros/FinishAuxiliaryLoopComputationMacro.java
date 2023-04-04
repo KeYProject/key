@@ -32,10 +32,8 @@ public class FinishAuxiliaryLoopComputationMacro extends AbstractFinishAuxiliary
             if (poForProof instanceof LoopInvExecutionPO) {
                 final Node parentOfInitiatingGoal =
                     ((LoopInvExecutionPO) poForProof).getInitiatingGoal().node().parent();
-                if (parentOfInitiatingGoal != null && parentOfInitiatingGoal
-                        .getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
-                    return true;
-                }
+                return parentOfInitiatingGoal != null && parentOfInitiatingGoal
+                        .getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp;
             }
         }
 

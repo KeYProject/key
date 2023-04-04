@@ -45,8 +45,9 @@ public final class ArrayComponentTypeCondition extends VariableConditionAdapter 
     @Override
     public boolean check(SchemaVariable var, SVSubstitute candidate, SVInstantiations svInst,
             Services services) {
-        if (var != this.var)
+        if (var != this.var) {
             return true;
+        }
         Sort s = null;
         if (candidate instanceof Term) {
             s = ((Term) candidate).sort();
@@ -57,7 +58,7 @@ public final class ArrayComponentTypeCondition extends VariableConditionAdapter 
             s = ((TypeReference) candidate).getKeYJavaType().getSort();
         }
 
-        if (s == null || !(s instanceof ArraySort)) {
+        if (!(s instanceof ArraySort)) {
             return false;
         }
         return !(((ArraySort) s).elementSort().extendsTrans(services.getJavaInfo().objectSort()))

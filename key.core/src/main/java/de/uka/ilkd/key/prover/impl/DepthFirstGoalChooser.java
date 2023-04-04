@@ -20,8 +20,9 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
         Goal result;
 
         if (allGoalsSatisfiable) {
-            if (nextGoals.isEmpty())
+            if (nextGoals.isEmpty()) {
                 nextGoals = selectedList;
+            }
 
             if (nextGoals.isEmpty()) {
                 result = null;
@@ -57,10 +58,10 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
     }
 
     protected void updateGoalListHelp(Node node, ImmutableList<Goal> newGoals) {
-        ImmutableList<Goal> prevGoalList = ImmutableSLList.<Goal>nil();
+        ImmutableList<Goal> prevGoalList = ImmutableSLList.nil();
         boolean newGoalsInserted = false;
 
-        nextGoals = ImmutableSLList.<Goal>nil();
+        nextGoals = ImmutableSLList.nil();
 
         // Remove "node" and goals contained within "newGoals"
         while (!selectedList.isEmpty()) {

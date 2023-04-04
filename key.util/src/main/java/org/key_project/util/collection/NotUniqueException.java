@@ -6,7 +6,7 @@ package org.key_project.util.collection;
 public class NotUniqueException extends Exception {
 
     private static final long serialVersionUID = 6565515240836947955L;
-    Object offender;
+    final Object offender;
 
     public NotUniqueException(Object o) {
         offender = o;

@@ -144,54 +144,58 @@ public class ViewSettings extends AbstractPropertiesSettings {
     /**
      * Show Taclet uninstantiated in tooltip -- for learning
      */
-    private PropertyEntry<Boolean> showUninstantiatedTaclet =
+    private final PropertyEntry<Boolean> showUninstantiatedTaclet =
         createBooleanProperty(SHOW_UNINSTANTIATED_TACLET, true);
-    private PropertyEntry<Boolean> showHeatmap = createBooleanProperty(HEATMAP_SHOW, false);
-    private PropertyEntry<Boolean> heatmapSF = createBooleanProperty(HEATMAP_SF, true);
+    private final PropertyEntry<Boolean> showHeatmap = createBooleanProperty(HEATMAP_SHOW, false);
+    private final PropertyEntry<Boolean> heatmapSF = createBooleanProperty(HEATMAP_SF, true);
     /**
      * Highlight newest formulas/terms (true) or all formulas/terms below specified age (false)
      */
-    private PropertyEntry<Boolean> heatmapNewest = createBooleanProperty(HEATMAP_NEWEST, true);
+    private final PropertyEntry<Boolean> heatmapNewest =
+        createBooleanProperty(HEATMAP_NEWEST, true);
     /**
      * Maximum age/number of newest terms/formulas for heatmap highlighting
      */
-    private PropertyEntry<Integer> maxAgeForHeatmap = createIntegerProperty(HEATMAP_MAXAGE, 5);
-    private PropertyEntry<Double> uiFontSizeFactor = createDoubleProperty(FONT_SIZE_FACTOR, 1.0);
-    private PropertyEntry<Integer> maxTooltipLines =
+    private final PropertyEntry<Integer> maxAgeForHeatmap =
+        createIntegerProperty(HEATMAP_MAXAGE, 5);
+    private final PropertyEntry<Double> uiFontSizeFactor =
+        createDoubleProperty(FONT_SIZE_FACTOR, 1.0);
+    private final PropertyEntry<Integer> maxTooltipLines =
         createIntegerProperty(MAX_TOOLTIP_LINES_KEY, 40);
-    private PropertyEntry<Boolean> hideIntermediateProofsteps =
+    private final PropertyEntry<Boolean> hideIntermediateProofsteps =
         createBooleanProperty(HIDE_INTERMEDIATE_PROOFSTEPS, false);
-    private PropertyEntry<Boolean> hideAutomodeProofsteps =
+    private final PropertyEntry<Boolean> hideAutomodeProofsteps =
         createBooleanProperty(HIDE_AUTOMODE_PROOFSTEPS, false);
-    private PropertyEntry<Boolean> hideClosedSubtrees =
+    private final PropertyEntry<Boolean> hideClosedSubtrees =
         createBooleanProperty(HIDE_CLOSED_SUBTREES, false);
-    private PropertyEntry<Boolean> notifyLoadBehaviour =
+    private final PropertyEntry<Boolean> notifyLoadBehaviour =
         createBooleanProperty(NOTIFY_LOAD_BEHAVIOUR, false);
-    private PropertyEntry<Boolean> usePretty = createBooleanProperty(PRETTY_SYNTAX, true);
-    private PropertyEntry<Boolean> useUnicode = createBooleanProperty(USE_UNICODE, false);
-    private PropertyEntry<Boolean> useSyntaxHighlighting =
+    private final PropertyEntry<Boolean> usePretty = createBooleanProperty(PRETTY_SYNTAX, true);
+    private final PropertyEntry<Boolean> useUnicode = createBooleanProperty(USE_UNICODE, false);
+    private final PropertyEntry<Boolean> useSyntaxHighlighting =
         createBooleanProperty(SYNTAX_HIGHLIGHTING, true);
-    private PropertyEntry<Boolean> hidePackagePrefix =
+    private final PropertyEntry<Boolean> hidePackagePrefix =
         createBooleanProperty(HIDE_PACKAGE_PREFIX, false);
-    private PropertyEntry<Boolean> confirmExit = createBooleanProperty(CONFIRM_EXIT, true);
-    private PropertyEntry<Boolean> showLoadExamplesDialog =
+    private final PropertyEntry<Boolean> confirmExit = createBooleanProperty(CONFIRM_EXIT, true);
+    private final PropertyEntry<Boolean> showLoadExamplesDialog =
         createBooleanProperty(SHOW_LOAD_EXAMPLES_DIALOG, true);
-    private PropertyEntry<Boolean> showWholeTaclet =
+    private final PropertyEntry<Boolean> showWholeTaclet =
         createBooleanProperty(SHOW_WHOLE_TACLET, false);
-    private PropertyEntry<Integer> sizeIndex = createIntegerProperty(FONT_INDEX, 2);
-    private PropertyEntry<String> lookAndFeel = createStringProperty(LOOK_AND_FEEL, null);
-    private PropertyEntry<Boolean> showSequentViewTooltips =
+    private final PropertyEntry<Integer> sizeIndex = createIntegerProperty(FONT_INDEX, 2);
+    private final PropertyEntry<String> lookAndFeel = createStringProperty(LOOK_AND_FEEL, null);
+    private final PropertyEntry<Boolean> showSequentViewTooltips =
         createBooleanProperty(SEQUENT_VIEW_TOOLTIP, true);
-    private PropertyEntry<Boolean> showSourceViewTooltips =
+    private final PropertyEntry<Boolean> showSourceViewTooltips =
         createBooleanProperty(SOURCE_VIEW_TOOLTIP, true);
-    private PropertyEntry<Boolean> highlightOrigin = createBooleanProperty(HIGHLIGHT_ORIGIN, true);
-    private PropertyEntry<Set<String>> clutterRules =
+    private final PropertyEntry<Boolean> highlightOrigin =
+        createBooleanProperty(HIGHLIGHT_ORIGIN, true);
+    private final PropertyEntry<Set<String>> clutterRules =
         createStringSetProperty(CLUTTER_RULES, CLUTTER_RULES_DEFAULT);
 
-    private PropertyEntry<Set<String>> clutterRuleSets =
+    private final PropertyEntry<Set<String>> clutterRuleSets =
         createStringSetProperty(CLUTTER_RULESSETS, CLUTTER_RULESETS_DEFAULT);
 
-    private PropertyEntry<Boolean> hideInteractiveGoals =
+    private final PropertyEntry<Boolean> hideInteractiveGoals =
         createBooleanProperty(HIDE_INTERACTIVE_GOALS, false);
 
     /**
@@ -200,7 +204,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
      * @see #getFolderBookmarks()
      * @see #setFolderBookmarks(List)
      */
-    private PropertyEntry<List<String>> folderBookmarks =
+    private final PropertyEntry<List<String>> folderBookmarks =
         createStringListProperty(USER_FOLDER_BOOKMARKS, System.getProperty("user.home"));
 
     /**

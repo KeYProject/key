@@ -225,7 +225,7 @@ public class TacletSoundnessPOLoader {
     private ImmutableSet<Taclet> computeCommonTaclets(ImmutableList<Taclet> taclets,
             ImmutableSet<Taclet> reference) {
         TreeSet<Taclet> treeSet =
-            new TreeSet<Taclet>((o1, o2) -> o1.name().toString().compareTo(o2.name().toString()));
+            new TreeSet<>(Comparator.comparing(o -> o.name().toString()));
         for (Taclet taclet : reference) {
             treeSet.add(taclet);
         }
@@ -273,7 +273,7 @@ public class TacletSoundnessPOLoader {
         ProofObligationCreator creator = new ProofObligationCreator();
 
 
-        List<Taclet> tacletsToProveList = new ArrayList<Taclet>();
+        List<Taclet> tacletsToProveList = new ArrayList<>();
         for (Taclet taclet : tacletsToProve) {
             tacletsToProveList.add(taclet);
         }
@@ -291,11 +291,12 @@ public class TacletSoundnessPOLoader {
 
 
         if (isUsedOnlyForProvingTaclets()) {
-            for (InitConfig proofConfig : proofConfigs)
+            for (InitConfig proofConfig : proofConfigs) {
                 for (Taclet taclet : proofConfig.getTaclets()) {
                     proofConfig.getJustifInfo().addJustification(taclet,
                         AxiomJustification.INSTANCE);
                 }
+            }
         }
 
         registerProofs(p, proofEnvForTaclets);

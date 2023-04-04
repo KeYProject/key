@@ -57,10 +57,12 @@ public class Comment extends JavaSourceElement {
     }
 
     public boolean equals(Object o) {
-        if (o == this)
+        if (o == this) {
             return true;
-        if (!(o instanceof Comment))
+        }
+        if (!(o instanceof Comment)) {
             return false;
+        }
         Comment cmp = (Comment) o;
         return (getText().equals(cmp.getText()));
     }

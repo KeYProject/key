@@ -40,7 +40,7 @@ public class ProofIndependentSettings {
 
     private final List<Settings> settings = new LinkedList<>();
 
-    private SettingsListener settingsListener = e -> saveSettings();
+    private final SettingsListener settingsListener = e -> saveSettings();
     private Properties lastReadedProperties;
 
     private ProofIndependentSettings(String filename) {

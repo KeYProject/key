@@ -10,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -935,7 +936,7 @@ public final class SourceView extends JComponent {
 
         private String extractFileName(URI uri) {
             String s = uri.toString();
-            int index = s.lastIndexOf("/");
+            int index = s.lastIndexOf('/');
             if (index < 0) {
                 return s; // fallback: return whole URI
             } else {
@@ -945,7 +946,8 @@ public final class SourceView extends JComponent {
 
         private void initLineInfo() {
             try {
-                InputStream inStream = new ByteArrayInputStream(source.getBytes());
+                InputStream inStream =
+                    new ByteArrayInputStream(source.getBytes(StandardCharsets.UTF_8));
                 lineInformation = IOUtil.computeLineInformation(inStream);
             } catch (IOException e) {
                 LOGGER.debug("Error while computing line information from {}", absoluteFileName, e);

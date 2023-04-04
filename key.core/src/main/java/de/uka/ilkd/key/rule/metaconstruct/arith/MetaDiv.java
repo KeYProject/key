@@ -26,14 +26,16 @@ public final class MetaDiv extends AbstractTermTransformer {
     private boolean checkResult(BigInteger a, BigInteger b, BigInteger result) {
 
         // (gt(b,0) -> (leq(0,sub(a,mul(result,b))) & lt(sub(a,mul(result,b)),b)) )
-        if (b.compareTo(BigInteger.ZERO) > 0)
+        if (b.compareTo(BigInteger.ZERO) > 0) {
             return ((BigInteger.ZERO.compareTo(a.subtract(result.multiply(b))) <= 0)
                     && (a.subtract(result.multiply(b)).compareTo(b) < 0));
+        }
 
         // ( lt(b,0) -> (leq(0,sub(a,mul(result,b))) & lt(sub(a,mul(result,b)),neg(b))) )
-        if (b.compareTo(BigInteger.ZERO) < 0)
+        if (b.compareTo(BigInteger.ZERO) < 0) {
             return ((BigInteger.ZERO.compareTo(a.subtract(result.multiply(b))) <= 0)
                     && (a.subtract(result.multiply(b)).compareTo(b.negate()) < 0));
+        }
 
         return false;
     }
@@ -50,7 +52,7 @@ public final class MetaDiv extends AbstractTermTransformer {
         bigIntArg2 = new BigInteger(convertToDecimalString(arg2, services));
         if (bigIntArg2.compareTo(new BigInteger("0")) == 0) {
             Name undefName = new Name("undef(" + term + ")");
-            Function undef = (Function) services.getNamespaces().functions().lookup(undefName);
+            Function undef = services.getNamespaces().functions().lookup(undefName);
             if (undef == null) {
                 undef = new Function(undefName,
                     services.getTypeConverter().getIntegerLDT().targetSort(), new Sort[0]);
@@ -61,11 +63,13 @@ public final class MetaDiv extends AbstractTermTransformer {
         BigInteger remainder = bigIntArg1.remainder(bigIntArg2);
         BigInteger bigIntResult = bigIntArg1.divide(bigIntArg2);
         if (remainder.compareTo(BigInteger.ZERO) != 0) {
-            if (bigIntArg1.compareTo(BigInteger.ZERO) < 0)
-                if (bigIntArg2.compareTo(BigInteger.ZERO) > 0)
+            if (bigIntArg1.compareTo(BigInteger.ZERO) < 0) {
+                if (bigIntArg2.compareTo(BigInteger.ZERO) > 0) {
                     bigIntResult = bigIntResult.subtract(BigInteger.ONE);
-                else
+                } else {
                     bigIntResult = bigIntResult.add(BigInteger.ONE);
+                }
+            }
         }
         Debug.assertTrue(checkResult(bigIntArg1, bigIntArg2, bigIntResult), bigIntArg1 + "/"
             + bigIntArg2 + "=" + bigIntResult + " is inconsistent with the taclet div_axiom");

@@ -11,7 +11,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 
 public class TermProgramVariableCollector extends DefaultVisitor {
 
-    private final HashSet<LocationVariable> result = new LinkedHashSet<LocationVariable>();
+    private final HashSet<LocationVariable> result = new LinkedHashSet<>();
     private final Services services;
 
 

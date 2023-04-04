@@ -42,23 +42,28 @@ public final class Metavariable extends AbstractSortedOperator
 
     @Override
     public int compareTo(Metavariable p_mr) {
-        if (p_mr == this)
+        if (p_mr == this) {
             return 0;
-        if (p_mr == null)
+        }
+        if (p_mr == null) {
             throw new NullPointerException();
+        }
 
         // temporary variables are the greatest ones
         if (isTemporaryVariable()) {
-            if (!p_mr.isTemporaryVariable())
+            if (!p_mr.isTemporaryVariable()) {
                 return 1;
+            }
         } else {
-            if (p_mr.isTemporaryVariable())
+            if (p_mr.isTemporaryVariable()) {
                 return -1;
+            }
         }
 
         int t = name().toString().compareTo(p_mr.name().toString());
-        if (t == 0)
+        if (t == 0) {
             return serial < p_mr.serial ? -1 : 1;
+        }
         return t;
     }
 

@@ -18,13 +18,13 @@ import recoder.service.ProgramModelInfo;
  * @author Tobias Gutzmann
  */
 public class TypeParameterInfo implements TypeParameter, ClassType {
-    protected String name;
+    protected final String name;
 
-    protected String[] boundNames;
+    protected final String[] boundNames;
 
-    protected List<TypeArgumentInfo>[] boundArgs;
+    protected final List<TypeArgumentInfo>[] boundArgs;
 
-    protected ClassFile containingClassFile;
+    protected final ClassFile containingClassFile;
 
     /**
      *

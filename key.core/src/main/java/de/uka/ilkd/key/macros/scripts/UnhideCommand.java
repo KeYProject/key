@@ -85,7 +85,7 @@ public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
         return "unhide";
     }
 
-    public class Parameters {
+    public static class Parameters {
         @Option("#2")
         public Sequent sequent;
     }

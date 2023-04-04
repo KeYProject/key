@@ -46,10 +46,10 @@ public class RemoveUnusedImports extends TwoPassTransformation {
      */
     public RemoveUnusedImports(CrossReferenceServiceConfiguration sc, CompilationUnit cu) {
         super(sc);
-        ArrayList<CompilationUnit> al = new ArrayList<CompilationUnit>(1);
+        ArrayList<CompilationUnit> al = new ArrayList<>(1);
         al.add(cu);
         this.units = al;
-        imports = new ArrayList<Import>();
+        imports = new ArrayList<>();
     }
 
     /**
@@ -64,7 +64,7 @@ public class RemoveUnusedImports extends TwoPassTransformation {
             throw new IllegalArgumentException("Missing units");
         }
         this.units = list;
-        imports = new ArrayList<Import>();
+        imports = new ArrayList<>();
     }
 
     /**

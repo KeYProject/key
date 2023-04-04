@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.smt.communication;
 
-
 import java.io.*;
 import javax.annotation.Nonnull;
 

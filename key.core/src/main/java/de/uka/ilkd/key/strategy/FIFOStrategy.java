@@ -46,7 +46,7 @@ public class FIFOStrategy implements Strategy {
         return NAME;
     }
 
-    public static Strategy INSTANCE = new FIFOStrategy();
+    public static final Strategy INSTANCE = new FIFOStrategy();
 
     public static class Factory implements StrategyFactory {
         public Name name() {

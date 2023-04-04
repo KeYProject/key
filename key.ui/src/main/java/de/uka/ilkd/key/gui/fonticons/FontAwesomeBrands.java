@@ -122,9 +122,10 @@ public enum FontAwesomeBrands implements IconFont {
 
     @Override
     public Font getFont() throws IOException, FontFormatException {
-        if (font == null)
+        if (font == null) {
             font = Font.createFont(Font.TRUETYPE_FONT,
                 getClass().getResourceAsStream("/fonts/Font Awesome 5 Brands-Regular-400.otf"));
+        }
         return font;
     }
 

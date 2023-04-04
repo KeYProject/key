@@ -65,13 +65,13 @@ public class Node implements Iterable<Node> {
      * a linked list of the locally generated program variables. It extends the list of the parent
      * node.
      */
-    private ImmutableList<IProgramVariable> localProgVars = ImmutableSLList.<IProgramVariable>nil();
+    private ImmutableList<IProgramVariable> localProgVars = ImmutableSLList.nil();
 
     /**
      * a linked list of the locally generated function symbols. It extends the list of the parent
      * node.
      */
-    private ImmutableList<Function> localFunctions = ImmutableSLList.<Function>nil();
+    private ImmutableList<Function> localFunctions = ImmutableSLList.nil();
 
     private boolean closed = false;
 
@@ -113,7 +113,7 @@ public class Node implements Iterable<Node> {
      * taclet with an addrule section on this node, then these taclets are stored in this list
      */
     private ImmutableSet<NoPosTacletApp> localIntroducedRules =
-        DefaultImmutableSet.<NoPosTacletApp>nil();
+        DefaultImmutableSet.nil();
 
     /**
      * Holds the undo methods for the information added by rules to the {@link Goal#strategyInfos}.
@@ -556,7 +556,8 @@ public class Node implements Iterable<Node> {
             tree.append(connectNode);
         }
 
-        tree.append("(" + newEnumeration + newPostNr + ") " + sequent().toString() + "\n");
+        tree.append("(").append(newEnumeration).append(newPostNr).append(") ")
+                .append(sequent().toString()).append("\n");
 
         // create new prefix
         if (ownNr < maxNr) {
@@ -797,8 +798,9 @@ public class Node implements Iterable<Node> {
      * @return
      */
     public @Nonnull Lookup getUserData() {
-        if (userData == null)
+        if (userData == null) {
             userData = new Lookup();
+        }
         return userData;
     }
 

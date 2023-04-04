@@ -108,26 +108,22 @@ public class FocussedRuleApplicationManager
 
         if (focFormula != null && pos != null) {
             if (isSameFormula(pos, focFormula)) {
-                if (!isBelow(focFormula, pos) || NonDuplicateAppModPositionFeature.INSTANCE
-                        .computeCost(rule, pos, goal).equals(BinaryFeature.TOP_COST))
-                    /*
-                     * rule app within the focussed formula, but not within the focussed subterm
-                     */
-                    return false;
+                /*
+                 * rule app within the focussed formula, but not within the focussed subterm
+                 */
+                return isBelow(focFormula, pos) && !NonDuplicateAppModPositionFeature.INSTANCE
+                        .computeCost(rule, pos, goal).equals(BinaryFeature.TOP_COST);
             } else {
-                if (onlyModifyFocussedFormula)
-                    return false;
+                return !onlyModifyFocussedFormula;
             }
-        } else if (onlyModifyFocussedFormula) {
-            return false;
+        } else {
+            return !onlyModifyFocussedFormula;
         }
-
-        return true;
     }
 
     @Override
     public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
-        ImmutableList<RuleApp> applicableRules = ImmutableSLList.<RuleApp>nil();
+        ImmutableList<RuleApp> applicableRules = ImmutableSLList.nil();
         for (RuleApp r : rules) {
             if (isRuleApplicationForFocussedFormula(r, pos)) {
                 applicableRules = applicableRules.prepend(r);
@@ -145,8 +141,9 @@ public class FocussedRuleApplicationManager
     private PosInOccurrence getPIOForFocussedSubterm() {
         final PosInOccurrence formula = goal.getFormulaTagManager().getPosForTag(focussedFormula);
 
-        if (formula == null)
+        if (formula == null) {
             return null;
+        }
 
         return focussedSubterm.replaceConstrainedFormula(formula.sequentFormula());
     }
@@ -158,10 +155,12 @@ public class FocussedRuleApplicationManager
         while (true) {
             final int overChild = overIt.next();
             final int underChild = underIt.next();
-            if (overChild == -1)
+            if (overChild == -1) {
                 return true;
-            if (overChild != underChild)
+            }
+            if (overChild != underChild) {
                 return false;
+            }
         }
     }
 

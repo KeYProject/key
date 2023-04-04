@@ -22,9 +22,9 @@ public class SettingsDialog extends JDialog {
     private static final long serialVersionUID = -3204453471778351602L;
     private final MainWindow mainWindow;
     private final SettingsUi ui;
-    private Action actionCancel = new CancelAction();
-    private Action actionAccept = new AcceptAction();
-    private Action actionApply = new ApplyAction();
+    private final Action actionCancel = new CancelAction();
+    private final Action actionAccept = new AcceptAction();
+    private final Action actionApply = new ApplyAction();
     private List<SettingsProvider> providers;
 
     public SettingsDialog(MainWindow owner) {
@@ -40,9 +40,8 @@ public class SettingsDialog extends JDialog {
         root.add(buttonBar, BorderLayout.SOUTH);
         setContentPane(root);
 
-        getRootPane().registerKeyboardAction(e -> {
-            dispose();
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().registerKeyboardAction(e -> dispose(),
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         setSize(600, 400);
     }
@@ -79,7 +78,6 @@ public class SettingsDialog extends JDialog {
                 it.applySettings(mainWindow);
                 apply(it.getChildren(), exceptions);
             } catch (Exception e) {
-                e.printStackTrace();
                 exceptions.add(e);
             }
         }

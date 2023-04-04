@@ -26,7 +26,7 @@ public final class SupportedTaclets {
      * The taclets that could be used for external provers.
      */
 
-    private Map<String, TreeItem> tacletNames = new LinkedHashMap<String, TreeItem>();
+    private final Map<String, TreeItem> tacletNames = new LinkedHashMap<>();
 
     private SupportedTaclets() {
         getTreeModel();
@@ -75,7 +75,7 @@ public final class SupportedTaclets {
     }
 
     public String[] getNamesOfSelectedTaclets() {
-        List<String> list = new LinkedList<String>();
+        List<String> list = new LinkedList<>();
         Enumeration<?> en = ((TreeItem) model.getRoot()).breadthFirstEnumeration();
         while (en.hasMoreElements()) {
             TreeItem item = (TreeItem) en.nextElement();
@@ -125,8 +125,7 @@ public final class SupportedTaclets {
     *
     */
     public HashSet<String> getTacletNamesAsHash() {
-        HashSet<String> names = new LinkedHashSet<String>();
-        names.addAll(tacletNames.keySet());
+        HashSet<String> names = new LinkedHashSet<>(tacletNames.keySet());
         return names;
     }
 
@@ -471,14 +470,14 @@ public final class SupportedTaclets {
     }
 
     private String toString(TreeItem node, String s) {
-        String result;
+        StringBuilder result;
 
-        result = "\n" + s + node.toComplexString();
+        result = new StringBuilder("\n" + s + node.toComplexString());
         for (int i = 0; i < node.getChildCount(); i++) {
-            result += toString((TreeItem) node.getChildAt(i), s + "+");
+            result.append(toString((TreeItem) node.getChildAt(i), s + "+"));
         }
 
-        return result;
+        return result.toString();
     }
 
     /**
@@ -487,7 +486,7 @@ public final class SupportedTaclets {
      *         time is in O(n^2)
      */
     public Collection<String> getMissingTaclets(Collection<Taclet> taclets) {
-        LinkedList<String> list = new LinkedList<String>();
+        LinkedList<String> list = new LinkedList<>();
 
         for (String name : this.tacletNames.keySet()) {
             boolean found = false;
@@ -516,7 +515,7 @@ public final class SupportedTaclets {
             all, nothing, user
         }
 
-        private String text;
+        private final String text;
 
         private SelectionMode mode = SelectionMode.nothing;
         private int selectedChildCount = 0;

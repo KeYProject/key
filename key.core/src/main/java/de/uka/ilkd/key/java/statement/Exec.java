@@ -50,7 +50,7 @@ public class Exec extends BranchStatement implements StatementContainer, Program
      */
     public Exec(StatementBlock body, Branch[] branches) {
         this.body = body;
-        this.branches = new ImmutableArray<Branch>(branches);
+        this.branches = new ImmutableArray<>(branches);
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -80,7 +80,7 @@ public class Exec extends BranchStatement implements StatementContainer, Program
     public Exec(ExtList children) {
         super(children);
         this.body = children.get(StatementBlock.class);
-        this.branches = new ImmutableArray<Branch>(children.collect(Branch.class));
+        this.branches = new ImmutableArray<>(children.collect(Branch.class));
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -139,10 +139,12 @@ public class Exec extends BranchStatement implements StatementContainer, Program
     @Override
     public int getChildCount() {
         int result = 0;
-        if (body != null)
+        if (body != null) {
             result++;
-        if (branches != null)
+        }
+        if (branches != null) {
             result += branches.size();
+        }
         return result;
     }
 
@@ -156,8 +158,9 @@ public class Exec extends BranchStatement implements StatementContainer, Program
     @Override
     public ProgramElement getChildAt(int index) {
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         if (branches != null) {

@@ -27,9 +27,7 @@ public class IsInductionVariable extends BinaryTermFeature {
         final String name = term.op().toString();
         if (name.length() > 3) {
             final String suffix = name.substring(name.length() - 3);
-            if (suffix.equals("Ind") || suffix.equals("IND")) {
-                return true;
-            }
+            return suffix.equals("Ind") || suffix.equals("IND");
         }
         return false;
     }

@@ -184,8 +184,9 @@ public class DesignTests {
                     || allClass.getPackage().getName().contains("key.strategy")) {
 
                 // exclude KeYMediator for the moment (contains some workarounds)
-                if (allClass.getName().contains("KeYMediator"))
+                if (allClass.getName().contains("KeYMediator")) {
                     continue;
+                }
 
                 for (Field f : allClass.getDeclaredFields()) {
                     if (java.awt.Component.class.isAssignableFrom(f.getType())) {
@@ -203,13 +204,14 @@ public class DesignTests {
                             "Illegal GUI reference as return type of {} declared in class {}",
                             m.getName(), allClass.getName());
                     }
-                    for (Class<?> t : m.getParameterTypes())
+                    for (Class<?> t : m.getParameterTypes()) {
                         if (java.awt.Component.class.isAssignableFrom(t)) {
                             LOGGER.error(
                                 "Illegal GUI reference as parameter type of {} declared in class {}",
                                 m.getName(), allClass.getName());
                             badClasses.add(allClass);
                         }
+                    }
                 }
             }
         }

@@ -24,7 +24,6 @@ import de.uka.ilkd.key.rule.NotFreeIn;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletMatcher;
 import de.uka.ilkd.key.rule.VariableCondition;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
@@ -114,13 +113,13 @@ public class VMTacletMatcher implements TacletMatcher {
 
 
         ImmutableList<IfFormulaInstantiation> resFormulas =
-            ImmutableSLList.<IfFormulaInstantiation>nil();
-        ImmutableList<MatchConditions> resMC = ImmutableSLList.<MatchConditions>nil();
+            ImmutableSLList.nil();
+        ImmutableList<MatchConditions> resMC = ImmutableSLList.nil();
 
         final boolean updateContextPresent =
             !p_matchCond.getInstantiations().getUpdateContext().isEmpty();
         ImmutableList<UpdateLabelPair> context =
-            ImmutableSLList.<SVInstantiations.UpdateLabelPair>nil();
+            ImmutableSLList.nil();
 
         if (updateContextPresent) {
             context = p_matchCond.getInstantiations().getUpdateContext();
@@ -210,8 +209,9 @@ public class VMTacletMatcher implements TacletMatcher {
             newMC = matchIf(ImmutableSLList.<IfFormulaInstantiation>nil().prepend(candidateInst),
                 itIfSequent.next().formula(), p_matchCond, p_services).getMatchConditions();
 
-            if (newMC.isEmpty())
+            if (newMC.isEmpty()) {
                 return null;
+            }
 
             p_matchCond = newMC.head();
         }
@@ -323,7 +323,7 @@ public class VMTacletMatcher implements TacletMatcher {
             return matchAndIgnoreUpdatePrefix(UpdateApplication.getTarget(term), matchCond,
                 services);
         } else {
-            return new Pair<Term, MatchConditions>(term, matchCond);
+            return new Pair<>(term, matchCond);
         }
     }
 

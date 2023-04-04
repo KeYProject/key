@@ -3,6 +3,7 @@ package de.uka.ilkd.key.smt.newsmt2;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -164,7 +165,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         List<Throwable> exceptions = master.getExceptions();
         for (Throwable t : exceptions) {
             sb.append("\n; ").append(t.toString().replace("\n", "\n;"));
-            t.printStackTrace();
+            LOGGER.warn("Exception", t);
         }
 
         // TODO Find a concept for exceptions here
@@ -202,7 +203,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
     private static String readResource(String s) {
         BufferedReader r = new BufferedReader(
-            new InputStreamReader(ModularSMTLib2Translator.class.getResourceAsStream(s)));
+            new InputStreamReader(ModularSMTLib2Translator.class.getResourceAsStream(s),
+                StandardCharsets.UTF_8));
 
         try {
             String line;

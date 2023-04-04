@@ -300,7 +300,7 @@ public final class SpecificationRepository {
             final String name = kjt.getJavaType().getFullName();
 
             if (name.contains(".")) {
-                final String enclosingName = name.substring(0, name.lastIndexOf("."));
+                final String enclosingName = name.substring(0, name.lastIndexOf('.'));
                 return services.getJavaInfo().getTypeByName(enclosingName);
             } else {
                 return null;
@@ -1318,7 +1318,7 @@ public final class SpecificationRepository {
      */
     public ContractPO getContractPOForProof(Proof proof) {
         ProofOblInput po = getProofOblInput(proof);
-        if (po != null && po instanceof ContractPO) {
+        if (po instanceof ContractPO) {
             return (ContractPO) po;
         } else {
             return null;

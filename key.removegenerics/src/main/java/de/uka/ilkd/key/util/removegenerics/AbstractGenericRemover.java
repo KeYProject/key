@@ -2,11 +2,7 @@ package de.uka.ilkd.key.util.removegenerics;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import de.uka.ilkd.key.util.removegenerics.monitor.GenericRemoverMonitor;
 
@@ -21,9 +17,9 @@ public abstract class AbstractGenericRemover {
     private final CrossReferenceServiceConfiguration sc = new CrossReferenceServiceConfiguration();
 
     private final Map<CompilationUnit, String> allUnits =
-        new LinkedHashMap<CompilationUnit, String>();
+        new LinkedHashMap<>();
 
-    private final List<String> sourceFiles = new ArrayList<String>();
+    private final List<String> sourceFiles = new ArrayList<>();
 
     public AbstractGenericRemover(GenericRemoverMonitor monitor) {
         assert monitor != null;
@@ -36,7 +32,7 @@ public abstract class AbstractGenericRemover {
     }
 
     public void addSourceFiles(Collection<String> sourceFiles) {
-        sourceFiles.addAll(sourceFiles);
+        this.sourceFiles.addAll(sourceFiles);
     }
 
     public void addSourceFile(String file) {
@@ -54,13 +50,14 @@ public abstract class AbstractGenericRemover {
     public void removeGenerics() throws ParserException, IOException {
         for (String fileName : sourceFiles) {
             File file = new File(fileName);
-            if (file.isDirectory())
+            if (file.isDirectory()) {
                 processDirectory(file);
-            else
+            } else {
                 processFile(file);
+            }
         }
 
-        List<ResolveGenerics> allTransformations = new ArrayList<ResolveGenerics>();
+        List<ResolveGenerics> allTransformations = new ArrayList<>();
 
         monitor.taskStarted("Analysing ...");
 
@@ -97,10 +94,11 @@ public abstract class AbstractGenericRemover {
     private void processDirectory(File dir) throws ParserException {
 
         for (File f : dir.listFiles()) {
-            if (f.isDirectory())
+            if (f.isDirectory()) {
                 processDirectory(f);
-            else if (f.getName().toLowerCase().endsWith(".java"))
+            } else if (f.getName().toLowerCase().endsWith(".java")) {
                 processFile(f);
+            }
         }
 
     }

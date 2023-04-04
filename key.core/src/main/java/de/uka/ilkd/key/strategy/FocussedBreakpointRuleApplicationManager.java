@@ -81,7 +81,7 @@ public class FocussedBreakpointRuleApplicationManager
     @Override
     public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
         ImmutableList<RuleApp> applicableRules = //
-            ImmutableSLList.<RuleApp>nil();
+            ImmutableSLList.nil();
         for (RuleApp r : rules) {
             if (mayAddRule(r, pos)) {
                 applicableRules = applicableRules.prepend(r);
@@ -102,12 +102,10 @@ public class FocussedBreakpointRuleApplicationManager
                 JavaTools.getActiveStatement(pos.subTerm().javaBlock());
             final String currStmtString = activeStmt.toString();
 
-            if (currStmtString != null && //
-                    (currStmtString.contains("{")
-                            ? currStmtString.substring(0, currStmtString.indexOf("{"))
-                            : currStmtString).trim().equals(breakpoint.get())) {
-                return false;
-            }
+            return currStmtString == null || //
+                    !(currStmtString.contains("{")
+                            ? currStmtString.substring(0, currStmtString.indexOf('{'))
+                            : currStmtString).trim().equals(breakpoint.get());
         }
 
         return true;

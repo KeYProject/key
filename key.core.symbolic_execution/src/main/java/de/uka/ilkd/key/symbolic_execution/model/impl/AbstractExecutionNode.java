@@ -39,7 +39,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * Contains all child {@link IExecutionNode}s.
      */
-    private final List<IExecutionNode<?>> children = new LinkedList<IExecutionNode<?>>();
+    private final List<IExecutionNode<?>> children = new LinkedList<>();
 
     /**
      * The contained call stack.
@@ -60,7 +60,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * The variable value pairs of the current state under given conditions.
      */
     private final Map<Term, IExecutionVariable[]> conditionalVariables =
-        new HashMap<Term, IExecutionVariable[]>();
+        new HashMap<>();
 
     /**
      * The used {@link ExecutionNodeSymbolicLayoutExtractor}.
@@ -81,13 +81,13 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * The already computed block completion conditions.
      */
     private final Map<IExecutionBlockStartNode<?>, Term> blockCompletionConditions =
-        new HashMap<IExecutionBlockStartNode<?>, Term>();
+        new HashMap<>();
 
     /**
      * The already computed human readable block completion conditions.
      */
     private final Map<IExecutionBlockStartNode<?>, String> formatedBlockCompletionConditions =
-        new HashMap<IExecutionBlockStartNode<?>, String>();
+        new HashMap<>();
 
     /**
      * The up to know discovered outgoing links.
@@ -132,7 +132,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      */
     @Override
     public AbstractExecutionNode<?>[] getChildren() {
-        return children.toArray(new AbstractExecutionNode[children.size()]);
+        return children.toArray(new AbstractExecutionNode[0]);
     }
 
     /**
@@ -468,7 +468,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
                 completedBlocks.contains(completedNode)) {
             final Services services = initConfig.getServices();
             // Collect branch conditions
-            List<Term> bcs = new LinkedList<Term>();
+            List<Term> bcs = new LinkedList<>();
             AbstractExecutionNode<?> parent = getParent();
             while (parent != null && parent != completedNode) {
                 if (parent instanceof IExecutionBranchCondition) {

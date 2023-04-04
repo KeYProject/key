@@ -47,7 +47,7 @@ public final class DescriptionFacade {
                     DescriptionFacade.class.getResourceAsStream(COMMANDS_DESCRIPTION));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to load properties", e);
         }
         return properties;
     }

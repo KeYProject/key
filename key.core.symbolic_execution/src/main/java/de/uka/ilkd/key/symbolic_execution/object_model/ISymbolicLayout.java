@@ -33,19 +33,19 @@ public interface ISymbolicLayout extends ISymbolicElement {
      *
      * @return The equivalence classes.
      */
-    public ImmutableList<ISymbolicEquivalenceClass> getEquivalenceClasses();
+    ImmutableList<ISymbolicEquivalenceClass> getEquivalenceClasses();
 
     /**
      * Returns the symbolic state.
      *
      * @return the symbolic state.
      */
-    public ISymbolicState getState();
+    ISymbolicState getState();
 
     /**
      * Returns all available symbolic objects.
      *
      * @return The available symbolic objects.
      */
-    public ImmutableList<ISymbolicObject> getObjects();
+    ImmutableList<ISymbolicObject> getObjects();
 }

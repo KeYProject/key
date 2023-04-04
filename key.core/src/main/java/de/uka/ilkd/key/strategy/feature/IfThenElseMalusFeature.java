@@ -24,8 +24,9 @@ public class IfThenElseMalusFeature implements Feature {
     private IfThenElseMalusFeature() {}
 
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-        if (pos == null)
+        if (pos == null) {
             return NumberRuleAppCost.getZeroCost();
+        }
 
         final ServiceCaches caches = goal.proof().getServices().getCaches();
 
@@ -45,12 +46,14 @@ public class IfThenElseMalusFeature implements Feature {
         final PIOPathIterator it = pos.iterator();
         while (true) {
             final int ind = it.next();
-            if (ind == -1)
+            if (ind == -1) {
                 break;
+            }
 
             final Term t = it.getSubTerm();
-            if (t.op() instanceof IfThenElse)
+            if (t.op() instanceof IfThenElse) {
                 res = ind != 0 ? res + 1 : res - 1;
+            }
         }
 
         resInt = NumberRuleAppCost.create(res);

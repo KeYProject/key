@@ -119,7 +119,7 @@ public class LemmataHandler implements TacletFilter {
     }
 
     private Collection<File> createFilesForAxioms(Collection<String> filenames) {
-        Collection<File> list = new LinkedList<File>();
+        Collection<File> list = new LinkedList<>();
         for (String filename : filenames) {
             list.add(new File(filename));
         }

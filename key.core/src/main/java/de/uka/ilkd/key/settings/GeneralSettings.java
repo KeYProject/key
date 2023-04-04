@@ -59,7 +59,7 @@ public class GeneralSettings implements Settings, Cloneable {
      */
     private boolean ensureSourceConsistency = true;
 
-    private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
+    private final LinkedList<SettingsListener> listenerList = new LinkedList<>();
 
     GeneralSettings() {
         addSettingsListener(AutoSaver.settingsListener);
@@ -144,30 +144,31 @@ public class GeneralSettings implements Settings, Cloneable {
     public void readSettings(Properties props) {
         String val = props.getProperty(TACLET_FILTER);
         if (val != null) {
-            tacletFilter = Boolean.valueOf(val).booleanValue();
+            tacletFilter = Boolean.parseBoolean(val);
         }
 
         val = props.getProperty(DND_DIRECTION_SENSITIVE_KEY);
         if (val != null) {
-            dndDirectionSensitive = Boolean.valueOf(val).booleanValue();
+            dndDirectionSensitive = Boolean.parseBoolean(val);
         }
 
         val = props.getProperty(RIGHT_CLICK_MACROS_KEY);
         if (val != null) {
-            rightClickMacros = Boolean.valueOf(val).booleanValue();
+            rightClickMacros = Boolean.parseBoolean(val);
         }
 
         val = props.getProperty(USE_JML_KEY);
         if (val != null) {
-            useJML = Boolean.valueOf(val).booleanValue();
+            useJML = Boolean.parseBoolean(val);
         }
 
         val = props.getProperty(AUTO_SAVE);
         if (val != null) {
             try {
                 autoSave = Integer.parseInt(val);
-                if (autoSave < 0)
+                if (autoSave < 0) {
                     autoSave = 0;
+                }
             } catch (NumberFormatException e) {
                 autoSave = 0;
             }
@@ -175,7 +176,7 @@ public class GeneralSettings implements Settings, Cloneable {
 
         val = props.getProperty(ENSURE_SOURCE_CONSISTENCY);
         if (val != null) {
-            ensureSourceConsistency = Boolean.valueOf(val).booleanValue();
+            ensureSourceConsistency = Boolean.parseBoolean(val);
         }
     }
 
@@ -186,12 +187,12 @@ public class GeneralSettings implements Settings, Cloneable {
      * @param props the Properties object where to write the settings as (key, value) pair
      */
     public void writeSettings(Properties props) {
-        props.setProperty(TACLET_FILTER, "" + tacletFilter);
-        props.setProperty(DND_DIRECTION_SENSITIVE_KEY, "" + dndDirectionSensitive);
-        props.setProperty(RIGHT_CLICK_MACROS_KEY, "" + rightClickMacros);
-        props.setProperty(USE_JML_KEY, "" + useJML);
-        props.setProperty(AUTO_SAVE, "" + autoSave);
-        props.setProperty(ENSURE_SOURCE_CONSISTENCY, "" + ensureSourceConsistency);
+        props.setProperty(TACLET_FILTER, String.valueOf(tacletFilter));
+        props.setProperty(DND_DIRECTION_SENSITIVE_KEY, String.valueOf(dndDirectionSensitive));
+        props.setProperty(RIGHT_CLICK_MACROS_KEY, String.valueOf(rightClickMacros));
+        props.setProperty(USE_JML_KEY, String.valueOf(useJML));
+        props.setProperty(AUTO_SAVE, String.valueOf(autoSave));
+        props.setProperty(ENSURE_SOURCE_CONSISTENCY, String.valueOf(ensureSourceConsistency));
     }
 
     /**

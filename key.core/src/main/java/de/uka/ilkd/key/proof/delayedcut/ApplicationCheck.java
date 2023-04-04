@@ -34,9 +34,9 @@ public interface ApplicationCheck {
      *
      * @author Benjamin Niedermann
      */
-    public static class NoNewSymbolsCheck implements ApplicationCheck {
+    class NoNewSymbolsCheck implements ApplicationCheck {
         private Node node;
-        private Set<String> names = new TreeSet<String>();
+        private final Set<String> names = new TreeSet<>();
 
         private static final String INFORMATION1 =
             "The formula contains a symbol that has been introduced below Node ";
@@ -70,7 +70,7 @@ public interface ApplicationCheck {
         }
 
         private void buildCaches(Node cutNode) {
-            LinkedList<Node> queue = new LinkedList<Node>();
+            LinkedList<Node> queue = new LinkedList<>();
             queue.add(cutNode);
             while (!queue.isEmpty()) {
                 Node next = queue.pollFirst();
@@ -87,7 +87,7 @@ public interface ApplicationCheck {
         }
 
         private String checkFormula(Term formula) {
-            final List<String> newSymbols = new LinkedList<String>();
+            final List<String> newSymbols = new LinkedList<>();
             formula.execPreOrder(new DefaultVisitor() {
                 @Override
                 public void visit(Term visited) {
@@ -102,8 +102,8 @@ public interface ApplicationCheck {
                 return null;
             }
 
-            StringBuffer buf =
-                new StringBuffer(newSymbols.size() == 1 ? INFORMATION1 : INFORMATION2);
+            StringBuilder buf =
+                new StringBuilder(newSymbols.size() == 1 ? INFORMATION1 : INFORMATION2);
             buf.append(node.serialNr()).append(": ");
             for (String name : newSymbols) {
                 buf.append(name);

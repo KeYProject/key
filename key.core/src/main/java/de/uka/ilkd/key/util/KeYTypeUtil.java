@@ -206,7 +206,7 @@ public final class KeYTypeUtil {
             return resolveType(((KeYJavaType) type).getJavaType());
         } else if (type instanceof ArrayType) {
             ArrayType arrayType = (ArrayType) type;
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append(resolveType(arrayType.getBaseType()));
             for (int i = 0; i < arrayType.getDimension(); i++) {
                 sb.append("[]");

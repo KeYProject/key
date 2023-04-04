@@ -904,7 +904,7 @@ public class LogicPrinter {
             // Hide package prefix when printing field constants.
             layouter.startTerm(0);
             String name = t.op().name().toString();
-            int index = name.lastIndexOf(".");
+            int index = name.lastIndexOf('.');
             String prettyFieldName = name.substring(index + 1);
             if (isKeyword) {
                 layouter.markStartKeyword();

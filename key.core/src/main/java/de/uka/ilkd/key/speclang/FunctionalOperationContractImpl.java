@@ -242,7 +242,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             ProgramVariable excVar, Map<LocationVariable, ? extends ProgramVariable> atPreVars,
             Services services) {
         final Map<ProgramVariable, ProgramVariable> result =
-            new LinkedHashMap<ProgramVariable, ProgramVariable>();
+            new LinkedHashMap<>();
 
         // self
         if (selfVar != null) {
@@ -300,9 +300,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     protected Map<Term, Term> getReplaceMap(LocationVariable heap, Term heapTerm, Term selfTerm,
             ImmutableList<Term> paramTerms, Term resultTerm, Term excTerm, Term atPre,
             Services services) {
-        Map<LocationVariable, Term> heapTerms = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> heapTerms = new LinkedHashMap<>();
         heapTerms.put(heap, heapTerm);
-        Map<LocationVariable, Term> atPres = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> atPres = new LinkedHashMap<>();
         heapTerms.put(heap, atPre);
         return getReplaceMap(heapTerms, selfTerm, paramTerms, resultTerm, excTerm, atPres,
             services);
@@ -323,7 +323,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     protected Map<Term, Term> getReplaceMap(Map<LocationVariable, Term> heapTerms, Term selfTerm,
             ImmutableList<Term> paramTerms, Term resultTerm, Term excTerm,
             Map<LocationVariable, Term> atPres, Services services) {
-        final Map<Term, Term> result = new LinkedHashMap<Term, Term>();
+        final Map<Term, Term> result = new LinkedHashMap<>();
 
         // heaps
         for (LocationVariable heap : heapTerms.keySet()) {
@@ -381,7 +381,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     private ImmutableList<ProgramVariable> addGhostParams(
             ImmutableList<ProgramVariable> paramVars) {
         // make sure ghost parameters are present
-        ImmutableList<ProgramVariable> ghostParams = ImmutableSLList.<ProgramVariable>nil();
+        ImmutableList<ProgramVariable> ghostParams = ImmutableSLList.nil();
         for (ProgramVariable param : originalParamVars) {
             if (param.isGhost()) {
                 ghostParams = ghostParams.append(param);
@@ -394,7 +394,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     /** Make sure ghost parameters appear in the list of parameter variables. */
     private ImmutableList<Term> addGhostParamTerms(ImmutableList<Term> paramVars) {
         // make sure ghost parameters are present
-        ImmutableList<Term> ghostParams = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> ghostParams = ImmutableSLList.nil();
         for (ProgramVariable param : originalParamVars) {
             if (param.isGhost()) {
                 ghostParams = ghostParams.append(tb.var(param));
@@ -477,7 +477,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
 
-        final Map<LocationVariable, Term> heapTerms = new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> heapTerms = new LinkedHashMap<>();
         heapTerms.put(heap, heapTerm);
 
         final Map<Term, Term> replaceMap =
@@ -551,7 +551,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
 
-        final Map<LocationVariable, Term> heapTerms = new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> heapTerms = new LinkedHashMap<>();
         heapTerms.put(heap, heapTerm);
 
         final Map<Term, Term> replaceMap =
@@ -639,7 +639,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         Operator originalResultVar = resultTerm != null ? resultTerm.op() : null;
         final TermBuilder tb = services.getTermBuilder();
 
-        Map<LocationVariable, Term> heapTerms = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> heapTerms = new LinkedHashMap<>();
         for (LocationVariable h : heapContext) {
             heapTerms.put(h, tb.var(h));
         }
@@ -648,14 +648,14 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 ? contract.getMby(heapTerms, contractSelf, contractParams, atPres, services)
                 : null;
 
-        Map<LocationVariable, Term> originalMods = new HashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> originalMods = new HashMap<>();
         for (LocationVariable heap : heapContext) {
             Term m = contract.getMod(heap, tb.var(heap), contractSelf, contractParams, services);
             originalMods.put(heap, m);
         }
 
         Map<LocationVariable, Boolean> hasRealModifiesClause =
-            new HashMap<LocationVariable, Boolean>();
+            new HashMap<>();
         for (LocationVariable heap : heapContext) {
             hasRealModifiesClause.put(heap, contract.hasModifiesClause(heap));
         }
@@ -663,28 +663,28 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         Term globalDefs =
             contract.getGlobalDefs(baseHeap, baseHeapTerm, contractSelf, contractParams, services);
 
-        Map<LocationVariable, Term> originalPres = new HashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> originalPres = new HashMap<>();
         for (LocationVariable heap : heapContext) {
             Term preTerm = contract.getPre(heap, heapTerms.get(heap), contractSelf, contractParams,
                 atPres, services);
             originalPres.put(heap, preTerm);
         }
 
-        Map<LocationVariable, Term> originalFreePres = new HashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> originalFreePres = new HashMap<>();
         for (LocationVariable heap : heapContext) {
             Term freePreTerm = contract.getFreePre(heap, heapTerms.get(heap), contractSelf,
                 contractParams, atPres, services);
             originalFreePres.put(heap, freePreTerm);
         }
 
-        Map<LocationVariable, Term> originalPosts = new HashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> originalPosts = new HashMap<>();
         for (LocationVariable heap : heapContext) {
             Term p = contract.getPost(heap, heapTerms.get(heap), contractSelf, contractParams,
                 resultTerm, excTerm, atPres, services);
             originalPosts.put(heap, p);
         }
 
-        Map<LocationVariable, Term> originalFreePosts = new HashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> originalFreePosts = new HashMap<>();
         for (LocationVariable heap : heapContext) {
             Term p = contract.getFreePost(heap, heapTerms.get(heap), contractSelf, contractParams,
                 resultTerm, excTerm, atPres, services);
@@ -692,7 +692,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         }
 
         Map<LocationVariable, ProgramVariable> atPresVars =
-            new HashMap<LocationVariable, ProgramVariable>();
+            new HashMap<>();
         for (Entry<LocationVariable, Term> entry : atPres.entrySet()) {
             if (entry.getValue() != null) {
                 atPresVars.put(entry.getKey(), (ProgramVariable) entry.getValue().op());
@@ -701,7 +701,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             }
         }
 
-        Map<LocationVariable, Term> originalAxioms = new HashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> originalAxioms = new HashMap<>();
         for (LocationVariable heap : heapContext) {
             Term p = contract.getRepresentsAxiom(heap, heapTerms.get(heap), contractSelf,
                 contractParams, resultTerm, excTerm, atPres, services);
@@ -721,7 +721,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             Operator originalSelfVar, ImmutableList<? extends SVSubstitute> originalParamVars,
             ProgramVariable originalExcVar, Services services, boolean usePrettyPrinting,
             boolean useUnicodeSymbols) {
-        final StringBuffer sig = new StringBuffer();
+        final StringBuilder sig = new StringBuilder();
         if (originalResultVar != null) {
             sig.append(originalResultVar);
             sig.append(" = ");
@@ -924,7 +924,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         for (ProgramVariable arg : originalParamVars) {
             args[i++] = arg;
         }
-        final MethodReference mr = new MethodReference(new ImmutableArray<Expression>(args),
+        final MethodReference mr = new MethodReference(new ImmutableArray<>(args),
             pm.getProgramElementName(), originalSelfVar);
         final Statement callStatement;
         if (originalResultVar == null) {
@@ -942,7 +942,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             ElementaryUpdate.getInstance(originalAtPreVars.get(baseHeap)), tb.getBaseHeap());
         final Term modalityTerm =
             tb.tf().createTerm(modality, new Term[] { originalPosts.get(baseHeap) },
-                new ImmutableArray<QuantifiableVariable>(), jb);
+                new ImmutableArray<>(), jb);
         final Term updateTerm =
             tb.tf().createTerm(UpdateApplication.UPDATE_APPLICATION, update, modalityTerm);
         final Term contractTerm =
@@ -1017,7 +1017,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert pm.isModel() || excTerm != null;
         assert atPres.size() != 0;
         assert services != null;
-        final Map<LocationVariable, Term> heapTerms = new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> heapTerms = new LinkedHashMap<>();
         heapTerms.put(heap, heapTerm);
 
         final Map<Term, Term> replaceMap =
@@ -1080,7 +1080,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert pm.isModel() || excTerm != null;
         assert atPres.size() != 0;
         assert services != null;
-        final Map<LocationVariable, Term> heapTerms = new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> heapTerms = new LinkedHashMap<>();
         heapTerms.put(heap, heapTerm);
 
         final Map<Term, Term> replaceMap =
@@ -1108,7 +1108,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             }
         }
         return result;
-    };
+    }
 
     @Override
     public Term getFreePost(List<LocationVariable> heapContext, ProgramVariable selfVar,
@@ -1165,7 +1165,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert pm.isModel() || excTerm != null;
         assert atPres.size() != 0;
         assert services != null;
-        final Map<LocationVariable, Term> heapTerms = new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> heapTerms = new LinkedHashMap<>();
         heapTerms.put(heap, heapTerm);
 
         final Map<Term, Term> replaceMap =
@@ -1210,7 +1210,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
 
-        final Map<LocationVariable, Term> heapTerms = new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> heapTerms = new LinkedHashMap<>();
         heapTerms.put(heap, heapTerm);
 
         final Map<Term, Term> replaceMap =
@@ -1244,7 +1244,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
         if (originalSelfVar != null) {
             map.put(originalSelfVar, selfVar);
         }
@@ -1272,7 +1272,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
         map.put(tb.var(heap), heapTerm);
         if (originalSelfVar != null) {
             map.put(tb.var(originalSelfVar), selfTerm);
@@ -1482,7 +1482,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     @Override
     public OriginalVariables getOrigVars() {
         Map<LocationVariable, ProgramVariable> atPreVars =
-            new LinkedHashMap<LocationVariable, ProgramVariable>();
+            new LinkedHashMap<>();
         for (LocationVariable h : originalAtPreVars.keySet()) {
             atPreVars.put(h, originalAtPreVars.get(h));
         }

@@ -132,11 +132,11 @@ public class InformationWindow extends JDialog {
             public String getText() {
                 int caretPosition = content.getDocument().getLength();
                 Element root = content.getDocument().getDefaultRootElement();
-                String text = "1" + StringUtil.NEW_LINE;
+                StringBuilder text = new StringBuilder("1" + StringUtil.NEW_LINE);
                 for (int i = 2; i < root.getElementIndex(caretPosition) + 2; i++) {
-                    text += i + StringUtil.NEW_LINE;
+                    text.append(i).append(StringUtil.NEW_LINE);
                 }
-                return text;
+                return text.toString();
             }
 
             @Override

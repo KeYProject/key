@@ -103,7 +103,7 @@ public class NJmlTranslatorTests {
 
     @Test
     void testContractModifiersMultiple() {
-        preParser.clearWarnings();;
+        preParser.clearWarnings();
         String contracts = "/*@ public abstract final normal_behaviour\n" +
             "  @ requires true;\n" +
             "  @ private static exceptional_behaviour\n" +
@@ -123,7 +123,7 @@ public class NJmlTranslatorTests {
 
     @Test
     void testContractModifiersMultipleAlso() {
-        preParser.clearWarnings();;
+        preParser.clearWarnings();
         String contracts = "/*@ public abstract final normal_behaviour\n" +
             "  @ requires true;\n" +
             "  @ also \n" +

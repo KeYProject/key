@@ -113,7 +113,7 @@ public class ProofStarter {
 
     private long timeout = -1L;
 
-    private ProverTaskListener ptl;
+    private final ProverTaskListener ptl;
 
     private AutoSaver autoSaver;
 

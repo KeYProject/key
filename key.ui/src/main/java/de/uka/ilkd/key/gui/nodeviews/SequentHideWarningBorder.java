@@ -37,10 +37,10 @@ public class SequentHideWarningBorder extends TitledBorder {
     private static final int DELTAX = 5;
 
     /** The component being shown */
-    private SequentView sequentView;
+    private final SequentView sequentView;
 
     /** The height of the original border text */
-    private int borderHeight;
+    private final int borderHeight;
 
     /**
      * Instantiates a new sequent border.

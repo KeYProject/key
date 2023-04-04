@@ -28,7 +28,7 @@ public class DefaultClassFileRepository extends AbstractService
         implements ClassFileRepository, PropertyChangeListener {
 
     // private PathList searchPath;
-    private final Map<String, ClassFile> classname2cf = new HashMap<String, ClassFile>(64);
+    private final Map<String, ClassFile> classname2cf = new HashMap<>(64);
 
     private final ByteCodeParser bytecodeParser = new ByteCodeParser();
 
@@ -89,7 +89,7 @@ public class DefaultClassFileRepository extends AbstractService
         if (loc == null) {
             String innername = classname;
             int ldp = innername.length() - 1;
-            StringBuffer sb = new StringBuffer(innername);
+            StringBuilder sb = new StringBuilder(innername);
             while (true) {
                 ldp = innername.lastIndexOf('.', ldp);
                 if (ldp == -1) {
@@ -118,11 +118,8 @@ public class DefaultClassFileRepository extends AbstractService
             loc.inputStreamClosed();
             // result.setLocation(loc.toString());
             classname2cf.put(classname, result);
-        } catch (IOException e) {
+        } catch (IOException | ParserException e) {
             getErrorHandler().reportError(e);
-            result = null;
-        } catch (ParserException pe) {
-            getErrorHandler().reportError(pe);
             result = null;
         }
         return result;
@@ -130,9 +127,10 @@ public class DefaultClassFileRepository extends AbstractService
 
     public List<ClassFile> getKnownClassFiles() {
         int n = classname2cf.size();
-        List<ClassFile> res = new ArrayList<ClassFile>(n);
-        for (ClassFile cf : classname2cf.values())
+        List<ClassFile> res = new ArrayList<>(n);
+        for (ClassFile cf : classname2cf.values()) {
             res.add(cf);
+        }
         return res;
     }
 

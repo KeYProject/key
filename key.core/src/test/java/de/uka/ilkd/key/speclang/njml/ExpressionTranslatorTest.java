@@ -31,8 +31,9 @@ public class ExpressionTranslatorTest {
 
     @BeforeEach
     public void setup() {
-        if (services != null)
+        if (services != null) {
             return;
+        }
         services = TacletForTests.services();
         Recoder2KeY r2k = new Recoder2KeY(services, services.getNamespaces());
         r2k.parseSpecialClasses();

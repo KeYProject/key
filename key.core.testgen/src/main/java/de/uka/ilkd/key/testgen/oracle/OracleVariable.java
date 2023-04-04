@@ -4,9 +4,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 public class OracleVariable implements OracleTerm {
 
-    private String name;
+    private final String name;
 
-    private Sort sort;
+    private final Sort sort;
 
     public OracleVariable(String name, Sort sort) {
         this.name = name;
@@ -24,24 +24,28 @@ public class OracleVariable implements OracleTerm {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         OracleVariable other = (OracleVariable) obj;
         if (name == null) {
-            if (other.name != null)
+            if (other.name != null) {
                 return false;
-        } else if (!name.equals(other.name))
+            }
+        } else if (!name.equals(other.name)) {
             return false;
+        }
         if (sort == null) {
-            if (other.sort != null)
-                return false;
-        } else if (!sort.equals(other.sort))
-            return false;
-        return true;
+            return other.sort == null;
+        } else {
+            return sort.equals(other.sort);
+        }
     }
 
     public String getName() {

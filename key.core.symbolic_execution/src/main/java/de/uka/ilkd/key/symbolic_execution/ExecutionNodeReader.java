@@ -75,7 +75,7 @@ public class ExecutionNodeReader {
     public IExecutionNode<?> read(InputStream in)
             throws ParserConfigurationException, SAXException, IOException {
         if (in != null) {
-            try {
+            try (in) {
                 // Parse XML file
                 SAXParserFactory factory = SAXParserFactory.newInstance();
                 factory.setNamespaceAware(true);
@@ -180,8 +180,6 @@ public class ExecutionNodeReader {
                 }
                 // Return result
                 return root;
-            } finally {
-                in.close();
             }
         } else {
             return null;
@@ -239,51 +237,51 @@ public class ExecutionNodeReader {
          * and emptied by {@link #endElement(String, String, String)}.
          */
         private final Deque<AbstractKeYlessExecutionNode<?>> parentNodeStack =
-            new LinkedList<AbstractKeYlessExecutionNode<?>>();
+            new LinkedList<>();
 
         /**
          * The parent hierarchy of {@link IExecutionVariable} and {@link IExecutionValue} filled by
          * {@link #startElement(String, String, String, Attributes)} and emptied by
          * {@link #endElement(String, String, String)}.
          */
-        private final Deque<Object> parentVariableValueStack = new LinkedList<Object>();
+        private final Deque<Object> parentVariableValueStack = new LinkedList<>();
 
         /**
          * Maps an {@link AbstractKeYlessExecutionNode} to the path entries of its call stack.
          */
         private final Map<AbstractKeYlessExecutionNode<?>, List<String>> callStackPathEntries =
-            new LinkedHashMap<AbstractKeYlessExecutionNode<?>, List<String>>();
+            new LinkedHashMap<>();
 
         /**
          * Maps an {@link KeYlessMethodCall} to the path entries of its method returns.
          */
         private final Map<KeYlessMethodCall, List<String>> methodReturnPathEntries =
-            new LinkedHashMap<KeYlessMethodCall, List<String>>();
+            new LinkedHashMap<>();
 
         /**
          * Maps an {@link AbstractKeYlessExecutionNode} to its completed block entries
          */
         private final Map<AbstractKeYlessExecutionNode<?>, List<Pair<String, String>>> completedBlockEntries =
-            new LinkedHashMap<AbstractKeYlessExecutionNode<?>, List<Pair<String, String>>>();
+            new LinkedHashMap<>();
 
         /**
          * Maps an {@link AbstractKeYlessExecutionBlockStartNode} to the path entries of its block
          * completions.
          */
         private final Map<AbstractKeYlessExecutionBlockStartNode<?>, List<String>> blockCompletionEntries =
-            new LinkedHashMap<AbstractKeYlessExecutionBlockStartNode<?>, List<String>>();
+            new LinkedHashMap<>();
 
         /**
          * Maps an {@link AbstractKeYlessExecutionNode} to the path entries of its outgoing links.
          */
         private final Map<AbstractKeYlessExecutionNode<?>, List<String>> outgoingLinks =
-            new LinkedHashMap<AbstractKeYlessExecutionNode<?>, List<String>>();
+            new LinkedHashMap<>();
 
         /**
          * Maps an {@link KeYlessStart} to the path entries of its terminations.
          */
         private final Map<KeYlessStart, List<String>> terminationPathEntries =
-            new LinkedHashMap<KeYlessStart, List<String>>();
+            new LinkedHashMap<>();
 
         /**
          * {@inheritDoc}
@@ -305,7 +303,7 @@ public class ExecutionNodeReader {
                         throw new SAXException("Can't add constraint to non execution node.");
                     }
                     KeYlessConstraint constraint = new KeYlessConstraint(getName(attributes));
-                    ((AbstractKeYlessExecutionNode<?>) parent).addConstraint(constraint);
+                    parent.addConstraint(constraint);
                 }
             } else if (isCallStateVariable(uri, localName, qName)) {
                 Object parentValue = parentVariableValueStack.peekFirst();
@@ -348,46 +346,37 @@ public class ExecutionNodeReader {
                 ((KeYlessVariable) parentValue).addValue(value);
                 parentVariableValueStack.addFirst(value);
             } else if (isCallStackEntry(uri, localName, qName)) {
-                List<String> callStackEntries = callStackPathEntries.get(parent);
-                if (callStackEntries == null) {
-                    callStackEntries = new LinkedList<String>();
-                    callStackPathEntries.put(parent, callStackEntries);
-                }
+                List<String> callStackEntries =
+                    callStackPathEntries.computeIfAbsent(parent, k -> new LinkedList<>());
                 callStackEntries.add(getPathInTree(attributes));
             } else if (isMethodReturnEntry(uri, localName, qName)) {
                 List<String> methodReturnEntries = methodReturnPathEntries.get(parent);
                 if (methodReturnEntries == null) {
-                    methodReturnEntries = new LinkedList<String>();
+                    methodReturnEntries = new LinkedList<>();
                     methodReturnPathEntries.put((KeYlessMethodCall) parent, methodReturnEntries);
                 }
                 methodReturnEntries.add(0, getPathInTree(attributes));
             } else if (isCompletedBlockEntry(uri, localName, qName)) {
-                List<Pair<String, String>> completedBlocks = completedBlockEntries.get(parent);
-                if (completedBlocks == null) {
-                    completedBlocks = new LinkedList<Pair<String, String>>();
-                    completedBlockEntries.put(parent, completedBlocks);
-                }
-                completedBlocks.add(new Pair<String, String>(getPathInTree(attributes),
+                List<Pair<String, String>> completedBlocks =
+                    completedBlockEntries.computeIfAbsent(parent, k -> new LinkedList<>());
+                completedBlocks.add(new Pair<>(getPathInTree(attributes),
                     getConditionString(attributes)));
             } else if (isBlockCompletionEntry(uri, localName, qName)) {
                 List<String> blockCompletionPathEntries = blockCompletionEntries.get(parent);
                 if (blockCompletionPathEntries == null) {
-                    blockCompletionPathEntries = new LinkedList<String>();
+                    blockCompletionPathEntries = new LinkedList<>();
                     blockCompletionEntries.put((AbstractKeYlessExecutionBlockStartNode<?>) parent,
                         blockCompletionPathEntries);
                 }
                 blockCompletionPathEntries.add(getPathInTree(attributes));
             } else if (isOutgoingLink(uri, localName, qName)) {
-                List<String> linkPaths = outgoingLinks.get(parent);
-                if (linkPaths == null) {
-                    linkPaths = new LinkedList<String>();
-                    outgoingLinks.put((AbstractKeYlessExecutionNode<?>) parent, linkPaths);
-                }
+                List<String> linkPaths =
+                    outgoingLinks.computeIfAbsent(parent, k -> new LinkedList<>());
                 linkPaths.add(getPathInTree(attributes));
             } else if (isTerminationEntry(uri, localName, qName)) {
                 List<String> terminationEntries = terminationPathEntries.get(parent);
                 if (terminationEntries == null) {
-                    terminationEntries = new LinkedList<String>();
+                    terminationEntries = new LinkedList<>();
                     terminationPathEntries.put((KeYlessStart) parent, terminationEntries);
                 }
                 terminationEntries.add(0, getPathInTree(attributes));
@@ -1120,7 +1109,8 @@ public class ExecutionNodeReader {
      */
     protected boolean isPathConditionChanged(Attributes attributes) {
         return Boolean
-                .valueOf(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_PATH_CONDITION_CHANGED));
+                .parseBoolean(
+                    attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_PATH_CONDITION_CHANGED));
     }
 
     /**
@@ -1130,7 +1120,7 @@ public class ExecutionNodeReader {
      * @return The value.
      */
     protected boolean isMergedBranchCondition(Attributes attributes) {
-        return Boolean.valueOf(
+        return Boolean.parseBoolean(
             attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_MERGED_BRANCH_CONDITION));
     }
 
@@ -1252,7 +1242,7 @@ public class ExecutionNodeReader {
         /**
          * The children.
          */
-        private final List<IExecutionNode<?>> children = new LinkedList<IExecutionNode<?>>();
+        private final List<IExecutionNode<?>> children = new LinkedList<>();
 
         /**
          * The formated path condition.
@@ -1267,18 +1257,18 @@ public class ExecutionNodeReader {
         /**
          * The call stack.
          */
-        private final List<IExecutionNode<?>> callStack = new LinkedList<IExecutionNode<?>>();
+        private final List<IExecutionNode<?>> callStack = new LinkedList<>();
 
         /**
          * The contained constraints.
          */
         private final List<IExecutionConstraint> constraints =
-            new LinkedList<IExecutionConstraint>();
+            new LinkedList<>();
 
         /**
          * The contained variables.
          */
-        private final List<IExecutionVariable> variables = new LinkedList<IExecutionVariable>();
+        private final List<IExecutionVariable> variables = new LinkedList<>();
 
         /**
          * The completed blocks.
@@ -1289,17 +1279,17 @@ public class ExecutionNodeReader {
          * The formated conditions under which a block is completed.
          */
         private final Map<IExecutionBlockStartNode<?>, String> formatedCompletedBlockConditions =
-            new LinkedHashMap<IExecutionBlockStartNode<?>, String>();
+            new LinkedHashMap<>();
 
         /**
          * The contained outgoing links.
          */
-        private ImmutableList<IExecutionLink> outgoingLinks = ImmutableSLList.<IExecutionLink>nil();
+        private ImmutableList<IExecutionLink> outgoingLinks = ImmutableSLList.nil();
 
         /**
          * The contained incoming links.
          */
-        private ImmutableList<IExecutionLink> incomingLinks = ImmutableSLList.<IExecutionLink>nil();
+        private ImmutableList<IExecutionLink> incomingLinks = ImmutableSLList.nil();
 
         /**
          * Constructor.
@@ -1339,7 +1329,7 @@ public class ExecutionNodeReader {
          */
         @Override
         public IExecutionNode<?>[] getChildren() {
-            return children.toArray(new IExecutionNode[children.size()]);
+            return children.toArray(new IExecutionNode[0]);
         }
 
         /**
@@ -1381,7 +1371,7 @@ public class ExecutionNodeReader {
         @Override
         public IExecutionNode<?>[] getCallStack() {
             return callStack.isEmpty() ? null
-                    : callStack.toArray(new IExecutionNode[callStack.size()]);
+                    : callStack.toArray(new IExecutionNode[0]);
         }
 
         /**
@@ -1398,7 +1388,7 @@ public class ExecutionNodeReader {
          */
         @Override
         public IExecutionConstraint[] getConstraints() {
-            return constraints.toArray(new IExecutionConstraint[constraints.size()]);
+            return constraints.toArray(new IExecutionConstraint[0]);
         }
 
         /**
@@ -1431,7 +1421,7 @@ public class ExecutionNodeReader {
          */
         @Override
         public IExecutionVariable[] getVariables() {
-            return variables.toArray(new IExecutionVariable[variables.size()]);
+            return variables.toArray(new IExecutionVariable[0]);
         }
 
         /**
@@ -2114,7 +2104,7 @@ public class ExecutionNodeReader {
          * The contained call state variables.
          */
         private final List<IExecutionVariable> callStateVariables =
-            new LinkedList<IExecutionVariable>();
+            new LinkedList<>();
 
         /**
          * The signature.
@@ -2149,7 +2139,7 @@ public class ExecutionNodeReader {
          */
         @Override
         public IExecutionVariable[] getCallStateVariables() {
-            return callStateVariables.toArray(new IExecutionVariable[callStateVariables.size()]);
+            return callStateVariables.toArray(new IExecutionVariable[0]);
         }
 
         /**
@@ -2255,7 +2245,7 @@ public class ExecutionNodeReader {
          * The possible return values.
          */
         private final List<IExecutionMethodReturnValue> returnValues =
-            new LinkedList<IExecutionMethodReturnValue>();
+            new LinkedList<>();
 
         /**
          * Constructor.
@@ -2319,7 +2309,7 @@ public class ExecutionNodeReader {
          */
         @Override
         public IExecutionMethodReturnValue[] getReturnValues() throws ProofInputException {
-            return returnValues.toArray(new IExecutionMethodReturnValue[returnValues.size()]);
+            return returnValues.toArray(new IExecutionMethodReturnValue[0]);
         }
 
         /**
@@ -2889,7 +2879,7 @@ public class ExecutionNodeReader {
         /**
          * The contained values.
          */
-        private final List<IExecutionValue> values = new LinkedList<IExecutionValue>();
+        private final List<IExecutionValue> values = new LinkedList<>();
 
         /**
          * Constructor.
@@ -2929,7 +2919,7 @@ public class ExecutionNodeReader {
          */
         @Override
         public IExecutionValue[] getValues() {
-            return values.toArray(new IExecutionValue[values.size()]);
+            return values.toArray(new IExecutionValue[0]);
         }
 
         /**
@@ -3086,7 +3076,7 @@ public class ExecutionNodeReader {
          * The child variables.
          */
         private final List<IExecutionVariable> childVariables =
-            new LinkedList<IExecutionVariable>();
+            new LinkedList<>();
 
         /**
          * The condition as {@link String}.
@@ -3097,7 +3087,7 @@ public class ExecutionNodeReader {
          * The related {@link IExecutionConstraint}s.
          */
         private final List<IExecutionConstraint> constraints =
-            new LinkedList<IExecutionConstraint>();
+            new LinkedList<>();
 
         /**
          * Constructor.
@@ -3167,7 +3157,7 @@ public class ExecutionNodeReader {
          */
         @Override
         public IExecutionVariable[] getChildVariables() throws ProofInputException {
-            return childVariables.toArray(new IExecutionVariable[childVariables.size()]);
+            return childVariables.toArray(new IExecutionVariable[0]);
         }
 
         /**
@@ -3224,7 +3214,7 @@ public class ExecutionNodeReader {
          */
         @Override
         public IExecutionConstraint[] getConstraints() throws ProofInputException {
-            return constraints.toArray(new IExecutionConstraint[constraints.size()]);
+            return constraints.toArray(new IExecutionConstraint[0]);
         }
 
         /**

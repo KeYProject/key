@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof.io;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
@@ -123,18 +124,18 @@ public class OutputStreamProofSaver {
         final StringBuffer logstr = new StringBuffer();
         // Advance the Log entries
         if (proof.userLog == null) {
-            proof.userLog = new Vector<>();
+            proof.userLog = new ArrayList<>();
         }
         if (proof.keyVersionLog == null) {
-            proof.keyVersionLog = new Vector<>();
+            proof.keyVersionLog = new ArrayList<>();
         }
         proof.userLog.add(System.getProperty("user.name"));
         proof.keyVersionLog.add(internalVersion);
         final int s = proof.userLog.size();
         for (int i = 0; i < s; i++) {
             logstr.append("(keyLog \"").append(i).append("\" (keyUser \"")
-                    .append(proof.userLog.elementAt(i)).append("\" ) (keyVersion \"")
-                    .append(proof.keyVersionLog.elementAt(i)).append("\"))\n");
+                    .append(proof.userLog.get(i)).append("\" ) (keyVersion \"")
+                    .append(proof.keyVersionLog.get(i)).append("\"))\n");
         }
         return logstr;
     }
@@ -148,7 +149,7 @@ public class OutputStreamProofSaver {
     }
 
     public void save(OutputStream out) throws IOException {
-        try (var ps = new PrintWriter(out, true)) {
+        try (var ps = new PrintWriter(out, true, StandardCharsets.UTF_8)) {
             final ProofOblInput po =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
             LogicPrinter printer = createLogicPrinter(proof.getServices(), false);
@@ -260,17 +261,17 @@ public class OutputStreamProofSaver {
                 String tmp2 = tmp.substring(0, i);
                 StringBuilder relPathString = new StringBuilder();
                 i += s.length();
-                final int l = tmp.indexOf(";", i);
+                final int l = tmp.indexOf(';', i);
 
                 // there may be more than one path
-                while (0 <= tmp.indexOf("\"", i) && tmp.indexOf("\"", i) < l) {
+                while (0 <= tmp.indexOf('"', i) && tmp.indexOf('"', i) < l) {
                     if (relPathString.length() > 0) {
                         relPathString.append(", ");
                     }
 
                     // path is always put in quotation marks
-                    final int k = tmp.indexOf("\"", i) + 1;
-                    final int j = tmp.indexOf("\"", k);
+                    final int k = tmp.indexOf('"', i) + 1;
+                    final int j = tmp.indexOf('"', k);
 
                     // add new relative path
                     final String absPath = tmp.substring(k, j);
@@ -286,7 +287,7 @@ public class OutputStreamProofSaver {
                 tmp = tmp2 + (i < tmp.length() ? tmp.substring(l + 1) : "");
             }
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to make relative", e);
         }
         return tmp;
     }

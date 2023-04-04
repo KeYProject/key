@@ -90,8 +90,9 @@ public class KeyIO {
         KeyAst.Term ctx = ParsingFacade.parseExpression(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
         visitor.setAbbrevMap(abbrevMap);
-        if (schemaNamespace != null)
+        if (schemaNamespace != null) {
             visitor.setSchemaVariables(schemaNamespace);
+        }
         Term t = (Term) ctx.accept(visitor);
         warnings = visitor.getBuildingIssues();
         return t;
@@ -109,8 +110,9 @@ public class KeyIO {
         KeyAst.Seq ctx = ParsingFacade.parseSequent(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
         visitor.setAbbrevMap(abbrevMap);
-        if (schemaNamespace != null)
+        if (schemaNamespace != null) {
             visitor.setSchemaVariables(schemaNamespace);
+        }
         Sequent seq = (Sequent) ctx.accept(visitor);
         warnings = visitor.getBuildingIssues();
         return seq;
@@ -232,8 +234,9 @@ public class KeyIO {
         }
 
         public List<Taclet> loadComplete() throws IOException {
-            if (ctx.isEmpty())
+            if (ctx.isEmpty()) {
                 parseFile();
+            }
             loadDeclarations();
             loadSndDegreeDeclarations();
             activateLDTs();
@@ -246,8 +249,9 @@ public class KeyIO {
         }
 
         public ProblemFinder loadCompleteProblem() throws IOException {
-            if (ctx.isEmpty())
+            if (ctx.isEmpty()) {
                 parseFile();
+            }
             loadDeclarations();
             loadSndDegreeDeclarations();
             activateLDTs();
@@ -256,12 +260,13 @@ public class KeyIO {
         }
 
         public Loader parseFile() throws IOException {
-            if (!ctx.isEmpty())
+            if (!ctx.isEmpty()) {
                 return this;
+            }
             long start = System.currentTimeMillis();
-            if (resource != null)
+            if (resource != null) {
                 ctx = parseFiles(resource);
-            else {
+            } else {
                 KeyAst.File c = ParsingFacade.parseFile(content);
                 ctx.add(c);
             }
@@ -310,16 +315,18 @@ public class KeyIO {
         }
 
         public ProblemFinder loadProblem() {
-            if (ctx.isEmpty())
+            if (ctx.isEmpty()) {
                 throw new IllegalStateException();
+            }
             ProblemFinder pf = new ProblemFinder(services, nss);
             ctx.get(0).accept(pf);
             return pf;
         }
 
         public List<Taclet> loadTaclets() {
-            if (ctx.isEmpty())
+            if (ctx.isEmpty()) {
                 throw new IllegalStateException();
+            }
             List<TacletPBuilder> parsers = ctx.stream().map(it -> new TacletPBuilder(services, nss))
                     .collect(Collectors.toList());
             long start = System.currentTimeMillis();

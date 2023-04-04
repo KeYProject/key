@@ -32,24 +32,28 @@ public class ProblemFinder extends ExpressionBuilder {
 
     @Override
     public KeYJavaType visitArrayopid(KeYParser.ArrayopidContext ctx) {
-        return (KeYJavaType) accept(ctx.keyjavatype());
+        return accept(ctx.keyjavatype());
     }
 
     @Override
     public Term visitProblem(KeYParser.ProblemContext ctx) {
         if (ctx.CHOOSECONTRACT() != null) {
-            if (ctx.chooseContract != null)
+            if (ctx.chooseContract != null) {
                 chooseContract = ParsingFacade.getValueDocumentation(ctx.chooseContract);
+            }
             // .replace("\\\\:", ":");
-            else
+            else {
                 chooseContract = "";
+            }
         }
         if (ctx.PROOFOBLIGATION() != null) {
-            if (ctx.proofObligation != null)
+            if (ctx.proofObligation != null) {
                 proofObligation = ParsingFacade.getValueDocumentation(ctx.proofObligation);
+            }
             // .replace("\\\\:", ":");
-            else
+            else {
                 proofObligation = "";
+            }
         }
         if (ctx.PROBLEM() != null) {
             problemTerm = accept(ctx.term());

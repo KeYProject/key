@@ -37,8 +37,9 @@ public class FormulaAddedByRuleFeature extends BinaryFeature {
             final Node par = node.parent();
             final Sequent pseq = par.sequent();
 
-            if (!(antec ? pseq.antecedent() : pseq.succedent()).contains(cfma))
+            if (!(antec ? pseq.antecedent() : pseq.succedent()).contains(cfma)) {
                 return filter.filter(par.getAppliedRuleApp().rule());
+            }
 
             node = par;
         }

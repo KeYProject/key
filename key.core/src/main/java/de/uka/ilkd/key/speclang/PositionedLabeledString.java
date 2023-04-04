@@ -27,7 +27,7 @@ public class PositionedLabeledString extends PositionedString {
     }
 
     public PositionedLabeledString(String text, String fileName, Position pos, TermLabel label) {
-        this(text, fileName, pos, new ImmutableArray<TermLabel>(label));
+        this(text, fileName, pos, new ImmutableArray<>(label));
     }
 
     public PositionedLabeledString(String text, String fileName, ImmutableArray<TermLabel> labels) {
@@ -35,7 +35,7 @@ public class PositionedLabeledString extends PositionedString {
     }
 
     public PositionedLabeledString(String text, String fileName, TermLabel label) {
-        this(text, fileName, new ImmutableArray<TermLabel>(label));
+        this(text, fileName, new ImmutableArray<>(label));
     }
 
     public PositionedLabeledString(String text, ImmutableArray<TermLabel> labels) {
@@ -43,7 +43,7 @@ public class PositionedLabeledString extends PositionedString {
     }
 
     public PositionedLabeledString(String text, TermLabel label) {
-        this(text, new ImmutableArray<TermLabel>(label));
+        this(text, new ImmutableArray<>(label));
     }
 
     /**

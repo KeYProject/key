@@ -12,7 +12,7 @@ import de.uka.ilkd.key.util.properties.Properties.Property;
  */
 public class InfFlowCheckInfo {
     public static final Properties.Property<Boolean> INF_FLOW_CHECK_PROPERTY =
-        new Properties.Property<Boolean>(Boolean.class, "information flow check property");
+        new Properties.Property<>(Boolean.class, "information flow check property");
 
     public static void set(Goal goal, final boolean checkForInfFlow) {
         final boolean oldValue = goal.getStrategyInfo(INF_FLOW_CHECK_PROPERTY);

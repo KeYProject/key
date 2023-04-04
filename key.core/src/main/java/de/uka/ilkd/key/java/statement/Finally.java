@@ -14,7 +14,7 @@ public class Finally extends BranchImp {
     /**
      * Body.
      */
-    protected StatementBlock body;
+    protected final StatementBlock body;
 
     /**
      * Finally.
@@ -51,8 +51,9 @@ public class Finally extends BranchImp {
      */
     public int getChildCount() {
         int result = 0;
-        if (body != null)
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -65,8 +66,9 @@ public class Finally extends BranchImp {
      */
     public ProgramElement getChildAt(int index) {
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

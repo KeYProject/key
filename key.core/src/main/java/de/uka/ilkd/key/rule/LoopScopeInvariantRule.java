@@ -273,10 +273,10 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     private ProgramElement newProgram(Services services, final While loop,
             Optional<Label> loopLabel, Statement stmtToReplace, final JavaBlock origProg,
             final ProgramVariable loopScopeIdxVar) {
-        final ArrayList<ProgramElement> stmnt = new ArrayList<ProgramElement>();
+        final ArrayList<ProgramElement> stmnt = new ArrayList<>();
 
         if (loop.getBody() instanceof StatementBlock) {
-            ((StatementBlock) loop.getBody()).getBody().forEach(elem -> stmnt.add(elem));
+            ((StatementBlock) loop.getBody()).getBody().forEach(stmnt::add);
         } else {
             stmnt.add(loop.getBody());
         }
@@ -286,7 +286,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
         stmnt.add(KeYJavaASTFactory.assign(loopScopeIdxVar, KeYJavaASTFactory.falseLiteral()));
 
-        Statement ifBody = new StatementBlock(stmnt.toArray(new Statement[stmnt.size()]));
+        Statement ifBody = new StatementBlock(stmnt.toArray(new Statement[0]));
 
         if (loopLabel.isPresent()) {
             final Label label = loopLabel.get();
