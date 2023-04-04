@@ -97,7 +97,7 @@ public class ProofCollections {
         var c = new ProofCollection(settings);
 
         var qs = c.group("quicksort");
-        qs.setLocalSettings("[Choice] DefaultChoices = moreSeqRules-moreSeqRules:on");
+        qs.setLocalSettings("[Choice]DefaultChoices=moreSeqRules-moreSeqRules:on");
         qs.setDirectory("heap/quicksort");
         qs.provable("toplevel.key");
         qs.provable("sort.key");
@@ -345,7 +345,7 @@ public class ProofCollections {
         g.provable("heap/saddleback_search/Saddleback_search.key");
 
         g = c.group("quicksort");
-        g.setLocalSettings("[Choice] DefaultChoices = moreSeqRules-moreSeqRules:on");
+        g.setLocalSettings("[Choice]DefaultChoices=moreSeqRules-moreSeqRules:on");
         g.setDirectory("heap/quicksort");
         g.provable("toplevel.key");
         g.provable("sort.key");
