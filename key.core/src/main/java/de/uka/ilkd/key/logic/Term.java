@@ -1,14 +1,16 @@
 package de.uka.ilkd.key.logic;
 
 import javax.annotation.Nullable;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * In contrast to the distinction of formulas and terms as made by most of the inductive definitions
@@ -33,69 +35,69 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * Term supports the {@link Visitor} pattern. Two different visit strategies are currently
  * supported: {@link Term#execPostOrder(Visitor)} and {@link Term#execPreOrder(Visitor)}.
  */
-public interface Term extends SVSubstitute, Sorted {
+public interface Term extends SVSubstitute, Sorted, EqualsModProofIrrelevancy {
 
     /**
      * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f").
      */
-    public Operator op();
+    Operator op();
 
     /**
      * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f") casted to the passed
      * type.
      */
-    public <T> T op(Class<T> opClass) throws IllegalArgumentException;
+    <T> T op(Class<T> opClass) throws IllegalArgumentException;
 
     /**
      * The subterms.
      */
-    public ImmutableArray<Term> subs();
+    ImmutableArray<Term> subs();
 
     /**
      * The <code>n</code>-th direct subterm.
      */
-    public Term sub(int n);
+    Term sub(int n);
 
     /**
      * The logical variables bound by the top level operator.
      */
-    public ImmutableArray<QuantifiableVariable> boundVars();
+    ImmutableArray<QuantifiableVariable> boundVars();
 
     /**
      * The logical variables bound by the top level operator for the nth subterm.
      */
-    public ImmutableArray<QuantifiableVariable> varsBoundHere(int n);
+    ImmutableArray<QuantifiableVariable> varsBoundHere(int n);
 
     /**
      * The Java block at top level.
      */
-    public JavaBlock javaBlock();
+    JavaBlock javaBlock();
 
     /**
      * The arity of the term.
      */
-    public int arity();
+    int arity();
 
     /**
      * The sort of the term.
      */
     @Override
-    public Sort sort();
+    Sort sort();
 
     /**
      * The nesting depth of this term.
      */
-    public int depth();
+    int depth();
 
     /**
      * Whether all operators in this term are rigid.
      */
-    public boolean isRigid();
+    boolean isRigid();
 
     /**
      * The set of free quantifiable variables occurring in this term.
      */
-    public ImmutableSet<QuantifiableVariable> freeVars();
+    ImmutableSet<QuantifiableVariable> freeVars();
 
     /**
      * The visitor is handed through till the bottom of the tree and then it walks upwards, while at
@@ -103,7 +105,7 @@ public interface Term extends SVSubstitute, Sorted {
      *
      * @param visitor the Visitor
      */
-    public void execPostOrder(Visitor visitor);
+    void execPostOrder(Visitor visitor);
 
     /**
      * The visitor walks downwards the tree, while at each downstep the method visit of the visitor
@@ -111,7 +113,7 @@ public interface Term extends SVSubstitute, Sorted {
      *
      * @param visitor the Visitor
      */
-    public void execPreOrder(Visitor visitor);
+    void execPreOrder(Visitor visitor);
 
     /**
      * Compares if two terms are equal modulo bound renaming
@@ -120,26 +122,26 @@ public interface Term extends SVSubstitute, Sorted {
      * @return true iff the given term has the same values in operator, sort, arity, varsBoundHere
      *         and javaBlock as this object modulo bound renaming
      */
-    public boolean equalsModRenaming(Term o);
+    boolean equalsModRenaming(Term o);
 
     /**
      * returns true if the term is labeled
      */
-    public boolean hasLabels();
+    boolean hasLabels();
 
     /**
      * checks if the given label is attached to the term
      *
      * @param label the TermLabel for which to look (must not be null)
      */
-    public boolean containsLabel(TermLabel label);
+    boolean containsLabel(TermLabel label);
 
     /**
      * returns list of labels attached to this term
      *
      * @return list of labels (maybe be empty but never <code>null</code>
      */
-    public ImmutableArray<TermLabel> getLabels();
+    ImmutableArray<TermLabel> getLabels();
 
     /**
      * Returns the first {@link TermLabel} with the given {@link Name}.
@@ -147,12 +149,12 @@ public interface Term extends SVSubstitute, Sorted {
      * @param termLabelName The {@link Name} of the {@link TermLabel} to search.
      * @return The first found {@link TermLabel} or {@code null} if not available.
      */
-    public TermLabel getLabel(Name termLabelName);
+    TermLabel getLabel(Name termLabelName);
 
     /**
      * Returns a serial number for a term. The serial number is not persistent.
      */
-    public int serialNumber();
+    int serialNumber();
 
 
     /**
@@ -162,7 +164,7 @@ public interface Term extends SVSubstitute, Sorted {
      * @return {@code true} The {@link Term} or one of its direct or indirect children contains a
      *         non empty {@link JavaBlock}, {@code false} no {@link JavaBlock} available.
      */
-    public boolean containsJavaBlockRecursive();
+    boolean containsJavaBlockRecursive();
 
     /**
      * Checks if {@code o} is a term syntactically equal to this one, except for some irrelevant

@@ -59,7 +59,7 @@ public final class NumberTranslation {
         /* initialize smallInts */
         smallInts = new BigInteger[11];
         for (int i = 0; i < smallInts.length; ++i) {
-            smallInts[i] = new BigInteger("" + i);
+            smallInts[i] = new BigInteger(String.valueOf(i));
         }
     }
 

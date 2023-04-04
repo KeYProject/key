@@ -1,6 +1,18 @@
 package de.uka.ilkd.key.gui.originlabels;
 
-import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.Objects;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
+import javax.swing.plaf.basic.BasicTreeUI;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
+
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -15,22 +27,12 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
-import javax.swing.plaf.basic.BasicTreeUI;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.Objects;
+import bibliothek.gui.dock.common.DefaultSingleCDockable;
 
 /**
  * This UI component visualizes the {@link OriginTermLabel}s of a term and its sub-terms.
@@ -126,9 +128,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     /**
      * Listens to rule application to call {@link #updateNodeLink()}.
      */
-    private RuleAppListener ruleAppListener = event -> {
-        updateNodeLink();
-    };
+    private RuleAppListener ruleAppListener = event -> updateNodeLink();
 
     /**
      * Listens to changes to the proof to call {@link #updateNodeLink()}.
@@ -505,7 +505,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             final int n = prefixPath.size();
 
             for (int i = 0; i < n; ++i) {
-                assert path.head() == prefixPath.head();
+                assert Objects.equals(path.head(), prefixPath.head());
 
                 path = path.tail();
                 prefixPath = prefixPath.tail();
@@ -549,7 +549,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         return "<html>Origin of selected term: <b>" + (origin == null ? "" : origin)
             + "</b><hr>Origin of (former) sub-terms:<br>"
             + (label == null ? ""
-                    : label.getSubtermOrigins().stream().map(o -> "" + o + "<br>").reduce("",
+                    : label.getSubtermOrigins().stream().map(o -> o + "<br>").reduce("",
                         String::concat));
     }
 
@@ -614,7 +614,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
                 text = LogicPrinter.quickPrintTerm(term, services);
             }
 
-            int endIndex = text.indexOf("\n");
+            int endIndex = text.indexOf('\n');
 
             if (endIndex != text.length() - 1 && endIndex != -1) {
                 return text.substring(0, endIndex).replaceAll("\\s+", " ") + " ...";

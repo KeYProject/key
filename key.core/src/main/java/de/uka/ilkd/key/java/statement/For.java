@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -15,7 +16,7 @@ import org.key_project.util.collection.ImmutableArray;
 public class For extends LoopStatement implements VariableScope {
 
     private static final ImmutableArray<VariableSpecification> EMPTY_VARSPECS =
-        new ImmutableArray<VariableSpecification>(new VariableSpecification[0]);
+        new ImmutableArray<>(new VariableSpecification[0]);
 
     /**
      * For.

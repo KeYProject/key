@@ -4,18 +4,14 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Logger;
+import java.util.function.Consumer;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
@@ -27,6 +23,8 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 
+import org.slf4j.LoggerFactory;
+
 /**
  * Provides a basic implementation of {@link UserInterfaceControl}.
  *
@@ -34,13 +32,15 @@ import de.uka.ilkd.key.prover.TaskStartedInfo;
  */
 public abstract class AbstractUserInterfaceControl
         implements UserInterfaceControl, ProblemLoaderControl, ProverTaskListener {
+    private static final org.slf4j.Logger LOGGER =
+        LoggerFactory.getLogger(AbstractUserInterfaceControl.class);
     private int numOfInvokedMacros = 0;
 
     /**
      * The registered {@link ProverTaskListener}.
      */
     private final List<ProverTaskListener> proverTaskListener =
-        new LinkedList<ProverTaskListener>();
+        new LinkedList<>();
 
     /**
      * Constructor.
@@ -77,7 +77,7 @@ public abstract class AbstractUserInterfaceControl
      */
     protected void fireTaskStarted(TaskStartedInfo info) {
         ProverTaskListener[] listener =
-            proverTaskListener.toArray(new ProverTaskListener[proverTaskListener.size()]);
+            proverTaskListener.toArray(new ProverTaskListener[0]);
         for (ProverTaskListener l : listener) {
             l.taskStarted(info);
         }
@@ -90,7 +90,7 @@ public abstract class AbstractUserInterfaceControl
      */
     protected void fireTaskProgress(int position) {
         ProverTaskListener[] listener =
-            proverTaskListener.toArray(new ProverTaskListener[proverTaskListener.size()]);
+            proverTaskListener.toArray(new ProverTaskListener[0]);
         for (ProverTaskListener l : listener) {
             l.taskProgress(position);
         }
@@ -103,7 +103,7 @@ public abstract class AbstractUserInterfaceControl
      */
     protected void fireTaskFinished(TaskFinishedInfo info) {
         ProverTaskListener[] listener =
-            proverTaskListener.toArray(new ProverTaskListener[proverTaskListener.size()]);
+            proverTaskListener.toArray(new ProverTaskListener[0]);
         for (ProverTaskListener l : listener) {
             l.taskFinished(info);
         }
@@ -167,8 +167,7 @@ public abstract class AbstractUserInterfaceControl
         if (numOfInvokedMacros > 0) {
             numOfInvokedMacros--;
         } else {
-            Logger.getLogger(this.getClass().getName(),
-                "Number of running macros became negative.");
+            LOGGER.warn("Number of running macros became negative.");
         }
     }
 
@@ -201,15 +200,20 @@ public abstract class AbstractUserInterfaceControl
     @Override
     public AbstractProblemLoader load(Profile profile, File file, List<File> classPath,
             File bootClassPath, List<File> includes, Properties poPropertiesToForce,
-            boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
+            boolean forceNewProfileOfNewProofs,
+            Consumer<Proof> callback) throws ProblemLoaderException {
         AbstractProblemLoader loader = null;
         try {
             loader = new SingleThreadProblemLoader(file, classPath, bootClassPath, includes,
                 profile, forceNewProfileOfNewProofs, this, false, poPropertiesToForce);
-            loader.load();
+            if (callback != null) {
+                loader.load(callback);
+            } else {
+                loader.load();
+            }
             return loader;
         } catch (ProblemLoaderException e) {
-            if (loader != null && loader.getProof() != null) {
+            if (loader.getProof() != null) {
                 loader.getProof().dispose();
             }
             // rethrow that exception

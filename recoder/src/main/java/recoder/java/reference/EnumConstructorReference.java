@@ -39,10 +39,12 @@ public class EnumConstructorReference extends JavaNonTerminalProgramElement
 
     protected EnumConstructorReference(EnumConstructorReference proto) {
         super(proto);
-        if (proto.classDeclaration != null)
+        if (proto.classDeclaration != null) {
             classDeclaration = proto.classDeclaration.deepClone();
-        if (proto.args != null)
+        }
+        if (proto.args != null) {
             args = proto.args.deepClone();
+        }
     }
 
     public void accept(SourceVisitor v) {
@@ -76,21 +78,24 @@ public class EnumConstructorReference extends JavaNonTerminalProgramElement
     }
 
     public TypeDeclaration getTypeDeclarationAt(int index) {
-        if (classDeclaration != null && index == 0)
+        if (classDeclaration != null && index == 0) {
             return classDeclaration;
+        }
         throw new ArrayIndexOutOfBoundsException(index);
     }
 
     public ProgramElement getChildAt(int index) {
         if (args != null) {
             int l = args.size();
-            if (index < l)
+            if (index < l) {
                 return args.get(index);
+            }
             index -= l;
         }
         if (classDeclaration != null) {
-            if (index == 0)
+            if (index == 0) {
                 return classDeclaration;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -103,23 +108,25 @@ public class EnumConstructorReference extends JavaNonTerminalProgramElement
     @Override
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (classDeclaration != null)
+        if (classDeclaration != null) {
             classDeclaration.setParent(this);
+        }
         if (args != null) {
-            for (int i = 0, max = args.size(); i < max; i++) {
-                Expression e = args.get(i);
+            for (Expression e : args) {
                 e.setExpressionContainer(this);
             }
         }
     }
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null)
+        if (p == null) {
             throw new NullPointerException();
+        }
         if (p == classDeclaration) {
             classDeclaration = (ClassDeclaration) q;
-            if (q != null)
+            if (q != null) {
                 classDeclaration.setParent(this);
+            }
             return true;
         }
         int idx;
@@ -139,12 +146,14 @@ public class EnumConstructorReference extends JavaNonTerminalProgramElement
     public int getChildPositionCode(ProgramElement child) {
         // role 0 : classDeclaration
         // role 1(idx) : arg
-        if (child == classDeclaration)
+        if (child == classDeclaration) {
             return 0;
+        }
         if (args != null) {
             int idx = args.indexOf(child);
-            if (idx != -1)
+            if (idx != -1) {
                 return (idx << 4) | 1;
+            }
         }
         return -1;
     }
@@ -184,8 +193,9 @@ public class EnumConstructorReference extends JavaNonTerminalProgramElement
     }
 
     public Expression getExpressionAt(int index) {
-        if (args == null)
+        if (args == null) {
             throw new ArrayIndexOutOfBoundsException(index);
+        }
         return args.get(index);
     }
 
@@ -194,16 +204,19 @@ public class EnumConstructorReference extends JavaNonTerminalProgramElement
     }
 
     public ProgramElement getFirstElement() {
-        if (args != null && args.size() > 0)
+        if (args != null && args.size() > 0) {
             return args.get(0);
+        }
         return this;
     }
 
     public ProgramElement getLastElement() {
-        if (classDeclaration != null)
+        if (classDeclaration != null) {
             return classDeclaration;
-        if (args != null && args.size() > 0)
+        }
+        if (args != null && args.size() > 0) {
             return args.get(args.size() - 1);
+        }
         return this;
     }
 

@@ -1,12 +1,12 @@
 package org.key_project.util.collection;
 
-import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import javax.annotation.Nonnull;
 
 /**
  * List interface to be implemented by non-destructive lists
@@ -18,11 +18,11 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      *
      * @return a Collector that accumulates the input elements into a new ImmutableList.
      */
-    public static <T> Collector<T, List<T>, ImmutableList<T>> collector() {
-        return Collector.of(LinkedList<T>::new, (list, el) -> list.add(el), (list1, list2) -> {
+    static <T> Collector<T, List<T>, ImmutableList<T>> collector() {
+        return Collector.of(LinkedList::new, List::add, (list1, list2) -> {
             list1.addAll(list2);
             return list1;
-        }, ImmutableList::<T>fromList);
+        }, ImmutableList::fromList);
     }
 
     /**
@@ -31,7 +31,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @param list a List.
      * @return an ImmutableList containing the same elements as the specified list.
      */
-    public static <T> ImmutableList<T> fromList(Collection<T> list) {
+    static <T> ImmutableList<T> fromList(Collection<T> list) {
         ImmutableList<T> result = ImmutableSLList.nil();
 
         for (T el : list) {
@@ -47,7 +47,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @return empty immutable list.
      * @param <T> the entry type of the list.
      */
-    public static <T> ImmutableList<T> of() {
+    static <T> ImmutableList<T> of() {
         return ImmutableSLList.nil();
     }
 
@@ -58,7 +58,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @return singleton immutable list.
      * @param <T> the entry type of the list.
      */
-    public static <T> ImmutableList<T> of(T e1) {
+    static <T> ImmutableList<T> of(T e1) {
         return ImmutableSLList.singleton(e1);
     }
 
@@ -71,7 +71,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @return (e1, e2) as immutable list
      * @param <T> the entry type of the list.
      */
-    public static <T> ImmutableList<T> of(T e1, T e2) {
+    static <T> ImmutableList<T> of(T e1, T e2) {
         return ImmutableSLList.singleton(e2).prepend(e1);
     }
 
@@ -85,7 +85,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @return (e1, e2, e3) as immutable list
      * @param <T> the entry type of the list.
      */
-    public static <T> ImmutableList<T> of(T e1, T e2, T e3) {
+    static <T> ImmutableList<T> of(T e1, T e2, T e3) {
         return ImmutableSLList.singleton(e3).prepend(e2).prepend(e1);
     }
 
@@ -97,7 +97,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @return (e1, e2, e3, ...) as immutable list
      * @param <T> the entry type of the list.
      */
-    public static <T> ImmutableList<T> of(T... es) {
+    static <T> ImmutableList<T> of(T... es) {
         ImmutableList<T> result = ImmutableSLList.nil();
         for (int i = es.length - 1; i >= 0; i--) {
             result = result.prepend(es[i]);
@@ -267,20 +267,19 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      */
     default List<T> toList() {
         List<T> result = new ArrayList<>();
-        Iterator<T> it = iterator();
-        while (it.hasNext()) {
-            result.add(it.next());
+        for (T t : this) {
+            result.add(t);
         }
         return result;
     }
 
-    /*
+    /**
      * Returns an immutable list consisting of the elements of this list that match
      * the given predicate.
      *
      * @param predicate a non-interfering, stateless
-     * predicate to apply to each element to determine if it
-     * should be included
+     *        predicate to apply to each element to determine if it
+     *        should be included
      *
      * @returns the filtered list
      */
@@ -298,6 +297,58 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      */
     default <R> ImmutableList<R> map(Function<T, R> function) {
         return Immutables.map(this, function);
+    }
+
+    /**
+     * @param other prefix to check for
+     * @return whether this list starts with the elements of the provided prefix
+     */
+    default boolean hasPrefix(ImmutableList<T> other) {
+        if (other.size() > this.size()) {
+            return false;
+        }
+        if (other.size() == 0) {
+            return true;
+        }
+        if (Objects.equals(head(), other.head())) {
+            return tail().hasPrefix(other.tail());
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Remove a prefix from this list.
+     *
+     * @param prefix prefix to remove
+     * @return new list with the prefix removed
+     * @throws IllegalArgumentException if the provided prefix is not a prefix of this list
+     */
+    default ImmutableList<T> stripPrefix(ImmutableList<T> prefix) {
+        if (prefix.isEmpty()) {
+            return this;
+        }
+        if (!Objects.equals(head(), prefix.head())) {
+            throw new IllegalArgumentException("not a prefix of this list");
+        }
+        return this.tail().stripPrefix(prefix.tail());
+    }
+
+    /**
+     * Get the last element of this list.
+     * Time complexity: O(n).
+     *
+     * @return last element of this list
+     */
+    default T last() {
+        if (isEmpty()) {
+            throw new IllegalStateException("last() called on empty list");
+        }
+        ImmutableList<T> remainder = this;
+        while (!remainder.tail().isEmpty()) {
+            remainder = remainder.tail();
+        }
+        return remainder.head();
     }
 
 }

@@ -17,7 +17,7 @@ public class TermNavigator {
      *
      * The used TermNavigator have to be explicitly released by the user via {@link #release()}
      */
-    private static ArrayDeque<TermNavigator> TERM_NAVIGATOR_POOL = new ArrayDeque<>();
+    private static final ArrayDeque<TermNavigator> TERM_NAVIGATOR_POOL = new ArrayDeque<>();
     static {
         for (int i = 0; i < POOL_SIZE; i++) {
             TERM_NAVIGATOR_POOL.push(new TermNavigator());
@@ -105,12 +105,12 @@ public class TermNavigator {
     }
 
     public void gotoNextSibling() {
-        stack.pop().release();;
+        stack.pop().release();
         gotoNextHelper();
     }
 
     public void release() {
-        stack.forEach((e) -> e.release());
+        stack.forEach(MutablePair::release);
         stack.clear();
         if (TERM_NAVIGATOR_POOL.size() < POOL_SIZE) {
             synchronized (TERM_NAVIGATOR_POOL) {
@@ -133,7 +133,7 @@ public class TermNavigator {
          *
          * The used TermNavigator have to be explicitly released by the user via {@link #release()}
          */
-        private static ArrayDeque<MutablePair> PAIR_POOL = new ArrayDeque<>();
+        private static final ArrayDeque<MutablePair> PAIR_POOL = new ArrayDeque<>();
         static {
             for (int i = 0; i < PAIR_POOL_SIZE; i++) {
                 PAIR_POOL.push(new MutablePair(null, null));

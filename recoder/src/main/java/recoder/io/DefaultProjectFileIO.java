@@ -2,13 +2,13 @@
 
 package recoder.io;
 
+import java.io.*;
+import java.util.*;
+
 import recoder.ServiceConfiguration;
 import recoder.convenience.Naming;
 import recoder.java.CompilationUnit;
 import recoder.util.FileUtils;
-
-import java.io.*;
-import java.util.*;
 
 /**
  * Imports and exports simple properties files.
@@ -58,7 +58,7 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
             } else if (key.equals(INPUT_PATH)) {
                 newValue = resolvePathnames(file.getParent(), newValue);
             }
-            if (oldValue == null || !newValue.equals(oldValue)) {
+            if (!newValue.equals(oldValue)) {
                 ps.setProperty(key, newValue);
             }
         }
@@ -69,7 +69,7 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
             res = new String[0];
         } else {
             StringTokenizer unitNames = new StringTokenizer(prop, ", \n");
-            List<String> v = new ArrayList<String>();
+            List<String> v = new ArrayList<>();
             while (unitNames.hasMoreTokens()) {
                 String filename = unitNames.nextToken();
                 if (filename != null && filename.length() > 0) {
@@ -78,7 +78,7 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
                     v.add(filename);
                 }
             }
-            res = v.toArray(new String[v.size()]);
+            res = v.toArray(new String[0]);
         }
         in.close();
         return res;
@@ -93,12 +93,13 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
     }
 
     private String resolvePathnames(String parentDir, String relativePathList) {
-        StringBuffer newpath = new StringBuffer();
-        if (File.pathSeparatorChar == ':')
+        StringBuilder newpath = new StringBuilder();
+        if (File.pathSeparatorChar == ':') {
             relativePathList = relativePathList.replace(';', ':');
-        else if (File.pathSeparatorChar == ';' && relativePathList.indexOf(":\\") == -1
-                && relativePathList.indexOf(":/") == -1)
+        } else if (File.pathSeparatorChar == ';' && !relativePathList.contains(":\\")
+                && !relativePathList.contains(":/")) {
             relativePathList = relativePathList.replace(':', ';');
+        }
         StringTokenizer paths = new StringTokenizer(relativePathList, File.pathSeparator);
         boolean firstToken = true;
         while (paths.hasMoreTokens()) {
@@ -118,7 +119,7 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
      */
     public void save() throws IOException {
         OutputStream out = new FileOutputStream(file);
-        StringBuffer units = new StringBuffer(1024);
+        StringBuilder units = new StringBuilder(1024);
         List<CompilationUnit> cus = getSourceFileRepository().getCompilationUnits();
         for (int i = 0, s = cus.size(); i < s; i += 1) {
             CompilationUnit cu = cus.get(i);
@@ -133,7 +134,7 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
         path = FileUtils.getRelativePath(FileUtils.getUserDirectory(), new File(path));
         properties.put(OUTPUT_PATH, path);
         path = properties.getProperty(INPUT_PATH);
-        StringBuffer newpath = new StringBuffer();
+        StringBuilder newpath = new StringBuilder();
         StringTokenizer tok = new StringTokenizer(path, File.pathSeparator);
         while (true) {
             newpath.append(

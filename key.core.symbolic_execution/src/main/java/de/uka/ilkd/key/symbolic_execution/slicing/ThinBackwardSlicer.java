@@ -4,8 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -19,6 +17,8 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Implementation of thin backward slicing.
@@ -65,7 +65,7 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
                 // Compute this reference
                 PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
                 // Compute modified locations
-                List<Location> modifiedLocations = new LinkedList<Location>();
+                List<Location> modifiedLocations = new LinkedList<>();
                 Term loopConditionModalityTerm =
                     SymbolicExecutionUtil.posInOccurrenceInOtherNode(node, pio, previousChild);
                 if (loopConditionModalityTerm.op() != UpdateApplication.UPDATE_APPLICATION) {

@@ -1,17 +1,19 @@
 package de.uka.ilkd.key.speclang.njml;
 
+import java.io.File;
+
 import de.uka.ilkd.key.api.KeYApi;
 import de.uka.ilkd.key.api.ProofManagementApi;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.File;
 
 public class ContractLoadingTests {
     public static final File EXAMPLES_DIR = new File("../key.ui/examples/");

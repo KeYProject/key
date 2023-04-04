@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.gui.actions;
 
+import java.awt.*;
+import java.util.*;
+import java.util.List;
+import java.util.Map.Entry;
+import javax.swing.*;
+
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerEvent;
 import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerListener;
@@ -7,12 +13,6 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Name;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * This menu can be used to toggle TermLabel visibility for the SequentView.
@@ -27,7 +27,7 @@ public class TermLabelMenu extends JMenu {
      */
     private static final long serialVersionUID = 1L;
     private final TermLabelVisibilityManager visibleTermLabels = new TermLabelVisibilityManager();
-    private final Map<Name, TermLabelCheckBox> checkBoxMap = new TreeMap<Name, TermLabelCheckBox>();
+    private final Map<Name, TermLabelCheckBox> checkBoxMap = new TreeMap<>();
     private final MainWindow mainWindow;
     private final DisplayLabelsCheckBox displayLabelsCheckBox;
 
@@ -35,7 +35,7 @@ public class TermLabelMenu extends JMenu {
      * Observes changes on {@link #visibleTermLabels}.
      */
     private final TermLabelVisibilityManagerListener termLabelVisibilityManagerListener =
-        e -> handleVisibleLabelsChanged(e);
+        this::handleVisibleLabelsChanged;
 
     public TermLabelMenu(final MainWindow mainWindow) {
         this.mainWindow = mainWindow;
@@ -111,7 +111,7 @@ public class TermLabelMenu extends JMenu {
         /*
          * Create list of {@link TermLabelCheckBox} instances.
          */
-        ArrayList<TermLabelCheckBox> checkBoxList = new ArrayList<TermLabelCheckBox>();
+        ArrayList<TermLabelCheckBox> checkBoxList = new ArrayList<>();
         for (Name labelName : labelNames) {
             TermLabelCheckBox checkBox = checkBoxMap.get(labelName);
             if (checkBox == null) {

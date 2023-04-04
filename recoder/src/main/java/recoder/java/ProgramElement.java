@@ -118,14 +118,14 @@ public interface ProgramElement extends SourceElement, ModelElement {
             if (x instanceof NonTerminalProgramElement) {
                 if (x.getClass() != y.getClass()) {
                     if (x instanceof UncollatedReferenceQualifier) {
-                        if (!(y instanceof ArrayLengthReference) && !(y instanceof FieldReference)
-                                && !(y instanceof PackageReference) && !(y instanceof TypeReference)
+                        if (!(y instanceof ArrayLengthReference) && !(y instanceof PackageReference)
+                                && !(y instanceof TypeReference)
                                 && !(y instanceof VariableReference)) {
                             return false;
                         }
                     } else if (y instanceof UncollatedReferenceQualifier) {
-                        if (!(x instanceof ArrayLengthReference) && !(x instanceof FieldReference)
-                                && !(x instanceof PackageReference) && !(x instanceof TypeReference)
+                        if (!(x instanceof ArrayLengthReference) && !(x instanceof PackageReference)
+                                && !(x instanceof TypeReference)
                                 && !(x instanceof VariableReference)) {
                             return false;
                         }

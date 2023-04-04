@@ -5,12 +5,12 @@
          <methodCall name="&lt;call BlockContractPreconditionNotVerified.magic(x_3)&gt;" pathCondition="true" pathConditionChanged="false">
             <blockContract name="result_magic = magic()) catch(exc_0)
 pre measuredByEmpty &amp; x_3 = 4711
-post returned#0 = TRUE
+post   returned#0 = TRUE
 &amp; exc_0 = null
 &amp; (returned#0 = TRUE -&gt; result_magic = -2)
 mod {}&lt;&lt;impl&gt;&gt;termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false">
                <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Validity">
-                  <branchStatement name="if (x_3==2)" pathCondition="true" pathConditionChanged="false" blockOpened="false">
+                  <branchStatement name="if (x_3 == 2)" pathCondition="true" pathConditionChanged="false" blockOpened="false">
                      <termination name="&lt;block contract end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="BLOCK_CONTRACT_NORMAL" branchVerified="false">
                      </termination>
                   </branchStatement>

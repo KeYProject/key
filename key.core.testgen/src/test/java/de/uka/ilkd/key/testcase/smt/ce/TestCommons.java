@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.testcase.smt.ce;
 
+import java.io.File;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
@@ -14,11 +19,6 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
-import java.io.File;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * this class directly but derive subclasses to implement tests.
  */
 public abstract class TestCommons {
-    protected static File folder =
+    protected static final File folder =
         new File(HelperClassForTests.TESTCASE_DIRECTORY, "smt/tacletTranslation");
     /**
      * The set of taclets
@@ -34,7 +34,7 @@ public abstract class TestCommons {
     private final Collection<Taclet> taclets = new LinkedList<>();
     InitConfig initConfig = null;
     static protected ProblemInitializer initializer = null;
-    static protected Profile profile = init();
+    static protected final Profile profile = init();
 
     static Profile init() {
         return new JavaProfile();
@@ -176,4 +176,3 @@ public abstract class TestCommons {
         return result;
     }
 }
-

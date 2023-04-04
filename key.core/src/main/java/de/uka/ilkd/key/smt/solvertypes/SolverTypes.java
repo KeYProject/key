@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.smt.solvertypes;
 
-import javax.annotation.Nonnull;
 import java.util.*;
+import javax.annotation.Nonnull;
 
 /**
  * Facade for the management of {@link SolverType}. This class holds references to common and known

@@ -13,16 +13,16 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 public interface InitiallyClause extends SpecificationElement {
 
     @Override
-    public InitiallyClause map(UnaryOperator<Term> op, Services services);
+    InitiallyClause map(UnaryOperator<Term> op, Services services);
 
     /**
      * Returns the formula without implicit all-quantification over the receiver object.
      */
-    public Term getClause(ParsableVariable selfVar, TermServices services);
+    Term getClause(ParsableVariable selfVar, TermServices services);
 
-    public LabeledParserRuleContext getOriginalSpec();
+    LabeledParserRuleContext getOriginalSpec();
 
-    public InitiallyClause setKJT(KeYJavaType newKjt);
+    InitiallyClause setKJT(KeYJavaType newKjt);
 
 
 }

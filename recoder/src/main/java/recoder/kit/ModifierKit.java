@@ -2,6 +2,8 @@
 
 package recoder.kit;
 
+import java.util.List;
+
 import recoder.ProgramFactory;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Member;
@@ -16,8 +18,6 @@ import recoder.list.generic.ASTList;
 import recoder.service.ChangeHistory;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
-
-import java.util.List;
 
 /**
  * this class implements basic functions for modifier handling.
@@ -106,8 +106,7 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
         if (mods == null) {
             return null;
         }
-        for (int i = 0; i < mods.size(); i += 1) {
-            DeclarationSpecifier res = mods.get(i);
+        for (DeclarationSpecifier res : mods) {
             if (res instanceof VisibilityModifier) {
                 return (VisibilityModifier) res;
             }
@@ -121,8 +120,7 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
         if (mods == null) {
             return false;
         }
-        for (int i = 0; i < mods.size(); i += 1) {
-            DeclarationSpecifier res = mods.get(i);
+        for (DeclarationSpecifier res : mods) {
             if (mod.isInstance(res)) {
                 return true;
             }
@@ -308,4 +306,3 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
     }
 
 }
-

@@ -1,10 +1,6 @@
 package de.uka.ilkd.key.rule.merge.procedures;
 
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getNewSkolemConstantForPrefix;
-
 import java.util.LinkedHashSet;
-
-import org.key_project.util.collection.DefaultImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -13,6 +9,10 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getNewSkolemConstantForPrefix;
 
 /**
  * Rule that merges two sequents based on "total" weakening: Replacement of symbolic state by an
@@ -54,11 +54,11 @@ public class MergeTotalWeakening extends MergeProcedure implements UnparametricM
 
         final Function newSkolemConstant =
             getNewSkolemConstantForPrefix(v.op().name().toString(), v.sort(), services);
-        LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
+        LinkedHashSet<Name> newNames = new LinkedHashSet<>();
         newNames.add(newSkolemConstant.name());
 
-        return new ValuesMergeResult(DefaultImmutableSet.<Term>nil(), tb.func(newSkolemConstant),
-            newNames, new LinkedHashSet<Term>());
+        return new ValuesMergeResult(DefaultImmutableSet.nil(), tb.func(newSkolemConstant),
+            newNames, new LinkedHashSet<>());
 
     }
 

@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.speclang.translation;
 
+import java.net.MalformedURLException;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import de.uka.ilkd.key.util.parsing.HasLocation;
-import org.antlr.v4.runtime.ParserRuleContext;
 
-import javax.annotation.Nullable;
-import java.net.MalformedURLException;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 public class SLTranslationException extends ProofInputException implements HasLocation {
     private final String fileName;
@@ -16,10 +17,12 @@ public class SLTranslationException extends ProofInputException implements HasLo
 
     public SLTranslationException(String message, Throwable cause, String fileName, Position pos) {
         super(message, cause);
-        if (fileName == null)
+        if (fileName == null) {
             throw new IllegalArgumentException();
-        if (pos == null)
+        }
+        if (pos == null) {
             throw new IllegalArgumentException();
+        }
         this.fileName = fileName;
         this.pos = pos;
     }

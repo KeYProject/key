@@ -2,8 +2,11 @@
 
 package recoder.java.declaration;
 
-import recoder.abstraction.Package;
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.abstraction.*;
+import recoder.abstraction.Package;
 import recoder.convenience.Naming;
 import recoder.java.*;
 import recoder.java.reference.TypeReference;
@@ -11,9 +14,6 @@ import recoder.java.reference.TypeReferenceContainer;
 import recoder.list.generic.ASTList;
 import recoder.service.ProgramModelInfo;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Method declaration.
@@ -243,8 +243,9 @@ public class MethodDeclaration extends JavaDeclaration
         // }
         if (typeParameters != null) {
             int index = typeParameters.indexOf(child);
-            if (index != -1)
+            if (index != -1) {
                 return (index << 4) | 7;
+            }
         }
         return -1;
     }
@@ -298,22 +299,29 @@ public class MethodDeclaration extends JavaDeclaration
 
     public int getChildCount() {
         int result = 0;
-        if (declarationSpecifiers != null)
+        if (declarationSpecifiers != null) {
             result += declarationSpecifiers.size();
-        if (returnType != null)
+        }
+        if (returnType != null) {
             result++;
-        if (name != null)
+        }
+        if (name != null) {
             result++;
-        if (parameters != null)
+        }
+        if (parameters != null) {
             result += parameters.size();
-        if (exceptions != null)
+        }
+        if (exceptions != null) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         // if (isVarArg != null)
         // result++;
-        if (typeParameters != null)
+        if (typeParameters != null) {
             result += typeParameters.size();
+        }
         return result;
     }
 
@@ -336,18 +344,21 @@ public class MethodDeclaration extends JavaDeclaration
         }
         if (typeParameters != null) {
             len = typeParameters.size();
-            if (len > index)
+            if (len > index) {
                 return typeParameters.get(index);
+            }
             index -= len;
         }
         if (returnType != null) {
-            if (index == 0)
+            if (index == 0) {
                 return returnType;
+            }
             index--;
         }
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (parameters != null) {
@@ -358,13 +369,15 @@ public class MethodDeclaration extends JavaDeclaration
             index -= len;
         }
         if (exceptions != null) {
-            if (index == 0)
+            if (index == 0) {
                 return exceptions;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         // if (isVarArg != null) {
@@ -808,12 +821,12 @@ public class MethodDeclaration extends JavaDeclaration
 
     public List<VariableSpecification> getVariablesInScope() {
         if (parameters == null || parameters.isEmpty()) {
-            return new ArrayList<VariableSpecification>(0);
+            return new ArrayList<>(0);
         }
         int s = parameters.size();
-        List<VariableSpecification> res = new ArrayList<VariableSpecification>(s);
-        for (int i = 0; i < s; i += 1) {
-            res.add(parameters.get(i).getVariableSpecification());
+        List<VariableSpecification> res = new ArrayList<>(s);
+        for (ParameterDeclaration parameter : parameters) {
+            res.add(parameter.getVariableSpecification());
         }
         return res;
     }
@@ -823,8 +836,8 @@ public class MethodDeclaration extends JavaDeclaration
         if (parameters == null) {
             return null;
         }
-        for (int i = 0, s = parameters.size(); i < s; i += 1) {
-            VariableSpecification res = parameters.get(i).getVariableSpecification();
+        for (ParameterDeclaration parameter : parameters) {
+            VariableSpecification res = parameter.getVariableSpecification();
             if (tname.equals(res.getName())) {
                 return res;
             }
@@ -847,8 +860,9 @@ public class MethodDeclaration extends JavaDeclaration
     public boolean isVarArgMethod() {
         // //return isVarArg != null;
         // return isVarArg;
-        if (parameters == null || parameters.size() == 0)
+        if (parameters == null || parameters.size() == 0) {
             return false;
+        }
         return parameters.get(parameters.size() - 1).isVarArg();
     }
 
@@ -877,15 +891,17 @@ public class MethodDeclaration extends JavaDeclaration
     }
 
     public TypeDeclaration getTypeDeclarationAt(int index) {
-        if (typeParameters == null)
+        if (typeParameters == null) {
             throw new IndexOutOfBoundsException();
+        }
         return typeParameters.get(index);
     }
 
     public List<TypeDeclaration> getTypesInScope() {
-        if (typeParameters == null || typeParameters.isEmpty())
-            return new ArrayList<TypeDeclaration>(0);
-        List<TypeDeclaration> ctl = new ArrayList<TypeDeclaration>(typeParameters.size());
+        if (typeParameters == null || typeParameters.isEmpty()) {
+            return new ArrayList<>(0);
+        }
+        List<TypeDeclaration> ctl = new ArrayList<>(typeParameters.size());
         for (TypeParameterDeclaration t : typeParameters) {
             ctl.add(t);
         }
@@ -893,11 +909,13 @@ public class MethodDeclaration extends JavaDeclaration
     }
 
     public ClassType getTypeInScope(String typename) {
-        if (typeParameters == null)
+        if (typeParameters == null) {
             return null;
+        }
         for (TypeParameterDeclaration tpd : typeParameters) {
-            if (typename.equals(tpd.getName()))
+            if (typename.equals(tpd.getName())) {
                 return tpd;
+            }
         }
         return null;
     }

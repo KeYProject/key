@@ -24,7 +24,7 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
 
     private boolean isModification;
 
-    private String fullFieldName;
+    private final String fullFieldName;
 
     /**
      * Creates a new {@link FieldWatchpoint}.
@@ -51,7 +51,7 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
     @Override
     public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
             Node node) {
-        if (activeStatement != null && activeStatement instanceof Assignment) {
+        if (activeStatement instanceof Assignment) {
             Assignment assignment = (Assignment) activeStatement;
             SourceElement firstElement = assignment.getChildAt(0);
             if (firstElement instanceof FieldReference) {

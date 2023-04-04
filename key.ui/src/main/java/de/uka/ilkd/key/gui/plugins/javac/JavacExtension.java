@@ -1,5 +1,14 @@
 package de.uka.ilkd.key.gui.plugins.javac;
 
+import java.awt.*;
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
+import java.util.TreeSet;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -12,17 +21,9 @@ import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.gui.fonticons.MaterialDesignRegular;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
-import java.util.TreeSet;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Extensions provides Javac checks for recent-loaded Java files.
@@ -96,7 +97,7 @@ public class JavacExtension
      */
     public JavacExtension() {
         lblStatus.addActionListener(ev -> {
-            if (mediator != null) {
+            if (mediator != null && mediator.getSelectedProof() != null) {
                 try {
                     JavacData data = mediator.getSelectedProof().getUserData().get(JavacData.class);
                     if (data.nonJavaProof) {
@@ -169,7 +170,7 @@ public class JavacExtension
      * @param data data to use
      */
     private void updateLabel(JavacData data) {
-        if (data == null) {
+        if (data == null || data.issues == null) {
             lblStatus.setText("Javac");
             lblStatus.setIcon(null);
             lblStatus.setForeground(Color.BLACK);

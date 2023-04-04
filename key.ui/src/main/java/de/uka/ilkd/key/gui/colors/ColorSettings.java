@@ -1,21 +1,22 @@
 package de.uka.ilkd.key.gui.colors;
 
-import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeSettings;
-import de.uka.ilkd.key.gui.settings.SettingsManager;
-import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
-import de.uka.ilkd.key.settings.PathConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
+
+import de.uka.ilkd.key.gui.settings.SettingsManager;
+import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
+import de.uka.ilkd.key.settings.PathConfig;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configurable colors for KeY.
@@ -38,8 +39,9 @@ public class ColorSettings extends AbstractPropertiesSettings {
     }
 
     public static ColorSettings getInstance() {
-        if (INSTANCE == null)
+        if (INSTANCE == null) {
             INSTANCE = new ColorSettings(SettingsManager.loadProperties(SETTINGS_FILE));
+        }
         return INSTANCE;
     }
 
@@ -72,11 +74,11 @@ public class ColorSettings extends AbstractPropertiesSettings {
      */
     public void save() {
         LOGGER.info("Save color settings to: " + SETTINGS_FILE.getAbsolutePath());
-        try (Writer writer = new FileWriter(SETTINGS_FILE)) {
+        try (Writer writer = new FileWriter(SETTINGS_FILE, StandardCharsets.UTF_8)) {
             properties.store(writer, "KeY's Colors");
             writer.flush();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.error("Failed to save color settings", ex);
         }
     }
 
@@ -114,8 +116,9 @@ public class ColorSettings extends AbstractPropertiesSettings {
 
         @Override
         public String value() {
-            if (currentValue != null)
+            if (currentValue != null) {
                 return toHex(currentValue);
+            }
 
             String v = properties.getProperty(key);
 
@@ -151,15 +154,16 @@ public class ColorSettings extends AbstractPropertiesSettings {
 
         @Override
         public Color get() {
-            if (currentValue != null)
+            if (currentValue != null) {
                 return currentValue;
+            }
 
             String v = properties.getProperty(key);
 
             try {
                 return currentValue = fromHex(v);
             } catch (NumberFormatException e) {
-                e.printStackTrace();
+                LOGGER.error("Failed to parse color, using magenta", e);
                 return Color.MAGENTA;
             }
         }

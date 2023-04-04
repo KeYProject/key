@@ -32,7 +32,7 @@ import recoder.service.SourceInfo;
 
 public class ResolveMemberReference extends GenericResolutionTransformation {
 
-    private NameReference reference;
+    private final NameReference reference;
 
     private TypeReference typeToReference;
 
@@ -83,8 +83,9 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
         if (reference instanceof MethodReference) {
             MethodReference methRef = (MethodReference) reference;
             ASTList<TypeArgumentDeclaration> typeArguments = methRef.getTypeArguments();
-            if (typeArguments != null && typeArguments.size() > 0)
+            if (typeArguments != null && typeArguments.size() > 0) {
                 setProblemReport(EQUIVALENCE);
+            }
         }
 
         SourceInfo sourceInfo = getSourceInfo();
@@ -243,8 +244,9 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
             Method meth = getSourceInfo().getMethod(methRef);
             int index = -1;
             ASTList<Expression> args = methRef.getArguments();
-            if (args != null)
+            if (args != null) {
                 index = args.indexOf(reference);
+            }
             if (index == -1) {
                 // not an argument --> must be prefix
                 Type classType = meth.getContainingClassType();
@@ -278,8 +280,9 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
             VariableDeclaration decl = (VariableDeclaration) parent.getASTParent();
             Type varType = targetType(getSourceInfo().getType(decl.getTypeReference()));
             int dimensions = varSpec.getDimensions();
-            if (dimensions > 0)
+            if (dimensions > 0) {
                 varType = getNameInfo().createArrayType(varType, dimensions);
+            }
 
             return varType;
         }
@@ -314,8 +317,9 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
                 programFactory.createTypeCast((Expression) reference.deepClone(), typeToReference);
             ParenthesizedExpression replaceWith =
                 programFactory.createParenthesizedExpression(cast);
-            if (replaceWith != null)
+            if (replaceWith != null) {
                 replace(reference, replaceWith);
+            }
         }
     }
 

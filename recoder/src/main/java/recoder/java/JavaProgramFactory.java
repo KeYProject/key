@@ -2,6 +2,16 @@
 
 package recoder.java;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.*;
+import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.DefaultServiceConfiguration;
 import recoder.ParserException;
 import recoder.ProgramFactory;
@@ -23,15 +33,8 @@ import recoder.list.generic.ASTList;
 import recoder.parser.JavaCCParser;
 import recoder.util.StringUtils;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.*;
-import java.nio.CharBuffer;
-import java.util.ArrayList;
-import java.util.List;
-
 public class JavaProgramFactory implements ProgramFactory, PropertyChangeListener {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(JavaProgramFactory.class);
     private final static Position ZERO_POSITION = new Position(0, 0);
     /**
      * The singleton instance of the program factory.
@@ -77,8 +80,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
             ProgramElement fc = ((CompilationUnit) pe).getChildAt(0);
             int distcu = c.getStartPosition().getLine();
             int distfc = fc.getStartPosition().getLine() - c.getEndPosition().getLine();
-            if (c instanceof SingleLineComment)
+            if (c instanceof SingleLineComment) {
                 distcu--;
+            }
             if (distcu >= distfc) {
                 dest = fc;
             }
@@ -86,7 +90,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
             NonTerminalProgramElement ppe = dest.getASTParent();
             int i = 0;
             if (ppe != null) {
-                for (; ppe.getChildAt(i) != dest; i++);
+                for (; ppe.getChildAt(i) != dest; i++) {
+                }
             }
             if (i == 0) { // before syntactical parent
                 c.setPrefixed(true);
@@ -110,8 +115,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                     ppe = ppe.getASTParent();
                     doChange = true;
                 }
-                if (ppe != null && doChange)
+                if (ppe != null && doChange) {
                     dest = ppe;
+                }
                 if (dest instanceof NonTerminalProgramElement) {
                     ppe = (NonTerminalProgramElement) dest;
                     if (ppe.getEndPosition().compareTo(c.getStartPosition()) >= 0) {
@@ -169,8 +175,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                     int distPre = dest.getStartPosition().getLine() - c.getEndPosition().getLine();
                     int distPost = c.getStartPosition().getLine()
                             - npe.getChildAt(idx - 1).getEndPosition().getLine();
-                    if (c instanceof SingleLineComment)
+                    if (c instanceof SingleLineComment) {
                         distPost--; // prefer postfix comment in this case
+                    }
                     if (distPost < distPre) {
                         dest = npe.getChildAt(idx - 1);
                         c.setPrefixed(false);
@@ -186,8 +193,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                     int distPre = npe.getChildAt(idx + 1).getStartPosition().getLine()
                             - c.getEndPosition().getLine();
                     int distPost = c.getStartPosition().getLine() - dest.getEndPosition().getLine();
-                    if (c instanceof SingleLineComment)
+                    if (c instanceof SingleLineComment) {
                         distPost--;
+                    }
                     if (distPre <= distPost) {
                         dest = npe.getChildAt(idx + 1);
                         c.setPrefixed(true);
@@ -205,7 +213,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         }
         ASTList<Comment> cml = dest.getComments();
         if (cml == null) {
-            dest.setComments(cml = new ASTArrayList<Comment>());
+            dest.setComments(cml = new ASTArrayList<>());
         }
         cml.add(c);
     }
@@ -255,21 +263,23 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                 ProgramElement newDest = null;
                 while (dest instanceof NonTerminalProgramElement) {
                     NonTerminalProgramElement npe = (NonTerminalProgramElement) dest;
-                    if (npe.getChildCount() == 0)
+                    if (npe.getChildCount() == 0) {
                         break;
+                    }
                     newDest = npe.getChildAt(npe.getChildCount() - 1);
                     if ((npe.getEndPosition().compareTo(current.getStartPosition()) > 0
                             || ((npe.getEndPosition().compareTo(current.getStartPosition()) == 0)
                                     && newDest.getEndPosition()
                                             .compareTo(current.getStartPosition()) <= 0))
-                            && dest != newDest)
+                            && dest != newDest) {
                         dest = newDest;
-                    else
+                    } else {
                         break;
+                    }
                 }
                 ASTList<Comment> cml = dest.getComments();
                 if (cml == null) {
-                    dest.setComments(cml = new ASTArrayList<Comment>());
+                    dest.setComments(cml = new ASTArrayList<>());
                 }
                 current.setPrefixed(false);
                 cml.add(current);
@@ -304,27 +314,28 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         } else {
             radix = 10;
         }
-        if (nm.startsWith("-", index))
+        if (nm.startsWith("-", index)) {
             throw new NumberFormatException("Negative sign in wrong position");
+        }
         int len = nm.length() - index;
         if (radix == 16 && len == 8) {
             char first = nm.charAt(index);
             index += 1;
-            result = Integer.valueOf(nm.substring(index), radix).intValue();
+            result = Integer.parseInt(nm.substring(index), radix);
             result |= Character.digit(first, 16) << 28;
             return negative ? -result : result;
         }
         if (radix == 8 && len == 11) {
             char first = nm.charAt(index);
             index += 1;
-            result = Integer.valueOf(nm.substring(index), radix).intValue();
+            result = Integer.parseInt(nm.substring(index), radix);
             result |= Character.digit(first, 8) << 30;
             return negative ? -result : result;
         }
         if (!negative && radix == 10 && len == 10 && nm.indexOf("2147483648", index) == index) {
             return Integer.MIN_VALUE;
         }
-        result = Integer.valueOf(nm.substring(index), radix).intValue();
+        result = Integer.parseInt(nm.substring(index), radix);
         return negative ? -result : result;
     }
 
@@ -334,8 +345,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      */
     public static long parseLong(String nm) throws NumberFormatException {
         // fixes a bug
-        if (nm.equalsIgnoreCase("0L"))
+        if (nm.equalsIgnoreCase("0L")) {
             return 0;
+        }
 
         int radix;
         boolean negative = false;
@@ -356,8 +368,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
             radix = 10;
         }
 
-        if (nm.startsWith("-", index))
+        if (nm.startsWith("-", index)) {
             throw new NumberFormatException("Negative sign in wrong position");
+        }
         int endIndex = nm.length();
         if (nm.endsWith("L") || nm.endsWith("l")) {
             endIndex -= 1;
@@ -367,14 +380,14 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         if (radix == 16 && len == 16) {
             char first = nm.charAt(index);
             index += 1;
-            result = Long.valueOf(nm.substring(index, endIndex), radix).longValue();
+            result = Long.parseLong(nm.substring(index, endIndex), radix);
             result |= ((long) Character.digit(first, 16)) << 60;
             return negative ? -result : result;
         }
         if (radix == 8 && len == 21) {
             char first = nm.charAt(index);
             index += 1;
-            result = Long.valueOf(nm.substring(index, endIndex), radix).longValue();
+            result = Long.parseLong(nm.substring(index, endIndex), radix);
             result |= ((long) Character.digit(first, 8)) << 63;
             return negative ? -result : result;
         }
@@ -382,7 +395,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                 && nm.indexOf("9223372036854775808", index) == index) {
             return Long.MIN_VALUE;
         }
-        result = Long.valueOf(nm.substring(index, endIndex), radix).longValue();
+        result = Long.parseLong(nm.substring(index, endIndex), radix);
         return negative ? -result : result;
     }
 
@@ -397,14 +410,10 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         }
         try {
             CompilationUnit cu = new DefaultServiceConfiguration().getProgramFactory()
-                    .parseCompilationUnit(new FileReader(args[0]));
+                    .parseCompilationUnit(new FileReader(args[0], StandardCharsets.UTF_8));
             System.out.println(cu.toSource());
-        } catch (IOException ioe) {
-            System.err.println(ioe);
-            ioe.printStackTrace();
-        } catch (ParserException pe) {
-            System.err.println(pe);
-            pe.printStackTrace();
+        } catch (IOException | ParserException ioe) {
+            LOGGER.warn("Failed to parse", ioe);
         }
     }
 
@@ -564,8 +573,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         synchronized (parser) {
             JavaCCParser.initialize(in);
             ASTList<Statement> res = JavaCCParser.GeneralizedStatements();
-            for (int i = 0; i < res.size(); i += 1) {
-                postWork(res.get(i));
+            for (Statement re : res) {
+                postWork(re);
             }
             return res;
         }
@@ -599,9 +608,10 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      */
     public List<CompilationUnit> parseCompilationUnits(String[] ins) throws ParserException {
         try {
-            List<CompilationUnit> cus = new ArrayList<CompilationUnit>();
-            for (int i = 0; i < ins.length; i++) {
-                CompilationUnit cu = parseCompilationUnit(new FileReader(ins[i]));
+            List<CompilationUnit> cus = new ArrayList<>();
+            for (String in : ins) {
+                CompilationUnit cu =
+                    parseCompilationUnit(new FileReader(in, StandardCharsets.UTF_8));
                 cus.add(cu);
             }
             return cus;
@@ -3250,7 +3260,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         return new While(guard, body);
     }
 
-    private class AddNewlineReader extends Reader {
+    private static class AddNewlineReader extends Reader {
         private final Reader reader;
         private boolean added = false;
 
@@ -3305,12 +3315,14 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
 
         @Override
         public int read(char[] cbuf, int off, int len) throws IOException {
-            if (added)
+            if (added) {
                 return -1;
+            }
             int result = reader.read(cbuf, off, len);
             if (!added && result < len) {
-                if (result == -1)
+                if (result == -1) {
                     result++;
+                }
                 cbuf[off + result++] = '\n';
                 added = true;
             }

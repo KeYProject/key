@@ -2,11 +2,11 @@
 
 package recoder.service;
 
-import recoder.abstraction.Package;
-import recoder.abstraction.*;
-import recoder.java.reference.*;
-
 import java.util.List;
+
+import recoder.abstraction.*;
+import recoder.abstraction.Package;
+import recoder.java.reference.*;
 
 /**
  * Source information service supporting cross reference information.
@@ -70,4 +70,3 @@ public interface CrossReferenceSourceInfo extends SourceInfo {
     List<PackageReference> getReferences(Package p);
 
 }
-

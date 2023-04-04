@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -16,6 +14,8 @@ import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
+import org.key_project.util.collection.ImmutableList;
 
 public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     public SelectCommand() {
@@ -68,7 +68,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
             return null;
         }
 
-        final Iterable<Node> children = (() -> node.childrenIterator());
+        final Iterable<Node> children = (node::childrenIterator);
         for (Node child : children) {
             goal = getFirstSubtreeGoal(child, proof);
             if (goal != null) {
@@ -86,7 +86,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
 
     private Goal findGoalWith(Function<Node, Boolean> filter, Function<Node, Goal> goalRetriever,
             Proof proof) throws ScriptException {
-        Deque<Node> choices = new LinkedList<Node>();
+        Deque<Node> choices = new LinkedList<>();
         Node node = proof.root();
 
         while (node != null) {
@@ -148,7 +148,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         return "select";
     }
 
-    public class Parameters {
+    public static class Parameters {
         /** A formula defining the goal to select */
         @Option(value = "formula", required = false)
         public Term formula;

@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.proof;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The abstract superclass of caches for taclet app indexes that are separated by different prefixes
@@ -26,8 +26,9 @@ abstract class PrefixTermTacletAppIndexCache implements ITermTacletAppIndexCache
     protected ImmutableList<QuantifiableVariable> getExtendedPrefix(
             ImmutableArray<QuantifiableVariable> extension) {
         ImmutableList<QuantifiableVariable> res = prefix;
-        for (int i = 0; i != extension.size(); ++i)
+        for (int i = 0; i != extension.size(); ++i) {
             res = res.prepend(extension.get(i));
+        }
         return res;
     }
 

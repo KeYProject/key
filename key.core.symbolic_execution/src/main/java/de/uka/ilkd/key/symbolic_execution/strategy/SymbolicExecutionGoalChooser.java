@@ -1,10 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -14,6 +11,8 @@ import de.uka.ilkd.key.prover.StopCondition;
 import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooser;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * <p>
@@ -50,7 +49,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
      * {@link Set} is empty which indicates that on all {@link Goal}s a symbolic execution tree node
      * was created. Then the process starts again.
      */
-    private Set<Goal> goalsToPrefer = new LinkedHashSet<Goal>();
+    private final Set<Goal> goalsToPrefer = new LinkedHashSet<>();
 
     /**
      * The optional custom stop condition used in the current proof.
@@ -68,7 +67,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
             // accepts the next rule
             if (stopCondition != null && goalsToPrefer.isEmpty()) {
                 for (Goal goalToPrefer : selectedList) {
-                    if (stopCondition.isGoalAllowed(-1, -1l, proof, -1l, -1, goalToPrefer)) {
+                    if (stopCondition.isGoalAllowed(-1, -1L, proof, -1L, -1, goalToPrefer)) {
                         goalsToPrefer.add(goalToPrefer);
                     }
                 }
@@ -80,7 +79,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
                 }
             }
             // Select goal
-            Set<Goal> goalsWhereStopConditionDoNotAllowNextRule = new LinkedHashSet<Goal>();
+            Set<Goal> goalsWhereStopConditionDoNotAllowNextRule = new LinkedHashSet<>();
             do {
                 Goal next = super.getNextGoal();
                 if (next == null) {
@@ -97,7 +96,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
                     if (goalsToPrefer.remove(next) || goalsToPrefer.isEmpty()) {
                         // Goal is preferred, so check if next rule is allowed
                         if (stopCondition == null
-                                || stopCondition.isGoalAllowed(-1, -1l, proof, -1l, -1, next)) {
+                                || stopCondition.isGoalAllowed(-1, -1L, proof, -1L, -1, next)) {
                             // Next rule allowed, goal is preferred so return it as result
                             goal = next;
                         } else {
@@ -166,12 +165,6 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
         // Update available goals in super class
         super.updateGoalList(node, newGoals);
         // Remove no longer relevant goals from preferred set
-        Iterator<Goal> preferredIter = goalsToPrefer.iterator();
-        while (preferredIter.hasNext()) {
-            Goal next = preferredIter.next();
-            if (!proof.openGoals().contains(next)) {
-                preferredIter.remove();
-            }
-        }
+        goalsToPrefer.removeIf(next -> !proof.openGoals().contains(next));
     }
 }

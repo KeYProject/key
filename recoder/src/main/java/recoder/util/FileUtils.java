@@ -72,7 +72,7 @@ public class FileUtils {
             // no common header: different devices; use absolute path
             return destname;
         }
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         if (index != slen) {
             while (index > 0 && (startname.charAt(index) != File.separatorChar)) {
                 index -= 1;
@@ -103,10 +103,11 @@ public class FileUtils {
         String classpath = System.getProperty("java.class.path");
         if (classpath != null) {
             char sep = File.separatorChar;
-            if (sep == '/')
+            if (sep == '/') {
                 classpath = classpath.replace('\\', sep);
-            else if (sep == '\\')
+            } else if (sep == '\\') {
                 classpath = classpath.replace('/', sep);
+            }
             StringTokenizer tok = new StringTokenizer(classpath, File.separator);
             while (tok.hasMoreTokens()) {
                 classpath = tok.nextToken();

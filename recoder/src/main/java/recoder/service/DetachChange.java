@@ -71,7 +71,7 @@ public class DetachChange extends TreeChange {
     }
 
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         if (isMinor()) {
             buf.append("Minor ");
         }
@@ -89,4 +89,3 @@ public class DetachChange extends TreeChange {
         return buf.toString();
     }
 }
-

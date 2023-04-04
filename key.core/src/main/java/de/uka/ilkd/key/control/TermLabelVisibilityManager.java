@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.control;
 
+import java.util.*;
+
 import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerEvent;
 import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerListener;
 import de.uka.ilkd.key.logic.Name;
@@ -9,8 +11,6 @@ import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
-
-import java.util.*;
 
 public class TermLabelVisibilityManager implements VisibleTermLabels {
 
@@ -33,26 +33,22 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
      * The names of all term labels that should not be printed, this contains also the labels in
      * {@link TermLabelVisibilityManager#HIDDEN_BY_DEFAULT}.
      */
-    private final Set<Name> hiddenLabels = new HashSet<Name>();
+    private final Set<Name> hiddenLabels = new HashSet<>();
 
     /**
      * All available {@link TermLabelVisibilityManagerListener}s.
      */
     private final List<TermLabelVisibilityManagerListener> listeners =
-        new LinkedList<TermLabelVisibilityManagerListener>();
+        new LinkedList<>();
 
     /**
      * Constructs a new TermLabelVisibilityManager.
      */
     public TermLabelVisibilityManager() {
-        for (Name name : HIDDEN_BY_DEFAULT) {
-            hiddenLabels.add(name);
-        }
+        Collections.addAll(hiddenLabels, HIDDEN_BY_DEFAULT);
 
 
-        for (Name name : ALWAYS_HIDDEN) {
-            hiddenLabels.add(name);
-        }
+        Collections.addAll(hiddenLabels, ALWAYS_HIDDEN);
     }
 
     /**
@@ -152,7 +148,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
      * @return all available {@link TermLabelVisibilityManagerListener}.
      */
     public TermLabelVisibilityManagerListener[] getTermLabelVisibilityManagerListeners() {
-        return listeners.toArray(new TermLabelVisibilityManagerListener[listeners.size()]);
+        return listeners.toArray(new TermLabelVisibilityManagerListener[0]);
     }
 
     /**
@@ -199,7 +195,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
     public static List<Name> getSortedTermLabelNames(TermLabelManager manager) {
         List<Name> labelNames = manager.getSupportedTermLabelNames().toList();
 
-        Collections.sort(labelNames,
+        labelNames.sort(
             (t, t1) -> String.CASE_INSENSITIVE_ORDER.compare(t.toString(), t1.toString()));
 
         return labelNames;

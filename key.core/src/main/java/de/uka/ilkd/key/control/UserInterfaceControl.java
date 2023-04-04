@@ -3,6 +3,7 @@ package de.uka.ilkd.key.control;
 import java.io.File;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Consumer;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -19,7 +20,7 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
  * Provides the user interface independent logic to manage multiple proofs. This includes:
  * <ul>
  * <li>Functionality to load files via {@link #load(Profile, File, List<File>, File, List<File>,
- * Properties, boolean)}.</li>
+ * Properties, boolean, Consumer<Proof>)}.</li>
  * <li>Functionality to instantiate new {@link Proof}s via
  * {@link #createProof(InitConfig, ProofOblInput)}.</li>
  * <li>Functionality to register existing {@link Proof}s in the user interface via
@@ -65,12 +66,14 @@ public interface UserInterfaceControl {
      *        {@link AbstractProblemLoader#profileOfNewProofs} will be used as {@link Profile} of
      *        new proofs, {@code false} {@link Profile} specified by problem file will be used for
      *        new proofs.
+     * @param callbackProofLoaded receives the proof after it is loaded, but before it is replayed
      * @return The opened {@link AbstractProblemLoader}.
      * @throws ProblemLoaderException Occurred Exception.
      */
     AbstractProblemLoader load(Profile profile, File file, List<File> classPaths,
             File bootClassPath, List<File> includes, Properties poPropertiesToForce,
-            boolean forceNewProfileOfNewProofs) throws ProblemLoaderException;
+            boolean forceNewProfileOfNewProofs,
+            Consumer<Proof> callbackProofLoaded) throws ProblemLoaderException;
 
     /**
      * Instantiates a new {@link Proof} in this {@link UserInterfaceControl} for the given
@@ -95,12 +98,12 @@ public interface UserInterfaceControl {
      *
      * @return The used {@link ProofControl}.
      */
-    public ProofControl getProofControl();
+    ProofControl getProofControl();
 
     /**
      * Returns the {@link TermLabelVisibilityManager}.
      *
      * @return The {@link TermLabelVisibilityManager}.
      */
-    public TermLabelVisibilityManager getTermLabelVisibilityManager();
+    TermLabelVisibilityManager getTermLabelVisibilityManager();
 }

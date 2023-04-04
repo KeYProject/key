@@ -1,7 +1,8 @@
 package org.key_project.util.testcase.java;
 
-import org.junit.jupiter.api.Test;
 import org.key_project.util.java.IntegerUtil;
+
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 

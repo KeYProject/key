@@ -12,7 +12,9 @@ import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
+
 import org.key_project.util.ExtList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -248,8 +250,6 @@ public abstract class ProgramVariable extends AbstractSortedOperator
         if (src == this) {
             return matchCond;
         } else {
-            LOGGER.debug("Program match failed. Not same program variable (pattern {}, source {})",
-                this, src);
             return null;
         }
     }

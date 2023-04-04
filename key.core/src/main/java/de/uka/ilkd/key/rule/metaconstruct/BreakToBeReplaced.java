@@ -5,7 +5,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 class BreakToBeReplaced {
 
-    private Break brk;
+    private final Break brk;
     private ProgramVariable pvar;
 
     public BreakToBeReplaced(Break brk, ProgramVariable pvar) {

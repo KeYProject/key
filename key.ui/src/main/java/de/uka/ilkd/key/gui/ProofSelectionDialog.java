@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -13,6 +11,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
 
 /**
  * This dialog allows the user to select the proof to load from a proof bundle.
@@ -114,13 +114,16 @@ public final class ProofSelectionDialog extends JDialog {
      * @throws IOException if the proof bundle can not be read
      */
     private JList<Path> createAndFillList(Path bundlePath) throws IOException {
-        // read zip
-        ZipFile bundle = new ZipFile(bundlePath.toFile());
-
         // create a list of all *.proof files (only top level in bundle)
-        List<Path> proofs = bundle.stream().filter(e -> !e.isDirectory())
-                .filter(e -> e.getName().endsWith(".proof")).map(e -> Paths.get(e.getName()))
-                .collect(Collectors.toList());
+        List<Path> proofs;
+        // read zip
+        try (ZipFile bundle = new ZipFile(bundlePath.toFile())) {
+            proofs = bundle.stream().filter(e -> !e.isDirectory())
+                    .filter(e -> e.getName().endsWith(".proof")).map(e -> Paths.get(e.getName()))
+                    .collect(Collectors.toList());
+        }
+
+
 
         // show the list in a JList
         DefaultListModel<Path> model = new DefaultListModel<>();

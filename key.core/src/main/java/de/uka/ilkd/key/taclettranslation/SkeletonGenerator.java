@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.taclettranslation;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -11,8 +8,11 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 public interface SkeletonGenerator {
-    public final static SkeletonGenerator DEFAULT_TACLET_TRANSLATOR = new DefaultTacletTranslator();
+    SkeletonGenerator DEFAULT_TACLET_TRANSLATOR = new DefaultTacletTranslator();
 
     /**
      * Override this method to introduce a translating mechanism for taclets.
@@ -21,7 +21,7 @@ public interface SkeletonGenerator {
      * @param services TODO
      * @return returns the translation of the taclet.
      */
-    public Term translate(Taclet t, TermServices services) throws IllegalTacletException;
+    Term translate(Taclet t, TermServices services) throws IllegalTacletException;
 }
 
 
@@ -47,12 +47,15 @@ abstract class AbstractSkeletonGenerator implements SkeletonGenerator {
         ImmutableList<Term> ante = getFormulaeOfSemisequent(s.antecedent());
         ImmutableList<Term> succ = getFormulaeOfSemisequent(s.succedent());
 
-        if (ante.size() == 0 && succ.size() == 0)
+        if (ante.size() == 0 && succ.size() == 0) {
             return null;
-        if (succ.size() == 0)
+        }
+        if (succ.size() == 0) {
             return builder.not(builder.and(ante));
-        if (ante.size() == 0)
+        }
+        if (ante.size() == 0) {
             return builder.or(succ);
+        }
 
         return builder.imp(builder.and(ante), builder.or(succ));
     }

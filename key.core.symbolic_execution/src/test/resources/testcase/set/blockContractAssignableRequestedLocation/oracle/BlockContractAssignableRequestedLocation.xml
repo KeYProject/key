@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call BlockContractAssignableRequestedLocation.main()&gt;" pathCondition="true" pathConditionChanged="false">
-      <statement name="x=2;" pathCondition="true" pathConditionChanged="false">
+      <statement name="x = 2;" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
-         <statement name="y=3;" pathCondition="true" pathConditionChanged="false">
+         <statement name="y = 3;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
             <blockContract name="main()) catch(exc_0)
 pre measuredByEmpty
 post exc_0 = null
-mod {(null, BlockContractAssignableRequestedLocation::$x)}termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true">
+mod {(null, BlockContractAssignableRequestedLocation::$x)}termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false">
                <callStackEntry path="/0"/>
                <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Validity">
                   <callStackEntry path="/0"/>
-                  <statement name="x=-2;" pathCondition="true" pathConditionChanged="false">
+                  <statement name="x = -2;" pathCondition="true" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
                      <termination name="&lt;block contract end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="BLOCK_CONTRACT_NORMAL" branchVerified="true">
                      </termination>

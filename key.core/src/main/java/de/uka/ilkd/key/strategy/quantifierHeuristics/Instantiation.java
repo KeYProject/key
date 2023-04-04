@@ -3,13 +3,6 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -24,6 +17,13 @@ import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
+import org.key_project.util.collection.DefaultImmutableMap;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
 class Instantiation {
 
 
@@ -35,10 +35,10 @@ class Instantiation {
     /**
      * Literals occurring in the sequent at hand. This is used for branch prediction
      */
-    private ImmutableSet<Term> assumedLiterals = DefaultImmutableSet.<Term>nil();
+    private ImmutableSet<Term> assumedLiterals = DefaultImmutableSet.nil();
 
     /** HashMap from instance(<code>Term</code>) to cost <code>Long</code> */
-    private final Map<Term, Long> instancesWithCosts = new LinkedHashMap<Term, Long>();
+    private final Map<Term, Long> instancesWithCosts = new LinkedHashMap<>();
 
     /** the <code>TriggersSet</code> of this <code>allTerm</code> */
     private final TriggersSet triggersSet;
@@ -58,8 +58,9 @@ class Instantiation {
 
     static Instantiation create(Term qf, Sequent seq, Services services) {
         synchronized (Instantiation.class) {
-            if (qf == lastQuantifiedFormula && seq == lastSequent)
+            if (qf == lastQuantifiedFormula && seq == lastSequent) {
                 return lastResult;
+            }
         }
         final Instantiation result = new Instantiation(qf, seq, services);
         synchronized (Instantiation.class) {
@@ -71,7 +72,7 @@ class Instantiation {
     }
 
     private static ImmutableSet<Term> sequentToTerms(Sequent seq) {
-        ImmutableList<Term> res = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> res = ImmutableSLList.nil();
         for (final SequentFormula cf : seq) {
             res = res.prepend(cf.formula());
         }
@@ -97,7 +98,7 @@ class Instantiation {
 
     private void addArbitraryInstance(Services services) {
         ImmutableMap<QuantifiableVariable, Term> varMap =
-            DefaultImmutableMap.<QuantifiableVariable, Term>nilMap();
+            DefaultImmutableMap.nilMap();
 
         for (QuantifiableVariable quantifiableVariable : triggersSet.getUniQuantifiedVariables()) {
             final QuantifiableVariable v = quantifiableVariable;
@@ -116,8 +117,9 @@ class Instantiation {
     private void addInstance(Substitution sub, Services services) {
         final long cost =
             PredictCostProver.computerInstanceCost(sub, getMatrix(), assumedLiterals, services);
-        if (cost != -1)
+        if (cost != -1) {
             addInstance(sub, cost);
+        }
     }
 
     /**
@@ -131,8 +133,9 @@ class Instantiation {
     private void addInstance(Substitution sub, long cost) {
         final Term inst = sub.getSubstitutedTerm(firstVar);
         final Long oldCost = instancesWithCosts.get(inst);
-        if (oldCost == null || oldCost.longValue() >= cost)
-            instancesWithCosts.put(inst, Long.valueOf(cost));
+        if (oldCost == null || oldCost >= cost) {
+            instancesWithCosts.put(inst, cost);
+        }
     }
 
     /**
@@ -145,14 +148,16 @@ class Instantiation {
         for (final SequentFormula cf : seq.antecedent()) {
             final Term atom = cf.formula();
             final Operator op = atom.op();
-            if (!(op == Quantifier.ALL || op == Quantifier.EX))
+            if (!(op == Quantifier.ALL || op == Quantifier.EX)) {
                 assertLits = assertLits.prepend(atom);
+            }
         }
         for (final SequentFormula cf : seq.succedent()) {
             final Term atom = cf.formula();
             final Operator op = atom.op();
-            if (!(op == Quantifier.ALL || op == Quantifier.EX))
+            if (!(op == Quantifier.ALL || op == Quantifier.EX)) {
                 assertLits = assertLits.prepend(services.getTermBuilder().not(atom));
+            }
         }
         return DefaultImmutableSet.fromImmutableList(assertLits);
     }
@@ -167,22 +172,24 @@ class Instantiation {
     private RuleAppCost computeCostHelp(Term inst) {
         Long cost = instancesWithCosts.get(inst);
         if (cost == null && (inst.op() instanceof SortDependingFunction
-                && ((SortDependingFunction) inst.op()).getKind().equals(Sort.CAST_NAME)))
+                && ((SortDependingFunction) inst.op()).getKind().equals(Sort.CAST_NAME))) {
             cost = instancesWithCosts.get(inst.sub(0));
+        }
 
         if (cost == null) {
             // if (triggersSet)
             return TopRuleAppCost.INSTANCE;
         }
-        if (cost.longValue() == -1)
+        if (cost == -1) {
             return TopRuleAppCost.INSTANCE;
+        }
 
-        return NumberRuleAppCost.create(cost.longValue());
+        return NumberRuleAppCost.create(cost);
     }
 
     /** get all instances from instancesCostCache subsCache */
     ImmutableSet<Term> getSubstitution() {
-        ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();
+        ImmutableSet<Term> res = DefaultImmutableSet.nil();
         for (final Term inst : instancesWithCosts.keySet()) {
             res = res.add(inst);
         }

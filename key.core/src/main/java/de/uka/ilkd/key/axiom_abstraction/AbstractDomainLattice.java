@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.axiom_abstraction;
 
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isProvableWithSplitting;
-
 import java.util.Iterator;
 
 import de.uka.ilkd.key.axiom_abstraction.signanalysis.Top;
@@ -9,6 +7,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
+
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isProvableWithSplitting;
 
 /**
  * An abstract domain is a countable lattice with a partial order relation and a join operator. It
@@ -39,11 +39,8 @@ public abstract class AbstractDomainLattice
      */
     public AbstractDomainElement abstractFrom(SymbolicExecutionState state, Term term,
             Services services) {
-        Iterator<AbstractDomainElement> it = iterator();
 
-        while (it.hasNext()) {
-            AbstractDomainElement elem = it.next();
-
+        for (AbstractDomainElement elem : this) {
             Term toProve = getSideConditionForAxiom(state, term, elem, services);
 
             if (isProvableWithSplitting(toProve, services, AXIOM_PROVE_TIMEOUT_MS)) {
@@ -121,9 +118,7 @@ public abstract class AbstractDomainLattice
      * @throws RuntimeException if s cannot be parsed.
      */
     public AbstractDomainElement fromString(String s, Services services) {
-        final Iterator<AbstractDomainElement> it = iterator();
-        while (it.hasNext()) {
-            final AbstractDomainElement elem = it.next();
+        for (AbstractDomainElement elem : this) {
             if (elem.toParseableString(services).equals(s)) {
                 return elem;
             }

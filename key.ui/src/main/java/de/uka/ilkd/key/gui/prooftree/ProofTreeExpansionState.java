@@ -7,7 +7,7 @@ package de.uka.ilkd.key.gui.prooftree;
  */
 
 import java.util.*;
-
+import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import javax.swing.JTree;
 import javax.swing.event.*;
@@ -71,8 +71,9 @@ import javax.swing.tree.TreePath;
  *
  * <p>
  * Note: For optimization purposes, this class is now tailored to ProofTreeView. In particular, the
- * method {@link #expandAllBelow(JTree, TreePath)} temporarily removes most TreeExpansionListeners
- * to avoid flooding them with events. This massively increases performance on large trees.
+ * method {@link #expandAllBelow(JTree, TreePath, Predicate)} temporarily removes most
+ * TreeExpansionListeners to avoid flooding them with events. This massively increases performance
+ * on large trees.
  * <p>
  * Note: The current implementation probably does not work correctly with TreeWillExpandListeners.
  *
@@ -200,7 +201,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
 
     @Override
     public Iterator<TreePath> iterator() {
-        return new Iterator<TreePath>() {
+        return new Iterator<>() {
             final Iterator<TreePath> i = paths.iterator();
 
             @Override
@@ -291,9 +292,12 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
     /**
      * Expands the given JTree completely.
      *
+     * Expands the given JTree completely except for the filtered out nodes.
+     *
      * @param tree the JTree to expand
+     * @param filter only the nodes that pass this filter will be expanded
      */
-    public static void expandAll(JTree tree) {
+    public static void expandAll(JTree tree, Predicate<TreePath> filter) {
         TreeModel data = tree.getModel();
 
         if (data == null) {
@@ -306,17 +310,19 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
             return;
         }
 
-        expandAllBelow(tree, new TreePath(root));
+        expandAllBelow(tree, new TreePath(root), filter);
     }
 
     /**
-     * Completely expands all nodes of the given JTree that are below the given path. Requires that
-     * path is not a leaf. That implies the tree has a model, and that has a root.
+     * Completely expands all nodes of the given JTree that are below the given path and pass the
+     * given filter. Requires that path is not a leaf. That implies the tree has a model, and that
+     * has a root.
      *
      * @param tree the JTree to expand
      * @param path the root path under which everything should be expanded afterwards
+     * @param filter only the nodes that pass this filter will be expanded
      */
-    public static void expandAllBelow(JTree tree, TreePath path) {
+    public static void expandAllBelow(JTree tree, TreePath path, Predicate<TreePath> filter) {
         // we temporarily remove all expansion listeners (except that which updates the expanded
         // paths set) before expanding
         TreeExpansionListener[] expansionListeners = tree.getTreeExpansionListeners();
@@ -325,7 +331,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
                 tree.removeTreeExpansionListener(exl);
             }
         }
-        for (TreePath tp : extremalPaths(tree.getModel(), path)) {
+        for (TreePath tp : extremalPaths(tree.getModel(), path, filter)) {
             tree.expandPath(tp);
         }
         for (TreeExpansionListener exl : expansionListeners) {
@@ -346,39 +352,46 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      * collection of a leave is empty. The extremal paths are stored in the order in which they
      * appear in pre-order in the tree model.
      */
-    private static Collection<TreePath> extremalPaths(TreeModel data, TreePath path) {
+    private static Collection<TreePath> extremalPaths(TreeModel data, TreePath path,
+            Predicate<TreePath> filter) {
         LinkedHashSet<TreePath> result = new LinkedHashSet<>();
 
         if (data.isLeaf(path.getLastPathComponent())) {
             return result; // should really be forbidden (?)
         }
 
-        extremalPathsImpl(data, path, result);
+        extremalPathsImpl(data, path, result, filter);
         return result;
     }
 
     private static void extremalPathsImpl(TreeModel data, TreePath path,
-            Collection<TreePath> result) {
+            Collection<TreePath> result, Predicate<TreePath> filter) {
         Object node = path.getLastPathComponent();
 
         boolean hasNonLeafChildren = false;
 
         int count = data.getChildCount(node);
 
+        // check if there is a child that is not leaf and passes the filter
         for (int i = 0; i < count; i++) {
-            if (!data.isLeaf(data.getChild(node, i))) {
+            Object child = data.getChild(node, i);
+            if (!data.isLeaf(child) && filter.test(path.pathByAddingChild(child))) {
                 hasNonLeafChildren = true;
+                break;
             }
         }
 
         if (!hasNonLeafChildren) {
-            result.add(path);
+            // filtered out nodes (e.g. OSS nodes) must not be expanded
+            if (filter.test(path)) {
+                result.add(path);
+            }
         } else {
             for (int i = 0; i < count; i++) {
                 Object child = data.getChild(node, i);
 
                 if (!data.isLeaf(child)) {
-                    extremalPathsImpl(data, path.pathByAddingChild(child), result);
+                    extremalPathsImpl(data, path.pathByAddingChild(child), result, filter);
                 }
             }
         }

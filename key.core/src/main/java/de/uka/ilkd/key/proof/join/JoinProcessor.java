@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.proof.join;
 
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.TreeSet;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
@@ -11,12 +16,9 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.TreeSet;
 
 /**
  * <p>
@@ -49,16 +51,16 @@ public class JoinProcessor implements Runnable {
     private final Proof proof;
     private final Services services;
     private final ProspectivePartner partner;
-    private final LinkedList<Listener> listeners = new LinkedList<Listener>();
+    private final LinkedList<Listener> listeners = new LinkedList<>();
     private static final String HIDE_RIGHT_TACLET = "hide_right";
     private static final String OR_RIGHT_TACLET = "orRight";
-    public static final String SIMPLIFY_UPDATE[] =
+    public static final String[] SIMPLIFY_UPDATE =
         { "simplifyIfThenElseUpdate1", "simplifyIfThenElseUpdate2", "simplifyIfThenElseUpdate3" };
 
     public interface Listener {
-        public void exceptionWhileJoining(Throwable e);
+        void exceptionWhileJoining(Throwable e);
 
-        public void endOfJoining(ImmutableList<Goal> goals);
+        void endOfJoining(ImmutableList<Goal> goals);
     }
 
     public JoinProcessor(ProspectivePartner partner, Proof proof) {
@@ -96,7 +98,7 @@ public class JoinProcessor implements Runnable {
 
         orRight(result);
 
-        ImmutableList<Goal> list = ImmutableSLList.<Goal>nil();
+        ImmutableList<Goal> list = ImmutableSLList.nil();
 
         for (NodeGoalPair pair : cut.getGoalsAfterUncovering()) {
             if (pair.node == partner.getNode(0) || pair.node == partner.getNode(1)) {
@@ -243,7 +245,7 @@ public class JoinProcessor implements Runnable {
 
     private Collection<Term> createConstrainedTerms(Collection<Term> terms, Term predicate,
             boolean gamma) {
-        Collection<Term> result = new LinkedList<Term>();
+        Collection<Term> result = new LinkedList<>();
         for (Term term : terms) {
             if (gamma) {
                 result.add(services.getTermBuilder().imp(predicate, term));
@@ -267,7 +269,7 @@ public class JoinProcessor implements Runnable {
 
     private Collection<Term> computeDifference(Semisequent s, Collection<Term> excludeSet,
             Term exclude) {
-        LinkedList<Term> result = new LinkedList<Term>();
+        LinkedList<Term> result = new LinkedList<>();
         for (SequentFormula sf : s) {
             if (sf.formula() != exclude && !excludeSet.contains(sf.formula())) {
                 result.add(sf.formula());
@@ -287,7 +289,7 @@ public class JoinProcessor implements Runnable {
     }
 
     private TreeSet<Term> createTree() {
-        return new TreeSet<Term>((o1, o2) -> o1.serialNumber() - o2.serialNumber());
+        return new TreeSet<>(Comparator.comparingInt(Term::serialNumber));
     }
 
     @Override

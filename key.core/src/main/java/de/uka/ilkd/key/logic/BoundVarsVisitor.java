@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /**
  * Visitor traversing a term and collecting all variables that occur bound. The visitor implements
@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 public class BoundVarsVisitor extends DefaultVisitor {
 
     private ImmutableSet<QuantifiableVariable> bdVars =
-        DefaultImmutableSet.<QuantifiableVariable>nil();
+        DefaultImmutableSet.nil();
 
 
     /**

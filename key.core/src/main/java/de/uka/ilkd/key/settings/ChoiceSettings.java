@@ -1,29 +1,20 @@
 package de.uka.ilkd.key.settings;
 
-import java.util.EventObject;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
+
+import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
-
 public class ChoiceSettings implements Settings, Cloneable {
 
     private static final String DEFAULTCHOICES_KEY = "[Choice]DefaultChoices";
-    private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
+    private final LinkedList<SettingsListener> listenerList = new LinkedList<>();
     private HashMap<String, String> category2Default;
 
 
@@ -32,11 +23,11 @@ public class ChoiceSettings implements Settings, Cloneable {
      * category).
      */
     private HashMap<String, Set<String>> category2Choices =
-        new LinkedHashMap<String, Set<String>>();
+        new LinkedHashMap<>();
 
 
     public ChoiceSettings() {
-        category2Default = new LinkedHashMap<String, String>();
+        category2Default = new LinkedHashMap<>();
     }
 
 
@@ -99,17 +90,17 @@ public class ChoiceSettings implements Settings, Cloneable {
      */
     public void updateChoices(Namespace<Choice> choiceNS, boolean remove) {
         Iterator<Choice> it = choiceNS.allElements().iterator();
-        HashMap<String, Set<String>> c2C = new LinkedHashMap<String, Set<String>>();
+        HashMap<String, Set<String>> c2C = new LinkedHashMap<>();
         Choice c;
         Set<String> soc;
         while (it.hasNext()) {
-            c = (Choice) it.next();
+            c = it.next();
             if (c2C.containsKey(c.category())) {
                 soc = c2C.get(c.category());
                 soc.add(c.name().toString());
                 c2C.put(c.category(), soc);
             } else {
-                soc = new LinkedHashSet<String>();
+                soc = new LinkedHashSet<>();
                 soc.add(c.name().toString());
                 c2C.put(c.category(), soc);
             }
@@ -178,14 +169,14 @@ public class ChoiceSettings implements Settings, Cloneable {
      * @param props the Properties object where to write the settings as (key, value) pair
      */
     public void writeSettings(Properties props) {
-        String choiceSequence = "";
+        StringBuilder choiceSequence = new StringBuilder();
         for (final Map.Entry<String, String> entry : category2Default.entrySet()) {
             if (choiceSequence.length() > 0) {
-                choiceSequence += " , ";
+                choiceSequence.append(" , ");
             }
-            choiceSequence += entry.getKey() + "-" + entry.getValue();
+            choiceSequence.append(entry.getKey()).append("-").append(entry.getValue());
         }
-        props.setProperty(DEFAULTCHOICES_KEY, choiceSequence);
+        props.setProperty(DEFAULTCHOICES_KEY, choiceSequence.toString());
     }
 
 

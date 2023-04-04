@@ -13,7 +13,7 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
  */
 public class CountBranchFeature implements Feature {
 
-    public static Feature INSTANCE = new CountBranchFeature();
+    public static final Feature INSTANCE = new CountBranchFeature();
 
     private CountBranchFeature() {
     }

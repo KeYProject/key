@@ -2,13 +2,13 @@
 
 package recoder.java.declaration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.java.*;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Field declaration.
@@ -53,7 +53,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 
     public FieldDeclaration(TypeReference typeRef, Identifier name) {
         setTypeReference(typeRef);
-        ASTList<FieldSpecification> list = new ASTArrayList<FieldSpecification>(1);
+        ASTList<FieldSpecification> list = new ASTArrayList<>(1);
         list.add(getFactory().createFieldSpecification(name));
         setFieldSpecifications(list);
         makeParentRoleValid();
@@ -72,7 +72,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
             Identifier name, Expression init) {
         setDeclarationSpecifiers(mods);
         setTypeReference(typeRef);
-        ASTList<FieldSpecification> list = new ASTArrayList<FieldSpecification>(1);
+        ASTList<FieldSpecification> list = new ASTArrayList<>(1);
         list.add(getFactory().createFieldSpecification(name, init));
         setFieldSpecifications(list);
         makeParentRoleValid();
@@ -170,7 +170,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     }
 
     public List<FieldSpecification> getVariables() {
-        return new ArrayList<FieldSpecification>(fieldSpecs);
+        return new ArrayList<>(fieldSpecs);
     }
 
     /**
@@ -181,12 +181,15 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 
     public int getChildCount() {
         int result = 0;
-        if (declarationSpecifiers != null)
+        if (declarationSpecifiers != null) {
             result += declarationSpecifiers.size();
-        if (typeReference != null)
+        }
+        if (typeReference != null) {
             result++;
-        if (fieldSpecs != null)
+        }
+        if (fieldSpecs != null) {
             result += fieldSpecs.size();
+        }
         return result;
     }
 
@@ -208,8 +211,9 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
             index--;
         }
         if (fieldSpecs != null) {

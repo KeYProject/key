@@ -1,5 +1,8 @@
 package recoder.kit.transformation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.CompilationUnit;
 import recoder.java.Import;
@@ -9,9 +12,6 @@ import recoder.kit.UnitKit;
 import recoder.service.CrossReferenceSourceInfo;
 import recoder.util.ProgressListener;
 import recoder.util.ProgressListenerManager;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Transformation that removes all superfluous import statements from a compilation unit.
@@ -46,10 +46,10 @@ public class RemoveUnusedImports extends TwoPassTransformation {
      */
     public RemoveUnusedImports(CrossReferenceServiceConfiguration sc, CompilationUnit cu) {
         super(sc);
-        ArrayList<CompilationUnit> al = new ArrayList<CompilationUnit>(1);
+        ArrayList<CompilationUnit> al = new ArrayList<>(1);
         al.add(cu);
         this.units = al;
-        imports = new ArrayList<Import>();
+        imports = new ArrayList<>();
     }
 
     /**
@@ -64,7 +64,7 @@ public class RemoveUnusedImports extends TwoPassTransformation {
             throw new IllegalArgumentException("Missing units");
         }
         this.units = list;
-        imports = new ArrayList<Import>();
+        imports = new ArrayList<>();
     }
 
     /**

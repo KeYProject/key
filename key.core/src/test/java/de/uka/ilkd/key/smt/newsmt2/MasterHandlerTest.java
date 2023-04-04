@@ -1,5 +1,22 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.Sequent;
@@ -12,30 +29,16 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.util.LineProperties;
+
+import org.key_project.util.Streams;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.key_project.util.Streams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringReader;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -80,7 +83,10 @@ public class MasterHandlerTest {
         Path directory = Paths.get(url.toURI());
         Assertions.assertTrue(Files.isDirectory(directory));
 
-        var files = Files.list(directory).collect(Collectors.toList());
+        List<Path> files;
+        try (var s = Files.list(directory)) {
+            files = s.collect(Collectors.toList());
+        }
         List<Arguments> result = new ArrayList<>(files.size());
         for (Path file : files) {
             try {
@@ -169,7 +175,7 @@ public class MasterHandlerTest {
             Path tmpSmt = Files.createTempFile("SMT_key_" + data.name, ".smt2");
             // FIXME This is beyond Java 8: add as soon as switched to Java 11:
             // Files.writeString(tmpSmt, translation);
-            Files.write(tmpSmt, data.translation.getBytes());
+            Files.write(tmpSmt, data.translation.getBytes(StandardCharsets.UTF_8));
             LOGGER.info("SMT2 for {}  saved in: {}", data.name, tmpSmt);
         }
 
@@ -205,8 +211,8 @@ public class MasterHandlerTest {
         // FIXME This is a hack.
         Process proc = new ProcessBuilder("z3", "-in", "-smt2", "-T:5").start();
         OutputStream os = proc.getOutputStream();
-        os.write(data.translation.getBytes());
-        os.write("\n\n(check-sat)".getBytes());
+        os.write(data.translation.getBytes(StandardCharsets.UTF_8));
+        os.write("\n\n(check-sat)".getBytes(StandardCharsets.UTF_8));
         os.close();
 
         String[] response = Streams.toString(proc.getInputStream()).split("\n");

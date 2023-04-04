@@ -9,7 +9,7 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <statement name="array[0]=100;" pathCondition="true" pathConditionChanged="false">
+      <statement name="array[0] = 100;" pathCondition="true" pathConditionChanged="false">
          <variable name="array" isArrayIndex="false">
             <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                <variable name="length" isArrayIndex="false">
@@ -26,7 +26,7 @@
             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
-         <statement name="array[1]=array[2];" pathCondition="true" pathConditionChanged="false">
+         <statement name="array[1] = array[2];" pathCondition="true" pathConditionChanged="false">
             <variable name="array" isArrayIndex="false">
                <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="length" isArrayIndex="false">
@@ -45,7 +45,7 @@
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <statement name="array[3]=array[0];" pathCondition="true" pathConditionChanged="false">
+            <statement name="array[3] = array[0];" pathCondition="true" pathConditionChanged="false">
                <variable name="array" isArrayIndex="false">
                   <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="length" isArrayIndex="false">

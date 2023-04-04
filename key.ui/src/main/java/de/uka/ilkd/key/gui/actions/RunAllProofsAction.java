@@ -1,5 +1,15 @@
 package de.uka.ilkd.key.gui.actions;
 
+import java.awt.event.ActionEvent;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -7,17 +17,9 @@ import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.ui.MediatorProofControl;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.awt.event.ActionEvent;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This class provides an action for KeY UI which runs a set of specified proof files automatically.
@@ -81,7 +83,8 @@ public class RunAllProofsAction extends MainWindowAction {
             stream = new FileInputStream(RUN_ALL_PROOFS_UI);
         }
 
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(stream))) {
+        try (BufferedReader in =
+            new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
             return in.lines().filter(it -> !it.startsWith("#") && !it.trim().isEmpty())
                     .map(it -> (it.startsWith("/") ? new File(it) : new File(exampleDir, it))
                             .getAbsoluteFile())
@@ -99,7 +102,7 @@ public class RunAllProofsAction extends MainWindowAction {
             files = loadFiles();
         } catch (IOException e) {
             files = new ArrayList<>();
-            e.printStackTrace();
+            LOGGER.warn("Failed to load files");
         }
 
         setName("Run all proofs");

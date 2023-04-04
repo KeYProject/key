@@ -30,7 +30,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @throws FileNotFoundException if the file does not exist
      * @throws IOException on IO errors, e.g. if the user has no permission to read the file
      */
-    public InputStream getInputStream(Path path) throws FileNotFoundException, IOException;
+    InputStream getInputStream(Path path) throws FileNotFoundException, IOException;
 
     /**
      * Provides access to the InputStream of a RuleSource. The file the RuleSource is read from is
@@ -42,7 +42,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @return an InputStream of the RuleSource, or <code>null</code>
      * @throws IOException on IO errors
      */
-    public InputStream getInputStream(RuleSource ruleSource) throws IOException;
+    InputStream getInputStream(RuleSource ruleSource) throws IOException;
 
     /**
      * Provides access to the InputStream of a file identified by an URL. The file is registered to
@@ -54,7 +54,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @return an InputStream to the file identified by the URL, or <code>null</code>
      * @throws IOException on IO errors
      */
-    public InputStream getInputStream(URL url) throws IOException;
+    InputStream getInputStream(URL url) throws IOException;
 
     /**
      * This method can be used to write a file that has no counterpart outside to the FileRepo.
@@ -64,14 +64,14 @@ public interface FileRepo extends ProofDisposedListener {
      * @return an OutputStream to the file in the FileRepo
      * @throws FileNotFoundException if a file with the given path exists
      */
-    public OutputStream createOutputStream(Path path) throws FileNotFoundException;
+    OutputStream createOutputStream(Path path) throws FileNotFoundException;
 
     /**
      * Register the proof in the FileRepo.
      *
      * @param proof the proof to register
      */
-    public void registerProof(Proof proof);
+    void registerProof(Proof proof);
 
     /**
      * Sets the bootclasspath (containing available classes from the Java Class Library).
@@ -79,7 +79,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @param path the bootclasspath to set (the method does nothing if null is given)
      * @throws IllegalStateException if the java path is already set
      */
-    public void setBootClassPath(File path) throws IllegalStateException;
+    void setBootClassPath(File path) throws IllegalStateException;
 
     /**
      * Sets the classpath.
@@ -87,7 +87,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @param classPath the classpath to set (the method does nothing if null is given)
      * @throws IllegalStateException if the java path is already set
      */
-    public void setClassPath(List<File> classPath) throws IllegalStateException;
+    void setClassPath(List<File> classPath) throws IllegalStateException;
 
     /**
      * Sets the java path (where the source files are located).
@@ -95,7 +95,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @param javaPath the java path to set (the method does nothing if null is given)
      * @throws IllegalStateException if the java path is already set
      */
-    public void setJavaPath(String javaPath) throws IllegalStateException;
+    void setJavaPath(String javaPath) throws IllegalStateException;
 
     /**
      * Sets the base directory of the proof, i.e. the main directory where the proof is loaded from.
@@ -108,5 +108,5 @@ public interface FileRepo extends ProofDisposedListener {
      * @param path The path of the base directory. If a file is given, then its parent directory is
      *        set as base path.
      */
-    public void setBaseDir(Path path);
+    void setBaseDir(Path path);
 }

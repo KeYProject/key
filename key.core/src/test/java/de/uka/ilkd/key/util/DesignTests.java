@@ -1,14 +1,5 @@
 package de.uka.ilkd.key.util;
 
-import de.uka.ilkd.key.logic.Term;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.key_project.util.java.IOUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.lang.reflect.Field;
@@ -17,6 +8,17 @@ import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+
+import de.uka.ilkd.key.logic.Term;
+
+import org.key_project.util.java.IOUtil;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -182,8 +184,9 @@ public class DesignTests {
                     || allClass.getPackage().getName().contains("key.strategy")) {
 
                 // exclude KeYMediator for the moment (contains some workarounds)
-                if (allClass.getName().contains("KeYMediator"))
+                if (allClass.getName().contains("KeYMediator")) {
                     continue;
+                }
 
                 for (Field f : allClass.getDeclaredFields()) {
                     if (java.awt.Component.class.isAssignableFrom(f.getType())) {
@@ -201,13 +204,14 @@ public class DesignTests {
                             "Illegal GUI reference as return type of {} declared in class {}",
                             m.getName(), allClass.getName());
                     }
-                    for (Class<?> t : m.getParameterTypes())
+                    for (Class<?> t : m.getParameterTypes()) {
                         if (java.awt.Component.class.isAssignableFrom(t)) {
                             LOGGER.error(
                                 "Illegal GUI reference as parameter type of {} declared in class {}",
                                 m.getName(), allClass.getName());
                             badClasses.add(allClass);
                         }
+                    }
                 }
             }
         }

@@ -6,8 +6,7 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.util.Debug;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +32,7 @@ public class TermLabelSettings implements Settings, Cloneable {
      * @see #addSettingsListener(SettingsListener)
      * @see #removeSettingsListener(SettingsListener)
      */
-    private final LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
+    private final LinkedList<SettingsListener> listenerList = new LinkedList<>();
 
     @Override
     public void readSettings(Properties props) {

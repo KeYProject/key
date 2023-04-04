@@ -1,5 +1,14 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Set;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
@@ -13,18 +22,9 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  * This handler handles the seqDef binder function specially.
@@ -224,7 +224,7 @@ public class SeqDefHandler implements SMTHandler {
      */
     @Override
     public List<SMTHandlerProperty<?>> getProperties() {
-        return Arrays.asList(HandlerUtil.PROPERTY_NOBINDERS);
+        return List.of(HandlerUtil.PROPERTY_NOBINDERS);
     }
 
 }

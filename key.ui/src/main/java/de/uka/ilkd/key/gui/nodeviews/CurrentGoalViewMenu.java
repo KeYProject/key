@@ -1,9 +1,23 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
+import de.uka.ilkd.key.gui.actions.useractions.FocussedAutoModeUserAction;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
 import de.uka.ilkd.key.gui.mergerule.MergeRuleMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
@@ -31,18 +45,13 @@ import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.List;
-import java.util.*;
-
 /**
  * The menu shown by a {@link CurrentGoalViewListener} when the user clicks on a
- * {@link CurrentGoalView}.
+ * {@link CurrentGoalView}, i.e. when the user clicks on the sequent.
  *
  * Shows all {@link Taclet}s that are applicable at a selected position.
  */
@@ -67,7 +76,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     public static final int TOO_MANY_TACLETS_THRESHOLD = 15; // reduce for debugging.
 
     private KeYMediator mediator;
-    private TacletAppComparator comp = new TacletAppComparator();
+    private final TacletAppComparator comp = new TacletAppComparator();
 
     /**
      * Creates an empty menu.
@@ -120,11 +129,9 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * @return list without RewriteTaclets
      */
     public static ImmutableList<TacletApp> removeRewrites(ImmutableList<TacletApp> list) {
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
-        Iterator<TacletApp> it = list.iterator();
+        ImmutableList<TacletApp> result = ImmutableSLList.nil();
 
-        while (it.hasNext()) {
-            TacletApp tacletApp = it.next();
+        for (TacletApp tacletApp : list) {
             Taclet taclet = tacletApp.taclet();
             result = (taclet instanceof RewriteTaclet ? result : result.prepend(tacletApp));
         }
@@ -201,9 +208,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
         if (!builtInList.isEmpty()) {
             addSeparator();
-            Iterator<BuiltInRule> it = builtInList.iterator();
-            while (it.hasNext()) {
-                addBuiltInRuleItem(it.next(), control);
+            for (BuiltInRule builtInRule : builtInList) {
+                addBuiltInRuleItem(builtInRule, control);
             }
         }
     }
@@ -259,7 +265,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * adds an item for built in rules (e.g. Run Simplify or Update Simplifier)
      */
     private void addBuiltInRuleItem(BuiltInRule builtInRule, MenuControl control) {
-        JMenuItem item;
+        JMenuItem item = null;
         if (builtInRule == LoopScopeInvariantRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
         } else if (builtInRule == WhileInvariantRule.INSTANCE) {
@@ -268,51 +274,42 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 "Applies a known and complete loop specification immediately.",
                 ENTER_LOOP_SPECIFICATION,
                 "Allows to modify an existing or to enter a new loop specification.", builtInRule);
-            item.addActionListener(control);
-            add(item);
         } else if (builtInRule == BlockContractInternalRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(builtInRule.displayName(), APPLY_RULE,
                 "Applies a known and complete block specification immediately.",
                 CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.",
                 builtInRule);
-            item.addActionListener(control);
-            add(item);
         } else if (builtInRule == BlockContractExternalRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(builtInRule.displayName(), APPLY_RULE,
                 "All available contracts of the block are combined and applied.",
                 CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.",
                 builtInRule);
-            item.addActionListener(control);
-            add(item);
         } else if (builtInRule == LoopContractInternalRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(builtInRule.displayName(), APPLY_RULE,
                 "Applies a known and complete loop block specification immediately.",
                 CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.",
                 builtInRule);
-            item.addActionListener(control);
-            add(item);
         } else if (builtInRule == LoopContractExternalRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(builtInRule.displayName(), APPLY_RULE,
                 "All available contracts of the loop block are combined and applied.",
                 CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.",
                 builtInRule);
-            item.addActionListener(control);
-            add(item);
         } else if (builtInRule == UseOperationContractRule.INSTANCE) {
             item = new MenuItemForTwoModeRules(builtInRule.displayName(), APPLY_CONTRACT,
                 "All available contracts of the method are combined and applied.",
                 CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.",
                 builtInRule);
-            item.addActionListener(control);
-            add(item);
         } else if (builtInRule == MergeRule.INSTANCE) {
             // (DS) MergeRule has a special menu item, and thus is not added here.
         } else {
             item = new DefaultBuiltInRuleMenuItem(builtInRule);
+        }
+
+        if (item != null) {
             item.addActionListener(control);
             add(item);
         }
@@ -330,15 +327,15 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      */
     public static ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds,
             TacletAppComparator comp) {
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+        ImmutableList<TacletApp> result = ImmutableSLList.nil();
 
-        List<TacletApp> list = new ArrayList<TacletApp>(finds.size());
+        List<TacletApp> list = new ArrayList<>(finds.size());
 
         for (final TacletApp app : finds) {
             list.add(app);
         }
 
-        Collections.sort(list, comp);
+        list.sort(comp);
 
         for (final TacletApp app : list) {
             result = result.prepend(app);
@@ -518,7 +515,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                             goal.proof().getSettings().getNewSMTSettings(), goal.proof());
                     SolverLauncher launcher = new SolverLauncher(settings);
                     launcher.addListener(new SolverListener(settings, goal.proof()));
-                    Collection<SMTProblem> list = new LinkedList<SMTProblem>();
+                    Collection<SMTProblem> list = new LinkedList<>();
                     list.add(new SMTProblem(goal));
                     launcher.launch(solverUnion.getTypes(), list, goal.proof().getServices());
                 }, "SMTRunner");
@@ -534,8 +531,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                     true);
 
             } else if (e.getSource() instanceof FocussedRuleApplicationMenuItem) {
-                mediator.getUI().getProofControl().startFocussedAutoMode(
-                    getPos().getPosInOccurrence(), mediator.getSelectedGoal());
+                new FocussedAutoModeUserAction(mediator, mediator.getSelectedProof(),
+                    getPos().getPosInOccurrence()).actionPerformed(e);
             } else {
                 PosInOccurrence occ = getPos().getPosInOccurrence();
 
@@ -661,9 +658,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
          */
         private int measureGoalComplexity(ImmutableList<TacletGoalTemplate> l) {
             int result = 0;
-            Iterator<TacletGoalTemplate> it = l.iterator();
-            while (it.hasNext()) {
-                TacletGoalTemplate gt = it.next();
+            for (TacletGoalTemplate gt : l) {
                 if (gt instanceof RewriteTacletGoalTemplate) {
                     if (((RewriteTacletGoalTemplate) gt).replaceWith() != null) {
                         result += ((RewriteTacletGoalTemplate) gt).replaceWith().depth();
@@ -733,7 +728,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
          * divergence point.
          */
         public LinkedHashMap<String, Integer> score(TacletApp o1) {
-            LinkedHashMap<String, Integer> map = new LinkedHashMap<String, Integer>();
+            LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
 
             final Taclet taclet1 = o1.taclet();
 
@@ -764,7 +759,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 TacletSchemaVariableCollector coll1 = new TacletSchemaVariableCollector();
                 find1.execPostOrder(coll1);
                 formulaSV1 = countFormulaSV(coll1);
-                cmpVar1 += -coll1.size();
+                cmpVar1 -= coll1.size();
                 map.put("num_sv", -cmpVar1);
 
             } else {

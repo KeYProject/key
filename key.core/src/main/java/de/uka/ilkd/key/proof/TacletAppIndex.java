@@ -3,9 +3,6 @@ package de.uka.ilkd.key.proof;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -25,6 +22,9 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -65,7 +65,7 @@ public class TacletAppIndex {
      */
     private Sequent seq;
 
-    private Map<CacheKey, TermTacletAppIndex> cache;
+    private final Map<CacheKey, TermTacletAppIndex> cache;
 
     public TacletAppIndex(TacletIndex tacletIndex, Services services) {
         this(tacletIndex, null, null, null, null, TacletFilter.TRUE,
@@ -139,10 +139,12 @@ public class TacletAppIndex {
 
     private void createNewIndexCache() {
         indexCaches = new TermTacletAppIndexCacheSet(cache);
-        if (antecIndex != null)
+        if (antecIndex != null) {
             antecIndex.setIndexCache(indexCaches);
-        if (succIndex != null)
+        }
+        if (succIndex != null) {
             succIndex.setIndexCache(indexCaches);
+        }
     }
 
     /**
@@ -167,8 +169,10 @@ public class TacletAppIndex {
             "TacletAppIndex does not know to which goal it " + "refers");
 
         if (!isUpToDateForGoal())
-            // Indices are not up to date
+        // Indices are not up to date
+        {
             createAllFromGoal();
+        }
     }
 
     /**
@@ -213,7 +217,7 @@ public class TacletAppIndex {
      */
     static ImmutableList<TacletApp> createTacletApps(ImmutableList<NoPosTacletApp> tacletInsts,
             PosInOccurrence pos, Services services) {
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+        ImmutableList<TacletApp> result = ImmutableSLList.nil();
         for (NoPosTacletApp tacletApp : tacletInsts) {
             if (tacletApp.taclet() instanceof FindTaclet) {
                 PosTacletApp newTacletApp = tacletApp.setPosInOccurrence(pos, services);
@@ -231,11 +235,7 @@ public class TacletAppIndex {
             Services services) {
         if (tacletApp.taclet() instanceof FindTaclet) {
             PosTacletApp newTacletApp = tacletApp.setPosInOccurrence(pos, services);
-            if (newTacletApp != null) {
-                return newTacletApp;
-            } else {
-                return null;
-            }
+            return newTacletApp;
         } else {
             return tacletApp;
         }
@@ -267,14 +267,15 @@ public class TacletAppIndex {
 
         final Iterator<NoPosTacletApp> it = getFindTaclet(pos, filter, services).iterator();
 
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+        ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
 
         while (it.hasNext()) {
             final NoPosTacletApp tacletApp = it.next();
             final Taclet t = tacletApp.taclet();
             if (t instanceof RewriteTaclet && ((RewriteTaclet) t).checkPrefix(pos,
-                MatchConditions.EMPTY_MATCHCONDITIONS) != null)
+                MatchConditions.EMPTY_MATCHCONDITIONS) != null) {
                 result = result.prepend(tacletApp);
+            }
         }
 
         return result;
@@ -317,10 +318,12 @@ public class TacletAppIndex {
      */
     public void sequentChanged(Goal goal, SequentChangeInfo sci) {
         if (sci.getOriginalSequent() != getSequent())
-            // we are not up to date and have to rebuild everything (lazy)
+        // we are not up to date and have to rebuild everything (lazy)
+        {
             clearIndexes();
-        else
+        } else {
             updateIndices(sci);
+        }
     }
 
     private void updateIndices(SequentChangeInfo sci) {
@@ -362,8 +365,9 @@ public class TacletAppIndex {
         }
 
         if (tacletApp.taclet() instanceof NoFindTaclet) {
-            if (ruleFilter.filter(tacletApp.taclet()))
+            if (ruleFilter.filter(tacletApp.taclet())) {
                 getNewRulePropagator().ruleAdded(tacletApp, null);
+            }
             return;
         }
 
@@ -479,10 +483,12 @@ public class TacletAppIndex {
      * taclet app.
      */
     public void reportRuleApps(NewRuleListener l, Services services) {
-        if (antecIndex != null)
+        if (antecIndex != null) {
             antecIndex.reportRuleApps(l);
-        if (succIndex != null)
+        }
+        if (succIndex != null) {
             succIndex.reportRuleApps(l);
+        }
 
         l.rulesAdded(getNoFindTaclet(TacletFilter.TRUE, services), null);
     }

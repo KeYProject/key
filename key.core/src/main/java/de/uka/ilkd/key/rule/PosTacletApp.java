@@ -1,10 +1,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -14,6 +11,10 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * A position taclet application object, contains already the information to which term/formula of
@@ -105,7 +106,7 @@ public class PosTacletApp extends TacletApp {
             PosInOccurrence pos) {
 
         if (!(taclet instanceof RewriteTaclet)) {
-            return DefaultImmutableSet.<QuantifiableVariable>nil();
+            return DefaultImmutableSet.nil();
         }
 
         return collectBoundVarsAbove(pos);
@@ -121,7 +122,7 @@ public class PosTacletApp extends TacletApp {
     @Override
     protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
         if (!taclet().getPrefix(sv).context()) {
-            return DefaultImmutableSet.<QuantifiableVariable>nil();
+            return DefaultImmutableSet.nil();
         }
         return varsBoundAboveFindPos(taclet(), posInOccurrence());
     }
@@ -162,14 +163,15 @@ public class PosTacletApp extends TacletApp {
     public TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
             Services services) {
 
-        if (interesting)
+        if (interesting) {
             return createPosTacletApp((FindTaclet) taclet(),
                 instantiations().addInteresting(sv, term, services), ifFormulaInstantiations(),
                 posInOccurrence(), services);
-        else
+        } else {
             return createPosTacletApp((FindTaclet) taclet(),
                 instantiations().add(sv, term, services), ifFormulaInstantiations(),
                 posInOccurrence(), services);
+        }
     }
 
     /**
@@ -182,13 +184,14 @@ public class PosTacletApp extends TacletApp {
     @Override
     public TacletApp addInstantiation(SchemaVariable sv, ProgramElement pe, boolean interesting,
             Services services) {
-        if (interesting)
+        if (interesting) {
             return createPosTacletApp((FindTaclet) taclet(),
                 instantiations().addInteresting(sv, pe, services), ifFormulaInstantiations(),
                 posInOccurrence(), services);
-        else
+        } else {
             return createPosTacletApp((FindTaclet) taclet(), instantiations().add(sv, pe, services),
                 ifFormulaInstantiations(), posInOccurrence(), services);
+        }
     }
 
 
@@ -292,6 +295,29 @@ public class PosTacletApp extends TacletApp {
     @Override
     public int hashCode() {
         return super.hashCode() + 13 * posInOccurrence().hashCode();
+    }
+
+    @Override
+    public boolean equalsModProofIrrelevancy(Object o) {
+        if (!super.equalsModProofIrrelevancy(o) || !(o instanceof PosTacletApp)) {
+            return false;
+        }
+        PosInOccurrence posA = ((PosTacletApp) o).pos;
+        PosInOccurrence posB = pos;
+        if (posA == null && posB == null) {
+            return true;
+        } else if (posA == null || posB == null) {
+            return false;
+        } else {
+            return posA.eqEquals(posB);
+        }
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        return Objects.hash(super.hashCodeModProofIrrelevancy(),
+            pos.sequentFormula().hashCodeModProofIrrelevancy(),
+            pos.posInTerm());
     }
 
     @Override

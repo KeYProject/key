@@ -9,7 +9,7 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <statement name="array[0].value=100;" pathCondition="true" pathConditionChanged="false">
+      <statement name="array[0].value = 100;" pathCondition="true" pathConditionChanged="false">
          <variable name="array" isArrayIndex="false">
             <value name="array {true}" typeString="NonSimpleArrayAssignmentTest[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                <variable name="length" isArrayIndex="false">
@@ -65,7 +65,7 @@
                   </variable>
                </value>
             </variable>
-            <statement name="array[1].value=array[2].value;" pathCondition="not(update-application(parallel-upd(elem-update(exc)(null),elem-update(n)(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))),equals(n,null)))" pathConditionChanged="false">
+            <statement name="array[1].value = array[2].value;" pathCondition="not(update-application(parallel-upd(elem-update(exc)(null),elem-update(n)(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))),equals(n,null)))" pathConditionChanged="false">
                <variable name="array" isArrayIndex="false">
                   <value name="array {true}" typeString="NonSimpleArrayAssignmentTest[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="length" isArrayIndex="false">
@@ -186,7 +186,7 @@
                         <value name="x {not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))}" typeString="int" valueString="int::select(heap,NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))))">
                         </value>
                      </variable>
-                     <statement name="array[3].value=array[0].value;" pathCondition="and(and(not(update-application(parallel-upd(elem-update(exc)(null),elem-update(n)(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))),equals(n,null))),not(update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),NonSimpleArrayAssignmentTest::$value,Z(0(0(1(#))))))),elem-update(n_2)(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))))),elem-update(n_3)(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))))),equals(n_3,null)))),not(update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),NonSimpleArrayAssignmentTest::$value,Z(0(0(1(#))))))),elem-update(n_2)(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))))),elem-update(x)(NonSimpleArrayAssignmentTest_value_0&lt;&lt;selectSK&gt;&gt;)),equals(n_2,null))))" pathConditionChanged="false">
+                     <statement name="array[3].value = array[0].value;" pathCondition="and(and(not(update-application(parallel-upd(elem-update(exc)(null),elem-update(n)(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))),equals(n,null))),not(update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),NonSimpleArrayAssignmentTest::$value,Z(0(0(1(#))))))),elem-update(n_2)(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))))),elem-update(n_3)(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))))),equals(n_3,null)))),not(update-application(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))),NonSimpleArrayAssignmentTest::$value,Z(0(0(1(#))))))),elem-update(n_2)(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(1(#)))))),elem-update(x)(NonSimpleArrayAssignmentTest_value_0&lt;&lt;selectSK&gt;&gt;)),equals(n_2,null))))" pathConditionChanged="false">
                         <variable name="array" isArrayIndex="false">
                            <value name="array {or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))}" typeString="NonSimpleArrayAssignmentTest[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="or(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#))))),not(equals(NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(2(#)))),NonSimpleArrayAssignmentTest::select(heap,array,arr(Z(0(#)))))))">
                               <variable name="length" isArrayIndex="false">

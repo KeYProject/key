@@ -1,16 +1,17 @@
 package de.uka.ilkd.key.gui.prooftree;
 
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CButton;
-import bibliothek.gui.dock.common.action.CCheckBox;
-import bibliothek.gui.dock.common.action.CMenu;
+import java.util.function.Supplier;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.docking.DynamicCMenu;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 
-import java.util.function.Supplier;
+import bibliothek.gui.dock.common.action.CAction;
+import bibliothek.gui.dock.common.action.CButton;
+import bibliothek.gui.dock.common.action.CCheckBox;
+import bibliothek.gui.dock.common.action.CMenu;
 
 import static de.uka.ilkd.key.gui.prooftree.ProofTreePopupFactory.ICON_SIZE;
 
@@ -18,8 +19,6 @@ public class ProofTreeSettingsMenuFactory {
     private ProofTreeSettingsMenuFactory() {}
 
     public static CAction create(ProofTreeView view) {
-        // TODO: action is used only to extract the properties from it
-        // TODO: our classes (DockingHelper) can currently not really handle CMenu
         Supplier<CMenu> supplier = () -> {
             CMenu menu = new CMenu();
 
@@ -36,6 +35,7 @@ public class ProofTreeSettingsMenuFactory {
             }
             menu.addSeparator();
 
+            menu.add(createExpandOSSToggle(view));
             menu.add(createTacletInfoToggle());
             return menu;
         };
@@ -48,7 +48,8 @@ public class ProofTreeSettingsMenuFactory {
         CButton button = new CButton();
         button.setText("Expand All");
         button.setIcon(IconFactory.plus(ICON_SIZE));
-        button.addActionListener(e -> ProofTreeExpansionState.expandAll(view.delegateView));
+        button.addActionListener(e -> ProofTreeExpansionState.expandAll(view.delegateView,
+            ProofTreePopupFactory.ossPathFilter(view.isExpandOSSNodes())));
         return button;
     }
 
@@ -104,6 +105,19 @@ public class ProofTreeSettingsMenuFactory {
             }
         });
         return button;
+    }
+
+    private static CCheckBox createExpandOSSToggle(ProofTreeView view) {
+        CCheckBox check = new CCheckBox() {
+            @Override
+            protected void changed() {
+                final boolean selected = isSelected();
+                view.setExpandOSSNodes(selected);
+            }
+        };
+        check.setText("Expand One Step Simplifications nodes");
+        check.setSelected(view.isExpandOSSNodes());
+        return check;
     }
 
     private static CCheckBox createTacletInfoToggle() {

@@ -52,7 +52,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      * Maps a {@link Goal} to the number of executed symbolic execution tree nodes.
      */
     private final Map<Goal, Integer> executedNumberOfSetNodesPerGoal =
-        new LinkedHashMap<Goal, Integer>();
+        new LinkedHashMap<>();
 
     /**
      * Stores for each {@link Node} which is a symbolic execution tree node the computed result of
@@ -61,7 +61,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      * for the same {@link Node}.
      */
     private final Map<Node, Boolean> goalAllowedResultPerSetNode =
-        new LinkedHashMap<Node, Boolean>();
+        new LinkedHashMap<>();
 
     /**
      * Constructor to stop after one executed symbolic execution tree node.
@@ -110,10 +110,10 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
                     // Get the number of executed set nodes on the current goal
                     Integer executedNumberOfSetNodes = executedNumberOfSetNodesPerGoal.get(goal);
                     if (executedNumberOfSetNodes == null) {
-                        executedNumberOfSetNodes = Integer.valueOf(0);
+                        executedNumberOfSetNodes = 0;
                     }
                     // Check if limit of set nodes of the current goal is exceeded
-                    if (executedNumberOfSetNodes.intValue()
+                    if (executedNumberOfSetNodes
                             + 1 > maximalNumberOfSetNodesToExecutePerGoal) {
                         handleNodeLimitExceeded(maxApplications, timeout, proof, startTime,
                             countApplied, goal, node, ruleApp, executedNumberOfSetNodes);
@@ -121,7 +121,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
                     } else {
                         // Increase number of set nodes on this goal and allow rule application
                         executedNumberOfSetNodes =
-                            Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
+                            executedNumberOfSetNodes.intValue() + 1;
                         executedNumberOfSetNodesPerGoal.put(goal, executedNumberOfSetNodes);
                         handleNodeLimitNotExceeded(maxApplications, timeout, proof, startTime,
                             countApplied, goal, node, ruleApp, executedNumberOfSetNodes);
@@ -129,7 +129,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
                     }
                 } else {
                     // Reuse already computed result.
-                    return value.booleanValue();
+                    return value;
                 }
             } else {
                 return true;

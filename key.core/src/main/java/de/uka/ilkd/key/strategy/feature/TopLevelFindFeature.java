@@ -27,8 +27,9 @@ public abstract class TopLevelFindFeature extends BinaryTacletAppFeature {
             if (!pos.isTopLevel()) {
                 final PIOPathIterator it = pos.iterator();
                 while (it.next() != -1) {
-                    if (!(it.getSubTerm().op() instanceof UpdateApplication))
+                    if (!(it.getSubTerm().op() instanceof UpdateApplication)) {
                         return false;
+                    }
                 }
             }
 

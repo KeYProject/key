@@ -1,27 +1,22 @@
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import java.util.*;
-
-import de.uka.ilkd.key.logic.*;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.rule.NewDependingOn;
-import de.uka.ilkd.key.rule.NewVarcond;
-import de.uka.ilkd.key.rule.NotFreeIn;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletAnnotation;
-import de.uka.ilkd.key.rule.TacletAttributes;
-import de.uka.ilkd.key.rule.Trigger;
-import de.uka.ilkd.key.rule.VariableCondition;
+import de.uka.ilkd.key.rule.*;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * abstract taclet builder class to be inherited from taclet builders specialised for their concrete
@@ -35,23 +30,23 @@ public abstract class TacletBuilder<T extends Taclet> {
 
     protected Name name = NONAME;
     protected Sequent ifseq = Sequent.EMPTY_SEQUENT;
-    protected ImmutableList<NewVarcond> varsNew = ImmutableSLList.<NewVarcond>nil();
-    protected ImmutableList<NotFreeIn> varsNotFreeIn = ImmutableSLList.<NotFreeIn>nil();
+    protected ImmutableList<NewVarcond> varsNew = ImmutableSLList.nil();
+    protected ImmutableList<NotFreeIn> varsNotFreeIn = ImmutableSLList.nil();
     protected ImmutableList<NewDependingOn> varsNewDependingOn =
-        ImmutableSLList.<NewDependingOn>nil();
-    protected ImmutableList<TacletGoalTemplate> goals = ImmutableSLList.<TacletGoalTemplate>nil();
-    protected ImmutableList<RuleSet> ruleSets = ImmutableSLList.<RuleSet>nil();
-    protected TacletAttributes attrs = new TacletAttributes();
+        ImmutableSLList.nil();
+    protected ImmutableList<TacletGoalTemplate> goals = ImmutableSLList.nil();
+    protected ImmutableList<RuleSet> ruleSets = ImmutableSLList.nil();
+    protected final TacletAttributes attrs = new TacletAttributes();
 
     /**
      * List of additional generic conditions on the instantiations of schema variables.
      */
     protected ImmutableList<VariableCondition> variableConditions =
-        ImmutableSLList.<VariableCondition>nil();
+        ImmutableSLList.nil();
     protected HashMap<TacletGoalTemplate, ChoiceExpr> goal2Choices = null;
     protected ChoiceExpr choices = ChoiceExpr.TRUE;
     protected ImmutableSet<TacletAnnotation> tacletAnnotations =
-        DefaultImmutableSet.<TacletAnnotation>nil();
+        DefaultImmutableSet.nil();
     protected String origin;
 
     public void setAnnotations(ImmutableSet<TacletAnnotation> tacletAnnotations) {
@@ -170,8 +165,9 @@ public abstract class TacletBuilder<T extends Taclet> {
      * given type
      */
     public void addVarsNew(SchemaVariable v, KeYJavaType type) {
-        if (type == null)
+        if (type == null) {
             throw new NullPointerException("given type is null");
+        }
         addVarsNew(new NewVarcond(v, type));
     }
 
@@ -331,8 +327,8 @@ public abstract class TacletBuilder<T extends Taclet> {
          *
          */
         private static final long serialVersionUID = -6710383705714015291L;
-        private Name tacletname;
-        private String errorMessage;
+        private final Name tacletname;
+        private final String errorMessage;
 
         TacletBuilderException(Name tacletname, String errorMessage) {
             this.tacletname = tacletname;

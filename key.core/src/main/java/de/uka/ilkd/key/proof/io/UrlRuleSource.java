@@ -1,18 +1,16 @@
 package de.uka.ilkd.key.proof.io;
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.IntStream;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
+
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 
 public class UrlRuleSource extends RuleSource {
 
@@ -33,7 +31,8 @@ public class UrlRuleSource extends RuleSource {
             final InputStream input = url.openStream();
             long localNumberOfBytes = 0;
             for (int readValue = input.read(); readValue != -1; localNumberOfBytes++, readValue =
-                input.read());
+                input.read()) {
+            }
             input.close();
             return localNumberOfBytes;
         } catch (final IOException exception) {

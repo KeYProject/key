@@ -1,4 +1,7 @@
 <configuration>
+    <!-- disables logback configuration messages on start up, see #1725 -->
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <file>key.log</file>
         <append>false</append>
@@ -7,7 +10,7 @@
         </encoder>
     </appender>
 
-    <root level="WARN">
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>

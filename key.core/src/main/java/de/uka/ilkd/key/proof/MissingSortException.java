@@ -9,7 +9,7 @@ public class MissingSortException extends SVInstantiationExceptionWithPosition {
      *
      */
     private static final long serialVersionUID = 2491948230461429971L;
-    private String toInstantiate;
+    private final String toInstantiate;
 
     public MissingSortException(String toInstantiate, Position position) {
         super("Missing Sort", position, false);

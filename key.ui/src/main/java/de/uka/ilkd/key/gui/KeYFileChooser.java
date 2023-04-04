@@ -3,15 +3,14 @@ package de.uka.ilkd.key.gui;
 import java.awt.Component;
 import java.io.File;
 import java.util.Locale;
-
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.key_project.util.java.IOUtil;
-
 import de.uka.ilkd.key.core.Main;
+
+import org.key_project.util.java.IOUtil;
 
 /**
  * Extends the usual Swing file chooser by a bookmark panel and predefined filters. This class is a
@@ -49,6 +48,10 @@ public final class KeYFileChooser extends JFileChooser {
     /** The Constant for the filter for statistics files. */
     public static final FileFilter STATISTICS_FILTER =
         new FileNameExtensionFilter("proof statistics files (.csv, .html)", "csv", "html");
+
+    /** The Constant for the filter for dot files. */
+    public static final FileFilter DOT_FILTER = new FileNameExtensionFilter(
+        "dot graphviz files (.dot)", "dot");
 
     /** filter for single java source files */
     public static final FileFilter JAVA_FILTER =

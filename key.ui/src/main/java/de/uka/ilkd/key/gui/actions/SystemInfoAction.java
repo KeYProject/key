@@ -3,7 +3,6 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.Map;
-
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -29,11 +28,13 @@ public class SystemInfoAction extends MainWindowAction {
         Object[] contents = new Object[6];
         contents[0] = "KeY info:\n";
         String params = System.getProperty("sun.java.command");
-        if (params == null)
+        if (params == null) {
             params = "(unknown)";
+        }
         int i = params.indexOf("Main");
-        if (i > 0)
+        if (i > 0) {
             params = params.substring(i + 4);
+        }
         java.lang.management.RuntimeMXBean rmb =
             java.lang.management.ManagementFactory.getRuntimeMXBean();
         final String keyInfoText = "Version: " + KeYConstants.VERSION + "\nKeY parameters: "
@@ -97,7 +98,7 @@ public class SystemInfoAction extends MainWindowAction {
     }
 
     private String formatList(List<?> l) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (Object o : l) {
             sb.append(o);
             sb.append(" ");
@@ -115,12 +116,12 @@ public class SystemInfoAction extends MainWindowAction {
         long allocatedMemory = rt.totalMemory();
         long freeMemory = rt.freeMemory();
 
-        sb.append("\nAvailable processors: " + rt.availableProcessors());
-        sb.append("\nFree VM memory: " + (freeMemory / 1024 / 1024) + " MB");
-        sb.append("\nAllocated VM memory: " + (allocatedMemory / 1024 / 1024) + " MB");
-        sb.append("\nMax VM memory: " + (maxMemory / 1024 / 1024) + " MB");
-        sb.append("\nTotal free VM memory: "
-            + ((freeMemory + (maxMemory - allocatedMemory)) / 1024 / 1024) + " MB");
+        sb.append("\nAvailable processors: ").append(rt.availableProcessors());
+        sb.append("\nFree VM memory: ").append(freeMemory / 1024 / 1024).append(" MB");
+        sb.append("\nAllocated VM memory: ").append(allocatedMemory / 1024 / 1024).append(" MB");
+        sb.append("\nMax VM memory: ").append(maxMemory / 1024 / 1024).append(" MB");
+        sb.append("\nTotal free VM memory: ")
+                .append((freeMemory + (maxMemory - allocatedMemory)) / 1024 / 1024).append(" MB");
         return sb.toString();
     }
 }

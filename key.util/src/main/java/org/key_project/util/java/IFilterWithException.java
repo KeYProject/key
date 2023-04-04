@@ -14,5 +14,5 @@ public interface IFilterWithException<T, E extends Throwable> {
      * @return {@code true} handle element, {@code false} ignore element.
      * @throws E An occurred exception.
      */
-    public boolean select(T element) throws E;
+    boolean select(T element) throws E;
 }

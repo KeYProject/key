@@ -40,10 +40,11 @@ public abstract class DividePolynomialsProjection extends AbstractDividePolynomi
 
         BigInteger res = numerator.divide(denominator);
         if (remainder.signum() != 0 && numerator.signum() < 0) {
-            if (denominator.signum() > 0)
+            if (denominator.signum() > 0) {
                 res = res.subtract(BigInteger.ONE);
-            else
+            } else {
                 res = res.add(BigInteger.ONE);
+            }
         }
         return res;
     }

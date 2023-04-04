@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Position;
@@ -7,11 +11,8 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import org.junit.jupiter.api.Test;
 
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -29,7 +30,7 @@ public class FocusCommandTest {
         Proof p = env.getLoadedProof();
         ProofScriptEngine pse = new ProofScriptEngine(
             "macro 'nosplit-prop'; focus 'i=1 ==> i = 4';",
-            new Location((URL) null, new Position(1, 1)));
+            new Location((URL) null, Position.newOneBased(1, 1)));
         pse.execute(env.getUi(), p);
 
         assertEquals(1, p.openGoals().size());
@@ -50,7 +51,7 @@ public class FocusCommandTest {
         Proof p = env.getLoadedProof();
         ProofScriptEngine pse = new ProofScriptEngine(
             "macro 'nosplit-prop'; focus 'i=1 ==> i = 3';",
-            new Location((URL) null, new Position(1, 1)));
+            new Location((URL) null, Position.newOneBased(1, 1)));
         pse.execute(env.getUi(), p);
 
         assertEquals(1, p.openGoals().size());

@@ -36,7 +36,7 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
 
     private static final String INVARIANT_FORALL = "[SMTSettings]invariantForall";
 
-    private Collection<SettingsListener> listeners = new LinkedHashSet<SettingsListener>();
+    private final Collection<SettingsListener> listeners = new LinkedHashSet<>();
 
     // FIXME Why are these fields public?!
     public boolean useExplicitTypeHierarchy = false;

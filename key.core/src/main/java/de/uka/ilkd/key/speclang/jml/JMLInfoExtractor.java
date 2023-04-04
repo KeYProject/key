@@ -1,18 +1,18 @@
 package de.uka.ilkd.key.speclang.jml;
 
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.speclang.njml.SpecMathMode;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 import de.uka.ilkd.key.util.MiscTools;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Helper class used by the JML translation. Provides methods that look for certain keywords (such
@@ -71,7 +71,7 @@ public final class JMLInfoExtractor {
     }
 
     private static ImmutableList<Comment> getJMLComments(TypeDeclaration td) {
-        ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
+        ImmutableList<Comment> coms = ImmutableSLList.nil();
 
         // Either mod is attached to the declaration itself ...
         coms = coms.prepend(td.getComments());
@@ -89,7 +89,7 @@ public final class JMLInfoExtractor {
     }
 
     private static ImmutableList<Comment> getJMLComments(MethodDeclaration method) {
-        ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
+        ImmutableList<Comment> coms = ImmutableSLList.nil();
 
         // Either mod is attached to the method itself ...
         Comment[] methodComments = method.getComments();
@@ -187,7 +187,7 @@ public final class JMLInfoExtractor {
     // -------------------------------------------------------------------------
 
     public static boolean hasJMLModifier(FieldDeclaration fd, String mod) {
-        ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
+        ImmutableList<Comment> coms = ImmutableSLList.nil();
 
         // Either mod is attached to the declaration itself ...
         coms = coms.prepend(fd.getComments());
@@ -272,8 +272,9 @@ public final class JMLInfoExtractor {
     public static boolean isNullable(String fieldName, TypeDeclaration td) {
 
         ImmutableList<Comment> comments = extractFieldModifiers(fieldName, td);
-        if (comments.isEmpty())
+        if (comments.isEmpty()) {
             return false;
+        }
 
         boolean non_null = checkFor("non_null", comments);
         boolean nullable = checkFor("nullable", comments);
@@ -305,7 +306,7 @@ public final class JMLInfoExtractor {
     public static boolean parameterIsNullable(IProgramMethod pm, ParameterDeclaration pd) {
         assert pm.getMethodDeclaration().getParameters().contains(pd)
                 : "parameter " + pd + " does not belong to method declaration " + pm;
-        ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
+        ImmutableList<Comment> comments = ImmutableSLList.nil();
         comments = comments.prepend(pd.getComments());
         comments = comments.prepend(pd.getTypeReference().getComments());
         comments = comments.prepend(pd.getVariableSpecification().getComments());
@@ -327,7 +328,7 @@ public final class JMLInfoExtractor {
     public static boolean resultIsNullable(IProgramMethod pm) {
         MethodDeclaration md = pm.getMethodDeclaration();
 
-        ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
+        ImmutableList<Comment> comments = ImmutableSLList.nil();
         for (Modifier mod : md.getModifiers()) {
             comments = comments.prepend(mod.getComments());
         }

@@ -1,9 +1,20 @@
 package de.uka.ilkd.key.core;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EventObject;
+import java.util.function.Consumer;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.swing.*;
+import javax.swing.event.EventListenerList;
+
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
+import de.uka.ilkd.key.gui.UserActionListener;
+import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
@@ -39,14 +50,9 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ThreadUtilities;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.lookup.Lookup;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.swing.*;
-import javax.swing.event.EventListenerList;
-import java.util.EventObject;
 
 /**
  * The {@link KeYMediator} provides control logic for the user interface implemented in Swing.
@@ -57,24 +63,29 @@ import java.util.EventObject;
 public class KeYMediator {
 
     /** The user interface */
-    private AbstractMediatorUserInterfaceControl ui;
+    private final AbstractMediatorUserInterfaceControl ui;
 
     /** the notation info used to print sequents */
     private final NotationInfo notationInfo;
 
     /** listenerList with to gui listeners */
-    private EventListenerList listenerList = new EventListenerList();
+    private final EventListenerList listenerList = new EventListenerList();
 
     /** listens to the proof */
-    private KeYMediatorProofListener proofListener;
+    private final KeYMediatorProofListener proofListener;
 
     /** listens to the ProofTree */
-    private KeYMediatorProofTreeListener proofTreeListener;
+    private final KeYMediatorProofTreeListener proofTreeListener;
 
     /**
      * current proof and node the user works with. All user interaction is relative to this model
      */
-    private KeYSelectionModel keySelectionModel;
+    private final KeYSelectionModel keySelectionModel;
+
+    /**
+     * Registered proof load listeners.
+     */
+    private final Collection<Consumer<Proof>> proofLoadListeners = new ArrayList<>();
 
     private TacletFilter filterForInteractiveProving;
 
@@ -94,6 +105,13 @@ public class KeYMediator {
     private boolean inAutoMode = false;
 
     /**
+     * Currently activated listeners for user actions. Notified whenever a user action is applied.
+     *
+     * @see #fireActionPerformed(UserAction)
+     */
+    private final Collection<UserActionListener> userActionListeners = new ArrayList<>();
+
+    /**
      * creates the KeYMediator with a reference to the application's main frame and the current
      * proof settings
      */
@@ -106,6 +124,16 @@ public class KeYMediator {
         keySelectionModel = new KeYSelectionModel();
 
         ui.getProofControl().addAutoModeListener(proofListener);
+    }
+
+    /**
+     * Register a proof load listener. Will be called whenever a new proof is loaded, but before
+     * it is replayed.
+     *
+     * @param listener callback
+     */
+    public synchronized void registerProofLoadListener(Consumer<Proof> listener) {
+        proofLoadListeners.add(listener);
     }
 
     /**
@@ -454,7 +482,7 @@ public class KeYMediator {
     }
 
     /**
-     * Fires the shut down event.
+     * Fires the shut-down event.
      */
     public synchronized void fireShutDown(EventObject e) {
         Object[] listeners = listenerList.getListenerList();
@@ -466,11 +494,26 @@ public class KeYMediator {
     }
 
     /**
+     * Fire the proof loaded event.
+     *
+     * @param p the proof that was just loaded and is about to be replayed
+     */
+    public synchronized void fireProofLoaded(Proof p) {
+        if (p == null) {
+            return;
+        }
+        for (Consumer<Proof> listener : proofLoadListeners) {
+            listener.accept(p);
+        }
+    }
+
+    /**
      * returns the current selected proof
      *
      * @return the current selected proof
      * @see #getProof()
      */
+    @Nullable
     public Proof getSelectedProof() {
         return keySelectionModel.getSelectedProof();
     }
@@ -642,8 +685,9 @@ public class KeYMediator {
      * @return
      */
     public @Nonnull Lookup getUserData() {
-        if (userData == null)
+        if (userData == null) {
             userData = new Lookup();
+        }
         return userData;
     }
 
@@ -894,7 +938,6 @@ public class KeYMediator {
                 public void eventException(Throwable throwable) {
                     KeYMediator.this.startInterface(true);
 
-                    throwable.printStackTrace();
                     KeYMediator.this.notify(new ExceptionFailureEvent(
                         "The cut could" + "not be processed successfully. In order to "
                             + "preserve consistency the proof is pruned."
@@ -932,5 +975,25 @@ public class KeYMediator {
      */
     public @Nonnull DefaultListModel<Proof> getCurrentlyOpenedProofs() {
         return currentlyOpenedProofs;
+    }
+
+    /**
+     * Add another listener for user actions.
+     *
+     * @param listener listener object
+     */
+    public void addUserActionListener(UserActionListener listener) {
+        userActionListeners.add(listener);
+    }
+
+    /**
+     * Notify all user action listeners about a performed action.
+     *
+     * @param action the user action
+     */
+    public void fireActionPerformed(UserAction action) {
+        for (UserActionListener listener : userActionListeners) {
+            listener.actionPerformed(action);
+        }
     }
 }

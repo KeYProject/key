@@ -154,18 +154,24 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
      */
     public int getChildCount() {
         int result = 0;
-        if (declarationSpecifiers != null)
+        if (declarationSpecifiers != null) {
             result += declarationSpecifiers.size();
-        if (name != null)
+        }
+        if (name != null) {
             result++;
-        if (extending != null)
+        }
+        if (extending != null) {
             result++;
-        if (implementing != null)
+        }
+        if (implementing != null) {
             result++;
-        if (members != null)
+        }
+        if (members != null) {
             result += members.size();
-        if (typeParameters != null)
+        }
+        if (typeParameters != null) {
             result += typeParameters.size();
+        }
         return result;
     }
 
@@ -186,29 +192,34 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
             index -= len;
         }
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (typeParameters != null) {
             len = typeParameters.size();
-            if (len > index)
+            if (len > index) {
                 return typeParameters.get(index);
+            }
             index -= len;
         }
         if (extending != null) {
-            if (index == 0)
+            if (index == 0) {
                 return extending;
+            }
             index--;
         }
         if (implementing != null) {
-            if (index == 0)
+            if (index == 0) {
                 return implementing;
+            }
             index--;
         }
         if (members != null) {
-            if (index < members.size())
+            if (index < members.size()) {
                 return members.get(index);
+            }
             index -= members.size();
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -227,12 +238,15 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
                 return (index << 4) | 0;
             }
         }
-        if (name == child)
+        if (name == child) {
             return 1;
-        if (extending == child)
+        }
+        if (extending == child) {
             return 2;
-        if (implementing == child)
+        }
+        if (implementing == child) {
             return 3;
+        }
         if (members != null) {
             int index = members.indexOf(child);
             if (index >= 0) {

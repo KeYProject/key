@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.macros;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -12,6 +10,8 @@ import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The interface ProofMacro is the entry point to a general strategy extension system.
@@ -62,7 +62,7 @@ public interface ProofMacro {
      *
      * @return a non-<code>null</code> constant string
      */
-    public String getName();
+    String getName();
 
     /**
      * Gets a unique short name for this macro that can be used in proof scripts.
@@ -72,7 +72,7 @@ public interface ProofMacro {
      * @return <code>null</code> if not supported, or a non-<code>null</code> constant string as the
      *         short name
      */
-    public String getScriptCommandName();
+    String getScriptCommandName();
 
     /**
      * Gets the category of this macro.
@@ -82,7 +82,7 @@ public interface ProofMacro {
      *
      * @return a constant string, or <code>null</code>
      */
-    public String getCategory();
+    String getCategory();
 
     /**
      * Gets the description of this macro.
@@ -91,7 +91,7 @@ public interface ProofMacro {
      *
      * @return a non-<code>null</code> constant string
      */
-    public String getDescription();
+    String getDescription();
 
     /**
      * Checks whether this {@link ProofMacro} has a parameter named <code>paramName</code>. For use
@@ -100,7 +100,7 @@ public interface ProofMacro {
      * @param paramName The name to check.
      * @return true iff this {@link ProofMacro} has a parameter named <code>paramName</code>.
      */
-    public boolean hasParameter(String paramName);
+    boolean hasParameter(String paramName);
 
     /**
      * Sets the parameter named <code>paramName</code> to the given String representation in
@@ -111,12 +111,12 @@ public interface ProofMacro {
      * @throws IllegalArgumentException if there is no parameter of that name or the value is
      *         incorrectly formatted (e.g., cannot be converted to a number).
      */
-    public void setParameter(String paramName, String paramValue) throws IllegalArgumentException;
+    void setParameter(String paramName, String paramValue) throws IllegalArgumentException;
 
     /**
      * Resets the macro parameters to their defaults.
      */
-    public void resetParams();
+    void resetParams();
 
     /**
      * Can this macro be applied on the given goals?
@@ -132,7 +132,7 @@ public interface ProofMacro {
      *
      * @return <code>true</code>, if the macro is allowed to be applied
      */
-    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc);
+    boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc);
 
     /**
      * Can this macro be applied on the given node?
@@ -151,7 +151,7 @@ public interface ProofMacro {
      *
      * @return <code>true</code>, if the macro is allowed to be applied
      */
-    public boolean canApplyTo(Node node, PosInOccurrence posInOcc);
+    boolean canApplyTo(Node node, PosInOccurrence posInOcc);
 
     /**
      * Apply this macro on the given goals.
@@ -174,9 +174,9 @@ public interface ProofMacro {
      * @param listener the listener to use for progress reports (may be <code>null</code>)
      * @throws InterruptedException if the application of the macro has been interrupted.
      */
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
+    ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
-            throws InterruptedException, Exception;
+            throws Exception;
 
     /**
      * Apply this macro on the given node.
@@ -198,9 +198,9 @@ public interface ProofMacro {
      * @param listener the listener to use for progress reports (may be <code>null</code>)
      * @throws InterruptedException if the application of the macro has been interrupted.
      */
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Node node,
+    ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Node node,
             PosInOccurrence posInOcc, ProverTaskListener listener)
-            throws InterruptedException, Exception;
+            throws Exception;
 
     /**
      * This observer acts as intermediate instance between the reports by the strategy and the UI

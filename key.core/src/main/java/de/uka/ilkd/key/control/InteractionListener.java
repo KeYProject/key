@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.control;
 
+import java.util.List;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
@@ -10,8 +12,6 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.Settings;
-
-import java.util.List;
 
 /**
  * @author Alexander Weigl
@@ -32,7 +32,7 @@ public interface InteractionListener {
 
     void runRule(Node goal, RuleApp app);
 
-    public enum SettingType {
+    enum SettingType {
         SMT, CHOICE, STRATEGY
     }
 }

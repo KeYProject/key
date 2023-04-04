@@ -5,18 +5,10 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.naming.NameAlreadyBoundException;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -37,7 +29,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
     /**
      * The sort for the argument of this {@link AbstractionPredicate}.
      */
-    private Sort argSort;
+    private final Sort argSort;
 
     /**
      * The predicate term. Contains a placeholder ({@link #placeholderVariable}) which is to be
@@ -72,7 +64,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
      *         constructed with.
      */
     public Pair<LocationVariable, Term> getPredicateFormWithPlaceholder() {
-        return new Pair<LocationVariable, Term>(placeholderVariable, predicateFormWithPlaceholder);
+        return new Pair<>(placeholderVariable, predicateFormWithPlaceholder);
     }
 
     /**
@@ -188,8 +180,8 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
         sb.append("(").append("'").append(predicateFormWithPlaceholder.first.sort()).append(" ")
                 .append(predicateFormWithPlaceholder.first).append("', '")
                 .append(OutputStreamProofSaver.escapeCharacters(OutputStreamProofSaver
-                        .printAnything(predicateFormWithPlaceholder.second, services, false)
-                        .toString().trim().replaceAll("(\\r|\\n|\\r\\n)+", "")))
+                        .printAnything(predicateFormWithPlaceholder.second, services, false).trim()
+                        .replaceAll("(\\r|\\n|\\r\\n)+", "")))
                 .append("')");
 
         return sb.toString();
@@ -208,7 +200,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
      */
     public static List<AbstractionPredicate> fromString(final String s, final Services services,
             NamespaceSet localNamespaces) throws ParserException {
-        final ArrayList<AbstractionPredicate> result = new ArrayList<AbstractionPredicate>();
+        final ArrayList<AbstractionPredicate> result = new ArrayList<>();
 
         Pattern p = Pattern.compile("\\('(.+?)', '(.+?)'\\)");
         Matcher m = p.matcher(s);
@@ -225,8 +217,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
                 final String predStr = m.group(i + 1);
 
                 // Parse the placeholder
-                Pair<Sort, Name> ph = null;
-                ph = MergeRuleUtils.parsePlaceholder(phStr, false, services);
+                Pair<Sort, Name> ph = MergeRuleUtils.parsePlaceholder(phStr, false, services);
 
                 // Add placeholder to namespaces, if necessary
                 Namespace<IProgramVariable> variables = services.getNamespaces().programVariables();

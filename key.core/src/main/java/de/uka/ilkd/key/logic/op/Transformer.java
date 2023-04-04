@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.logic.op;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.PIOPathIterator;
@@ -9,6 +7,8 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Functions with a restricted/special rule set only applicable for the top level of the term
@@ -29,7 +29,7 @@ public class Transformer extends Function {
     }
 
     public Transformer(Name name, Sort argSort) {
-        this(name, Sort.FORMULA, new ImmutableArray<Sort>(argSort));
+        this(name, Sort.FORMULA, new ImmutableArray<>(argSort));
     }
 
     /**
@@ -45,7 +45,7 @@ public class Transformer extends Function {
     public static Transformer getTransformer(Name name, Sort sort, ImmutableArray<Sort> argSorts,
             TermServices services) {
         final Named f = services.getNamespaces().functions().lookup(name);
-        if (f != null && f instanceof Transformer) {
+        if (f instanceof Transformer) {
             Transformer t = (Transformer) f;
             assert t.sort() == sort;
             assert t.argSorts().size() == argSorts.size();
@@ -106,8 +106,9 @@ public class Transformer extends Function {
             while (it.next() != -1) {
                 final Term t = it.getSubTerm();
                 op = t.op();
-                if (op instanceof Transformer)
+                if (op instanceof Transformer) {
                     return (Transformer) op;
+                }
             }
         }
         return null;

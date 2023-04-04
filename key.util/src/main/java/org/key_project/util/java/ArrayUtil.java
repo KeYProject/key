@@ -259,7 +259,7 @@ public final class ArrayUtil {
     @SuppressWarnings("unchecked")
     public static <T> T[] remove(T[] array, T toRemove) {
         if (array != null) {
-            List<T> result = new LinkedList<T>();
+            List<T> result = new LinkedList<>();
             for (T element : array) {
                 if (!Objects.equals(element, toRemove)) {
                     result.add(element);

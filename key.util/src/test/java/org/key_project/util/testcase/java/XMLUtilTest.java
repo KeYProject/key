@@ -1,12 +1,13 @@
 package org.key_project.util.testcase.java;
 
-import org.junit.jupiter.api.Test;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.XMLUtil;
 import org.key_project.util.java.XMLUtil.ITagReplacer;
 
-import java.util.LinkedList;
-import java.util.List;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;

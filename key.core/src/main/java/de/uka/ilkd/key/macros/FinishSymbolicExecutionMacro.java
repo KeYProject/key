@@ -59,8 +59,9 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
         if (rule instanceof Taclet) {
             Taclet taclet = (Taclet) rule;
             for (RuleSet rs : taclet.getRuleSets()) {
-                if (ruleSetName.equals(rs.name()))
+                if (ruleSetName.equals(rs.name())) {
                     return true;
+                }
             }
         }
         return false;

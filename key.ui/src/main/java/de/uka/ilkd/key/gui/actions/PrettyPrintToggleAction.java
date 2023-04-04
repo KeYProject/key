@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.gui.actions;
 
+import java.awt.event.ActionEvent;
+import java.util.EventObject;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.util.EventObject;
 
 public class PrettyPrintToggleAction extends MainWindowAction {
     public static final String NAME = "Use Pretty Syntax";
@@ -25,7 +25,7 @@ public class PrettyPrintToggleAction extends MainWindowAction {
      * Such changes can occur in the Eclipse context when settings are changed in for instance the
      * KeYIDE.
      */
-    private final SettingsListener viewSettingsListener = e -> handleViewSettingsChanged(e);
+    private final SettingsListener viewSettingsListener = this::handleViewSettingsChanged;
 
     public PrettyPrintToggleAction(MainWindow mainWindow) {
         super(mainWindow);

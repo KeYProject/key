@@ -1,10 +1,11 @@
 package de.uka.ilkd.key.logic.label;
 
+import java.util.List;
+
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import org.key_project.util.java.StringUtil;
 
-import java.util.List;
+import org.key_project.util.java.StringUtil;
 
 /**
  * A factory for creating {@link BlockContractValidityTermLabel} objects.

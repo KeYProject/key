@@ -9,21 +9,18 @@ import java.util.Set;
 public abstract class AbstractProperties implements Properties {
 
     private final Map<Property<?>, Set<PropertyListener>> listenerMap =
-        new IdentityHashMap<Property<?>, Set<PropertyListener>>();
+        new IdentityHashMap<>();
 
     private final Set<PropertyListener> globalListeners =
-        new HashSet<Properties.PropertyListener>();
+        new HashSet<>();
 
     @Override
     public void addPropertyListener(Property<?> property, PropertyListener listener) {
         if (property == null) {
             globalListeners.add(listener);
         } else {
-            Set<PropertyListener> list = listenerMap.get(property);
-            if (list == null) {
-                list = new HashSet<PropertyListener>();
-                listenerMap.put(property, list);
-            }
+            Set<PropertyListener> list =
+                listenerMap.computeIfAbsent(property, k -> new HashSet<>());
             list.add(listener);
         }
     }

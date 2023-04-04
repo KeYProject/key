@@ -3,7 +3,6 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.util.List;
 import java.util.Properties;
-
 import javax.swing.SwingWorker;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -62,7 +61,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
 
     private Throwable doWork() {
         try {
-            load();
+            load(mediator::fireProofLoaded);
             return null;
         } catch (Exception exception) {
             final String errorMessage = "Failed to load "
@@ -108,7 +107,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
      * {@link ProverTaskListener#taskFinished(TaskFinishedInfo)} on the registered listener.
      */
     public void runAsynchronously() {
-        final SwingWorker<Throwable, Void> worker = new SwingWorker<Throwable, Void>() {
+        final SwingWorker<Throwable, Void> worker = new SwingWorker<>() {
 
             private long runTime;
 

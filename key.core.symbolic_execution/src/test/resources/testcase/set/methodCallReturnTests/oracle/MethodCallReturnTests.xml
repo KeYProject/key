@@ -37,7 +37,7 @@
                </value>
             </variable>
             <callStackEntry path="/0"/>
-            <statement name="this.value=0;" pathCondition="true" pathConditionChanged="false">
+            <statement name="this.value = 0;" pathCondition="true" pathConditionChanged="false">
                <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="value" isArrayIndex="false">
@@ -110,7 +110,7 @@
                            </variable>
                            <callStackEntry path="/0/0/0/0/0/0/0"/>
                            <callStackEntry path="/0"/>
-                           <statement name="return ;" pathCondition="true" pathConditionChanged="false">
+                           <statement name="return;" pathCondition="true" pathConditionChanged="false">
                               <variable name="self" isArrayIndex="false">
                                  <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                     <variable name="value" isArrayIndex="false">
@@ -334,7 +334,7 @@
                                                                         </value>
                                                                      </variable>
                                                                      <callStackEntry path="/0"/>
-                                                                     <statement name="staticValue=0;" pathCondition="true" pathConditionChanged="false">
+                                                                     <statement name="staticValue = 0;" pathCondition="true" pathConditionChanged="false">
                                                                         <variable name="exc" isArrayIndex="false">
                                                                            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                            </value>
@@ -419,7 +419,7 @@
                                                                                     </variable>
                                                                                     <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                     <callStackEntry path="/0"/>
-                                                                                    <statement name="return ;" pathCondition="true" pathConditionChanged="false">
+                                                                                    <statement name="return;" pathCondition="true" pathConditionChanged="false">
                                                                                        <variable name="exc" isArrayIndex="false">
                                                                                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                                                           </value>
@@ -639,7 +639,7 @@
                                                                                                                         </variable>
                                                                                                                         <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                                         <callStackEntry path="/0"/>
-                                                                                                                        <statement name="return returnedValue1+returnedValue2;" pathCondition="true" pathConditionChanged="false">
+                                                                                                                        <statement name="return returnedValue1 + returnedValue2;" pathCondition="true" pathConditionChanged="false">
                                                                                                                            <variable name="self" isArrayIndex="false">
                                                                                                                               <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                                                                                                  <variable name="value" isArrayIndex="false">

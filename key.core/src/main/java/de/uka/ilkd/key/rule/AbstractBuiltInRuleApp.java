@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 
@@ -21,7 +22,7 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
             ImmutableList<PosInOccurrence> ifInsts) {
         this.builtInRule = rule;
         this.pio = pio;
-        this.ifInsts = (ifInsts == null ? ImmutableSLList.<PosInOccurrence>nil() : ifInsts);
+        this.ifInsts = (ifInsts == null ? ImmutableSLList.nil() : ifInsts);
     }
 
     protected AbstractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio) {
@@ -130,5 +131,37 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
         return "BuiltInRule: " + rule().name() + " at pos " + pio.subTerm();
     }
 
+
+    @Override
+    public boolean equalsModProofIrrelevancy(Object obj) {
+        if (!(obj instanceof IBuiltInRuleApp)) {
+            return false;
+        }
+        IBuiltInRuleApp that = (IBuiltInRuleApp) obj;
+        if (!(Objects.equals(rule(), that.rule())
+                && Objects.equals(getHeapContext(), that.getHeapContext()))) {
+            return false;
+        }
+        ImmutableList<PosInOccurrence> ifInsts1 = ifInsts();
+        ImmutableList<PosInOccurrence> ifInsts2 = that.ifInsts();
+        if (ifInsts1.size() != ifInsts2.size()) {
+            return false;
+        }
+        while (!ifInsts1.isEmpty()) {
+            if (!ifInsts1.head().eqEquals(ifInsts2.head())) {
+                return false;
+            }
+            ifInsts1 = ifInsts1.tail();
+            ifInsts2 = ifInsts2.tail();
+        }
+        return posInOccurrence().eqEquals(that.posInOccurrence());
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        return Objects.hash(rule(), getHeapContext(),
+            posInOccurrence().sequentFormula().hashCodeModProofIrrelevancy(),
+            posInOccurrence().posInTerm());
+    }
 
 }

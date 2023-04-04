@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
+import java.util.ArrayList;
+
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -21,9 +23,6 @@ import de.uka.ilkd.key.strategy.termfeature.ContainsLabelFeature;
 import de.uka.ilkd.key.symbolic_execution.rule.ModalitySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.util.Triple;
-
-import java.util.ArrayList;
 
 /**
  * {@link Strategy} to use for symbolic execution.
@@ -37,7 +36,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     /**
      * The default factory.
      */
-    public static IDefaultStrategyPropertiesFactory DEFAULT_FACTORY =
+    public static final IDefaultStrategyPropertiesFactory DEFAULT_FACTORY =
         () -> SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false,
             false, false, false, false);
 
@@ -317,7 +316,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
             // Model
             return new StrategySettingsDefinition(false, null, 1000, "Symbolic Execution Options",
                 SymbolicExecutionStrategy.DEFAULT_FACTORY,
-                new ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>>(),
+                new ArrayList<>(),
                 methodTreatment, loopTreatment, blockTreatment, branchHiding, aliasChecks);
         }
     }

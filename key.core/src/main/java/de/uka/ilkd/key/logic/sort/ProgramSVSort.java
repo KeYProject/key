@@ -4,9 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.expression.operator.BinaryOperator;
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.DefaultImmutableSet;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.NamedProgramElement;
@@ -49,6 +46,10 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.DefaultImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -279,7 +280,7 @@ public abstract class ProgramSVSort extends AbstractSort {
     // --------------------------------------------------------------------------
 
     public ProgramSVSort(Name name) {
-        super(name, DefaultImmutableSet.<Sort>nil(), false);
+        super(name, DefaultImmutableSet.nil(), false);
         NAME2SORT.put(name, this);
     }
 
@@ -523,11 +524,8 @@ public abstract class ProgramSVSort extends AbstractSort {
         /* Will not match on MetaClassReference variables */
         @Override
         public boolean canStandFor(ProgramElement check, Services services) {
-            if (!super.canStandFor(check, services)
-                    || CLASSREFERENCE.canStandFor(check, services)) {
-                return false;
-            }
-            return true;
+            return super.canStandFor(check, services)
+                    && !CLASSREFERENCE.canStandFor(check, services);
         }
     }
 
@@ -1152,8 +1150,9 @@ public abstract class ProgramSVSort extends AbstractSort {
             if (kjt != null) {
                 final Type type = kjt.getJavaType();
                 for (PrimitiveType forbidden_type : forbidden_types) {
-                    if (type == forbidden_type)
+                    if (type == forbidden_type) {
                         return false;
+                    }
                 }
             }
             return true;

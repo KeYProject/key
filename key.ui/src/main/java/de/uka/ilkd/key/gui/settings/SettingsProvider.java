@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.gui.settings;
 
-import de.uka.ilkd.key.gui.MainWindow;
-
-import javax.swing.*;
 import java.util.Collections;
 import java.util.List;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.MainWindow;
 
 /**
  * A settings provider is an entry in an {@link SettingsUi}.
@@ -92,6 +92,7 @@ public interface SettingsProvider {
 
     /**
      * Determines the order in the {@link JTree} of the settings.
+     * Higher values are shown last.
      *
      * @return
      */

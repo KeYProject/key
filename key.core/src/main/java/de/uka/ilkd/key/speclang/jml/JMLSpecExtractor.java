@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.speclang.jml;
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -26,10 +28,10 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
-import org.antlr.v4.runtime.ParserRuleContext;
+
 import org.key_project.util.collection.*;
 
-import java.util.*;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.SIGNALS_ONLY;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.*;
@@ -186,8 +188,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 type = ((ArrayType) type).getBaseType().getKeYJavaType().getJavaType();
             }
             return tc.isReferenceType(type) ? d : d - 1;
-        } else
+        } else {
             return 0;
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -219,11 +222,12 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     }
                 }
                 // check for spec_* modifiers (bug #1280)
-                if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) member, "spec_public"))
+                if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) member, "spec_public")) {
                     visibility = new Public();
-                else if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) member,
-                    "spec_protected"))
+                } else if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) member,
+                    "spec_protected")) {
                     visibility = new Protected();
+                }
 
                 for (FieldSpecification field : ((FieldDeclaration) member)
                         .getFieldSpecifications()) {
@@ -356,7 +360,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             constructs = parser.parseClassLevel(concatenatedComment, fileName, pos);
             warnings = warnings.append(parser.getWarnings());
         } else {
-            constructs = ImmutableSLList.<TextualJMLConstruct>nil();
+            constructs = ImmutableSLList.nil();
         }
 
         // create JML contracts out of constructs, add them to result
@@ -390,7 +394,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             TextualJMLSpecCase specCase = (TextualJMLSpecCase) constructsArray[i];
             if (modelMethodDecl != null && modelMethodDecl.getMethodDefinition() != null) {
                 specCase.addClause(AXIOMS, null, modelMethodDecl.getMethodDefinition());
-            } ;
+            }
             // add purity. Strict purity overrides purity.
             if (isStrictlyPure || pm.isModel()) {
                 for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
