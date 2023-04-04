@@ -75,8 +75,8 @@ public final class ProofCollection {
     }
 
     public GroupedProofCollectionUnit group(String name) {
-        var settings = new ProofCollectionSettings(this.settings, new ArrayList<>());
-        var unit = new GroupedProofCollectionUnit(name, settings, new ArrayList<>());
+        var settings = new ProofCollectionSettings(this.settings);
+        var unit = new GroupedProofCollectionUnit(name, settings);
         units.add(unit);
         return unit;
     }

@@ -19,6 +19,8 @@ import static de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile.getAbs
  * test run of
  * {@link RunAllProofsTest}.
  *
+ * THIS CLASS IS NOT IMMUTABLE?!?!??
+ *
  * @author Kai Wallisch
  */
 public class ProofCollectionSettings implements Serializable {
@@ -74,7 +76,7 @@ public class ProofCollectionSettings implements Serializable {
      * properties by providing JVM arguments like:
      * "-Dkey.runallproofs.forkMode=perFile"
      */
-    private static final List<Entry<String, String>> SYSTEM_PROPERTIES_ENTRIES;
+    private static final Map<String, String> SYSTEM_PROPERTIES_ENTRIES;
 
     static {
         /*
@@ -82,47 +84,16 @@ public class ProofCollectionSettings implements Serializable {
          * properties starting
          * with "key.runallproofs." are relevant for proof collection settings.
          */
-        List<Entry<String, String>> tmp = new LinkedList<>();
-        Set<Entry<Object, Object>> entrySet = System.getProperties().entrySet();
-        for (Entry<Object, Object> entry : entrySet) {
+        Map<String, String> tmp = new LinkedHashMap<>();
+        for (Entry<Object, Object> entry : System.getProperties().entrySet()) {
             String key = (String) entry.getKey();
             String value = (String) entry.getValue();
             if (key.startsWith("key.runallproofs.")) {
                 key = key.substring(17);// strip "key.runallproofs." from key
-                tmp.add(getSettingsEntry(key, value));
+                tmp.put(key, value);
             }
         }
-        SYSTEM_PROPERTIES_ENTRIES = Collections.unmodifiableList(tmp);
-    }
-
-    /**
-     * Converts a list of map entries to an unmodifiable map containing the
-     * specified entries and
-     * additionally default entries specified in {@link #SYSTEM_PROPERTIES_ENTRIES}.
-     */
-    private static Map<String, String> createUnmodifiableMapContainingDefaults(
-            List<Entry<String, String>> entries) {
-
-        Map<String, String> mutableMap = new LinkedHashMap<>();
-
-        /*
-         * Add specified entries.
-         */
-        for (Entry<String, String> entry : entries) {
-            mutableMap.put(entry.getKey(), entry.getValue());
-        }
-
-        /*
-         * Add entries created from system properties.
-         */
-        for (Entry<String, String> entry : SYSTEM_PROPERTIES_ENTRIES) {
-            mutableMap.put(entry.getKey(), entry.getValue());
-        }
-
-        /*
-         * Convert to an unmodifiable map and return.
-         */
-        return mutableMap;
+        SYSTEM_PROPERTIES_ENTRIES = Collections.unmodifiableMap(tmp);
     }
 
     /**
@@ -130,44 +101,18 @@ public class ProofCollectionSettings implements Serializable {
      * parameters with no parent
      * settings.
      */
-    public ProofCollectionSettings(List<Entry<String, String>> entries, Date runStart) {
+    public ProofCollectionSettings(Date runStart) {
         this.runStart = runStart;
-        /*
-         * Compute immutable map containing settings entries.
-         */
-        settingsMap = createUnmodifiableMapContainingDefaults(entries);
+        settingsMap = new LinkedHashMap<>(SYSTEM_PROPERTIES_ENTRIES);
     }
 
     /**
      * Creates a {@link ProofCollectionSettings} object that overrides an existing
      * {@link ProofCollectionSettings} object.
      */
-    public ProofCollectionSettings(ProofCollectionSettings parentSettings,
-            List<Entry<String, String>> entries) {
+    public ProofCollectionSettings(ProofCollectionSettings parentSettings) {
         this.runStart = parentSettings.runStart;
-
-        /*
-         * Create new list of entries containing parent entries and local entries.
-         * Entries from
-         * parent ProofCollectionSettings are by local entries.
-         */
-        Set<String> localKeys = new LinkedHashSet<>();
-        for (Entry<String, String> entry : entries) {
-            String key = entry.getKey();
-            localKeys.add(key);
-        }
-        List<Entry<String, String>> mergedEntries = new LinkedList<>(entries);
-        for (Entry<String, String> entry : parentSettings.settingsMap.entrySet()) {
-            if (!localKeys.contains(entry.getKey())) {
-                mergedEntries.add(entry);
-            }
-        }
-        mergedEntries.addAll(entries);
-
-        /*
-         * Compute immutable map containing settings entries.
-         */
-        settingsMap = createUnmodifiableMapContainingDefaults(mergedEntries);
+        settingsMap = new HashMap<>(parentSettings.settingsMap);
 
         /*
          * Inherit statistics file from parent settings.

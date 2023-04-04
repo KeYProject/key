@@ -193,6 +193,10 @@ public class TestFile implements Serializable {
 
             autoMode(env, loadedProof, script);
 
+            if (testProperty == TestProperty.PROVABLE || testProperty == TestProperty.NOTPROVABLE) {
+                loadedProof.saveToFile(new File(keyFile.getAbsolutePath() + ".save.proof"));
+            }
+
             boolean closed = loadedProof.closed();
             success = (testProperty == TestProperty.PROVABLE) == closed;
             if (verbose) {

@@ -2,14 +2,14 @@ package de.uka.ilkd.key.proof.runallproofs;
 
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkMode;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
-
 import org.key_project.util.java.IOUtil;
+
+import org.junit.jupiter.api.Assertions;
 
 /**
  * @author Alexander Weigl
@@ -17,8 +17,7 @@ import org.key_project.util.java.IOUtil;
  */
 public class ProofCollections {
     public static ProofCollection automaticJavaDL() throws IOException {
-        var settings = new ProofCollectionSettings(new ArrayList<>(), new Date());
-        var c = new ProofCollection(settings);
+        var settings = new ProofCollectionSettings(new Date());
         /*
          * Defines a base directory.
          * All paths in this file are treated relative to base directory (except path for base
@@ -95,6 +94,15 @@ public class ProofCollections {
 
         settings.setKeySettings(loadFromFile("automaticJavaDL.properties"));
 
+        var c = new ProofCollection(settings);
+
+        var qs = c.group("quicksort");
+        qs.setLocalSettings("[Choice] DefaultChoices = moreSeqRules-moreSeqRules:on");
+        qs.setDirectory("heap/quicksort");
+        qs.provable("toplevel.key");
+        qs.provable("sort.key");
+        qs.provable("split.key");
+
         // Examples used in the new book
         var newBook = c.group("newBook");
         newBook.provable("newBook/09.list_modelfield/ArrayList.add.key");
@@ -105,7 +113,7 @@ public class ProofCollections {
 
         var oldBook = c.group("oldBook");
         oldBook.provable("standard_key/BookExamples/02FirstOrderLogic/Ex2.58.key");
-        oldBook.provable("standard_key/BookExamples/03DynamicLogic/Sect3.3.1.key");
+        oldBook.provable("standard_key/BookExamples/03DynamicLogic/Sect3.3.1.key");;
 
 
         // Comprehension Tests
@@ -964,7 +972,7 @@ public class ProofCollections {
 
 
     public static ProofCollection automaticInfFlow() throws IOException {
-        var settings = new ProofCollectionSettings(new ArrayList<>(), new Date());
+        var settings = new ProofCollectionSettings(new Date());
         var c = new ProofCollection(settings);
         /*
          * Defines a base directory.
@@ -1982,7 +1990,9 @@ public class ProofCollections {
 
 
     private static String loadFromFile(String name) throws IOException {
-        return IOUtil.readFrom(ProofCollections.class.getResourceAsStream(name));
+        var stream = ProofCollections.class.getResourceAsStream(name);
+        Assertions.assertNotNull(stream, "Failed to find " + name);
+        return IOUtil.readFrom(stream);
     }
 
 }

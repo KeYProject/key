@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
@@ -19,11 +20,10 @@ public class GroupedProofCollectionUnit extends ProofCollectionUnit {
     private final List<TestFile> testFiles;
     private final ProofCollectionSettings settings;
 
-    public GroupedProofCollectionUnit(String groupName, ProofCollectionSettings settings,
-            List<TestFile> files) {
+    public GroupedProofCollectionUnit(String groupName, ProofCollectionSettings settings) {
         this.groupName = groupName;
-        this.settings = settings;
-        this.testFiles = files;
+        this.settings = new ProofCollectionSettings(settings);
+        this.testFiles = new ArrayList<>();
     }
 
     @Override
