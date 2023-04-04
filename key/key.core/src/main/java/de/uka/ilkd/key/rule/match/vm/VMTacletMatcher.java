@@ -315,8 +315,8 @@ public class VMTacletMatcher implements TacletMatcher {
      */
     @Override
     public final MatchConditions matchFind(Term term, 
-            MatchConditions matchCond,
-            Services services) {        
+            MatchConditions matchCond, Services services) {
+
         if (findMatchProgram != TacletMatchProgram.EMPTY_PROGRAM) {
             if (ignoreTopLevelUpdates) {
                 Pair</* term below updates */Term, MatchConditions> resultUpdateMatch = 
@@ -328,7 +328,7 @@ public class VMTacletMatcher implements TacletMatcher {
         } else {
             matchCond = null;
         }
-        
+
         return matchCond; 
     }
 

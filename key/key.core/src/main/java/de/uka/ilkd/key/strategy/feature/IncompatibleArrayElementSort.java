@@ -36,6 +36,7 @@ public class IncompatibleArrayElementSort extends BinaryFeature {
 
     final Sort matrixElementSort = ((ArraySort) t_matrix.sort()).elementSort();
     final Sort rowSort = t_row.sort();
+
     if (rowSort.extendsTrans(matrixElementSort)) {
       return false;
     }
@@ -51,6 +52,7 @@ public class IncompatibleArrayElementSort extends BinaryFeature {
     if (matrixElementKJT == null || matrixElementKJT.getJavaType() == null) {
       return false;
     }
-    return tc.isAssignableTo(rowKJT, matrixElementKJT);
+
+    return !tc.isAssignableTo(rowKJT, matrixElementKJT);
   }
 }

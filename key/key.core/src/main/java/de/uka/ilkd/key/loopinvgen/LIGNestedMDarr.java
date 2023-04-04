@@ -31,18 +31,51 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 
 		ImmutableList<Goal> goalsAfterShift = ruleApp.applyShiftUpdateRule(services.getProof().openGoals());
 
+
+
 		outerCompPreds.add(tb.geq(indexOuter, lowOuter));
+		outerCompPreds.add(tb.geq(indexOuter, tb.add(lowOuter, tb.one())));
+		outerCompPreds.add(tb.geq(indexOuter, tb.sub(lowOuter, tb.one())));
+		outerCompPreds.add(tb.leq(indexOuter, highOuter));
 		outerCompPreds.add(tb.leq(indexOuter, tb.add(highOuter, tb.one())));
+		outerCompPreds.add(tb.leq(indexOuter, tb.sub(highOuter, tb.one())));
+
+
 		outerCompPreds.add(tb.geq(indexInner, lowInner));
 		outerCompPreds.add(tb.leq(indexInner, tb.add(highInner, tb.one())));
+		outerCompPreds.add(tb.geq(indexInner, lowInner));
+		outerCompPreds.add(tb.geq(indexInner, tb.add(lowInner, tb.one())));
+		outerCompPreds.add(tb.geq(indexInner, tb.sub(lowInner, tb.one())));
+		outerCompPreds.add(tb.leq(indexInner, highInner));
+		outerCompPreds.add(tb.leq(indexInner, tb.add(highInner, tb.one())));
+		outerCompPreds.add(tb.leq(indexInner, tb.sub(highInner, tb.one())));
 
 		outerCompPreds.add(tb.wellFormedMatrix(arrays[0], tb.getBaseHeap()));
 
 		outerDepPreds.add(tb.noR(tb.matrixRange(tb.getBaseHeap(), arrays[0],lowOuter,highOuter, lowInner, highInner)));
 		outerDepPreds.add(tb.noW(tb.matrixRange(tb.getBaseHeap(), arrays[0],lowOuter,highOuter, lowInner, highInner)));
 
+
+
+		innerCompPreds.add(tb.geq(indexOuter, lowOuter));
+		innerCompPreds.add(tb.geq(indexOuter, tb.add(lowOuter, tb.one())));
+		innerCompPreds.add(tb.geq(indexOuter, tb.sub(lowOuter, tb.one())));
+		innerCompPreds.add(tb.leq(indexOuter, highOuter));
+		innerCompPreds.add(tb.leq(indexOuter, tb.add(highOuter, tb.one())));
+		innerCompPreds.add(tb.leq(indexOuter, tb.sub(highOuter, tb.one())));
+
+
 		innerCompPreds.add(tb.geq(indexInner, lowInner));
 		innerCompPreds.add(tb.leq(indexInner, tb.add(highInner, tb.one())));
+		innerCompPreds.add(tb.geq(indexInner, lowInner));
+		innerCompPreds.add(tb.geq(indexInner, tb.add(lowInner, tb.one())));
+		innerCompPreds.add(tb.geq(indexInner, tb.sub(lowInner, tb.one())));
+		innerCompPreds.add(tb.leq(indexInner, highInner));
+		innerCompPreds.add(tb.leq(indexInner, tb.add(highInner, tb.one())));
+		innerCompPreds.add(tb.leq(indexInner, tb.sub(highInner, tb.one())));
+
+
+
 		innerCompPreds.add(tb.wellFormedMatrix(arrays[0], tb.getBaseHeap()));
 
 

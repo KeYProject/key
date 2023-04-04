@@ -724,25 +724,23 @@ public final class TypeConverter {
 
     public boolean isWidening(Type from, Type to) {
         if (from instanceof KeYJavaType)
-            return isWidening((KeYJavaType) from,
-                    to instanceof KeYJavaType ? (KeYJavaType)to : getKeYJavaType(to));
+            return isWidening(((KeYJavaType) from).getJavaType(), to);
         if (to instanceof KeYJavaType)
-            return isWidening(from instanceof KeYJavaType ? (KeYJavaType)from : getKeYJavaType(from),
-                    (KeYJavaType) to);
+            return isWidening(from, ((KeYJavaType) to).getJavaType());
 
-        if (from instanceof ClassType) {
+        if (from instanceof ArrayType) {
+            if (to instanceof ArrayType) {
+                return isWidening((ArrayType) from, (ArrayType) to);
+            } else if (to instanceof ClassType) {
+                final Sort toSort = getKeYJavaType(to).getSort();
+                return services.getJavaInfo().isAJavaCommonSort(toSort);
+            }
+        } else if (from instanceof ClassType) {
             return isWidening(getKeYJavaType(from),
                     getKeYJavaType(to));
         } else if (from instanceof PrimitiveType) {
             if (to instanceof PrimitiveType) {
                 return isWidening((PrimitiveType) from, (PrimitiveType) to);
-            }
-        } else if (from instanceof ArrayType) {
-            if (to instanceof ClassType) {
-                final Sort toSort = getKeYJavaType(to).getSort();
-                return services.getJavaInfo().isAJavaCommonSort(toSort);
-            } else if (to instanceof ArrayType) {
-                return isWidening((ArrayType) from, (ArrayType) to);
             }
         }
         return false;

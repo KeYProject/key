@@ -408,7 +408,14 @@ public abstract class TacletApp implements RuleApp {
 	}
 	registerSkolemConstants(goal.getLocalNamespaces());
 	goal.addAppliedRuleApp(this);
-	return taclet().apply(goal, services, this);
+			final ImmutableList<Goal> result;
+			try {
+				result = taclet().apply(goal, services, this);
+			} catch(Exception e) {
+				System.out.println(taclet.name());
+				throw e;
+			}
+			return result;
     }
 
     /*

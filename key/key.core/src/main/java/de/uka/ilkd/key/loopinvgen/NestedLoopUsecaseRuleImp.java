@@ -42,19 +42,18 @@ public class NestedLoopUsecaseRuleImp{
         constructUsecase(loopInvariant, anonUpdate, loopGuard);
     }
 
-    private Term findNoW(Term innerLI){
-        Term mod = tb.allLocs();
+    private Term findNoW(Term innerLI, Term mod){
         if (innerLI.op()==depLDT.getNoW()){
             mod = tb.setMinus(mod, innerLI.sub(0));
         } else {
             for (Term t:innerLI.subs()){
-                findNoW(t);
+                mod = findNoW(t, mod);
             }
         }
         return mod;
     }
     private Term creatUpdates(Term innerLI, PosInOccurrence pos) {
-        Term mod = findNoW(innerLI);
+        Term mod = findNoW(innerLI, tb.allLocs());
 
         //anonymizes the heap
         final Name heapPrimeName = new Name(tb.newName(tb.getBaseHeap()+"_Prime"));

@@ -718,9 +718,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "dep_pred_unroll_fixed_bounds", longConst(0));
         bindRuleSet(d, "dep_pred_known", add(ScaleFeature.createScaled(depth, 1500), longConst(100)));//+100
         bindRuleSet(d, "dep_pred_known_2", add(noDoubleMinus,longConst(100)));//+100
-        bindRuleSet(d, "dep_pred_known_2b", add(noDoubleMinus,longConst(0)));
-        bindRuleSet(d, "dep_pred_known_3", add(noDoubleMinus,longConst(-500)));//-500
-        bindRuleSet(d, "saturate_dep_locset_relations_def", add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE, ScaleFeature.createScaled(depth, 1000), longConst(300)));
+        bindRuleSet(d, "dep_pred_known_2b", add(noDoubleMinus,longConst(-50)));
+        bindRuleSet(d, "dep_pred_known_3", add(noDoubleMinus,longConst(-5000)));//-500
+        bindRuleSet(d, "saturate_dep_locset_relations_def",
+            add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE, ScaleFeature.createScaled(depth, 1000), longConst(300)));
         bindRuleSet(d, "self_app_prevention", add(NonDuplicateAppModPositionFeature.INSTANCE, ScaleFeature.createScaled(depth, 10000), longConst(300)));
         bindRuleSet(d, "lateSimplification", longConst(1000));
 
@@ -1127,8 +1128,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     "split_cond",
                     add(// do not split over formulas containing auxiliary variables
                         applyTF(FocusProjection.INSTANCE,
-                                rec(any(), ifZero( not(IsSelectSkolemConstantTermFeature.INSTANCE),
-                                        longTermConst(0), longTermConst(5000)))),
+                                rec(any(), not(IsSelectSkolemConstantTermFeature.INSTANCE))),
                         // prefer splits when condition has quantifiers (less
                         // likely to be simplified away)
                         applyTF(splitCondition,
