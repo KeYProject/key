@@ -72,7 +72,7 @@ jobs:
         uses: peter-evans/find-comment@v2
         id: fc
         with:
-          issue-number: ${{ steps.da.test-artifact-id }}
+          issue-number: ${{ steps.rpn.pr-number }}
           comment-author: 'KiKi'
           body-includes: Artiweb
 
