@@ -54,10 +54,15 @@ public abstract class KeyAst<T extends ParserRuleContext> {
 
         public @Nullable ProofSettings findProofSettings() {
             ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
-            if (ctx.preferences() != null) {
-                String text =
-                        StringUtil.trim(ctx.preferences().s.getText(), '"').replace("\\\\:", ":");
-                settings.loadSettingsFromString(text);
+
+            if (ctx.preferences() != null && ctx.preferences().s != null) {
+                String text = StringUtil.trim(ctx.preferences().s.getText(), '"')
+                        .replace("\\\\:", ":");
+                settings.loadSettingsFromPropertyString(text);
+            } else if (ctx.preferences() != null && ctx.preferences().c != null) {
+                var cb = new ConfigurationBuilder();
+                var c = (Configuration) ctx.preferences().c.accept(cb);
+                settings.readSettings(c);
             }
             return settings;
         }

@@ -101,6 +101,9 @@ public class ProofSettings {
         if (lastLoadedProperties != null) {
             settings.readSettings(lastLoadedProperties);
         }
+        if (lastLoadedConfiguration != null) {
+            settings.readSettings(lastLoadedConfiguration);
+        }
     }
 
     /**
@@ -154,11 +157,7 @@ public class ProofSettings {
 
     public void loadSettingsFromJSONStream(Reader in) throws IOException {
         var config = Configuration.load(CharStreams.fromReader(in));
-        lastLoadedProperties = null;
-        lastLoadedConfiguration = config;
-        for (Settings s : settings) {
-            s.readSettings(config);
-        }
+        readSettings(config);
     }
 
     public void loadDefaultJSONSettings() {
@@ -221,7 +220,7 @@ public class ProofSettings {
     /**
      * Used to load Settings from a .key file
      */
-    public void loadSettingsFromString(String s) {
+    public void loadSettingsFromPropertyString(String s) {
         if (s == null) {
             return;
         }
@@ -288,5 +287,12 @@ public class ProofSettings {
      */
     public TermLabelSettings getTermLabelSettings() {
         return termLabelSettings;
+    }
+
+    public void readSettings(Configuration c) {
+        lastLoadedProperties = null;
+        lastLoadedConfiguration = c;
+        for (Settings setting : settings)
+            setting.readSettings(c);
     }
 }
