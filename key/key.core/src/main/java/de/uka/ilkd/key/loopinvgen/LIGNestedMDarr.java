@@ -42,12 +42,10 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 
 
 		outerCompPreds.add(tb.geq(indexInner, lowInner));
-		outerCompPreds.add(tb.leq(indexInner, tb.add(highInner, tb.one())));
-		outerCompPreds.add(tb.geq(indexInner, lowInner));
 		outerCompPreds.add(tb.geq(indexInner, tb.add(lowInner, tb.one())));
 		outerCompPreds.add(tb.geq(indexInner, tb.sub(lowInner, tb.one())));
-		outerCompPreds.add(tb.leq(indexInner, highInner));
 		outerCompPreds.add(tb.leq(indexInner, tb.add(highInner, tb.one())));
+		outerCompPreds.add(tb.leq(indexInner, highInner));
 		outerCompPreds.add(tb.leq(indexInner, tb.sub(highInner, tb.one())));
 
 		outerCompPreds.add(tb.wellFormedMatrix(arrays[0], tb.getBaseHeap()));
@@ -65,8 +63,6 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 		innerCompPreds.add(tb.leq(indexOuter, tb.sub(highOuter, tb.one())));
 
 
-		innerCompPreds.add(tb.geq(indexInner, lowInner));
-		innerCompPreds.add(tb.leq(indexInner, tb.add(highInner, tb.one())));
 		innerCompPreds.add(tb.geq(indexInner, lowInner));
 		innerCompPreds.add(tb.geq(indexInner, tb.add(lowInner, tb.one())));
 		innerCompPreds.add(tb.geq(indexInner, tb.sub(lowInner, tb.one())));
@@ -99,11 +95,11 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 		PredicateRefiner prOuter = null;
 		if(arrays.length==1)
 			prOuter = new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
-					innerDepPreds, innerCompPreds, arrays[0], arrays[0],
+					outerDepPreds, outerCompPreds, arrays[0], arrays[0],
 					indexOuter, indexInner, outerItrNumber, services);
 		if(arrays.length==2)
 			prOuter = new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
-					innerDepPreds, innerCompPreds, arrays[0], arrays[1],
+					outerDepPreds, outerCompPreds, arrays[0], arrays[1],
 					indexOuter, indexInner, outerItrNumber, services);
 		Pair<Set<Term>, Set<Term>> refinedOuterPreds = prOuter.refine();
 		outerDepPreds = refinedOuterPreds.first;
@@ -128,11 +124,11 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 
 
 			boolean nested = false;
-			boolean firstApproach = true; //First approach forgets everything that it knows. Only produces the inner LI once and uses it.
+			boolean firstApproach = false; //First approach forgets everything that it knows. Only produces the inner LI once and uses it.
 			// Second approach calculates th inner LI for each outer iteration.
 			// I should compare their speed and precision.
 			ImmutableList<Goal> goalsAfterShiftUpdate = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
-
+			System.out.println("Num of Goals after Shifting Outer Loop's Updates: " + goalsAfterShiftUpdate.size());
 			for (Goal g : goalsAfterShiftUpdate) {
 				for (final SequentFormula sf : g.sequent().succedent()) {
 					final Term formula = tb.goBelowUpdates(sf.formula());
@@ -148,37 +144,47 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 							// **
 							System.out.println("Nested Loop!");
 							nested = true;//Even if the loop is not nested the modality starts with a While. I should find another way to distinguish between nested and normal loops
-							if(!once){
+							if(firstApproach && !once){
 								innerLoop = (LoopStatement) activePE;
 								SideProof innerLoopProof = new  SideProof(services, modifySeqAnte(g));
 								innerLI = innerLIComputation(innerLoopProof.retGoal().head(), activePE);//For now only taking the head goal
 								System.out.println("Inner Loop Inv:   " + innerLI);
 								once=true;
+							} else if (!firstApproach) {
+								innerLoop = (LoopStatement) activePE;
+								SideProof innerLoopProof = new  SideProof(services,modifySeqFor2ndApproach(g));
+								innerLI = innerLIComputation(innerLoopProof.retGoal().head(), activePE);//For now only taking the head goal
+								System.out.println("2nd Approach Inner Loop Inv:   " + innerLI);
 							}
 						}
 						break;
 					}
 				}
 
-				if (nested && firstApproach) {
-					nested = false;
+
+				if (nested) {
 					LoopSpecification loopSpec = new LoopSpecificationImpl(innerLoop, tb.and(innerLI.getConjuncts()));
 					services.getSpecificationRepository().addLoopInvariant(loopSpec);
+//					System.out.println("Goals before Usecase: " + goalsAfterShiftUpdate.head());
 					ImmutableList<Goal> goalsAfterNestedLoopUsecase = ruleApp.applyNestedLoopUsecaseRule(goalsAfterShiftUpdate);
-
+//					System.out.println("Goals after nested Loop Usecase: "+ goalsAfterNestedLoopUsecase);
 					goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterNestedLoopUsecase);
+//					System.out.println("Goals After Shifting the inner LI : " + goalsAfterShift);
+				}
+				if (firstApproach) {
+					nested = false;
 				}
 			}
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
-//			System.out.println("goal for refinement: " + currentGoal + " ------------------------------");
+			System.out.println("goal for refinement: " + currentGoal + " ------------------------------");
 			PredicateRefiner prOuter1 = null;
 			if(arrays.length==1)
-				prOuter1 = new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
-						innerDepPreds, innerCompPreds, arrays[0], arrays[0],
+				prOuter1 = new NestedLoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(),
+						outerDepPreds, outerCompPreds, arrays[0], arrays[0],
 						indexOuter, indexInner, outerItrNumber, services);
 			if(arrays.length==2)
-				prOuter1 = new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
-						innerDepPreds, innerCompPreds, arrays[0], arrays[1],
+				prOuter1 = new NestedLoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(),
+						outerDepPreds, outerCompPreds, arrays[0], arrays[1],
 						indexOuter, indexInner, outerItrNumber, services);
 			Pair<Set<Term>, Set<Term>> refinedOuterPreds1 = prOuter1.refine();
 
@@ -253,8 +259,16 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 		Sequent newSeq = Sequent.createSequent(g.sequent().antecedent(),succSemi);
 
 
-		LIGNewInnerMltpArr innerLIG = new LIGNewInnerMltpArr(newSeq,services, innerDepPreds, innerCompPreds, arrays[0], arrays[0], indexOuter,indexInner);
+		LIGNewInner innerLIG = new LIGNewInner(newSeq,services, innerDepPreds, innerCompPreds);
 
 		return innerLIG.generate();
+	}
+	private Sequent modifySeqFor2ndApproach(Goal g) {
+
+//		SemisequentChangeInfo semiSCI = new SemisequentChangeInfo(g.sequent().antecedent().asList());
+		Sequent newSeq = Sequent.createSequent(g.sequent().antecedent() , g.sequent().succedent());
+
+//		System.out.println("seq for calculating the inner loop inv: " + newSeq);
+		return newSeq;
 	}
 }

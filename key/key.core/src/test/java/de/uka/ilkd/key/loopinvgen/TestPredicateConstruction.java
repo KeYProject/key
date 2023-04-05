@@ -752,7 +752,7 @@ public LoopInvariantGenerationResult basicEx0() {//Change length of arrays in Ab
 	try {
 		succFormula = parse("{i:=0 || j:=0}\\<{" + "		while (i<=a.length-1) {"
 													+ "			while (j<=a.length-1) {"
-													+ "				a[j] = 1;"
+													+ "				a[j] = a[j]+1;"
 													+ "				j++;}"
 													+ "			i++;}"
 													+ "		}\\>true");
@@ -1072,7 +1072,7 @@ public LoopInvariantGenerationResult correlation_init_array() {//Change length o
 	}
 	Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 
-	String[] arrLeft = { "wellFormedMatrix(a, heap)", "noW(matrixRange(heap,a,0,N-1,0,M-1))","noR(matrixRange(heap,a,0,N-1,0,M-1))", "a.length > N", "a[0].length > M"};
+	String[] arrLeft = { "wellFormedMatrix(a, heap)", "noW(matrixRange(heap,a,0,N-1,0,M-1))","noR(matrixRange(heap,a,0,N-1,0,M-1))", "a.length > N", "a[0].length > M", "N >10","M >10"};
 	String[] arrRight = { "a=null" };
 	try {
 		for (String fml : arrLeft) {

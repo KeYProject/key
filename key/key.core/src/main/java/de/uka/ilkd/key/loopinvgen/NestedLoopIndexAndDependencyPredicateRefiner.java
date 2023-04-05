@@ -682,44 +682,44 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 				if (lowToOuter != null && outerToHigh != null) {
 					if (depLDT.isDependencePredicate(pred.op())) {
 						final Function dependencyOp = (Function) pred.op();
-
 						result.add(tb.func(dependencyOp, lowToOuter));
+						result.add(tb.func(dependencyOp, outerToHigh));
 
-						result.add(tb.func(dependencyOp, tb.matrixRange(lowToOuter.sub(0), lowToOuter.sub(1),
-								tb.add(lowToOuter.sub(2), tb.one()),
-								lowToOuter.sub(3),
-								lowToOuter.sub(4),
-								lowToOuter.sub(5))));
+//						result.add(tb.func(dependencyOp, tb.matrixRange(heap, arr,
+//								tb.add(lowToOuter.sub(2), tb.one()),
+//								lowToOuter.sub(3),
+//								lowToOuter.sub(4),
+//								lowToOuter.sub(5))));
 
-						result.add(tb.func(dependencyOp, tb.matrixRange(lowToOuter.sub(0), lowToOuter.sub(1),
-								tb.add(lowToOuter.sub(2), tb.one()),
-								lowToOuter.sub(3),
-								tb.add(lowToOuter.sub(4), tb.one()),
-								lowToOuter.sub(5))));
+//						result.add(tb.func(dependencyOp, tb.matrixRange(heap, arr,
+//								tb.add(lowToOuter.sub(2), tb.one()),
+//								lowToOuter.sub(3),
+//								tb.add(lowToOuter.sub(4), tb.one()),
+//								lowToOuter.sub(5))));
 
-						result.add(tb.func(dependencyOp, tb.matrixRange(lowToOuter.sub(0), lowToOuter.sub(1),
-								lowToOuter.sub(2),
-								lowToOuter.sub(3),
-								tb.add(lowToOuter.sub(4), tb.one()),
-								lowToOuter.sub(5))));
+//						result.add(tb.func(dependencyOp, tb.matrixRange(heap, arr,
+//								lowToOuter.sub(2),
+//								lowToOuter.sub(3),
+//								tb.add(lowToOuter.sub(4), tb.one()),
+//								lowToOuter.sub(5))));
 
-						result.add(tb.func(dependencyOp, tb.matrixRange(lowToOuter.sub(0), lowToOuter.sub(1),
-								lowToOuter.sub(2),
-								tb.sub(lowToOuter.sub(3), tb.one()),
-								lowToOuter.sub(4),
-								lowToOuter.sub(5))));
-
-						result.add(tb.func(dependencyOp, tb.matrixRange(lowToOuter.sub(0), lowToOuter.sub(1),
+						result.add(tb.func(dependencyOp, tb.matrixRange(heap, arr,
 								lowToOuter.sub(2),
 								tb.sub(lowToOuter.sub(3), tb.one()),
 								lowToOuter.sub(4),
-								tb.sub(lowToOuter.sub(5), tb.one()))));
+								lowToOuter.sub(5))));
 
-						result.add(tb.func(dependencyOp, tb.matrixRange(lowToOuter.sub(0), lowToOuter.sub(1),
-								lowToOuter.sub(2),
-								lowToOuter.sub(3),
-								lowToOuter.sub(4),
-								tb.sub(lowToOuter.sub(5), tb.one()))));
+//						result.add(tb.func(dependencyOp, tb.matrixRange(heap, arr,
+//								lowToOuter.sub(2),
+//								tb.sub(lowToOuter.sub(3), tb.one()),
+//								lowToOuter.sub(4),
+//								tb.sub(lowToOuter.sub(5), tb.one()))));
+//
+//						result.add(tb.func(dependencyOp, tb.matrixRange(heap, lowToOuter.sub(1),
+//								lowToOuter.sub(2),
+//								lowToOuter.sub(3),
+//								lowToOuter.sub(4),
+//								tb.sub(lowToOuter.sub(5), tb.one()))));
 
 
 
@@ -731,36 +731,36 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 								outerToHigh.sub(4),
 								outerToHigh.sub(5))));
 
-						result.add(tb.func(dependencyOp, tb.matrixRange(outerToHigh.sub(0), outerToHigh.sub(1),
-								tb.add(outerToHigh.sub(2), tb.one()),
-								outerToHigh.sub(3),
-								tb.add(outerToHigh.sub(4), tb.one()),
-								outerToHigh.sub(5))));
-
-						result.add(tb.func(dependencyOp, tb.matrixRange(outerToHigh.sub(0), outerToHigh.sub(1),
-								outerToHigh.sub(2),
-								outerToHigh.sub(3),
-								tb.add(outerToHigh.sub(4), tb.one()),
-								outerToHigh.sub(5))));
-
-
-						result.add(tb.func(dependencyOp, tb.matrixRange(outerToHigh.sub(0), outerToHigh.sub(1),
-								outerToHigh.sub(2),
-								tb.sub(outerToHigh.sub(3), tb.one()),
-								outerToHigh.sub(4),
-								outerToHigh.sub(5))));
-
-						result.add(tb.func(dependencyOp, tb.matrixRange(outerToHigh.sub(0), outerToHigh.sub(1),
-								outerToHigh.sub(2),
-								tb.sub(outerToHigh.sub(3), tb.one()),
-								outerToHigh.sub(4),
-								tb.sub(outerToHigh.sub(5), tb.one()))));
-
-						result.add(tb.func(dependencyOp, tb.matrixRange(outerToHigh.sub(0), outerToHigh.sub(1),
-								outerToHigh.sub(2),
-								outerToHigh.sub(3),
-								outerToHigh.sub(4),
-								tb.sub(outerToHigh.sub(5), tb.one()))));
+//						result.add(tb.func(dependencyOp, tb.matrixRange(outerToHigh.sub(0), outerToHigh.sub(1),
+//								tb.add(outerToHigh.sub(2), tb.one()),
+//								outerToHigh.sub(3),
+//								tb.add(outerToHigh.sub(4), tb.one()),
+//								outerToHigh.sub(5))));
+//
+//						result.add(tb.func(dependencyOp, tb.matrixRange(outerToHigh.sub(0), outerToHigh.sub(1),
+//								outerToHigh.sub(2),
+//								outerToHigh.sub(3),
+//								tb.add(outerToHigh.sub(4), tb.one()),
+//								outerToHigh.sub(5))));
+//
+//
+//						result.add(tb.func(dependencyOp, tb.matrixRange(outerToHigh.sub(0), outerToHigh.sub(1),
+//								outerToHigh.sub(2),
+//								tb.sub(outerToHigh.sub(3), tb.one()),
+//								outerToHigh.sub(4),
+//								outerToHigh.sub(5))));
+//
+//						result.add(tb.func(dependencyOp, tb.matrixRange(outerToHigh.sub(0), outerToHigh.sub(1),
+//								outerToHigh.sub(2),
+//								tb.sub(outerToHigh.sub(3), tb.one()),
+//								outerToHigh.sub(4),
+//								tb.sub(outerToHigh.sub(5), tb.one()))));
+//
+//						result.add(tb.func(dependencyOp, tb.matrixRange(outerToHigh.sub(0), outerToHigh.sub(1),
+//								outerToHigh.sub(2),
+//								outerToHigh.sub(3),
+//								outerToHigh.sub(4),
+//								tb.sub(outerToHigh.sub(5), tb.one()))));
 
 					}
 				}

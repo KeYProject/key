@@ -100,17 +100,17 @@ public class RuleApplication {
 				e.printStackTrace();
 			}
 			ps.start(goals);
-//			for(Goal g: goals){
-//				System.out.println("After Start:"+g.sequent());
-//			}
-//			try {
-//				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
+			for(Goal g: goals){
+				System.out.println("After Start:"+g.sequent());
+			}
+			try {
+				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
 
-//				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\testAfterSEAfterShift.key")).save();
-//			} catch (IOException e) {
+				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\testAfterSEAfterShift.key")).save();
+			} catch (IOException e) {
 			// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
+				e.printStackTrace();
+			}
 			return ps.getProof().getSubtreeGoals(subtreeRoot);
 			// return currentGoal.proof().openGoals();
 //			return services.getProof().openEnabledGoals();
@@ -238,7 +238,7 @@ public class RuleApplication {
 			}
 
 			ApplyStrategyInfo info = ps.start(goals);
-//			System.out.println("info after unwind: "+info);
+			System.out.println("info after unwind: "+info);
 
 			return currentGoal.proof().openGoals();
 		}

@@ -37,7 +37,7 @@ public class LIGNewInner extends AbstractLoopInvariantGenerator {
 			oldCompPreds.addAll(allCompPreds);
 
 			ImmutableList<Goal> goalsAfterUnwind = ruleApp.applyUnwindRule(services.getProof().openGoals());
-//			System.out.println("Goals After Unwind:" + goalsAfterUnwind);
+			System.out.println("Goals After Unwind:" + goalsAfterUnwind);
 
 			goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
 //			System.out.println("Goals After Shift:" + goalsAfterShift);
