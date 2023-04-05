@@ -64,12 +64,9 @@ jobs:
             let fs = require('fs');
             let issue_number_text = fs.readFileSync('./pr_number');
             core.info("Found pr number \"" + issue_number_text + "\"");
-            if (issue_number_text === "") {
-               core.setFailed("No pr number found");
-            } else {
-               core.setOutput("pr-number", Number(issue_number_text));
-            }
+            core.setOutput("pr-number", issue_number_text === "" ? "" : Number(issue_number_text));
       - name: Find Comment
+        if: ${{ steps.rpn.outputs.pr-number != '' }}
         uses: peter-evans/find-comment@v2
         id: fc
         with:
@@ -78,6 +75,7 @@ jobs:
           body-includes: Artiweb
 
       - name: Create or update comment
+        if: ${{ steps.rpn.outputs.pr-number != '' }}
         uses: peter-evans/create-or-update-comment@v2
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
