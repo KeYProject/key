@@ -801,7 +801,8 @@ profile: PROFILE name=string_value SEMI;
 
 preferences
 :
-	KEYSETTINGS LBRACE (s=string_value | c=cfile )? RBRACE
+	KEYSETTINGS (LBRACE s=string_value? RBRACE
+	            |  c=cvalue ) // LBRACE, RBRACE included in cvalue#table
 ;
 
 proofScript
@@ -813,12 +814,10 @@ proofScript
 proof: PROOF EOF;
 
 // Config
-cfile: (csection? ckv)*;
-csection: LBRACKET IDENT RBRACKET;
-ckv: doc=DOC_COMMENT? ckey EQUALS cvalue;
-ckey: (any* | STRING_LITERAL);
-any:   INT_LITERAL | IDENT | BIN_LITERAL | HEX_LITERAL | FLOAT_LITERAL | DOUBLE_LITERAL
-     | TRUE | FALSE | DOT;
+cfile: cvalue*;
+//csection: LBRACKET IDENT RBRACKET;
+ckv: doc=DOC_COMMENT? ckey ':' cvalue;
+ckey: IDENT | STRING_LITERAL;
 cvalue:
     IDENT #csymbol
   | STRING_LITERAL #cstring
@@ -830,6 +829,6 @@ cvalue:
   | REAL_LITERAL #cfpr
   | (TRUE|FALSE) #cbool
   | LBRACE
-     (ckv (COMMA ckv)*)?
+     (ckv (COMMA ckv)*)? COMMA?
     RBRACE #table
   | LBRACKET (cvalue (COMMA cvalue)*)? RBRACKET #list;

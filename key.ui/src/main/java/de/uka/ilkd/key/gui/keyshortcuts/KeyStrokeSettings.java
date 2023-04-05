@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -37,7 +38,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
      */
     public static final File SETTINGS_FILE =
             new File(PathConfig.getKeyConfigDir(), SETTINGS_FILENAME);
-    private static final File SETTINGS_FILE_NEW = new File(PathConfig.getKeyConfigDir(), "keystrokes.toml");
+    private static final File SETTINGS_FILE_NEW = new File(PathConfig.getKeyConfigDir(), "keystrokes.json");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyStrokeSettings.class);
 

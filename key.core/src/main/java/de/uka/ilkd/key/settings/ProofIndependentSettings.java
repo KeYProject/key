@@ -25,7 +25,7 @@ public class ProofIndependentSettings {
     public static final ProofIndependentSettings DEFAULT_INSTANCE;
 
     static {
-        var file = new File(PathConfig.getProofIndependentSettings().replace(".props", ".toml"));
+        var file = new File(PathConfig.getProofIndependentSettings().replace(".props", ".json"));
         if (file.exists()) {
             DEFAULT_INSTANCE = new ProofIndependentSettings(file);
         } else {
@@ -127,7 +127,7 @@ public class ProofIndependentSettings {
             filename.getParentFile().mkdirs();
         }
 
-        try (var out = new BufferedWriter(new FileWriter(filename.toString().replace(".props", ".toml")))) {
+        try (var out = new BufferedWriter(new FileWriter(filename.toString().replace(".props", ".json")))) {
             config.save(out, "Proof-Independent-Settings-File. Generated " + new Date());
         } catch (IOException e) {
             throw new RuntimeException(e);

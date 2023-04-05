@@ -25,13 +25,6 @@ class ConfigurationBuilder extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitCsection(KeYParser.CsectionContext ctx) {
-        var name = ctx.IDENT().getText();
-        section = root.getSection(name, true);
-        return null;
-    }
-
-    @Override
     public Object visitCkv(KeYParser.CkvContext ctx) {
         var name = ctx.ckey().getText();
         var val = ctx.cvalue().accept(this);

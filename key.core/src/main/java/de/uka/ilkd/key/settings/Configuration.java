@@ -158,7 +158,7 @@ public class Configuration {
     }
 
     public void save(Writer writer, String comment) {
-        new ConfigurationWriter(writer).printComment(comment).printConfiguration(this);
+        new ConfigurationWriter(writer).printComment(comment).printMap(this.data);
     }
 
 
@@ -187,7 +187,6 @@ public class Configuration {
     private static class ConfigurationWriter {
         private final PrintWriter out;
         private int indent;
-        private int equalSignPos;
 
         public ConfigurationWriter(Writer writer) {
             this.out = new PrintWriter(writer);
@@ -206,33 +205,6 @@ public class Configuration {
             } else {
                 out.format("// %s\n", comment);
             }
-            return this;
-        }
-
-        public ConfigurationWriter printConfiguration(Configuration c) {
-            return printConfiguration(c, true);
-        }
-
-        public ConfigurationWriter printConfiguration(Configuration c, boolean section) {
-            c.data.forEach((k, v) -> {
-                if (v != null) {
-                    if (section && v instanceof Configuration)
-                        printSection(k, (Configuration) v);
-                    else
-                        printKeyValue(k, v).newline().reset();
-                }
-            });
-            return this;
-        }
-
-        private void printSection(String k, Configuration v) {
-            reset();
-            out.format("\n[%s]\n", k);
-            printConfiguration(v, false);
-        }
-
-        private ConfigurationWriter reset() {
-            equalSignPos = 0;
             return this;
         }
 
@@ -270,9 +242,9 @@ public class Configuration {
         }
 
         private ConfigurationWriter printMap(Map<String, Object> value) {
-            var old = equalSignPos;
-            var own = equalSignPos += 2;
             out.format("{ ");
+            indent += 4;
+            newline().printIndent();
             for (Iterator<Map.Entry<String, Object>> iterator = value.entrySet().iterator(); iterator.hasNext(); ) {
                 Map.Entry<String, Object> entry = iterator.next();
                 String k = entry.getKey();
@@ -280,20 +252,15 @@ public class Configuration {
                 printKeyValue(k, v);
                 if (iterator.hasNext()) {
                     print(",").newline();
-                    equalSignPos = own;
-                    fillSpaces();
+                    printIndent();
                 }
             }
+            indent -= 4;
+            newline().printIndent();
             out.format(" }");
-            equalSignPos = old;
             return this;
         }
 
-        private void fillSpaces() {
-            for (int i = 0; i < equalSignPos; i++) {
-                print(" ");
-            }
-        }
 
         private ConfigurationWriter print(String s) {
             out.print(s);
@@ -301,9 +268,10 @@ public class Configuration {
         }
 
         private ConfigurationWriter printSeq(Collection<Object> value) {
-            var old = equalSignPos;
-            equalSignPos += 2;
             out.format("[ ");
+            indent += 4;
+            newline();
+            printIndent();
             for (Iterator<Object> iterator = value.iterator(); iterator.hasNext(); ) {
                 Object o = iterator.next();
                 printValue(o);
@@ -313,24 +281,19 @@ public class Configuration {
                     } else {
                         print(",");
                         newline();
-                        fillSpaces();
+                        printIndent();
                     }
                 }
             }
+            indent -= 4;
+            newline().printIndent();
             out.format(" ]");
-            equalSignPos = old;
             return this;
         }
 
         private ConfigurationWriter printKey(String key) {
-            if (key.contains(" ") || key.contains("(") || key.contains(")") || key.contains("[s")) {
-                printValue(key);
-                equalSignPos += key.length() + 5;
-            } else {
-                out.write(key);
-                equalSignPos += key.length() + 3;
-            }
-            out.format(" = ");
+            printValue(key);
+            out.format(" : ");
             return this;
         }
     }

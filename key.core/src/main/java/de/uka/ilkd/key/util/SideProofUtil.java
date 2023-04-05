@@ -62,8 +62,7 @@ public final class SideProofUtil {
                 : null;
         initConfig.setSettings(clonedSettings);
         initConfig.setTaclet2Builder(
-            (HashMap<Taclet, TacletBuilder<? extends Taclet>>) sourceInitConfig.getTaclet2Builder()
-                    .clone());
+            (HashMap<Taclet, TacletBuilder<? extends Taclet>>) sourceInitConfig.getTaclet2Builder().clone());
         initConfig.setTaclets(sourceInitConfig.getTaclets());
         // Create new ProofEnvironment and initialize it with values from initial one.
         ProofEnvironment env = new ProofEnvironment(initConfig);

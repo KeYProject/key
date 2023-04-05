@@ -33,7 +33,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
             new File(PathConfig.getKeyConfigDir(), SETTINGS_FILENAME);
 
     public static final File SETTINGS_FILE_NEW =
-            new File(PathConfig.getKeyConfigDir(), "colors.toml");
+            new File(PathConfig.getKeyConfigDir(), "colors.json");
     private static final Logger LOGGER = LoggerFactory.getLogger(ColorSettings.class);
     private static ColorSettings INSTANCE;
 
