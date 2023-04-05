@@ -3,8 +3,6 @@ package de.uka.ilkd.key.logic.sort;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.expression.Operator;
-import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.NamedProgramElement;
@@ -21,7 +19,9 @@ import de.uka.ilkd.key.java.declaration.VariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
+import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.Catch;
@@ -1109,10 +1109,8 @@ public abstract class ProgramSVSort extends AbstractSort {
                 return false;
             }
             Operator bin = (Operator) check;
-            if (
-                    !SIMPLEEXPRESSION.canStandFor(bin.getChildAt(0), ec, services) ||
-                    !SIMPLEEXPRESSION.canStandFor(bin.getChildAt(1), ec, services)
-            ) {
+            if (!SIMPLEEXPRESSION.canStandFor(bin.getChildAt(0), ec, services) ||
+                    !SIMPLEEXPRESSION.canStandFor(bin.getChildAt(1), ec, services)) {
                 return false;
             }
             KeYJavaType t1 = getKeYJavaType(bin.getChildAt(0), ec, services);
