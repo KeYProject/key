@@ -93,7 +93,7 @@ public class ProofCollections {
          */
         // runOnlyOn = group1,group2
 
-        settings.setKeySettings(loadFromFile("automaticJavaDL.properties"));
+        settings.setKeySettings(loadFromFile("automaticJAVADL.properties"));
 
         var c = new ProofCollection(settings);
 
