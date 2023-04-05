@@ -71,7 +71,7 @@ jobs:
         id: fc
         with:
           issue-number: ${{ steps.rpn.outputs.pr-number }}
-          comment-author: 'KiKi'
+          comment-author: 'github-actions'
           body-includes: Artiweb
 
       - name: Create or update comment
@@ -81,7 +81,8 @@ jobs:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ steps.rpn.outputs.pr-number }}
           body: |
-            Test artifacts are available on [Artiweb](https://keyproject.github.io/artiweb/${{steps.rpn.outputs.pr-number}}/).
+            Thank you for your contribution.
             
+            The test artifacts are available on [Artiweb](https://keyproject.github.io/artiweb/${{steps.rpn.outputs.pr-number}}/).
             The newest artifact is [here](https://keyproject.github.io/artiweb/${{steps.rpn.outputs.pr-number}}/${{steps.da.outputs.test-artifact-id}}/).
           edit-mode: replace
