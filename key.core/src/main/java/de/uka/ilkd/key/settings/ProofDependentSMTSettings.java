@@ -9,21 +9,21 @@ import java.util.Properties;
 public class ProofDependentSMTSettings extends AbstractSettings {
     public static final String CATEGORY = "SMTSettings";
 
-    public static final String EXPLICIT_TYPE_HIERARCHY = "[SMTSettings]explicitTypeHierarchy";
+    public static final String EXPLICIT_TYPE_HIERARCHY = "explicitTypeHierarchy";
     public static final String INSTANTIATE_NULL_PREDICATES =
-            "[SMTSettings]instantiateHierarchyAssumptions";
-    public static final String MAX_GENERIC_SORTS = "[SMTSettings]maxGenericSorts";
-    public static final String TACLET_SELECTION = "[SMTSettings]SelectedTaclets";
-    public static final String USE_BUILT_IN_UNIQUENESS = "[SMTSettings]UseBuiltUniqueness";
+            "instantiateHierarchyAssumptions";
+    public static final String MAX_GENERIC_SORTS = "maxGenericSorts";
+    public static final String TACLET_SELECTION = "SelectedTaclets";
+    public static final String USE_BUILT_IN_UNIQUENESS = "UseBuiltUniqueness";
     public static final String USE_UNINTERPRETED_MULTIPLICATION =
-            "[SMTSettings]useUninterpretedMultiplication";
+            "useUninterpretedMultiplication";
     public static final String USE_CONSTANTS_FOR_BIGSMALL_INTEGERS =
-            "[SMTSettings]useConstantsForBigOrSmallIntegers";
-    public static final String INTEGERS_MAXIMUM = "[SMTSettings]integersMaximum";
-    public static final String INTEGERS_MINIMUM = "[SMTSettings]integersMinimum";
-    public static final String INVARIANT_FORALL = "[SMTSettings]invariantForall";
+            "useConstantsForBigOrSmallIntegers";
+    public static final String INTEGERS_MAXIMUM = "integersMaximum";
+    public static final String INTEGERS_MINIMUM = "integersMinimum";
+    public static final String INVARIANT_FORALL = "invariantForall";
 
-    public static final String PROP_LEGACY_TRANSLATION = "[SMTSettings]legacyTranslation";
+    public static final String PROP_LEGACY_TRANSLATION = "legacyTranslation";
     private static final String PROP_SUPPORTED_TACLETS = "supportedTaclets";
 
     private boolean useExplicitTypeHierarchy = false;

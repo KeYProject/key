@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.settings;
 
-import java.util.*;
-
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
@@ -170,6 +168,7 @@ public class ChoiceSettings extends AbstractSettings {
     @Override
     public void readSettings(Configuration props) {
         var category = props.getSection(CATEGORY);
+        if (category == null) return;
         for (Map.Entry<String, Object> entry : category.getEntries()) {
             assert entry.getValue() instanceof String;
             category2Default.put(entry.getKey(), entry.getValue().toString());

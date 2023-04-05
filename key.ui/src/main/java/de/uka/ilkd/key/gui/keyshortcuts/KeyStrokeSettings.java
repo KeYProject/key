@@ -215,7 +215,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
             ex.printStackTrace();
         }
 
-
+        LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE_NEW.getAbsolutePath());
         try (Writer writer = new FileWriter(SETTINGS_FILE_NEW)) {
             var config = new Configuration(properties);
             config.save(writer, "KeY's Colors");

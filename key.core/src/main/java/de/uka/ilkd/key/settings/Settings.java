@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.settings;
 
+import javax.annotation.Nonnull;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Properties;
 
 /**
@@ -12,37 +14,74 @@ public interface Settings {
     /**
      * gets a Properties object and has to perform the necessary steps in order to change this
      * object in a way that it represents the stored settings
+     *
+     * @deprecated Deprecated in favour of {@link #readSettings(Properties)}
      */
+    @Deprecated
     void readSettings(Properties props);
 
     /**
      * The settings to store are written to the given Properties object.
      *
      * @param props the Properties object where to write the settings as (key, value) pair
+     * @deprecated Deprecated in favour of {@link #writeSettings(Configuration)}
      */
+    @Deprecated
     void writeSettings(Properties props);
 
     /**
-     * gets a Properties object and has to perform the necessary steps in order to change this
-     * object in a way that it represents the stored settings
+     * This method transfers the given configuration information into the local states. The setter methods are used
+     * so {@link java.beans.PropertyChangeEvent} should be triggered accordingly to the new state.
+     * <p>
+     *
+     * @param props a non-null references to a configuration object. The state of this object
+     *              shall not be changed by the implementations.
      */
-    void readSettings(Configuration props);
+    void readSettings(@Nonnull Configuration props);
 
     /**
-     * The settings to store are written to the given Properties object.
+     * The internal state is stored in the given configuration object. The stored information must be sufficient
+     * to restore the local state.
+     * <p>
+     * The internal state shall not be changed by the implementations.
      *
-     * @param props the Properties object where to write the settings as (key, value) pair
+     * @param props a non-null reference to a configration object, which state is modified accordingly to the local
+     *              internal state.
      */
-    void writeSettings(Configuration props);
+    void writeSettings(@Nonnull Configuration props);
 
 
-    void addPropertyChangeListener(PropertyChangeListener listener);
+    /**
+     * Register a new listener which is triggered for changes on properties.
+     *
+     * @param listener a non-null reference
+     * @see java.beans.PropertyChangeSupport#addPropertyChangeListener(PropertyChangeListener)
+     */
+    void addPropertyChangeListener(@Nonnull PropertyChangeListener listener);
 
+    /**
+     * Removes the given listener.
+     *
+     * @param listener a non-null reference
+     * @see java.beans.PropertyChangeSupport#removePropertyChangeListener(PropertyChangeListener)
+     */
     void removePropertyChangeListener(PropertyChangeListener listener);
 
-    PropertyChangeListener[] getPropertyChangeListeners();
+    /**
+     * Register a new listener which is triggered for changes on the specified property.
+     *
+     * @param propertyName the name for identification of the property
+     * @param listener     the listener to be added
+     * @see PropertyChangeSupport#addPropertyChangeListener(String, PropertyChangeListener)
+     */
+    void addPropertyChangeListener(@Nonnull String propertyName, @Nonnull PropertyChangeListener listener);
 
-    void addPropertyChangeListener(String propertyName, PropertyChangeListener listener);
-
-    void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);
+    /**
+     * Removes the given listener from being triggered by changes of the specified property.
+     *
+     * @param propertyName the name for identification of the property
+     * @param listener     the listener to be removed
+     * @see PropertyChangeSupport#removePropertyChangeListener(String, PropertyChangeListener)
+     */
+    void removePropertyChangeListener(@Nonnull String propertyName, @Nonnull PropertyChangeListener listener);
 }

@@ -814,7 +814,7 @@ proofScript
 proof: PROOF EOF;
 
 // Config
-cfile: cvalue*;
+cfile: cvalue* EOF;
 //csection: LBRACKET IDENT RBRACKET;
 ckv: doc=DOC_COMMENT? ckey ':' cvalue;
 ckey: IDENT | STRING_LITERAL;
@@ -831,4 +831,4 @@ cvalue:
   | LBRACE
      (ckv (COMMA ckv)*)? COMMA?
     RBRACE #table
-  | LBRACKET (cvalue (COMMA cvalue)*)? RBRACKET #list;
+  | LBRACKET (cvalue (COMMA cvalue)*)? COMMA? RBRACKET #list;

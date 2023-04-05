@@ -151,7 +151,7 @@ public class SettingsManager {
         return settingsProviders.remove(o);
     }
 
-    public Action getActionShowSettings(MainWindow window) {
+    public static Action getActionShowSettings(MainWindow window) {
         class ShowSettingsAction extends KeyAction {
             private static final long serialVersionUID = 153753479823919818L;
 
@@ -163,7 +163,7 @@ public class SettingsManager {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                showSettingsDialog(window);
+                SettingsManager.getInstance().showSettingsDialog(window);
             }
         }
         return new ShowSettingsAction();

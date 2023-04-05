@@ -419,7 +419,7 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
 
         cat.set(KEY_TIMEOUT, timeout);
         cat.set(SHOW_SMT_RES_DIA, showResultsAfterExecution);
-        cat.set(PROGRESS_DIALOG_MODE, modeOfProgressDialog);
+        cat.set(PROGRESS_DIALOG_MODE, modeOfProgressDialog.toString());
         cat.set(PATH_FOR_SMT_TRANSLATION, pathForSMTTranslation);
         cat.set(PATH_FOR_TACLET_TRANSLATION, pathForTacletTranslation);
         cat.set(ACTIVE_SOLVER, activeSolver);

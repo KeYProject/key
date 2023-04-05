@@ -4,6 +4,8 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
@@ -12,33 +14,24 @@ import java.util.ArrayList;
  */
 class ConfigurationBuilder extends KeYParserBaseVisitor<Object> {
     private Configuration root;
-    private Configuration section;
 
     public Configuration getConfiguration() {
         return root;
     }
 
     @Override
-    public Object visitCfile(KeYParser.CfileContext ctx) {
-        section = root = new Configuration();
-        return null;
+    public List<Object> visitCfile(KeYParser.CfileContext ctx) {
+        return ctx.cvalue().stream().map(it -> it.accept(this)).collect(Collectors.toList());
     }
 
-    @Override
-    public Object visitCkv(KeYParser.CkvContext ctx) {
-        var name = ctx.ckey().getText();
-        var val = ctx.cvalue().accept(this);
-        section.set(name, val);
-        return null;
-    }
 
     @Override
-    public Object visitCsymbol(KeYParser.CsymbolContext ctx) {
+    public String visitCsymbol(KeYParser.CsymbolContext ctx) {
         return ctx.IDENT().getText();
     }
 
     @Override
-    public Object visitCstring(KeYParser.CstringContext ctx) {
+    public String visitCstring(KeYParser.CstringContext ctx) {
         final var text = ctx.getText();
         return text.substring(1, text.length() - 1)
                 .replace("\\\"", "\"")
@@ -82,13 +75,13 @@ class ConfigurationBuilder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitTable(KeYParser.TableContext ctx) {
-        var oldSection = section;
-        var table = section = new Configuration(new LinkedHashMap<>());
+        final var data = new LinkedHashMap<String, Object>();
         for (KeYParser.CkvContext context : ctx.ckv()) {
-            context.accept(this);
+            var name = context.ckey().getText();
+            var val = context.cvalue().accept(this);
+            data.put(name, val);
         }
-        section = oldSection;
-        return table;
+        return new Configuration(data);
     }
 
     @Override

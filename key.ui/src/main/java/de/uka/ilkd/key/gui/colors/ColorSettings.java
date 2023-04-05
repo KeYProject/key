@@ -104,6 +104,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
             ex.printStackTrace();
         }
 
+        LOGGER.info("Save color settings to: " + SETTINGS_FILE_NEW.getAbsolutePath());
         try (Writer writer = new FileWriter(SETTINGS_FILE_NEW)) {
             var config = new Configuration(properties);
             config.save(writer, "KeY's Colors");

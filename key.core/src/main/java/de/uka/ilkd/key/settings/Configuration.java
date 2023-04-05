@@ -2,6 +2,7 @@ package de.uka.ilkd.key.settings;
 
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.util.Position;
+import org.antlr.v4.runtime.CharStream;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,6 +30,10 @@ public class Configuration {
 
     public static Configuration load(File file) throws IOException {
         return ParsingFacade.readConfigurationFile(file);
+    }
+
+    public static Configuration load(CharStream input) throws IOException {
+        return ParsingFacade.readConfigurationFile(input);
     }
 
     public boolean exists(String name) {
@@ -102,6 +107,8 @@ public class Configuration {
 
     public List<String> getStringList(String name) {
         var seq = get(name, List.class);
+        if (seq == null)
+            return Collections.emptyList();
         if (!seq.stream().allMatch(it -> it instanceof String)) throw new AssertionError();
         return seq;
     }
@@ -144,6 +151,38 @@ public class Configuration {
         return data.put(name, obj);
     }
 
+    public Object set(String name, Boolean obj) {
+        return set(name, (Object) obj);
+    }
+
+    public Object set(String name, String obj) {
+        return set(name, (Object) obj);
+    }
+
+    public Object set(String name, Long obj) {
+        return set(name, (Object) obj);
+    }
+
+    public Object set(String name, int obj) {
+        return set(name, (long) obj);
+    }
+
+    public Object set(String name, Double obj) {
+        return set(name, (Object) obj);
+    }
+
+    public Object set(String name, Configuration obj) {
+        return set(name, (Object) obj);
+    }
+
+    public Object set(String name, List<?> obj) {
+        return set(name, (Object) obj);
+    }
+
+    public Object set(String name, String[] seq) {
+        return set(name, (Object) Arrays.asList(seq));
+    }
+
     public Set<Map.Entry<String, Object>> getEntries() {
         return data.entrySet();
     }
@@ -184,7 +223,7 @@ public class Configuration {
         }
     }
 
-    private static class ConfigurationWriter {
+    public static class ConfigurationWriter {
         private final PrintWriter out;
         private int indent;
 
@@ -217,7 +256,7 @@ public class Configuration {
             return this;
         }
 
-        private ConfigurationWriter printValue(Object value) {
+        public ConfigurationWriter printValue(Object value) {
             if (value instanceof String) {
                 out.format("\"%s\"", value);
             } else if (value instanceof Long || value instanceof Integer
