@@ -170,11 +170,12 @@ public class ChoiceSettings implements Settings, Cloneable {
      */
     public void writeSettings(Properties props) {
         StringBuilder choiceSequence = new StringBuilder();
-        for (final Map.Entry<String, String> entry : category2Default.entrySet()) {
+        var keys = category2Default.keySet().stream().sorted().toArray(String[]::new);
+        for (var key : keys) {
             if (choiceSequence.length() > 0) {
-                choiceSequence.append(" , ");
+                choiceSequence.append(", ");
             }
-            choiceSequence.append(entry.getKey()).append("-").append(entry.getValue());
+            choiceSequence.append(key).append("-").append(category2Default.get(key));
         }
         props.setProperty(DEFAULTCHOICES_KEY, choiceSequence.toString());
     }

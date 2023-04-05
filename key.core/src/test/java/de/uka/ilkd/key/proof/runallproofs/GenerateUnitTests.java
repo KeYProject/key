@@ -25,7 +25,8 @@ import org.slf4j.LoggerFactory;
  * This class is intended to be called from gradle. See the gradle task
  * {@code generateRunAllProofs}.
  * <p>
- * The considered proof collections files are configured statically in {@link #collections}.
+ * The considered proof collections files are configured statically in
+ * {@link #collections}.
  *
  * @author Alexander Weigl
  * @version 1 (6/14/20)
@@ -37,13 +38,9 @@ public class GenerateUnitTests {
      */
     private static String outputFolder;
 
-    /**
-     * List of considered proofs collections.
-     */
-    private final static String[] collections =
-        new String[] { RunAllProofsFunctional.INDEX_FILE, RunAllProofsInfFlow.INDEX_FILE };
-
     public static void main(String[] args) throws IOException {
+        var collections = new ProofCollection[] { ProofCollections.automaticJavaDL(),
+            ProofCollections.automaticInfFlow() };
         if (args.length != 1) {
             System.err.println("Usage: <main> <output-folder>");
             System.exit(1);
@@ -55,9 +52,7 @@ public class GenerateUnitTests {
         File out = new File(outputFolder);
         out.mkdirs();
 
-        for (String index : collections) {
-            LOGGER.info("Index file: {}", index);
-            ProofCollection col = RunAllProofsTest.parseIndexFile(index);
+        for (var col : collections) {
             for (RunAllProofsTestUnit unit : col.createRunAllProofsTestUnits()) {
                 createUnitClass(col, unit);
             }
@@ -82,7 +77,8 @@ public class GenerateUnitTests {
             + "\n" + "  $methods\n" + "\n" + "}\n";
 
     /**
-     * Generates the test classes for the given proof collection, and writes the java files.
+     * Generates the test classes for the given proof collection, and writes the
+     * java files.
      *
      * @param col
      * @param unit

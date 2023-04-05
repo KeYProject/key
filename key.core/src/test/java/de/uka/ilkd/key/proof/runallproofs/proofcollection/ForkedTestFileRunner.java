@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.IOForwarder;
@@ -30,9 +29,6 @@ public abstract class ForkedTestFileRunner implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String FORK_TIMEOUT_KEY = "forkTimeout";
-
-    private static final String FORK_DEBUG_PORT = "forkDebugPort";
 
     private static Path getLocationOfSerializedTestFiles(Path tempDirectory) {
         return Paths.get(tempDirectory.toString(), "TestFiles.serialized");
@@ -103,12 +99,12 @@ public abstract class ForkedTestFileRunner implements Serializable {
         List<String> command = pb.command();
 
         // TODO make sure no injection happens here?
-        String forkMemory = settings.get("forkMemory");
+        String forkMemory = settings.getForkMemory();
         if (forkMemory != null) {
             command.add("-Xmx" + forkMemory);
         }
 
-        String debugPort = settings.get(FORK_DEBUG_PORT);
+        String debugPort = settings.getForkDebugPort();
         if (debugPort != null) {
             String suspend = "n";
             if (debugPort.startsWith("wait:")) {
@@ -211,12 +207,12 @@ public abstract class ForkedTestFileRunner implements Serializable {
     private static void installTimeoutWatchdog(ProofCollectionSettings settings,
             final Path tempDirectory) {
 
-        String timeoutString = settings.get(FORK_TIMEOUT_KEY);
+        String timeoutString = settings.getForkTimeout();
         if (timeoutString == null) {
             return;
         }
 
-        final boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
+        final boolean verbose = settings.getVerboseOutput();
 
         final int timeout;
         try {
