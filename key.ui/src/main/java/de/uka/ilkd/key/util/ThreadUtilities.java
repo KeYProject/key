@@ -19,9 +19,9 @@ public final class ThreadUtilities {
      * @param runner Runnable capturing code to execute on the awt thread.
      */
     public static void invokeAndWait(Runnable runner) {
-        if (SwingUtilities.isEventDispatchThread())
+        if (SwingUtilities.isEventDispatchThread()) {
             runner.run();
-        else {
+        } else {
             try {
                 SwingUtilities.invokeAndWait(runner);
             } catch (InterruptedException e) {

@@ -43,8 +43,9 @@ public class TestDeclarationProgramVariableCollector {
 
     @BeforeEach
     public void setUp() {
-        if (down != 0)
+        if (down != 0) {
             return;
+        }
         final Recoder2KeY r2k = new Recoder2KeY(TacletForTests.services(), new NamespaceSet());
         for (int i = 0; i < jblocks.length; i++) {
             test_block[i] = r2k.readBlockWithEmptyContext(jblocks[i]);
@@ -54,8 +55,9 @@ public class TestDeclarationProgramVariableCollector {
     @AfterEach
     public void tearDown() {
         down++;
-        if (down < testCases)
+        if (down < testCases) {
             return;
+        }
         test_block = null;
     }
 

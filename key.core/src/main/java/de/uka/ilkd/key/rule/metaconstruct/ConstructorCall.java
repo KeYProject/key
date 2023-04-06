@@ -112,7 +112,7 @@ public class ConstructorCall extends ProgramTransformer {
         final ExecutionContext ec = svInst.getExecutionContext();
         final ImmutableArray<Expression> arguments = constructorReference.getArguments();
 
-        final ArrayList<Statement> evaluatedArgs = new ArrayList<Statement>();
+        final ArrayList<Statement> evaluatedArgs = new ArrayList<>();
 
         int j = 0;
         if (services.getJavaInfo().getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS,
@@ -148,11 +148,9 @@ public class ConstructorCall extends ProgramTransformer {
 
         // the assignment statements + the method body statement +
         // <allocateArea> for memory areas
-        final ArrayList<Statement> stmnts = new ArrayList<Statement>();
+        final ArrayList<Statement> stmnts = new ArrayList<>();
 
-        for (int i = 0, sz = evaluatedArgs.size(); i < sz; i++) {
-            stmnts.add(evaluatedArgs.get(i));
-        }
+        stmnts.addAll(evaluatedArgs);
 
         stmnts.add(mbs);
 

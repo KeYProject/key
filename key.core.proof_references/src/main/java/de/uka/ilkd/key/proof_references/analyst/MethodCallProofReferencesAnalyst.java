@@ -6,7 +6,6 @@ import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodReference;
@@ -50,14 +49,14 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
                     IProofReference<IProgramMethod> reference = createReference(node, services,
                         context, (MethodReference) info.getActiveStatement());
                     LinkedHashSet<IProofReference<?>> result =
-                        new LinkedHashSet<IProofReference<?>>();
+                        new LinkedHashSet<>();
                     result.add(reference);
                     return result;
                 } else if (info.getActiveStatement() instanceof Assignment) {
                     Assignment assignment = (Assignment) info.getActiveStatement();
                     ExecutionContext context = extractContext(node, services);
                     LinkedHashSet<IProofReference<?>> result =
-                        new LinkedHashSet<IProofReference<?>>();
+                        new LinkedHashSet<>();
                     for (int i = 0; i < assignment.getChildCount(); i++) {
                         ProgramElement child = assignment.getChildAt(i);
                         if (child instanceof MethodReference) {
@@ -106,7 +105,7 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
         if (context != null) {
             KeYJavaType refPrefixType = mr.determineStaticPrefixType(services, context);
             IProgramMethod pm = mr.method(services, refPrefixType, context);
-            return new DefaultProofReference<IProgramMethod>(IProofReference.CALL_METHOD, node, pm);
+            return new DefaultProofReference<>(IProofReference.CALL_METHOD, node, pm);
         } else {
             if (!(node.getAppliedRuleApp() instanceof PosTacletApp)) {
                 throw new IllegalArgumentException("PosTacletApp expected.");
@@ -131,8 +130,8 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
                 throw new IllegalArgumentException("Empty argument list expected.");
             }
             IProgramMethod pm = services.getJavaInfo().getProgramMethod(type.getKeYJavaType(),
-                method.toString(), ImmutableSLList.<Type>nil(), type.getKeYJavaType());
-            return new DefaultProofReference<IProgramMethod>(IProofReference.CALL_METHOD, node, pm);
+                method.toString(), ImmutableSLList.nil(), type.getKeYJavaType());
+            return new DefaultProofReference<>(IProofReference.CALL_METHOD, node, pm);
         }
     }
 }

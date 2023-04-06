@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.proof.init;
 
-import java.util.Iterator;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -42,11 +41,10 @@ public abstract class AbstractProfile implements Profile {
     private static ImmutableSet<String> extractNames(
             ImmutableSet<GoalChooserBuilder> supportedGCB) {
 
-        ImmutableSet<String> result = DefaultImmutableSet.<String>nil();
+        ImmutableSet<String> result = DefaultImmutableSet.nil();
 
-        final Iterator<GoalChooserBuilder> it = supportedGCB.iterator();
-        while (it.hasNext()) {
-            result = result.add(it.next().name());
+        for (GoalChooserBuilder goalChooserBuilder : supportedGCB) {
+            result = result.add(goalChooserBuilder.name());
         }
 
         return result;
@@ -87,7 +85,7 @@ public abstract class AbstractProfile implements Profile {
     }
 
     protected ImmutableSet<StrategyFactory> getStrategyFactories() {
-        return DefaultImmutableSet.<StrategyFactory>nil();
+        return DefaultImmutableSet.nil();
     }
 
     protected ImmutableList<BuiltInRule> initBuiltInRules() {
@@ -104,9 +102,7 @@ public abstract class AbstractProfile implements Profile {
     }
 
     public StrategyFactory getStrategyFactory(Name n) {
-        Iterator<StrategyFactory> it = getStrategyFactories().iterator();
-        while (it.hasNext()) {
-            final StrategyFactory sf = it.next();
+        for (StrategyFactory sf : getStrategyFactories()) {
             if (sf.name().equals(n)) {
                 return sf;
             }
@@ -154,9 +150,7 @@ public abstract class AbstractProfile implements Profile {
      *         supported
      */
     public GoalChooserBuilder lookupGC(String name) {
-        final Iterator<GoalChooserBuilder> it = supportedGCB.iterator();
-        while (it.hasNext()) {
-            final GoalChooserBuilder supprotedGCB = it.next();
+        for (GoalChooserBuilder supprotedGCB : supportedGCB) {
             if (supprotedGCB.name().equals(name)) {
                 return supprotedGCB.copy();
             }

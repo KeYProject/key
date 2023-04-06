@@ -40,7 +40,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     /**
      * the type that is used for schema variables types.
      */
-    private static KeYJavaType typeSVType =
+    private static final KeYJavaType typeSVType =
         new KeYJavaType(PrimitiveType.PROGRAM_SV, ProgramSVSort.TYPE);
 
     /**
@@ -89,9 +89,9 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             }
             ProgramSV[] svw = mc.getSV();
             ProgramSV execSV = null;
-            for (int i = 0; i < svw.length; i++) {
-                if (svw[i].sort() == ProgramSVSort.EXECUTIONCONTEXT) {
-                    execSV = svw[i];
+            for (ProgramSV programSV : svw) {
+                if (programSV.sort() == ProgramSVSort.EXECUTIONCONTEXT) {
+                    execSV = programSV;
                     break;
                 }
             }
@@ -104,12 +104,12 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             ProgramSV[] svw = mc.getSV();
             ProgramSV execSV = null;
             ProgramSV returnSV = null;
-            for (int i = 0; i < svw.length; i++) {
-                if (svw[i].sort() == ProgramSVSort.VARIABLE) {
-                    returnSV = svw[i];
+            for (ProgramSV programSV : svw) {
+                if (programSV.sort() == ProgramSVSort.VARIABLE) {
+                    returnSV = programSV;
                 }
-                if (svw[i].sort() == ProgramSVSort.EXECUTIONCONTEXT) {
-                    execSV = svw[i];
+                if (programSV.sort() == ProgramSVSort.EXECUTIONCONTEXT) {
+                    execSV = programSV;
                 }
             }
             return new MethodCall(execSV, returnSV, list.get(Expression.class));
@@ -132,7 +132,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         } else if ("#reattachLoopInvariant".equals(mcName)) {
             return new ReattachLoopInvariant(list.get(LoopStatement.class));
         } else {
-            throw new ConvertException("Program meta construct " + mc.toString() + " unknown.");
+            throw new ConvertException("Program meta construct " + mc + " unknown.");
         }
     }
 
@@ -153,7 +153,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         } else if ("#length-reference".equals(mcName)) {
             return new ArrayLength(list.get(Expression.class));
         } else {
-            throw new ConvertException("Program meta construct " + mc.toString() + " unknown.");
+            throw new ConvertException("Program meta construct " + mc + " unknown.");
         }
     }
 
@@ -168,7 +168,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         if ("#typeof".equals(mc.getName0())) {
             return new TypeOf(list.get(Expression.class));
         } else {
-            throw new ConvertException("Program meta construct " + mc.toString() + " unknown.");
+            throw new ConvertException("Program meta construct " + mc + " unknown.");
         }
     }
 
@@ -364,7 +364,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
 
         // there is no explicit PackageReference convert method
         // but the cast is safe.
-        PackageReference packref = result != null ? (PackageReference) convert(result) : null;
+        PackageReference packref = result != null ? convert(result) : null;
 
         return new SchemaTypeReference(new ProgramElementName(tr.getName()), tr.getDimensions(),
             packref);
@@ -438,7 +438,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             keyArgs[i] = (Expression) callConvert(recoderArgs.get(i));
         }
 
-        return new MethodReference(new ImmutableArray<Expression>(keyArgs), name, prefix);
+        return new MethodReference(new ImmutableArray<>(keyArgs), name, prefix);
     }
 
     /**

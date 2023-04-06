@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Timer;
@@ -144,7 +145,7 @@ public class EditSourceFileAction extends KeyAction {
             try {
                 doc.insertString(0, source, new SimpleAttributeSet());
             } catch (BadLocationException e) {
-                e.printStackTrace();
+                LOGGER.warn("Failed insert string", e);
             }
             textPane.setDocument(doc);
 
@@ -180,7 +181,7 @@ public class EditSourceFileAction extends KeyAction {
                                     textPane.setSelectionStart(start);
                                     textPane.setSelectionEnd(end);
                                 } catch (BadLocationException ex) {
-                                    ex.printStackTrace();
+                                    LOGGER.warn("Failed update document", ex);
                                 }
                                 textPane.repaint();
                             }
@@ -239,7 +240,7 @@ public class EditSourceFileAction extends KeyAction {
                     // workaround for #1641: replace "\n" with system dependent line separators when
                     // saving
                     String text = textPane.getText().replace("\n", System.lineSeparator());
-                    Files.write(sourceFile.toPath(), text.getBytes());
+                    Files.write(sourceFile.toPath(), text.getBytes(StandardCharsets.UTF_8));
                 } catch (IOException ioe) {
                     String message = "Cannot write to file:\n" + ioe.getMessage();
                     JOptionPane.showMessageDialog(parent, message);

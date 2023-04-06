@@ -37,13 +37,10 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, String> arguments) {
+    public Parameters evaluateArguments(EngineState state, Map<String, String> arguments)
+            throws Exception {
         Parameters args = new Parameters();
-        try {
-            ValueInjector.getInstance().inject(this, args, arguments);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        ValueInjector.getInstance().inject(this, args, arguments);
         return args;
     }
 
@@ -75,8 +72,9 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
 
         // set the max number of steps if given
         int oldNumberOfSteps = state.getMaxAutomaticSteps();
-        if (arguments.getSteps() > 0)
+        if (arguments.getSteps() > 0) {
             state.setMaxAutomaticSteps(arguments.getSteps());
+        }
 
         // Give some feedback
         applyStrategy.addProverTaskObserver(uiControl);

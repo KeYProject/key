@@ -36,7 +36,7 @@ public class ModelGenerator implements SolverLauncherListener {
 
     private final Services services;
 
-    private Goal goal;
+    private final Goal goal;
 
     private int count;
 
@@ -51,7 +51,7 @@ public class ModelGenerator implements SolverLauncherListener {
         this.goal = s;
         this.services = services;
         this.target = target;
-        models = new LinkedList<Model>();
+        models = new LinkedList<>();
         this.count = 0;
     }
 

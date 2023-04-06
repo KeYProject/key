@@ -110,16 +110,21 @@ public class InterfaceDeclaration extends TypeDeclaration {
 
     public int getChildCount() {
         int result = 0;
-        if (declarationSpecifiers != null)
+        if (declarationSpecifiers != null) {
             result += declarationSpecifiers.size();
-        if (name != null)
+        }
+        if (name != null) {
             result++;
-        if (extending != null)
+        }
+        if (extending != null) {
             result++;
-        if (members != null)
+        }
+        if (members != null) {
             result += members.size();
-        if (typeParameters != null)
+        }
+        if (typeParameters != null) {
             result += typeParameters.size();
+        }
         return result;
     }
 
@@ -141,19 +146,22 @@ public class InterfaceDeclaration extends TypeDeclaration {
             index -= len;
         }
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (typeParameters != null) {
             len = typeParameters.size();
-            if (len > index)
+            if (len > index) {
                 return typeParameters.get(index);
+            }
             index -= len;
         }
         if (extending != null) {
-            if (index == 0)
+            if (index == 0) {
                 return extending;
+            }
             index--;
         }
         if (members != null) {
@@ -179,10 +187,12 @@ public class InterfaceDeclaration extends TypeDeclaration {
                 return (index << 4) | 0;
             }
         }
-        if (name == child)
+        if (name == child) {
             return 1;
-        if (extending == child)
+        }
+        if (extending == child) {
             return 2;
+        }
         if (members != null) {
             int index = members.indexOf(child);
             if (index >= 0) {

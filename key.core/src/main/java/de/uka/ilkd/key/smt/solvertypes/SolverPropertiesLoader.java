@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -185,14 +186,13 @@ public class SolverPropertiesLoader {
             return name;
         }
         // if NAME was already used, use <NAME>_<counter> as NAME and increase counter afterwards
-        StringBuilder nameBuilder = new StringBuilder();
-        nameBuilder.append(name);
-        nameBuilder.append("_");
-        nameBuilder.append(counter);
+        String nameBuilder = name +
+            "_" +
+            counter;
         counter++;
         NAME_COUNTERS.put(name, counter);
         // <NAME>_<counter> is now also a NAME that has been used and must be unique
-        return uniqueName(nameBuilder.toString());
+        return uniqueName(nameBuilder);
     }
 
     /**
@@ -323,7 +323,8 @@ public class SolverPropertiesLoader {
                     }
                     // load solvers from this single solvers.txt
                     Collection<Properties> props = new ArrayList<>();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+                    BufferedReader reader =
+                        new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
                     List<String> propsNames = reader.lines().collect(Collectors.toList());
                     for (String fileName : propsNames.stream().filter(n -> n.endsWith(".props"))
                             .collect(Collectors.toList())) {

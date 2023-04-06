@@ -21,7 +21,7 @@ public class ProgramSVInstantiation {
         new ProgramSVInstantiation();
 
     /** the map with the instantiations */
-    private ImmutableList<ProgramSVEntry> list = ImmutableSLList.<ProgramSVEntry>nil();
+    private ImmutableList<ProgramSVEntry> list = ImmutableSLList.nil();
 
     /** integer to cache the hashcode */
     private int hashcode = 0;
@@ -164,7 +164,7 @@ public class ProgramSVInstantiation {
 
     /** toString */
     public String toString() {
-        StringBuffer result = new StringBuffer("ProgramSVInstantiation:\n");
+        StringBuilder result = new StringBuilder("ProgramSVInstantiation:\n");
         return (result.append(list.toString())).toString();
     }
 }

@@ -67,7 +67,7 @@ public class RenameType extends TwoPassTransformation {
      * @return the problem report.
      */
     public ProblemReport analyze() {
-        refs = new ArrayList<TypeReference>();
+        refs = new ArrayList<>();
         if (newName.equals(type.getName())) {
             return setProblemReport(IDENTITY);
         }
@@ -75,7 +75,7 @@ public class RenameType extends TwoPassTransformation {
         refs.addAll(getCrossReferenceSourceInfo().getReferences(type));
         cons = type.getConstructors();
         if (cons == null) {
-            cons = new ArrayList<Constructor>(0);
+            cons = new ArrayList<>(0);
         }
         Type atype = ni.getArrayType(type);
         while (atype != null) {

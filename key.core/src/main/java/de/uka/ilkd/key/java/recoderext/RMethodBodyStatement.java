@@ -83,16 +83,21 @@ public class RMethodBodyStatement extends JavaStatement implements KeYRecoderExt
 
     public int getChildCount() {
         int result = 0;
-        if (bodySource != null)
+        if (bodySource != null) {
             result++;
-        if (resultVar != null)
+        }
+        if (resultVar != null) {
             result++;
-        if (methodReferencePrefix != null)
+        }
+        if (methodReferencePrefix != null) {
             result++;
-        if (methodName != null)
+        }
+        if (methodName != null) {
             result++;
-        if (arguments != null)
+        }
+        if (arguments != null) {
             result += arguments.size();
+        }
         return result;
     }
 
@@ -106,23 +111,27 @@ public class RMethodBodyStatement extends JavaStatement implements KeYRecoderExt
 
     public ProgramElement getChildAt(int index) {
         if (bodySource != null) {
-            if (index == 0)
+            if (index == 0) {
                 return bodySource;
+            }
             index--;
         }
         if (resultVar != null) {
-            if (index == 0)
+            if (index == 0) {
                 return resultVar;
+            }
             index--;
         }
         if (methodReferencePrefix != null) {
-            if (index == 0)
+            if (index == 0) {
                 return methodReferencePrefix;
+            }
             index--;
         }
         if (methodName != null) {
-            if (index == 0)
+            if (index == 0) {
                 return methodName;
+            }
             index--;
         }
         if (arguments != null) {
@@ -178,8 +187,8 @@ public class RMethodBodyStatement extends JavaStatement implements KeYRecoderExt
         }
 
         if (arguments != null) {
-            for (int i = 0, sz = arguments.size(); i < sz; i++) {
-                arguments.get(i).setExpressionContainer(this);
+            for (Expression argument : arguments) {
+                argument.setExpressionContainer(this);
             }
         }
     }
@@ -199,8 +208,9 @@ public class RMethodBodyStatement extends JavaStatement implements KeYRecoderExt
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null)
+        if (p == null) {
             throw new NullPointerException();
+        }
         if (bodySource == p) {
             TypeReference r = (TypeReference) q;
             bodySource = r;

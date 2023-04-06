@@ -18,7 +18,7 @@ public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpda
         super(op);
         if (op.lhs() instanceof LocationVariable) {
             leftHandSide =
-                new MatchOpIdentityInstruction<LocationVariable>((LocationVariable) op.lhs());
+                new MatchOpIdentityInstruction<>((LocationVariable) op.lhs());
         } else {
             assert op.lhs() instanceof ProgramSV;
             leftHandSide = (MatchOperatorInstruction) TacletMatchProgram

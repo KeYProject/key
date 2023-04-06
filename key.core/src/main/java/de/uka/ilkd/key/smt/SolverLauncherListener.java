@@ -9,8 +9,8 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
  */
 public interface SolverLauncherListener {
 
-    public void launcherStopped(SolverLauncher launcher, Collection<SMTSolver> finishedSolvers);
+    void launcherStopped(SolverLauncher launcher, Collection<SMTSolver> finishedSolvers);
 
-    public void launcherStarted(Collection<SMTProblem> problems, Collection<SolverType> solverTypes,
+    void launcherStarted(Collection<SMTProblem> problems, Collection<SolverType> solverTypes,
             SolverLauncher launcher);
 }

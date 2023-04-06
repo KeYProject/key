@@ -3,7 +3,6 @@ package de.uka.ilkd.key.symbolic_execution.profile;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -64,7 +63,7 @@ public class SimplifyTermProfile extends JavaProfile {
                             goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars,
                             newTermJavaBlock, newTermOriginalLabels, label) -> label);
         result = result.prepend(new TermLabelConfiguration(SymbolicExecutionUtil.RESULT_LABEL_NAME,
-            new SingletonLabelFactory<TermLabel>(SymbolicExecutionUtil.RESULT_LABEL), null,
+            new SingletonLabelFactory<>(SymbolicExecutionUtil.RESULT_LABEL), null,
             symExcPolicies, null, null, null, null, null));
         return result;
     }

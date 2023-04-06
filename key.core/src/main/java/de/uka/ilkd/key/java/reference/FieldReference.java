@@ -53,10 +53,12 @@ public class FieldReference extends VariableReference
      */
     public int getChildCount() {
         int result = 0;
-        if (prefix != null)
+        if (prefix != null) {
             result++;
-        if (variable != null)
+        }
+        if (variable != null) {
             result++;
+        }
         return result;
     }
 
@@ -69,13 +71,15 @@ public class FieldReference extends VariableReference
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0)
+            if (index == 0) {
                 return prefix;
+            }
             index--;
         }
         if (variable != null) {
-            if (index == 0)
+            if (index == 0) {
                 return variable;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

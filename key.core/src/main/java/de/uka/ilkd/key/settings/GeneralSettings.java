@@ -168,8 +168,9 @@ public class GeneralSettings extends AbstractSettings {
         if (val != null) {
             try {
                 setAutoSave(Integer.parseInt(val));
-                if (autoSave < 0)
+                if (autoSave < 0) {
                     setAutoSave(0);
+                }
             } catch (NumberFormatException e) {
                 setAutoSave(0);
             }
@@ -190,11 +191,11 @@ public class GeneralSettings extends AbstractSettings {
      */
     @Override
     public void writeSettings(Properties props) {
-        props.setProperty(TACLET_FILTER, "" + tacletFilter);
-        props.setProperty(DND_DIRECTION_SENSITIVE_KEY, "" + dndDirectionSensitive);
-        props.setProperty(RIGHT_CLICK_MACROS_KEY, "" + rightClickMacros);
-        props.setProperty(USE_JML_KEY, "" + useJML);
-        props.setProperty(AUTO_SAVE, "" + autoSave);
-        props.setProperty(ENSURE_SOURCE_CONSISTENCY, "" + ensureSourceConsistency);
+        props.setProperty(TACLET_FILTER, String.valueOf(tacletFilter));
+        props.setProperty(DND_DIRECTION_SENSITIVE_KEY, String.valueOf(dndDirectionSensitive));
+        props.setProperty(RIGHT_CLICK_MACROS_KEY, String.valueOf(rightClickMacros));
+        props.setProperty(USE_JML_KEY, String.valueOf(useJML));
+        props.setProperty(AUTO_SAVE, String.valueOf(autoSave));
+        props.setProperty(ENSURE_SOURCE_CONSISTENCY, String.valueOf(ensureSourceConsistency));
     }
 }

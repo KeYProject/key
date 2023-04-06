@@ -168,7 +168,8 @@ public abstract class AbstractIndex implements HashCode {
     }
 
     public void clear() {
-        for (int index = table.length; --index >= 0; table[index] = null);
+        for (int index = table.length; --index >= 0; table[index] = null) {
+        }
         count = 0;
     }
 
@@ -210,7 +211,7 @@ public abstract class AbstractIndex implements HashCode {
 
     public String toString() {
         int max = size() - 1;
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         Enumeration e = elements();
         buf.append("{");
         for (int i = 0; i <= max; i++) {
@@ -229,7 +230,7 @@ public abstract class AbstractIndex implements HashCode {
     static class Enumerator implements Enumeration {
         int index;
 
-        Object[] table;
+        final Object[] table;
 
         Enumerator(Object[] table) {
             this.table = table;

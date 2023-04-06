@@ -280,7 +280,7 @@ public class MiscKit {
         Debug.assertNonnull(parent, child);
         ASTList<Import> list = parent.getImports();
         if (list == null) {
-            parent.setImports(new ASTArrayList<Import>(child));
+            parent.setImports(new ASTArrayList<>(child));
         } else {
             if (asHead) {
                 list.add(0, child);
@@ -331,7 +331,7 @@ public class MiscKit {
         Debug.assertNonnull(parent, child);
         ASTList<Statement> list = parent.getBody();
         if (list == null) {
-            parent.setBody(new ASTArrayList<Statement>(child));
+            parent.setBody(new ASTArrayList<>(child));
         } else {
             if (asHead) {
                 list.add(0, child);

@@ -59,6 +59,7 @@ application {
 
 run {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
+    //systemProperties["slf4j.detectLoggerNameMismatch"] = true
     //systemProperties["KeyDebugFlag"] = "on"
     //args "--experimental"
 
@@ -101,7 +102,7 @@ List<String> scanReadmeFiles() {
     for (String line : Files.readAllLines(examplesIndex)) {
         line = line.trim()
         if (line.isEmpty() || line.startsWith("#")) {
-            continue;
+            continue
         }
 
         def readme = Paths.get(projectDir.toString(), "examples",
@@ -112,9 +113,9 @@ List<String> scanReadmeFiles() {
         // default file.
         result.add(dir + "project.key")
         for (String rmLine : Files.readAllLines(readme)) {
-            if(rmLine.startsWith("#")) continue;
+            if(rmLine.startsWith("#")) continue
             def parts = rmLine.split("=", 2)
-            if (parts.length < 2) break;
+            if (parts.length < 2) break
             def key = parts[0].trim()
             if(key.containsIgnoreCase("file")) {
                 def filename = parts[1].trim()

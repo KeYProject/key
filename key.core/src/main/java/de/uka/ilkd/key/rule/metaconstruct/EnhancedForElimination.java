@@ -437,9 +437,9 @@ public class EnhancedForElimination extends ProgramTransformer {
 
         Optional<Term> maybeVariant = Optional.ofNullable(rawInv.getInternalVariant());
         final Map<LocationVariable, Term> newInvs = //
-            new LinkedHashMap<LocationVariable, Term>(rawInv.getInternalInvariants());
+            new LinkedHashMap<>(rawInv.getInternalInvariants());
         final Map<LocationVariable, Term> newFreeInvs = //
-            new LinkedHashMap<LocationVariable, Term>(rawInv.getInternalFreeInvariants());
+            new LinkedHashMap<>(rawInv.getInternalFreeInvariants());
 
         // replace index
         updateInvs(newInvs, tb.index(), loopIdxVar, services);
@@ -471,7 +471,7 @@ public class EnhancedForElimination extends ProgramTransformer {
             final ProgramVariable replaceWith, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
         invs.entrySet().stream().filter(entry -> entry.getValue() != null)
-                .map(entry -> new Pair<LocationVariable, Term>(entry.getKey(),
+                .map(entry -> new Pair<>(entry.getKey(),
                     GenericTermReplacer.replace(entry.getValue(), termToReplace::equals,
                         t -> tb.var(replaceWith), services)))
                 .forEach(p -> invs.put(p.first, p.second));

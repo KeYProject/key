@@ -126,7 +126,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
     @Override
     public Object visitTransform_decl(KeYParser.Transform_declContext ctx) {
-        Sort retSort = (Sort) (ctx.FORMULA() != null ? Sort.FORMULA : accept(ctx.sortId()));
+        Sort retSort = ctx.FORMULA() != null ? Sort.FORMULA : accept(ctx.sortId());
         String trans_name = accept(ctx.funcpred_name());
         List<Sort> argSorts = accept(ctx.arg_sorts_or_formula());
         Transformer t =

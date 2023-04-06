@@ -21,8 +21,9 @@ import org.key_project.util.collection.ImmutableSLList;
  */
 public class BoundUniquenessChecker {
 
-    private HashSet<QuantifiableVariable> boundVars = new LinkedHashSet<QuantifiableVariable>();
-    private ImmutableList<Term> terms = ImmutableSLList.<Term>nil();
+    private final HashSet<QuantifiableVariable> boundVars =
+        new LinkedHashSet<>();
+    private ImmutableList<Term> terms = ImmutableSLList.nil();
 
     public BoundUniquenessChecker(Sequent seq) {
         addAll(seq);
@@ -58,7 +59,7 @@ public class BoundUniquenessChecker {
         /*
          * Note that a term can bound a variable in several subterms.
          */
-        final HashSet<QuantifiableVariable> localVars = new LinkedHashSet<QuantifiableVariable>(10);
+        final HashSet<QuantifiableVariable> localVars = new LinkedHashSet<>(10);
 
         for (int i = 0, ar = t.arity(); i < ar; i++) {
             for (int j = 0, sz = t.varsBoundHere(i).size(); j < sz; j++) {

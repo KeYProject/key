@@ -18,7 +18,7 @@ public abstract class ShowDisplayPane implements NotificationAction {
      * the message to be displayed
      */
     private String message = "";
-    protected Frame parentComponent;
+    protected final Frame parentComponent;
 
 
     /**

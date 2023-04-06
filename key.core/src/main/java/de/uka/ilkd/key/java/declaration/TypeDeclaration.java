@@ -375,7 +375,8 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     public boolean equals(Object o) {
         if (o instanceof TypeDeclaration) {
             return ((TypeDeclaration) o).fullName.equals(fullName);
-        } else
+        } else {
             return false;
+        }
     }
 }

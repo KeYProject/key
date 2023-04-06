@@ -44,19 +44,23 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
     @Override
     protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, Goal goal) {
         if (t1.op() == Z) {
-            if (t2.op() != Z)
+            if (t2.op() != Z) {
                 return true;
+            }
             return super.lessThan(t1, t2, focus, goal);
         } else {
-            if (t2.op() == Z)
+            if (t2.op() == Z) {
                 return false;
+            }
         }
 
         final int v = introductionTime(t2.op(), goal) - introductionTime(t1.op(), goal);
-        if (v < 0)
+        if (v < 0) {
             return true;
-        if (v > 0)
+        }
+        if (v > 0) {
             return false;
+        }
 
         return super.lessThan(t1, t2, focus, goal);
     }

@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 
@@ -170,7 +169,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         this.decreases = decreases;
         this.services = services;
 
-        Set<Label> loopLabels = new HashSet<Label>();
+        Set<Label> loopLabels = new HashSet<>();
         Label outerLabel = new ProgramElementName("breakLoop");
         Label innerLabel = new ProgramElementName("continueLoop");
         loopLabels.add(outerLabel);
@@ -259,7 +258,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         this.services = services;
         this.loop = loop;
 
-        Set<Label> loopLabels = new HashSet<Label>();
+        Set<Label> loopLabels = new HashSet<>();
         Label outerLabel = new ProgramElementName("breakLoop");
         Label innerLabel = new ProgramElementName("continueLoop");
         loopLabels.add(outerLabel);
@@ -777,15 +776,15 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             final OpReplacer replacer = createOpReplacer(index, values, services);
 
             final Map<LocationVariable, Term> newPreconditions =
-                new LinkedHashMap<LocationVariable, Term>();
+                new LinkedHashMap<>();
             final Map<LocationVariable, Term> newFreePreconditions =
-                new LinkedHashMap<LocationVariable, Term>();
+                new LinkedHashMap<>();
             final Map<LocationVariable, Term> newPostconditions =
-                new LinkedHashMap<LocationVariable, Term>();
+                new LinkedHashMap<>();
             final Map<LocationVariable, Term> newFreePostconditions =
-                new LinkedHashMap<LocationVariable, Term>();
+                new LinkedHashMap<>();
             final Map<LocationVariable, Term> newModifiesClauses =
-                new LinkedHashMap<LocationVariable, Term>();
+                new LinkedHashMap<>();
 
             final Term newMeasuredBy = replacer.replace(measuredBy);
             final Term newDecreases = replacer.replace(decreases);
@@ -877,7 +876,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         /**
          * @see LoopContract#getDecreases()
          */
-        private Term decreases;
+        private final Term decreases;
 
         /**
          * {@code null} if this contracts belongs to a block instead of a loop, the loop this
@@ -1000,9 +999,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             final Map<LocationVariable, Term> result = super.buildPreconditions();
 
             if (decreases != null) {
-                for (Entry<LocationVariable, Term> entry : result.entrySet()) {
-                    result.put(entry.getKey(), and(entry.getValue(), geq(decreases, zero())));
-                }
+                result.replaceAll((k, v) -> and(v, geq(decreases, zero())));
             }
 
             return result;
@@ -1033,13 +1030,13 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             }
 
             final LoopContract head = contracts[0];
-            String baseName = head.getBaseName();
+            StringBuilder baseName = new StringBuilder(head.getBaseName());
 
             for (int i = 1; i < contracts.length; i++) {
                 assert contracts[i].getBlock().equals(head.getBlock());
 
-                baseName += SpecificationRepository.CONTRACT_COMBINATION_MARKER
-                        + contracts[i].getBaseName();
+                baseName.append(SpecificationRepository.CONTRACT_COMBINATION_MARKER)
+                        .append(contracts[i].getBaseName());
             }
 
             placeholderVariables = head.getPlaceholderVariables();
@@ -1053,7 +1050,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
                 functionalContracts = functionalContracts.union(contract.getFunctionalContracts());
             }
 
-            Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<LocationVariable, Boolean>();
+            Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 boolean hm = false;
 
@@ -1064,7 +1061,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             }
 
             LoopContractImpl result =
-                new LoopContractImpl(baseName, head.getBlock(), head.getLabels(), head.getMethod(),
+                new LoopContractImpl(baseName.toString(), head.getBlock(), head.getLabels(),
+                    head.getMethod(),
                     head.getModality(), preconditions, freePreconditions, contracts[0].getMby(),
                     postconditions, freePostconditions, modifiesClauses, head.getInfFlowSpecs(),
                     placeholderVariables, head.isTransactionApplicable(), hasMod,

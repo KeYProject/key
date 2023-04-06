@@ -5,7 +5,7 @@ import java.util.Set;
 
 public class OracleLocationSet {
 
-    private Set<OracleLocation> locs;
+    private final Set<OracleLocation> locs;
 
     public static final EmptyOracleLocationSet EMPTY = new EmptyOracleLocationSet();
 
@@ -13,7 +13,7 @@ public class OracleLocationSet {
 
 
     public OracleLocationSet() {
-        locs = new HashSet<OracleLocation>();
+        locs = new HashSet<>();
     }
 
     private void add(OracleLocation loc) {
@@ -108,18 +108,18 @@ public class OracleLocationSet {
         }
 
 
-        String result = "";
+        StringBuilder result = new StringBuilder();
 
-        result += "{";
+        result.append("{");
 
         for (OracleLocation loc : locs) {
-            result += loc + " ";
+            result.append(loc).append(" ");
         }
 
-        result += "}";
+        result.append("}");
 
 
-        return result;
+        return result.toString();
 
 
     }

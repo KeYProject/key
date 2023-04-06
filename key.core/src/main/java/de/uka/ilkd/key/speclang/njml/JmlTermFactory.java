@@ -368,8 +368,9 @@ public final class JmlTermFactory {
             t = bounded.apply(lv, lowerBound(t1, lv), upperBound(t1, lv), t2);
         }
 
-        if (resultType == null)
+        if (resultType == null) {
             resultType = services.getTypeConverter().getKeYJavaType(t2);
+        }
 
         // cast to specific JML type (fixes bug #1347)
         return buildBigintTruncationExpression(resultType, t);
@@ -493,8 +494,9 @@ public final class JmlTermFactory {
     }
 
     public SLExpression dlKeyword(String name, ImmutableList<SLExpression> list) {
-        if (name.startsWith("\\dl_"))
+        if (name.startsWith("\\dl_")) {
             name = name.substring(4);
+        }
         return translateToJDLTerm(name, list);
     }
 
@@ -681,7 +683,7 @@ public final class JmlTermFactory {
             throw exc.createException0("Illegal Arguments in equality expression.");
         } catch (TermCreationException e) {
             throw exc.createException0(
-                "Error in equality-expression\n" + a.toString() + " == " + b.toString() + ".");
+                "Error in equality-expression\n" + a + " == " + b.toString() + ".");
         }
     }
     // endregion
@@ -954,9 +956,7 @@ public final class JmlTermFactory {
     // region clauses
     public Term signalsOnly(ImmutableList<KeYJavaType> signalsonly, ProgramVariable excVar) {
         Term result = tb.ff();
-        Iterator<KeYJavaType> it = signalsonly.iterator();
-        while (it.hasNext()) {
-            KeYJavaType kjt = it.next();
+        for (KeYJavaType kjt : signalsonly) {
             Function instance = kjt.getSort().getInstanceofSymbol(services);
             result = tb.or(result, tb.equals(tb.func(instance, tb.var(excVar)), tb.TRUE()));
         }
@@ -991,14 +991,16 @@ public final class JmlTermFactory {
             SLExpression mby) {
         LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
 
-        if (!lhs.isTerm())
+        if (!lhs.isTerm()) {
             throw exc.createException0(
                 "Left hand side of depends clause should be a term, given:" + lhs);
+        }
 
-        if (!(lhs.getTerm().op() instanceof IObserverFunction))
+        if (!(lhs.getTerm().op() instanceof IObserverFunction)) {
             throw exc.createException0(
                 "Left hand side of depends clause should be of type IObserverFunction, given:"
                     + lhs.getTerm().op().getClass());
+        }
 
         if (lhs.getTerm().sub(0).op() != heap) {
             throw exc.createException0("Depends clause should be heap dependent of heap " + heap
@@ -1098,14 +1100,14 @@ public final class JmlTermFactory {
      * Get non-critical warnings.
      */
     public @Nonnull List<PositionedString> getWarnings() {
-        return new ArrayList<PositionedString>(warnings);
+        return new ArrayList<>(warnings);
     }
 
     /**
      * Get non-critical warnings.
      */
     public @Nonnull String getWarningsAsString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (PositionedString s : warnings) {
             sb.append(s.toString());
             sb.append("\n");
@@ -1155,77 +1157,6 @@ public final class JmlTermFactory {
         return new SLExpression(t, type);
     }
     // endregion
-
-    /*
-     * Translate a function name together with a list of arguments to a JDL term.
-     */
-    public SLExpression translateToJDLTerm(Token escape, final String functName, Services services,
-            TermBuilder tb, ImmutableList<SLExpression> list) {
-        Namespace<Function> funcs = services.getNamespaces().functions();
-        Named symbol = funcs.lookup(new Name(functName));
-
-        if (symbol != null) {
-            // Function or predicate symbol found
-
-            assert symbol instanceof Function : "Expecting a function symbol in this namespace";
-            Function function = (Function) symbol;
-
-            Term[] args;
-            if (list == null) {
-                list = ImmutableSLList.nil();
-            }
-
-            Term heap = tb.getBaseHeap();
-
-            // special casing "implicit heap" arguments:
-            // omitting one argument means first argument is "heap"
-            int i = 0;
-            if (function.arity() == list.size() + 1 && function.argSort(0) == heap.sort()) {
-                args = new Term[list.size() + 1];
-                args[i++] = heap;
-            } else {
-                args = new Term[list.size()];
-            }
-
-            for (SLExpression expr : list) {
-                if (!expr.isTerm()) {
-                    throw exc.createException0("Expecting a term here, not: " + expr);
-                }
-                args[i++] = expr.getTerm();
-            }
-
-            try {
-                Term resultTerm = tb.func(function, args, null);
-                final KeYJavaType type =
-                    services.getTypeConverter().getIntegerLDT().targetSort() == resultTerm.sort()
-                            ? services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT)
-                            : services.getJavaInfo().getKeYJavaType(resultTerm.sort());
-                return type == null ? new SLExpression(resultTerm)
-                        : new SLExpression(resultTerm, type);
-            } catch (TermCreationException ex) {
-                throw exc.createException0(format("Cannot create term {0}({1})", function.name(),
-                    MiscTools.join(args, ", ")), escape, ex);
-            }
-
-        }
-
-        Namespace<IProgramVariable> progVars = services.getNamespaces().programVariables();
-        symbol = progVars.lookup(new Name(functName));
-
-        if (symbol == null) {
-            throw exc.createException0(format("Unknown escaped symbol {0}", functName), escape);
-        }
-
-        assert symbol instanceof ProgramVariable : "Expecting a program variable";
-        ProgramVariable pv = (ProgramVariable) symbol;
-        try {
-            Term resultTerm = tb.var(pv);
-            return new SLExpression(resultTerm);
-        } catch (TermCreationException ex) {
-            throw exc.createException0(format("Cannot create term {0}", pv.name()), escape, ex);
-        }
-
-    }
 
 
     public SLExpression translateToJDLTerm(final String functName,
@@ -1333,7 +1264,8 @@ public final class JmlTermFactory {
      * {@link TermBuilder#reachableValue(Term, KeYJavaType)}.
      */
     @Nonnull
-    protected Term typerestrict(@Nonnull KeYJavaType kjt, final boolean nullable,
+    private Term typerestrict(
+            @Nonnull KeYJavaType kjt, final boolean nullable,
             Iterable<? extends QuantifiableVariable> qvs) {
         final Type type = kjt.getJavaType();
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);

@@ -247,7 +247,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
     public String getFormatedContractParams() throws ProofInputException {
         ImmutableList<Term> contractParams = getContractParams();
         if (contractParams != null && !contractParams.isEmpty()) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             boolean afterFirst = false;
             for (Term term : contractParams) {
                 if (afterFirst) {

@@ -32,7 +32,7 @@ public class Default extends BranchImp {
      */
 
     public Default(Statement[] body) {
-        this.body = new ImmutableArray<Statement>(body);
+        this.body = new ImmutableArray<>(body);
     }
 
     /**
@@ -43,7 +43,7 @@ public class Default extends BranchImp {
      */
     public Default(ExtList children) {
         super(children);
-        this.body = new ImmutableArray<Statement>(children.collect(Statement.class));
+        this.body = new ImmutableArray<>(children.collect(Statement.class));
     }
 
     /**
@@ -53,8 +53,9 @@ public class Default extends BranchImp {
      */
     public int getChildCount() {
         int result = 0;
-        if (body != null)
+        if (body != null) {
             result += body.size();
+        }
         return result;
     }
 

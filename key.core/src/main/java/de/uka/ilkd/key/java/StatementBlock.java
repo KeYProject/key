@@ -32,7 +32,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
 
     public StatementBlock() {
-        body = new ImmutableArray<Statement>();
+        body = new ImmutableArray<>();
         prefixLength = 1;
         innerMostMethodFrame = null;
     }
@@ -46,7 +46,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     public StatementBlock(ExtList children) {
         super(children);
-        body = new ImmutableArray<Statement>(children.collect(Statement.class));
+        body = new ImmutableArray<>(children.collect(Statement.class));
 
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
@@ -64,11 +64,11 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
 
     public StatementBlock(Statement as) {
-        this(new ImmutableArray<Statement>(as));
+        this(new ImmutableArray<>(as));
     }
 
     public StatementBlock(Statement... body) {
-        this(new ImmutableArray<Statement>(body));
+        this(new ImmutableArray<>(body));
     }
 
     @Override
@@ -92,7 +92,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
             prefix.add(current);
         }
 
-        return new ImmutableArray<ProgramPrefix>(prefix);
+        return new ImmutableArray<>(prefix);
     }
 
 
@@ -221,18 +221,20 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
 
     public SourceElement getFirstElement() {
-        if (isEmpty())
+        if (isEmpty()) {
             return this;
+        }
         final SourceElement e = getBody().get(0);
         return (e instanceof StatementBlock) ? e.getFirstElement() : e;
     }
 
     @Override
     public SourceElement getFirstElementIncludingBlocks() {
-        if (isEmpty())
+        if (isEmpty()) {
             return this;
-        else
+        } else {
             return getBody().get(0);
+        }
     }
 
 

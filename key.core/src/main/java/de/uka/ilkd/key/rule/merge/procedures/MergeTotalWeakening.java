@@ -54,11 +54,11 @@ public class MergeTotalWeakening extends MergeProcedure implements UnparametricM
 
         final Function newSkolemConstant =
             getNewSkolemConstantForPrefix(v.op().name().toString(), v.sort(), services);
-        LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
+        LinkedHashSet<Name> newNames = new LinkedHashSet<>();
         newNames.add(newSkolemConstant.name());
 
-        return new ValuesMergeResult(DefaultImmutableSet.<Term>nil(), tb.func(newSkolemConstant),
-            newNames, new LinkedHashSet<Term>());
+        return new ValuesMergeResult(DefaultImmutableSet.nil(), tb.func(newSkolemConstant),
+            newNames, new LinkedHashSet<>());
 
     }
 

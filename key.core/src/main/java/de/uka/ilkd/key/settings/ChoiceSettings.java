@@ -2,6 +2,7 @@ package de.uka.ilkd.key.settings;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
@@ -11,8 +12,6 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-
-import javax.annotation.Nonnull;
 
 /**
  *

@@ -24,7 +24,7 @@ class InfFlowContractAppInOutRelationSnippet extends InfFlowInputOutputRelationS
             InfFlowSpec infFlowSpec2, BasicSnippetData d, ProofObligationVars vs1,
             ProofObligationVars vs2, Term eqAtLocsTerm) {
         // build equalities for newObjects terms
-        ImmutableList<Term> newObjEqs = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> newObjEqs = ImmutableSLList.nil();
         Iterator<Term> newObjects1It = infFlowSpec1.newObjects.iterator();
         Iterator<Term> newObjects2It = infFlowSpec2.newObjects.iterator();
         for (int i = 0; i < infFlowSpec1.newObjects.size(); i++) {

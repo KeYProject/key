@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import de.uka.ilkd.key.java.*;
@@ -455,8 +456,9 @@ public final class ProblemInitializer {
                 baseConfig = currentBaseConfig;
             }
             InitConfig ic = prepare(envInput, currentBaseConfig);
-            if (Debug.ENABLE_DEBUG)
+            if (Debug.ENABLE_DEBUG) {
                 print(ic);
+            }
             return ic;
         }
     }
@@ -466,14 +468,15 @@ public final class ProblemInitializer {
         try {
             taclets1 = File.createTempFile("proof", ".txt");
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to create temp file", e);
             return;
         }
         LOGGER.debug("Taclets under: {}", taclets1);
-        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(taclets1)))) {
+        try (PrintWriter out =
+            new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
             out.print(firstProof.toString());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed write proof", e);
         }
     }
 
@@ -482,11 +485,12 @@ public final class ProblemInitializer {
         try {
             taclets1 = File.createTempFile("taclets", ".txt");
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to create temp file", e);
             return;
         }
         LOGGER.debug("Taclets under: {}", taclets1);
-        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(taclets1)))) {
+        try (PrintWriter out =
+            new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
             out.format("Date: %s%n", new Date());
 
             out.format("Choices: %n");
@@ -494,8 +498,7 @@ public final class ProblemInitializer {
 
             out.format("Activated Taclets: %n");
             final List<Taclet> taclets = new ArrayList<>();
-            for (Taclet t : ic.activatedTaclets())
-                taclets.add(t);
+            taclets.addAll(ic.activatedTaclets());
             taclets.sort(Comparator.comparing(a -> a.name().toString()));
             for (Taclet taclet : taclets) {
                 out.format("== %s (%s) =========================================%n", taclet.name(),
@@ -504,7 +507,7 @@ public final class ProblemInitializer {
                 out.format("-----------------------------------------------------%n");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to save", e);
         }
     }
 
@@ -539,15 +542,17 @@ public final class ProblemInitializer {
                     }
                 }
                 for (ProgramMethod pm : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
-                    if (pm == null)
+                    if (pm == null) {
                         continue; // weigl 2021-11-10
+                    }
                     if (!(pm.isVoid() || pm.isConstructor())) {
                         functions.add(pm);
                     }
                 }
             }
-        } else
+        } else {
             throw new ProofInputException("Problem initialization without JavaInfo!");
+        }
 
         // read envInput
         readEnvInput(envInput, initConfig);
@@ -574,8 +579,9 @@ public final class ProblemInitializer {
             // final work
             setUpProofHelper(po, pa);
 
-            if (Debug.ENABLE_DEBUG)
+            if (Debug.ENABLE_DEBUG) {
                 print(pa.getFirstProof());
+            }
 
             // done
             proofCreated(pa);

@@ -10,11 +10,11 @@ import recoder.convenience.Naming;
 
 public class FieldInfo extends MemberInfo implements Field {
 
-    protected String type;
+    protected final String type;
 
-    protected String constantValue;
+    protected final String constantValue;
 
-    protected List<TypeArgumentInfo> typeArgs;
+    protected final List<TypeArgumentInfo> typeArgs;
 
     public FieldInfo(int accessFlags, String name, String type, ClassFile cf, String constantValue,
             List<TypeArgumentInfo> typeArgs) {

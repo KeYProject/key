@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.testgen;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -80,8 +81,8 @@ public class TestCaseGenerator {
     }
 
     private final boolean rflAsInternalClass;
-    protected boolean useRFL;
-    protected ReflectionClassCreator rflCreator;
+    protected final boolean useRFL;
+    protected final ReflectionClassCreator rflCreator;
     private final String dontCopy;
     protected final String modDir;
     protected final String directory;
@@ -474,8 +475,9 @@ public class TestCaseGenerator {
         exportCodeUnderTest();
         createDummyClasses();
         try {
-            if (useRFL)
+            if (useRFL) {
                 writeRFLFile();
+            }
         } catch (Exception ex) {
             logger.writeln("Error: The file RFL" + JAVA_FILE_EXTENSION_WITH_DOT
                 + " is either not generated or it has an error.");
@@ -724,12 +726,9 @@ public class TestCaseGenerator {
     }
 
     public String generateModifierSetAssertions(Model m) {
-        StringBuilder res = new StringBuilder();
-
-        res.append(TAB + "//Modifier set assertions");
 
 
-        return res.toString();
+        return TAB + "//Modifier set assertions";
     }
 
     public String generateTestCase(Model m, Map<String, Sort> typeInfMap) {
@@ -768,8 +767,9 @@ public class TestCaseGenerator {
                         right = "RFL.new" + ReflectionClassCreator.cleanTypeName(type) + "()";
                         rflCreator.addSort(type);
                         LOGGER.debug("Adding sort (create Object): {}", type);
-                    } else
+                    } else {
                         right = "new " + type + "()";
+                    }
                 }
 
                 String objName = createObjectName(o);
@@ -831,7 +831,7 @@ public class TestCaseGenerator {
                     if (f.contains("<") || f.contains(">")) {
                         continue;
                     }
-                    String fieldName = f.substring(f.lastIndexOf(":") + 1);
+                    String fieldName = f.substring(f.lastIndexOf(':') + 1);
                     fieldName = fieldName.replace("|", "");
                     String val = o.getFieldvalues().get(f);
                     String fieldName2 = f.replace("|", "");
@@ -1063,7 +1063,7 @@ public class TestCaseGenerator {
 
     protected String translateValueExpression(String val) {
         if (val.contains("/")) {
-            val = val.substring(0, val.indexOf("/"));
+            val = val.substring(0, val.indexOf('/'));
         }
         if (val.equals("#o0")) {
             return "null";
@@ -1080,7 +1080,8 @@ public class TestCaseGenerator {
         }
         final File pcFile = new File(dir, file);
         LOGGER.debug("Writing file: {}", pcFile);
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(pcFile))) {
+        try (BufferedWriter bw =
+            new BufferedWriter(new FileWriter(pcFile, StandardCharsets.UTF_8))) {
             bw.write(sb.toString());
         }
     }

@@ -96,7 +96,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
             final Term newPred = or.replace(pred.getPredicateFormWithPlaceholder().second);
             return AbstractionPredicate.create(newPred,
                 pred.getPredicateFormWithPlaceholder().first, services);
-        }).collect(Collectors.toCollection(() -> new ArrayList<>()));
+        }).collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override
@@ -126,7 +126,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
      * @return
      */
     private Map<Term, Term> getReplaceMap(Map<LocationVariable, Term> atPres, Services services) {
-        final Map<Term, Term> result = new LinkedHashMap<Term, Term>();
+        final Map<Term, Term> result = new LinkedHashMap<>();
 
         if (atPres != null) {
             for (Map.Entry<LocationVariable, Term> en : this.atPres.entrySet()) {

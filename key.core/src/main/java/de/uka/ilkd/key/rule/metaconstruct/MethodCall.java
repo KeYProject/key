@@ -56,7 +56,7 @@ public class MethodCall extends ProgramTransformer {
     private IProgramMethod pm;
     protected ReferencePrefix newContext;
     protected ProgramVariable pvar;
-    private IExecutionContext execContextSV;
+    private final IExecutionContext execContextSV;
     private ExecutionContext execContext;
     protected ImmutableArray<Expression> arguments;
     protected KeYJavaType staticPrefixType;
@@ -107,7 +107,7 @@ public class MethodCall extends ProgramTransformer {
     /** gets an array of expression and returns a list of types */
     private ImmutableList<KeYJavaType> getTypes(ImmutableArray<Expression> args,
             Services services) {
-        ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
+        ImmutableList<KeYJavaType> result = ImmutableSLList.nil();
         for (int i = args.size() - 1; i >= 0; i--) {
             Expression argument = args.get(i);
             result =
@@ -471,7 +471,7 @@ public class MethodCall extends ProgramTransformer {
         for (int i = 0; i < varspecs.length; i++) {
             vars[i] = (Expression) varspecs[i].getProgramVariable();
         }
-        return new ImmutableArray<Expression>(vars);
+        return new ImmutableArray<>(vars);
     }
 
     /**

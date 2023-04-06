@@ -28,11 +28,17 @@ jobs:
       GH_TOKEN: ${{ github.token }}
     steps:
       - name: Save PR number
-        env:
-          PR_NUMBER: ${{ github.event.number }}
-        run: |
-          mkdir -p ./pr
-          echo $PR_NUMBER > ./pr/pr_number
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const util = require('util');
+            fs.mkdirSync("./pr", { recursive: true });
+            const payload = context.payload;
+            const number = (payload.issue || payload.pull_request || payload).number;
+            const text = number === undefined ? "" : String(number);
+            core.info("Pr number is " + number + ", writing \"" + text + "\"");
+            fs.writeFileSync("./pr/pr_number", text);
       - uses: actions/upload-artifact@v3
         with:
           name: pr-number

@@ -50,32 +50,36 @@ public class CountingBufferedReader extends BufferedReader {
     @Override
     public int read() throws IOException {
         final int readChar = super.read();
-        if (readChar != -1)
+        if (readChar != -1) {
             incCharCounter(1);
+        }
         return readChar;
     }
 
     @Override
-    public int read(char cbuf[], int off, int len) throws IOException {
+    public int read(char[] cbuf, int off, int len) throws IOException {
         final int readChars = super.read(cbuf, off, len);
-        if (readChars > 0)
+        if (readChars > 0) {
             incCharCounter(readChars);
+        }
         return readChars;
     }
 
     @Override
     public String readLine() throws IOException {
         final String line = super.readLine();
-        if (line != null)
+        if (line != null) {
             incCharCounter(line.length());
+        }
         return line;
     }
 
     @Override
     public long skip(long n) throws IOException {
         final long skippedChars = super.skip(n);
-        if (skippedChars > 0)
+        if (skippedChars > 0) {
             incCharCounter(skippedChars);
+        }
         return skippedChars;
     }
 }

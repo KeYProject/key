@@ -41,7 +41,6 @@ public final class OpenMostRecentFileAction extends MainWindowAction {
                     Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
                     if (proofPath == null) {
                         // canceled by user
-                        return;
                     } else {
                         mainWindow.loadProofFromBundle(file, proofPath.toFile());
                     }

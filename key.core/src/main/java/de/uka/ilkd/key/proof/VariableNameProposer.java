@@ -104,11 +104,11 @@ public class VariableNameProposer implements InstantiationProposer {
             if (inst instanceof Term) {
                 result = ((Term) inst).op().name().toString();
             } else {
-                result = "" + inst;
+                result = String.valueOf(inst);
             }
         } else {
             // ... otherwise use the name of the SkolemTermSV
-            result = "" + p_var.name();
+            result = String.valueOf(p_var.name());
         }
 
         // remove characters that should better not turn up in identifiers
@@ -197,8 +197,9 @@ public class VariableNameProposer implements InstantiationProposer {
         ProgramElement contextProgram =
             app.matchConditions().getInstantiations().getContextInstantiation().contextProgram();
 
-        if (contextProgram == null)
+        if (contextProgram == null) {
             contextProgram = new StatementBlock();
+        }
 
         final LabelCollector lc = new LabelCollector(contextProgram, services);
 

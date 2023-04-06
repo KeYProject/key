@@ -31,13 +31,13 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
     public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
         // Compute collect terms of sequent formulas
         Sequent sequent = goal.sequent();
-        Set<Term> topTerms = new LinkedHashSet<Term>();
+        Set<Term> topTerms = new LinkedHashSet<>();
         for (SequentFormula sf : sequent) {
             topTerms.add(sf.formula());
         }
         // Compute equality terms
         HeapLDT heapLDT = goal.node().proof().getServices().getTypeConverter().getHeapLDT();
-        Set<Term> equalityTerms = new LinkedHashSet<Term>();
+        Set<Term> equalityTerms = new LinkedHashSet<>();
         for (SequentFormula sf : sequent) {
             collectEqualityTerms(sf, equalityTerms, topTerms, heapLDT,
                 goal.node().proof().getServices());
@@ -57,12 +57,12 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
     protected void collectEqualityTerms(SequentFormula sf, Set<Term> equalityTerms,
             Set<Term> topTerms, HeapLDT heapLDT, Services services) {
         // Collect objects (target of store operations on heap)
-        Set<Term> storeLocations = new LinkedHashSet<Term>();
+        Set<Term> storeLocations = new LinkedHashSet<>();
         collectStoreLocations(sf.formula(), storeLocations, heapLDT);
         // Check if equality checks are possible
         if (storeLocations.size() >= 2) {
             // Generate all possible equality checks
-            Term[] storeLocationsArray = storeLocations.toArray(new Term[storeLocations.size()]);
+            Term[] storeLocationsArray = storeLocations.toArray(new Term[0]);
             for (int i = 0; i < storeLocationsArray.length; i++) {
                 for (int j = i + 1; j < storeLocationsArray.length; j++) {
                     Term equality = services.getTermBuilder().equals(storeLocationsArray[i],

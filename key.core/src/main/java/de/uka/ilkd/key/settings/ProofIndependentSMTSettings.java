@@ -292,9 +292,7 @@ public final class ProofIndependentSMTSettings
         solverTypes.addAll(data.solverTypes);
 
         solverUnions = new LinkedList<>();
-        for (SolverTypeCollection solverUnion : data.solverUnions) {
-            solverUnions.add(solverUnion);
-        }
+        solverUnions.addAll(data.solverUnions);
 
         legacyTranslationSolverUnions = new LinkedList<>();
         legacyTranslationSolverUnions.addAll(data.legacyTranslationSolverUnions);

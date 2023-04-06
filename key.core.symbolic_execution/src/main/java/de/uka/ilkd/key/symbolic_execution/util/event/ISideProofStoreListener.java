@@ -16,12 +16,12 @@ public interface ISideProofStoreListener extends EventListener {
      *
      * @param e The {@link SideProofStoreEvent}.
      */
-    public void entriesAdded(SideProofStoreEvent e);
+    void entriesAdded(SideProofStoreEvent e);
 
     /**
      * When existing {@link Entry}s were removed.
      *
      * @param e The {@link SideProofStoreEvent}.
      */
-    public void entriesRemoved(SideProofStoreEvent e);
+    void entriesRemoved(SideProofStoreEvent e);
 }

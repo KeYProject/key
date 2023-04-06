@@ -31,12 +31,12 @@ public class ProgramVariableReferencesAnalyst implements IProofReferencesAnalyst
         if (node.getAppliedRuleApp() != null && node.getNodeInfo() != null) {
             SourceElement statement = node.getNodeInfo().getActiveStatement();
             if (statement instanceof CopyAssignment) {
-                LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
+                LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<>();
                 listReferences(node, (CopyAssignment) statement,
                     services.getJavaInfo().getArrayLength(), result, true);
                 return result;
             } else if (statement instanceof If) {
-                LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
+                LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<>();
                 listReferences(node, ((If) statement).getExpression(),
                     services.getJavaInfo().getArrayLength(), result, false);
                 return result;
@@ -63,7 +63,7 @@ public class ProgramVariableReferencesAnalyst implements IProofReferencesAnalyst
             ProgramVariable pv = (ProgramVariable) pe;
             if (pv.isMember()) {
                 DefaultProofReference<ProgramVariable> reference =
-                    new DefaultProofReference<ProgramVariable>(IProofReference.ACCESS, node,
+                    new DefaultProofReference<>(IProofReference.ACCESS, node,
                         (ProgramVariable) pe);
                 ProofReferenceUtil.merge(toFill, reference);
             }
@@ -76,7 +76,7 @@ public class ProgramVariableReferencesAnalyst implements IProofReferencesAnalyst
             ProgramVariable pv = fr.getProgramVariable();
             if (pv != arrayLength) {
                 DefaultProofReference<ProgramVariable> reference =
-                    new DefaultProofReference<ProgramVariable>(IProofReference.ACCESS, node, pv);
+                    new DefaultProofReference<>(IProofReference.ACCESS, node, pv);
                 ProofReferenceUtil.merge(toFill, reference);
             }
         } else if (includeExpressionContainer && pe instanceof ExpressionContainer) {

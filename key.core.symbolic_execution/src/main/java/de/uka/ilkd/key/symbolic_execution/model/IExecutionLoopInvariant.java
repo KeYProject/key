@@ -25,19 +25,19 @@ public interface IExecutionLoopInvariant extends IExecutionNode<SourceElement> {
      *
      * @return The used {@link LoopSpecification}.
      */
-    public LoopSpecification getLoopInvariant();
+    LoopSpecification getLoopInvariant();
 
     /**
      * Returns the loop statement which is simulated by its loop invariant.
      *
      * @return The loop statement which is simulated by its loop invariant.
      */
-    public While getLoopStatement();
+    While getLoopStatement();
 
     /**
      * Checks if the loop invariant is initially valid.
      *
      * @return {@code true} initially valid, {@code false} initially invalid.
      */
-    public boolean isInitiallyValid();
+    boolean isInitiallyValid();
 }

@@ -11,8 +11,9 @@ public class TopRuleAppCost implements RuleAppCost {
     private TopRuleAppCost() {}
 
     public int compareTo(@Nonnull RuleAppCost o) {
-        if (o instanceof TopRuleAppCost)
+        if (o instanceof TopRuleAppCost) {
             return 0;
+        }
         return 1;
     }
 

@@ -17,7 +17,7 @@ public class SimpleFilteredStrategy implements Strategy {
 
     private static final Name NAME = new Name("Simple ruleset");
 
-    private RuleFilter ruleFilter;
+    private final RuleFilter ruleFilter;
 
     private static final long IF_NOT_MATCHED_MALUS = 0; // this should be a feature
 
@@ -41,16 +41,19 @@ public class SimpleFilteredStrategy implements Strategy {
      *         all (it is discarded by the strategy).
      */
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
-        if (app instanceof TacletApp && !ruleFilter.filter(app.rule()))
+        if (app instanceof TacletApp && !ruleFilter.filter(app.rule())) {
             return TopRuleAppCost.INSTANCE;
+        }
 
         RuleAppCost res = NonDuplicateAppFeature.INSTANCE.computeCost(app, pio, goal);
-        if (res == TopRuleAppCost.INSTANCE)
+        if (res == TopRuleAppCost.INSTANCE) {
             return res;
+        }
 
         long cost = goal.getTime();
-        if (app instanceof TacletApp && !((TacletApp) app).ifInstsComplete())
+        if (app instanceof TacletApp && !((TacletApp) app).ifInstsComplete()) {
             cost += IF_NOT_MATCHED_MALUS;
+        }
 
         return NumberRuleAppCost.create(cost);
     }
@@ -63,11 +66,8 @@ public class SimpleFilteredStrategy implements Strategy {
      */
     public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
         // do not apply a rule twice
-        if (app instanceof TacletApp && NonDuplicateAppFeature.INSTANCE.computeCost(app, pio,
-            goal) == TopRuleAppCost.INSTANCE)
-            return false;
-
-        return true;
+        return !(app instanceof TacletApp) || NonDuplicateAppFeature.INSTANCE.computeCost(app, pio,
+            goal) != TopRuleAppCost.INSTANCE;
     }
 
     public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,

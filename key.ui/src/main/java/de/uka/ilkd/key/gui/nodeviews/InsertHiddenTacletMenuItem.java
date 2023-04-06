@@ -48,8 +48,9 @@ public class InsertHiddenTacletMenuItem extends InsertionTacletBrowserMenuItem {
         }
 
         final ImmutableList<TacletGoalTemplate> goalTemplates = t.goalTemplates();
-        if (goalTemplates.size() != 1)
+        if (goalTemplates.size() != 1) {
             return null;
+        }
         return goalTemplates.head().sequent();
     }
 }

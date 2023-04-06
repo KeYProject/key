@@ -33,7 +33,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
         super(list);
         assert kjt != null;
         this.kjt = kjt;
-        this.children = new ImmutableArray<Expression>(list.collect(Expression.class));
+        this.children = new ImmutableArray<>(list.collect(Expression.class));
     }
 
 
@@ -46,7 +46,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
         super();
         assert kjt != null;
         this.kjt = kjt;
-        this.children = new ImmutableArray<Expression>(expressions);
+        this.children = new ImmutableArray<>(expressions);
     }
 
 

@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,11 +40,12 @@ public class HandlerUtil {
     public static final SMTHandlerProperty.BooleanProperty NO_QUANTIFIERS = new BooleanProperty(
         "NoQuantifiers", "Reduce the number of introduced universal quantifiers", "TODO");
 
+    /* add global handler properties here */
     /**
      * This lists the handler properties that do not belong to a particular SMT handler.
      */
     public static final List<? extends SMTHandlerProperty<?>> GLOBAL_PROPERTIES =
-        Arrays.asList(/* add global handler properties here */);
+        List.of();
 
     private HandlerUtil() {
         throw new Error("do not instantiate");

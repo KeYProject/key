@@ -28,17 +28,17 @@ public class VariableAssignments {
     /**
      * Reference to parent assignments
      */
-    private VariableAssignments parent;
+    private final VariableAssignments parent;
 
     /**
      * Current Assignments
      */
-    private Map<String, Object> currentAssignments;
+    private final Map<String, Object> currentAssignments;
 
     /**
      * Type Map of assignments
      */
-    private Map<String, VariableAssignments.VarType> typeMap;
+    private final Map<String, VariableAssignments.VarType> typeMap;
 
     /**
      * Create new, empty variable assignment, to add variables

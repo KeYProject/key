@@ -29,7 +29,7 @@ import org.key_project.util.collection.ImmutableList;
  */
 public class ProgramVariableCollector extends JavaASTVisitor {
 
-    private final LinkedHashSet<LocationVariable> result = new LinkedHashSet<LocationVariable>();
+    private final LinkedHashSet<LocationVariable> result = new LinkedHashSet<>();
 
     /**
      * collects all program variables occurring in the AST <tt>root</tt> using this constructor is
@@ -92,9 +92,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
 
         final ArrayList<AbstractionPredicate> preds =
             pamc.getAbstractionPredicates(atPres, services);
-        preds.forEach(pred -> {
-            pred.getPredicateFormWithPlaceholder().second.execPostOrder(tpvc);
-        });
+        preds.forEach(pred -> pred.getPredicateFormWithPlaceholder().second.execPostOrder(tpvc));
 
         result.addAll(tpvc.result());
     }

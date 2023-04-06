@@ -62,7 +62,7 @@ public interface TermLabelUpdate extends RuleSpecificTask {
      * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
      * @param labels The {@link Set} of {@link TermLabel}s to modify.
      */
-    public void updateLabels(TermLabelState state, Services services,
+    void updateLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
             Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Operator newTermOp,
             ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars,

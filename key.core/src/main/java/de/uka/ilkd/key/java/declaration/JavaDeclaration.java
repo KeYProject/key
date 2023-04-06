@@ -44,7 +44,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
 
 
     public JavaDeclaration(Modifier[] mods) {
-        modArray = new ImmutableArray<Modifier>(mods);
+        modArray = new ImmutableArray<>(mods);
     }
 
 
@@ -61,7 +61,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      */
     public JavaDeclaration(ExtList children) {
         super(children);
-        modArray = new ImmutableArray<Modifier>(children.collect(Modifier.class));
+        modArray = new ImmutableArray<>(children.collect(Modifier.class));
     }
 
 

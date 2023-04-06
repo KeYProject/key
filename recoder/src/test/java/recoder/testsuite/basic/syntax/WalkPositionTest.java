@@ -17,8 +17,7 @@ public class WalkPositionTest extends TestCase {
     public void testWalkPosition() {
         SourceFileRepository sfr = BasicTestsSuite.getConfig().getSourceFileRepository();
         List<CompilationUnit> units = sfr.getCompilationUnits();
-        for (int i = 0; i < units.size(); i += 1) {
-            CompilationUnit u = units.get(i);
+        for (CompilationUnit u : units) {
             ProgramElement oldPe = u;
             Position oldPos = u.getFirstElement().getStartPosition();
             TreeWalker tw = new TreeWalker(u);

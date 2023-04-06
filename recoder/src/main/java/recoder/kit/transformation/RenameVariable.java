@@ -57,7 +57,7 @@ public class RenameVariable extends TwoPassTransformation {
      * @return the problem report.
      */
     public ProblemReport analyze() {
-        refs = new ArrayList<VariableReference>();
+        refs = new ArrayList<>();
         if (newName.equals(vs.getName())) {
             return setProblemReport(IDENTITY);
         }

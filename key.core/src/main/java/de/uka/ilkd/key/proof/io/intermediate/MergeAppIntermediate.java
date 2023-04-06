@@ -16,12 +16,12 @@ import org.key_project.util.collection.ImmutableList;
 public class MergeAppIntermediate extends BuiltInAppIntermediate {
 
     private int id = 0;
-    private String mergeProc;
+    private final String mergeProc;
     private String distinguishingFormula = null;
     private int nrPartners = 0;
     private String abstractionPredicates = null;
     private String userChoices = null;
-    private Class<? extends AbstractPredicateAbstractionLattice> predAbstrLatticeType;
+    private final Class<? extends AbstractPredicateAbstractionLattice> predAbstrLatticeType;
 
     /**
      * Constructs a new join rule.

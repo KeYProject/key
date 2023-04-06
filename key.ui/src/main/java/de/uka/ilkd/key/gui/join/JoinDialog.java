@@ -125,11 +125,7 @@ public class JoinDialog extends StdDialog {
                 if (valid) {
                     getSelectedPartner().setCommonPredicate(
                         InspectorForFormulas.translate(proof.getServices(), input));
-                    if (getSelectedItem().isApplicable()) {
-                        listener.userInputChanged(input, true, reason);
-                    } else {
-                        listener.userInputChanged(input, false, reason);
-                    }
+                    listener.userInputChanged(input, getSelectedItem().isApplicable(), reason);
                 } else {
                     listener.userInputChanged(input, false, reason);
                 }
@@ -150,7 +146,7 @@ public class JoinDialog extends StdDialog {
 
 
 
-            DefaultListModel<ContentItem> model = new DefaultListModel<ContentItem>();
+            DefaultListModel<ContentItem> model = new DefaultListModel<>();
             for (final ProspectivePartner partner : partnerList) {
 
                 Result result = estimator.estimate(partner, proof);
@@ -314,7 +310,7 @@ public class JoinDialog extends StdDialog {
 
         private JList<ContentItem> getChoiceList() {
             if (choiceList == null) {
-                choiceList = new JList<ContentItem>();
+                choiceList = new JList<>();
                 choiceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
                 choiceList.setPreferredSize(new Dimension(100, 300));
                 choiceList.addListSelectionListener(

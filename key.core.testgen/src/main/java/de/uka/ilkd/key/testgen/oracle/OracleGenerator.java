@@ -470,7 +470,7 @@ public class OracleGenerator {
         Term field = term.sub(2);
         OracleTerm fldTerm = generateOracle(field, true);
         String fieldName = fldTerm.toString();
-        fieldName = fieldName.substring(fieldName.lastIndexOf(":") + 1);
+        fieldName = fieldName.substring(fieldName.lastIndexOf(':') + 1);
         fieldName = fieldName.replace("$", "");
 
         String value;
@@ -588,8 +588,7 @@ public class OracleGenerator {
     private OracleMethod createIfThenElseMethod(Term term, boolean initialSelect) {
 
         String methodName = generateMethodName();
-        List<OracleVariable> args = new LinkedList<>();
-        args.addAll(methodArgs);
+        List<OracleVariable> args = new LinkedList<>(methodArgs);
         OracleTerm cond = generateOracle(term.sub(0), initialSelect);
         OracleTerm trueCase = generateOracle(term.sub(1), initialSelect);
         OracleTerm falseCase = generateOracle(term.sub(2), initialSelect);

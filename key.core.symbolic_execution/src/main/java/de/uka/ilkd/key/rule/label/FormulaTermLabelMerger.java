@@ -35,10 +35,9 @@ public class FormulaTermLabelMerger implements TermLabelMerger {
             mergedLabels.remove(existingLabel);
             // Add new label
             mergedLabels.add(newLabel);
-            return true;
         } else {
             mergedLabels.add(rejectedLabel);
-            return true;
         }
+        return true;
     }
 }

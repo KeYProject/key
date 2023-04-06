@@ -122,7 +122,7 @@ public class HandleArith {
      * @return trueT if true, falseT if false, and atom if can't be prove;
      */
     public static Term provedByArith(Term problem, Term axiom, Services services) {
-        final Pair<Term, Term> key = new Pair<Term, Term>(problem, axiom);
+        final Pair<Term, Term> key = new Pair<>(problem, axiom);
         final LRUCache<Pair<Term, Term>, Term> provedByArithCache =
             services.getCaches().getProvedByArithSndCache();
         Term result;

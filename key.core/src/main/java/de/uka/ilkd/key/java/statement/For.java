@@ -16,7 +16,7 @@ import org.key_project.util.collection.ImmutableArray;
 public class For extends LoopStatement implements VariableScope {
 
     private static final ImmutableArray<VariableSpecification> EMPTY_VARSPECS =
-        new ImmutableArray<VariableSpecification>(new VariableSpecification[0]);
+        new ImmutableArray<>(new VariableSpecification[0]);
 
     /**
      * For.

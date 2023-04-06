@@ -245,7 +245,7 @@ public final class MainWindow extends JFrame {
             return noSolverSelected;
         }
         for (SolverType type : types) {
-            builder.append(type.getName() + ", ");
+            builder.append(type.getName()).append(", ");
         }
         builder.delete(builder.length() - 2, builder.length());
         SolverTypeCollection chosenSolvers =
@@ -576,7 +576,7 @@ public final class MainWindow extends JFrame {
         Stream<TabPanel> defaultPanels =
             Stream.of(proofTreeView, infoView, strategySelectionView, openGoalsView);
         Stream.concat(defaultPanels, extensionPanels).map(DockingHelper::createSingleDock)
-                .forEach(it -> dockControl.addDockable(it));
+                .forEach(dockControl::addDockable);
         dockControl.addDockable(dockProofListView);
         dockControl.addDockable(dockSequent);
         dockControl.addDockable(dockSourceView);
@@ -742,7 +742,7 @@ public final class MainWindow extends JFrame {
     /**
      * @return the status line object
      */
-    protected MainStatusLine getStatusLine() {
+    MainStatusLine getStatusLine() {
         return statusLine;
     }
 
@@ -758,7 +758,7 @@ public final class MainWindow extends JFrame {
      * Make the status line display a standard message, make progress bar and abort button invisible
      */
     public void setStandardStatusLine() {
-        ThreadUtilities.invokeOnEventQueue(() -> setStandardStatusLineImmediately());
+        ThreadUtilities.invokeOnEventQueue(this::setStandardStatusLineImmediately);
     }
 
     private void setStatusLineImmediately(String str, int max) {
@@ -1184,7 +1184,7 @@ public final class MainWindow extends JFrame {
                 // such that the entire app needs to be closed. Just print
                 // the exception and pretend everything was good. (Like would
                 // happen when incoked on the event queue.
-                ex.printStackTrace();
+                LOGGER.warn("Sequent updater exception", ex);
             }
         } else {
             SwingUtilities.invokeLater(sequentUpdater);
@@ -1264,7 +1264,7 @@ public final class MainWindow extends JFrame {
      * @param component the non-null component whose preferences are to be set
      * @see PreferenceSaver
      */
-    public final void loadPreferences(Component component) {
+    public void loadPreferences(Component component) {
         prefSaver.load(component);
     }
 
@@ -1275,12 +1275,12 @@ public final class MainWindow extends JFrame {
      *
      * @see PreferenceSaver
      */
-    public final void syncPreferences() {
+    public void syncPreferences() {
         try {
             prefSaver.flush();
         } catch (BackingStoreException e) {
             // it is not tragic if the preferences cannot be stored.
-            e.printStackTrace();
+            LOGGER.warn("Failed to save preferences", e);
         }
     }
 
@@ -1455,8 +1455,8 @@ public final class MainWindow extends JFrame {
      */
     private static class GlassPaneListener extends MouseInputAdapter {
         Component currentComponent = null;
-        Component glassPane;
-        Container contentPane;
+        final Component glassPane;
+        final Container contentPane;
 
         public GlassPaneListener(Component glassPane, Container contentPane) {
             this.glassPane = glassPane;
@@ -1568,20 +1568,20 @@ public final class MainWindow extends JFrame {
 
         private void setToolBarDisabled() {
             assert EventQueue.isDispatchThread() : "toolbar disabled from wrong thread";
-            doNotReenable = new LinkedHashSet<Component>();
+            doNotReenable = new LinkedHashSet<>();
             Component[] cs = controlToolBar.getComponents();
-            for (int i = 0; i < cs.length; i++) {
-                if (!cs[i].isEnabled()) {
-                    doNotReenable.add(cs[i]);
+            for (Component component : cs) {
+                if (!component.isEnabled()) {
+                    doNotReenable.add(component);
                 }
-                cs[i].setEnabled(false);
+                component.setEnabled(false);
             }
             cs = fileOpToolBar.getComponents();
-            for (int i = 0; i < cs.length; i++) {
-                if (!cs[i].isEnabled()) {
-                    doNotReenable.add(cs[i]);
+            for (Component c : cs) {
+                if (!c.isEnabled()) {
+                    doNotReenable.add(c);
                 }
-                cs[i].setEnabled(false);
+                c.setEnabled(false);
             }
         }
 
@@ -1594,15 +1594,15 @@ public final class MainWindow extends JFrame {
             }
 
             Component[] cs = controlToolBar.getComponents();
-            for (int i = 0; i < cs.length; i++) {
-                if (!doNotReenable.contains(cs[i])) {
-                    cs[i].setEnabled(true);
+            for (Component component : cs) {
+                if (!doNotReenable.contains(component)) {
+                    component.setEnabled(true);
                 }
             }
             cs = fileOpToolBar.getComponents();
-            for (int i = 0; i < cs.length; i++) {
-                if (!doNotReenable.contains(cs[i])) {
-                    cs[i].setEnabled(true);
+            for (Component c : cs) {
+                if (!doNotReenable.contains(c)) {
+                    c.setEnabled(true);
                 }
             }
 

@@ -29,7 +29,7 @@ import org.key_project.util.collection.ImmutableArray;
  */
 public class SMTTacletTranslator {
 
-    private SkeletonGenerator tacletTranslator = new DefaultTacletTranslator() {
+    private final SkeletonGenerator tacletTranslator = new DefaultTacletTranslator() {
         @Override
         protected Term getFindFromTaclet(FindTaclet findTaclet) {
             Term org = super.getFindFromTaclet(findTaclet);
@@ -37,7 +37,7 @@ public class SMTTacletTranslator {
         }
     };
 
-    private Services services;
+    private final Services services;
 
     public SMTTacletTranslator(Services services) {
         this.services = services;

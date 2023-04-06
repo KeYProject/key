@@ -201,7 +201,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
 
     @Override
     public Iterator<TreePath> iterator() {
-        return new Iterator<TreePath>() {
+        return new Iterator<>() {
             final Iterator<TreePath> i = paths.iterator();
 
             @Override

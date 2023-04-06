@@ -72,7 +72,7 @@ public class JavaDocument extends DefaultStyledDocument {
         /** parser is currently inside a JML annotation (starting with "&#47;&#42;&#64;") */
         JML,
         /** parser is currently inside a JML keyword */
-        JML_KEYWORD;
+        JML_KEYWORD
     }
 
     /**
@@ -102,7 +102,7 @@ public class JavaDocument extends DefaultStyledDocument {
          */
         JML_ANNOTATION_LINE,
         /** last processed char was "&#42;" */
-        MAYBEEND;
+        MAYBEEND
     }
 
     /**

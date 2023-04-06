@@ -49,7 +49,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
     private static final long serialVersionUID = 5124050224007103908L;
 
     // the table showing the instantiations
-    private DataTable[] dataTable;
+    private final DataTable[] dataTable;
 
     // the current chosen model
     private int current = 0;
@@ -59,11 +59,11 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
     private JTabbedPane alternatives;
 
     /** the goal the application of the rule has to be performed */
-    private Goal goal;
+    private final Goal goal;
 
     private JScrollPane tablePane;
 
-    private MainWindow mainWindow;
+    private final MainWindow mainWindow;
 
     public TacletMatchCompletionDialog(MainWindow parent, TacletInstantiationModel[] model,
             Goal goal, KeYMediator mediator) {
@@ -222,7 +222,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
     private void adaptSizes(DataTable dt) {
         int tableSize_x = dt.getTotalColumnWidth();
-        int visible_rows = dt.getRowCount() > 8 ? 8 : dt.getRowCount();
+        int visible_rows = Math.min(dt.getRowCount(), 8);
         int tableSize_y = (visible_rows + 1) * 48;
         Dimension tableDim = new Dimension(tableSize_x, tableSize_y);
         // bugfix. march-09 m.u.:
@@ -255,8 +255,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
      */
     @Override
     protected void closeDlg() {
-        if (mainWindow != null)
+        if (mainWindow != null) {
             mainWindow.savePreferences(this);
+        }
         super.closeDlg();
     }
 
@@ -340,17 +341,17 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
         private static final long serialVersionUID = 5988602390976062610L;
 
-        JTextArea inputArea = new BracketMatchingTextArea("Nothing", 3, 16);
+        final JTextArea inputArea = new BracketMatchingTextArea("Nothing", 3, 16);
         final InputEditor iEditor = new InputEditor(inputArea);
         final InputCellRenderer iRenderer = new InputCellRenderer();
 
         /** the number of the model the data table belongs to */
-        private int modelNr;
+        private final int modelNr;
 
         /** the enclosing dialog */
-        private TacletMatchCompletionDialog owner;
+        private final TacletMatchCompletionDialog owner;
 
-        private KeYMediator mediator;
+        private final KeYMediator mediator;
         /**
          * the TacletIfSelectionPanel that shows the different possible instantiations of the
          * if-sequent or a manual entered instantiation. The value is null if and only if the taclet
@@ -431,11 +432,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                             } else {
                                 event.rejectDrop();
                             }
-                        } catch (IOException exception) {
-                            exception.printStackTrace();
-                            event.rejectDrop();
-                        } catch (UnsupportedFlavorException ufException) {
-                            ufException.printStackTrace();
+                        } catch (IOException | UnsupportedFlavorException exception) {
+                            LOGGER.warn("Drop failed", exception);
                             event.rejectDrop();
                         }
                     } else {
@@ -465,8 +463,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
         public Object getValueAt(int x, int y) {
             Object value = super.getValueAt(x, y);
-            if (value == null)
+            if (value == null) {
                 return "";
+            }
             return value;
         }
 
@@ -528,8 +527,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         class InputEditor extends DefaultCellEditor implements PositionSettable {
 
             private static final long serialVersionUID = 1547755822847646366L;
-            JPanel editPanel;
-            JTextArea textarea;
+            final JPanel editPanel;
+            final JTextArea textarea;
 
             public InputEditor(JTextArea ta) {
                 super(new JCheckBox()); // Unfortunately, the constructor
@@ -618,11 +617,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                                 int pos = textarea.viewToModel(event.getLocation());
                                 textarea.insert(droppedString, pos);
                                 event.getDropTargetContext().dropComplete(true);
-                            } catch (UnsupportedFlavorException e) {
-                                e.printStackTrace();
-                                event.rejectDrop();
-                            } catch (java.io.IOException e) {
-                                e.printStackTrace();
+                            } catch (UnsupportedFlavorException | IOException e) {
+                                LOGGER.warn("Drop failed", e);
                                 event.rejectDrop();
                             }
                         } else {
@@ -665,8 +661,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
             public Component getTableCellEditorComponent(JTable table, Object value,
                     boolean isSelected, int row, int column) {
-                if (value == null)
+                if (value == null) {
                     value = "";
+                }
                 textarea.setText(value.toString());
                 textarea.setRows(getRowHeight(row) / 16);
                 return editorComponent;
@@ -680,12 +677,13 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
              *
              */
             private static final long serialVersionUID = -7270236368657110379L;
-            JTextArea ta = new JTextArea("nothing");
+            final JTextArea ta = new JTextArea("nothing");
 
             public Component getTableCellRendererComponent(JTable table, Object obj,
                     boolean isSelected, boolean hasFocus, int row, int column) {
-                if (obj == null)
+                if (obj == null) {
                     obj = "";
+                }
                 ta.setRows(getRowHeight(row) / 16);
                 ta.setText(obj.toString());
                 if (table.isCellEditable(row, column)) {

@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.TaskTree;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.util.KeYConstants;
@@ -22,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * @author bruns
  */
 public final class QuickSaveAction extends MainWindowAction {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TaskTree.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(QuickSaveAction.class);
     private static final long serialVersionUID = -7084304175671744403L;
 
     /** The OS's tmp directory. */

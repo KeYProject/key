@@ -26,19 +26,19 @@ public interface IExecutionAuxiliaryContract extends IExecutionNode<SourceElemen
      *
      * @return The applied {@link AuxiliaryContract}.
      */
-    public AuxiliaryContract getContract();
+    AuxiliaryContract getContract();
 
     /**
      * Returns the {@link StatementBlock} at which the {@link BlockContract} is applied.
      *
      * @return The {@link StatementBlock} at which the {@link BlockContract} is applied.
      */
-    public StatementBlock getBlock();
+    StatementBlock getBlock();
 
     /**
      * Checks if the precondition is complied.
      *
      * @return {@code true} precondition complied, {@code false} precondition not complied.
      */
-    public boolean isPreconditionComplied();
+    boolean isPreconditionComplied();
 }

@@ -44,7 +44,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * Transaction tags.
      */
     private static final Map<Boolean, String> TRANSACTION_TAGS =
-        new LinkedHashMap<Boolean, String>();
+        new LinkedHashMap<>();
 
     static {
         TRANSACTION_TAGS.put(false, "transaction_inactive");
@@ -54,7 +54,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
     /**
      * The contract from which this PO is generated.
      */
-    private FunctionalBlockContract contract;
+    private final FunctionalBlockContract contract;
 
     /**
      * The initial proof configuration.
@@ -141,7 +141,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
     private static Map<LocationVariable, Function> createAnonInHeaps(
             final List<LocationVariable> heaps, final Services services, final TermBuilder tb) {
         Map<LocationVariable, Function> anonHeaps =
-            new LinkedHashMap<LocationVariable, Function>(40);
+            new LinkedHashMap<>(40);
         for (LocationVariable heap : heaps) {
             final String anonymisationName =
                 tb.newName(AuxiliaryContractBuilders.ANON_IN_PREFIX + heap.name());
@@ -164,7 +164,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
             final List<LocationVariable> heaps, final FunctionalBlockContract contract,
             final Services services, final TermBuilder tb) {
         Map<LocationVariable, Function> anonOutHeaps =
-            new LinkedHashMap<LocationVariable, Function>(40);
+            new LinkedHashMap<>(40);
         for (LocationVariable heap : heaps) {
             if (contract.hasModifiesClause(heap)) {
                 final String anonymisationName =
@@ -328,13 +328,10 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
             return false;
         }
         if (environmentConfig == null) {
-            if (other.environmentConfig != null) {
-                return false;
-            }
-        } else if (!environmentConfig.equals(other.environmentConfig)) {
-            return false;
+            return other.environmentConfig == null;
+        } else {
+            return environmentConfig.equals(other.environmentConfig);
         }
-        return true;
     }
 
     @Override

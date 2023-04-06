@@ -36,7 +36,7 @@ public class Services implements TermServices {
      * used to determine whether an expression is a compile-time constant and if so the type and
      * result of the expression
      */
-    private ConstantExpressionEvaluator cee;
+    private final ConstantExpressionEvaluator cee;
 
     /**
      * used to convert types, expressions and so on to logic elements (in special into to terms or
@@ -57,7 +57,7 @@ public class Services implements TermServices {
     /**
      * map of names to counters
      */
-    private HashMap<String, Counter> counters;
+    private final HashMap<String, Counter> counters;
 
     /**
      * specification repository
@@ -72,7 +72,7 @@ public class Services implements TermServices {
     private NameRecorder nameRecorder;
 
     private ITermProgramVariableCollectorFactory factory =
-        services -> new TermProgramVariableCollector(services);
+        TermProgramVariableCollector::new;
 
     private final Profile profile;
 
@@ -89,7 +89,7 @@ public class Services implements TermServices {
     public Services(Profile profile) {
         assert profile != null;
         this.profile = profile;
-        this.counters = new LinkedHashMap<String, Counter>();
+        this.counters = new LinkedHashMap<>();
         this.caches = new ServiceCaches();
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
@@ -256,7 +256,7 @@ public class Services implements TermServices {
      * @return The created deep copy with new {@link Counter} instances.
      */
     private HashMap<String, Counter> copyCounters() {
-        HashMap<String, Counter> result = new LinkedHashMap<String, Counter>();
+        HashMap<String, Counter> result = new LinkedHashMap<>();
         for (Entry<String, Counter> entry : counters.entrySet()) {
             result.put(entry.getKey(), entry.getValue().copy());
         }
@@ -319,8 +319,9 @@ public class Services implements TermServices {
      */
     public Counter getCounter(String name) {
         Counter c = counters.get(name);
-        if (c != null)
+        if (c != null) {
             return c;
+        }
         c = new Counter(name);
         counters.put(name, c);
         return c;
@@ -355,7 +356,7 @@ public class Services implements TermServices {
     }
 
     public interface ITermProgramVariableCollectorFactory {
-        public TermProgramVariableCollector create(Services services);
+        TermProgramVariableCollector create(Services services);
     }
 
     /**

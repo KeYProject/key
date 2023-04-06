@@ -15,7 +15,7 @@ import java.util.Set;
  */
 public class Marker implements Cloneable {
 
-    private final Set<Object> marks = new HashSet<Object>();
+    private final Set<Object> marks = new HashSet<>();
 
     public void mark(Object o) {
         marks.add(o);

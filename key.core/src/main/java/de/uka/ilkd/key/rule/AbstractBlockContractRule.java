@@ -113,7 +113,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
      */
     protected static ImmutableSet<BlockContract> filterAppliedContracts(
             final ImmutableSet<BlockContract> collectedContracts, final Goal goal) {
-        ImmutableSet<BlockContract> result = DefaultImmutableSet.<BlockContract>nil();
+        ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
         for (BlockContract contract : collectedContracts) {
             if (!contractApplied(contract, goal) || InfFlowCheckInfo.isInfFlow(goal)) {
                 result = result.add(contract);
@@ -179,7 +179,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
     protected static Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(
             final Iterable<LocationVariable> variables, final BlockContract contract,
             final TermServices services) {
-        Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>(40);
+        Map<LocationVariable, Function> result = new LinkedHashMap<>(40);
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable variable : variables) {
             if (contract.hasModifiesClause(variable)) {
@@ -210,9 +210,9 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         final TermBuilder tb = services.getTermBuilder();
         KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
         if (!suffix.equalsIgnoreCase("")) {
-            suffix = new String("_" + suffix);
+            suffix = "_" + suffix;
         }
-        String name = tb.newName(varTerm.toString() + "_After" + suffix);
+        String name = tb.newName(varTerm + "_After" + suffix);
         LocationVariable varAtPostVar =
             new LocationVariable(new ProgramElementName(name), resultType);
         register(varAtPostVar, services);
@@ -226,13 +226,13 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             return varTerms;
         }
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableList<Term> renamedLocalOuts = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> renamedLocalOuts = ImmutableSLList.nil();
         for (Term varTerm : varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 
             KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
 
-            String name = tb.newName(varTerm.toString() + "_Before");
+            String name = tb.newName(varTerm + "_Before");
             LocationVariable varAtPostVar =
                 new LocationVariable(new ProgramElementName(name), resultType);
             register(varAtPostVar, services);
@@ -248,13 +248,13 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             return varTerms;
         }
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableList<Term> renamedLocalOuts = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> renamedLocalOuts = ImmutableSLList.nil();
         for (Term varTerm : varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 
             KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
 
-            String name = tb.newName(varTerm.toString() + "_After");
+            String name = tb.newName(varTerm + "_After");
             LocationVariable varAtPostVar =
                 new LocationVariable(new ProgramElementName(name), resultType);
             register(varAtPostVar, services);

@@ -111,10 +111,12 @@ public class LoopScopeBlock extends JavaStatement
 
     public int getChildCount() {
         int result = 0;
-        if (indexPV != null)
+        if (indexPV != null) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -128,13 +130,15 @@ public class LoopScopeBlock extends JavaStatement
 
     public ProgramElement getChildAt(int index) {
         if (indexPV != null) {
-            if (index == 0)
+            if (index == 0) {
                 return indexPV;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();

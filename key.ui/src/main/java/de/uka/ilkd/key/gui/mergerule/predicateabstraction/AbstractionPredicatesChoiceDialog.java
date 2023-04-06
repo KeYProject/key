@@ -60,7 +60,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
     private ArrayList<Pair<Sort, Name>> registeredPlaceholders = new ArrayList<>();
     private ArrayList<AbstractionPredicate> registeredPredicates = new ArrayList<>();
-    private ArrayList<AbstractDomainElemChoice> abstrPredicateChoices = new ArrayList<>();
+    private final ArrayList<AbstractDomainElemChoice> abstrPredicateChoices = new ArrayList<>();
 
     private Class<? extends AbstractPredicateAbstractionLattice> latticeType =
         SimplePredicateAbstractionLattice.class;
@@ -103,9 +103,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     public AbstractionPredicatesChoiceDialog(Goal goal, List<LocationVariable> differingLocVars) {
         this();
         this.goal = goal;
-        differingLocVars.forEach(v -> {
-            abstrPredicateChoices.add(new AbstractDomainElemChoice(v, Optional.empty()));
-        });
+        differingLocVars.forEach(
+            v -> abstrPredicateChoices.add(new AbstractDomainElemChoice(v, Optional.empty())));
     }
 
     /**
@@ -581,10 +580,10 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      *
      * @author Dominic Steinhoefel
      */
-    class Result {
-        private ArrayList<AbstractionPredicate> registeredPredicates;
-        private Class<? extends AbstractPredicateAbstractionLattice> latticeType;
-        private LinkedHashMap<ProgramVariable, AbstractDomainElement> abstractDomElemUserChoices =
+    static class Result {
+        private final ArrayList<AbstractionPredicate> registeredPredicates;
+        private final Class<? extends AbstractPredicateAbstractionLattice> latticeType;
+        private final LinkedHashMap<ProgramVariable, AbstractDomainElement> abstractDomElemUserChoices =
             new LinkedHashMap<>();
 
         public Result(ArrayList<AbstractionPredicate> registeredPredicates,
@@ -667,10 +666,10 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
             items.addItem(Optional.empty());
 
             if (lattice != null) {
-                final Iterator<AbstractDomainElement> it = lattice.iterator();
-                while (it.hasNext()) {
+                for (AbstractDomainElement abstractDomainElement : lattice) {
                     items.addItem(
-                        Optional.of((AbstractPredicateAbstractionDomainElement) it.next()));
+                        Optional.of(
+                            (AbstractPredicateAbstractionDomainElement) abstractDomainElement));
                 }
             }
 

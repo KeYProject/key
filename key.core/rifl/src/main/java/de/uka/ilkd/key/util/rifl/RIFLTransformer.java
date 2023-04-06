@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.util.rifl;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -74,8 +75,9 @@ public class RIFLTransformer {
      */
     public static boolean transform(File riflFilename, File javaSource, File savePath,
             KeYRecoderExcHandler kexh) {
-        if (riflFilename == null || javaSource == null || savePath == null || kexh == null)
+        if (riflFilename == null || javaSource == null || savePath == null || kexh == null) {
             throw new IllegalArgumentException("A parameter is null");
+        }
 
         RIFLTransformer rt;
         try {
@@ -110,10 +112,11 @@ public class RIFLTransformer {
     }
 
     private static File getBaseDirPath(File origSourcePath) {
-        if (origSourcePath.isFile())
+        if (origSourcePath.isFile()) {
             return origSourcePath.getParentFile();
-        else
+        } else {
             return origSourcePath;
+        }
     }
 
     private Map<CompilationUnit, File> readJava(File root) throws IOException, ParserException {
@@ -135,7 +138,7 @@ public class RIFLTransformer {
 
             final CompilationUnit cu;
 
-            try (Reader fr = new BufferedReader(new FileReader(javaFile))) {
+            try (Reader fr = new BufferedReader(new FileReader(javaFile, StandardCharsets.UTF_8))) {
                 cu = JPF.parseCompilationUnit(fr);
 
                 // crud relative
@@ -229,8 +232,10 @@ public class RIFLTransformer {
         final var stream = getClass().getResourceAsStream("blueprint_rifl.key");
         Objects.requireNonNull(stream);
 
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(stream));
-                Writer fw = new BufferedWriter(new FileWriter(problemFileName))) {
+        try (BufferedReader br =
+            new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+                Writer fw =
+                    new BufferedWriter(new FileWriter(problemFileName, StandardCharsets.UTF_8))) {
             while ((tmp = br.readLine()) != null) {
                 blueprint.append(tmp).append("\n");
             }
@@ -238,7 +243,7 @@ public class RIFLTransformer {
             fw.write(blueprint.toString().replace("%%JAVA_SOURCE%%", newJavaFolder)
                     .replace("%%PO_NAME%%", poname));
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to write problem file", e);
         }
     }
 
@@ -256,7 +261,7 @@ public class RIFLTransformer {
      * Writes a single Java file.
      */
     private void writeJavaFile(File target, CompilationUnit cu) throws IOException {
-        try (var writer = new BufferedWriter(new FileWriter(target))) {
+        try (var writer = new BufferedWriter(new FileWriter(target, StandardCharsets.UTF_8))) {
             LOGGER.debug("Trying to write file {}", target);
             final String source = cu.toSource();
 

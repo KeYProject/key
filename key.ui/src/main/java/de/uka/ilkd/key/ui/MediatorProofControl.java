@@ -170,9 +170,7 @@ public class MediatorProofControl extends AbstractProofControl {
         protected void done() {
             try {
                 get();
-            } catch (final InterruptedException exception) {
-                notifyException(exception);
-            } catch (final ExecutionException exception) {
+            } catch (final InterruptedException | ExecutionException exception) {
                 notifyException(exception);
             } catch (final CancellationException exception) {
                 // when the user canceled it's not an error

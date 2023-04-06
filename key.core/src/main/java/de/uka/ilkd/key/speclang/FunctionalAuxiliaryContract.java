@@ -172,7 +172,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
         Map<LocationVariable, ProgramVariable> atPreVars0 =
             (Map<LocationVariable, ProgramVariable>) atPreVars;
         return contract.getPrecondition(heap, selfVar, atPreVars0.entrySet().stream().collect(
-            MapUtil.<Map.Entry<LocationVariable, ProgramVariable>, LocationVariable, LocationVariable>collector(
+            MapUtil.collector(
                 Map.Entry::getKey, entry -> (LocationVariable) entry.getValue())),
             services);
     }
