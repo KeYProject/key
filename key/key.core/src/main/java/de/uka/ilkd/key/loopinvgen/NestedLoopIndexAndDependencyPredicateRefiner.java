@@ -113,14 +113,14 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 	private Set<Term> weakeningDependencePredicates(Term unProven) {
 		Set<Term> result = new HashSet<>();
 //		**
-		System.out.println("Weaken by Pred symbol for " + unProven + ": ");
+//		System.out.println("Weaken by Pred symbol for " + unProven + ": ");
 		if(unProven!=null) {
 			result.addAll(weakenByPredicateSymbol(unProven));
 
-		System.out.println("Weaken by Index for "+unProven);
+//		System.out.println("Weaken by Index for "+unProven);
 		result.addAll(weakenByIndexesANDPredicate(unProven));
 		if (itrNumber < 1) {
-		System.out.println("Weaken by Subset for "+unProven);
+//		System.out.println("Weaken by Subset for "+unProven);
 			result.addAll(weakenBySubSetInnerLoop(unProven));
 
 		}

@@ -34,19 +34,19 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 
 
 		outerCompPreds.add(tb.geq(indexOuter, lowOuter));
-		outerCompPreds.add(tb.geq(indexOuter, tb.add(lowOuter, tb.one())));
-		outerCompPreds.add(tb.geq(indexOuter, tb.sub(lowOuter, tb.one())));
+//		outerCompPreds.add(tb.geq(indexOuter, tb.add(lowOuter, tb.one())));
+//		outerCompPreds.add(tb.geq(indexOuter, tb.sub(lowOuter, tb.one())));
 		outerCompPreds.add(tb.leq(indexOuter, highOuter));
-		outerCompPreds.add(tb.leq(indexOuter, tb.add(highOuter, tb.one())));
-		outerCompPreds.add(tb.leq(indexOuter, tb.sub(highOuter, tb.one())));
+//		outerCompPreds.add(tb.leq(indexOuter, tb.add(highOuter, tb.one())));
+//		outerCompPreds.add(tb.leq(indexOuter, tb.sub(highOuter, tb.one())));
 
 
 		outerCompPreds.add(tb.geq(indexInner, lowInner));
-		outerCompPreds.add(tb.geq(indexInner, tb.add(lowInner, tb.one())));
-		outerCompPreds.add(tb.geq(indexInner, tb.sub(lowInner, tb.one())));
+//		outerCompPreds.add(tb.geq(indexInner, tb.add(lowInner, tb.one())));
+//		outerCompPreds.add(tb.geq(indexInner, tb.sub(lowInner, tb.one())));
 		outerCompPreds.add(tb.leq(indexInner, tb.add(highInner, tb.one())));
-		outerCompPreds.add(tb.leq(indexInner, highInner));
-		outerCompPreds.add(tb.leq(indexInner, tb.sub(highInner, tb.one())));
+//		outerCompPreds.add(tb.leq(indexInner, highInner));
+//		outerCompPreds.add(tb.leq(indexInner, tb.sub(highInner, tb.one())));
 
 		outerCompPreds.add(tb.wellFormedMatrix(arrays[0], tb.getBaseHeap()));
 
@@ -56,19 +56,19 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 
 
 		innerCompPreds.add(tb.geq(indexOuter, lowOuter));
-		innerCompPreds.add(tb.geq(indexOuter, tb.add(lowOuter, tb.one())));
-		innerCompPreds.add(tb.geq(indexOuter, tb.sub(lowOuter, tb.one())));
+//		innerCompPreds.add(tb.geq(indexOuter, tb.add(lowOuter, tb.one())));
+//		innerCompPreds.add(tb.geq(indexOuter, tb.sub(lowOuter, tb.one())));
 		innerCompPreds.add(tb.leq(indexOuter, highOuter));
-		innerCompPreds.add(tb.leq(indexOuter, tb.add(highOuter, tb.one())));
-		innerCompPreds.add(tb.leq(indexOuter, tb.sub(highOuter, tb.one())));
+//		innerCompPreds.add(tb.leq(indexOuter, tb.add(highOuter, tb.one())));
+//		innerCompPreds.add(tb.leq(indexOuter, tb.sub(highOuter, tb.one())));
 
 
 		innerCompPreds.add(tb.geq(indexInner, lowInner));
-		innerCompPreds.add(tb.geq(indexInner, tb.add(lowInner, tb.one())));
-		innerCompPreds.add(tb.geq(indexInner, tb.sub(lowInner, tb.one())));
+//		innerCompPreds.add(tb.geq(indexInner, tb.add(lowInner, tb.one())));
+//		innerCompPreds.add(tb.geq(indexInner, tb.sub(lowInner, tb.one())));
 		innerCompPreds.add(tb.leq(indexInner, highInner));
-		innerCompPreds.add(tb.leq(indexInner, tb.add(highInner, tb.one())));
-		innerCompPreds.add(tb.leq(indexInner, tb.sub(highInner, tb.one())));
+//		innerCompPreds.add(tb.leq(indexInner, tb.add(highInner, tb.one())));
+//		innerCompPreds.add(tb.leq(indexInner, tb.sub(highInner, tb.one())));
 
 
 
@@ -128,7 +128,7 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 			// Second approach calculates th inner LI for each outer iteration.
 			// I should compare their speed and precision.
 			ImmutableList<Goal> goalsAfterShiftUpdate = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
-			System.out.println("Num of Goals after Shifting Outer Loop's Updates: " + goalsAfterShiftUpdate.size());
+//			System.out.println("Num of Goals after Shifting Outer Loop's Updates: " + goalsAfterShiftUpdate.size());
 			for (Goal g : goalsAfterShiftUpdate) {
 				for (final SequentFormula sf : g.sequent().succedent()) {
 					final Term formula = tb.goBelowUpdates(sf.formula());

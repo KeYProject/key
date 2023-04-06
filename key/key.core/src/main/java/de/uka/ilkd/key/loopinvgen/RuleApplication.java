@@ -91,20 +91,20 @@ public class RuleApplication {
 			final ImmutableList<Goal> goals = currentGoal.apply(app);
 
 //			System.out.println("Number of Open Goals after applying NestedLoopUsecase: " + currentGoal.proof().openGoals().size());
-			System.out.println("After NestedLoopUsecase:" + ProofSaver.printAnything(currentGoal.sequent(), services));
+//			System.out.println("After NestedLoopUsecase:" + ProofSaver.printAnything(currentGoal.sequent(), services));
 			try {
-				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
+//				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
 
 				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\NestedLoopUsecaseRuleApplication.key")).save();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			ps.start(goals);
-			for(Goal g: goals){
-				System.out.println("After Start:"+g.sequent());
-			}
+//			for(Goal g: goals){
+////				System.out.println("After Start:"+g.sequent());
+//			}
 			try {
-				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
+//				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
 
 				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\testAfterSEAfterShift.key")).save();
 			} catch (IOException e) {
@@ -190,7 +190,7 @@ public class RuleApplication {
 				IBuiltInRuleApp bApp = findShiftUpdateRuleApp(
 						g.ruleAppIndex().getBuiltInRules(g, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
 				if (bApp != null) {
-					System.out.println("Goal of taclet shiftUpdate" + " is: " + g);
+//					System.out.println("Goal of taclet shiftUpdate" + " is: " + g);
 					return g;
 				}
 			}
@@ -237,8 +237,9 @@ public class RuleApplication {
 				e.printStackTrace();
 			}
 
-			ApplyStrategyInfo info = ps.start(goals);
-			System.out.println("info after unwind: "+info);
+//			ApplyStrategyInfo info =
+					ps.start(goals);
+//			System.out.println("info after unwind: "+info);
 
 			return currentGoal.proof().openGoals();
 		}
@@ -296,7 +297,8 @@ public class RuleApplication {
 				e.printStackTrace();
 			}
 
-			ApplyStrategyInfo info = ps.start(goals);
+//			ApplyStrategyInfo info =
+					ps.start(goals);
 //			System.out.println("info after unwind: "+info);
 
 			return currentGoal.proof().openGoals();
