@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.*;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.proof.CompoundProof;
 import de.uka.ilkd.key.proof.Proof;
@@ -44,7 +45,7 @@ public class TacletSoundnessPOLoader {
     public interface LoaderListener {
         void started();
 
-        void stopped(ProofAggregate p, ImmutableSet<Taclet> taclets, boolean addAsAxioms);
+        void stopped(@Nullable ProofAggregate p, ImmutableSet<Taclet> taclets, boolean addAsAxioms);
 
         void stopped(Throwable exception);
 
@@ -240,7 +241,8 @@ public class TacletSoundnessPOLoader {
     }
 
 
-    private void computeResultingTaclets(List<TacletInfo> collectionOfTacletInfo) {
+    private void computeResultingTaclets(List<TacletInfo> collectionOfTacletInfo)
+            throws ProofInputException {
         resultingTaclets = tacletFilter.filter(collectionOfTacletInfo);
         if (!isUsedOnlyForProvingTaclets()) {
             assert tacletLoader instanceof TacletLoader.TacletFromFileLoader;
