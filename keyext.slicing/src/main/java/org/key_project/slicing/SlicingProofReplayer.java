@@ -334,6 +334,7 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
         } else {
             filename = MiscTools.removeFileExtension(currentProof.name().toString());
         }
+        filename = MiscTools.toValidFileName(filename);
         int prevSlice = filename.indexOf("_slice");
         if (prevSlice != -1) {
             int sliceNr = Integer.parseInt(filename.substring(prevSlice + "_slice".length()));
