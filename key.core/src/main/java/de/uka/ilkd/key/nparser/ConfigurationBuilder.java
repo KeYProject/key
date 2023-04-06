@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.nparser;
 
-import de.uka.ilkd.key.settings.Configuration;
-import de.uka.ilkd.key.util.LinkedHashMap;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.settings.Configuration;
+import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
  * @author Alexander Weigl

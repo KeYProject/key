@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.settings;
 
 
-import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
-
 import java.util.Properties;
+
+import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 
 
 public class ProofDependentSMTSettings extends AbstractSettings {
@@ -11,14 +11,14 @@ public class ProofDependentSMTSettings extends AbstractSettings {
 
     public static final String EXPLICIT_TYPE_HIERARCHY = "explicitTypeHierarchy";
     public static final String INSTANTIATE_NULL_PREDICATES =
-            "instantiateHierarchyAssumptions";
+        "instantiateHierarchyAssumptions";
     public static final String MAX_GENERIC_SORTS = "maxGenericSorts";
     public static final String TACLET_SELECTION = "SelectedTaclets";
     public static final String USE_BUILT_IN_UNIQUENESS = "UseBuiltUniqueness";
     public static final String USE_UNINTERPRETED_MULTIPLICATION =
-            "useUninterpretedMultiplication";
+        "useUninterpretedMultiplication";
     public static final String USE_CONSTANTS_FOR_BIGSMALL_INTEGERS =
-            "useConstantsForBigOrSmallIntegers";
+        "useConstantsForBigOrSmallIntegers";
     public static final String INTEGERS_MAXIMUM = "integersMaximum";
     public static final String INTEGERS_MINIMUM = "integersMinimum";
     public static final String INVARIANT_FORALL = "invariantForall";
@@ -50,7 +50,7 @@ public class ProofDependentSMTSettings extends AbstractSettings {
 
     public void copy(ProofDependentSMTSettings data) {
         setSupportedTaclets(
-                new SupportedTaclets(data.supportedTaclets.getNamesOfSelectedTaclets()));
+            new SupportedTaclets(data.supportedTaclets.getNamesOfSelectedTaclets()));
         setUseExplicitTypeHierarchy(data.useExplicitTypeHierarchy);
         setUseNullInstantiation(data.useNullInstantiation);
         setMaxGenericSorts(data.maxGenericSorts);
@@ -80,23 +80,28 @@ public class ProofDependentSMTSettings extends AbstractSettings {
     public void readSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";
         setUseExplicitTypeHierarchy(
-                SettingsConverter.read(props, prefix + EXPLICIT_TYPE_HIERARCHY, useExplicitTypeHierarchy));
+            SettingsConverter.read(props, prefix + EXPLICIT_TYPE_HIERARCHY,
+                useExplicitTypeHierarchy));
         setUseNullInstantiation(
-                SettingsConverter.read(props, prefix + INSTANTIATE_NULL_PREDICATES, useNullInstantiation));
+            SettingsConverter.read(props, prefix + INSTANTIATE_NULL_PREDICATES,
+                useNullInstantiation));
         setUseBuiltInUniqueness(
-                SettingsConverter.read(props, prefix + USE_BUILT_IN_UNIQUENESS, useBuiltInUniqueness));
-        setMaxGenericSorts(SettingsConverter.read(props, prefix + MAX_GENERIC_SORTS, maxGenericSorts));
+            SettingsConverter.read(props, prefix + USE_BUILT_IN_UNIQUENESS, useBuiltInUniqueness));
+        setMaxGenericSorts(
+            SettingsConverter.read(props, prefix + MAX_GENERIC_SORTS, maxGenericSorts));
         setUseUIMultiplication(
-                SettingsConverter.read(props, prefix + USE_UNINTERPRETED_MULTIPLICATION, useUIMultiplication));
+            SettingsConverter.read(props, prefix + USE_UNINTERPRETED_MULTIPLICATION,
+                useUIMultiplication));
         setUseConstantsForIntegers(
-                SettingsConverter.read(props, prefix + USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,
-                        useConstantsForIntegers));
+            SettingsConverter.read(props, prefix + USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,
+                useConstantsForIntegers));
 
         setMaxInteger(SettingsConverter.read(props, prefix + INTEGERS_MAXIMUM, maxInteger));
         setMinInteger(SettingsConverter.read(props, prefix + INTEGERS_MINIMUM, minInteger));
-        setInvariantForall(SettingsConverter.read(props, prefix + INVARIANT_FORALL, invariantForall));
+        setInvariantForall(
+            SettingsConverter.read(props, prefix + INVARIANT_FORALL, invariantForall));
         supportedTaclets.selectTaclets(SettingsConverter.read(props, prefix + TACLET_SELECTION,
-                supportedTaclets.getNamesOfSelectedTaclets()));
+            supportedTaclets.getNamesOfSelectedTaclets()));
     }
 
     @Override
@@ -106,11 +111,12 @@ public class ProofDependentSMTSettings extends AbstractSettings {
         SettingsConverter.store(props, prefix + INSTANTIATE_NULL_PREDICATES, useNullInstantiation);
         SettingsConverter.store(props, prefix + MAX_GENERIC_SORTS, maxGenericSorts);
         SettingsConverter.store(props, prefix + TACLET_SELECTION,
-                supportedTaclets.getNamesOfSelectedTaclets());
+            supportedTaclets.getNamesOfSelectedTaclets());
         SettingsConverter.store(props, prefix + USE_BUILT_IN_UNIQUENESS, useBuiltInUniqueness);
-        SettingsConverter.store(props, prefix + USE_UNINTERPRETED_MULTIPLICATION, useUIMultiplication);
+        SettingsConverter.store(props, prefix + USE_UNINTERPRETED_MULTIPLICATION,
+            useUIMultiplication);
         SettingsConverter.store(props, prefix + USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,
-                useConstantsForIntegers);
+            useConstantsForIntegers);
         SettingsConverter.store(props, prefix + INTEGERS_MAXIMUM, maxInteger);
         SettingsConverter.store(props, prefix + INTEGERS_MINIMUM, minInteger);
         SettingsConverter.store(props, prefix + INVARIANT_FORALL, invariantForall);
@@ -120,19 +126,23 @@ public class ProofDependentSMTSettings extends AbstractSettings {
     public void readSettings(Configuration props) {
         props = props.getSection(CATEGORY);
 
-        if (props == null) return;
+        if (props == null)
+            return;
 
-        setUseExplicitTypeHierarchy(props.getBool(EXPLICIT_TYPE_HIERARCHY, useExplicitTypeHierarchy));
+        setUseExplicitTypeHierarchy(
+            props.getBool(EXPLICIT_TYPE_HIERARCHY, useExplicitTypeHierarchy));
         setUseNullInstantiation(props.getBool(INSTANTIATE_NULL_PREDICATES, useNullInstantiation));
         setUseBuiltInUniqueness(props.getBool(USE_BUILT_IN_UNIQUENESS, useBuiltInUniqueness));
         setMaxGenericSorts(props.getInt(MAX_GENERIC_SORTS, maxGenericSorts));
-        setUseUIMultiplication(props.getBool(USE_UNINTERPRETED_MULTIPLICATION, useUIMultiplication));
-        setUseConstantsForIntegers(props.getBool(USE_CONSTANTS_FOR_BIGSMALL_INTEGERS, useConstantsForIntegers));
+        setUseUIMultiplication(
+            props.getBool(USE_UNINTERPRETED_MULTIPLICATION, useUIMultiplication));
+        setUseConstantsForIntegers(
+            props.getBool(USE_CONSTANTS_FOR_BIGSMALL_INTEGERS, useConstantsForIntegers));
         setMaxInteger(props.getInt(INTEGERS_MAXIMUM, maxInteger));
         setMinInteger(props.getInt(INTEGERS_MINIMUM, minInteger));
         setInvariantForall(props.getBool(INVARIANT_FORALL, invariantForall));
         supportedTaclets.selectTaclets(
-                props.getStringArray(TACLET_SELECTION, supportedTaclets.getNamesOfSelectedTaclets()));
+            props.getStringArray(TACLET_SELECTION, supportedTaclets.getNamesOfSelectedTaclets()));
 
     }
 

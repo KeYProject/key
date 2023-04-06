@@ -1,16 +1,17 @@
 package de.uka.ilkd.key.settings;
 
-import de.uka.ilkd.key.nparser.ParsingFacade;
-import de.uka.ilkd.key.util.Position;
-import org.antlr.v4.runtime.CharStream;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.util.Position;
+
+import org.antlr.v4.runtime.CharStream;
 
 /**
  * @author Alexander Weigl
@@ -45,14 +46,18 @@ public class Configuration {
     }
 
     public <T> T get(String name, Class<T> clazz) {
-        if (exists(name, clazz)) return (T) data.get(name);
-        else return null;
+        if (exists(name, clazz))
+            return (T) data.get(name);
+        else
+            return null;
     }
 
     @Nonnull
     public <T> T get(String name, @Nonnull T defaultValue) {
-        if (exists(name, defaultValue.getClass())) return (T) data.get(name);
-        else return defaultValue;
+        if (exists(name, defaultValue.getClass()))
+            return (T) data.get(name);
+        else
+            return defaultValue;
     }
 
     @Nullable
@@ -109,7 +114,8 @@ public class Configuration {
         var seq = get(name, List.class);
         if (seq == null)
             return Collections.emptyList();
-        if (!seq.stream().allMatch(it -> it instanceof String)) throw new AssertionError();
+        if (!seq.stream().allMatch(it -> it instanceof String))
+            throw new AssertionError();
         return seq;
     }
 
@@ -117,7 +123,8 @@ public class Configuration {
     public String[] getStringArray(String name, @Nonnull String[] defaultValue) {
         if (exists(name)) {
             return getStringList(name).toArray(new String[0]);
-        } else return defaultValue;
+        } else
+            return defaultValue;
     }
 
 
@@ -284,7 +291,8 @@ public class Configuration {
             out.format("{ ");
             indent += 4;
             newline().printIndent();
-            for (Iterator<Map.Entry<String, Object>> iterator = value.entrySet().iterator(); iterator.hasNext(); ) {
+            for (Iterator<Map.Entry<String, Object>> iterator =
+                value.entrySet().iterator(); iterator.hasNext();) {
                 Map.Entry<String, Object> entry = iterator.next();
                 String k = entry.getKey();
                 Object v = entry.getValue();
@@ -311,7 +319,7 @@ public class Configuration {
             indent += 4;
             newline();
             printIndent();
-            for (Iterator<Object> iterator = value.iterator(); iterator.hasNext(); ) {
+            for (Iterator<Object> iterator = value.iterator(); iterator.hasNext();) {
                 Object o = iterator.next();
                 printValue(o);
                 if (iterator.hasNext()) {

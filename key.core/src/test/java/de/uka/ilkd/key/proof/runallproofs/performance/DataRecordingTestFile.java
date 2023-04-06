@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
 import java.io.File;
+import java.io.IOException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -14,11 +15,13 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.Pair;
 
-@SuppressWarnings("serial")
 class DataRecordingTestFile extends TestFile {
+    public final ProfilingDirectories directories;
+
     public DataRecordingTestFile(TestProperty testProperty, String path,
-            ProofCollectionSettings settings) {
-        super(testProperty, path, settings, new ProfilingDirectories(settings.runStart));
+            ProofCollectionSettings settings) throws IOException {
+        super(testProperty, path, settings);
+        this.directories = new ProfilingDirectories(settings.runStart);
     }
 
     @Override
@@ -49,6 +52,6 @@ class DataRecordingTestFile extends TestFile {
     }
 
     public final ProfilingDirectories getProfileDirectories() {
-        return (ProfilingDirectories) directories;
+        return directories;
     }
 }

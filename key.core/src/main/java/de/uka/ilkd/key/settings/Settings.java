@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.settings;
 
-import javax.annotation.Nonnull;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Properties;
+import javax.annotation.Nonnull;
 
 /**
  * This interface is implemented by classes that are used to store settings for different proposes
@@ -30,23 +30,26 @@ public interface Settings {
     void writeSettings(Properties props);
 
     /**
-     * This method transfers the given configuration information into the local states. The setter methods are used
+     * This method transfers the given configuration information into the local states. The setter
+     * methods are used
      * so {@link java.beans.PropertyChangeEvent} should be triggered accordingly to the new state.
      * <p>
      *
      * @param props a non-null references to a configuration object. The state of this object
-     *              shall not be changed by the implementations.
+     *        shall not be changed by the implementations.
      */
     void readSettings(@Nonnull Configuration props);
 
     /**
-     * The internal state is stored in the given configuration object. The stored information must be sufficient
+     * The internal state is stored in the given configuration object. The stored information must
+     * be sufficient
      * to restore the local state.
      * <p>
      * The internal state shall not be changed by the implementations.
      *
-     * @param props a non-null reference to a configration object, which state is modified accordingly to the local
-     *              internal state.
+     * @param props a non-null reference to a configration object, which state is modified
+     *        accordingly to the local
+     *        internal state.
      */
     void writeSettings(@Nonnull Configuration props);
 
@@ -71,17 +74,19 @@ public interface Settings {
      * Register a new listener which is triggered for changes on the specified property.
      *
      * @param propertyName the name for identification of the property
-     * @param listener     the listener to be added
+     * @param listener the listener to be added
      * @see PropertyChangeSupport#addPropertyChangeListener(String, PropertyChangeListener)
      */
-    void addPropertyChangeListener(@Nonnull String propertyName, @Nonnull PropertyChangeListener listener);
+    void addPropertyChangeListener(@Nonnull String propertyName,
+            @Nonnull PropertyChangeListener listener);
 
     /**
      * Removes the given listener from being triggered by changes of the specified property.
      *
      * @param propertyName the name for identification of the property
-     * @param listener     the listener to be removed
+     * @param listener the listener to be removed
      * @see PropertyChangeSupport#removePropertyChangeListener(String, PropertyChangeListener)
      */
-    void removePropertyChangeListener(@Nonnull String propertyName, @Nonnull PropertyChangeListener listener);
+    void removePropertyChangeListener(@Nonnull String propertyName,
+            @Nonnull PropertyChangeListener listener);
 }

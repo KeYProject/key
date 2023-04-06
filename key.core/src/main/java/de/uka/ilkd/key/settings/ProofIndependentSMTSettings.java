@@ -1,14 +1,14 @@
 package de.uka.ilkd.key.settings;
 
-import de.uka.ilkd.key.smt.SolverTypeCollection;
-import de.uka.ilkd.key.smt.solvertypes.SolverType;
-import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
-
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.smt.SolverTypeCollection;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
 public final class ProofIndependentSMTSettings extends AbstractSettings {
     private static final String CATEGORY = "SMTSettings";
@@ -36,15 +36,15 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
     public static final String SOLVER_CHECK_FOR_SUPPORT = "checkForSupport";
 
     private static final ProofIndependentSMTSettings DEFAULT_DATA =
-            new ProofIndependentSMTSettings();
+        new ProofIndependentSMTSettings();
 
     private static final int DEFAULT_BIT_LENGTH_FOR_CE_GENERATION = 3;
     public static final String PROP_SOLVER_UNION = "activeSolverUnion";
     public static final String PROP_SHOW_RESULT_AFTER_EXECUTION =
-            "PROP_SHOW_RESULT_AFTER_EXECUTION";
+        "PROP_SHOW_RESULT_AFTER_EXECUTION";
     public static final String PROP_STORE_SMT_TRANSLATION_FILE = "PROP_STORE_SMT_TRANSLATION_FILE";
     public static final String PROP_STORE_TACLET_TRANSLATION_FILE =
-            "PROP_STORE_TACLET_TRANSLATION_FILE";
+        "PROP_STORE_TACLET_TRANSLATION_FILE";
 
     private final Collection<SolverType> solverTypes = new LinkedList<>();
     private boolean showResultsAfterExecution = false;
@@ -130,7 +130,7 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
         var old = this.storeTacletTranslationToFile;
         this.storeTacletTranslationToFile = storeTacletTranslationToFile;
         firePropertyChange(PROP_STORE_TACLET_TRANSLATION_FILE, old,
-                this.storeTacletTranslationToFile);
+            this.storeTacletTranslationToFile);
 
     }
 
@@ -334,16 +334,19 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
 
         timeout = SettingsConverter.read(props, prefix + KEY_TIMEOUT, timeout);
         showResultsAfterExecution =
-                SettingsConverter.read(props, prefix + SHOW_SMT_RES_DIA, showResultsAfterExecution);
+            SettingsConverter.read(props, prefix + SHOW_SMT_RES_DIA, showResultsAfterExecution);
         pathForSMTTranslation =
-                SettingsConverter.read(props, prefix + PATH_FOR_SMT_TRANSLATION, pathForSMTTranslation);
+            SettingsConverter.read(props, prefix + PATH_FOR_SMT_TRANSLATION, pathForSMTTranslation);
         pathForTacletTranslation =
-                SettingsConverter.read(props, prefix + PATH_FOR_TACLET_TRANSLATION, pathForTacletTranslation);
+            SettingsConverter.read(props, prefix + PATH_FOR_TACLET_TRANSLATION,
+                pathForTacletTranslation);
         modeOfProgressDialog = SettingsConverter.read(props, prefix + PROGRESS_DIALOG_MODE,
-                modeOfProgressDialog, ProgressMode.values());
+            modeOfProgressDialog, ProgressMode.values());
         maxConcurrentProcesses =
-                SettingsConverter.read(props, prefix + MAX_CONCURRENT_PROCESSES, maxConcurrentProcesses);
-        checkForSupport = SettingsConverter.read(props, prefix + SOLVER_CHECK_FOR_SUPPORT, checkForSupport);
+            SettingsConverter.read(props, prefix + MAX_CONCURRENT_PROCESSES,
+                maxConcurrentProcesses);
+        checkForSupport =
+            SettingsConverter.read(props, prefix + SOLVER_CHECK_FOR_SUPPORT, checkForSupport);
         intBound = SettingsConverter.read(props, prefix + INT_BOUND, intBound);
         heapBound = SettingsConverter.read(props, prefix + HEAP_BOUND, heapBound);
         seqBound = SettingsConverter.read(props, prefix + FIELD_BOUND, seqBound);
@@ -351,11 +354,13 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
         objectBound = SettingsConverter.read(props, prefix + OBJECT_BOUND, objectBound);
 
         for (SolverType type : solverTypes) {
-            type.setSolverTimeout(SettingsConverter.read(props, prefix + PROP_TIMEOUT + type.getName(),
+            type.setSolverTimeout(
+                SettingsConverter.read(props, prefix + PROP_TIMEOUT + type.getName(),
                     type.getDefaultSolverTimeout()));
             type.setSolverParameters(SettingsConverter.read(props,
-                    prefix + SOLVER_PARAMETERS + type.getName(), type.getDefaultSolverParameters()));
-            type.setSolverCommand(SettingsConverter.read(props, prefix + SOLVER_COMMAND + type.getName(),
+                prefix + SOLVER_PARAMETERS + type.getName(), type.getDefaultSolverParameters()));
+            type.setSolverCommand(
+                SettingsConverter.read(props, prefix + SOLVER_COMMAND + type.getName(),
                     type.getDefaultSolverCommand()));
         }
     }
@@ -366,7 +371,8 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
         SettingsConverter.store(props, prefix + SHOW_SMT_RES_DIA, showResultsAfterExecution);
         SettingsConverter.store(props, prefix + PROGRESS_DIALOG_MODE, modeOfProgressDialog);
         SettingsConverter.store(props, prefix + PATH_FOR_SMT_TRANSLATION, pathForSMTTranslation);
-        SettingsConverter.store(props, prefix + PATH_FOR_TACLET_TRANSLATION, pathForTacletTranslation);
+        SettingsConverter.store(props, prefix + PATH_FOR_TACLET_TRANSLATION,
+            pathForTacletTranslation);
         SettingsConverter.store(props, prefix + ACTIVE_SOLVER, activeSolver);
         SettingsConverter.store(props, prefix + MAX_CONCURRENT_PROCESSES, maxConcurrentProcesses);
         SettingsConverter.store(props, prefix + SOLVER_CHECK_FOR_SUPPORT, checkForSupport);
@@ -377,23 +383,26 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
         SettingsConverter.store(props, prefix + LOCSET_BOUND, locsetBound);
 
         for (SolverType type : solverTypes) {
-            SettingsConverter.store(props, prefix + PROP_TIMEOUT + type.getName(), type.getSolverTimeout());
+            SettingsConverter.store(props, prefix + PROP_TIMEOUT + type.getName(),
+                type.getSolverTimeout());
             SettingsConverter.store(props, prefix + SOLVER_PARAMETERS + type.getName(),
-                    type.getSolverParameters());
+                type.getSolverParameters());
             SettingsConverter.store(props, prefix + SOLVER_COMMAND + type.getName(),
-                    type.getSolverCommand());
+                type.getSolverCommand());
         }
     }
 
     @Override
     public void readSettings(Configuration props) {
         var cat = props.getSection(CATEGORY);
-        if (cat == null) return;
+        if (cat == null)
+            return;
 
         setTimeout(cat.getLong(KEY_TIMEOUT, timeout));
         setShowResultsAfterExecution(cat.getBool(SHOW_SMT_RES_DIA, showResultsAfterExecution));
         setPathForSMTTranslation(cat.getString(PATH_FOR_SMT_TRANSLATION, pathForSMTTranslation));
-        setPathForTacletTranslation(cat.getString(PATH_FOR_TACLET_TRANSLATION, pathForTacletTranslation));
+        setPathForTacletTranslation(
+            cat.getString(PATH_FOR_TACLET_TRANSLATION, pathForTacletTranslation));
         setModeOfProgressDialog(cat.getEnum(PROGRESS_DIALOG_MODE, modeOfProgressDialog));
         setMaxConcurrentProcesses(cat.getInt(MAX_CONCURRENT_PROCESSES, maxConcurrentProcesses));
         setCheckForSupport(cat.getBool(SOLVER_CHECK_FOR_SUPPORT, checkForSupport));
@@ -405,9 +414,11 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
 
         for (SolverType type : solverTypes) {
             var solver = cat.getTable(type.getName());
-            if (solver == null) return;
+            if (solver == null)
+                return;
 
-            type.setSolverParameters(props.getString(SOLVER_PARAMETERS, type.getDefaultSolverParameters()));
+            type.setSolverParameters(
+                props.getString(SOLVER_PARAMETERS, type.getDefaultSolverParameters()));
             type.setSolverTimeout(solver.getLong(PROP_TIMEOUT, type.getDefaultSolverTimeout()));
             type.setSolverCommand(solver.getString(SOLVER_COMMAND, type.getDefaultSolverCommand()));
         }

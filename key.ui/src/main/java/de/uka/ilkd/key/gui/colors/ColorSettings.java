@@ -1,23 +1,24 @@
 package de.uka.ilkd.key.gui.colors;
 
-import de.uka.ilkd.key.gui.settings.SettingsManager;
-import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
-import de.uka.ilkd.key.settings.Configuration;
-import de.uka.ilkd.key.settings.PathConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Map;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
+
+import de.uka.ilkd.key.gui.settings.SettingsManager;
+import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
+import de.uka.ilkd.key.settings.Configuration;
+import de.uka.ilkd.key.settings.PathConfig;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configurable colors for KeY.
@@ -30,10 +31,10 @@ import java.util.stream.Stream;
 public class ColorSettings extends AbstractPropertiesSettings {
     public static final String SETTINGS_FILENAME = "colors.properties";
     public static final File SETTINGS_FILE =
-            new File(PathConfig.getKeyConfigDir(), SETTINGS_FILENAME);
+        new File(PathConfig.getKeyConfigDir(), SETTINGS_FILENAME);
 
     public static final File SETTINGS_FILE_NEW =
-            new File(PathConfig.getKeyConfigDir(), "colors.json");
+        new File(PathConfig.getKeyConfigDir(), "colors.json");
     private static final Logger LOGGER = LoggerFactory.getLogger(ColorSettings.class);
     private static ColorSettings INSTANCE;
 
@@ -79,7 +80,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
     public static Color fromHex(String s) {
         long i = Long.decode(s);
         return new Color((int) ((i >> 16) & 0xFF), (int) ((i >> 8) & 0xFF), (int) (i & 0xFF),
-                (int) ((i >> 24) & 0xFF));
+            (int) ((i >> 24) & 0xFF));
     }
 
     public static Color invert(Color c) {
@@ -116,7 +117,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
 
     private ColorProperty createColorProperty(String key, String description, Color defaultValue) {
         Optional<ColorProperty> item =
-                getProperties().filter(it -> it.getKey().equals(key)).findFirst();
+            getProperties().filter(it -> it.getKey().equals(key)).findFirst();
         if (item.isPresent()) {
             return item.get();
         }

@@ -171,7 +171,8 @@ public class InitConfig {
      * specified choice the default choice contained in category2DefaultChoice is added.
      */
     public void setActivatedChoices(ImmutableSet<Choice> activatedChoices) {
-        category2DefaultChoice = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+        category2DefaultChoice =
+            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
 
         HashMap<String, String> c2DC = new HashMap<>(category2DefaultChoice);
         for (final Choice c : activatedChoices) {

@@ -194,12 +194,14 @@ public class GeneralSettings extends AbstractSettings {
     @Override
     public void writeSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";
-        props.setProperty(prefix+TACLET_FILTER, String.valueOf(tacletFilter));
-        props.setProperty(prefix+DND_DIRECTION_SENSITIVE_KEY, String.valueOf(dndDirectionSensitive));
-        props.setProperty(prefix+RIGHT_CLICK_MACROS_KEY, String.valueOf(rightClickMacros));
-        props.setProperty(prefix+USE_JML_KEY, String.valueOf(useJML));
-        props.setProperty(prefix+AUTO_SAVE, String.valueOf(autoSave));
-        props.setProperty(prefix+ENSURE_SOURCE_CONSISTENCY, String.valueOf(ensureSourceConsistency));
+        props.setProperty(prefix + TACLET_FILTER, String.valueOf(tacletFilter));
+        props.setProperty(prefix + DND_DIRECTION_SENSITIVE_KEY,
+            String.valueOf(dndDirectionSensitive));
+        props.setProperty(prefix + RIGHT_CLICK_MACROS_KEY, String.valueOf(rightClickMacros));
+        props.setProperty(prefix + USE_JML_KEY, String.valueOf(useJML));
+        props.setProperty(prefix + AUTO_SAVE, String.valueOf(autoSave));
+        props.setProperty(prefix + ENSURE_SOURCE_CONSISTENCY,
+            String.valueOf(ensureSourceConsistency));
     }
 
     @Override

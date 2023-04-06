@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.settings;
 
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * A base class for own settings based on properties.
@@ -104,7 +104,8 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
     @Override
     public void readSettings(Configuration props) {
         var cat = props.getSection(category);
-        if (cat == null) return;
+        if (cat == null)
+            return;
         propertyEntries.forEach(it -> {
             final var value = cat.get(it.getKey());
             if (value != null) {
@@ -153,8 +154,8 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
 
     protected PropertyEntry<Set<String>> createStringSetProperty(String key, String defValue) {
         PropertyEntry<Set<String>> pe = new DefaultPropertyEntry<>(key, parseStringSet(defValue),
-                AbstractPropertiesSettings::parseStringSet,
-                AbstractPropertiesSettings::stringSetToString);
+            AbstractPropertiesSettings::parseStringSet,
+            AbstractPropertiesSettings::stringSetToString);
         propertyEntries.add(pe);
         return pe;
     }
@@ -162,15 +163,15 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
     /**
      * Creates a string list property.
      *
-     * @param key      the key value of this property inside {@link Properties} instance
+     * @param key the key value of this property inside {@link Properties} instance
      * @param defValue a default value
      * @return returns a {@link PropertyEntry}
      */
     protected PropertyEntry<List<String>> createStringListProperty(@Nonnull String key,
-                                                                   @Nullable String defValue) {
+            @Nullable String defValue) {
         PropertyEntry<List<String>> pe = new DefaultPropertyEntry<>(key, parseStringList(defValue),
-                AbstractPropertiesSettings::parseStringList,
-                AbstractPropertiesSettings::stringListToString);
+            AbstractPropertiesSettings::parseStringList,
+            AbstractPropertiesSettings::stringListToString);
         propertyEntries.add(pe);
         return pe;
     }
@@ -204,7 +205,7 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
         }
 
         private DefaultPropertyEntry(String key, T defaultValue, Function<String, T> convert,
-                                     Function<T, String> toString) {
+                Function<T, String> toString) {
             this.key = key;
             this.defaultValue = defaultValue;
             this.convert = convert;

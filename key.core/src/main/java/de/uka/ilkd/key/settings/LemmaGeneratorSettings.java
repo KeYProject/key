@@ -5,9 +5,9 @@ import java.util.Properties;
 public class LemmaGeneratorSettings extends AbstractSettings {
     public static final String CATEGORY = "LemmaGenerator";
     private static final String SHOW_DIALOG_ADDING_AXIOMS =
-            "showDialogWhenAddingAxioms";
+        "showDialogWhenAddingAxioms";
     private static final String SHOW_DIALOG_USING_AXIOMS =
-            "showDialogWhenUsingTacletsAsAxioms";
+        "showDialogWhenUsingTacletsAsAxioms";
 
     private boolean showDialogAddingAxioms = true;
     private boolean showDialogUsingAxioms = true;
@@ -35,21 +35,24 @@ public class LemmaGeneratorSettings extends AbstractSettings {
     @Override
     public void readSettings(Properties props) {
         setShowDialogAddingAxioms(SettingsConverter.read(props,
-                "[" + CATEGORY + "]" + SHOW_DIALOG_ADDING_AXIOMS, true));
+            "[" + CATEGORY + "]" + SHOW_DIALOG_ADDING_AXIOMS, true));
         setShowDialogUsingAxioms(SettingsConverter.read(props,
-                "[" + CATEGORY + "]" + SHOW_DIALOG_USING_AXIOMS, true));
+            "[" + CATEGORY + "]" + SHOW_DIALOG_USING_AXIOMS, true));
     }
 
     @Override
     public void writeSettings(Properties props) {
-        SettingsConverter.store(props, "[" + CATEGORY + "]" + SHOW_DIALOG_ADDING_AXIOMS, showDialogAddingAxioms);
-        SettingsConverter.store(props, "[" + CATEGORY + "]" + SHOW_DIALOG_USING_AXIOMS, showDialogUsingAxioms);
+        SettingsConverter.store(props, "[" + CATEGORY + "]" + SHOW_DIALOG_ADDING_AXIOMS,
+            showDialogAddingAxioms);
+        SettingsConverter.store(props, "[" + CATEGORY + "]" + SHOW_DIALOG_USING_AXIOMS,
+            showDialogUsingAxioms);
     }
 
     @Override
     public void readSettings(Configuration props) {
         var cat = props.getSection(CATEGORY);
-        if (cat == null) return;
+        if (cat == null)
+            return;
         setShowDialogAddingAxioms(cat.getBool(SHOW_DIALOG_ADDING_AXIOMS, true));
         setShowDialogUsingAxioms(cat.getBool(SHOW_DIALOG_USING_AXIOMS, true));
     }

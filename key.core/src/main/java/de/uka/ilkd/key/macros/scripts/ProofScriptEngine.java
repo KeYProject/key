@@ -140,7 +140,7 @@ public class ProofScriptEngine {
                 }
 
                 if (!name.startsWith(SYSTEM_COMMAND_PREFIX) && stateMap.isEchoOn()) {
-                    LOGGER.info("{}: {}", ++cnt, cmd);
+                    LOGGER.debug("{}: {}", ++cnt, cmd);
                 }
 
                 Object o = command.evaluateArguments(stateMap, argMap);

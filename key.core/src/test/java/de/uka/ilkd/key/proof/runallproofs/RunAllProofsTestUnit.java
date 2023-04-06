@@ -70,12 +70,12 @@ public final class RunAllProofsTestUnit implements Serializable {
          */
         List<TestResult> testResults;
 
-        boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
+        boolean verbose = settings.getVerboseOutput();
         if (verbose) {
             LOGGER.info("Running test " + testName);
         }
 
-        boolean ignoreTest = "true".equals(settings.get(RunAllProofsTest.IGNORE_KEY));
+        boolean ignoreTest = settings.getIgnoreTest();
         if (ignoreTest) {
             if (verbose) {
                 LOGGER.info("... ignoring this test due to 'ignore=true' in file");

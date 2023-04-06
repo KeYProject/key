@@ -1711,7 +1711,7 @@ public final class MainWindow extends JFrame {
         }
 
         @Override
-        public void propertyChange(PropertyChangeEvent evt) {
+        public synchronized void propertyChange(PropertyChangeEvent evt) {
             if (proof.getSettings().getStrategySettings() == evt.getSource()) {
                 // updateAutoModeConfigButton();
             }

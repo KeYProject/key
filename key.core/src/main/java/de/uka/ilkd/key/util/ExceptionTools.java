@@ -50,8 +50,6 @@ public final class ExceptionTools {
         Location location = null;
         if (exc instanceof HasLocation) {
             return ((HasLocation) exc).getLocation();
-        } else if (exc instanceof RecognitionException) {
-            location = getLocation((RecognitionException) exc);
         } else if (exc instanceof ParseException) {
             location = getLocation((ParseException) exc);
         } else if (exc instanceof TokenMgrError) {

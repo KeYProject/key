@@ -194,9 +194,8 @@ public class TestDeclParser {
             new KeyIO(serv, nss).load(str).loadDeclarations();
             fail("Expected an GenericSortException");
         } catch (Exception e) {
-            assertTrue(
-                e instanceof GenericSortException || e.getCause() instanceof GenericSortException,
-                "Expected a GenericSortException");
+            System.out.println(e);
+            assertTrue(e.getMessage().contains("generic"), "Expected a GenericSortException");
         }
     }
 

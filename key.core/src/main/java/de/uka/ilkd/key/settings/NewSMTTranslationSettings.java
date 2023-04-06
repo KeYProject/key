@@ -75,7 +75,8 @@ public class NewSMTTranslationSettings extends AbstractSettings {
     @Override
     public void readSettings(Configuration props) {
         var newSmt = props.getSection("NewSMT");
-        if (newSmt == null) return;
+        if (newSmt == null)
+            return;
         for (var entry : newSmt.getEntries()) {
             final var value = entry.getValue();
             assert value instanceof String;
@@ -114,7 +115,7 @@ public class NewSMTTranslationSettings extends AbstractSettings {
     /**
      * Set a key-value-pair. All listeners are informed after the internal hashmap has been updated.
      *
-     * @param key   the non-null key to set
+     * @param key the non-null key to set
      * @param value the non-null value to set
      * @return the value that was in the map prior to the call (see {@link Map#put(Object, Object)}.
      */

@@ -6,19 +6,19 @@ import java.util.*;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 
 /**
- * Data structure for parse results of {@link ProofCollectionParser}. Method
- * {@link #createRunAllProofsTestUnits()} can be used to create a {@link List} of
+ * Data structure for proof jobs. Method
+ * {@link #createRunAllProofsTestUnits()} can be used to create a {@link List}
+ * of
  * {@link RunAllProofsTestUnit}s from an object of this class.
  *
  * @author Kai Wallisch
- *
  */
 public final class ProofCollection {
 
     private final List<ProofCollectionUnit> units = new LinkedList<>();
     private final ProofCollectionSettings settings;
 
-    ProofCollection(ProofCollectionSettings settings) {
+    public ProofCollection(ProofCollectionSettings settings) {
         this.settings = settings;
     }
 
@@ -27,11 +27,14 @@ public final class ProofCollection {
     }
 
     /**
-     * Create list of {@link RunAllProofsTestUnit}s from list of {@link ProofCollectionUnit}s.
+     * Create list of {@link RunAllProofsTestUnit}s from list of
+     * {@link ProofCollectionUnit}s.
      *
      * @return A list of {@link RunAllProofsTestUnit}s.
-     * @throws IOException Names of {@link SingletonProofCollectionUnit}s are determined by their
-     *         corresponding file names. In case file name can't be read {@link IOException} may be
+     * @throws IOException Names of {@link SingletonProofCollectionUnit}s are
+     *         determined by their
+     *         corresponding file names. In case file name can't be read
+     *         {@link IOException} may be
      *         thrown.
      */
     public List<RunAllProofsTestUnit> createRunAllProofsTestUnits() throws IOException {
@@ -71,4 +74,10 @@ public final class ProofCollection {
         return settings;
     }
 
+    public GroupedProofCollectionUnit group(String name) {
+        var settings = new ProofCollectionSettings(this.settings);
+        var unit = new GroupedProofCollectionUnit(name, settings);
+        units.add(unit);
+        return unit;
+    }
 }

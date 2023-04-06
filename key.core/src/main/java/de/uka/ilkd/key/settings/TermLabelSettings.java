@@ -1,11 +1,12 @@
 package de.uka.ilkd.key.settings;
 
+import java.util.Properties;
+
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Properties;
 
 /**
  * Proof-dependent settings for {@link TermLabel}s.
@@ -29,25 +30,28 @@ public class TermLabelSettings extends AbstractSettings {
             setUseOriginLabels(Boolean.parseBoolean(str));
         } else {
             LOGGER.debug("TermLabelSettings: Failure while reading the setting \"UseOriginLabels\"."
-                    + "Using the default value: true." + "The string read was: {}", str);
+                + "Using the default value: true." + "The string read was: {}", str);
             setUseOriginLabels(true);
         }
     }
 
     @Override
     public void writeSettings(Properties props) {
-        props.setProperty("[" + CATEGORY + "]" + USE_ORIGIN_LABELS, Boolean.toString(useOriginLabels));
+        props.setProperty("[" + CATEGORY + "]" + USE_ORIGIN_LABELS,
+            Boolean.toString(useOriginLabels));
     }
 
     @Override
     public void readSettings(Configuration props) {
         var category = props.getSection(CATEGORY);
-        if (category == null) return;
+        if (category == null)
+            return;
         try {
             setUseOriginLabels(category.getBool(USE_ORIGIN_LABELS));
         } catch (Exception e) {
             LOGGER.debug("TermLabelSettings: Failure while reading the setting \"UseOriginLabels\"."
-                    + "Using the default value: true." + "The string read was: {}", category.get(USE_ORIGIN_LABELS), e);
+                + "Using the default value: true." + "The string read was: {}",
+                category.get(USE_ORIGIN_LABELS), e);
             setUseOriginLabels(true);
         }
     }

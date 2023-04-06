@@ -1,15 +1,17 @@
 package de.uka.ilkd.key.settings;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -56,18 +58,20 @@ public class ChoiceSettings extends AbstractSettings {
     }
 
     /**
-     * returns a copy of the HashMap that maps categories to their currently selected choices.
+     * Returns an immutable view of the current mapping between category and default choices.
      * <p>
      * The method name is somewhat misleading.
      */
+    @Nonnull
     public Map<String, String> getDefaultChoices() {
         return Collections.unmodifiableMap(category2Default);
     }
 
 
     /**
-     * returns the current selected choices as set
+     * returns the current selected choices as an immutable set
      */
+    @Nonnull
     public ImmutableSet<Choice> getDefaultChoicesAsSet() {
         return choiceMap2choiceSet(category2Default);
     }
@@ -168,7 +172,8 @@ public class ChoiceSettings extends AbstractSettings {
     @Override
     public void readSettings(Configuration props) {
         var category = props.getSection(CATEGORY);
-        if (category == null) return;
+        if (category == null)
+            return;
         for (Map.Entry<String, Object> entry : category.getEntries()) {
             assert entry.getValue() instanceof String;
             category2Default.put(entry.getKey(), entry.getValue().toString());
