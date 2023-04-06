@@ -12,6 +12,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import javax.annotation.Nonnull;
+
 /**
  *
  */
@@ -56,18 +58,20 @@ public class ChoiceSettings extends AbstractSettings {
     }
 
     /**
-     * returns a copy of the HashMap that maps categories to their currently selected choices.
+     * Returns an immutable view of the current mapping between category and default choices.
      * <p>
      * The method name is somewhat misleading.
      */
+    @Nonnull
     public Map<String, String> getDefaultChoices() {
         return Collections.unmodifiableMap(category2Default);
     }
 
 
     /**
-     * returns the current selected choices as set
+     * returns the current selected choices as an immutable set
      */
+    @Nonnull
     public ImmutableSet<Choice> getDefaultChoicesAsSet() {
         return choiceMap2choiceSet(category2Default);
     }
