@@ -10,8 +10,13 @@ import java.util.Set;
 
 public class LIGNew extends AbstractLoopInvariantGenerator {
 
+	Term outerIndex;
 	public LIGNew(Sequent sequent, Services services) {
 		super(sequent, services);
+	}
+	public LIGNew(Sequent sequent, Services services, Term outerIndex) {
+		super(sequent, services);
+		this.outerIndex = outerIndex;
 	}
 
 	@Override
@@ -61,7 +66,7 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 //			System.out.println(term);
 //		}
 		int itrNumber = -1;
-		PredicateRefiner pr0 = new LoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(), allDepPreds, allCompPreds,
+		PredicateRefiner pr0 = new LoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(), allDepPreds, allCompPreds, outerIndex,
 				index, itrNumber, services);
 		Pair<Set<Term>, Set<Term>> refinedPreds = pr0.refine();
 //		System.out.println(ProofSaver.printAnything(seq, services));
@@ -102,7 +107,7 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 //			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
 //			System.out.println("Before refinement: " + currentGoal.sequent());
 
-			PredicateRefiner pr = new LoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(), allDepPreds, allCompPreds,
+			PredicateRefiner pr = new LoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(), allDepPreds, allCompPreds, outerIndex,
 					index, itrNumber, services);
 			refinedPreds = pr.refine();
 			allDepPreds = refinedPreds.first;

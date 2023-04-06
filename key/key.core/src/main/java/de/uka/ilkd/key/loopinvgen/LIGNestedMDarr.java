@@ -128,7 +128,7 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 			// Second approach calculates th inner LI for each outer iteration.
 			// I should compare their speed and precision.
 			ImmutableList<Goal> goalsAfterShiftUpdate = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
-//			System.out.println("Num of Goals after Shifting Outer Loop's Updates: " + goalsAfterShiftUpdate.size());
+			System.out.println("Goal after Shifting Outer Loop's Updates: " + goalsAfterShiftUpdate.head());
 			for (Goal g : goalsAfterShiftUpdate) {
 				for (final SequentFormula sf : g.sequent().succedent()) {
 					final Term formula = tb.goBelowUpdates(sf.formula());
@@ -259,7 +259,7 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 		Sequent newSeq = Sequent.createSequent(g.sequent().antecedent(),succSemi);
 
 
-		LIGNewInner innerLIG = new LIGNewInner(newSeq,services, innerDepPreds, innerCompPreds);
+		LIGNewInner innerLIG = new LIGNewInner(newSeq,services, innerDepPreds, innerCompPreds, indexOuter, indexInner);
 
 		return innerLIG.generate();
 	}

@@ -63,7 +63,7 @@ public class LIGNewRelaxed extends AbstractLoopInvariantGenerator {
 //			System.out.println(term);
 //		}
 		int itrNumber = -1;
-		PredicateRefiner pr0 = new LoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(), allDepPreds, allCompPreds,
+		PredicateRefiner pr0 = new LoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(), allDepPreds, allCompPreds, indexOuter,
 				index, itrNumber, services);
 		Pair<Set<Term>, Set<Term>> refinedPreds = pr0.refine();
 //		System.out.println(ProofSaver.printAnything(seq, services));
@@ -104,7 +104,7 @@ public class LIGNewRelaxed extends AbstractLoopInvariantGenerator {
 //			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
 //			System.out.println("Before refinement: " + currentGoal.sequent());
 
-			PredicateRefiner pr = new LoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(), allDepPreds, allCompPreds,
+			PredicateRefiner pr = new LoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(), allDepPreds, allCompPreds, indexOuter,
 					index, itrNumber, services);
 			refinedPreds = pr.refine();
 			allDepPreds = refinedPreds.first;

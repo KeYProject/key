@@ -12,10 +12,19 @@ import java.util.Set;
 public class LIGNewInner extends AbstractLoopInvariantGenerator {
 	Set<Term> allDepPreds;
 	Set<Term> allCompPreds;
+	Term outerIndex;
 	public LIGNewInner(Sequent sequent, Services services, Set<Term> innerDepPreds, Set<Term> innerCompPreds) {
 		super(sequent, services);
 		this.allDepPreds = innerDepPreds;
 		this.allCompPreds = innerCompPreds;
+	}
+
+	public LIGNewInner(Sequent sequent, Services services, Set<Term> innerDepPreds, Set<Term> innerCompPreds, Term outerIndex, Term innerIndex) {
+		super(sequent, services);
+		this.allDepPreds = innerDepPreds;
+		this.allCompPreds = innerCompPreds;
+		this.outerIndex =  outerIndex;
+		this.index = innerIndex;
 	}
 
 	@Override
@@ -40,11 +49,11 @@ public class LIGNewInner extends AbstractLoopInvariantGenerator {
 //			System.out.println("Goals After Unwind:" + goalsAfterUnwind);
 
 			goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
-//			System.out.println("Goals After Shift:" + goalsAfterShift);
+			System.out.println("Goals After Shift:" + goalsAfterShift);
 
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
 
-			PredicateRefiner pr = new LoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(), allDepPreds, allCompPreds,
+			PredicateRefiner pr = new LoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(), allDepPreds, allCompPreds, outerIndex,
 					index, itrNumber, services);
 			refinedPreds = pr.refine();
 			allDepPreds = refinedPreds.first;
