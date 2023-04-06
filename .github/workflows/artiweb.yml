@@ -71,7 +71,7 @@ jobs:
         id: fc
         with:
           issue-number: ${{ steps.rpn.outputs.pr-number }}
-          comment-author: 'github-actions'
+          comment-author: 'github-actions[bot]'
           body-includes: Artiweb
 
       - name: Create or update comment
