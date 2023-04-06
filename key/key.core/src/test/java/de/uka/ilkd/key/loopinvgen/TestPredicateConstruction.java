@@ -1060,7 +1060,7 @@ public LoopInvariantGenerationResult correlation_init_array() {//Change length o
 				+ "			while (j<=M-1) {"
 				+ "				a[i][j] = 1;"
 				+ "				j++;}"
-				+ "			i++;}"
+				+ "			j = 0; i++;}"
 				+ "		}\\>true");
 	} catch (Exception e) {
 		System.out.println(e.getMessage());

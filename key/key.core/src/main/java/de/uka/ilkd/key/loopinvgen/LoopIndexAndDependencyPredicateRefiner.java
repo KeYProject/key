@@ -172,30 +172,78 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 		return result;
 	}
 
-	private Set<Term> weakenBySubSet(Term unProven) {
+	private Set<Term> weakenBySubSetForArrayRange(Term unProven) {
 		Set<Term> result = new HashSet<>();
 
 		final Term locSet = unProven.sub(0);
 
-		if (locSet.op().equals(locsetLDT.getArrayRange())) {
-			final Term array = locSet.sub(0);
-			final Term low = locSet.sub(1);
-			final Term high = locSet.sub(2);
-			final Term newLow = tb.add(low, tb.one());
-			final Term newHigh = tb.sub(high, tb.one());
+		final Term array = locSet.sub(0);
+		final Term low = locSet.sub(1);
+		final Term high = locSet.sub(2);
+		final Term newLow = tb.add(low, tb.one());
+		final Term newHigh = tb.sub(high, tb.one());
+
+		if (!sProof.proofEquality(low, high)) {
+			final Term lowSingleton = tb.singleton(array, tb.arr(low));
+			final Term highSingleton = tb.singleton(array, tb.arr(high));
+
+			Term subLoc;
+			if (sProof.proofLT(tb.zero(), newHigh)) {
+				if (sProof.proofLT(newLow, newHigh)) {
+					subLoc = tb.arrayRange(array, newLow, newHigh);
+				} else if (sProof.proofEquality(newLow, newHigh)) {
+					subLoc = tb.singleton(array, tb.arr(newLow));
+				} else {
+					// should not happen, weaken to essentially tru
+					subLoc = tb.empty();
+				}
+
+				if (depLDT.isDependencePredicate(unProven.op())) {
+					final Function op = (Function) unProven.op();
+					if(op==depLDT.getRelaxedNoRaW() || op == depLDT.getRelaxedNoWaR()){
+						result.add(tb.func(op, subLoc, tb.empty(), tb.empty(), tb.empty()));
+						result.add(tb.func(op, lowSingleton, tb.empty(), tb.empty(), tb.empty()));
+						result.add(tb.func(op, highSingleton, tb.empty(), tb.empty(), tb.empty()));
+					} else if( op == depLDT.getRelaxedNoWaW()){
+						result.add(tb.func(op, subLoc, tb.empty(), tb.empty()));
+						result.add(tb.func(op, lowSingleton, tb.empty(), tb.empty()));
+						result.add(tb.func(op, highSingleton, tb.empty(), tb.empty()));
+					}
+					else{
+						result.add(tb.func(op, subLoc));
+						result.add(tb.func(op, lowSingleton));
+						result.add(tb.func(op, highSingleton));
+					}
+				}
+			}
+		}
+
+		System.out.println("weaken by subset "+ unProven +" with "+ result);
+		return result;
+
+	}
+	private Set<Term> weakenBySubSetForMatrixRange(Term unProven) {
+		Set<Term> result = new HashSet<>();
+
+		final Term locSet = unProven.sub(0);
+
+		final Term heap = locSet.sub(0);
+		final Term array = locSet.sub(1);
+		final Term outerlow = locSet.sub(2);
+		final Term outerhigh = locSet.sub(3);
+		final Term low = locSet.sub(4);
+		final Term high = locSet.sub(5);
+		final Term newLow = tb.add(low, tb.one());
+		final Term newHigh = tb.sub(high, tb.one());
 
 			if (!sProof.proofEquality(low, high)) {
-				final Term lowSingleton = tb.singleton(array, tb.arr(low));
-				final Term highSingleton = tb.singleton(array, tb.arr(high));
+				final Term arrRange = tb.arrayRange(array, low, high);
 
 				Term subLoc;
 				if (sProof.proofLT(tb.zero(), newHigh)) {
 					if (sProof.proofLT(newLow, newHigh)) {
-						subLoc = tb.arrayRange(array, newLow, newHigh);
-					} else if (sProof.proofEquality(newLow, newHigh)) {
-						subLoc = tb.singleton(array, tb.arr(newLow));
+						subLoc = tb.matrixRange(heap, array, outerlow, outerhigh, newLow, newHigh);
 					} else {
-						// should not happen, weaken to essentially tru
 						subLoc = tb.empty();
 					}
 
@@ -203,24 +251,28 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 						final Function op = (Function) unProven.op();
 						if(op==depLDT.getRelaxedNoRaW() || op == depLDT.getRelaxedNoWaR()){
 							result.add(tb.func(op, subLoc, tb.empty(), tb.empty(), tb.empty()));
-							result.add(tb.func(op, lowSingleton, tb.empty(), tb.empty(), tb.empty()));
-							result.add(tb.func(op, highSingleton, tb.empty(), tb.empty(), tb.empty()));
+							result.add(tb.func(op, arrRange, tb.empty(), tb.empty(), tb.empty()));
 						} else if( op == depLDT.getRelaxedNoWaW()){
 							result.add(tb.func(op, subLoc, tb.empty(), tb.empty()));
-							result.add(tb.func(op, lowSingleton, tb.empty(), tb.empty()));
-							result.add(tb.func(op, highSingleton, tb.empty(), tb.empty()));
+							result.add(tb.func(op, arrRange, tb.empty(), tb.empty()));
 						}
 						else{
 							result.add(tb.func(op, subLoc));
-							result.add(tb.func(op, lowSingleton));
-							result.add(tb.func(op, highSingleton));
+							result.add(tb.func(op, arrRange));
 						}
 					}
 				}
 			}
-		}
 		System.out.println("weaken by subset "+ unProven +" with "+ result);
 		return result;
+
+	}
+	private Set<Term> weakenBySubSet(Term pred) {
+		if(pred.sub(0).op()  == locsetLDT.getArrayRange())
+			return weakenBySubSetForArrayRange(pred);
+		else if (pred.sub(0).op() == locsetLDT.getMatrixRange())
+			return weakenBySubSetForMatrixRange(pred);
+		else return null;
 	}
 
 //	private Set<Term> weakenBySequent(Term unProven) {
@@ -294,8 +346,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 //		}
 		return null;
 	}
-
-	private Set<Term> weakenByIndexANDPredicate(Term pred) {
+	private Set<Term> weakenByIndexANDPredicateForArrayRange(Term pred) {
 		Set<Term> result = new HashSet<>();
 		Term locSet = findArrayRange(pred.sub(0));
 		if (locSet != null) {
@@ -350,6 +401,74 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 		}
 		System.out.println("weaken by index & pred symb "+ pred +" with "+ result);
 		return result;
+
+	}
+	private Set<Term> weakenByIndexANDPredicateForMatrixRange(Term pred) {
+		Set<Term> result = new HashSet<>();
+		Term locSet = pred.sub(0);
+		if (locSet != null) {
+			Term heap = locSet.sub(0);
+			Term array = locSet.sub(1);
+			Term outerLow = locSet.sub(2);
+			Term outerHigh = locSet.sub(3);
+			Term low = locSet.sub(4);
+			Term high = locSet.sub(5);
+
+			Term lowToI;
+			Term iToHigh;
+
+
+//			System.out.println("low: "+ low + ", index: "+ index + ", high: " + high);
+			if (heap!=null && array != null && low != null && high != null && index != null) {
+				if (!sProof.proofEquality(low, index)) {
+					lowToI = tb.matrixRange(heap, array, outerLow, outerHigh, low, index);
+					if (!sProof.proofEquality(index, high)) {
+						iToHigh = tb.matrixRange(heap, array, outerLow, outerHigh, index, high);
+//					if(sProof.proofLT(low, tb.subtract(index, tb.one())) && sProof.proofLT(tb.add(index, tb.one()), high)) {
+//						lowToI = tb.arrayRange(array, low, tb.subtract(index, tb.one()));
+//						iToHigh = tb.arrayRange(array, tb.add(index, tb.one()), high);
+//					}
+					} else {
+						iToHigh = tb.empty();
+					}
+				} else {
+					lowToI = tb.singleton(array, tb.arr(index));
+					if (!sProof.proofEquality(index, high)) {
+						iToHigh = tb.matrixRange(heap, array, outerLow, outerHigh, index, high);
+
+					} else {
+						iToHigh = tb.empty();
+					}
+				}
+				if (lowToI != null && iToHigh != null) {
+					if (depLDT.isDependencePredicate(pred.op())) {
+						final Function dependencyOp = (Function) pred.op();
+						if(dependencyOp==depLDT.getRelaxedNoRaW() || dependencyOp == depLDT.getRelaxedNoWaR()){
+							result.add(tb.func(dependencyOp, lowToI, tb.empty(), tb.empty(), tb.empty()));
+							result.add(tb.func(dependencyOp, iToHigh, tb.empty(), tb.empty(), tb.empty()));
+						} else if(dependencyOp == depLDT.getRelaxedNoWaW()){
+							result.add(tb.func(dependencyOp, lowToI, tb.empty(), tb.empty()));
+							result.add(tb.func(dependencyOp, iToHigh, tb.empty(), tb.empty()));
+						}
+						else{
+							result.add(tb.func(dependencyOp, lowToI));
+							result.add(tb.func(dependencyOp, iToHigh));
+						}
+
+					}
+				}
+			}
+//		System.out.println(result);
+		}
+		System.out.println("weaken by index & pred symb "+ pred +" with "+ result);
+		return result;
+	}
+	private Set<Term> weakenByIndexANDPredicate(Term pred) {
+		if(pred.sub(0).op()  == locsetLDT.getArrayRange())
+			return weakenByIndexANDPredicateForArrayRange(pred);
+		else if (pred.sub(0).op() == locsetLDT.getMatrixRange())
+			return weakenByIndexANDPredicateForMatrixRange(pred);
+		else return null;
 	}
 
 	private Set<Term> weakeningComparisonPredicates(Term pred) {
