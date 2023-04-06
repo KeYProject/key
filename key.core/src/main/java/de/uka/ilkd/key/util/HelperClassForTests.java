@@ -5,6 +5,7 @@ package de.uka.ilkd.key.util;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -153,8 +154,9 @@ public class HelperClassForTests {
      * @throws ProblemLoaderException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    public static HashMap<String, String> setDefaultTacletOptions(File baseDir,
-            String javaPathInBaseDir) throws ProblemLoaderException, ProofInputException {
+    public static Map<String, String> setDefaultTacletOptions(File baseDir,
+            String javaPathInBaseDir)
+            throws ProblemLoaderException, ProofInputException {
         if (!ProofSettings.isChoiceSettingInitialised()) {
             // Make sure that required files exists
             File javaFile = new File(baseDir, javaPathInBaseDir);
@@ -189,9 +191,9 @@ public class HelperClassForTests {
      * @throws ProblemLoaderException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    public static HashMap<String, String> setDefaultTacletOptionsForTarget(File javaFile,
-            String containerTypeName, final String targetName)
-            throws ProblemLoaderException, ProofInputException {
+    public static Map<String, String> setDefaultTacletOptionsForTarget(File javaFile,
+            String containerTypeName,
+            final String targetName) throws ProblemLoaderException, ProofInputException {
         if (!ProofSettings.isChoiceSettingInitialised()) {
             KeYEnvironment<?> environment = null;
             Proof proof = null;
@@ -235,16 +237,16 @@ public class HelperClassForTests {
      *
      * @return The original settings which are overwritten.
      */
-    public static HashMap<String, String> setDefaultTacletOptions() {
+    public static Map<String, String> setDefaultTacletOptions() {
         // Assert.assertTrue(ProofSettings.isChoiceSettingInitialised());
         // Set default taclet options
         ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-        HashMap<String, String> oldSettings = choiceSettings.getDefaultChoices();
+        var oldSettings = choiceSettings.getDefaultChoices();
         HashMap<String, String> newSettings = new HashMap<>(oldSettings);
         newSettings.putAll(MiscTools.getDefaultTacletOptions());
         choiceSettings.setDefaultChoices(newSettings);
         // Make sure that default taclet options are set
-        HashMap<String, String> updatedChoiceSettings =
+        var updatedChoiceSettings =
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
         for (Entry<String, String> entry : newSettings.entrySet()) {
             // Assert.assertEquals(entry.getValue(), updatedChoiceSettings.get(entry.getKey()));
@@ -257,12 +259,12 @@ public class HelperClassForTests {
      *
      * @param options The taclet options to restore.
      */
-    public static void restoreTacletOptions(HashMap<String, String> options) {
+    public static void restoreTacletOptions(Map<String, String> options) {
         if (options != null) {
             // Assert.assertTrue(ProofSettings.isChoiceSettingInitialised());
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(options);
             // Make sure that taclet options are restored
-            HashMap<String, String> updatedChoiceSettings =
+            var updatedChoiceSettings =
                 ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
             for (Entry<String, String> entry : options.entrySet()) {
                 // Assert.assertEquals(entry.getValue(), updatedChoiceSettings.get(entry.getKey()));

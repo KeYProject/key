@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.proof.io;
 
+import java.beans.PropertyChangeListener;
 import java.io.File;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -7,13 +8,13 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.settings.GeneralSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.util.KeYConstants;
 
 import org.key_project.util.java.IOUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * Saves intermediate proof artifacts during strategy execution. An {@link AutoSaver} instance saves
@@ -28,8 +29,8 @@ import org.slf4j.LoggerFactory;
 public class AutoSaver implements ProverTaskListener {
     public static final Logger LOGGER = LoggerFactory.getLogger(AutoSaver.class);
 
-    private final static File TMP_DIR = IOUtil.getTempDirectory();
-    private final static String PREFIX = TMP_DIR + File.separator + ".autosave.";
+    private static final File TMP_DIR = IOUtil.getTempDirectory();
+    private static final String PREFIX = TMP_DIR + File.separator + ".autosave.";
 
     private Proof proof;
     private final int interval;
@@ -40,11 +41,12 @@ public class AutoSaver implements ProverTaskListener {
 
     private static AutoSaver DEFAULT_INSTANCE = null;
 
-    public final static SettingsListener settingsListener = e -> {
-        assert e.getSource() instanceof GeneralSettings;
-        GeneralSettings settings = (GeneralSettings) e.getSource();
-        setDefaultValues(settings.autoSavePeriod(), settings.autoSavePeriod() > 0);
-    };
+    public static final PropertyChangeListener settingsListener =
+        e -> {
+            assert e.getSource() instanceof GeneralSettings;
+            GeneralSettings settings = (GeneralSettings) e.getSource();
+            setDefaultValues(settings.autoSavePeriod(), settings.autoSavePeriod() > 0);
+        };
 
     /**
      * Set default values.

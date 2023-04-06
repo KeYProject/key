@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.proof;
 
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -29,7 +30,6 @@ import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -110,7 +110,7 @@ public class Proof implements Named {
 
     private Strategy activeStrategy;
 
-    private SettingsListener settingsListener;
+    private PropertyChangeListener settingsListener;
 
     /**
      * Set to true if the proof has been abandoned and the dispose method has been called on this
@@ -157,7 +157,7 @@ public class Proof implements Named {
 
         localMgt = new ProofCorrectnessMgt(this);
 
-        initConfig.getSettings().getStrategySettings().addSettingsListener(settingsListener);
+        initConfig.getSettings().getStrategySettings().addPropertyChangeListener(settingsListener);
 
         pis = ProofIndependentSettings.DEFAULT_INSTANCE;
     }
@@ -261,7 +261,8 @@ public class Proof implements Named {
                                             // contained in a static List
         }
         // remove setting listener from settings
-        initConfig.getSettings().getStrategySettings().removeSettingsListener(settingsListener);
+        initConfig.getSettings().getStrategySettings()
+                .removePropertyChangeListener(settingsListener);
         // set every reference (except the name) to null
         root = null;
         env = null;
@@ -275,8 +276,6 @@ public class Proof implements Named {
         keyVersionLog = null;
         activeStrategy = null;
         settingsListener = null;
-        ruleAppListenerList.clear();
-        listenerList.clear();
         disposed = true;
         userData = null;
         fireProofDisposed(new ProofDisposedEvent(this));

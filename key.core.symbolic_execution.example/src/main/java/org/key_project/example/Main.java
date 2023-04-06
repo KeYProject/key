@@ -3,6 +3,7 @@ package org.key_project.example;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -61,8 +62,8 @@ public class Main {
             }
             // Set Taclet options
             ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-            HashMap<String, String> oldSettings = choiceSettings.getDefaultChoices();
-            HashMap<String, String> newSettings = new HashMap<>(oldSettings);
+            Map<String, String> oldSettings = choiceSettings.getDefaultChoices();
+            Map<String, String> newSettings = new HashMap<>(oldSettings);
             newSettings.putAll(MiscTools.getDefaultTacletOptions());
             newSettings.put("methodExpansion", "methodExpansion:noRestriction");
             choiceSettings.setDefaultChoices(newSettings);

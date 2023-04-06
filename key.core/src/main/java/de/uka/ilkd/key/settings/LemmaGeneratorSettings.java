@@ -1,66 +1,45 @@
 package de.uka.ilkd.key.settings;
 
-import java.util.EventObject;
-import java.util.LinkedList;
 import java.util.Properties;
 
-public class LemmaGeneratorSettings implements de.uka.ilkd.key.settings.Settings, Cloneable {
-    private final LinkedList<SettingsListener> listeners = new LinkedList<>();
-    private boolean showDialogAddingAxioms = true;
-    private boolean showDialogUsingAxioms = true;
+public class LemmaGeneratorSettings extends AbstractSettings {
     private static final String SHOW_DIALOG_ADDING_AXIOMS =
         "[LemmaGenerator]showDialogWhenAddingAxioms";
     private static final String SHOW_DIALOG_USING_AXIOMS =
         "[LemmaGenerator]showDialogWhenUsingTacletsAsAxioms";
 
-
-
-    private void fireSettingsChanged() {
-        for (SettingsListener listener : listeners) {
-            listener.settingsChanged(new EventObject(this));
-        }
-    }
-
+    private boolean showDialogAddingAxioms = true;
+    private boolean showDialogUsingAxioms = true;
 
     public boolean isShowingDialogAddingAxioms() {
         return showDialogAddingAxioms;
     }
 
-    public void showDialogAddingAxioms(boolean value) {
+    public void setShowDialogAddingAxioms(boolean value) {
+        var old = this.showDialogAddingAxioms;
         this.showDialogAddingAxioms = value;
-        fireSettingsChanged();
+        firePropertyChange(SHOW_DIALOG_USING_AXIOMS, old, showDialogUsingAxioms);
     }
 
     public boolean isShowingDialogUsingAxioms() {
         return showDialogUsingAxioms;
     }
 
-    public void showDialogUsingAxioms(boolean value) {
+    public void setShowDialogUsingAxioms(boolean value) {
+        var old = this.showDialogUsingAxioms;
         this.showDialogUsingAxioms = value;
-        fireSettingsChanged();
-    }
-
-    @Override
-    public void addSettingsListener(SettingsListener l) {
-        listeners.add(l);
-    }
-
-    @Override
-    public void removeSettingsListener(SettingsListener l) {
-        listeners.remove(l);
+        firePropertyChange(SHOW_DIALOG_USING_AXIOMS, old, showDialogUsingAxioms);
     }
 
     @Override
     public void readSettings(Properties props) {
-        showDialogAddingAxioms = SettingsConverter.read(props, SHOW_DIALOG_ADDING_AXIOMS, true);
-        showDialogUsingAxioms = SettingsConverter.read(props, SHOW_DIALOG_USING_AXIOMS, true);
+        setShowDialogAddingAxioms(SettingsConverter.read(props, SHOW_DIALOG_ADDING_AXIOMS, true));
+        setShowDialogUsingAxioms(SettingsConverter.read(props, SHOW_DIALOG_USING_AXIOMS, true));
     }
 
     @Override
     public void writeSettings(Properties props) {
         SettingsConverter.store(props, SHOW_DIALOG_ADDING_AXIOMS, showDialogAddingAxioms);
         SettingsConverter.store(props, SHOW_DIALOG_USING_AXIOMS, showDialogUsingAxioms);
-
     }
-
 }

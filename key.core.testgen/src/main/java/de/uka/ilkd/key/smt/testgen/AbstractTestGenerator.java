@@ -156,7 +156,7 @@ public abstract class AbstractTestGenerator {
         final ProofDependentSMTSettings pdSettings = proof.getSettings().getSMTSettings().clone();
         final NewSMTTranslationSettings newSettings =
             new NewSMTTranslationSettings(proof.getSettings().getNewSMTSettings());
-        pdSettings.invariantForall = settings.invariantForAll();
+        pdSettings.setInvariantForall(settings.invariantForAll());
         // invoke z3 for counterexamples
         final DefaultSMTSettings smtsettings =
             new DefaultSMTSettings(pdSettings, piSettings, newSettings, proof);

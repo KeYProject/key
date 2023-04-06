@@ -112,7 +112,6 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     public void applySettings(MainWindow window) {
         ProofIndependentSMTSettings pi = SettingsManager.getSmtPiSettings();
         pi.copy(settings);
-        pi.fireSettingsChanged();
         setSmtSettings(pi.clone());
     }
 

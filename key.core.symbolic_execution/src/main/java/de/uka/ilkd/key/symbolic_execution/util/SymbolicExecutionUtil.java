@@ -2782,9 +2782,9 @@ public final class SymbolicExecutionUtil {
      * @param value The new choice value to set.
      */
     public static void setChoiceSetting(String key, String value) {
-        HashMap<String, String> settings =
+        var settings =
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
-        HashMap<String, String> clone = new LinkedHashMap<>(settings);
+        var clone = new LinkedHashMap<>(settings);
         clone.put(key, value);
         ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
     }

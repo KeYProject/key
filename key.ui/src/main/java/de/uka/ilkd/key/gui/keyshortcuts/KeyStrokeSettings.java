@@ -161,10 +161,10 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     }
 
     void setKeyStroke(String key, KeyStroke stroke, boolean override) {
-        boolean exists = properties.contains(key);
-        if (override || !exists) {
+        var old = getKeyStroke(key, null);
+        if (override || (old == null)) {
             properties.setProperty(key, stroke != null ? stroke.toString() : "");
-            fireSettingsChange();
+            firePropertyChange(key, old, stroke);
         }
     }
 
@@ -174,13 +174,13 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
             if (ks != null) {
                 return ks;
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return defaultValue;
     }
 
     public void save() {
-        LOGGER.info("Save keyboard shortcuts to: " + SETTINGS_FILE.getAbsolutePath());
+        LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE.getAbsolutePath());
         SETTINGS_FILE.getParentFile().mkdirs();
         try (Writer writer = new FileWriter(SETTINGS_FILE, StandardCharsets.UTF_8)) {
             properties.store(writer, "KeY's KeyStrokes");
