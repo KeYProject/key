@@ -1,29 +1,24 @@
 package de.uka.ilkd.key.nparser;
 
+import de.uka.ilkd.key.settings.Configuration;
+import de.uka.ilkd.key.util.LinkedHashMap;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.settings.Configuration;
-import de.uka.ilkd.key.util.LinkedHashMap;
-
 /**
+ * Translates the configuration grammar (something like JSON) into a {@link Configuration} object.
+ *
  * @author Alexander Weigl
  * @version 1 (03.04.23)
  * @see KeyAst.ConfigurationFile#asConfiguration()
  */
 class ConfigurationBuilder extends KeYParserBaseVisitor<Object> {
-    private Configuration root;
-
-    public Configuration getConfiguration() {
-        return root;
-    }
-
     @Override
     public List<Object> visitCfile(KeYParser.CfileContext ctx) {
         return ctx.cvalue().stream().map(it -> it.accept(this)).collect(Collectors.toList());
     }
-
 
     @Override
     public String visitCsymbol(KeYParser.CsymbolContext ctx) {
@@ -40,17 +35,17 @@ class ConfigurationBuilder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitCintb(KeYParser.CintbContext ctx) {
-        return Integer.parseInt(ctx.getText(), 2);
+        return Long.parseLong(ctx.getText(), 2);
     }
 
     @Override
     public Object visitCinth(KeYParser.CinthContext ctx) {
-        return Integer.parseInt(ctx.getText(), 16);
+        return Long.parseLong(ctx.getText(), 16);
     }
 
     @Override
     public Object visitCintd(KeYParser.CintdContext ctx) {
-        return Integer.parseInt(ctx.getText(), 10);
+        return Long.parseLong(ctx.getText(), 10);
     }
 
     @Override

@@ -128,6 +128,7 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
             if (settings != null) {
                 settings.setMaxInteger(e.longValue());
             }
+            long result = 0;
             try {
                 result = (long) maxField.getValue();
                 maxField.setForeground(Color.BLACK);
