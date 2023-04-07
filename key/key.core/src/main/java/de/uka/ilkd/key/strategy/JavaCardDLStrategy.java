@@ -719,6 +719,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "dep_pred_known", add(ScaleFeature.createScaled(depth, 1500), longConst(100)));//+100
         bindRuleSet(d, "dep_pred_known_2", add(noDoubleMinus,longConst(100)));//+100
         bindRuleSet(d, "dep_pred_known_2b", add(noDoubleMinus,longConst(-50)));
+        bindRuleSet(d, "dep_pred_known_2c", add(noDoubleMinus,longConst(-2500)));
         bindRuleSet(d, "dep_pred_known_3", add(noDoubleMinus,longConst(-5000)));//-500
         bindRuleSet(d, "saturate_dep_locset_relations_def",
             add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE, ScaleFeature.createScaled(depth, 1000), longConst(300)));
