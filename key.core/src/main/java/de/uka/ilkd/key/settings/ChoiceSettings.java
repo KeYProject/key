@@ -1,13 +1,11 @@
 package de.uka.ilkd.key.settings;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
-
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -162,10 +160,15 @@ public class ChoiceSettings extends AbstractSettings {
      */
     @Override
     public void writeSettings(Properties props) {
-        var choiceSequence = category2Default.entrySet().stream()
-                .map(entry -> entry.getKey() + "-" + entry.getValue())
-                .collect(Collectors.joining(" , "));
-        props.setProperty(KEY_DEFAULT_CHOICES, choiceSequence);
+        StringBuilder choiceSequence = new StringBuilder();
+        var keys = category2Default.keySet().stream().sorted().toArray(String[]::new);
+        for (var key : keys) {
+            if (choiceSequence.length() > 0) {
+                choiceSequence.append(", ");
+            }
+            choiceSequence.append(key).append("-").append(category2Default.get(key));
+        }
+        props.setProperty(KEY_DEFAULT_CHOICES, choiceSequence.toString());
     }
 
 
