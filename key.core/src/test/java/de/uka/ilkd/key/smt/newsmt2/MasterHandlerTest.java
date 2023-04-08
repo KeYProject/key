@@ -215,7 +215,7 @@ public class MasterHandlerTest {
         os.write("\n\n(check-sat)".getBytes(StandardCharsets.UTF_8));
         os.close();
 
-        String[] response = Streams.toString(proc.getInputStream()).split("\n");
+        String[] response = Streams.toString(proc.getInputStream()).split(System.lineSeparator());
 
         try {
             String lookFor = null;
