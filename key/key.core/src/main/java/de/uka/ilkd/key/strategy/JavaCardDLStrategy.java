@@ -676,13 +676,27 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         DependenciesLDT depLDT = getServices().getTypeConverter().getDependenciesLDT();
         final Operator noRaW = depLDT.getNoRaW();
         final Operator noWaR = depLDT.getNoWaR();
-        final Operator noWaW = depLDT.getNoWaW();;
-        final Operator noR = depLDT.getNoR();;
-        final Operator noW = depLDT.getNoW();;
+        final Operator noWaW = depLDT.getNoWaW();
+        final Operator noR = depLDT.getNoR();
+        final Operator noW = depLDT.getNoW();
+        final Operator relNoRaW = depLDT.getRelaxedNoRaW();
+        final Operator relNoWaR = depLDT.getRelaxedNoWaR();
+        final Operator relNoWaW = depLDT.getRelaxedNoWaW();
+        final Operator relNoR = depLDT.getRelaxedNoR();
+        final Operator relNoW = depLDT.getRelaxedNoW();
+
+
+        final Operator noRaWH = depLDT.getNoRaWAtHistory();
+        final Operator noWaRH = depLDT.getNoWaRAtHistory();
+        final Operator noWaWH = depLDT.getNoWaWAtHistory();
+        final Operator noRH = depLDT.getNoRAtHistory();
+        final Operator noWH = depLDT.getNoWAtHistory();
 
 
         final TermFeature isDepPredicate =
-                or(op(noRaW), or(op(noWaR), or(op(noWaW), op(noR), op(noW))));
+                or(op(noRaW), op(noWaR), op(noWaW), op(noR), op(noW),
+                    op(noRaWH), op(noWaRH), op(noWaWH), op(noRH), op(noWH));
+
         bindRuleSet(d, "pull_out_dep_locations",
                 add(applyTF(FocusProjection.create(1), isDepPredicate),
                         applyTF(FocusProjection.create(2), ff.update), applyTF("t", IsNonRigidTermFeature.INSTANCE),
@@ -716,6 +730,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "noEqApp", EqNonDuplicateAppFeature.INSTANCE);
         bindRuleSet(d, "dep_pred_unroll_fixed_bounds", longConst(0));
+
+        bindRuleSet(d, "boostIdenticalLoc", ifZero(MatchedIfFeature.INSTANCE,
+            ifZero(eq(println(instOf("loc1")), println(instOf("loc2"))),
+            longConst(-8000), longConst(0)), longConst(0)));
+
         bindRuleSet(d, "dep_pred_known", add(ScaleFeature.createScaled(depth, 1500), longConst(100)));//+100
         bindRuleSet(d, "dep_pred_known_2", add(noDoubleMinus,longConst(100)));//+100
         bindRuleSet(d, "dep_pred_known_2b", add(noDoubleMinus,longConst(-50)));

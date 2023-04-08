@@ -44,7 +44,31 @@ public class DependenciesLDT extends LDT {
     private final Function endMarker;
 
     private final LocationVariable timestamp;
+    private final Function noWaWAtHistory;
+    private final Function noRaWAtHistory;
+    private final Function noWaRAtHistory;
+    private final Function noWAtHistory;
+    private final Function noRAtHistory;
 
+    public Function getNoWaWAtHistory() {
+        return noWaWAtHistory;
+    }
+
+    public Function getNoRaWAtHistory() {
+        return noRaWAtHistory;
+    }
+
+    public Function getNoWaRAtHistory() {
+        return noWaRAtHistory;
+    }
+
+    public Function getNoWAtHistory() {
+        return noWAtHistory;
+    }
+
+    public Function getNoRAtHistory() {
+        return noRAtHistory;
+    }
 
     public DependenciesLDT(TermServices services) {
         super(NAME, services);
@@ -59,6 +83,12 @@ public class DependenciesLDT extends LDT {
         relaxedNoRaW = addFunction(services, "relaxedNoRaW");
         relaxedNoWaR = addFunction(services, "relaxedNoWaR");
         relaxedNoWaW = addFunction(services, "relaxedNoWaW");
+
+        noRAtHistory = addFunction(services, "noRAtHistory");
+        noWAtHistory = addFunction(services, "noWAtHistory");
+        noRaWAtHistory = addFunction(services, "noRaWAtHistory");
+        noWaRAtHistory = addFunction(services, "noWaRAtHistory");
+        noWaWAtHistory = addFunction(services, "noWaWAtHistory");
 
         rPred = addFunction(services, "rPred");
         wPred = addFunction(services, "wPred");

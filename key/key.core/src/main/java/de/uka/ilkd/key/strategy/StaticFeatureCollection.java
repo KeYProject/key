@@ -219,6 +219,19 @@ public abstract class StaticFeatureCollection {
         return add(a, add(b, c));
     }
 
+
+    protected static TermFeature or(TermFeature... disjuncts) {
+        if (disjuncts.length == 0) inftyTermConst();
+        else if (disjuncts.length == 1) {
+            return disjuncts[0];
+        }
+        TermFeature result = disjuncts[0];
+        for (int i = 1; i<disjuncts.length;i++) {
+            result = ifZero(result, longTermConst(0), disjuncts[i]);
+        }
+        return result;
+    }
+
     protected static TermFeature or(TermFeature a, TermFeature b) {
         return ifZero(a, longTermConst(0), b);
     }
