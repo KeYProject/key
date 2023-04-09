@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.strategy.feature;
 
+import de.uka.ilkd.key.ldt.DependenciesLDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -34,7 +36,12 @@ public class SimilarityCountFeature implements Feature {
         Term fst = first.toTerm(app, pos, goal);
         Term snd = second.toTerm(app, pos, goal);
 
-        if (fst.arity() != snd.arity()) {
+        LocSetLDT locsetLDT = goal.proof().getServices().getTypeConverter().getLocSetLDT();
+
+
+        if (fst.arity() != snd.arity() || fst.op() != snd.op()
+            || (fst.op() != locsetLDT.getMatrixRange() && fst.op() != locsetLDT.getArrayRange())
+            || (snd.op() != locsetLDT.getMatrixRange() && snd.op() != locsetLDT.getArrayRange())){
             return NumberRuleAppCost.getZeroCost();
         }
         int count = 0;

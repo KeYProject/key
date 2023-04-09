@@ -735,7 +735,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             ifZero(MatchedIfFeature.INSTANCE,
                 ScaleFeature.createAffine(
                     SimilarityCountFeature.create(instOf("loc1"), instOf("loc2")),
-                    -500, 1000),
+                    -500, 1500),
                 longConst(0)));
 
 
@@ -1212,7 +1212,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "simplify_matrix_range_literal",
             ifZero(or(rowEndLessThanRowStart, colEndLessThanColStart),
-                longConst(0), inftyConst()));
+                longConst(-3000),
+                ifZero(or(applyTF(instOf("rowEnd"), tf.negLiteral),
+                        applyTF(instOf("colEnd"), tf.negLiteral)),
+                        add(longConst(-250),
+                            ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 50)),
+                    inftyConst())));
 
         bindRuleSet(d, "checkArrayElementSort",
             IncompatibleArrayElementSort.create(instOf("row"), instOf("matrix")));

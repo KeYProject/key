@@ -20,6 +20,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -266,7 +267,15 @@ public class SideProof {
 	 */
 	private Sequent addRelevantSequentFormulas(Semisequent seq, Set<SequentFormula> tempAnteToAdd,
 											   Set<Term> locSetVars, Sequent sideSeq, boolean antec, Predicate<SequentFormula> filter) {
+		LinkedList<SequentFormula> working = new LinkedList<>();
+		LinkedList<SequentFormula> queue = new LinkedList<>();
+
 		for (SequentFormula sfAnte : seq) {
+			working.add(sfAnte);
+		}
+
+		while (!working.isEmpty()) {
+			SequentFormula sfAnte = working.pop();
 			if (tempAnteToAdd.contains(sfAnte) || filter.test(sfAnte)) {
 				continue;
 			}
@@ -277,9 +286,13 @@ public class SideProof {
 						sideSeq = sideSeq.addFormula(sfAnte, antec, true).sequent();
 						locSetVars.addAll(anteFmlVars);
 						break;
+					} else {
+						queue.add(sfAnte);
 					}
 				}
 			}
+			working = queue;
+			queue.clear();
 		}
 		return sideSeq;
 	}
