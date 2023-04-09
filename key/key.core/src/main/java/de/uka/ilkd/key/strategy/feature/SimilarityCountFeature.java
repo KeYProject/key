@@ -38,19 +38,42 @@ public class SimilarityCountFeature implements Feature {
 
         LocSetLDT locsetLDT = goal.proof().getServices().getTypeConverter().getLocSetLDT();
 
+        Term subFst = null;
+        Term subSnd = null;
+        int penalty = 0;
+        while ( fst.op()==locsetLDT.getSetMinus() || snd.op()==locsetLDT.getSetMinus()) {
+            if (fst.op()==locsetLDT.getSetMinus()) {
+                fst = fst.sub(0);
+                subFst = fst.sub(1);
+            } else {
+                subFst = null;
+            }
+            if (fst.op()==locsetLDT.getSetMinus()) {
+                snd = snd.sub(0);
+                subSnd = snd.sub(1);
+            } else {
+                subSnd = null;
+            }
 
-        if (fst.arity() != snd.arity() || fst.op() != snd.op()
-            || (fst.op() != locsetLDT.getMatrixRange() && fst.op() != locsetLDT.getArrayRange())
-            || (snd.op() != locsetLDT.getMatrixRange() && snd.op() != locsetLDT.getArrayRange())){
+            if ( (subFst != null || subSnd != null) ) {
+                if ((subFst != null && subSnd == null) || (subSnd != null && subFst == null) ||
+                    !subFst.equalsModRenaming(subSnd)) {
+                    penalty += 1;
+                }
+            }
+        }
+
+        if (fst.arity() != snd.arity()){
             return NumberRuleAppCost.getZeroCost();
         }
+
         int count = 0;
         for (int i = 0; i<fst.arity();i++) {
             if (fst.sub(i).equalsModRenaming(snd.sub(i))) {
-                count += 1;
+                count += 10;
             }
         }
-        return NumberRuleAppCost.create(count);
+        return NumberRuleAppCost.create(count - penalty >= 0 ? count - penalty : 0);
     }
 
 }
