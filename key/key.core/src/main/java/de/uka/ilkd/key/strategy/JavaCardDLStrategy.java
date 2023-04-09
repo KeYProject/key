@@ -5,6 +5,7 @@ import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.loopinvgen.NestedLoopUsecaseRule;
 import de.uka.ilkd.key.loopinvgen.RelaxedShiftUpdateRule;
@@ -738,12 +739,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 longConst(0)));
 
 
-        Feature accessAtEarlierTime = not(leq("label2", "label1"));
+        Feature accessAtEarlierTime = gt("label1", "label2");
 
         bindRuleSet(d, "accessAtEarlierTime",
             ifZero(MatchedIfFeature.INSTANCE, accessAtEarlierTime, longConst(0)));
-
-
 
         bindRuleSet(d, "rewriteDependenciesAfterArgumentSimplification", add(noDoubleMinus, longConst(-100)));
 
@@ -783,6 +782,20 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             applyTF(left, tf.polynomial),
             applyTF(right, tf.polynomial),
             PolynomialValuesCmpFeature.leq(instOf(left), instOf(right)));
+    }
+
+    private Feature gt(String left, String right) {
+        return add(
+            applyTF(left, tf.polynomial),
+            applyTF(right, tf.polynomial),
+            not(PolynomialValuesCmpFeature.leq(instOf(right), instOf(left))));
+    }
+
+    private Feature geq(String left, String right) {
+        return add(
+            applyTF(left, tf.polynomial),
+            applyTF(right, tf.polynomial),
+            not(PolynomialValuesCmpFeature.lt(instOf(right), instOf(left))));
     }
 
     private void setupSelectSimplification(final RuleSetDispatchFeature d) {
@@ -1194,25 +1207,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 instOf("colEnd"),
                 instOf("colStart")));
 
-        Feature rowEndGeqRowStart = add(
-            applyTF("rowStart", tf.polynomial),
-            applyTF("rowEnd", tf.polynomial),
-            not(PolynomialValuesCmpFeature.lt(
-                instOf("rowStart"),
-                instOf("rowEnd"))));
-
-        Feature colEndGeqColStart = add(
-            applyTF("colStart", tf.polynomial),
-            applyTF("colEnd", tf.polynomial),
-            not(PolynomialValuesCmpFeature.lt(
-                instOf("colStart"),
-                instOf("colEnd"))));
+        Feature rowEndGeqRowStart = geq("rowEnd", "rowStart");
+        Feature colEndGeqColStart = geq("colEnd", "colStart");
 
         bindRuleSet(d, "simplify_matrix_range_literal",
             ifZero(or(rowEndLessThanRowStart, colEndLessThanColStart),
-                longConst(0),
-                ifZero(add(rowEndGeqRowStart, colEndGeqColStart),
-                    inftyConst(), longConst(500))));
+                longConst(0), inftyConst()));
 
         bindRuleSet(d, "checkArrayElementSort",
             IncompatibleArrayElementSort.create(instOf("row"), instOf("matrix")));
