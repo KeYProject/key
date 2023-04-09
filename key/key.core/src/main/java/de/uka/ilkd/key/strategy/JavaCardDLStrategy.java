@@ -738,10 +738,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 longConst(0)));
 
 
-        Feature accessEarlierOrAtSametime = leq("label1", "label2");
+        Feature accessAtEarlierTime = not(leq("label2", "label1"));
 
-        bindRuleSet(d, "accessAtSameOrEarlierTime",
-            ifZero(MatchedIfFeature.INSTANCE, accessEarlierOrAtSametime, longConst(0)));
+        bindRuleSet(d, "accessAtEarlierTime",
+            ifZero(MatchedIfFeature.INSTANCE, accessAtEarlierTime, longConst(0)));
 
 
 
