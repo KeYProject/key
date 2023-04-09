@@ -782,7 +782,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         return add(
             applyTF(left, tf.polynomial),
             applyTF(right, tf.polynomial),
-            PolynomialValuesCmpFeature.leq(instOf(right), instOf(left)));
+            PolynomialValuesCmpFeature.leq(instOf(left), instOf(right)));
     }
 
     private void setupSelectSimplification(final RuleSetDispatchFeature d) {
@@ -1136,7 +1136,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     // //////////////////////////////////////////////////////////////////////////
     private  void setupLocset(RuleSetDispatchFeature d) {
         Feature rowIndexInBetween = inClosedInterval("rowStart", "rowIndex", "rowEnd");
-        Feature colIndexInBetween = inClosedInterval("colStart", "colIndex", "colEnd");
         Feature colNotInInterval = or(PolynomialValuesCmpFeature.lt(instOf("colIndex"), instOf("colStart")),
             PolynomialValuesCmpFeature.lt(instOf("rowEnd"), instOf("rowIndex")));
 
@@ -1145,6 +1144,24 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "locsetExpandSetMinusMatrix", add(ifZero(MatchedIfFeature.INSTANCE,
                 or(rowIndexInBetween, colNotInInterval)), longConst(100)));
+
+
+
+        Feature covered =
+            ifZero(add( applyTF("lRow1", tf.polynomial),
+                        applyTF("hRow1", tf.polynomial),
+                        applyTF("lCol1", tf.polynomial),
+                        applyTF("hCol1", tf.polynomial),
+                        applyTF("lRow2", tf.polynomial),
+                        applyTF("hRow2", tf.polynomial),
+                        applyTF("lCol2", tf.polynomial),
+                        applyTF("hCol2", tf.polynomial)),
+                add(leq("lRow2", "lRow1"), leq("hRow1", "hRow2"),
+                        leq("lCol2", "lCol1"), leq("hCol1", "hCol2")),
+                inftyConst());
+
+        bindRuleSet(d, "coveredMatrix", add(ifZero(covered,
+            ScaleFeature.createAffine(FindDepthFeature.INSTANCE, 100, -2500), inftyConst())));
 
         bindRuleSet(d, "locset_expand_setMinus", longConst(100));
 
