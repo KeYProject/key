@@ -761,7 +761,6 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 //								outerToHigh.sub(3),
 //								outerToHigh.sub(4),
 //								tb.sub(outerToHigh.sub(5), tb.one()))));
-
 					}
 				}
 			}

@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.util.Pair;
@@ -446,6 +447,8 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
 			Term lowToInner, innerToHigh;
 			Term lowToOuter, outerToHigh;
+
+
 //			if(arr == arrInner){
 				if (!sProof.proofEquality(inLow, index)) {
 					lowToInner = tb.matrixRange(heap, arr, outLow, outHigh,inLow, index);

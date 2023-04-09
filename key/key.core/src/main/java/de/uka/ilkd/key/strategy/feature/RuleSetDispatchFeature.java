@@ -42,6 +42,9 @@ public class RuleSetDispatchFeature implements Feature {
         	final Feature partialF = rulesetToFeature.get ( rs );
             if ( partialF != null ) {
                 res = res.add (partialF.computeCost ( app, pos, goal ) );
+                if (rs.name().equals("boostIdenticalLoc")) {
+                    System.out.println(app.rule().name() + ":" + partialF.computeCost ( app, pos, goal ));
+                }
                 if ( res instanceof TopRuleAppCost ) {
                     break;
                 }

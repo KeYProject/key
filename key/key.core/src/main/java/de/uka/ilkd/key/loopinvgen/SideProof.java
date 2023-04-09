@@ -21,6 +21,7 @@ import org.key_project.util.collection.ImmutableList;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * Provides means to perform side proofs required by the loop invariant generator.
@@ -46,7 +47,7 @@ public class SideProof {
 	}
 
 	public SideProof(Services s, Sequent sequent) {
-		this(s, sequent, 15000);
+		this(s, sequent, 20000);
 	}//100000
 
 	/**
@@ -170,7 +171,7 @@ public class SideProof {
 	public boolean proofEquality(Term left, Term right) {
 		if(left!=null && right!=null){
 			Term fml = tb.equals(left, right);
-			Sequent sideSeq = prepareSideProof(left, right);
+			Sequent sideSeq = prepareSideProof(left, right, sf->services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()));
 			sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
 			boolean closed = isProvable(sideSeq, services);
 			// true: Holds, false: Unknown
@@ -181,7 +182,7 @@ public class SideProof {
 
 	public boolean proofNonEmptyIntersection(Term left, Term right) {
 		Term fml = tb.not(tb.equals(tb.intersect(left, right), tb.empty()));
-		Sequent sideSeq = prepareSideProof(left, right);
+		Sequent sideSeq = prepareSideProof(left, right, sf->services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()));
 		sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
 		boolean closed = isProvable(sideSeq, maxRuleApp, true, services);
 		// true: Holds, false: Unknown
@@ -208,11 +209,11 @@ public class SideProof {
 	}
 	private boolean prove(Function pred, Term ts1, Term ts2) {
 		Term fml = tb.func(pred, ts1, ts2);
-		Sequent sideSeq = prepareSideProof(ts1, ts2);
+		Sequent sideSeq = prepareSideProof(ts1, ts2,
+				sf-> services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()));
 		sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
-		boolean closed = isProvable(sideSeq, services);
 		// true: Holds, false: Unknown
-		return closed;
+		return isProvable(sideSeq, services);
 	}
 
 	/**
@@ -221,7 +222,7 @@ public class SideProof {
 	 * @param ts2 Term used to initialize the sequent
 	 * @return the initialized sequent
 	 */
-	private Sequent prepareSideProof(Term ts1, Term ts2) {
+	private Sequent prepareSideProof(Term ts1, Term ts2, Predicate<SequentFormula> filter) {
 		final CacheKey key = new CacheKey(ts1, ts2);
 		CacheValue value= cache.get(key);
 		if (value != null) {
@@ -245,8 +246,8 @@ public class SideProof {
 		int size;
 		do {
 			size = locSetVars.size();
-			sideSeq = addRelevantSequentFormulas(seq.antecedent(), tempAnteToAdd, locSetVars, sideSeq, true);
-			sideSeq = addRelevantSequentFormulas(seq.succedent(), tempSuccToAdd, locSetVars, sideSeq, false);
+			sideSeq = addRelevantSequentFormulas(seq.antecedent(), tempAnteToAdd, locSetVars, sideSeq, true, filter);
+			sideSeq = addRelevantSequentFormulas(seq.succedent(), tempSuccToAdd, locSetVars, sideSeq, false, filter);
 		} while (size != locSetVars.size());
 
 		cache.put(key, new CacheValue(sideSeq));
@@ -264,9 +265,9 @@ public class SideProof {
 	 * @return the resulting sequent with added relevant formulas to sideSeq
 	 */
 	private Sequent addRelevantSequentFormulas(Semisequent seq, Set<SequentFormula> tempAnteToAdd,
-											   Set<Term> locSetVars, Sequent sideSeq, boolean antec) {
+											   Set<Term> locSetVars, Sequent sideSeq, boolean antec, Predicate<SequentFormula> filter) {
 		for (SequentFormula sfAnte : seq) {
-			if (tempAnteToAdd.contains(sfAnte)) {
+			if (tempAnteToAdd.contains(sfAnte) || filter.test(sfAnte)) {
 				continue;
 			}
 			final Set<Term> anteFmlVars = collectProgramAndLogicVariables(sfAnte.formula());
@@ -282,7 +283,40 @@ public class SideProof {
 		}
 		return sideSeq;
 	}
+/*
 
+	private Sequent addRelevantSequentFormulas(Semisequent seq, Set<SequentFormula> tempAnteToAdd,
+											   Set<Term> locSetVars, Sequent sideSeq, boolean antec, boolean noDep) {
+		DependenciesLDT depLDT = services.getTypeConverter().getDependenciesLDT();
+
+		LinkedList<SequentFormula> queue = new LinkedList<>();
+		for (SequentFormula sfAnte : seq) {
+			queue.add(sfAnte);
+		}
+		LinkedList<SequentFormula> newQueue = new LinkedList<>();
+		while (!queue.isEmpty()) {
+		for (SequentFormula sfAnte = queue.pop(); !queue.isEmpty(); sfAnte = queue.pop()) {
+			if (tempAnteToAdd.contains(sfAnte)) {
+				continue;
+			}
+			final Set<Term> anteFmlVars = collectProgramAndLogicVariables(sfAnte.formula());
+			for (Term tfv : anteFmlVars) {
+				if (locSetVars.contains(tfv)) {
+					if (tempAnteToAdd.add(sfAnte) && (!noDep || !depLDT.isDependencePredicate(sfAnte.formula().op()))) {
+						sideSeq = sideSeq.addFormula(sfAnte, antec, true).sequent();
+						locSetVars.addAll(anteFmlVars);
+						break;
+					} else {
+						newQueue.add(sfAnte);
+					}
+				}
+			}
+		}
+			queue = newQueue;
+		}
+		return sideSeq;
+	}
+ */
 	protected boolean isProvable(Sequent seq2prove, Services services) {
 //		System.out.println(seq2prove);
 		return isProvable(seq2prove, maxRuleApp, true, services);

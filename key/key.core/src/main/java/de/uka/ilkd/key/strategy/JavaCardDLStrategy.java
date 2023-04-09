@@ -12,7 +12,6 @@ import de.uka.ilkd.key.loopinvgen.ShiftUpdateRule;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
-import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
@@ -731,17 +730,33 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "noEqApp", EqNonDuplicateAppFeature.INSTANCE);
         bindRuleSet(d, "dep_pred_unroll_fixed_bounds", longConst(0));
 
-        bindRuleSet(d, "boostIdenticalLoc", ifZero(MatchedIfFeature.INSTANCE,
-            ifZero(eq(println(instOf("loc1")), println(instOf("loc2"))),
-            longConst(-8000), longConst(0)), longConst(0)));
+        bindRuleSet(d, "similarLocSetArguments",
+            ifZero(MatchedIfFeature.INSTANCE,
+                ScaleFeature.createAffine(
+                    SimilarityCountFeature.create(instOf("loc1"), instOf("loc2")),
+                    -500, 1000),
+                longConst(0)));
 
-        bindRuleSet(d, "dep_pred_known", add(ScaleFeature.createScaled(depth, 1500), longConst(100)));//+100
+
+        Feature accessEarlierOrAtSametime = leq("label1", "label2");
+
+        bindRuleSet(d, "accessAtSameOrEarlierTime",
+            ifZero(MatchedIfFeature.INSTANCE, accessEarlierOrAtSametime, longConst(0)));
+
+
+
+        bindRuleSet(d, "rewriteDependenciesAfterArgumentSimplification", add(noDoubleMinus, longConst(-100)));
+
+        bindRuleSet(d, "dep_pred_known", add(ScaleFeature.createScaled(FocusTermDepthFeature.INSTANCE, 3000), longConst(5000)));//+100
         bindRuleSet(d, "dep_pred_known_2", add(noDoubleMinus,longConst(100)));//+100
-        bindRuleSet(d, "dep_pred_known_2b", add(noDoubleMinus,longConst(-50)));
+        bindRuleSet(d, "dep_pred_known_2b", add(noDoubleMinus,longConst(10)));
         bindRuleSet(d, "dep_pred_known_2c", add(noDoubleMinus,longConst(-2500)));
         bindRuleSet(d, "dep_pred_known_3", add(noDoubleMinus,longConst(-5000)));//-500
+
+
+
         bindRuleSet(d, "saturate_dep_locset_relations_def",
-            add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE, ScaleFeature.createScaled(depth, 1000), longConst(300)));
+            add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE, ScaleFeature.createScaled(FocusTermDepthFeature.INSTANCE, 1000), longConst(3000)));
         bindRuleSet(d, "self_app_prevention", add(NonDuplicateAppModPositionFeature.INSTANCE, ScaleFeature.createScaled(depth, 10000), longConst(300)));
         bindRuleSet(d, "lateSimplification", longConst(1000));
 
@@ -757,6 +772,17 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 longConst(-100), d.get(new RuleSet(new Name("semantics_blasting"))));
 
         bindRuleSet(d, "pullOutRestricted", pullOutFeature);
+    }
+
+    private Feature inClosedInterval(String rowStart, String rowIndex, String rowEnd) {
+        return add(leq(rowStart, rowIndex), leq(rowIndex, rowEnd));
+    }
+
+    private Feature leq(String left, String right) {
+        return add(
+            applyTF(left, tf.polynomial),
+            applyTF(right, tf.polynomial),
+            PolynomialValuesCmpFeature.leq(instOf(right), instOf(left)));
     }
 
     private void setupSelectSimplification(final RuleSetDispatchFeature d) {
@@ -1109,16 +1135,67 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
     private  void setupLocset(RuleSetDispatchFeature d) {
-        bindRuleSet(d, "locset_expand_setMinus", 100);
+        Feature rowIndexInBetween = inClosedInterval("rowStart", "rowIndex", "rowEnd");
+        Feature colIndexInBetween = inClosedInterval("colStart", "colIndex", "colEnd");
+        Feature colNotInInterval = or(PolynomialValuesCmpFeature.lt(instOf("colIndex"), instOf("colStart")),
+            PolynomialValuesCmpFeature.lt(instOf("rowEnd"), instOf("rowIndex")));
+
+        bindRuleSet(d, "rowInInterval", rowIndexInBetween);
+
+
+        bindRuleSet(d, "locsetExpandSetMinusMatrix", add(ifZero(MatchedIfFeature.INSTANCE,
+                or(rowIndexInBetween, colNotInInterval)), longConst(100)));
+
+        bindRuleSet(d, "locset_expand_setMinus", longConst(100));
+
         bindRuleSet(d, "locset_expand_setMinus_low_priority", 5000);
-        final IntegerLDT integerLDT = getServices().getTypeConverter().getIntegerLDT();
+
+        /*final IntegerLDT integerLDT = getServices().getTypeConverter().getIntegerLDT();
         bindRuleSet(d, "simplify_matrix_range_literal",
             ifZero(
-                or(NumberLiteralsSmallerThanFeature.create(instOf("rowEnd"), instOf("rowStart"),
+                or(NumberLiteralsSmallerThanFeature.create(instOf("rowEnd"), instOf("rowEnd"),
                         integerLDT),
                     NumberLiteralsSmallerThanFeature.create(instOf("colEnd"), instOf("colStart"),
-                        integerLDT)), longConst(-4000), inftyConst())
-        );
+                        integerLDT)), longConst(-4000),
+                    ifZero(or(applyTF(instOf("rowEnd"), tf.negLiteral),
+                        add(applyTF(instOf("colEnd"), tf.negLiteral)), longConst(-250),
+                            ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 50)),
+                        inftyConst()))
+        );*/
+
+        Feature rowEndLessThanRowStart = add(
+            applyTF("rowStart", tf.polynomial),
+            applyTF("rowEnd", tf.polynomial),
+            PolynomialValuesCmpFeature.lt(
+                instOf("rowEnd"),
+                instOf("rowStart")));
+
+        Feature colEndLessThanColStart = add(
+            applyTF("colStart", tf.polynomial),
+            applyTF("colEnd", tf.polynomial),
+            PolynomialValuesCmpFeature.lt(
+                instOf("colEnd"),
+                instOf("colStart")));
+
+        Feature rowEndGeqRowStart = add(
+            applyTF("rowStart", tf.polynomial),
+            applyTF("rowEnd", tf.polynomial),
+            not(PolynomialValuesCmpFeature.lt(
+                instOf("rowStart"),
+                instOf("rowEnd"))));
+
+        Feature colEndGeqColStart = add(
+            applyTF("colStart", tf.polynomial),
+            applyTF("colEnd", tf.polynomial),
+            not(PolynomialValuesCmpFeature.lt(
+                instOf("colStart"),
+                instOf("colEnd"))));
+
+        bindRuleSet(d, "simplify_matrix_range_literal",
+            ifZero(or(rowEndLessThanRowStart, colEndLessThanColStart),
+                longConst(0),
+                ifZero(add(rowEndGeqRowStart, colEndGeqColStart),
+                    inftyConst(), longConst(500))));
 
         bindRuleSet(d, "checkArrayElementSort",
             IncompatibleArrayElementSort.create(instOf("row"), instOf("matrix")));
