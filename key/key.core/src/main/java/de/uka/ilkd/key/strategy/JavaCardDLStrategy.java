@@ -1206,8 +1206,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 instOf("colEnd"),
                 instOf("colStart")));
 
-        Feature rowEndGeqRowStart = geq("rowEnd", "rowStart");
-        Feature colEndGeqColStart = geq("colEnd", "colStart");
+//        Feature rowEndGeqRowStart = geq("rowEnd", "rowStart");
+//        Feature colEndGeqColStart = geq("colEnd", "colStart");
 
         bindRuleSet(d, "simplify_matrix_range_literal",
             ifZero(or(rowEndLessThanRowStart, colEndLessThanColStart),
@@ -1217,6 +1217,22 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                         add(longConst(-250),
                             ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 50)),
                     inftyConst()))) ;
+
+
+        bindRuleSet(d, "pull_out_matrixRange_heap", longConst(-2500));
+
+        bindRuleSet(d, "simplifyMatrixAnonHeap", add(not(isBelow(ff.ifThenElse)),
+            longConst(-2000) /* slightly faster than simplify_ENLARGING */, EqNonDuplicateAppFeature.INSTANCE));
+
+        bindRuleSet(d, "simplifyAnonHeapMatrixRange", add(
+            DirectlyBelowSymbolFeature.create(Equality.EQUALS),
+            longConst(-1000)));
+
+//        bindRuleSet(d, "apply_eq_MatrixRange_reverse",
+//            add(applyTF("right", tf.constant),
+//                applyTF("ls", )
+//                )
+//            );
 
         bindRuleSet(d, "checkArrayElementSort",
             IncompatibleArrayElementSort.create(instOf("row"), instOf("matrix")));
