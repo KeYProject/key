@@ -41,16 +41,16 @@ public class SimilarityCountFeature implements Feature {
         Term subFst = null;
         Term subSnd = null;
         int penalty = 0;
-        while ( fst.op()==locsetLDT.getSetMinus() || snd.op()==locsetLDT.getSetMinus()) {
-            if (fst.op()==locsetLDT.getSetMinus()) {
-                fst = fst.sub(0);
+        while ( fst.op() == locsetLDT.getSetMinus() || snd.op()==locsetLDT.getSetMinus()) {
+            if (fst.op() == locsetLDT.getSetMinus()) {
                 subFst = fst.sub(1);
+                fst = fst.sub(0);
             } else {
                 subFst = null;
             }
-            if (snd.op()==locsetLDT.getSetMinus()) {
-                snd = snd.sub(0);
+            if (snd.op() == locsetLDT.getSetMinus()) {
                 subSnd = snd.sub(1);
+                snd = snd.sub(0);
             } else {
                 subSnd = null;
             }
