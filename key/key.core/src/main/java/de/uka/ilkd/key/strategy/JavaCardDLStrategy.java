@@ -1219,7 +1219,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     inftyConst()))) ;
 
 
-        bindRuleSet(d, "pull_out_matrixRange_heap", longConst(-2500));
+        bindRuleSet(d, "pull_out_matrixRange",
+            add(not(isBelow(tf.eqF)), longConst(-2500)));
 
         bindRuleSet(d, "simplifyMatrixAnonHeap", add(not(isBelow(ff.ifThenElse)),
             longConst(-2000) /* slightly faster than simplify_ENLARGING */, EqNonDuplicateAppFeature.INSTANCE));
