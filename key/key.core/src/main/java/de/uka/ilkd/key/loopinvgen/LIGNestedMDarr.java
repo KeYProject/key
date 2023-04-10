@@ -36,8 +36,8 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 		outerCompPreds.add(tb.geq(indexOuter, lowOuter));
 //		outerCompPreds.add(tb.geq(indexOuter, tb.add(lowOuter, tb.one())));
 //		outerCompPreds.add(tb.geq(indexOuter, tb.sub(lowOuter, tb.one())));
-		outerCompPreds.add(tb.leq(indexOuter, highOuter));
-//		outerCompPreds.add(tb.leq(indexOuter, tb.add(highOuter, tb.one())));
+//		outerCompPreds.add(tb.leq(indexOuter, highOuter));
+		outerCompPreds.add(tb.leq(indexOuter, tb.add(highOuter, tb.one())));
 //		outerCompPreds.add(tb.leq(indexOuter, tb.sub(highOuter, tb.one())));
 
 
@@ -157,7 +157,7 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 								innerLoop = (LoopStatement) activePE;
 								SideProof innerLoopProof = new  SideProof(services,modifySeqFor2ndApproach(g));
 								innerLI = innerLIComputation(innerLoopProof.retGoal().head(), activePE);//For now only taking the head goal
-								System.out.println("2nd Approach Inner Loop Inv:   " + innerLI);
+//								System.out.println("2nd Approach Inner Loop Inv:   " + innerLI);
 							}
 						}
 						break;
@@ -168,11 +168,11 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 				if (nested) {
 					LoopSpecification loopSpec = new LoopSpecificationImpl(innerLoop, tb.and(innerLI.getConjuncts()));
 					services.getSpecificationRepository().addLoopInvariant(loopSpec);
-//					System.out.println("Goals before Usecase: " + goalsAfterShiftUpdate.head());
+					System.out.println("Goals before Usecase: " + goalsAfterShiftUpdate.head());
 					ImmutableList<Goal> goalsAfterNestedLoopUsecase = ruleApp.applyNestedLoopUsecaseRule(goalsAfterShiftUpdate);
-//					System.out.println("Goals after nested Loop Usecase: "+ goalsAfterNestedLoopUsecase);
+					System.out.println("Goals after nested Loop Usecase: "+ goalsAfterNestedLoopUsecase);
 					goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterNestedLoopUsecase);
-//					System.out.println("Goals After Shifting the inner LI : " + goalsAfterShift);
+					System.out.println("Goals After Shifting the inner LI : " + goalsAfterShift);
 				}
 				if (firstApproach) {
 					nested = false;
