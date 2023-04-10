@@ -77,6 +77,8 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 
 		innerDepPreds.add(tb.noR(tb.matrixRange(tb.getBaseHeap(), arrays[0],lowOuter,highOuter, lowInner, highInner)));
 		innerDepPreds.add(tb.noW(tb.matrixRange(tb.getBaseHeap(), arrays[0],lowOuter,highOuter, lowInner, highInner)));
+		innerDepPreds.add(tb.noW(tb.arrayRange(arrays[0],tb.zero(),tb.dotLength(arrays[0]))));
+
 
 		int outerItrNumber = -1;
 		PredicateRefiner prInner = null;
