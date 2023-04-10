@@ -63,7 +63,7 @@ public class SimilarityCountFeature implements Feature {
             }
         }
 
-        if (fst.arity() != snd.arity()){
+        if (fst.arity() != snd.arity()) {
             return NumberRuleAppCost.getZeroCost();
         }
 
@@ -73,7 +73,7 @@ public class SimilarityCountFeature implements Feature {
                 count += 10;
             }
         }
-        return NumberRuleAppCost.create(count - penalty >= 0 ? count - penalty : 0);
+        return NumberRuleAppCost.create(count - penalty > 0 ? count - penalty : 0);
     }
 
 }

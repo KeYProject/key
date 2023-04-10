@@ -738,7 +738,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     -50, 1000),
                 longConst(0)));
 
-
         Feature accessAtEarlierTime = gt("label1", "label2");
 
         bindRuleSet(d, "accessAtEarlierTime",
