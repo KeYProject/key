@@ -59,16 +59,16 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 		innerCompPreds.add(tb.geq(indexOuter, lowOuter));
 //		innerCompPreds.add(tb.geq(indexOuter, tb.add(lowOuter, tb.one())));
 //		innerCompPreds.add(tb.geq(indexOuter, tb.sub(lowOuter, tb.one())));
-		innerCompPreds.add(tb.leq(indexOuter, highOuter));
-//		innerCompPreds.add(tb.leq(indexOuter, tb.add(highOuter, tb.one())));
+//		innerCompPreds.add(tb.leq(indexOuter, highOuter));
+		innerCompPreds.add(tb.leq(indexOuter, tb.add(highOuter, tb.one())));
 //		innerCompPreds.add(tb.leq(indexOuter, tb.sub(highOuter, tb.one())));
 
 
 		innerCompPreds.add(tb.geq(indexInner, lowInner));
 //		innerCompPreds.add(tb.geq(indexInner, tb.add(lowInner, tb.one())));
 //		innerCompPreds.add(tb.geq(indexInner, tb.sub(lowInner, tb.one())));
-		innerCompPreds.add(tb.leq(indexInner, highInner));
-//		innerCompPreds.add(tb.leq(indexInner, tb.add(highInner, tb.one())));
+//		innerCompPreds.add(tb.leq(indexInner, highInner));
+		innerCompPreds.add(tb.leq(indexInner, tb.add(highInner, tb.one())));
 //		innerCompPreds.add(tb.leq(indexInner, tb.sub(highInner, tb.one())));
 
 
