@@ -48,7 +48,7 @@ public class SimilarityCountFeature implements Feature {
             } else {
                 subFst = null;
             }
-            if (fst.op()==locsetLDT.getSetMinus()) {
+            if (snd.op()==locsetLDT.getSetMinus()) {
                 snd = snd.sub(0);
                 subSnd = snd.sub(1);
             } else {
