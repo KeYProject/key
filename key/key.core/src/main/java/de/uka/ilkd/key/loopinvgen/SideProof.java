@@ -266,7 +266,7 @@ public class SideProof {
 	 * @return the resulting sequent with added relevant formulas to sideSeq
 	 */
 	private Sequent addRelevantSequentFormulas(Semisequent seq, Set<SequentFormula> tempAnteToAdd,
-											   Set<Term> locSetVars, Sequent sideSeq, boolean antec, Predicate<SequentFormula> filter) {
+																						 Set<Term> locSetVars, Sequent sideSeq, boolean antec, Predicate<SequentFormula> filter) {
 		LinkedList<SequentFormula> working = new LinkedList<>();
 		LinkedList<SequentFormula> queue = new LinkedList<>();
 
@@ -275,19 +275,20 @@ public class SideProof {
 		}
 
 		while (!working.isEmpty()) {
-			SequentFormula sfAnte = working.pop();
-			if (tempAnteToAdd.contains(sfAnte) || filter.test(sfAnte)) {
-				continue;
-			}
-			final Set<Term> anteFmlVars = collectProgramAndLogicVariables(sfAnte.formula());
-			for (Term tfv : anteFmlVars) {
-				if (locSetVars.contains(tfv)) {
-					if (tempAnteToAdd.add(sfAnte)) {
-						sideSeq = sideSeq.addFormula(sfAnte, antec, true).sequent();
-						locSetVars.addAll(anteFmlVars);
-						break;
-					} else {
-						queue.add(sfAnte);
+			for (SequentFormula sfAnte : working) {
+				if (tempAnteToAdd.contains(sfAnte) || filter.test(sfAnte)) {
+					continue;
+				}
+				final Set<Term> anteFmlVars = collectProgramAndLogicVariables(sfAnte.formula());
+				for (Term tfv : anteFmlVars) {
+					if (locSetVars.contains(tfv)) {
+						if (tempAnteToAdd.add(sfAnte)) {
+							sideSeq = sideSeq.addFormula(sfAnte, antec, true).sequent();
+							locSetVars.addAll(anteFmlVars);
+							break;
+						} else {
+							queue.add(sfAnte);
+						}
 					}
 				}
 			}
