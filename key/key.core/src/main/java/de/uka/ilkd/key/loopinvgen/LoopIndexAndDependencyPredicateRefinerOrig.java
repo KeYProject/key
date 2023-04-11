@@ -13,43 +13,33 @@ import java.util.Set;
 /**
  * Refinement of the predicates describing the loop index and the dependency predicates
  */
-public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
+public class LoopIndexAndDependencyPredicateRefinerOrig extends PredicateRefiner {
 
 	private final Term index;
 	private final Term indexOuter;
 	private final int itrNumber;
+	private Set<Term> refinedCompList;
+	private Set<Term> refinedDepList;
 	private Set<Term> depPredicates;
 	private Set<Term> compPredicates;
 
-	private	Graph<Term> locSetToPredicate;
-
-	public LoopIndexAndDependencyPredicateRefiner(Sequent sequent, Set<Term> depPredList, Set<Term> compPredList, Term outerIndex,
-												  Term index, int iteration, Services services) {
+	public LoopIndexAndDependencyPredicateRefinerOrig(Sequent sequent, Set<Term> depPredList, Set<Term> compPredList, Term outerIndex,
+													  Term index, int iteration, Services services) {
 		super(sequent, services);
 		this.depPredicates  = depPredList;
 		this.compPredicates = compPredList;
 		this.index = index;
 		this.itrNumber = iteration;
 		this.indexOuter = outerIndex;
-		this.locSetToPredicate = new Graph<Term>();
 	}
 
 	@Override
 	public Pair<Set<Term>, Set<Term>> refine() {
-		int inlattice = 0;
 		Set<Term> unProvenDepPreds = new HashSet<>();
 		for (Term pred : depPredicates) {
 			System.out.println("Proving Dep Pred: " + pred);
-			if(locSetToPredicate.hasVertex(pred.sub(0)) && locSetToPredicate.hasEdge(pred.sub(0),pred)){
-				System.out.println("In lattice " + pred);
-				inlattice++;
-			}
-			else if(sequentImpliesPredicate(pred)){
-				locSetToPredicate.addEdge(pred.sub(0),pred, false);
-			}
-			else {
+			if (!sequentImpliesPredicate(pred)) {
 				unProvenDepPreds.add(pred);
-				System.out.println("Here: 2");
 			}
 		}
 		depPredicates.removeAll(unProvenDepPreds);
@@ -58,24 +48,21 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 			weakenedDepPreds.addAll(weakeningDependencePredicates(un));
 		}
 
-
 		for (Term w : weakenedDepPreds) {
-			if (locSetToPredicate.hasVertex(w.sub(0))) {
-				if(locSetToPredicate.hasEdge(w.sub(0),w)) {
-					depPredicates.add(w);
-					System.out.println("In lattice: " + w);
-					inlattice++;
+			boolean weakerPredicateIsSubsumed = false;
+			for (Term dp : depPredicates) {  // to not loose precision here, the refinement needs to have the property that if dp is removed at some point t1 then there will be a time tn which adds w again (or something that implies it)
+				if (predicateImpliedBypredicate(w, dp)) {
+//					System.out.println("IMPLIED " + w + " by " + dp);
+					weakerPredicateIsSubsumed = true;
+					break;
 				}
 			}
-			else{
+			if (!weakerPredicateIsSubsumed && !depPredicates.contains(w)) {
 				if (sequentImpliesPredicate(w)) {
 					depPredicates.add(w);
-					locSetToPredicate.addEdge(w.sub(0), w, false);
 				}
 			}
-
 		}
-		System.out.println("Lattice was useful " + inlattice + " times");
 		System.out.println("DEP PREDS: " + depPredicates);
 		// -------------------------------------
 		Set<Term> unProvenCompPreds = new HashSet<>();
@@ -151,7 +138,6 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
 	private Set<Term> weakeningDependencePredicates(Term unProven) {
 		Set<Term> result = new HashSet<>();
-
 //		**
 		if (unProven!=null) {
 //		System.out.println("Weaken " + unProven + ": ");
@@ -172,9 +158,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 //		result.addAll(weakenBySequent(unProven)); // 0 or 1
 //		**		
 //		System.out.println(result);
-
 		}
-
 		return result;
 	}
 
@@ -203,12 +187,6 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 		}
 
 		System.out.println("weaken by pred symb "+ unProven +" with "+ result);
-		for(Term r:result){
-			if(locSetToPredicate.hasVertex(r.sub(0))){
-				locSetToPredicate.addEdge(r.sub(0), r, false);
-				System.out.println("added 1");
-			}
-		}
 		return result;
 	}
 
@@ -375,12 +353,6 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 //					result.add(tb.func(op, highArr));
 		}
 
-		for(Term r : result){
-			if(locSetToPredicate.hasVertex(r.sub(0))){
-				locSetToPredicate.addEdge(r.sub(0), r, false);
-				System.out.println("added 3");
-			}
-		}
 		return result;
 	}
 
@@ -600,12 +572,6 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 			}
 		}
 		System.out.println("weakening res for: "+ pred + " is:"+ result);
-		for(Term r : result){
-			if(locSetToPredicate.hasVertex(r.sub(0))){
-				locSetToPredicate.addEdge(r.sub(0), r, false);
-				System.out.println("added 2");
-			}
-		}
 		return result;
 	}
 

@@ -172,7 +172,8 @@ public class SideProof {
 	public boolean proofEquality(Term left, Term right) {
 		if(left!=null && right!=null){
 			Term fml = tb.equals(left, right);
-			Sequent sideSeq = prepareSideProof(left, right, sf->services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()));
+			Sequent sideSeq = prepareSideProof(left, right,
+					sf->true);//services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()));
 			sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
 			boolean closed = isProvable(sideSeq, services);
 			// true: Holds, false: Unknown
@@ -183,7 +184,8 @@ public class SideProof {
 
 	public boolean proofNonEmptyIntersection(Term left, Term right) {
 		Term fml = tb.not(tb.equals(tb.intersect(left, right), tb.empty()));
-		Sequent sideSeq = prepareSideProof(left, right, sf->services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()));
+		Sequent sideSeq = prepareSideProof(left, right,
+				sf->services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()));
 		sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
 		boolean closed = isProvable(sideSeq, maxRuleApp, true, services);
 		// true: Holds, false: Unknown
@@ -211,7 +213,7 @@ public class SideProof {
 	private boolean prove(Function pred, Term ts1, Term ts2) {
 		Term fml = tb.func(pred, ts1, ts2);
 		Sequent sideSeq = prepareSideProof(ts1, ts2,
-				sf-> services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()));
+				sf-> true);//services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()));
 		sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
 		// true: Holds, false: Unknown
 		return isProvable(sideSeq, services);

@@ -7,7 +7,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableList;
 
-import java.util.Set;
+import java.util.*;
 
 public class LIGNewInner extends AbstractLoopInvariantGenerator {
 	Set<Term> allDepPreds;
@@ -58,6 +58,26 @@ public class LIGNewInner extends AbstractLoopInvariantGenerator {
 			refinedPreds = pr.refine();
 			allDepPreds = refinedPreds.first;
 			allCompPreds = refinedPreds.second;
+
+
+//			HashMap<Term, List<Term>> locSets2predicates = new HashMap<>();
+//			for (Term pred: allDepPreds) {
+//				List<Term> list;
+//				if (locSets2predicates.containsKey(pred.sub(0))) {
+//					list = locSets2predicates.get(pred.sub(0));
+//				} else {
+//					list = new LinkedList<Term>();
+//				}
+//				list.add(pred);
+//				locSets2predicates.put(pred.sub(0), list);
+//			}
+//
+//			var it = locSets2predicates.entrySet();
+//			System.out.println("====>>>>");
+//			for(var entry : it) {
+//				System.out.println(entry.getKey() + ":" + entry.getValue().size() + ":" + entry.getValue());
+//			}
+
 
 			for (Goal g : goalsAfterShift) {
 				if(g!=null)
