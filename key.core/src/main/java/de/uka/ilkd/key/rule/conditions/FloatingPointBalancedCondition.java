@@ -1,30 +1,24 @@
 package de.uka.ilkd.key.rule.conditions;
 
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.operator.BinaryOperator;
+import de.uka.ilkd.key.java.expression.operator.ComparativeOperator;
 import de.uka.ilkd.key.java.expression.operator.TypeCast;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-
-import javax.annotation.Nullable;
-import java.util.Set;
 
 
 /**
@@ -64,13 +58,18 @@ public final class FloatingPointBalancedCondition implements VariableCondition {
             Services services) {
 
         SVInstantiations svInst = mc.getInstantiations();
-        BinaryOperator inInst = (BinaryOperator) svInst.getInstantiation(unbalanced);
+        Object untypedInstantiation = svInst.getInstantiation(unbalanced);
+        if (!(untypedInstantiation instanceof BinaryOperator
+                || untypedInstantiation instanceof ComparativeOperator)) {
+            return null;
+        }
+        Operator inInst = (Operator) untypedInstantiation;
         JavaProgramElement outInst = (JavaProgramElement) svInst.getInstantiation(balanced);
         if (inInst == null) {
             return mc;
         }
 
-        BinaryOperator properResultInst = balance(inInst, services);
+        Operator properResultInst = balance(inInst, services);
         if (properResultInst == null) {
             return null;
         } else if (outInst == null) {
@@ -103,7 +102,7 @@ public final class FloatingPointBalancedCondition implements VariableCondition {
      * @return null if already same types. Otherwise a binary operator which
      *         has an added cast compared to the input
      */
-    private static @Nullable BinaryOperator balance(BinaryOperator inInst, Services services) {
+    private static @Nullable Operator balance(Operator inInst, Services services) {
 
         ProgramElement child0 = inInst.getChildAt(0);
         ProgramElement child1 = inInst.getChildAt(1);
@@ -142,12 +141,12 @@ public final class FloatingPointBalancedCondition implements VariableCondition {
      * @return a binary operation similar to the input, but with one
      *         cast added to child childNo.
      */
-    private static BinaryOperator cast(BinaryOperator inInst, int childNo, KeYJavaType kjt,
+    private static Operator cast(Operator inInst, int childNo, KeYJavaType kjt,
             Services services) {
         Expression child = (Expression) inInst.getChildAt(childNo);
         TypeCast cast = new TypeCast(child, new TypeRef(kjt));
         ProgramElementReplacer per = new ProgramElementReplacer(inInst, services);
         ProgramElement result = per.replace(child, cast);
-        return (BinaryOperator) result;
+        return (Operator) result;
     }
 }
