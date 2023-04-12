@@ -198,9 +198,9 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 
 		outerDepPreds.addAll(outerCompPreds);
 
-//		PredicateSetCompressor compressor =
-//				new PredicateSetCompressor(outerDepPreds, currentGoal.sequent(), false, services);
-//		outerDepPreds = compressor.compress();
+		PredicateSetCompressor compressor =
+				new PredicateSetCompressor(outerDepPreds, currentGoal.sequent(), false, services);
+		outerDepPreds = compressor.compress();
 		LoopInvariantGenerationResult outLoopInv = new LoopInvariantGenerationResult(outerDepPreds, outerItrNumber);
 		System.out.println("Outer loops invariant: " + outLoopInv);
 		return outLoopInv;

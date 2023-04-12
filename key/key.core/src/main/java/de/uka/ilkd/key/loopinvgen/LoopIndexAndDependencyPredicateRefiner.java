@@ -46,6 +46,14 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 			}
 			else if(sequentImpliesPredicate(pred)){
 				locSetToPredicate.addEdge(pred.sub(0),pred, false);
+				if(pred.op() == depLDT.getNoR()){
+					locSetToPredicate.addEdge(pred.sub(0),tb.noRaW(pred.sub(0)), false);
+					locSetToPredicate.addEdge(pred.sub(0),tb.noWaR(pred.sub(0)), false);
+				} else if(pred.op() == depLDT.getNoW()){
+					locSetToPredicate.addEdge(pred.sub(0),tb.noRaW(pred.sub(0)), false);
+					locSetToPredicate.addEdge(pred.sub(0),tb.noWaR(pred.sub(0)), false);
+					locSetToPredicate.addEdge(pred.sub(0),tb.noWaW(pred.sub(0)), false);
+				}
 			}
 			else {
 				unProvenDepPreds.add(pred);
@@ -71,6 +79,14 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 				if (sequentImpliesPredicate(w)) {
 					depPredicates.add(w);
 					locSetToPredicate.addEdge(w.sub(0), w, false);
+					if(w.op() == depLDT.getNoR()){
+						locSetToPredicate.addEdge(w.sub(0),tb.noRaW(w.sub(0)), false);
+						locSetToPredicate.addEdge(w.sub(0),tb.noWaR(w.sub(0)), false);
+					} else if(w.op() == depLDT.getNoW()){
+						locSetToPredicate.addEdge(w.sub(0),tb.noRaW(w.sub(0)), false);
+						locSetToPredicate.addEdge(w.sub(0),tb.noWaR(w.sub(0)), false);
+						locSetToPredicate.addEdge(w.sub(0),tb.noWaW(w.sub(0)), false);
+					}
 				}
 			}
 
