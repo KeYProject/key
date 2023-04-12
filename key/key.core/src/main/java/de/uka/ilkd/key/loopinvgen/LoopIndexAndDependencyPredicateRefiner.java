@@ -382,7 +382,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 		}
 
 
-		subLoc = tb.matrixRange(heap, arr, inLow, inHigh, newInLow, newInHigh);
+		subLoc = tb.matrixRange(heap, arr, outLow, outHigh, newInLow, newInHigh);
 
 		if (depLDT.isDependencePredicate(unProven.op())) {
 			final Function op = (Function) unProven.op();
