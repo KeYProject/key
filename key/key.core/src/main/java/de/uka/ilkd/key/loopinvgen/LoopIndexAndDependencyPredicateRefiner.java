@@ -96,7 +96,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 		// -------------------------------------
 		Set<Term> unProvenCompPreds = new HashSet<>();
 		for (Term pred : compPredicates) {
-//			System.out.println("Proving Comp Pred: " + pred);
+			System.out.println("Proving Comp Pred: " + pred);
 			if (!sequentImpliesPredicate(pred)) {
 //				System.out.println("not proved Inner: "+pred);
 				unProvenCompPreds.add(pred);
@@ -109,6 +109,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 		}
 
 		for (Term w : weakenedCompPreds) {
+			System.out.println("Proving Weakened Comp Pred: " + w);
 			if (sequentImpliesPredicate(w)) {
 				compPredicates.add(w);
 			}

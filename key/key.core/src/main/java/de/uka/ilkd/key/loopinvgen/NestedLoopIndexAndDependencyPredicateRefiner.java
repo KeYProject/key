@@ -64,6 +64,7 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 				}
 			}
 			if (!weakerPredicateIsSubsumed && !depPredicates.contains(w)) {
+				System.out.println("Proving Dep Pred: " + w);
 				if (sequentImpliesPredicate(w)) {
 					depPredicates.add(w);
 				}
@@ -73,7 +74,7 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 		// -------------------------------------
 		Set<Term> unProvenCompPreds = new HashSet<>();
 		for (Term pred : compPredicates) {
-//			System.out.println("Proving Comp Pred: " + pred);
+			System.out.println("Proving Comp Pred: " + pred);
 			if (!sequentImpliesPredicate(pred)) {
 				unProvenCompPreds.add(pred);
 			}
@@ -86,6 +87,7 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 		}
 
 		for (Term w : weakenedCompPreds) {
+			System.out.println("Proving Weakened Comp Pred: " + w);
 			if (sequentImpliesPredicate(w)) {
 				compPredicates.add(w);
 			}

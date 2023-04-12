@@ -28,15 +28,7 @@ import de.uka.ilkd.key.strategy.termProjection.MonomialColumnOp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termProjection.ReduceMonomialsProjection;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
-import de.uka.ilkd.key.strategy.termfeature.AnonHeapTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.IsInductionVariable;
-import de.uka.ilkd.key.strategy.termfeature.IsNonRigidTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.IsSelectSkolemConstantTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
-import de.uka.ilkd.key.strategy.termfeature.PrimitiveHeapTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.SimplifiedSelectTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+import de.uka.ilkd.key.strategy.termfeature.*;
 import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.HeapGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.MultiplesModEquationsGenerator;
@@ -1220,7 +1212,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
 
         bindRuleSet(d, "pull_out_matrixRange",
-            add(not(isBelow(tf.eqF)), longConst(-2500)));
+            add(not(isBelow(tf.eqF)), longConst(-3500)));
 
         bindRuleSet(d, "simplifyMatrixAnonHeap", add(not(isBelow(ff.ifThenElse)),
             longConst(-2000) /* slightly faster than simplify_ENLARGING */, EqNonDuplicateAppFeature.INSTANCE));
@@ -1229,11 +1221,16 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             DirectlyBelowSymbolFeature.create(Equality.EQUALS),
             longConst(-1000)));
 
-//        bindRuleSet(d, "apply_eq_MatrixRange_reverse",
-//            add(applyTF("right", tf.constant),
-//                applyTF("ls", )
-//                )
-//            );
+        bindRuleSet(d, "apply_matrix_eq_reverse",
+            ifZero(
+                add(MatchedIfFeature.INSTANCE,applyTF("matrixRangeDescription", or(tf.constant,
+                            OperatorClassTF.create(IProgramVariable.class))),
+                    applyTF("heapSV",
+                        not(OperatorTF.
+                            create(getServices().getTypeConverter().getHeapLDT().getAnon())))
+                ),
+                longConst(-10000),  inftyConst() )
+        );
 
         bindRuleSet(d, "checkArrayElementSort",
             IncompatibleArrayElementSort.create(instOf("row"), instOf("matrix")));

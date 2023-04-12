@@ -194,26 +194,28 @@ public class SideProof {
 
 	public boolean proofSubSet(Term left, Term right) {
 		Function pred = services.getTypeConverter().getLocSetLDT().getSubset();
-		return prove(pred, left, right);
+		return prove(pred, left, right, sf-> true);
 	}
 
 	public boolean proofLT(Term left, Term right) {
 		Function pred = services.getTypeConverter().getIntegerLDT().getLessThan();
-		return prove(pred, left, right);
+		return prove(pred, left, right,
+				sf-> services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()));
 	}
 
 	public boolean proofLEQ(Term left, Term right) {
 		Function pred = services.getTypeConverter().getIntegerLDT().getLessOrEquals();
-		return prove(pred, left, right);
+		return prove(pred, left, right,
+				sf-> services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()));
 	}
 
 	public ImmutableList<Goal> retGoal(){
 		return this.services.getProof().openGoals();
 	}
-	private boolean prove(Function pred, Term ts1, Term ts2) {
+
+	private boolean prove(Function pred, Term ts1, Term ts2, Predicate<SequentFormula> filter) {
 		Term fml = tb.func(pred, ts1, ts2);
-		Sequent sideSeq = prepareSideProof(ts1, ts2,
-				sf-> true);//services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()));
+		Sequent sideSeq = prepareSideProof(ts1, ts2, filter);
 		sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
 		// true: Holds, false: Unknown
 		return isProvable(sideSeq, services);
@@ -268,7 +270,8 @@ public class SideProof {
 	 * @return the resulting sequent with added relevant formulas to sideSeq
 	 */
 	private Sequent addRelevantSequentFormulas(Semisequent seq, Set<SequentFormula> tempAnteToAdd,
-																						 Set<Term> locSetVars, Sequent sideSeq, boolean antec, Predicate<SequentFormula> filter) {
+																						 Set<Term> locSetVars, Sequent sideSeq, boolean antec,
+																						 Predicate<SequentFormula> filter) {
 		LinkedList<SequentFormula> working = new LinkedList<>();
 		LinkedList<SequentFormula> queue = new LinkedList<>();
 
