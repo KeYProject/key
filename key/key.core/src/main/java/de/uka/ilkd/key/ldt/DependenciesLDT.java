@@ -241,4 +241,8 @@ public class DependenciesLDT extends LDT {
         return functions().contains(op) && op != nothingMarker && op != readMarker && op != writeMarker && op != startMarker && op != endMarker;
     }
 
+    public boolean isHistoryPredicate(de.uka.ilkd.key.logic.op.Operator op) {
+        return op == this.noRAtHistory || op == this.noWAtHistory ||
+                op == this.noRaWAtHistory || op == this.noWaRAtHistory || op == this.noWaWAtHistory;
+    }
 }

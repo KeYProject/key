@@ -322,17 +322,17 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 		}
 
 		if (!sProof.proofEquality(inLow, inHigh)) {
-//			final Term lowArr = tb.matrixRange(heap, arr , outLow, outHigh, inLow, inLow);//=empty
-//			final Term highArr = tb.matrixRange(heap, arr , outLow, outHigh, inHigh, inHigh);//=empty
+			final Term lowArr = tb.matrixRange(heap, arr , outLow, outHigh, inLow, inLow);
+			final Term highArr = tb.matrixRange(heap, arr , outLow, outHigh, inHigh, inHigh);
 
 			Term subLoc;
 			if (sProof.proofLT(tb.zero(), newInHigh)) {
 				if (sProof.proofLT(newInLow, newInHigh)) {
 					subLoc = tb.matrixRange(heap, arr, inLow, inHigh, newInLow, newInHigh);
 				}
-//				else if (sProof.proofEquality(newInLow, newInHigh)) {
-//					subLoc = tb.matrixRange(heap, arr, inLow, inHigh, newInLow, newInLow);//=empty
-//				}
+				else if (sProof.proofEquality(newInLow, newInHigh)) {
+					subLoc = tb.matrixRange(heap, arr, inLow, inHigh, newInLow, newInLow);
+				}
 				else {
 					// should not happen, weaken to essentially true
 					subLoc = tb.empty();
@@ -341,8 +341,8 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 				if (depLDT.isDependencePredicate(unProven.op())) {
 					final Function op = (Function) unProven.op();
 					result.add(tb.func(op, subLoc));
-//					result.add(tb.func(op, lowArr));
-//					result.add(tb.func(op, highArr));
+					result.add(tb.func(op, lowArr));
+					result.add(tb.func(op, highArr));
 				}
 			}
 		}

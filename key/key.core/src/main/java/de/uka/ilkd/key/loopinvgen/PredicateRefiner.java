@@ -9,12 +9,14 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.util.Pair;
 
+import java.util.HashMap;
 import java.util.Set;
 
 public abstract class PredicateRefiner {
@@ -41,10 +43,61 @@ public abstract class PredicateRefiner {
 
     public abstract Pair<Set<Term>, Set<Term>> refine();
 
-    protected Sequent filter(Sequent originalSequent) {
+    public Sequent filter(Sequent sequent) {
+        return filter(sequent,services);
+    }
+    public static Sequent filter(Sequent originalSequent, Services services) {
         Sequent sequent = Sequent.EMPTY_SEQUENT;
+        DependenciesLDT depLDT = services.getTypeConverter().getDependenciesLDT();
+        IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        Function numberSymbol = integerLDT.getNumberSymbol();
+
+        HashMap<Operator, HashMap<Term, Term>> labels = new HashMap<>();
+        for (SequentFormula sf:originalSequent.antecedent()) {
+            Operator op = sf.formula().op();
+            if (depLDT.isHistoryPredicate(op)) {
+                HashMap<Term, Term> loc2label = labels.get(op);
+                Term loc = sf.formula().sub(0);
+                if (loc2label == null) {
+                    loc2label = new HashMap<>();
+                    loc2label.put(loc, sf.formula().sub(1));
+                    labels.put(op, loc2label);
+                } else {
+                    Term label = loc2label.get(loc);
+                    if (label == null) {
+                        loc2label.put(loc, sf.formula().sub(1));
+                    } else if (label.op() == numberSymbol) {
+                        Term currentLabel = sf.formula().sub(1);
+                        Term minimalLabel = currentLabel;
+                        if (currentLabel.op() == numberSymbol) {
+                            Integer current = Integer.parseInt(integerLDT.toNumberString(currentLabel.sub(0)));
+                            Integer inMap = Integer.parseInt(integerLDT.toNumberString(label.sub(0)));
+                            if (inMap.compareTo(current) < 0) {
+                                minimalLabel = label;
+                            }
+                        }
+                        loc2label.put(loc, minimalLabel);
+                    }
+                }
+            }
+        }
+
+
         for (SequentFormula sequentFormula : originalSequent.antecedent()) {
-            sequent = sequent.addFormula(sequentFormula, true, false).sequent();
+            Operator op = sequentFormula.formula().op();
+            if (labels.containsKey(op)) {
+                HashMap<Term, Term> loc2label = labels.get(op);
+                Term minLabel = loc2label.get(sequentFormula.formula().sub(0));
+                if (minLabel == null ||
+                        (minLabel.op() != numberSymbol || minLabel.equalsModRenaming(sequentFormula.formula().sub(1)))) {
+                    sequent = sequent.addFormula(sequentFormula, true, false).sequent();
+                }
+                //else {
+                // System.out.println("Discarding " + ProofSaver.printAnything(sequentFormula.formula(), null));
+                //}
+            } else {
+                sequent = sequent.addFormula(sequentFormula, true, false).sequent();
+            }
         }
 
         for (SequentFormula sequentFormula : originalSequent.succedent()) {
@@ -54,7 +107,8 @@ public abstract class PredicateRefiner {
 //                System.out.println("added");
             }
         }
-//        System.out.println("Sequent: " + sequent.toString());
+//        System.out.println("MMMMMM Sequent: " +
+//                ProofSaver.printAnything(sequent, null));
         return sequent;
     }
 
@@ -62,7 +116,13 @@ public abstract class PredicateRefiner {
 //        System.out.println("sequentImpliesPredicate is called for: "+pred);
 
 //        Sequent sequent = Sequent.EMPTY_SEQUENT;
-        final Sequent sideSeq = sequent.addFormula(new SequentFormula(pred), false, true).sequent();
+
+
+
+        final Sequent sideSeq =
+                filter(sequent).addFormula(new SequentFormula(pred), false, true).sequent();
+
+
 
         final boolean provable = sProof.isProvable(sideSeq, services);//SideProof.isProvable(sideSeq, 100000, true, services);
 
@@ -75,7 +135,8 @@ public abstract class PredicateRefiner {
     protected Sequent simplify(Sequent sequent) {
         System.out.println("sequent " + sequent);
         try {
-            ApplyStrategyInfo info = SideProof.isProvableHelper(sequent, 1000, true, false, services);
+            ApplyStrategyInfo info =
+                    SideProof.isProvableHelper(sequent, 1000, true, false, services);
             if (info.getProof().openGoals().size() != 1) {
                 throw new ProofInputException("Illegal number of goals. Open goals: " + info.getProof().openGoals().size());
             }
