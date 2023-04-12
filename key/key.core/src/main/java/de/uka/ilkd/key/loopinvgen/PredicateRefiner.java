@@ -82,20 +82,29 @@ public abstract class PredicateRefiner {
             }
         }
 
-
+        boolean doNotAdd = false;
         for (SequentFormula sequentFormula : originalSequent.antecedent()) {
-            Operator op = sequentFormula.formula().op();
-            if (labels.containsKey(op)) {
-                HashMap<Term, Term> loc2label = labels.get(op);
-                Term minLabel = loc2label.get(sequentFormula.formula().sub(0));
-                if (minLabel == null ||
-                        (minLabel.op() != numberSymbol || minLabel.equalsModRenaming(sequentFormula.formula().sub(1)))) {
-                    sequent = sequent.addFormula(sequentFormula, true, false).sequent();
+            Operator sfOp = sequentFormula.formula().op();
+            for (Operator op: strongestOp(sfOp,depLDT)) {
+                if (labels.containsKey(op)) {
+                    HashMap<Term, Term> loc2label = labels.get(op);
+                    Term minLabel = loc2label.get(sequentFormula.formula().sub(0));
+                    if (minLabel == null ||
+                            (minLabel.op() != numberSymbol || minLabel.equalsModRenaming(sequentFormula.formula().sub(1)))) {
+                        //sequent = sequent.addFormula(sequentFormula, true, false).sequent();
+                        doNotAdd = (sfOp != op);
+                        break;
+                    }
+                    doNotAdd = true;
+                    //else {
+                    // System.out.println("Discarding " + ProofSaver.printAnything(sequentFormula.formula(), null));
+                    //}
+                } else {
+                    doNotAdd =
+                            depLDT.isHistoryPredicate(op);
                 }
-                //else {
-                // System.out.println("Discarding " + ProofSaver.printAnything(sequentFormula.formula(), null));
-                //}
-            } else {
+            }
+            if (!doNotAdd) {
                 sequent = sequent.addFormula(sequentFormula, true, false).sequent();
             }
         }
@@ -110,6 +119,15 @@ public abstract class PredicateRefiner {
 //        System.out.println("MMMMMM Sequent: " +
 //                ProofSaver.printAnything(sequent, null));
         return sequent;
+    }
+
+    private static Operator[] strongestOp(Operator op, DependenciesLDT ldt) {
+        if (op == ldt.getNoRaWAtHistory() || op == ldt.getNoWaRAtHistory()) {
+            return new Operator[] { ldt.getNoRAtHistory(), ldt.getNoWAtHistory(), op };
+        } else if (op == ldt.getNoWaWAtHistory()){
+            return new Operator[] { ldt.getNoWAtHistory(), op };
+        }
+        return new Operator[] {op};
     }
 
     protected boolean sequentImpliesPredicate(Term pred) {

@@ -780,7 +780,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 			return weakenByIndexANDPredicateForArrayRange(pred);
 		else if (pred.sub(0).op() == locsetLDT.getMatrixRange())
 			return weakenByIndexesANDPredicateForMatrixRange(pred);
-		else return null;
+		else return new HashSet<>();
 	}
 
 	private Set<Term> weakeningComparisonPredicates(Term pred) {
