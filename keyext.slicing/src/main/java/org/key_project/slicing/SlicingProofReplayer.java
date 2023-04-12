@@ -287,6 +287,7 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
             }
         }
 
+        proof.addAutoModeTime(originalProof.getAutoModeTime());
         return saveProof(originalProof, proof);
     }
 
