@@ -720,20 +720,24 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         Feature depth = applyTF(FocusFormulaProjection.INSTANCE, rec(any(), longTermConst(1)));
 
-        bindRuleSet(d, "noEqApp", EqNonDuplicateAppFeature.INSTANCE);
+       // bindRuleSet(d, "noEqApp", StrictEqNonDuplicateAppFeature.INSTANCE);
         bindRuleSet(d, "dep_pred_unroll_fixed_bounds", longConst(0));
 
         bindRuleSet(d, "similarLocSetArguments",
             ifZero(MatchedIfFeature.INSTANCE,
                 ScaleFeature.createAffine(
                     SimilarityCountFeature.create(instOf("loc1"), instOf("loc2")),
-                    -50, 1000),
+                    -100, 1000),
                 longConst(0)));
 
         Feature accessAtEarlierTime = gt("label1", "label2");
 
         bindRuleSet(d, "accessAtEarlierTime",
             ifZero(MatchedIfFeature.INSTANCE, accessAtEarlierTime, longConst(0)));
+
+        bindRuleSet(d, "accessAtSameOrLaterTime",
+            ifZero(MatchedIfFeature.INSTANCE, leq("label1", "label2"), longConst(0)));
+
 
         bindRuleSet(d, "rewriteDependenciesAfterArgumentSimplification", add(noDoubleMinus, longConst(-100)));
 
@@ -2861,7 +2865,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // TestSymbolicExecutionTreeBuilder#testInstanceOfNotInEndlessLoop()
         bindRuleSet(d, "apply_equations", EqNonDuplicateAppFeature.INSTANCE);
 
-        bindRuleSet(d, "noEqApp", EqNonDuplicateAppFeature.INSTANCE);
+        bindRuleSet(d, "noEqApp", StrictEqNonDuplicateAppFeature.INSTANCE);
         return d;
     }
 

@@ -5,9 +5,14 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.util.collection.ImmutableList;
+
+import java.util.Iterator;
 
 
 /**
@@ -29,6 +34,51 @@ public class StrictEqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeatu
         if ( !app.ifInstsComplete () ) return true;
 
         return noDuplicateFindTaclet ( app, pos, goal );
+    }
+
+    protected boolean sameApplication(RuleApp ruleCmp,
+                                      TacletApp newApp,
+                                      PosInOccurrence newPio) {
+        // compare the rules
+        if ( newApp.rule () != ruleCmp.rule () ) {
+            return false;
+        }
+
+        final TacletApp cmp = (TacletApp)ruleCmp;
+
+        // compare the position of application
+        if ( newPio != null ) {
+            if ( ! ( cmp instanceof PosTacletApp) ) return false;
+            final PosInOccurrence oldPio = cmp.posInOccurrence();
+            if ( !comparePio ( newApp, cmp, newPio, oldPio ) ) return false;
+        }
+
+
+        // compare the if-sequent instantiations
+      /*  final ImmutableList<IfFormulaInstantiation> newAppIfFmlInstantiations = newApp.ifFormulaInstantiations ();
+        final ImmutableList<IfFormulaInstantiation> cmpIfFmlInstantiations = cmp.ifFormulaInstantiations ();
+        if ( newAppIfFmlInstantiations == null
+            || cmpIfFmlInstantiations == null ) {
+            if ( newAppIfFmlInstantiations != null
+                || cmpIfFmlInstantiations != null ) {
+                return false;
+            }
+        } else {
+
+            final Iterator<IfFormulaInstantiation> it0 =
+                newAppIfFmlInstantiations.iterator ();
+            final Iterator<IfFormulaInstantiation> it1 =
+                cmpIfFmlInstantiations.iterator ();
+
+            while ( it0.hasNext () ) {
+                // this test should be improved
+                if ( !it0.next ().getConstrainedFormula ().formula().equalsModIrrelevantTermLabels(
+                    it1.next ().getConstrainedFormula ().formula()) )
+                    return false;
+            }
+        }*/
+
+        return equalInterestingInsts ( newApp.instantiations (), cmp.instantiations () );
     }
 
     protected boolean semiSequentContains(Semisequent semisequent,
