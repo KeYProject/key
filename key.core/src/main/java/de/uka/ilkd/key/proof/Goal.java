@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -41,6 +43,12 @@ import org.key_project.util.collection.ImmutableSLList;
  * Goal.
  */
 public final class Goal {
+
+    public static final AtomicLong PERF_APP_EXECUTE = new AtomicLong();
+    public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();
+    public static final AtomicLong PERF_UPDATE_TAG_MANAGER = new AtomicLong();
+    public static final AtomicLong PERF_UPDATE_RULE_APP_INDEX = new AtomicLong();
+    public static final AtomicLong PERF_UPDATE_LISTENERS = new AtomicLong();
 
     /**
      * If an application of a rule added some information for the strategy, then this information is
@@ -221,11 +229,17 @@ public final class Goal {
      * event object.
      */
     private void fireSequentChanged(SequentChangeInfo sci) {
+        var time = System.nanoTime();
         getFormulaTagManager().sequentChanged(this, sci);
+        var time1 = System.nanoTime();
+        PERF_UPDATE_TAG_MANAGER.getAndAdd(time1 - time);
         ruleAppIndex().sequentChanged(this, sci);
+        var time2 = System.nanoTime();
+        PERF_UPDATE_RULE_APP_INDEX.getAndAdd(time2 - time1);
         for (GoalListener listener : listeners) {
             listener.sequentChanged(this, sci);
         }
+        PERF_UPDATE_LISTENERS.getAndAdd(System.nanoTime() - time2);
     }
 
     private void fireGoalReplaced(Goal goal, Node parent, ImmutableList<Goal> newGoals) {
@@ -367,7 +381,9 @@ public final class Goal {
         node().setSequent(sci.sequent());
         node().getNodeInfo().setSequentChangeInfo(sci);
         // VK reminder: now update the index
+        var time = System.nanoTime();
         fireSequentChanged(sci);
+        PERF_SET_SEQUENT.getAndAdd(System.nanoTime() - time);
     }
 
     /**
@@ -538,6 +554,7 @@ public final class Goal {
      *
      * @return the list of new created goals.
      */
+    @Nonnull
     public ImmutableList<Goal> split(int n) {
         ImmutableList<Goal> goalList = ImmutableSLList.nil();
 
@@ -619,7 +636,13 @@ public final class Goal {
          */
         NamespaceSet originalNamespaces = getLocalNamespaces();
         Services overlayServices = proof.getServices().getOverlay(originalNamespaces);
-        final ImmutableList<Goal> goalList = ruleApp.execute(this, overlayServices);
+        final ImmutableList<Goal> goalList;
+        var time = System.nanoTime();
+        try {
+            goalList = ruleApp.execute(this, overlayServices);
+        } finally {
+            PERF_APP_EXECUTE.getAndAdd(System.nanoTime() - time);
+        }
 
         proof.getServices().saveNameRecorder(n);
 
