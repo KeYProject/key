@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
@@ -23,6 +24,10 @@ import org.key_project.util.collection.ImmutableSLList;
  * This class holds <code>TermTacletAppIndex</code>s for all formulas of a semisequent.
  */
 public class SemisequentTacletAppIndex {
+    public static final AtomicLong PERF_UPDATE = new AtomicLong();
+    public static final AtomicLong PERF_ADD = new AtomicLong();
+    public static final AtomicLong PERF_REMOVE = new AtomicLong();
+
     private ImmutableMap<SequentFormula, TermTacletAppIndex> termIndices =
         DefaultImmutableMap.nilMap();
 
@@ -214,11 +219,20 @@ public class SemisequentTacletAppIndex {
             TacletIndex tacletIndex, NewRuleListener listener) {
         if (sci.hasChanged(antec)) {
             final SemisequentTacletAppIndex result = copy();
+
+            var time = System.nanoTime();
             result.removeTermIndices(sci.removedFormulas(antec));
+            PERF_REMOVE.getAndAdd(System.nanoTime() - time);
+
+            time = System.nanoTime();
             result.updateTermIndices(sci.modifiedFormulas(antec), sci.sequent(), services,
                 tacletIndex, listener);
+            PERF_UPDATE.getAndAdd(System.nanoTime() - time);
+
+            time = System.nanoTime();
             result.addTermIndices(sci.addedFormulas(antec), sci.sequent(), services, tacletIndex,
                 listener);
+            PERF_ADD.getAndAdd(System.nanoTime() - time);
             return result;
         }
 

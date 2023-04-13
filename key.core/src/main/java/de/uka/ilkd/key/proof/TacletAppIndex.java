@@ -2,6 +2,7 @@ package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -36,6 +37,8 @@ import org.key_project.util.collection.ImmutableSLList;
  */
 
 public class TacletAppIndex {
+    public static final AtomicLong PERF_CREATE_ALL = new AtomicLong();
+    public static final AtomicLong PERF_UPDATE = new AtomicLong();
 
     private final TacletIndex tacletIndex;
 
@@ -156,12 +159,19 @@ public class TacletAppIndex {
     }
 
     private void createAllFromGoal() {
-        this.seq = getNode().sequent();
+        var time = System.nanoTime();
+        try {
+            this.seq = getNode().sequent();
 
-        antecIndex = new SemisequentTacletAppIndex(getSequent(), true, getServices(), tacletIndex(),
-            getNewRulePropagator(), getRuleFilter(), indexCaches);
-        succIndex = new SemisequentTacletAppIndex(getSequent(), false, getServices(), tacletIndex(),
-            getNewRulePropagator(), getRuleFilter(), indexCaches);
+            antecIndex =
+                new SemisequentTacletAppIndex(getSequent(), true, getServices(), tacletIndex(),
+                    newRuleListener, ruleFilter, indexCaches);
+            succIndex =
+                new SemisequentTacletAppIndex(getSequent(), false, getServices(), tacletIndex(),
+                    newRuleListener, ruleFilter, indexCaches);
+        } finally {
+            PERF_CREATE_ALL.getAndAdd(System.nanoTime() - time);
+        }
     }
 
     private void ensureIndicesExist() {
@@ -322,7 +332,9 @@ public class TacletAppIndex {
         {
             clearIndexes();
         } else {
+            var time = System.nanoTime();
             updateIndices(sci);
+            PERF_UPDATE.getAndAdd(System.nanoTime() - time);
         }
     }
 
