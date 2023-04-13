@@ -31,7 +31,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 		this.index = index;
 		this.itrNumber = iteration;
 		this.indexOuter = outerIndex;
-		this.locSetToPredicate = new Graph<Term>();
+		this.locSetToPredicate = new Graph<>();
 	}
 
 	@Override

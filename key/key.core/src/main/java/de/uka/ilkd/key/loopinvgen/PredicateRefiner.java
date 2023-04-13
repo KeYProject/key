@@ -142,7 +142,9 @@ public abstract class PredicateRefiner {
 
 
 
-        final boolean provable = sProof.isProvable(sideSeq, services);//SideProof.isProvable(sideSeq, 100000, true, services);
+        final boolean provable = sProof.isProvable(sideSeq, services);
+            //SideProof.isProvable(sideSeq, 100000, 3000, true, services);
+
 
 //        if(!provable)
 //            System.out.println(pred+ " can't be proven in Seq: "+ sideSeq);
