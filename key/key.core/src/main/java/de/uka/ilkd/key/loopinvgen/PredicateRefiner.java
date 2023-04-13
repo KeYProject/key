@@ -95,10 +95,10 @@ public abstract class PredicateRefiner {
                         doNotAdd = (sfOp != op);
                         break;
                     }
+                   /* else {
+                     System.out.println("Discarding " + ProofSaver.printAnything(sequentFormula.formula(), null));
+                    }*/
                     doNotAdd = true;
-                    //else {
-                    // System.out.println("Discarding " + ProofSaver.printAnything(sequentFormula.formula(), null));
-                    //}
                 } else {
                     doNotAdd =
                             depLDT.isHistoryPredicate(op);

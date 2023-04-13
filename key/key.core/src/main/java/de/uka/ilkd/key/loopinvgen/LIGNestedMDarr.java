@@ -60,7 +60,7 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 //		innerCompPreds.add(tb.geq(indexOuter, tb.add(lowOuter, tb.one())));
 //		innerCompPreds.add(tb.geq(indexOuter, tb.sub(lowOuter, tb.one())));
 //		innerCompPreds.add(tb.leq(indexOuter, highOuter));
-		innerCompPreds.add(tb.leq(indexOuter, tb.add(highOuter, tb.one())));
+		innerCompPreds.add(tb.leq(indexOuter, highOuter));
 //		innerCompPreds.add(tb.leq(indexOuter, tb.sub(highOuter, tb.one())));
 
 
