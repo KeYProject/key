@@ -7,5 +7,5 @@ import de.uka.ilkd.key.rule.RuleApp;
  * is used in the signature of the method <code>Strategy.instantiateApp</code>
  */
 public interface RuleAppCostCollector {
-    void collect(RuleApp app, RuleAppCost cost);
+    void collect(RuleApp app, long cost);
 }

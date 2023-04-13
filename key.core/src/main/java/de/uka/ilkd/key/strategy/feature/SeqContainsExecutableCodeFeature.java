@@ -33,7 +33,7 @@ public class SeqContainsExecutableCodeFeature extends BinaryFeature {
 
     private boolean containsExec(Iterator<SequentFormula> it, Services services) {
         while (it.hasNext()) {
-            if (tf.compute(it.next().formula(), services).equals(BinaryTermFeature.ZERO_COST)) {
+            if (tf.compute(it.next().formula(), services) == BinaryTermFeature.ZERO_COST) {
                 return true;
             }
         }

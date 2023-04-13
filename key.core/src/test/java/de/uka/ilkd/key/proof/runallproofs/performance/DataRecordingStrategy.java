@@ -7,7 +7,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 
 /**
@@ -36,9 +35,9 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+    public long computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
         long begin = System.nanoTime();
-        RuleAppCost result = super.computeCost(app, pio, goal);
+        long result = super.computeCost(app, pio, goal);
         long end = System.nanoTime();
         computeCostData.addDurationToData(app, goal, end - begin);
         return result;

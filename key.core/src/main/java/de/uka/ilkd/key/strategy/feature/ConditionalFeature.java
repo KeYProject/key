@@ -4,7 +4,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
 /**
@@ -19,7 +18,7 @@ public class ConditionalFeature implements Feature {
         elseFeature = p_elseFeature;
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public long computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         if (cond.filter(app.rule())) {
             return thenFeature.computeCost(app, pos, goal);
         } else {
@@ -31,7 +30,7 @@ public class ConditionalFeature implements Feature {
      * @param cond the filter that decides which value is to be returned
      * @param thenValue the value of the feature, if <code>filter</code> returns true
      */
-    public static Feature createConditional(RuleFilter cond, RuleAppCost thenValue) {
+    public static Feature createConditional(RuleFilter cond, long thenValue) {
         return createConditional(cond, ConstFeature.createConst(thenValue));
     }
 
@@ -40,8 +39,7 @@ public class ConditionalFeature implements Feature {
      * @param thenValue the value of the feature, if <code>filter</code> returns true
      * @param elseValue the value of the feature, if <code>filter</code> returns false
      */
-    public static Feature createConditional(RuleFilter cond, RuleAppCost thenValue,
-            RuleAppCost elseValue) {
+    public static Feature createConditional(RuleFilter cond, long thenValue, long elseValue) {
         return createConditional(cond, ConstFeature.createConst(thenValue),
             ConstFeature.createConst(elseValue));
     }
@@ -52,7 +50,7 @@ public class ConditionalFeature implements Feature {
      *        false
      */
     public static Feature createConditional(RuleFilter cond, Feature thenFeature) {
-        return createConditional(cond, thenFeature, NumberRuleAppCost.getZeroCost());
+        return createConditional(cond, thenFeature, RuleAppCost.ZERO);
     }
 
     /**
@@ -60,8 +58,7 @@ public class ConditionalFeature implements Feature {
      * @param thenFeature the feature that is evaluted, if <code>filter</code> returns true
      * @param elseValue the value of the feature, if <code>filter</code> returns false
      */
-    public static Feature createConditional(RuleFilter cond, Feature thenFeature,
-            RuleAppCost elseValue) {
+    public static Feature createConditional(RuleFilter cond, Feature thenFeature, long elseValue) {
         return createConditional(cond, thenFeature, ConstFeature.createConst(elseValue));
     }
 

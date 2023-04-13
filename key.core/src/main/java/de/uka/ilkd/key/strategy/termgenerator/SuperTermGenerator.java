@@ -13,7 +13,7 @@ import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -53,7 +53,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
     }
 
     private boolean generateFurther(Term t, Services services) {
-        return !(cond.compute(t, services) instanceof TopRuleAppCost);
+        return !(cond.compute(t, services) == RuleAppCost.MAX_VALUE);
     }
 
     abstract static class SuperTermWithIndexGenerator extends SuperTermGenerator {

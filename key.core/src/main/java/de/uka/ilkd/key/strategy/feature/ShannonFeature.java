@@ -3,7 +3,6 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
 
@@ -23,7 +22,7 @@ public class ShannonFeature implements Feature {
     /**
      * If the result of <code>cond</code> is this cost, then the condition is assumed to hold
      */
-    private final RuleAppCost trueCost;
+    private final long trueCost;
 
     /**
      * The feature for positive results of <code>filter</code>
@@ -35,7 +34,7 @@ public class ShannonFeature implements Feature {
      */
     private final Feature elseFeature;
 
-    private ShannonFeature(Feature p_cond, RuleAppCost p_trueCost, Feature p_thenFeature,
+    private ShannonFeature(Feature p_cond, long p_trueCost, Feature p_thenFeature,
             Feature p_elseFeature) {
         cond = p_cond;
         trueCost = p_trueCost;
@@ -43,8 +42,8 @@ public class ShannonFeature implements Feature {
         elseFeature = p_elseFeature;
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-        if (cond.computeCost(app, pos, goal).equals(trueCost)) {
+    public long computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+        if (cond.computeCost(app, pos, goal) == trueCost) {
             return thenFeature.computeCost(app, pos, goal);
         } else {
             return elseFeature.computeCost(app, pos, goal);
@@ -58,8 +57,8 @@ public class ShannonFeature implements Feature {
      * @return <code>thenValue</code> if <code>cond</code> returns <code>trueCost</code>, zero
      *         otherwise
      */
-    public static Feature createConditional(Feature cond, RuleAppCost trueCost,
-            RuleAppCost thenValue) {
+    public static Feature createConditional(Feature cond, long trueCost,
+            long thenValue) {
         return createConditional(cond, trueCost, ConstFeature.createConst(thenValue));
     }
 
@@ -72,8 +71,8 @@ public class ShannonFeature implements Feature {
      * @return <code>thenValue</code> if <code>cond</code> returns <code>trueCost</code>,
      *         <code>elseValue</code> otherwise
      */
-    public static Feature createConditional(Feature cond, RuleAppCost trueCost,
-            RuleAppCost thenValue, RuleAppCost elseValue) {
+    public static Feature createConditional(Feature cond, long trueCost,
+            long thenValue, long elseValue) {
         return createConditional(cond, trueCost, ConstFeature.createConst(thenValue),
             ConstFeature.createConst(elseValue));
     }
@@ -86,9 +85,9 @@ public class ShannonFeature implements Feature {
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns
      *         <code>trueCost</code>, zero otherwise
      */
-    public static Feature createConditional(Feature cond, RuleAppCost trueCost,
+    public static Feature createConditional(Feature cond, long trueCost,
             Feature thenFeature) {
-        return createConditional(cond, trueCost, thenFeature, NumberRuleAppCost.getZeroCost());
+        return createConditional(cond, trueCost, thenFeature, RuleAppCost.ZERO);
     }
 
     /**
@@ -101,8 +100,8 @@ public class ShannonFeature implements Feature {
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns
      *         <code>trueCost</code>, <code>elseValue</code> otherwise
      */
-    public static Feature createConditional(Feature cond, RuleAppCost trueCost, Feature thenFeature,
-            RuleAppCost elseValue) {
+    public static Feature createConditional(Feature cond, long trueCost, Feature thenFeature,
+            long elseValue) {
         return createConditional(cond, trueCost, thenFeature, ConstFeature.createConst(elseValue));
     }
 
@@ -116,7 +115,7 @@ public class ShannonFeature implements Feature {
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns
      *         <code>trueCost</code>, the value of <code>elseFeature</code> otherwise
      */
-    public static Feature createConditional(Feature cond, RuleAppCost trueCost, Feature thenFeature,
+    public static Feature createConditional(Feature cond, long trueCost, Feature thenFeature,
             Feature elseFeature) {
         return new ShannonFeature(cond, trueCost, thenFeature, elseFeature);
     }
@@ -127,7 +126,7 @@ public class ShannonFeature implements Feature {
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns zero, zero
      *         otherwise
      */
-    public static Feature createConditionalBinary(Feature cond, RuleAppCost thenValue) {
+    public static Feature createConditionalBinary(Feature cond, long thenValue) {
         return createConditionalBinary(cond, ConstFeature.createConst(thenValue));
     }
 
@@ -138,8 +137,8 @@ public class ShannonFeature implements Feature {
      * @return <code>thenValue</code> if <code>cond</code> returns zero, <code>elseValue</code>
      *         otherwise
      */
-    public static Feature createConditionalBinary(Feature cond, RuleAppCost thenValue,
-            RuleAppCost elseValue) {
+    public static Feature createConditionalBinary(Feature cond, long thenValue,
+            long elseValue) {
         return createConditionalBinary(cond, ConstFeature.createConst(thenValue),
             ConstFeature.createConst(elseValue));
     }
@@ -152,7 +151,7 @@ public class ShannonFeature implements Feature {
      *         <code>elseValue</code> otherwise
      */
     public static Feature createConditionalBinary(Feature cond, Feature thenFeature,
-            RuleAppCost elseValue) {
+            long elseValue) {
         return createConditionalBinary(cond, thenFeature, ConstFeature.createConst(elseValue));
     }
 
@@ -176,7 +175,7 @@ public class ShannonFeature implements Feature {
      */
     public static Feature createConditionalBinary(Feature cond, Feature thenFeature) {
         return createConditional(cond, BinaryFeature.ZERO_COST, thenFeature,
-            NumberRuleAppCost.getZeroCost());
+            RuleAppCost.ZERO);
     }
 
 }

@@ -2,9 +2,7 @@ package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 
 /**
@@ -15,33 +13,37 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
  */
 public class SubTermFeature implements TermFeature {
 
-    private SubTermFeature(TermFeature[] features, RuleAppCost arityMismatchCost) {
+    private SubTermFeature(TermFeature[] features, long arityMismatchCost) {
         this.features = features;
         this.arityMismatchCost = arityMismatchCost;
     }
 
-    public static TermFeature create(TermFeature[] fs, RuleAppCost arityMismatchCost) {
+    public static TermFeature create(TermFeature[] fs, long arityMismatchCost) {
         final TermFeature[] fsCopy = new TermFeature[fs.length];
         System.arraycopy(fs, 0, fsCopy, 0, fs.length);
         return new SubTermFeature(fsCopy, arityMismatchCost);
     }
 
     public static TermFeature create(TermFeature[] fs) {
-        return create(fs, TopRuleAppCost.INSTANCE);
+        return create(fs, RuleAppCost.MAX_VALUE);
     }
 
     private final TermFeature[] features;
-    private final RuleAppCost arityMismatchCost;
+    private final long arityMismatchCost;
 
-    public RuleAppCost compute(Term term, Services services) {
+    public long compute(Term term, Services services) {
         if (term.arity() != features.length) {
             return arityMismatchCost;
         }
 
-        RuleAppCost res = NumberRuleAppCost.getZeroCost();
+        long res = RuleAppCost.ZERO;
 
-        for (int i = 0; i < features.length && !(res instanceof TopRuleAppCost); i++) {
-            res = res.add(features[i].compute(term.sub(i), services));
+        for (int i = 0; i < features.length; i++) {
+            var partial = features[i].compute(term.sub(i), services);
+            if (partial == RuleAppCost.MAX_VALUE) {
+                return RuleAppCost.MAX_VALUE;
+            }
+            res = res + partial;
         }
 
         return res;

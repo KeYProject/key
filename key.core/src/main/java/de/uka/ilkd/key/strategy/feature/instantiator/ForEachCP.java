@@ -6,7 +6,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
@@ -45,17 +44,17 @@ public class ForEachCP implements Feature {
         this.manager = manager;
     }
 
-    public RuleAppCost computeCost(final RuleApp app, final PosInOccurrence pos, final Goal goal) {
+    public long computeCost(final RuleApp app, final PosInOccurrence pos, final Goal goal) {
         final Term outerVarContent = var.getContent();
         var.setContent(null);
 
         manager.passChoicePoint(new CP(app, pos, goal), this);
 
-        final RuleAppCost res;
+        final long res;
         if (var.getContent() != null) {
             res = body.computeCost(app, pos, goal);
         } else {
-            res = NumberRuleAppCost.getZeroCost();
+            res = RuleAppCost.ZERO;
         }
 
         var.setContent(outerVarContent);

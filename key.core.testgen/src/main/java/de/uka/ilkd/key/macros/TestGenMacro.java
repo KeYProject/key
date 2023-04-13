@@ -11,8 +11,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.Strategy;
 
 public class TestGenMacro extends StrategyProofMacro {
@@ -75,9 +73,9 @@ class TestGenStrategy extends FilterStrategy {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+    public long computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
         if (TestGenStrategy.isUnwindRule(app.rule())) {
-            return NumberRuleAppCost.create(TestGenStrategy.UNWIND_COST);
+            return TestGenStrategy.UNWIND_COST;
         }
         return super.computeCost(app, pio, goal);
     }

@@ -25,8 +25,8 @@ public class FIFOStrategy implements Strategy {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
      *         all (it is discarded by the strategy).
      */
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
-        return NumberRuleAppCost.create(goal.getTime());
+    public long computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+        return goal.getTime();
     }
 
     /**

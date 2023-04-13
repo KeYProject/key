@@ -24,16 +24,16 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
     /**
      * The costs of the stored rule app
      */
-    private final RuleAppCost cost;
+    private final long cost;
 
-    protected RuleAppContainer(RuleApp p_app, RuleAppCost p_cost) {
+    protected RuleAppContainer(RuleApp p_app, long p_cost) {
         ruleApp = p_app;
         cost = p_cost;
     }
 
     @Override
     public final int compareTo(RuleAppContainer o) {
-        return cost.compareTo(o.cost);
+        return Long.compare(cost, o.cost);
     }
 
     /**
@@ -51,7 +51,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
     }
 
 
-    public final RuleAppCost getCost() {
+    public final long getCost() {
         return cost;
     }
 

@@ -6,7 +6,6 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 public abstract class FilterStrategy implements Strategy {
 
@@ -22,9 +21,9 @@ public abstract class FilterStrategy implements Strategy {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+    public long computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
         if (!isApprovedApp(app, pio, goal)) {
-            return TopRuleAppCost.INSTANCE;
+            return RuleAppCost.MAX_VALUE;
         }
         return delegate.computeCost(app, pio, goal);
     }

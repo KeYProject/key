@@ -18,8 +18,8 @@ import org.key_project.util.collection.ImmutableSLList;
  * Implementation of {@link AutomatedRuleApplicationManager} that stores possible {@link RuleApp}s
  * in a priority queue. The element with highest priority in the queue can be obtained via
  * {@link #next()}. This operation will remove the element from the queue. The priority of a given
- * {@link RuleApp} corresponds to its {@link RuleAppCost}. A {@link RuleApp} can be equipped with a
- * {@link RuleAppCost} by converting it into a {@link RuleAppContainer}. The cost of a
+ * {@link RuleApp} corresponds to its cost. A {@link RuleApp} can be equipped with a
+ * cost by converting it into a {@link RuleAppContainer}. The cost of a
  * {@link RuleApp} is computed according to a given {@link Strategy} (see
  * {@link Strategy#computeCost(RuleApp, PosInOccurrence, Goal)}).
  */
@@ -167,7 +167,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      */
     private static ImmutableHeap<RuleAppContainer> push(RuleAppContainer c,
             ImmutableHeap<RuleAppContainer> sourceQueue) {
-        if (c.getCost() == TopRuleAppCost.INSTANCE) {
+        if (c.getCost() == RuleAppCost.MAX_VALUE) {
             return sourceQueue;
         } else {
             return sourceQueue.insert(c);
@@ -186,7 +186,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
 
         var actualApps = new ArrayList<RuleAppContainer>(apps.size());
         for (RuleAppContainer app : apps) {
-            if (app.getCost() == TopRuleAppCost.INSTANCE) {
+            if (app.getCost() == RuleAppCost.MAX_VALUE) {
                 continue;
             }
             actualApps.add(app);

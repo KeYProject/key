@@ -7,10 +7,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.AbstractFeatureStrategy;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.FocusIsSubFormulaOfInfFlowContractAppFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsPostConditionTermFeature;
 
@@ -77,17 +75,17 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
+        public long computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
             String name = ruleApp.rule().name().toString();
             if (name.equals("hide_right")) {
                 return applyTF("b", IsPostConditionTermFeature.INSTANCE).computeCost(ruleApp, pio,
                     goal);
             } else if (name.equals(AND_RIGHT_RULENAME)) {
-                RuleAppCost andRightCost = FocusIsSubFormulaOfInfFlowContractAppFeature.INSTANCE
+                long andRightCost = FocusIsSubFormulaOfInfFlowContractAppFeature.INSTANCE
                         .computeCost(ruleApp, pio, goal);
-                return andRightCost.add(NumberRuleAppCost.create(1));
+                return RuleAppCost.addRight(andRightCost, 1);
             } else {
-                return TopRuleAppCost.INSTANCE;
+                return RuleAppCost.MAX_VALUE;
             }
         }
 
@@ -128,7 +126,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
 
         @Override
-        protected RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+        protected long instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal) {
             return computeCost(app, pio, goal);
         }
 

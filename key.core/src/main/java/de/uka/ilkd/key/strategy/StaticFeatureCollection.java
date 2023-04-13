@@ -6,51 +6,12 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
-import de.uka.ilkd.key.rule.BlockContractExternalRule;
-import de.uka.ilkd.key.rule.BlockContractInternalRule;
-import de.uka.ilkd.key.rule.LoopApplyHeadRule;
-import de.uka.ilkd.key.rule.LoopContractExternalRule;
-import de.uka.ilkd.key.rule.LoopContractInternalRule;
-import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
-import de.uka.ilkd.key.rule.QueryExpand;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
-import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.strategy.feature.ApplyTFFeature;
-import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.CompareCostsFeature;
-import de.uka.ilkd.key.strategy.feature.ComprehendedSumFeature;
-import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
-import de.uka.ilkd.key.strategy.feature.ConstFeature;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.ImplicitCastNecessary;
-import de.uka.ilkd.key.strategy.feature.InstantiatedSVFeature;
-import de.uka.ilkd.key.strategy.feature.LetFeature;
-import de.uka.ilkd.key.strategy.feature.MergeRuleFeature;
-import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.SeqContainsExecutableCodeFeature;
-import de.uka.ilkd.key.strategy.feature.ShannonFeature;
-import de.uka.ilkd.key.strategy.feature.SortComparisonFeature;
-import de.uka.ilkd.key.strategy.feature.SumFeature;
-import de.uka.ilkd.key.strategy.feature.TermSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.TriggerVarInstantiatedFeature;
+import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.LiteralsSmallerThanFeature;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
-import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
-import de.uka.ilkd.key.strategy.termProjection.SubtermProjection;
-import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
-import de.uka.ilkd.key.strategy.termProjection.TermConstructionProjection;
-import de.uka.ilkd.key.strategy.termProjection.TriggerVariableInstantiationProjection;
-import de.uka.ilkd.key.strategy.termfeature.BinarySumTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.ConstTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.EqTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
-import de.uka.ilkd.key.strategy.termfeature.PrintTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.RecSubTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.ShannonTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.SortExtendsTransTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.SubTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+import de.uka.ilkd.key.strategy.termProjection.*;
+import de.uka.ilkd.key.strategy.termfeature.*;
 import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.SubtermGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
@@ -264,7 +225,7 @@ public abstract class StaticFeatureCollection {
     }
 
     protected static TermFeature not(TermFeature f) {
-        return ifZero(f, ConstTermFeature.createConst(TopRuleAppCost.INSTANCE), longTermConst(0));
+        return ifZero(f, ConstTermFeature.createConst(RuleAppCost.MAX_VALUE), longTermConst(0));
     }
 
     protected static Feature eq(Feature a, Feature b) {
@@ -279,12 +240,12 @@ public abstract class StaticFeatureCollection {
         return CompareCostsFeature.leq(a, b);
     }
 
-    protected static RuleAppCost c(long p) {
-        return NumberRuleAppCost.create(p);
+    protected static long c(long p) {
+        return p;
     }
 
-    private static RuleAppCost infty() {
-        return TopRuleAppCost.INSTANCE;
+    private static long infty() {
+        return RuleAppCost.MAX_VALUE;
     }
 
     /**
@@ -446,7 +407,7 @@ public abstract class StaticFeatureCollection {
      * @return feature
      */
     protected static Feature applyTFNonStrict(ProjectionToTerm term, TermFeature tf) {
-        return ApplyTFFeature.createNonStrict(term, tf, NumberRuleAppCost.getZeroCost());
+        return ApplyTFFeature.createNonStrict(term, tf, RuleAppCost.ZERO);
     }
 
     protected static Feature sum(TermBuffer x, TermGenerator gen, Feature body) {

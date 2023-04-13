@@ -33,7 +33,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     // constructors
     // -------------------------------------------------------------------------
 
-    private BuiltInRuleAppContainer(IBuiltInRuleApp bir, PosInOccurrence pio, RuleAppCost cost,
+    private BuiltInRuleAppContainer(IBuiltInRuleApp bir, PosInOccurrence pio, long cost,
             Goal goal) {
         super(bir, cost);
         applicationPosition = pio;
@@ -92,11 +92,9 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      */
     static RuleAppContainer createAppContainer(IBuiltInRuleApp bir, PosInOccurrence pio,
             Goal goal) {
-        final RuleAppCost cost = goal.getGoalStrategy().computeCost(bir, pio, goal);
+        final long cost = goal.getGoalStrategy().computeCost(bir, pio, goal);
 
-        final BuiltInRuleAppContainer container = new BuiltInRuleAppContainer(bir, pio, cost, goal);
-
-        return container;
+        return new BuiltInRuleAppContainer(bir, pio, cost, goal);
     }
 
     /**
@@ -127,7 +125,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
         final PosInOccurrence pio = getPosInOccurrence(goal);
 
         RuleAppContainer container = createAppContainer(bir, pio, goal);
-        if (container.getCost() instanceof TopRuleAppCost) {
+        if (container.getCost() == RuleAppCost.MAX_VALUE) {
             return ImmutableSLList.nil();
         }
         return ImmutableSLList.<RuleAppContainer>nil().prepend(container);

@@ -5,7 +5,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 
@@ -79,7 +78,7 @@ public class OneStepProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+        public long computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
             return delegate.computeCost(app, pio, goal);
 
         }

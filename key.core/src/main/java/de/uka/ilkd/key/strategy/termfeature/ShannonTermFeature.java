@@ -2,7 +2,6 @@ package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
 /**
@@ -21,7 +20,7 @@ public class ShannonTermFeature implements TermFeature {
     /**
      * If the result of <code>cond</code> is this cost, then the condition is assumed to hold
      */
-    private final RuleAppCost trueCost;
+    private final long trueCost;
 
     /**
      * The feature for positive results of <code>filter</code>
@@ -33,7 +32,7 @@ public class ShannonTermFeature implements TermFeature {
      */
     private final TermFeature elseFeature;
 
-    private ShannonTermFeature(TermFeature p_cond, RuleAppCost p_trueCost,
+    private ShannonTermFeature(TermFeature p_cond, long p_trueCost,
             TermFeature p_thenFeature, TermFeature p_elseFeature) {
         cond = p_cond;
         trueCost = p_trueCost;
@@ -41,8 +40,8 @@ public class ShannonTermFeature implements TermFeature {
         elseFeature = p_elseFeature;
     }
 
-    public RuleAppCost compute(Term term, Services services) {
-        if (cond.compute(term, services).equals(trueCost)) {
+    public long compute(Term term, Services services) {
+        if (cond.compute(term, services) == trueCost) {
             return thenFeature.compute(term, services);
         } else {
             return elseFeature.compute(term, services);
@@ -69,7 +68,7 @@ public class ShannonTermFeature implements TermFeature {
      */
     public static TermFeature createConditionalBinary(TermFeature cond, TermFeature thenFeature) {
         return createConditionalBinary(cond, thenFeature,
-            ConstTermFeature.createConst(NumberRuleAppCost.getZeroCost()));
+            ConstTermFeature.createConst(RuleAppCost.ZERO));
     }
 
 }

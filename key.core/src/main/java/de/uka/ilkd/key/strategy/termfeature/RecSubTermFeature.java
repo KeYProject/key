@@ -3,7 +3,6 @@ package de.uka.ilkd.key.strategy.termfeature;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 
 /**
@@ -24,16 +23,20 @@ public class RecSubTermFeature implements TermFeature {
         return new RecSubTermFeature(cond, summand);
     }
 
-    public RuleAppCost compute(Term term, Services services) {
-        RuleAppCost res = summand.compute(term, services);
+    public long compute(Term term, Services services) {
+        long res = summand.compute(term, services);
 
-        if (res instanceof TopRuleAppCost
-                || cond.compute(term, services) instanceof TopRuleAppCost) {
+        if (res == RuleAppCost.MAX_VALUE
+                || cond.compute(term, services) == RuleAppCost.MAX_VALUE) {
             return res;
         }
 
-        for (int i = 0; i != term.arity() && !(res instanceof TopRuleAppCost); ++i) {
-            res = res.add(compute(term.sub(i), services));
+        for (int i = 0; i != term.arity(); ++i) {
+            var partial = compute(term.sub(i), services);
+            if (partial == RuleAppCost.MAX_VALUE) {
+                return RuleAppCost.MAX_VALUE;
+            }
+            res = res + partial;
         }
 
         return res;

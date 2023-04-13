@@ -3,7 +3,6 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,9 +27,9 @@ public class PrintFeature implements Feature {
 
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-        RuleAppCost cost = f.computeCost(app, pos, goal);
-        LOGGER.debug("{}:{}:{}{}", prefix, cost.toString(), pos != null ? pos.subTerm() + ":" : "",
+    public long computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+        long cost = f.computeCost(app, pos, goal);
+        LOGGER.debug("{}:{}:{}{}", prefix, cost, pos != null ? pos.subTerm() + ":" : "",
             app.rule().name());
         return cost;
     }

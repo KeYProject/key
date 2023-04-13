@@ -7,7 +7,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -16,13 +15,20 @@ import de.uka.ilkd.key.util.Debug;
 public class SumFeature implements Feature {
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public long computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         // We require that there is at least one feature (in method
         // <code>createSum</code>)
-        RuleAppCost res = features[0].computeCost(app, pos, goal);
+        long res = features[0].computeCost(app, pos, goal);
+        if (res == RuleAppCost.MAX_VALUE) {
+            return RuleAppCost.MAX_VALUE;
+        }
 
-        for (int i = 1; i < features.length && !(res instanceof TopRuleAppCost); i++) {
-            res = res.add(features[i].computeCost(app, pos, goal));
+        for (int i = 1; i < features.length; i++) {
+            var partial = features[i].computeCost(app, pos, goal);
+            if (partial == RuleAppCost.MAX_VALUE) {
+                return RuleAppCost.MAX_VALUE;
+            }
+            res += partial;
         }
 
         return res;

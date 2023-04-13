@@ -2040,7 +2040,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      *         all (it is discarded by the strategy).
      */
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+    public long computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
         var time = System.nanoTime();
         try {
             return costComputationF.computeCost(app, pio, goal);
@@ -2062,14 +2062,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     public final boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
         var time = System.nanoTime();
         try {
-            return !(approvalF.computeCost(app, pio, goal) == TopRuleAppCost.INSTANCE);
+            return !(approvalF.computeCost(app, pio, goal) == RuleAppCost.MAX_VALUE);
         } finally {
             PERF_APPROVE.addAndGet(System.nanoTime() - time);
         }
     }
 
     @Override
-    protected RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+    protected long instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal) {
         var time = System.nanoTime();
         try {
             return instantiationF.computeCost(app, pio, goal);

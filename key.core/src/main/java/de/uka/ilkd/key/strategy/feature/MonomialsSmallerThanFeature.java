@@ -7,14 +7,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
-import de.uka.ilkd.key.strategy.termfeature.BinarySumTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.ConstTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
-import de.uka.ilkd.key.strategy.termfeature.SubTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+import de.uka.ilkd.key.strategy.termfeature.*;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -46,7 +41,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
     static TermFeature createHasCoeffTermFeature(final IntegerLDT numbers) {
         return BinarySumTermFeature.createSum(OperatorTF.create(numbers.getMul()),
             SubTermFeature.create(
-                new TermFeature[] { ConstTermFeature.createConst(NumberRuleAppCost.getZeroCost()),
+                new TermFeature[] { ConstTermFeature.createConst(RuleAppCost.ZERO),
                     OperatorTF.create(numbers.getNumberSymbol()) }));
     }
 
@@ -167,7 +162,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
         }
 
         private Term stripOffLiteral(Term te, Services services) {
-            if (!(hasCoeff.compute(te, services) instanceof TopRuleAppCost))
+            if (!(hasCoeff.compute(te, services) == RuleAppCost.MAX_VALUE))
             // we leave out literals/coefficients on the right, because we
             // do not want to compare these literals
             {

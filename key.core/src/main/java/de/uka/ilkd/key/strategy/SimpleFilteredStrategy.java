@@ -40,13 +40,13 @@ public class SimpleFilteredStrategy implements Strategy {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
      *         all (it is discarded by the strategy).
      */
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+    public long computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
         if (app instanceof TacletApp && !ruleFilter.filter(app.rule())) {
-            return TopRuleAppCost.INSTANCE;
+            return RuleAppCost.MAX_VALUE;
         }
 
-        RuleAppCost res = NonDuplicateAppFeature.INSTANCE.computeCost(app, pio, goal);
-        if (res == TopRuleAppCost.INSTANCE) {
+        long res = NonDuplicateAppFeature.INSTANCE.computeCost(app, pio, goal);
+        if (res == RuleAppCost.MAX_VALUE) {
             return res;
         }
 
@@ -55,7 +55,7 @@ public class SimpleFilteredStrategy implements Strategy {
             cost += IF_NOT_MATCHED_MALUS;
         }
 
-        return NumberRuleAppCost.create(cost);
+        return cost;
     }
 
     /**
@@ -67,7 +67,7 @@ public class SimpleFilteredStrategy implements Strategy {
     public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
         // do not apply a rule twice
         return !(app instanceof TacletApp) || NonDuplicateAppFeature.INSTANCE.computeCost(app, pio,
-            goal) != TopRuleAppCost.INSTANCE;
+            goal) != RuleAppCost.MAX_VALUE;
     }
 
     public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,

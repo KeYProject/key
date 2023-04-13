@@ -1,10 +1,6 @@
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.FormulaChangeInfo;
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -38,7 +34,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * @param goal the goal to apply the taclet on
      * @param age the age
      */
-    FindTacletAppContainer(NoPosTacletApp app, PosInOccurrence pio, RuleAppCost cost, Goal goal,
+    FindTacletAppContainer(NoPosTacletApp app, PosInOccurrence pio, long cost, Goal goal,
             long age) {
         super(app, cost, age);
         applicationPosition = pio;

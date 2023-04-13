@@ -1,33 +1,37 @@
 package de.uka.ilkd.key.strategy;
 
-import javax.annotation.Nonnull;
-
 /**
- * Represents the costs of a rule. In the default case this is just an integral number, but in some
- * cases it could be just positive infinity.
- * <p>
- * weigl: It would be better just to implement it on floats!
+ * Constants and utility functions for dealing with costs encoded as long
  */
-public interface RuleAppCost extends Comparable<RuleAppCost> {
+public class RuleAppCost {
+    public static final long MAX_VALUE = Long.MAX_VALUE;
+    public static final long ZERO = 0;
 
-    int compareTo(@Nonnull RuleAppCost o);
-
-    /**
-     * Add the given costs to the costs that are represented by this object
-     */
-    @Nonnull
-    RuleAppCost add(@Nonnull RuleAppCost cost2);
-
+    private RuleAppCost() {}
 
     /**
-     * newCost = this * cost.
+     * Adds the sums where any can be {@link RuleAppCost.MAX_VALUE}.
      *
-     * <p>
-     * This function is associative. this.mul(a) == a.mul(this)
-     * </p>
-     *
-     * @param cost - non-null {@link RuleAppCost}
+     * @param left any cost
+     * @param right any cost
+     * @return the sum
      */
-    @Nonnull
-    RuleAppCost mul(@Nonnull RuleAppCost cost);
+    public static long add(long left, long right) {
+        if (left == MAX_VALUE || right == MAX_VALUE)
+            return MAX_VALUE;
+        return left + right;
+    }
+
+    /**
+     * Adds the sums where right must not be {@link RuleAppCost.MAX_VALUE}.
+     *
+     * @param left any cost
+     * @param right cost != {@link RuleAppCost.MAX_VALUE}.
+     * @return the sum
+     */
+    public static long addRight(long left, long right) {
+        if (left == MAX_VALUE)
+            return MAX_VALUE;
+        return left + right;
+    }
 }

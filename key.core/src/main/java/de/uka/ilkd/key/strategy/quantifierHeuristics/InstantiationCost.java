@@ -4,7 +4,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
@@ -26,7 +25,7 @@ public class InstantiationCost implements Feature {
     /**
      * Compute the cost of a RuleApp.
      */
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public long computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         assert pos != null : "Projection is only applicable to rules with find";
 
         final Term formula = pos.sequentFormula().formula();

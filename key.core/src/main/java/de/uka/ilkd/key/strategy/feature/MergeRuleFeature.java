@@ -8,9 +8,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 /**
  * Costs for the {@link MergeRule}; cheap if the first statement in the chosen top-level formula is
@@ -26,16 +24,16 @@ public class MergeRuleFeature implements Feature {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public long computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         final Term t = pos.subTerm();
         if (!pos.isTopLevel() || !t.containsJavaBlockRecursive()) {
-            return TopRuleAppCost.INSTANCE;
+            return RuleAppCost.MAX_VALUE;
         }
 
         return JavaTools.getActiveStatement(
             TermBuilder.goBelowUpdates(t).javaBlock()) instanceof MergePointStatement
-                    ? NumberRuleAppCost.create(0)
-                    : TopRuleAppCost.INSTANCE;
+                    ? 0
+                    : RuleAppCost.MAX_VALUE;
     }
 
 }

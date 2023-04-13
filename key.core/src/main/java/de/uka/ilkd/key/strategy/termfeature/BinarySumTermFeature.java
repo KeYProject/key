@@ -3,7 +3,6 @@ package de.uka.ilkd.key.strategy.termfeature;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 /**
  * A feature that computes the sum of two given features (faster than the more general class
@@ -11,12 +10,12 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
  */
 public class BinarySumTermFeature implements TermFeature {
 
-    public RuleAppCost compute(Term term, Services services) {
-        RuleAppCost f0Cost = f0.compute(term, services);
-        if (f0Cost instanceof TopRuleAppCost) {
-            return f0Cost;
+    public long compute(Term term, Services services) {
+        var a = f0.compute(term, services);
+        if (a == RuleAppCost.MAX_VALUE) {
+            return a;
         }
-        return f0Cost.add(f1.compute(term, services));
+        return RuleAppCost.addRight(f1.compute(term, services), a);
     }
 
     private BinarySumTermFeature(TermFeature f0, TermFeature f1) {

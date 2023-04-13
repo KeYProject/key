@@ -13,9 +13,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -165,11 +163,11 @@ class Instantiation {
     /**
      * Try to find the cost of an instance(inst) according its quantified formula and current goal.
      */
-    static RuleAppCost computeCost(Term inst, Term form, Sequent seq, Services services) {
+    static long computeCost(Term inst, Term form, Sequent seq, Services services) {
         return Instantiation.create(form, seq, services).computeCostHelp(inst);
     }
 
-    private RuleAppCost computeCostHelp(Term inst) {
+    private long computeCostHelp(Term inst) {
         Long cost = instancesWithCosts.get(inst);
         if (cost == null && (inst.op() instanceof SortDependingFunction
                 && ((SortDependingFunction) inst.op()).getKind().equals(Sort.CAST_NAME))) {
@@ -178,13 +176,13 @@ class Instantiation {
 
         if (cost == null) {
             // if (triggersSet)
-            return TopRuleAppCost.INSTANCE;
+            return RuleAppCost.MAX_VALUE;
         }
         if (cost == -1) {
-            return TopRuleAppCost.INSTANCE;
+            return RuleAppCost.MAX_VALUE;
         }
 
-        return NumberRuleAppCost.create(cost);
+        return cost.longValue();
     }
 
     /** get all instances from instancesCostCache subsCache */

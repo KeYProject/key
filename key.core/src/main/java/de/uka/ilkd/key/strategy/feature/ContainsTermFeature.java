@@ -5,9 +5,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 
@@ -18,10 +16,10 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 public class ContainsTermFeature implements Feature {
 
     /** Constant that represents the boolean value true */
-    public static final RuleAppCost ZERO_COST = NumberRuleAppCost.getZeroCost();
+    public static final long ZERO_COST = RuleAppCost.ZERO;
 
     /** Constant that represents the boolean value false */
-    public static final RuleAppCost TOP_COST = TopRuleAppCost.INSTANCE;
+    public static final long TOP_COST = RuleAppCost.MAX_VALUE;
 
     private final ProjectionToTerm proj1;
 
@@ -47,7 +45,7 @@ public class ContainsTermFeature implements Feature {
 
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public long computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         final Term t1 = proj1.toTerm(app, pos, goal);
         final Term t2 = proj2.toTerm(app, pos, goal);
         ContainsTermVisitor visitor = new ContainsTermVisitor(t2);

@@ -8,7 +8,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
  */
 public class NoFindTacletAppContainer extends TacletAppContainer {
 
-    NoFindTacletAppContainer(NoPosTacletApp p_app, RuleAppCost p_cost, long p_age) {
+    NoFindTacletAppContainer(NoPosTacletApp p_app, long p_cost, long p_age) {
         super(p_app, p_cost, p_age);
     }
 

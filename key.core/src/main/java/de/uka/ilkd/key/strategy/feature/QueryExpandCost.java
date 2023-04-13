@@ -12,9 +12,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -29,10 +27,8 @@ import org.slf4j.LoggerFactory;
 public class QueryExpandCost implements Feature {
     private static final Logger LOGGER = LoggerFactory.getLogger(QueryExpandCost.class);
 
-    /** Constant that represents the boolean value true */
-    public static final RuleAppCost ZERO_COST = NumberRuleAppCost.getZeroCost();
     /** Constant that represents the boolean value false */
-    public static final RuleAppCost TOP_COST = TopRuleAppCost.INSTANCE;
+    public static final long TOP_COST = RuleAppCost.MAX_VALUE;
 
     /**
      * If the literals in a query become greater than abs(ConsideredAsBigLiteral), then this is
@@ -70,7 +66,7 @@ public class QueryExpandCost implements Feature {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public long computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         final Services services = goal.proof().getServices();
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         final Term t = pos.subTerm();
@@ -104,7 +100,7 @@ public class QueryExpandCost implements Feature {
             }
         }
 
-        return NumberRuleAppCost.create(cost);
+        return cost;
     }
 
     /**
