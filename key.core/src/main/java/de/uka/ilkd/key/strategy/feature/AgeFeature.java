@@ -3,8 +3,6 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 
 /**
  * Feature that computes the age of the goal (i.e. total number of rules applications that have been
@@ -16,8 +14,8 @@ public class AgeFeature implements Feature {
 
     private AgeFeature() {}
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return NumberRuleAppCost.create(goal.getTime());
+    public long computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+        return goal.getTime();
         // return LongRuleAppCost.create ( goal.getTime() / goal.sequent ().size () );
         // return LongRuleAppCost.create ( (long)Math.sqrt ( goal.getTime () ) );
     }

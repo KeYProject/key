@@ -24,9 +24,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
@@ -199,19 +197,19 @@ public class InfFlowContractAppFeature implements Feature {
 
 
     @Override
-    public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pos, Goal goal) {
+    public long computeCost(RuleApp ruleApp, PosInOccurrence pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert ruleApp instanceof TacletApp : "Feature is only applicable " + "to Taclets.";
         TacletApp app = (TacletApp) ruleApp;
 
         if (!app.ifInstsComplete()) {
-            return NumberRuleAppCost.getZeroCost();
+            return RuleAppCost.ZERO;
         }
 
         if (!isInfFlowProof(goal.proof()) || app.ifFormulaInstantiations() == null
                 || app.ifFormulaInstantiations().size() < 1
                 || duplicateFindTaclet(app, pos, goal)) {
-            return TopRuleAppCost.INSTANCE;
+            return RuleAppCost.MAX_VALUE;
         }
 
         // only relate the n-th called method in execution A with the n-th
@@ -231,10 +229,10 @@ public class InfFlowContractAppFeature implements Feature {
         }
         final int findApplNumber = assumesApplNumber + numOfContractAppls;
         if (!relatesTerms.get(findApplNumber).equals(focusFor)) {
-            return TopRuleAppCost.INSTANCE;
+            return RuleAppCost.MAX_VALUE;
         }
 
-        return NumberRuleAppCost.create(assumesApplNumber);
+        return assumesApplNumber;
     }
 
 

@@ -9,7 +9,6 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 
 
 /**
@@ -321,7 +320,7 @@ public abstract class AbstractBetaFeature implements Feature {
      * @param goal the goal on which <code>app</code> is to be applied
      * @return the cost of <code>app</code>
      */
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public long computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final Term findTerm = pos.sequentFormula().formula();
@@ -329,6 +328,6 @@ public abstract class AbstractBetaFeature implements Feature {
         return doComputation(pos, findTerm, goal.proof().getServices().getCaches());
     }
 
-    protected abstract RuleAppCost doComputation(PosInOccurrence pos, Term findTerm,
+    protected abstract long doComputation(PosInOccurrence pos, Term findTerm,
             ServiceCaches caches);
 }

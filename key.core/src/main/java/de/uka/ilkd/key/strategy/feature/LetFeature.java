@@ -4,7 +4,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 
@@ -30,11 +29,11 @@ public class LetFeature implements Feature {
         this.body = body;
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public long computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         final Term outerVarContent = var.getContent();
 
         var.setContent(value.toTerm(app, pos, goal));
-        final RuleAppCost res = body.computeCost(app, pos, goal);
+        final long res = body.computeCost(app, pos, goal);
 
         var.setContent(outerVarContent);
         return res;

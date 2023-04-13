@@ -64,7 +64,7 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
                     }
                 }
             }
-            return hasLabel ? TopRuleAppCost.INSTANCE : NumberRuleAppCost.create(0);
+            return hasLabel ? RuleAppCost.MAX_VALUE : 0;
         };
         // The label feature ensures that Taclets mapping an assumes to a Term with a result label
         // are only applicable if also a Term with the result label is used in the find clause

@@ -3,9 +3,7 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -54,28 +52,28 @@ public abstract class ScaleFeature implements Feature {
      * @param img0 point 0 in the image
      * @param img1 point 1 in the image
      */
-    public static Feature createAffine(Feature f, RuleAppCost dom0, RuleAppCost dom1,
-            RuleAppCost img0, RuleAppCost img1) {
-        Debug.assertFalse(dom0.equals(dom1),
+    public static Feature createAffine(Feature f, long dom0, long dom1,
+            long img0, long img1) {
+        Debug.assertFalse(dom0 == dom1,
             "Two different points are needed to define the " + "affine transformation");
-        if (img0.equals(img1)) {
+        if (img0 == img1) {
             return ConstFeature.createConst(img0);
         }
 
         // now the two points of the domain (resp. of the image) are distinct
 
-        if (dom0 instanceof TopRuleAppCost) {
+        if (dom0 == RuleAppCost.MAX_VALUE) {
             return firstDomInfty(f, dom1, img0, img1);
         } else {
-            if (dom1 instanceof TopRuleAppCost) {
+            if (dom1 == RuleAppCost.MAX_VALUE) {
                 return firstDomInfty(f, dom0, img1, img0);
             } else {
 
                 // the points of the domain are finite
-                if (img0 instanceof TopRuleAppCost) {
+                if (img0 == RuleAppCost.MAX_VALUE) {
                     return firstImgInfty(f, dom0, dom1, img1);
                 } else {
-                    if (img1 instanceof TopRuleAppCost) {
+                    if (img1 == RuleAppCost.MAX_VALUE) {
                         return firstImgInfty(f, dom1, dom0, img0);
                     } else {
                         return realAffine(f, dom0, dom1, img0, img1);
@@ -86,51 +84,31 @@ public abstract class ScaleFeature implements Feature {
         }
     }
 
-    private static Feature firstDomInfty(Feature f, RuleAppCost dom1, RuleAppCost img0,
-            RuleAppCost img1) {
-        if (img0 instanceof TopRuleAppCost) {
-            final long img1Val = getValue(img1);
-            final long dom1Val = getValue(dom1);
-            return createAffine(f, 1.0, img1Val - dom1Val);
+    private static Feature firstDomInfty(Feature f, long dom1, long img0,
+            long img1) {
+        if (img0 == RuleAppCost.MAX_VALUE) {
+            return createAffine(f, 1.0, img1 - dom1);
         } else {
-            if (img1 instanceof TopRuleAppCost) {
-                return ShannonFeature.createConditional(f, TopRuleAppCost.INSTANCE, img0,
-                    TopRuleAppCost.INSTANCE);
+            if (img1 == RuleAppCost.MAX_VALUE) {
+                return ShannonFeature.createConditional(f, RuleAppCost.MAX_VALUE, img0,
+                    RuleAppCost.MAX_VALUE);
             } else {
-                return ShannonFeature.createConditional(f, TopRuleAppCost.INSTANCE, img0, img1);
+                return ShannonFeature.createConditional(f, RuleAppCost.MAX_VALUE, img0, img1);
             }
         }
     }
 
-    private static Feature firstImgInfty(Feature f, RuleAppCost dom0, RuleAppCost dom1,
-            RuleAppCost img1) {
-        return ShannonFeature.createConditional(f, dom1, img1, TopRuleAppCost.INSTANCE);
+    private static Feature firstImgInfty(Feature f, long dom0, long dom1,
+            long img1) {
+        return ShannonFeature.createConditional(f, dom1, img1, RuleAppCost.MAX_VALUE);
     }
 
-    public static Feature realAffine(Feature f, RuleAppCost dom0, RuleAppCost dom1,
-            RuleAppCost img0, RuleAppCost img1) {
-        final double img0Val = getValue(img0);
-        final double img1Val = getValue(img1);
-        final double dom0Val = getValue(dom0);
-        final double dom1Val = getValue(dom1);
+    public static Feature realAffine(Feature f, long dom0, long dom1,
+            long img0, long img1) {
 
-        final double coeff = (img1Val - img0Val) / (dom1Val - dom0Val);
-        final long offset = (long) (img0Val - (dom0Val * coeff));
+        final double coeff = (double) (img1 - img0) / (dom1 - dom0);
+        final long offset = (long) (img0 - (dom0 * coeff));
         return createAffine(f, coeff, offset);
-    }
-
-    /**
-     * @param cost
-     */
-    private static long getValue(RuleAppCost cost) {
-        if (!(cost instanceof NumberRuleAppCost)) {
-            illegalCostError(cost);
-        }
-        return ((NumberRuleAppCost) cost).getValue();
-    }
-
-    protected static void illegalCostError(final RuleAppCost cost) {
-        Debug.fail("Don't know what to do with cost class " + cost.getClass());
     }
 
     protected Feature getFeature() {
@@ -149,28 +127,28 @@ public abstract class ScaleFeature implements Feature {
 
         private MultFeature(Feature f, double p_coeff, long p_offset) {
             super(f);
+            if (p_offset == RuleAppCost.MAX_VALUE) {
+                throw new IllegalArgumentException();
+            }
             coeff = p_coeff;
             offset = p_offset;
         }
 
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-            final RuleAppCost cost = getFeature().computeCost(app, pos, goal);
+        public long computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+            final long cost = getFeature().computeCost(app, pos, goal);
             long costVal;
 
-            if (cost instanceof TopRuleAppCost) {
+            if (cost == RuleAppCost.MAX_VALUE) {
                 if (isZero(coeff)) {
                     costVal = 0;
                 } else {
-                    return TopRuleAppCost.INSTANCE;
+                    return RuleAppCost.MAX_VALUE;
                 }
-            } else if (cost instanceof NumberRuleAppCost) {
-                costVal = ((NumberRuleAppCost) cost).getValue();
             } else {
-                illegalCostError(cost);
-                return null;
+                costVal = cost;
             }
 
-            return NumberRuleAppCost.create((long) (coeff * costVal) + offset);
+            return (long) (coeff * costVal) + offset;
         }
     }
 

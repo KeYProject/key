@@ -12,13 +12,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCostCollector;
-import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.*;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -120,20 +114,20 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
+        public long computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
             String name = ruleApp.rule().name().toString();
             if ((admittedRuleNames.contains(name) || name.startsWith(INF_FLOW_UNFOLD_PREFIX))
                     && ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
                 JavaCardDLStrategyFactory strategyFactory = new JavaCardDLStrategyFactory();
                 Strategy javaDlStrategy =
                     strategyFactory.create(goal.proof(), new StrategyProperties());
-                RuleAppCost costs = javaDlStrategy.computeCost(ruleApp, pio, goal);
+                long costs = javaDlStrategy.computeCost(ruleApp, pio, goal);
                 if ("orLeft".equals(name)) {
-                    costs = costs.add(NumberRuleAppCost.create(100));
+                    costs += 100;
                 }
                 return costs;
             } else {
-                return TopRuleAppCost.INSTANCE;
+                return RuleAppCost.MAX_VALUE;
             }
         }
 

@@ -5,7 +5,6 @@ import java.util.Iterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.Feature;
 
 public class OneOfCP implements Feature {
@@ -25,7 +24,7 @@ public class OneOfCP implements Feature {
         return new OneOfCP(manager, features);
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public long computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         manager.passChoicePoint(cp, this);
         return features[theChosenOne].computeCost(app, pos, goal);
     }

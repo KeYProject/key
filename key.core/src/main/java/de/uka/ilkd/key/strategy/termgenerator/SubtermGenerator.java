@@ -7,7 +7,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
@@ -58,7 +58,7 @@ public abstract class SubtermGenerator implements TermGenerator {
     }
 
     private boolean descendFurther(Term t, Services services) {
-        return !(cond.compute(t, services) instanceof TopRuleAppCost);
+        return !(cond.compute(t, services) == RuleAppCost.MAX_VALUE);
     }
 
     abstract static class SubIterator implements Iterator<Term> {

@@ -8,9 +8,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -25,12 +23,12 @@ public class RuleSetDispatchFeature implements Feature {
 
     private final Map<RuleSet, Feature> rulesetToFeature = new LinkedHashMap<>();
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public long computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         if (!(app instanceof TacletApp)) {
-            return NumberRuleAppCost.getZeroCost();
+            return RuleAppCost.ZERO;
         }
 
-        RuleAppCost res = NumberRuleAppCost.getZeroCost();
+        long res = RuleAppCost.ZERO;
         ImmutableList<RuleSet> ruleSetsOfAppliedTaclet = ((TacletApp) app).taclet().getRuleSets();
         /*
          * do not use iterator here, as this method is called a lot when proving such that avoiding
@@ -42,11 +40,11 @@ public class RuleSetDispatchFeature implements Feature {
 
             final Feature partialF = rulesetToFeature.get(rs);
             if (partialF != null) {
-                res = res.add(partialF.computeCost(app, pos, goal));
-                if (res instanceof TopRuleAppCost) {
-                    break;
+                long partial = partialF.computeCost(app, pos, goal);
+                if (partial == RuleAppCost.MAX_VALUE) {
+                    return RuleAppCost.MAX_VALUE;
                 }
-
+                res = res + partial;
             }
         }
         return res;

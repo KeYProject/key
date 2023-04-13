@@ -3,9 +3,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.Feature;
 
 public class InstantiationCostScalerFeature implements Feature {
@@ -13,8 +11,8 @@ public class InstantiationCostScalerFeature implements Feature {
     private final Feature costFeature;
     private final Feature allowSplitting;
 
-    private static final RuleAppCost ONE_COST = NumberRuleAppCost.create(1);
-    private static final RuleAppCost MINUS_3000_COST = NumberRuleAppCost.create(-3000);
+    private static final long ONE_COST = 1;
+    private static final long MINUS_3000_COST = -3000;
 
     private InstantiationCostScalerFeature(Feature costFeature, Feature allowSplitting) {
         this.costFeature = costFeature;
@@ -25,29 +23,25 @@ public class InstantiationCostScalerFeature implements Feature {
         return new InstantiationCostScalerFeature(costFeature, allowSplitting);
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public long computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+        final long cost = costFeature.computeCost(app, pos, goal);
 
-        final RuleAppCost cost = costFeature.computeCost(app, pos, goal);
-
-        if (cost.equals(NumberRuleAppCost.getZeroCost())) {
+        if (cost == RuleAppCost.ZERO) {
             return MINUS_3000_COST;
         }
-        if (cost.equals(ONE_COST)) {
-            return NumberRuleAppCost.getZeroCost();
+        if (cost == ONE_COST) {
+            return RuleAppCost.ZERO;
         }
 
-        final RuleAppCost as = allowSplitting.computeCost(app, pos, goal);
-        if (!as.equals(NumberRuleAppCost.getZeroCost())) {
-            return TopRuleAppCost.INSTANCE;
+        final long as = allowSplitting.computeCost(app, pos, goal);
+        if (!(as == RuleAppCost.ZERO)) {
+            return RuleAppCost.MAX_VALUE;
         }
-        if (cost.equals(TopRuleAppCost.INSTANCE)) {
-            return TopRuleAppCost.INSTANCE;
+        if (cost == RuleAppCost.MAX_VALUE) {
+            return RuleAppCost.MAX_VALUE;
         }
 
-        assert cost instanceof NumberRuleAppCost : "Can only handle LongRuleAppCost";
-
-        final NumberRuleAppCost longCost = (NumberRuleAppCost) cost;
-        return NumberRuleAppCost.create(longCost.getValue() + 200);
+        return RuleAppCost.addRight(cost, 200);
     }
 
 }

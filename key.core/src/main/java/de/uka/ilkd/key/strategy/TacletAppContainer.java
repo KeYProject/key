@@ -1,8 +1,7 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -30,7 +29,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
     private final long age;
 
-    protected TacletAppContainer(RuleApp p_app, RuleAppCost p_cost, long p_age) {
+    protected TacletAppContainer(RuleApp p_app, long p_cost, long p_age) {
         super(p_app, p_cost);
         age = p_age;
     }
@@ -55,8 +54,9 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             p_goal.getGoalStrategy().computeCost(p_app, p_pio, p_goal), p_initial);
     }
 
+    @Nonnull
     private static TacletAppContainer createContainer(NoPosTacletApp p_app, PosInOccurrence p_pio,
-            Goal p_goal, RuleAppCost p_cost, boolean p_initial) {
+            Goal p_goal, long p_cost, boolean p_initial) {
         // This relies on the fact that the method <code>Goal.getTime()</code>
         // never returns a value less than zero
         final long localage = p_initial ? -1 : p_goal.getTime();
@@ -78,7 +78,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         }
 
         final TacletAppContainer newCont = createContainer(p_goal);
-        if (newCont.getCost() instanceof TopRuleAppCost) {
+        if (newCont.getCost() == RuleAppCost.MAX_VALUE) {
             return ImmutableSLList.nil();
         }
 
@@ -122,7 +122,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         final ImmutableList<RuleAppContainer>[] resA = new ImmutableList[] { targetList };
 
         final RuleAppCostCollector collector = (newApp, cost) -> {
-            if (cost instanceof TopRuleAppCost) {
+            if (cost == RuleAppCost.MAX_VALUE) {
                 return;
             }
             resA[0] = addContainer((NoPosTacletApp) newApp, resA[0], p_goal, cost);
@@ -147,7 +147,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * <code>sufficientlyComplete</code>, and add the container to <code>targetList</code>
      */
     private ImmutableList<RuleAppContainer> addContainer(NoPosTacletApp app,
-            ImmutableList<RuleAppContainer> targetList, Goal p_goal, RuleAppCost cost) {
+            ImmutableList<RuleAppContainer> targetList, Goal p_goal, long cost) {
         if (!sufficientlyCompleteApp(app)) {
             return targetList;
         }
@@ -182,19 +182,19 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     protected static ImmutableList<RuleAppContainer> createInitialAppContainers(
             ImmutableList<NoPosTacletApp> p_app, PosInOccurrence p_pio, Goal p_goal) {
 
-        List<RuleAppCost> costs = new LinkedList<>();
+        long[] costs = new long[p_app.size()];
 
+        int off = 0;
         for (NoPosTacletApp app : p_app) {
-            costs.add(p_goal.getGoalStrategy().computeCost(app, p_pio, p_goal));
+            costs[off] = p_goal.getGoalStrategy().computeCost(app, p_pio, p_goal);
+            off += 1;
         }
 
         ImmutableList<RuleAppContainer> result = ImmutableSLList.nil();
-        for (RuleAppCost cost : costs) {
+        for (long cost : costs) {
             final TacletAppContainer container =
                 createContainer(p_app.head(), p_pio, p_goal, cost, true);
-            if (container != null) {
-                result = result.prepend(container);
-            }
+            result = result.prepend(container);
             p_app = p_app.tail();
         }
         return result;

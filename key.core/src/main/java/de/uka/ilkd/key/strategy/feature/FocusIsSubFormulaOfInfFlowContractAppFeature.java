@@ -7,9 +7,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -31,29 +29,29 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
 
 
     @Override
-    public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pos, Goal goal) {
+    public long computeCost(RuleApp ruleApp, PosInOccurrence pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert ruleApp instanceof TacletApp : "Feature is only applicable " + "to Taclets.";
         TacletApp app = (TacletApp) ruleApp;
 
         if (!app.ifInstsComplete()) {
-            return NumberRuleAppCost.getZeroCost();
+            return RuleAppCost.ZERO;
         }
 
         final Term focusFor = pos.sequentFormula().formula();
         ImmutableList<Term> contractAppls =
             goal.getStrategyInfo(InfFlowContractAppTacletExecutor.INF_FLOW_CONTRACT_APPL_PROPERTY);
         if (contractAppls == null) {
-            return TopRuleAppCost.INSTANCE;
+            return RuleAppCost.MAX_VALUE;
         }
 
         for (Term appl : contractAppls) {
             if (isSubFormula(focusFor, appl)) {
-                return NumberRuleAppCost.getZeroCost();
+                return RuleAppCost.ZERO;
             }
         }
 
-        return TopRuleAppCost.INSTANCE;
+        return RuleAppCost.MAX_VALUE;
     }
 
 

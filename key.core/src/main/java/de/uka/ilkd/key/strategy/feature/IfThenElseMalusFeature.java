@@ -7,7 +7,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
 import org.key_project.util.LRUCache;
@@ -23,15 +22,15 @@ public class IfThenElseMalusFeature implements Feature {
 
     private IfThenElseMalusFeature() {}
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public long computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         if (pos == null) {
-            return NumberRuleAppCost.getZeroCost();
+            return RuleAppCost.ZERO;
         }
 
         final ServiceCaches caches = goal.proof().getServices().getCaches();
 
-        RuleAppCost resInt;
-        final LRUCache<PosInOccurrence, RuleAppCost> ifThenElseMalusCache =
+        Long resInt;
+        final LRUCache<PosInOccurrence, Long> ifThenElseMalusCache =
             caches.getIfThenElseMalusCache();
         synchronized (ifThenElseMalusCache) {
             resInt = ifThenElseMalusCache.get(pos);
@@ -41,7 +40,7 @@ public class IfThenElseMalusFeature implements Feature {
             return resInt;
         }
 
-        int res = 0;
+        long res = 0;
 
         final PIOPathIterator it = pos.iterator();
         while (true) {
@@ -56,7 +55,7 @@ public class IfThenElseMalusFeature implements Feature {
             }
         }
 
-        resInt = NumberRuleAppCost.create(res);
+        resInt = res;
 
         synchronized (ifThenElseMalusCache) {
             ifThenElseMalusCache.put(pos, resInt);

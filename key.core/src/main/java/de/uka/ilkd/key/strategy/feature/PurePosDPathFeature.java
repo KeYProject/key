@@ -3,7 +3,6 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 
 
 /**
@@ -18,7 +17,7 @@ public class PurePosDPathFeature extends AbstractBetaFeature {
     private PurePosDPathFeature() {}
 
     @Override
-    protected RuleAppCost doComputation(PosInOccurrence pos, Term findTerm, ServiceCaches caches) {
+    protected long doComputation(PosInOccurrence pos, Term findTerm, ServiceCaches caches) {
         return hasPurePosPath(findTerm, !pos.isInAntec(), caches) ? BinaryFeature.ZERO_COST
                 : BinaryFeature.TOP_COST;
     }

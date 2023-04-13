@@ -6,9 +6,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
@@ -39,15 +37,14 @@ public class ComprehendedSumFeature implements Feature {
     }
 
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public long computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         final Term outerVarContent = var.getContent();
 
         final Iterator<Term> it = generator.generate(app, pos, goal);
-        RuleAppCost res = NumberRuleAppCost.getZeroCost();
-        while (it.hasNext() && !(res instanceof TopRuleAppCost)) {
+        long res = RuleAppCost.ZERO;
+        while (it.hasNext() && !(res == RuleAppCost.MAX_VALUE)) {
             var.setContent(it.next());
-
-            res = res.add(body.computeCost(app, pos, goal));
+            res = RuleAppCost.add(res, body.computeCost(app, pos, goal));
         }
 
         var.setContent(outerVarContent);

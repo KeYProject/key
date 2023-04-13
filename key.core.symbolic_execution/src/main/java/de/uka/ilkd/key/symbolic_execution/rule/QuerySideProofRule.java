@@ -2,6 +2,7 @@ package de.uka.ilkd.key.symbolic_execution.rule;
 
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -193,6 +194,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
     /**
      * {@inheritDoc}
      */
+    @Nonnull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException {

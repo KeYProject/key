@@ -11,14 +11,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.SortCollector;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -33,11 +26,9 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -201,29 +192,29 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+        public long computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
 
             if (app.rule() instanceof OneStepSimplifier) {
-                return NumberRuleAppCost.getZeroCost();
+                return RuleAppCost.ZERO;
             }
             // else if(app.rule().name().toString().equals("applyEq")){
             // return LongRuleAppCost.ZERO_COST;
             // }
             else if (getSemanticsRuleFilter().filter(app.rule())) {
-                return NumberRuleAppCost.create(1);
+                return 1;
             } else if (getEqualityRuleFilter().filter(app.rule())) {
-                return NumberRuleAppCost.create(10);
+                return 10;
             } else if (app.rule().name().toString().equals("pullOut")) {
                 Term t = pio.subTerm();
                 if (t.op() instanceof Function) {
                     if (getAllowedPullOut().contains(t.op().name().toString())) {
-                        return NumberRuleAppCost.create(1000);
+                        return 1000;
                     }
                 }
 
             }
 
-            return TopRuleAppCost.INSTANCE;
+            return RuleAppCost.MAX_VALUE;
         }
 
         @Override

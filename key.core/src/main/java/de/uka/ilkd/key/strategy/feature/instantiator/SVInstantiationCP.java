@@ -9,7 +9,6 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
@@ -50,9 +49,9 @@ public class SVInstantiationCP implements Feature {
         this.manager = manager;
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public long computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         manager.passChoicePoint(new CP(app, pos, goal), this);
-        return NumberRuleAppCost.getZeroCost();
+        return RuleAppCost.ZERO;
     }
 
     private SchemaVariable findSVWithName(TacletApp app) {

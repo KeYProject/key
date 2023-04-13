@@ -16,7 +16,6 @@ import de.uka.ilkd.key.rule.IfFormulaInstantiationCache;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 import de.uka.ilkd.key.strategy.IfInstantiationCachePool;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature.TermInfo;
 import de.uka.ilkd.key.strategy.feature.AppliedRuleAppsNameCache;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesGraph;
@@ -84,7 +83,7 @@ public class ServiceCaches {
      */
     private final LRUCache<Term, TermInfo> betaCandidates = new LRUCache<>(1000);
 
-    private final LRUCache<PosInOccurrence, RuleAppCost> ifThenElseMalusCache =
+    private final LRUCache<PosInOccurrence, Long> ifThenElseMalusCache =
         new LRUCache<>(1000);
 
     private final LRUCache<Operator, Integer> introductionTimeCache =
@@ -157,7 +156,7 @@ public class ServiceCaches {
         return betaCandidates;
     }
 
-    public final LRUCache<PosInOccurrence, RuleAppCost> getIfThenElseMalusCache() {
+    public final LRUCache<PosInOccurrence, Long> getIfThenElseMalusCache() {
         return ifThenElseMalusCache;
     }
 

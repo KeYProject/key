@@ -11,7 +11,9 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.strategy.*;
+import de.uka.ilkd.key.strategy.RuleAppCost;
+import de.uka.ilkd.key.strategy.RuleAppCostCollector;
+import de.uka.ilkd.key.strategy.Strategy;
 
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     private static final Set<String> ADMITTED_RULES =
@@ -77,7 +79,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            return computeCost(app, pio, goal) != TopRuleAppCost.INSTANCE &&
+            return computeCost(app, pio, goal) != RuleAppCost.MAX_VALUE &&
             // Assumptions are normally not considered by the cost
             // computation, because they are normally not yet
             // instantiated when the costs are computed. Because the
@@ -92,11 +94,11 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+        public long computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
 
             Rule rule = app.rule();
             if (FinishSymbolicExecutionMacro.isForbiddenRule(rule)) {
-                return TopRuleAppCost.INSTANCE;
+                return RuleAppCost.MAX_VALUE;
             }
 
             if (modalityCache.hasModality(goal.node().sequent())) {
@@ -104,7 +106,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
             }
 
             if (isAdmittedRule(rule)) {
-                return NumberRuleAppCost.getZeroCost();
+                return RuleAppCost.ZERO;
             }
 
             // apply OSS to <inv>() calls.
@@ -113,12 +115,12 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
                 if (target.op() instanceof UpdateApplication) {
                     Operator updatedOp = target.sub(1).op();
                     if (updatedOp instanceof ObserverFunction) {
-                        return NumberRuleAppCost.getZeroCost();
+                        return RuleAppCost.ZERO;
                     }
                 }
             }
 
-            return TopRuleAppCost.INSTANCE;
+            return RuleAppCost.MAX_VALUE;
         }
 
         @Override

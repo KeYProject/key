@@ -3,8 +3,6 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 
 
 /**
@@ -19,8 +17,8 @@ public class CountPosDPathFeature extends AbstractBetaFeature {
     private CountPosDPathFeature() {}
 
     @Override
-    protected RuleAppCost doComputation(PosInOccurrence pos, Term findTerm, ServiceCaches caches) {
-        return NumberRuleAppCost.create(maxPosPath(findTerm, !pos.isInAntec(), caches));
+    protected long doComputation(PosInOccurrence pos, Term findTerm, ServiceCaches caches) {
+        return maxPosPath(findTerm, !pos.isInAntec(), caches);
     }
 
 }
