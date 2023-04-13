@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Thu Mar 16 10:46:38 CET 2023
+#Wed Apr 12 13:31:52 CEST 2023
 [Labels]UseOriginLabels=true
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
 [SMTSettings]invariantForall=false
@@ -10,7 +10,7 @@
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
 [StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_INSTANTIATE
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
-[Choice]DefaultChoices=JavaCard-JavaCard\\:off , Strings-Strings\\:on , assertions-assertions\\:on , bigint-bigint\\:on , floatRules-floatRules\\:strictfpOnly , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , integerSimplificationRules-integerSimplificationRules\\:full , javaLoopTreatment-javaLoopTreatment\\:efficient , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off , methodExpansion-methodExpansion\\:modularOnly , modelFields-modelFields\\:showSatisfiability , moreSeqRules-moreSeqRules\\:off , permissions-permissions\\:off , programRules-programRules\\:Java , reach-reach\\:on , runtimeExceptions-runtimeExceptions\\:allow , sequences-sequences\\:on , wdChecks-wdChecks\\:off , wdOperator-wdOperator\\:L
+[Choice]DefaultChoices=JavaCard-JavaCard\\:off, Strings-Strings\\:on, assertions-assertions\\:on, bigint-bigint\\:on, floatRules-floatRules\\:strictfpOnly, initialisation-initialisation\\:disableStaticInitialisation, intRules-intRules\\:arithmeticSemanticsIgnoringOF, integerSimplificationRules-integerSimplificationRules\\:full, javaLoopTreatment-javaLoopTreatment\\:efficient, mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off, methodExpansion-methodExpansion\\:modularOnly, modelFields-modelFields\\:showSatisfiability, moreSeqRules-moreSeqRules\\:off, permissions-permissions\\:off, programRules-programRules\\:Java, reach-reach\\:on, runtimeExceptions-runtimeExceptions\\:allow, sequences-sequences\\:on, wdChecks-wdChecks\\:off, wdOperator-wdOperator\\:L
 [StrategyProperty]LOOP_OPTIONS_KEY=LOOP_EXPAND
 [StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
 [SMTSettings]UseBuiltUniqueness=false
@@ -43,21 +43,18 @@
 }
 
 \proofObligation "#Proof Obligation Settings
-#Thu Mar 16 10:46:38 CET 2023
+#Wed Apr 12 13:31:52 CEST 2023
 name=getAnyOfArray2seq
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
 
 \proof {
-(keyLog "0" (keyUser "mattias" ) (keyVersion "e5095ad740f809525e4c4689dcc12514a0ca06cc"))
-(keyLog "1" (keyUser "bubel" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
-(keyLog "2" (keyUser "Julian" ) (keyVersion "44c2a312eb"))
-(keyLog "3" (keyUser "Julian" ) (keyVersion "9f937a1ea4"))
+(keyLog "0" (keyUser "Julian" ) (keyVersion "80a871ca3bac8bb405ecc216fcb6fa9ef6f8a395"))
 
-(autoModeTime "620")
+(autoModeTime "0")
 
 (branch "dummy ID"
- (builtin "One Step Simplification" (formula "1"))
+ (builtin "One Step Simplification" (formula "1") (newnames "f_h,f_a,f_idx"))
 (rule "notRight" (formula "1"))
 (rule "andLeft" (formula "1"))
 (rule "andLeft" (formula "1"))
@@ -78,7 +75,6 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 (rule "add_zero_right" (formula "3") (term "0,2,1,0"))
  (builtin "One Step Simplification" (formula "3"))
 (rule "orRight" (formula "3"))
-(rule "eqSymm" (formula "4"))
 (rule "polySimp_elimSub" (formula "3") (term "1,1"))
 (rule "times_zero_2" (formula "3") (term "1,1,1"))
 (rule "add_zero_right" (formula "3") (term "1,1"))
