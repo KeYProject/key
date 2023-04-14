@@ -190,7 +190,7 @@ public class MethodCall extends ProgramTransformer {
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
-        LOGGER.debug("method-call: called for {}", pe);
+        LOGGER.trace("method-call: called for {}", pe);
         if (resultVar != null) {
             pvar = (ProgramVariable) svInst.getInstantiation(resultVar);
         }
@@ -254,7 +254,7 @@ public class MethodCall extends ProgramTransformer {
 
     private Statement handleStatic(Services services) {
         Statement result;
-        LOGGER.debug("method-call: invocation of static method detected");
+        LOGGER.trace("method-call: invocation of static method detected");
         newContext = null;
         IProgramMethod staticMethod = getMethod(staticPrefixType, methRef, services);
         result = KeYJavaASTFactory.methodBody(pvar, newContext, staticMethod, arguments);
@@ -263,7 +263,7 @@ public class MethodCall extends ProgramTransformer {
 
     private Statement handleSuperReference(Services services) {
         Statement result;
-        LOGGER.debug(
+        LOGGER.trace(
             "method-call: super invocation of method detected." + "Requires static resolving.");
         IProgramMethod superMethod = getSuperMethod(execContext, methRef, services);
         result = KeYJavaASTFactory.methodBody(pvar, execContext.getRuntimeInstance(), superMethod,
@@ -276,11 +276,11 @@ public class MethodCall extends ProgramTransformer {
                 .equals(ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER))) {
             // private methods or constructor invocations are bound
             // statically
-            LOGGER.debug("method-call: invocation of private method detected."
+            LOGGER.trace("method-call: invocation of private method detected."
                 + "Requires static resolving.");
             result = makeMbs(staticPrefixType, services);
         } else {
-            LOGGER.debug("method-call: invocation of non-private" + " instance method detected."
+            LOGGER.trace("method-call: invocation of non-private" + " instance method detected."
                 + "Requires dynamic resolving.");
             ImmutableList<KeYJavaType> imps =
                 services.getJavaInfo().getKeYProgModelInfo().findImplementations(staticPrefixType,

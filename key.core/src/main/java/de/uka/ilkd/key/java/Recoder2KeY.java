@@ -300,7 +300,7 @@ public class Recoder2KeY implements JavaReader {
         de.uka.ilkd.key.java.CompilationUnit[] result =
             new de.uka.ilkd.key.java.CompilationUnit[cUnits.size()];
         for (int i = 0, sz = cUnits.size(); i < sz; i++) {
-            LOGGER.debug("converting now {}", cUnitStrings[i]);
+            LOGGER.trace("Converting {}", cUnitStrings[i]);
             try {
                 recoder.java.CompilationUnit cu = cUnits.get(i);
                 result[i] = getConverter().processCompilationUnit(cu, cu.getDataLocation());
