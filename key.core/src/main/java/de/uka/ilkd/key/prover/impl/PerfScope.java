@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.prover.impl;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -52,7 +54,8 @@ public class PerfScope {
         new Pair<>("AbstractBuiltInRuleApp Goal setSequent",
             AbstractBuiltInRuleApp.PERF_SET_SEQUENT),
     };
-    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.##");
+    private static final DecimalFormat DECIMAL_FORMAT =
+        new DecimalFormat("#.##", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
     private final long timeNs = System.nanoTime();
     private final long[] timesBefore = new long[PERF_COUNTERS.length];
@@ -63,7 +66,7 @@ public class PerfScope {
         }
     }
 
-    public static void displayTime(String name, long dt) {
+    public static String formatTime(long dt) {
         String unit;
         double time;
         if (dt < 1000000) {
@@ -77,7 +80,11 @@ public class PerfScope {
             unit = "s";
         }
 
-        LOGGER.trace(name + ": " + DECIMAL_FORMAT.format(time) + unit);
+        return DECIMAL_FORMAT.format(time) + unit;
+    }
+
+    private static void displayTime(String name, long dt) {
+        LOGGER.trace(name + ": " + formatTime(dt));
     }
 
     public void report() {

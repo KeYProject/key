@@ -176,7 +176,7 @@ public class ApplyStrategy extends AbstractProverCore {
             time = (System.currentTimeMillis() - time);
             LOGGER.trace("Strategy stopped, applied {} steps in {}ms", countApplied, time);
 
-            PerfScope.displayTime("applyAutomaticRule", applyAutomatic);
+            LOGGER.trace("applyAutomaticRule: " + PerfScope.formatTime(applyAutomatic));
             perfScope.report();
         }
         assert srInfo != null;
