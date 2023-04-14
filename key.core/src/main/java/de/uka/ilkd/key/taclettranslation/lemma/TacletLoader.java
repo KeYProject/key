@@ -41,12 +41,12 @@ public abstract class TacletLoader {
     /**
      * get the set of axioms from the axiom files if applicable.
      */
-    public abstract ImmutableSet<Taclet> loadAxioms();
+    public abstract ImmutableSet<Taclet> loadAxioms() throws ProofInputException;
 
     /**
      * get the set of taclets to examine (either from the system or from a file)
      */
-    public abstract ImmutableList<Taclet> loadTaclets();
+    public abstract ImmutableList<Taclet> loadTaclets() throws ProofInputException;
 
     /**
      * get the taclet base which is considered fix (?)
@@ -149,21 +149,17 @@ public abstract class TacletLoader {
                 loader.listener);
         }
 
-        private void prepareKeYFile(File file) {
+        private void prepareKeYFile(File file) throws ProofInputException {
             KeYFile keyFileDefs = new KeYFile(file.getName(), file, monitor, profile);
-            try {
-                if (initConfig != null) {
-                    problemInitializer.readEnvInput(keyFileDefs, initConfig);
-                } else {
-                    initConfig = problemInitializer.prepare(keyFileDefs);
-                }
-            } catch (ProofInputException e) {
-                throw new RuntimeException(e);
+            if (initConfig != null) {
+                problemInitializer.readEnvInput(keyFileDefs, initConfig);
+            } else {
+                initConfig = problemInitializer.prepare(keyFileDefs);
             }
         }
 
         @Override
-        public ImmutableList<Taclet> loadTaclets() {
+        public ImmutableList<Taclet> loadTaclets() throws ProofInputException {
 
             // No axioms file:
             if (initConfig == null) {
@@ -180,7 +176,7 @@ public abstract class TacletLoader {
         }
 
         @Override
-        public ImmutableSet<Taclet> loadAxioms() {
+        public ImmutableSet<Taclet> loadAxioms() throws ProofInputException {
             ImmutableSet<Taclet> axioms = DefaultImmutableSet.nil();
             for (File f : filesForAxioms) {
                 prepareKeYFile(f);
@@ -222,12 +218,7 @@ public abstract class TacletLoader {
 
         @Override
         public ImmutableList<Taclet> loadTaclets() {
-            try {
-                return getProofEnvForTaclets().getInitConfigForEnvironment().getTaclets();
-            } catch (Throwable e) {
-                throw new RuntimeException(e);
-            }
-
+            return getProofEnvForTaclets().getInitConfigForEnvironment().getTaclets();
         }
 
         @Override

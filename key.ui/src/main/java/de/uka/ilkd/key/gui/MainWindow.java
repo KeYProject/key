@@ -1690,7 +1690,7 @@ public final class MainWindow extends JFrame {
          */
         @Override
         public synchronized void autoModeStarted(ProofEvent e) {
-            LOGGER.info("Automode started");
+            LOGGER.debug("Automode started");
             disableCurrentGoalView = true;
             getMediator().removeKeYSelectionListener(proofListener);
             freezeExceptAutoModeButton();
@@ -1701,9 +1701,7 @@ public final class MainWindow extends JFrame {
          */
         @Override
         public synchronized void autoModeStopped(ProofEvent e) {
-            if (Debug.ENABLE_DEBUG) {
-                LOGGER.info("Automode stopped");
-            }
+            LOGGER.debug("Automode stopped");
             unfreezeExceptAutoModeButton();
             disableCurrentGoalView = false;
             updateSequentView();
