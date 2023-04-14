@@ -57,9 +57,12 @@ public class TacletAppIndex {
     /**
      * The sequent with the formulas for which taclet indices are hold by this object. Invariant:
      * <code>seq != null</code> implies that the indices <code>antecIndex</code>,
-     * <code>succIndex</code> are up to date for the sequent <code>seq</code>
+     * <code>succIndex</code> are up-to-date for the sequent <code>seq</code>
      */
     private Sequent seq;
+
+    /** Used for delta updates. If this is nonnull, originalSequent == seq and resultingSequent == goal.sequent. */
+    private SequentChangeInfo sequentChangeInfo = null;
 
     private final Map<CacheKey, TermTacletAppIndex> cache;
 
@@ -98,13 +101,17 @@ public class TacletAppIndex {
      * returns a new TacletAppIndex with a given TacletIndex
      */
     TacletAppIndex copyWith(TacletIndex p_tacletIndex, Goal goal) {
-        return new TacletAppIndex(p_tacletIndex, antecIndex, succIndex, goal, getSequent(),
+        var res = new TacletAppIndex(p_tacletIndex, antecIndex, succIndex, goal, seq,
             ruleFilter, indexCaches, cache);
+        if (sequentChangeInfo != null) {
+            res.sequentChanged(sequentChangeInfo);
+        }
+        return res;
     }
 
     /**
      * Delete all cached information about taclet apps. This also makes the index cache of this
-     * index independent from the caches of other indexes (expensive)
+     * index independent of the caches of other indexes (expensive)
      */
     public void clearAndDetachCache() {
         clearIndexes();
@@ -112,7 +119,10 @@ public class TacletAppIndex {
     }
 
     public void clearIndexes() {
-        seq = null; // This leads to a delayed rebuild
+        // This leads to a delayed rebuild
+        seq = null;
+        // This is needed since delta updates must be disabled as well (e.g. new taclet was added)
+        sequentChangeInfo = null;
         antecIndex = null;
         succIndex = null;
     }
@@ -152,20 +162,23 @@ public class TacletAppIndex {
     }
 
     private void ensureIndicesExist() {
-        if (isOutdated()) {
-            // Indices are not up-to-date
+        if (!isOutdated()) {
+            return;
+        }
+        if (sequentChangeInfo != null && sequentChangeInfo.sequent() == goal.sequent()) {
+            deltaUpdateIndices(sequentChangeInfo);
+        } else {
             createAllFromGoal();
         }
+        sequentChangeInfo = null;
     }
 
     /**
-     * @return true iff this index is currently outdated with respect to the sequent of the
-     *         associated goal; this does not detect other modifications
-     *         like an altered user
-     *         constraint
+     * @return true iff this index is currently outdated; this does not detect other modifications
+     *         like an altered user constraint
      */
     private boolean isOutdated() {
-        return getGoal() == null || getSequent() != getNode().sequent();
+        return goal == null || seq != goal.node().sequent();
     }
 
     private SemisequentTacletAppIndex getIndex(PosInOccurrence pos) {
@@ -295,17 +308,27 @@ public class TacletAppIndex {
      * @param sci SequentChangeInfo describing the change of the sequent
      */
     public void sequentChanged(SequentChangeInfo sci) {
-        if (sci.getOriginalSequent() != getSequent()) {
-            // we are not up-to-date and have to rebuild everything (lazy)
-            clearIndexes();
+        if (!sci.hasChanged()) {
+            return;
+        }
+        assert sci.getOriginalSequent() != sci.sequent();
+        if (sequentChangeInfo == null) {
+            if (seq != sci.getOriginalSequent()) {
+                // we are not up-to-date and have to rebuild everything
+                clearIndexes();
+            } else {
+                // Nothing stored, store change
+                sequentChangeInfo = sci.copy();
+            }
         } else {
-            var time = System.nanoTime();
-            updateIndices(sci);
-            PERF_UPDATE.getAndAdd(System.nanoTime() - time);
+            assert sequentChangeInfo.sequent() == sci.getOriginalSequent();
+            // Combine the changes
+            sequentChangeInfo.combine(sci);
         }
     }
 
-    private void updateIndices(SequentChangeInfo sci) {
+    private void deltaUpdateIndices(SequentChangeInfo sci) {
+        var time = System.nanoTime();
         seq = sci.sequent();
 
         antecIndex =
@@ -313,6 +336,7 @@ public class TacletAppIndex {
 
         succIndex =
             succIndex.sequentChanged(sci, getServices(), tacletIndex, newRuleListener);
+        PERF_UPDATE.getAndAdd(System.nanoTime() - time);
     }
 
     private void updateIndices(final SetRuleFilter newTaclets) {
@@ -462,6 +486,7 @@ public class TacletAppIndex {
      * taclet app.
      */
     public void reportRuleApps(NewRuleListener l, Services services) {
+        ensureIndicesExist();
         if (antecIndex != null) {
             antecIndex.reportRuleApps(l);
         }
