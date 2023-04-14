@@ -135,10 +135,6 @@ public class BuiltInRuleAppIndex {
      * @param sci SequentChangeInfo describing the change of the sequent
      */
     public void sequentChanged(SequentChangeInfo sci) {
-        if (!sci.hasChanged()) {
-            return;
-        }
-        assert sci.getOriginalSequent() != sci.sequent();
         if (sequentChangeInfo == null) {
             // Nothing stored, store change
             sequentChangeInfo = sci.copy();

@@ -421,6 +421,9 @@ public class Semisequent implements Iterable<SequentFormula> {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
         if (!(o instanceof Semisequent)) {
             return false;
         }
