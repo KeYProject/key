@@ -109,8 +109,8 @@ public class SequentChangeInfo {
      * @return true iff the sequent has been changed by the operation
      */
     public boolean hasChanged() {
-        return (antecedent == null || antecedent.hasChanged())
-                || (succedent == null || succedent.hasChanged());
+        return (antecedent != null && antecedent.hasChanged())
+                || (succedent != null && succedent.hasChanged());
     }
 
     /**
