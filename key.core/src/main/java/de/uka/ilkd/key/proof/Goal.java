@@ -93,45 +93,36 @@ public final class Goal {
      */
     private NamespaceSet localNamespaces;
 
-    /*
-     * creates a new goal referencing the given node.
+    /**
+     * copy constructor
      */
     private Goal(Node node, RuleAppIndex ruleAppIndex, ImmutableList<RuleApp> appliedRuleApps,
             FormulaTagManager tagManager, AutomatedRuleApplicationManager ruleAppManager,
             Properties strategyInfos, NamespaceSet localNamespace) {
         this.node = node;
-        this.ruleAppIndex = ruleAppIndex;
+        this.ruleAppIndex = ruleAppIndex.copy(this);
         this.appliedRuleApps = appliedRuleApps;
-        this.tagManager = tagManager;
+        this.tagManager = tagManager == null ? new FormulaTagManager(this) : tagManager;
         this.goalStrategy = null;
-        this.ruleAppIndex.setup(this);
         this.strategyInfos = strategyInfos;
         setRuleAppManager(ruleAppManager);
-        this.localNamespaces = localNamespace;
-    }
-
-    private Goal(Node node, RuleAppIndex ruleAppIndex, ImmutableList<RuleApp> appliedRuleApps,
-            AutomatedRuleApplicationManager ruleAppManager, Properties strategyInfos,
-            NamespaceSet localNamespace) {
-        this.node = node;
-        this.ruleAppIndex = ruleAppIndex;
-        this.appliedRuleApps = appliedRuleApps;
-        this.goalStrategy = null;
-        this.ruleAppIndex.setup(this);
-        this.strategyInfos = strategyInfos;
-        setRuleAppManager(ruleAppManager);
-        this.tagManager = new FormulaTagManager(this);
         this.localNamespaces = localNamespace;
     }
 
     /**
      * creates a new goal referencing the given node
      */
-    public Goal(Node node, RuleAppIndex ruleAppIndex) {
-        this(node, ruleAppIndex, ImmutableSLList.nil(), null,
-            new QueueRuleApplicationManager(), new MapProperties(),
-            node.proof().getServices().getNamespaces().copyWithParent().copyWithParent());
-        tagManager = new FormulaTagManager(this);
+    public Goal(Node node, TacletIndex tacletIndex, BuiltInRuleAppIndex builtInRuleAppIndex,
+            Services services) {
+        this.node = node;
+        this.ruleAppIndex = new RuleAppIndex(tacletIndex, builtInRuleAppIndex, this, services);
+        this.appliedRuleApps = ImmutableSLList.nil();
+        this.goalStrategy = null;
+        this.strategyInfos = new MapProperties();
+        this.tagManager = new FormulaTagManager(this);
+        setRuleAppManager(new QueueRuleApplicationManager());
+        this.localNamespaces =
+            node.proof().getServices().getNamespaces().copyWithParent().copyWithParent();
     }
 
     /**
@@ -264,7 +255,6 @@ public final class Goal {
         } else {
             node = p_node;
         }
-        ruleAppIndex.setup(this);
     }
 
     /**
@@ -463,14 +453,6 @@ public final class Goal {
     /**
      * Rebuild all rule caches
      */
-    public void updateRuleAppIndex() {
-        getRuleAppManager().clearCache();
-        ruleAppIndex.clearIndexes();
-    }
-
-    /**
-     * Rebuild all rule caches
-     */
     public void clearAndDetachRuleAppIndex() {
         getRuleAppManager().clearCache();
         ruleAppIndex.clearAndDetachCache();
@@ -504,11 +486,11 @@ public final class Goal {
     public Goal clone(Node node) {
         Goal clone;
         if (node.sequent() != this.node.sequent()) {
-            clone = new Goal(node, ruleAppIndex.copy(), appliedRuleApps, ruleAppManager.copy(),
+            clone = new Goal(node, ruleAppIndex, appliedRuleApps, null, ruleAppManager.copy(),
                 strategyInfos.clone(), localNamespaces);
         } else {
             clone =
-                new Goal(node, ruleAppIndex.copy(), appliedRuleApps, getFormulaTagManager().copy(),
+                new Goal(node, ruleAppIndex, appliedRuleApps, getFormulaTagManager().copy(),
                     ruleAppManager.copy(), strategyInfos.clone(), localNamespaces);
         }
         clone.listeners = (List<GoalListener>) ((ArrayList<GoalListener>) listeners).clone();

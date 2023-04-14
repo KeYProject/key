@@ -3,6 +3,7 @@ package de.uka.ilkd.key.proof;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -39,7 +40,7 @@ public class TacletAppIndex {
 
     private TermTacletAppIndexCacheSet indexCaches;
 
-    private Goal goal;
+    private final Goal goal;
 
     /**
      * Object to which the appearance of new taclet apps is reported
@@ -62,14 +63,15 @@ public class TacletAppIndex {
 
     private final Map<CacheKey, TermTacletAppIndex> cache;
 
-    public TacletAppIndex(TacletIndex tacletIndex, Services services) {
-        this(tacletIndex, null, null, null, null, TacletFilter.TRUE,
+    public TacletAppIndex(TacletIndex tacletIndex, Goal goal, Services services) {
+        this(tacletIndex, null, null, goal, null, TacletFilter.TRUE,
             new TermTacletAppIndexCacheSet(services.getCaches().getTermTacletAppIndexCache()),
             services.getCaches().getTermTacletAppIndexCache());
     }
 
     private TacletAppIndex(TacletIndex tacletIndex, SemisequentTacletAppIndex antecIndex,
-            SemisequentTacletAppIndex succIndex, Goal goal, Sequent seq, RuleFilter ruleFilter,
+            SemisequentTacletAppIndex succIndex, @Nonnull Goal goal, Sequent seq,
+            RuleFilter ruleFilter,
             TermTacletAppIndexCacheSet indexCaches, Map<CacheKey, TermTacletAppIndex> cache) {
         this.tacletIndex = tacletIndex;
         this.antecIndex = antecIndex;
@@ -95,18 +97,9 @@ public class TacletAppIndex {
     /**
      * returns a new TacletAppIndex with a given TacletIndex
      */
-    TacletAppIndex copyWithTacletIndex(TacletIndex p_tacletIndex) {
-        return new TacletAppIndex(p_tacletIndex, antecIndex, succIndex, getGoal(), getSequent(),
+    TacletAppIndex copyWith(TacletIndex p_tacletIndex, Goal goal) {
+        return new TacletAppIndex(p_tacletIndex, antecIndex, succIndex, goal, getSequent(),
             ruleFilter, indexCaches, cache);
-    }
-
-    /**
-     * Set the goal association of this index to the given object <code>p_goal</code>. If the
-     * sequent of the new goal differs from the former one (attribute <code>seq</code>), the index
-     * will be rebuilt as soon as data is requested from it.
-     */
-    public void setup(Goal p_goal) {
-        goal = p_goal;
     }
 
     /**
@@ -159,10 +152,6 @@ public class TacletAppIndex {
     }
 
     private void ensureIndicesExist() {
-        if (getGoal() == null) {
-            Debug.fail("TacletAppIndex does not know to which goal it refers");
-        }
-
         if (isOutdated()) {
             // Indices are not up-to-date
             createAllFromGoal();
@@ -171,7 +160,8 @@ public class TacletAppIndex {
 
     /**
      * @return true iff this index is currently outdated with respect to the sequent of the
-     *         associated goal; this does not detect other modifications like an altered user
+     *         associated goal; this does not detect other modifications
+     *         like an altered user
      *         constraint
      */
     private boolean isOutdated() {

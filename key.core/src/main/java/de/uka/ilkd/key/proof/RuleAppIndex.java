@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableSLList;
  */
 public final class RuleAppIndex {
 
-    private Goal goal;
+    private final Goal goal;
 
     private final TacletIndex tacletIndex;
 
@@ -58,17 +58,13 @@ public final class RuleAppIndex {
         }
     };
 
-
-    public RuleAppIndex(TacletAppIndex p_tacletAppIndex, BuiltInRuleAppIndex p_builtInRuleAppIndex,
-            Services services) {
-        this(p_tacletAppIndex.tacletIndex(), p_builtInRuleAppIndex, services);
-    }
-
     public RuleAppIndex(TacletIndex p_tacletIndex, BuiltInRuleAppIndex p_builtInRuleAppIndex,
+            Goal goal,
             Services services) {
         tacletIndex = p_tacletIndex;
-        automatedTacletAppIndex = new TacletAppIndex(tacletIndex, services);
-        interactiveTacletAppIndex = new TacletAppIndex(tacletIndex, services);
+        automatedTacletAppIndex = new TacletAppIndex(tacletIndex, goal, services);
+        interactiveTacletAppIndex = new TacletAppIndex(tacletIndex, goal, services);
+        this.goal = goal;
         builtInRuleAppIndex = p_builtInRuleAppIndex;
         // default to false to keep compatibility with old code
         autoMode = false;
@@ -81,12 +77,13 @@ public final class RuleAppIndex {
 
     private RuleAppIndex(TacletIndex tacletIndex, TacletAppIndex interactiveTacletAppIndex,
             TacletAppIndex automatedTacletAppIndex, BuiltInRuleAppIndex builtInRuleAppIndex,
-            boolean autoMode) {
+            Goal goal, boolean autoMode) {
         this.tacletIndex = tacletIndex;
         this.interactiveTacletAppIndex = interactiveTacletAppIndex;
         this.automatedTacletAppIndex = automatedTacletAppIndex;
         this.builtInRuleAppIndex = builtInRuleAppIndex;
         this.autoMode = autoMode;
+        this.goal = goal;
 
         setNewRuleListeners();
     }
@@ -95,12 +92,6 @@ public final class RuleAppIndex {
         interactiveTacletAppIndex.setNewRuleListener(newRuleListener);
         automatedTacletAppIndex.setNewRuleListener(newRuleListener);
         builtInRuleAppIndex.setNewRuleListener(newRuleListener);
-    }
-
-    public void setup(Goal p_goal) {
-        goal = p_goal;
-        interactiveTacletAppIndex.setup(p_goal);
-        automatedTacletAppIndex.setup(p_goal);
     }
 
     /**
@@ -394,14 +385,14 @@ public final class RuleAppIndex {
      * returns a new RuleAppIndex with a copied TacletIndex. Attention: the listener lists are not
      * copied
      */
-    public RuleAppIndex copy() {
+    public RuleAppIndex copy(Goal goal) {
         TacletIndex copiedTacletIndex = tacletIndex.copy();
         TacletAppIndex copiedInteractiveTacletAppIndex =
-            interactiveTacletAppIndex.copyWithTacletIndex(copiedTacletIndex);
+            interactiveTacletAppIndex.copyWith(copiedTacletIndex, goal);
         TacletAppIndex copiedAutomatedTacletAppIndex =
-            automatedTacletAppIndex.copyWithTacletIndex(copiedTacletIndex);
+            automatedTacletAppIndex.copyWith(copiedTacletIndex, goal);
         return new RuleAppIndex(copiedTacletIndex, copiedInteractiveTacletAppIndex,
-            copiedAutomatedTacletAppIndex, builtInRuleAppIndex().copy(), autoMode);
+            copiedAutomatedTacletAppIndex, builtInRuleAppIndex().copy(), goal, autoMode);
     }
 
 

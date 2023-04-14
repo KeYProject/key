@@ -138,10 +138,8 @@ public class TestTermLabelManager {
         Proof proof = new Proof("TestTermLabelManager", initConfig.deepCopy());
         Node node = new Node(proof, sequent);
         return new Goal(node,
-            new RuleAppIndex(
-                new TacletAppIndex(TacletIndexKit.getKit().createTacletIndex(),
-                    initConfig.getServices()),
-                new BuiltInRuleAppIndex(new BuiltInRuleIndex()), initConfig.getServices()));
+            TacletIndexKit.getKit().createTacletIndex(),
+            new BuiltInRuleAppIndex(new BuiltInRuleIndex()), initConfig.getServices());
     }
 
     protected void compareSequents(Sequent expected, Sequent current, boolean changed,
