@@ -180,10 +180,8 @@ public class TestTriggersSet {
 
         proof = new Proof("TestTriggersSet", TacletForTests.initConfig());
         g = new Goal(new Node(proof, Sequent.EMPTY_SEQUENT),
-            new RuleAppIndex(
-                new TacletAppIndex(TacletIndexKit.getKit().createTacletIndex(),
-                    proof.getServices()),
-                new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices()));
+            TacletIndexKit.getKit().createTacletIndex(),
+            new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices());
         proof.setRoot(g.node());
         proof.add(g);
 

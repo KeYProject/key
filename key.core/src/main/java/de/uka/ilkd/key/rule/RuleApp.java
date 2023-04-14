@@ -3,6 +3,8 @@
  */
 package de.uka.ilkd.key.rule;
 
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
