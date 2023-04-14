@@ -423,9 +423,9 @@ public class TermTranslator {
 
                     if (!r.get().isEmpty()) {
                         if (heapLine > 0 ) {
-                            return String.format("(%s) < \\old<%d>(%s)", r.get(), heapLine, r.get());
+                            return String.format("0 <= (%s) < \\old<%d>(%s)", r.get(), heapLine, r.get());
                         } else {
-                            return String.format("(%s) < \\old(%s)", r.get(), r.get());
+                            return String.format("0 <= (%s) < \\old(%s)", r.get(), r.get());
                         }
                     }
                 }
