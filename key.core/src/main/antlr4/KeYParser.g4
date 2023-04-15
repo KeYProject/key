@@ -304,7 +304,7 @@ id_declaration
 
 funcpred_name
 :
-  (sortId DOUBLECOLON)? name=simple_ident_dots
+  (sortId DOUBLECOLON)? (name=simple_ident_dots|num=INT_LITERAL)
 ;
 
 
@@ -330,7 +330,7 @@ literals:
 ;
 
 
-term: equivalence_term;
+term: parallel_term; // weigl: should normally be equivalence_term
 //labeled_term: a=parallel_term (LGUILLEMETS labels=label RGUILLEMETS)?;
 parallel_term: a=elementary_update_term (PARALLEL b=elementary_update_term)*;
 elementary_update_term: a=equivalence_term (ASSIGN b=equivalence_term)?;
@@ -361,7 +361,7 @@ atom_prefix:
     update_term
   | substitution_term
   | locset_term
-  //| cast_term
+  | cast_term
   | unary_minus_term
   | bracket_term
 ;
@@ -382,16 +382,9 @@ primitive_term:
   | ifThenElseTerm
   | ifExThenElseTerm
   | abbreviation
-  | prim_conflicting;
-
-prim_conflicting:
-   accessterm  |
-     boolean_literal
-     | char_literal
-     | integer
-     | floatnum
-     | string_literal
-;
+  | accessterm
+  | literals
+  ;
 
 /*
 weigl, 2021-03-12:
@@ -451,15 +444,15 @@ term
 accessterm
 :
   // OLD
-  //(sortId DOUBLECOLON)?
-  //firstName=simple_ident
+  (sortId DOUBLECOLON)?
+  firstName=simple_ident
 
-  //Faster version
+  /*Faster version
   simple_ident_dots
   ( EMPTYBRACKETS*
     DOUBLECOLON
     simple_ident
-  )?
+  )?*/
   call?
   ( attribute )*
 ;
@@ -684,8 +677,7 @@ varexp_argument
 :
     //weigl: Ambguity between term (which can also contain simple_ident_dots and sortId)
     //       suggestion add an explicit keyword to request the sort by name or manually resolve later in builder
-    SORT sortId //also covers possible varId
-  | TYPEOF LPAREN y=varId RPAREN
+    TYPEOF LPAREN y=varId RPAREN
   | CONTAINERTYPE LPAREN y=varId RPAREN
   | DEPENDINGON LPAREN y=varId RPAREN
   | term
