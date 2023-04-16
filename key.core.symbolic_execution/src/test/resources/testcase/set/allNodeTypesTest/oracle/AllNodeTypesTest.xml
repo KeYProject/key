@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call AllNodeTypesTest.main(_obj)&gt;" pathCondition="true" pathConditionChanged="false">
+      <statement name="_obj.value = 1;" pathCondition="true" pathConditionChanged="false">
+         <branchCondition name="not(equals(obj,null))" pathCondition="not(equals(obj,null))" pathConditionChanged="true" branchCondition="not(equals(obj,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <operationContract name="result_0 = doubleValue(1) catch(exc_1)
+pre: 1 &gt;= 0
+post: result_0 = 1 + 1 &amp; (exc_1 = null)&lt;&lt;impl&gt;&gt;
+mod: allLocs
+termination: diamond" pathCondition="not(equals(obj,null))" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_1" contractParameters="Z(1(#))" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+            </operationContract>
+         </branchCondition>
+         <branchCondition name="equals(obj,null)" pathCondition="equals(obj,null)" pathConditionChanged="true" branchCondition="equals(obj,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call AllNodeTypesTest.main(_obj)&gt;&gt;" pathCondition="equals(obj,null)" pathConditionChanged="false" methodReturnCondition="equals(obj,null)">
+               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(obj,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="false">
+               </termination>
+            </exceptionalMethodReturn>
+         </branchCondition>
+      </statement>
+      <methodReturnEntry path="/0/0/1/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/1/0/0"/>
+</start>
