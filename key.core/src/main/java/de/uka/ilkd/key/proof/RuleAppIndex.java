@@ -296,7 +296,7 @@ public final class RuleAppIndex {
             interactiveTacletAppIndex.sequentChanged(sci);
         }
         automatedTacletAppIndex.sequentChanged(sci);
-        builtInRuleAppIndex.sequentChanged(goal, sci, newRuleListener);
+        builtInRuleAppIndex.sequentChanged(sci);
     }
 
     /**
@@ -315,6 +315,7 @@ public final class RuleAppIndex {
         // Currently this only applies to the taclet index
         interactiveTacletAppIndex.clearIndexes();
         automatedTacletAppIndex.clearIndexes();
+        builtInRuleAppIndex.resetSequentChanges();
     }
 
     /**
@@ -325,6 +326,7 @@ public final class RuleAppIndex {
             interactiveTacletAppIndex.fillCache();
         }
         automatedTacletAppIndex.fillCache();
+        builtInRuleAppIndex.flushSequentChanges(goal, newRuleListener);
     }
 
     /**
