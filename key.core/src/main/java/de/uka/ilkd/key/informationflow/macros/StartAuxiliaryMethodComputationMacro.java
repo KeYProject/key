@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.informationflow.macros;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.informationflow.po.InfFlowContractPO;
 import de.uka.ilkd.key.informationflow.po.SymbolicExecutionPO;
@@ -18,6 +16,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.prover.ProverTaskListener;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  *

@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.Color;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -11,8 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
-
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.text.BadLocationException;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -30,12 +28,16 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This class implements all input listener interfaces for SequentView.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class SequentViewInputListener implements MouseMotionListener, MouseListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SequentViewInputListener.class);
 
     /**
      * The color for origin highlights.
@@ -61,13 +63,13 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
      *
      * @see #highlightOriginInSourceView(PosInSequent)
      */
-    private Set<Highlight> originHighlights = new HashSet<>();
+    private final Set<Highlight> originHighlights = new HashSet<>();
 
     /** The sequent view associated with this listener. */
     private final SequentView sequentView;
 
     /** Whether term info should be shown in the status line. */
-    private boolean showTermInfo = false;
+    private final boolean showTermInfo = false;
 
     /** @see #isRefresh() */
     private static boolean refresh = true;
@@ -197,7 +199,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
                 }
             }
         } catch (BadLocationException | IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to read or set location", e);
         }
     }
 

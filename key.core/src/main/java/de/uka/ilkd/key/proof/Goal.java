@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.proof;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
@@ -19,13 +24,9 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.properties.MapProperties;
 import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * A proof is represented as a tree of nodes containing sequents. The initial proof consists of just
@@ -50,11 +51,11 @@ public final class Goal {
     /**
      * all possible rule applications at this node are managed with this index
      */
-    private RuleAppIndex ruleAppIndex;
+    private final RuleAppIndex ruleAppIndex;
     /**
      * list of all applied rule applications at this branch
      */
-    private ImmutableList<RuleApp> appliedRuleApps = ImmutableSLList.<RuleApp>nil();
+    private ImmutableList<RuleApp> appliedRuleApps = ImmutableSLList.nil();
     /**
      * this object manages the tags for all formulas of the sequent
      */
@@ -70,7 +71,7 @@ public final class Goal {
     /**
      * goal listeners
      */
-    private List<GoalListener> listeners = new ArrayList<GoalListener>(10);
+    private List<GoalListener> listeners = new ArrayList<>(10);
     /**
      * a goal has been excluded from automatic rule application iff automatic == false
      */
@@ -121,7 +122,7 @@ public final class Goal {
      * @param namespaceSet
      */
     public Goal(Node node, RuleAppIndex ruleAppIndex) {
-        this(node, ruleAppIndex, ImmutableSLList.<RuleApp>nil(), null,
+        this(node, ruleAppIndex, ImmutableSLList.nil(), null,
             new QueueRuleApplicationManager(), new MapProperties(),
             node.proof().getServices().getNamespaces().copyWithParent().copyWithParent());
         tagManager = new FormulaTagManager(this);
@@ -148,8 +149,9 @@ public final class Goal {
      * @return the strategy that determines automated rule applications for this goal
      */
     public Strategy getGoalStrategy() {
-        if (goalStrategy == null)
+        if (goalStrategy == null) {
             goalStrategy = proof().getActiveStrategy();
+        }
         return goalStrategy;
     }
 
@@ -218,7 +220,7 @@ public final class Goal {
      * creation the necessary information is passed to the listener as parameters and not through an
      * event object.
      */
-    protected void fireSequentChanged(SequentChangeInfo sci) {
+    private void fireSequentChanged(SequentChangeInfo sci) {
         getFormulaTagManager().sequentChanged(this, sci);
         ruleAppIndex().sequentChanged(this, sci);
         for (GoalListener listener : listeners) {
@@ -226,13 +228,13 @@ public final class Goal {
         }
     }
 
-    protected void fireGoalReplaced(Goal goal, Node parent, ImmutableList<Goal> newGoals) {
+    private void fireGoalReplaced(Goal goal, Node parent, ImmutableList<Goal> newGoals) {
         for (GoalListener listener : listeners) {
             listener.goalReplaced(goal, parent, newGoals);
         }
     }
 
-    protected void fireAautomaticStateChanged(boolean oldAutomatic, boolean newAutomatic) {
+    private void fireAautomaticStateChanged(boolean oldAutomatic, boolean newAutomatic) {
         for (GoalListener listener : listeners) {
             listener.automaticStateChanged(this, oldAutomatic, newAutomatic);
         }
@@ -537,7 +539,7 @@ public final class Goal {
      * @return the list of new created goals.
      */
     public ImmutableList<Goal> split(int n) {
-        ImmutableList<Goal> goalList = ImmutableSLList.<Goal>nil();
+        ImmutableList<Goal> goalList = ImmutableSLList.nil();
 
         final Node parent = node; // has to be stored because the node
         // of this goal will be replaced

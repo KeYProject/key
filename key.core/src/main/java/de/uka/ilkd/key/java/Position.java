@@ -30,7 +30,7 @@ public class Position implements Comparable<Position> {
     /**
      * Constructs a new invalid source code position object.
      */
-    Position() {
+    private Position() {
         line = column = -1;
     }
 
@@ -40,13 +40,22 @@ public class Position implements Comparable<Position> {
      * @param line the line number.
      * @param column the column number.
      */
-
-    public Position(int line, int column) {
+    private Position(int line, int column) {
         if (line < 1 || column < 1) {
             throw new IllegalArgumentException();
         }
         this.line = line;
         this.column = column;
+    }
+
+    /**
+     * Creates a new Location with 1-based line and 1-based column numbers.
+     *
+     * @param line_1 1-based line of the Location
+     * @param column_0 1-based column of the Location
+     */
+    public static Position newOneBased(int line_1, int column_0) {
+        return new Position(line_1, column_0);
     }
 
     /**
@@ -56,7 +65,7 @@ public class Position implements Comparable<Position> {
      * @param line_1 1-based line of the Location
      * @param column_0 0-based column of the Location
      */
-    public static Position newOneZeroBased(int line_1, int column_0) {
+    public static Position fromOneZeroBased(int line_1, int column_0) {
         return new Position(line_1, column_0 + 1);
     }
 
@@ -66,7 +75,7 @@ public class Position implements Comparable<Position> {
      * @param token the token
      */
     public static Position fromToken(Token token) {
-        return newOneZeroBased(token.getLine(), token.getCharPositionInLine());
+        return fromOneZeroBased(token.getLine(), token.getCharPositionInLine());
     }
 
     /**
@@ -75,14 +84,24 @@ public class Position implements Comparable<Position> {
      * @param token the token
      */
     public static Position fromToken(de.uka.ilkd.key.parser.proofjava.Token token) {
-        return newOneZeroBased(token.beginLine, token.beginColumn);
+        return new Position(token.beginLine, token.beginColumn);
     }
 
-    public static Position fromPosition(SourceElement.Position pos) {
+    /**
+     * Creates a new location from a SourceElement position.
+     *
+     * @param pos the position
+     */
+    public static Position fromSEPosition(SourceElement.Position pos) {
         if (pos == SourceElement.Position.UNDEFINED) {
             return UNDEFINED;
+        } else if (pos.getColumn() == 0) {
+            // This is a hack, some recoder positions have column 0 (not set)
+            // even though the column is 0-based *and* -1 is the unset value
+            // return new Position(pos.getLine(), 1);
+            throw new IllegalArgumentException("ProofJava produced column 0");
         } else {
-            return new Position(pos.getLine(), pos.getColumn() + 1);
+            return new Position(pos.getLine(), pos.getColumn());
         }
     }
 
@@ -100,7 +119,7 @@ public class Position implements Comparable<Position> {
      *
      * @return the line number of this position.
      */
-    public int getLine() {
+    public int line() {
         return line;
     }
 
@@ -109,7 +128,7 @@ public class Position implements Comparable<Position> {
      *
      * @return the column number of this position.
      */
-    public int getColumn() {
+    public int column() {
         return column;
     }
 

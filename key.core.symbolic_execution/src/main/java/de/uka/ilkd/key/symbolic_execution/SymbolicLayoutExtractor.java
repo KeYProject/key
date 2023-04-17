@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution;
 
+import java.util.*;
+
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -19,13 +21,12 @@ import de.uka.ilkd.key.symbolic_execution.object_model.impl.*;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.ProofStarter;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.CollectionUtil;
-
-import java.util.*;
 
 /**
  * <p>
@@ -212,29 +213,29 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                 // locations will be later computed in the state computation (and finally shown in a
                 // memory layout).
                 Set<ExtractLocationParameter> temporaryCurrentLocations =
-                    new LinkedHashSet<ExtractLocationParameter>();
+                    new LinkedHashSet<>();
                 objectsToIgnore = computeInitialObjectsToIgnore(false, false); // Contains all
                                                                                // objects which
                                                                                // should be ignored,
                                                                                // like exc of the
                                                                                // proof obligation.
-                Set<Term> updateCreatedObjects = new LinkedHashSet<Term>(); // Contains all objects
-                                                                            // which are created
-                                                                            // during symbolic
-                                                                            // execution
-                Set<Term> updateValueObjects = new LinkedHashSet<Term>(); // Contains all objects
-                                                                          // which are the value of
-                                                                          // an update
+                Set<Term> updateCreatedObjects = new LinkedHashSet<>(); // Contains all objects
+                                                                        // which are created
+                                                                        // during symbolic
+                                                                        // execution
+                Set<Term> updateValueObjects = new LinkedHashSet<>(); // Contains all objects
+                                                                      // which are the value of
+                                                                      // an update
                 collectLocationsFromUpdates(node.sequent(), temporaryCurrentLocations,
                     updateCreatedObjects, updateValueObjects, objectsToIgnore);
                 objectsToIgnore.addAll(updateCreatedObjects);
                 initialLocations = extractLocationsFromTerm(pathCondition, objectsToIgnore);
                 initialLocations
                         .addAll(extractLocationsFromSequent(node.sequent(), objectsToIgnore));
-                currentLocations = new LinkedHashSet<ExtractLocationParameter>(initialLocations);
+                currentLocations = new LinkedHashSet<>(initialLocations);
                 currentLocations.addAll(temporaryCurrentLocations);
                 // Compute objects for equivalence check.
-                Set<Term> symbolicObjectsResultingInCurrentState = new LinkedHashSet<Term>();
+                Set<Term> symbolicObjectsResultingInCurrentState = new LinkedHashSet<>();
                 symbolicObjectsResultingInCurrentState
                         .addAll(filterOutObjectsToIgnore(updateValueObjects, objectsToIgnore));
                 symbolicObjectsResultingInCurrentState
@@ -277,11 +278,11 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                         extractAppliedCutsFromGoals(equivalentClassesProofStarter.getProof());
                     // Create memory layout maps which are filled lazily
                     initialLayouts =
-                        new LinkedHashMap<Integer, ISymbolicLayout>(appliedCutsPerLayout.size());
+                        new LinkedHashMap<>(appliedCutsPerLayout.size());
                     currentLayouts =
-                        new LinkedHashMap<Integer, ISymbolicLayout>(appliedCutsPerLayout.size());
+                        new LinkedHashMap<>(appliedCutsPerLayout.size());
                     layoutsEquivalentClasses =
-                        new LinkedHashMap<Integer, ImmutableList<ISymbolicEquivalenceClass>>();
+                        new LinkedHashMap<>();
                 } finally {
                     SymbolicExecutionSideProofUtil.disposeOrStore(
                         "Equivalence class computation on node " + node.serialNr() + ".", info);
@@ -312,13 +313,13 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @return The sorted {@link Term}s.
      */
     protected Set<Term> sortTerms(Set<Term> terms) {
-        List<Term> list = new LinkedList<Term>(terms);
-        Collections.sort(list, (o1, o2) -> {
+        List<Term> list = new LinkedList<>(terms);
+        list.sort((o1, o2) -> {
             String o1s = o1.toString();
             String o2s = o2.toString();
             return o1s.length() - o2s.length();
         });
-        return new LinkedHashSet<Term>(list);
+        return new LinkedHashSet<>(list);
     }
 
     /**
@@ -332,7 +333,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      */
     protected Set<Term> filterOutObjectsToIgnore(Set<Term> objectsToFilter,
             Set<Term> objectsToIgnore) throws ProofInputException {
-        Set<Term> result = new LinkedHashSet<Term>();
+        Set<Term> result = new LinkedHashSet<>();
         for (Term symbolicObject : objectsToFilter) {
             if (!objectsToIgnore.contains(symbolicObject)) {
                 result.add(symbolicObject);
@@ -372,7 +373,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     protected void applyCutRules(ProofStarter starter, Set<Term> symbolicObjects,
             ImmutableList<Term> updates) {
         final TermBuilder tb = getServices().getTermBuilder();
-        List<Term> objectsCopy = new ArrayList<Term>(symbolicObjects);
+        List<Term> objectsCopy = new ArrayList<>(symbolicObjects);
         int maxProofSteps = 8000;
         for (int i = 0; i < objectsCopy.size(); i++) {
             for (int j = i + 1; j < objectsCopy.size(); j++) {
@@ -435,12 +436,12 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      */
     protected List<ImmutableSet<Term>> extractAppliedCutsFromGoals(Proof proof)
             throws ProofInputException {
-        Set<ImmutableSet<Term>> resultSet = new LinkedHashSet<ImmutableSet<Term>>();
+        Set<ImmutableSet<Term>> resultSet = new LinkedHashSet<>();
         Node root = proof.root();
         for (Goal goal : proof.openGoals()) {
             resultSet.add(extractAppliedCutsSet(goal.node(), root));
         }
-        return new ArrayList<ImmutableSet<Term>>(resultSet);
+        return new ArrayList<>(resultSet);
     }
 
     /**
@@ -454,7 +455,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      */
     protected ImmutableSet<Term> extractAppliedCutsSet(Node goalnode, Node root)
             throws ProofInputException {
-        ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
+        ImmutableSet<Term> result = DefaultImmutableSet.nil();
         if (!root.find(goalnode)) {
             throw new ProofInputException(
                 "Node \"" + goalnode + "\" ist not a childs of root node \"" + root + "\".");
@@ -464,7 +465,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             goalnode = goalnode.parent();
             if (goalnode.getAppliedRuleApp() instanceof NoPosTacletApp) {
                 NoPosTacletApp npta = (NoPosTacletApp) goalnode.getAppliedRuleApp();
-                if ("CUT".equals(npta.taclet().name().toString().toUpperCase())) {
+                if ("CUT".equalsIgnoreCase(npta.taclet().name().toString())) {
                     Term inst = (Term) npta.instantiations()
                             .lookupEntryForSV(new Name("cutFormula")).value().getInstantiation();
                     inst = TermBuilder.goBelowUpdates(inst);
@@ -578,7 +579,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             assert layoutIndex >= 0;
             assert layoutIndex < appliedCutsPerLayout.size();
             assert isAnalysed();
-            ISymbolicLayout result = confiurationsMap.get(Integer.valueOf(layoutIndex));
+            ISymbolicLayout result = confiurationsMap.get(layoutIndex);
             if (result == null) {
                 // Get memory layout
                 ImmutableSet<Term> layout = appliedCutsPerLayout.get(layoutIndex);
@@ -586,7 +587,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                     getEquivalenceClasses(layoutIndex);
                 result = lazyComputeLayout(layout, locations, equivalentClasses, stateName,
                     currentLayout);
-                confiurationsMap.put(Integer.valueOf(layoutIndex), result);
+                confiurationsMap.put(layoutIndex, result);
             }
             return result;
         }
@@ -616,7 +617,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             boolean currentLayout) throws ProofInputException {
         if (!locations.isEmpty()) {
             final TermBuilder tb = getServices().getTermBuilder();
-            List<Term> updateConditions = new ArrayList<Term>(layout.size());
+            List<Term> updateConditions = new ArrayList<>(layout.size());
             for (Term term : layout) {
                 updateConditions.add(tb.applyParallel(updates, term));
             }
@@ -630,7 +631,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             return createLayoutFromExecutionVariableValuePairs(equivalentClasses, pairs, stateName);
         } else {
             return createLayoutFromExecutionVariableValuePairs(equivalentClasses,
-                new LinkedHashSet<ExecutionVariableValuePair>(), stateName);
+                new LinkedHashSet<>(), stateName);
         }
     }
 
@@ -647,7 +648,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             Set<ExtractLocationParameter> locations,
             ImmutableList<ISymbolicEquivalenceClass> equivalentClasses) {
         Set<ExtractLocationParameter> newLocations =
-            new LinkedHashSet<ExtractLocationParameter>(locations.size());
+            new LinkedHashSet<>(locations.size());
         for (ExtractLocationParameter location : locations) {
             Term parent = location.getParentTerm();
             ISymbolicEquivalenceClass eq = findEquivalentClass(equivalentClasses, parent);
@@ -670,7 +671,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      */
     protected Set<Term> collectObjectsFromSequent(Sequent sequent, Set<Term> objectsToIgnore)
             throws ProofInputException {
-        Set<Term> result = new LinkedHashSet<Term>();
+        Set<Term> result = new LinkedHashSet<>();
         for (SequentFormula sf : sequent) {
             if (SymbolicExecutionUtil.checkSkolemEquality(sf) == 0) {
                 result.addAll(collectSymbolicObjectsFromTerm(sf.formula(), objectsToIgnore));
@@ -689,7 +690,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      */
     protected Set<Term> collectSymbolicObjectsFromTerm(Term term, final Set<Term> objectsToIgnore)
             throws ProofInputException {
-        final Set<Term> result = new LinkedHashSet<Term>();
+        final Set<Term> result = new LinkedHashSet<>();
         term.execPreOrder(new DefaultVisitor() {
             @Override
             public void visit(Term visited) {
@@ -718,11 +719,11 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     public ImmutableList<ISymbolicEquivalenceClass> getEquivalenceClasses(int layoutIndex) {
         synchronized (this) {
             ImmutableList<ISymbolicEquivalenceClass> equivalentClasses =
-                layoutsEquivalentClasses.get(Integer.valueOf(layoutIndex));
+                layoutsEquivalentClasses.get(layoutIndex);
             if (equivalentClasses == null) {
                 ImmutableSet<Term> appliedCuts = appliedCutsPerLayout.get(layoutIndex);
                 equivalentClasses = lazyComputeEquivalenceClasses(appliedCuts);
-                layoutsEquivalentClasses.put(Integer.valueOf(layoutIndex), equivalentClasses);
+                layoutsEquivalentClasses.put(layoutIndex, equivalentClasses);
             }
             return equivalentClasses;
         }
@@ -807,7 +808,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
         SymbolicState state = new SymbolicState(stateName, settings);
         result.setState(state);
         // Create objects
-        Map<Term, SymbolicObject> objects = new LinkedHashMap<Term, SymbolicObject>();
+        Map<Term, SymbolicObject> objects = new LinkedHashMap<>();
         for (ExecutionVariableValuePair pair : pairs) {
             // Create object for parent of current value
             createObjectForTerm(objects, equivalentClasses, result, pair.getParent());

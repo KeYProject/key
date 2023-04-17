@@ -2,8 +2,6 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -14,6 +12,8 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * A contract for checking the well-definedness of a jml block contract.
@@ -46,7 +46,7 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
      */
     public BlockWellDefinedness(BlockContract block, BlockContract.Variables variables,
             ImmutableSet<ProgramVariable> params, Services services) {
-        super(block.getName(), block.getBlock().getStartPosition().getLine(), block.getMethod(),
+        super(block.getName(), block.getBlock().getStartPosition().line(), block.getMethod(),
             variables.toOrigVars().add(convertParams(params)), Type.BLOCK_CONTRACT, services);
         assert block != null;
         final LocationVariable h = getHeap();
@@ -117,8 +117,8 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
         assert wdc instanceof BlockWellDefinedness;
         final BlockWellDefinedness bwd = (BlockWellDefinedness) wdc;
         assert this.getStatement().getName().equals(bwd.getStatement().getName());
-        assert this.getStatement().getBlock().getStartPosition().getLine() == bwd.getStatement()
-                .getBlock().getStartPosition().getLine();
+        assert this.getStatement().getBlock().getStartPosition().line() == bwd.getStatement()
+                .getBlock().getStartPosition().line();
         assert this.getStatement().getMethod().equals(bwd.getStatement().getMethod());
         assert this.getStatement().getKJT().equals(bwd.getStatement().getKJT());
 

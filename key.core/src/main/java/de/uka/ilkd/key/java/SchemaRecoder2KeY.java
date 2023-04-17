@@ -13,9 +13,8 @@ import de.uka.ilkd.key.java.recoderext.SchemaJavaProgramFactory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.java.declaration.TypeDeclaration;
@@ -29,11 +28,11 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
     protected Namespace<SchemaVariable> svns;
 
     /** caches access to methods for reflection */
-    private final static HashMap<?, ?> schemaCt2meth = new LinkedHashMap<Object, Object>(400);
+    private final static HashMap<?, ?> schemaCt2meth = new LinkedHashMap<>(400);
 
     /** caches constructor access for reflection */
     private final static HashMap<?, ?> recClass2schemakeyClassCons =
-        new LinkedHashMap<Object, Object>(400);
+        new LinkedHashMap<>(400);
 
     // could this be the servConf of the super class?
     private static final SchemaCrossReferenceServiceConfiguration schemaServConf =
@@ -92,7 +91,7 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
         ASTList<TypeDeclaration> typeDecls = cUnit.getDeclarations();
 
         if (typeDecls == null) {
-            typeDecls = new ASTArrayList<TypeDeclaration>(0);
+            typeDecls = new ASTArrayList<>(0);
         } else {
             typeDecls = typeDecls.deepClone();
         }

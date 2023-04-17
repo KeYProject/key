@@ -14,7 +14,7 @@ public interface IDefaultStrategyPropertiesFactory {
      * The default implementation.
      */
     IDefaultStrategyPropertiesFactory DEFAULT_FACTORY =
-        () -> new StrategyProperties();
+        StrategyProperties::new;
 
     /**
      * Creates new default {@link StrategyProperties}.

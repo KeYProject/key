@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.macros.scripts.meta;
 
-import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 
 /**
  * @author Alexander Weigl
@@ -28,7 +28,7 @@ public class ValueInjector {
      * T --> StringConverter<T>
      * </pre>
      */
-    private Map<Class, StringConverter> converters = new HashMap<>();
+    private final Map<Class, StringConverter> converters = new HashMap<>();
 
     /**
      * Injects the given {@code arguments} in the {@code obj}. For more details see
@@ -44,7 +44,7 @@ public class ValueInjector {
      * @throws NoSpecifiedConverterException unknown type for the current converter map
      * @throws ConversionException an converter could not translate the given value in arguments
      */
-    public static <T> T injection(ProofScriptCommand<?> command, T obj,
+    public static <T> T injection(ProofScriptCommand<T> command, T obj,
             Map<String, String> arguments) throws ArgumentRequiredException,
             InjectionReflectionException, NoSpecifiedConverterException, ConversionException {
         return getInstance().inject(command, obj, arguments);
@@ -102,16 +102,16 @@ public class ValueInjector {
      * @see Option
      * @see Flag
      */
-    public <T> T inject(ProofScriptCommand<?> command, T obj, Map<String, String> arguments)
+    public <T> T inject(ProofScriptCommand<T> command, T obj, Map<String, String> arguments)
             throws ConversionException, InjectionReflectionException, NoSpecifiedConverterException,
             ArgumentRequiredException {
-        List<ProofScriptArgument> meta =
+        List<ProofScriptArgument<T>> meta =
             ArgumentsLifter.inferScriptArguments(obj.getClass(), command);
-        List<ProofScriptArgument> varArgs = new ArrayList<>(meta.size());
+        List<ProofScriptArgument<T>> varArgs = new ArrayList<>(meta.size());
 
         List<String> usedKeys = new ArrayList<>();
 
-        for (ProofScriptArgument<?> arg : meta) {
+        for (ProofScriptArgument<T> arg : meta) {
             if (arg.hasVariableArguments()) {
                 varArgs.add(arg);
             } else {
@@ -120,7 +120,7 @@ public class ValueInjector {
             }
         }
 
-        for (ProofScriptArgument<?> vararg : varArgs) {
+        for (ProofScriptArgument<T> vararg : varArgs) {
             final Map<String, Object> map = getStringMap(obj, vararg);
             final int prefixLength = vararg.getName().length();
             for (Map.Entry<String, String> e : arguments.entrySet()) {

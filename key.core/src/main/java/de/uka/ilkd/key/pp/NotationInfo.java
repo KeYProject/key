@@ -5,11 +5,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.ldt.FloatLDT;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -148,7 +147,7 @@ public final class NotationInfo {
      */
     private HashMap<Object, Notation> createDefaultNotation() {
 
-        HashMap<Object, Notation> tbl = new LinkedHashMap<Object, Notation>(50);
+        HashMap<Object, Notation> tbl = new LinkedHashMap<>(50);
 
         tbl.put(Junctor.TRUE, new Notation.Constant("true", PRIORITY_ATOM));
         tbl.put(Junctor.FALSE, new Notation.Constant("false", PRIORITY_ATOM));

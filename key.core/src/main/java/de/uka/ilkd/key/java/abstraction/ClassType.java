@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.java.abstraction;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Services;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * A program model element representing class types.

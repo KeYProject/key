@@ -2,9 +2,6 @@ package de.uka.ilkd.key.rule.merge;
 
 import java.util.ArrayList;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
@@ -23,6 +20,9 @@ import de.uka.ilkd.key.speclang.MergeContract;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Rule application class for merge rule applications. Is complete iff the mergePartners field as

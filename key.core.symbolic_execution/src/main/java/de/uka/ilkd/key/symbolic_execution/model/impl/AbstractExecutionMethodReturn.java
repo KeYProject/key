@@ -130,7 +130,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
         if (initConfig != null) { // Otherwise Proof is disposed.
             final Services services = initConfig.getServices();
             // Collect branch conditions
-            List<Term> bcs = new LinkedList<Term>();
+            List<Term> bcs = new LinkedList<>();
             AbstractExecutionNode<?> parent = getParent();
             while (parent != null && parent != methodCall) {
                 if (parent instanceof IExecutionBranchCondition) {

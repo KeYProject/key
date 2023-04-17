@@ -2,10 +2,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableMapEntry;
-
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -21,6 +17,10 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableMapEntry;
 
 
 
@@ -58,11 +58,13 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
 
         // compare the position of application
         if (newPio != null) {
-            if (!(cmp instanceof PosTacletApp))
+            if (!(cmp instanceof PosTacletApp)) {
                 return false;
+            }
             final PosInOccurrence oldPio = cmp.posInOccurrence();
-            if (!comparePio(newApp, cmp, newPio, oldPio))
+            if (!comparePio(newApp, cmp, newPio, oldPio)) {
                 return false;
+            }
         }
 
 
@@ -82,8 +84,9 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
 
             while (it0.hasNext()) {
                 // this test should be improved
-                if (it0.next().getConstrainedFormula() != it1.next().getConstrainedFormula())
+                if (it0.next().getConstrainedFormula() != it1.next().getConstrainedFormula()) {
                     return false;
+                }
             }
         }
 
@@ -91,8 +94,9 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
     }
 
     private boolean equalInterestingInsts(SVInstantiations inst0, SVInstantiations inst1) {
-        if (!inst0.getUpdateContext().equals(inst1.getUpdateContext()))
+        if (!inst0.getUpdateContext().equals(inst1.getUpdateContext())) {
             return false;
+        }
 
         final ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting0 =
             inst0.interesting();
@@ -103,20 +107,18 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
 
     private boolean subset(ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts0,
             ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts1) {
-        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
-            insts0.iterator();
 
-        while (it.hasNext()) {
-            final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry0 = it.next();
-
-            if (entry0.key() instanceof SkolemTermSV || entry0.key() instanceof VariableSV)
+        for (ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry0 : insts0) {
+            if (entry0.key() instanceof SkolemTermSV || entry0.key() instanceof VariableSV) {
                 continue;
+            }
 
             final InstantiationEntry<?> instEntry1 = insts1.get(entry0.key());
 
             if (instEntry1 == null
-                    || !entry0.value().getInstantiation().equals(instEntry1.getInstantiation()))
+                    || !entry0.value().getInstantiation().equals(instEntry1.getInstantiation())) {
                 return false;
+            }
         }
 
         return true;
@@ -144,16 +146,19 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
 
                 final Sequent pseq = par.sequent();
                 if (antec) {
-                    if (!semiSequentContains(pseq.antecedent(), focusFor))
+                    if (!semiSequentContains(pseq.antecedent(), focusFor)) {
                         return true;
+                    }
                 } else {
-                    if (!semiSequentContains(pseq.succedent(), focusFor))
+                    if (!semiSequentContains(pseq.succedent(), focusFor)) {
                         return true;
+                    }
                 }
             }
 
-            if (sameApplication(par.getAppliedRuleApp(), app, pos))
+            if (sameApplication(par.getAppliedRuleApp(), app, pos)) {
                 return false;
+            }
 
             node = par;
         }

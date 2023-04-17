@@ -4,7 +4,7 @@
       <statement name="return noArgs();" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_noArgs = self.noArgs() catch(exc_0)
 pre: self.&lt;inv&gt;&lt;&lt;impl&gt;&gt;
-post: (result_noArgs = 42
+post:   (result_noArgs = 42
 &amp; self.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
 &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;
 mod: allLocs

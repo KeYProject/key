@@ -3,6 +3,7 @@ package de.uka.ilkd.key.java.declaration;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.modifier.Static;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
 import org.key_project.util.ExtList;
 
 
@@ -68,10 +69,12 @@ public class ClassInitializer extends JavaDeclaration
 
     public int getChildCount() {
         int result = 0;
-        if (modArray != null)
+        if (modArray != null) {
             result += modArray.size();
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -93,8 +96,9 @@ public class ClassInitializer extends JavaDeclaration
             index -= len;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

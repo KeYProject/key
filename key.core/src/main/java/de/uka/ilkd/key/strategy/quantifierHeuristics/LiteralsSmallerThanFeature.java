@@ -60,56 +60,70 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         final int t1Def = quanAnalyser.eliminableDefinition(t1, focus);
         final int t2Def = quanAnalyser.eliminableDefinition(t2, focus);
 
-        if (t1Def > t2Def)
+        if (t1Def > t2Def) {
             return true;
-        if (t1Def < t2Def)
+        }
+        if (t1Def < t2Def) {
             return false;
+        }
 
         // HACK: we move literals that do not contain any variables to the left,
         // so that they can be moved out of the scope of the quantifiers
         if (t1.freeVars().size() == 0) {
-            if (t2.freeVars().size() > 0)
+            if (t2.freeVars().size() > 0) {
                 return false;
+            }
         } else {
-            if (t2.freeVars().size() == 0)
+            if (t2.freeVars().size() == 0) {
                 return true;
+            }
         }
 
         t1 = discardNegation(t1);
         t2 = discardNegation(t2);
 
         if (isBinaryIntRelation(t2)) {
-            if (!isBinaryIntRelation(t1))
+            if (!isBinaryIntRelation(t1)) {
                 return true;
+            }
 
             int c = compare(t1.sub(0), t2.sub(0));
-            if (c < 0)
+            if (c < 0) {
                 return true;
-            if (c > 0)
+            }
+            if (c > 0) {
                 return false;
+            }
 
             c = comparePolynomials(t1.sub(1), t2.sub(1));
-            if (c < 0)
+            if (c < 0) {
                 return true;
-            if (c > 0)
+            }
+            if (c > 0) {
                 return false;
+            }
 
             final Services services = goal.proof().getServices();
             final Polynomial t1RHS = Polynomial.create(t1.sub(1), services);
             final Polynomial t2RHS = Polynomial.create(t2.sub(1), services);
-            if (t1RHS.valueLess(t2RHS))
+            if (t1RHS.valueLess(t2RHS)) {
                 return true;
-            if (t2RHS.valueLess(t1RHS))
+            }
+            if (t2RHS.valueLess(t1RHS)) {
                 return false;
+            }
 
             c = formulaKind(t1) - formulaKind(t2);
-            if (c < 0)
+            if (c < 0) {
                 return true;
-            if (c > 0)
+            }
+            if (c > 0) {
                 return false;
+            }
         } else {
-            if (isBinaryIntRelation(t1))
+            if (isBinaryIntRelation(t1)) {
                 return false;
+            }
         }
 
         return super.lessThan(t1, t2, focus, goal);
@@ -121,24 +135,28 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
 
         while (true) {
             if (it1.hasNext()) {
-                if (!it2.hasNext())
+                if (!it2.hasNext()) {
                     return 1;
+                }
             } else {
-                if (it2.hasNext())
+                if (it2.hasNext()) {
                     return -1;
-                else
+                } else {
                     return 0;
+                }
             }
 
             final int c = compare(it1.next(), it2.next());
-            if (c != 0)
+            if (c != 0) {
                 return c;
+            }
         }
     }
 
     private Term discardNegation(Term t) {
-        while (t.op() == Junctor.NOT)
+        while (t.op() == Junctor.NOT) {
             t = t.sub(0);
+        }
         return t;
     }
 
@@ -148,13 +166,16 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
 
     private int formulaKind(Term t) {
         final Operator op = t.op();
-        if (op == numbers.getLessOrEquals())
+        if (op == numbers.getLessOrEquals()) {
             return 1;
-        if (op == numbers.getGreaterOrEquals())
+        }
+        if (op == numbers.getGreaterOrEquals()) {
             return 2;
+        }
         if (op == Equality.EQUALS && t.sub(0).sort() == numbers.targetSort()
-                && t.sub(1).sort() == numbers.targetSort())
+                && t.sub(1).sort() == numbers.targetSort()) {
             return 3;
+        }
         return -1;
     }
 
@@ -177,8 +198,9 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
                     polynomial = null;
                 }
 
-                if (nextMonomial.op() == numbers.getNumberSymbol())
+                if (nextMonomial.op() == numbers.getNumberSymbol()) {
                     nextMonomial = null;
+                }
             }
         }
 
@@ -201,7 +223,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         }
     }
 
-    private class LiteralCollector extends Collector {
+    private static class LiteralCollector extends Collector {
         protected void collect(Term te) {
             final Operator op = te.op();
             if (op == Junctor.OR) {

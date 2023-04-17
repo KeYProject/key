@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.speclang;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.UnaryOperator;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -14,15 +20,10 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.UnaryOperator;
 
 /**
  * A class axiom corresponding to a JML* represents clause.
@@ -89,11 +90,7 @@ public final class RepresentsAxiom extends ClassAxiom {
         if (target != other.target) {
             return false;
         }
-        if (!kjt.equals(other.kjt)) {
-            return false;
-        }
-
-        return true;
+        return kjt.equals(other.kjt);
     }
 
     @Override
@@ -112,7 +109,7 @@ public final class RepresentsAxiom extends ClassAxiom {
         assert heapVar != null;
         assert (selfVar == null) == target.isStatic();
         final Map<ProgramVariable, ParsableVariable> map =
-            new LinkedHashMap<ProgramVariable, ParsableVariable>();
+            new LinkedHashMap<>();
         map.put(services.getTypeConverter().getHeapLDT().getHeap(), heapVar);
         if (selfVar != null) {
             map.put(originalSelfVar, selfVar);
@@ -144,7 +141,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     @Override
     public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             final Services services) {
-        List<LocationVariable> heaps = new ArrayList<LocationVariable>();
+        List<LocationVariable> heaps = new ArrayList<>();
         int hc = 0;
         for (LocationVariable h : HeapContext.getModHeaps(services, false)) {
             if (hc >= target.getHeapCount(services)) {
@@ -157,7 +154,7 @@ public final class RepresentsAxiom extends ClassAxiom {
         Name tacletName = MiscTools.toValidTacletName(name);
         TacletGenerator tg = TacletGenerator.getInstance();
         if (isFunctional(services)) {
-            ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
+            ImmutableSet<Taclet> res = DefaultImmutableSet.nil();
             res = res.union(
                 tg.generateFunctionalRepresentsTaclets(tacletName, originalPre, originalRep, kjt,
                     target, heaps, self, originalParamVars, atPreVars, toLimit, true, services));

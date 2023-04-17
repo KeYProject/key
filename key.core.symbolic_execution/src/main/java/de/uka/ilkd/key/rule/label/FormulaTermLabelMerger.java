@@ -2,10 +2,7 @@ package de.uka.ilkd.key.rule.label;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
-
-import org.key_project.util.java.CollectionUtil;
 
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -38,10 +35,9 @@ public class FormulaTermLabelMerger implements TermLabelMerger {
             mergedLabels.remove(existingLabel);
             // Add new label
             mergedLabels.add(newLabel);
-            return true;
         } else {
             mergedLabels.add(rejectedLabel);
-            return true;
         }
+        return true;
     }
 }

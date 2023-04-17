@@ -2,9 +2,12 @@
 
 package recoder.kit;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.ProgramFactory;
-import recoder.abstraction.Package;
 import recoder.abstraction.*;
+import recoder.abstraction.Package;
 import recoder.convenience.TreeWalker;
 import recoder.java.Identifier;
 import recoder.java.NonTerminalProgramElement;
@@ -17,9 +20,6 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.*;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * this class implements basic functions for type handling.
@@ -65,11 +65,12 @@ public class TypeKit {
     public static ASTList<TypeArgumentDeclaration> makeTypeArgRef(ProgramFactory f,
             List<? extends TypeArgument> tas) {
         ASTList<TypeArgumentDeclaration> res =
-            new ASTArrayList<TypeArgumentDeclaration>(tas.size());
+            new ASTArrayList<>(tas.size());
         for (TypeArgument ta : tas) {
             TypeReference tr = createTypeReference(f, ta.getTypeName());
-            if (ta.getTypeArguments() != null)
+            if (ta.getTypeArguments() != null) {
                 tr.setTypeArguments(makeTypeArgRef(f, ta.getTypeArguments()));
+            }
             res.add(new TypeArgumentDeclaration(tr, ta.getWildcardMode()));
         }
         return res;
@@ -83,8 +84,9 @@ public class TypeKit {
         } else if (t instanceof ParameterizedType) {
             ParameterizedType pt = ((ParameterizedType) t);
             result = createTypeReference(f, pt.getGenericType());
-            if (addTypeArgs)
+            if (addTypeArgs) {
                 result.setTypeArguments(makeTypeArgRef(f, pt.getTypeArgs()));
+            }
         } else if (t instanceof ClassType) {
             result = f.createTypeReference(f.createIdentifier(t.getName()));
             ClassTypeContainer ctc = ((ClassType) t).getContainer();
@@ -178,12 +180,10 @@ public class TypeKit {
          */
         ProgramFactory pf = cdecl.getFactory();
 
-        ASTList<MemberDeclaration> imembers = new ASTArrayList<MemberDeclaration>(1);
+        ASTList<MemberDeclaration> imembers = new ASTArrayList<>(1);
         ASTList<MemberDeclaration> cmems = cdecl.getMembers();
         if (cmems != null) {
-            for (int i = 0, s = cmems.size(); i < s; i++) {
-                MemberDeclaration cmemd = cmems.get(i);
-
+            for (MemberDeclaration cmemd : cmems) {
                 if (!cmemd.isPublic()) {
                     continue;
                 }
@@ -213,12 +213,12 @@ public class TypeKit {
                     // && !cdecl.overridesInherited(md)
                     ) {
                         imembers.add(MethodKit.createAbstractMethodDeclaration(md, true));
-                    } else
-                        continue;
+                    } else {
+                    }
                 } else if (cmemd instanceof TypeDeclaration) {
                     imembers.add((TypeDeclaration) cmemd.deepClone());
-                } else
-                    continue;
+                } else {
+                }
             }
             if (!imembers.isEmpty()) {
                 Identifier iid = pf.createIdentifier(abstractsupername);
@@ -227,7 +227,7 @@ public class TypeKit {
                 DeclarationSpecifier vis = cdecl.getVisibilityModifier();
                 ASTList<DeclarationSpecifier> imods = null;
                 if (vis != null) {
-                    imods = new ASTArrayList<DeclarationSpecifier>(1);
+                    imods = new ASTArrayList<>(1);
                     imods.add((DeclarationSpecifier) vis.deepClone());
                 }
                 InterfaceDeclaration idecl = pf.createInterfaceDeclaration(imods, // modifiers
@@ -243,7 +243,7 @@ public class TypeKit {
                 // benoetigt. !!!!!!!!!!!!!!!!!!!!!!!!
 
                 // extend "extends list" of cdecl by idecl
-                ASTList<TypeReference> itypes = new ASTArrayList<TypeReference>(1);
+                ASTList<TypeReference> itypes = new ASTArrayList<>(1);
                 TypeReference iref = pf.createTypeReference(iid);
 
                 Implements impl = cdecl.getImplementedTypes();
@@ -288,18 +288,17 @@ public class TypeKit {
         res.setIdentifier(factory.createIdentifier("Abstract" + decl.getName()));
         DeclarationSpecifier vis = decl.getVisibilityModifier();
         if (vis != null) {
-            ASTList<DeclarationSpecifier> imods = new ASTArrayList<DeclarationSpecifier>(1);
+            ASTList<DeclarationSpecifier> imods = new ASTArrayList<>(1);
             imods.add((DeclarationSpecifier) vis.deepClone());
             res.setDeclarationSpecifiers(imods);
         }
-        ASTList<MemberDeclaration> imembers = new ASTArrayList<MemberDeclaration>();
+        ASTList<MemberDeclaration> imembers = new ASTArrayList<>();
         res.setMembers(imembers);
         List<MemberDeclaration> cmems = decl.getMembers();
         if (cmems == null) {
             return res;
         }
-        for (int i = 0, s = cmems.size(); i < s; i += 1) {
-            MemberDeclaration cmemd = cmems.get(i);
+        for (MemberDeclaration cmemd : cmems) {
             if (!cmemd.isPublic()) {
                 continue;
             }
@@ -365,9 +364,9 @@ public class TypeKit {
         ReferencePrefix delegationObject =
             new FieldReference(factory.createIdentifier("delegationObject" + classDecl.getName()));
         ClassDeclaration adapterClass =
-            factory.createClassDeclaration(new ASTArrayList<DeclarationSpecifier>(),
+            factory.createClassDeclaration(new ASTArrayList<>(),
                 factory.createIdentifier(adapterName), factory.createExtends(),
-                factory.createImplements(), new ASTArrayList<MemberDeclaration>());
+                factory.createImplements(), new ASTArrayList<>());
 
         // Create an adapter interface with delegating methods
         for (int i2 = 0; i2 < classDecl.getMembers().size(); i2++) {
@@ -378,8 +377,9 @@ public class TypeKit {
                     Debug.info(2, "adapting public method " + method.getName());
                     MethodDeclaration clone =
                         MethodKit.createAdapterMethod(delegationObject, method);
-                    if (clone != null)
+                    if (clone != null) {
                         adapterClass.getMembers().add(clone);
+                    }
                 }
             }
         }
@@ -407,7 +407,7 @@ public class TypeKit {
         Debug.assertNonnull(xr, ni, type, newName);
         Debug.assertNonnull(type.getName());
         if (!newName.equals(type.getName())) {
-            List<TypeReference> refs = new ArrayList<TypeReference>();
+            List<TypeReference> refs = new ArrayList<>();
             refs.addAll(xr.getReferences(type));
             List<? extends Constructor> cons = type.getConstructors();
             Type atype = ni.getArrayType(type);
@@ -455,7 +455,7 @@ public class TypeKit {
         Type t = xr.getType(newTypeName, context);
         if (t == null) {
             // the type is void or new, hence there are no references
-            return new ArrayList<TypeReference>(0);
+            return new ArrayList<>(0);
         }
         List<TypeReference> list = xr.getReferences(t);
         if (list.isEmpty()) {
@@ -463,7 +463,7 @@ public class TypeKit {
         }
         // a new type is only visible in its scope
         // all references from outside do not change
-        List<TypeReference> result = new ArrayList<TypeReference>();
+        List<TypeReference> result = new ArrayList<>();
         for (int i = list.size() - 1; i >= 0; i -= 1) {
             TypeReference tr = list.get(i);
             if (MiscKit.contains(context, tr)) {
@@ -491,7 +491,7 @@ public class TypeKit {
     public static List<TypeReference> getReferences(CrossReferenceSourceInfo xr, Type t,
             NonTerminalProgramElement root, boolean scanTree) {
         Debug.assertNonnull(xr, t, root);
-        List<TypeReference> result = new ArrayList<TypeReference>();
+        List<TypeReference> result = new ArrayList<>();
         if (scanTree) {
             TreeWalker tw = new TreeWalker(root);
             while (tw.next(TypeReference.class)) {
@@ -502,8 +502,7 @@ public class TypeKit {
             }
         } else {
             List<TypeReference> refs = xr.getReferences(t);
-            for (int i = 0, s = refs.size(); i < s; i += 1) {
-                TypeReference tr = refs.get(i);
+            for (TypeReference tr : refs) {
                 if (MiscKit.contains(root, tr)) {
                     result.add(tr);
                 }
@@ -522,7 +521,7 @@ public class TypeKit {
      * @return a mutable list of all members of the given class type.
      */
     public static List<Member> getMembers(ClassTypeContainer ctc) {
-        List<Member> result = new ArrayList<Member>();
+        List<Member> result = new ArrayList<>();
         List<? extends Member> mlist;
         if (ctc instanceof ClassType) {
             ClassType ct = (ClassType) ctc;
@@ -558,8 +557,8 @@ public class TypeKit {
     public static ClassType getSuperClass(NameInfo ni, ClassType ct) {
         if (!ct.isInterface()) {
             List<? extends ClassType> ctl = ct.getSupertypes();
-            for (int i = 0; i < ctl.size(); i += 1) {
-                ct = ctl.get(i);
+            for (ClassType classType : ctl) {
+                ct = classType;
                 if (!ct.isInterface()) {
                     return ct;
                 }
@@ -639,8 +638,8 @@ public class TypeKit {
                 return false;
             }
             List<? extends VariableSpecification> vars = ((FieldDeclaration) member).getVariables();
-            for (int j = 0, z = vars.size(); j < z; j += 1) {
-                if (vars.get(j).getInitializer() == null) {
+            for (VariableSpecification var : vars) {
+                if (var.getInitializer() == null) {
                     return false;
                 }
             }
@@ -664,7 +663,7 @@ public class TypeKit {
      */
     public static List<? extends ClassType> getCoveredSubtypes(ProgramModelInfo pmi,
             List<? extends ClassType> list) {
-        List<ClassType> copy = new ArrayList<ClassType>();
+        List<ClassType> copy = new ArrayList<>();
         copy.addAll(list);
         return removeCoveredSubtypes(pmi, copy);
     }
@@ -681,7 +680,7 @@ public class TypeKit {
      */
     public static List<ClassType> removeCoveredSubtypes(ProgramModelInfo pmi,
             List<ClassType> list) {
-        List<ClassType> removed = new ArrayList<ClassType>();
+        List<ClassType> removed = new ArrayList<>();
         for (int i = list.size() - 1; i >= 0; i -= 1) {
             ClassType ct = list.get(i);
             for (int j = list.size() - 1; j >= 0; j -= 1) {
@@ -712,7 +711,7 @@ public class TypeKit {
             TypeDeclaration td) {
         // get all super interface references
         ClassType superclass = null;
-        List<TypeReference> superinterfaces = new ArrayList<TypeReference>(0);
+        List<TypeReference> superinterfaces = new ArrayList<>(0);
         if (td instanceof InterfaceDeclaration) {
             InterfaceDeclaration id = (InterfaceDeclaration) td;
             if (id.getExtendedTypes() != null) {
@@ -728,10 +727,9 @@ public class TypeKit {
             }
         }
 
-        List<TypeReference> redundantReferences = new ArrayList<TypeReference>();
-        List<ClassType> types = new ArrayList<ClassType>();
-        for (int i = 0; i < superinterfaces.size(); i += 1) {
-            TypeReference tr = superinterfaces.get(i);
+        List<TypeReference> redundantReferences = new ArrayList<>();
+        List<ClassType> types = new ArrayList<>();
+        for (TypeReference tr : superinterfaces) {
             types.add((ClassType) si.getType(tr));
         }
         for (int i = superinterfaces.size() - 1; i >= 0; i -= 1) {
@@ -768,10 +766,10 @@ public class TypeKit {
      */
     public static List<TypeReference> getRedundantExceptions(SourceInfo si, Throws t) {
         List<TypeReference> exceptions = t.getExceptions();
-        List<TypeReference> redundantReferences = new ArrayList<TypeReference>();
-        List<ClassType> types = new ArrayList<ClassType>(exceptions.size());
-        for (int i = 0; i < exceptions.size(); i += 1) {
-            types.add((ClassType) si.getType(exceptions.get(i)));
+        List<TypeReference> redundantReferences = new ArrayList<>();
+        List<ClassType> types = new ArrayList<>(exceptions.size());
+        for (TypeReference exception : exceptions) {
+            types.add((ClassType) si.getType(exception));
         }
         for (int i = exceptions.size() - 1; i >= 0; i -= 1) {
             ClassType ct = types.get(i);

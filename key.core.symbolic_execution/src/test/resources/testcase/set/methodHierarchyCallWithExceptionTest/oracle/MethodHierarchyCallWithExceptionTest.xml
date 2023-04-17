@@ -19,7 +19,7 @@
                         <callStackEntry path="/0/0/0/0/0"/>
                         <callStackEntry path="/0/0/0"/>
                         <callStackEntry path="/0"/>
-                        <statement name="throw new RuntimeException ();" pathCondition="true" pathConditionChanged="false">
+                        <statement name="throw new RuntimeException();" pathCondition="true" pathConditionChanged="false">
                            <callStackEntry path="/0/0/0/0/0/0/0"/>
                            <callStackEntry path="/0/0/0/0/0"/>
                            <callStackEntry path="/0/0/0"/>

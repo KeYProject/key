@@ -1,43 +1,31 @@
 package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.util.parsing.HasLocation;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.TokenStream;
-
-import javax.annotation.Nullable;
 import java.net.MalformedURLException;
+import javax.annotation.Nullable;
+
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.util.RecognitionException;
+import de.uka.ilkd.key.util.parsing.HasLocation;
+
+import org.antlr.v4.runtime.CharStream;
 
 public class KeYSemanticException extends RecognitionException implements HasLocation {
     private final String cat;
     private final String filename;
 
-    public KeYSemanticException(String message) {
-        this.cat = message;
-        this.filename = "<unknown>";
-    }
-
-    public KeYSemanticException(TokenStream input, String sourceName, String message) {
-        super(input);
+    public KeYSemanticException(CharStream input, String sourceName, String message) {
+        super(input, Position.UNDEFINED);
         this.cat = message;
         this.filename = sourceName;
     }
 
-    public KeYSemanticException(TokenStream input, String sourceName, Exception cause) {
+    public KeYSemanticException(CharStream input, String sourceName, Exception cause) {
         this(input, sourceName, cause.getMessage());
         initCause(cause);
     }
 
     public String getFilename() {
         return filename;
-    }
-
-    public int getLine() {
-        return line;
-    }
-
-    public int getColumn() {
-        return charPositionInLine;
     }
 
     /**
@@ -61,13 +49,14 @@ public class KeYSemanticException extends RecognitionException implements HasLoc
      * Returns a string representation of this exception.
      */
     public String toString() {
-        return String.format("%s(%d, %d): %s", filename, this.getLine(), this.getColumn(),
+        return String.format("%s(%d, %d): %s", filename, getPosition().line(),
+            getPosition().column(),
             getMessage());
     }
 
     @Nullable
     @Override
     public Location getLocation() throws MalformedURLException {
-        return new Location(getFilename(), Position.newOneZeroBased(line, charPositionInLine));
+        return new Location(getFilename(), getPosition());
     }
 }

@@ -6,7 +6,7 @@ import de.uka.ilkd.key.smt.SolverTypeCollection;
 
 public class SMTMenuItem extends JMenuItem {
     private static final long serialVersionUID = 1L;
-    private SolverTypeCollection solverUnion;
+    private final SolverTypeCollection solverUnion;
 
     public SMTMenuItem(SolverTypeCollection solverUnion) {
         super();

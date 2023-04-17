@@ -1,10 +1,5 @@
 package de.uka.ilkd.key.informationflow.rule.tacletbuilder;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
@@ -17,6 +12,11 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**
@@ -73,7 +73,7 @@ public final class InfFlowMethodContractTacletBuilder
             ProofObligationVars contAppData2, Services services) {
         ImmutableSet<InformationFlowContract> ifContracts =
             getInformFlowContracts(methodContract.getTarget(), services);
-        ImmutableList<Term> contractsApplications = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> contractsApplications = ImmutableSLList.nil();
         for (InformationFlowContract cont : ifContracts) {
             InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(cont, contAppData, contAppData2, services);
@@ -90,7 +90,7 @@ public final class InfFlowMethodContractTacletBuilder
         ImmutableSet<Contract> contracts =
             services.getSpecificationRepository().getContracts(pm.getContainerType(), pm);
         ImmutableSet<InformationFlowContract> ifContracts =
-            DefaultImmutableSet.<InformationFlowContract>nil();
+            DefaultImmutableSet.nil();
         for (Contract c : contracts) {
             if (c instanceof InformationFlowContract) {
                 ifContracts = ifContracts.add((InformationFlowContract) c);

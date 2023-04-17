@@ -1,13 +1,13 @@
 package org.key_project.slicing.ui;
 
+import java.awt.event.ActionEvent;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.proof.Node;
+
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.graph.GraphNode;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
 
 /**
  * Context menu action to display the dependency graph "around" a formula.

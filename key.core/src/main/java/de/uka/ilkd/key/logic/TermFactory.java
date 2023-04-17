@@ -3,13 +3,13 @@ package de.uka.ilkd.key.logic;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import javax.annotation.Nonnull;
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * The TermFactory is the <em>only</em> way to create terms using constructors of class Term or any
@@ -23,7 +23,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 public final class TermFactory {
 
 
-    private static final ImmutableArray<Term> NO_SUBTERMS = new ImmutableArray<Term>();
+    private static final ImmutableArray<Term> NO_SUBTERMS = new ImmutableArray<>();
     private final Map<Term, Term> cache;
 
 
@@ -89,7 +89,7 @@ public final class TermFactory {
     public Term createTerm(Operator op, Term[] subs, ImmutableArray<QuantifiableVariable> boundVars,
             JavaBlock javaBlock, TermLabel label) {
         return createTerm(op, createSubtermArray(subs), boundVars, javaBlock,
-            new ImmutableArray<TermLabel>(label));
+            new ImmutableArray<>(label));
     }
 
     public Term createTerm(Operator op, Term[] subs, TermLabel label) {
@@ -101,7 +101,7 @@ public final class TermFactory {
     }
 
     public Term createTerm(Operator op, Term sub, ImmutableArray<TermLabel> labels) {
-        return createTerm(op, new ImmutableArray<Term>(sub), null, null, labels);
+        return createTerm(op, new ImmutableArray<>(sub), null, null, labels);
     }
 
     public Term createTerm(Operator op, Term sub1, Term sub2, ImmutableArray<TermLabel> labels) {
@@ -118,7 +118,7 @@ public final class TermFactory {
     // -------------------------------------------------------------------------
 
     private ImmutableArray<Term> createSubtermArray(Term[] subs) {
-        return subs == null || subs.length == 0 ? NO_SUBTERMS : new ImmutableArray<Term>(subs);
+        return subs == null || subs.length == 0 ? NO_SUBTERMS : new ImmutableArray<>(subs);
     }
 
     private Term doCreateTerm(Operator op, ImmutableArray<Term> subs,
@@ -155,13 +155,15 @@ public final class TermFactory {
      * @param terms a list of non-null temrs
      */
     public @Nonnull Term createTerm(@Nonnull Operator junctor, @Nonnull List<Term> terms) {
-        if (terms.size() == 1)
+        if (terms.size() == 1) {
             return terms.get(0);
-        else if (terms.size() == 2)
+        } else if (terms.size() == 2) {
             return createTerm(junctor, terms.get(0), terms.get(1));
+        }
         final Optional<Term> reduce = terms.stream().reduce((a, b) -> createTerm(junctor, a, b));
-        if (reduce.isPresent())
+        if (reduce.isPresent()) {
             return reduce.get();
+        }
         throw new IllegalArgumentException("list of terms is empty.");
     }
 }

@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.proof.proofevent;
 
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * More specific information about a rule application: the original proof node and the new proof

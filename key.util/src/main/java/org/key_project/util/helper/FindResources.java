@@ -45,16 +45,21 @@ public final class FindResources {
             dirURL = clazz.getClassLoader().getResource(me);
         }
 
-        if (dirURL == null)
+        if (dirURL == null) {
             return null;
+        }
 
         if ("jar".equals(dirURL.getProtocol())) {
             /* A JAR path */
             // strip out only the JAR file
-            String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!"));
-            FileSystem fs = FileSystems.newFileSystem(Paths.get(jarPath), clazz.getClassLoader());
-            Path dir = fs.getPath(path);
-            return Files.list(dir).collect(Collectors.toList());
+            String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf('!'));
+            try (FileSystem fs =
+                FileSystems.newFileSystem(Paths.get(jarPath), clazz.getClassLoader())) {
+                Path dir = fs.getPath(path);
+                try (var s = Files.list(dir)) {
+                    return s.collect(Collectors.toList());
+                }
+            }
         }
         throw new UnsupportedOperationException("Cannot list files for URL \"" + dirURL + "\"");
     }
@@ -79,16 +84,18 @@ public final class FindResources {
             dirURL = clazz.getClassLoader().getResource(me);
         }
 
-        if (dirURL == null)
+        if (dirURL == null) {
             return null;
+        }
 
         if (dirURL.getProtocol().equals("jar")) {
             /* A JAR path */
             // strip out only the JAR file
-            String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!"));
-            FileSystem fs = FileSystems.newFileSystem(Paths.get(jarPath), clazz.getClassLoader());
-            Path dir = fs.getPath(path);
-            return dir;
+            String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf('!'));
+            try (FileSystem fs =
+                FileSystems.newFileSystem(Paths.get(jarPath), clazz.getClassLoader())) {
+                return fs.getPath(path);
+            }
         }
         throw new UnsupportedOperationException("Cannot list files for URL \"" + dirURL + "\"");
     }

@@ -5,6 +5,10 @@ package recoder.util;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.kit.pattern.FactoryMethod;
+
 /**
  * This class can be used either as a template or as a base class for building RECODER command line
  * applications.
@@ -29,6 +33,7 @@ import java.util.HashMap;
  * @author RN
  */
 public abstract class CommandLineProgram {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FactoryMethod.class);
 
     // some variables that may be used as default values by derived classes
 
@@ -49,7 +54,7 @@ public abstract class CommandLineProgram {
     public static final int ZERO_OR_MORE = OptionManager.ZERO_OR_MORE;
     // the following methods have to be redefined in derived classes
     private final OptionManager om = new OptionManager();
-    private final java.util.Map<String, Field> vars = new HashMap<String, Field>();
+    private final java.util.Map<String, Field> vars = new HashMap<>();
     // by default the command line program provides a simple help facility
     public boolean showHelp;
 
@@ -84,7 +89,7 @@ public abstract class CommandLineProgram {
         } catch (OptionException oe) {
             handleOptionException(oe);
         } catch (Exception e) {
-            System.err.println(e);
+            LOGGER.warn("Failed", e);
             System.exit(1);
         }
     }
@@ -97,7 +102,7 @@ public abstract class CommandLineProgram {
         if (showHelp) {
             usage(true, 0);
         } else {
-            System.err.println(oe);
+            LOGGER.warn("Error", oe);
             usage(false, 1);
         }
     }
@@ -120,7 +125,7 @@ public abstract class CommandLineProgram {
 
     protected final void registerSwitchOpt(String varName, String shortOpt, String longOpt,
             String descr, int multiplicity, boolean defaultVal) {
-        registerVar(varName, shortOpt, new Boolean(defaultVal));
+        registerVar(varName, shortOpt, defaultVal);
         om.addOption(OptionManager.SWITCH, multiplicity, shortOpt, longOpt, descr);
     }
 
@@ -131,7 +136,7 @@ public abstract class CommandLineProgram {
 
     protected final void registerBooleanOpt(String varName, String shortOpt, String longOpt,
             String descr, int multiplicity, boolean defaultVal) {
-        registerVar(varName, shortOpt, new Boolean(defaultVal));
+        registerVar(varName, shortOpt, defaultVal);
         om.addOption(OptionManager.BOOL, multiplicity, shortOpt, longOpt, descr);
     }
 
@@ -142,7 +147,7 @@ public abstract class CommandLineProgram {
 
     protected final void registerNumberOpt(String varName, String shortOpt, String longOpt,
             String descr, int multiplicity, int defaultVal) {
-        registerVar(varName, shortOpt, new Integer(defaultVal));
+        registerVar(varName, shortOpt, defaultVal);
         om.addOption(OptionManager.NUM, multiplicity, shortOpt, longOpt, descr);
     }
 

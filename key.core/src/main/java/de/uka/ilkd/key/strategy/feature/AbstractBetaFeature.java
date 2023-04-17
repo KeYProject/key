@@ -18,10 +18,10 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
  */
 public abstract class AbstractBetaFeature implements Feature {
     /** helper for computing maxPosPath_* in TermInfo */
-    private static MaxPosPathHelper maxPosPathHelper = new MaxPosPathHelper();
+    private static final MaxPosPathHelper maxPosPathHelper = new MaxPosPathHelper();
 
     /** helper for computing maxDPath_* in TermInfo */
-    private static MaxDPathHelper maxDPathHelper = new MaxDPathHelper();
+    private static final MaxDPathHelper maxDPathHelper = new MaxDPathHelper();
 
     /**
      * Get the informations about a term
@@ -63,28 +63,23 @@ public abstract class AbstractBetaFeature implements Feature {
 
     private abstract static class MaxPathHelper {
         public int compute(Term p_t, boolean p_positive) {
-            if (p_t.op() == (p_positive ? Junctor.AND : Junctor.OR))
+            if (p_t.op() == (p_positive ? Junctor.AND : Junctor.OR)) {
                 return compute(p_t.sub(0), p_positive) + compute(p_t.sub(1), p_positive);
-
-            else if (p_t.op() == (p_positive ? Junctor.OR : Junctor.AND))
+            } else if (p_t.op() == (p_positive ? Junctor.OR : Junctor.AND)) {
                 return Math.max(compute(p_t.sub(0), p_positive), compute(p_t.sub(1), p_positive));
-
-            else if (p_t.op() == Junctor.NOT)
+            } else if (p_t.op() == Junctor.NOT) {
                 return compute(p_t.sub(0), !p_positive);
-
-            else if (p_positive && p_t.op() == Junctor.IMP)
+            } else if (p_positive && p_t.op() == Junctor.IMP) {
                 return Math.max(compute(p_t.sub(0), !p_positive), compute(p_t.sub(1), p_positive));
-
-            else if (!p_positive && p_t.op() == Junctor.IMP)
+            } else if (!p_positive && p_t.op() == Junctor.IMP) {
                 return compute(p_t.sub(0), !p_positive) + compute(p_t.sub(1), p_positive);
-
-            else if (p_positive && p_t.op() == Equality.EQV)
+            } else if (p_positive && p_t.op() == Equality.EQV) {
                 return Math.max(compute(p_t.sub(0), p_positive) + compute(p_t.sub(1), p_positive),
                     compute(p_t.sub(0), !p_positive) + compute(p_t.sub(1), !p_positive));
-
-            else if (!p_positive && p_t.op() == Equality.EQV)
+            } else if (!p_positive && p_t.op() == Equality.EQV) {
                 return Math.max(compute(p_t.sub(0), !p_positive) + compute(p_t.sub(1), p_positive),
                     compute(p_t.sub(0), p_positive) + compute(p_t.sub(1), !p_positive));
+            }
 
             return computeDefault(p_t, p_positive);
         }
@@ -94,8 +89,9 @@ public abstract class AbstractBetaFeature implements Feature {
 
     private static class MaxPosPathHelper extends MaxPathHelper {
         protected int computeDefault(Term p_t, boolean p_positive) {
-            if (alwaysReplace(p_t))
+            if (alwaysReplace(p_t)) {
                 return 1;
+            }
 
             return p_positive ? 0 : 1;
         }
@@ -123,85 +119,79 @@ public abstract class AbstractBetaFeature implements Feature {
      * @param caches TODO
      */
     private static boolean hasPurePosPathHelp(Term p_t, boolean p_positive, ServiceCaches caches) {
-        if (p_t.op() == (p_positive ? Junctor.AND : Junctor.OR))
+        if (p_t.op() == (p_positive ? Junctor.AND : Junctor.OR)) {
             return hasPurePosPath(p_t.sub(0), p_positive, caches)
                     && hasPurePosPath(p_t.sub(1), p_positive, caches);
-
-        else if (p_t.op() == (p_positive ? Junctor.OR : Junctor.AND))
+        } else if (p_t.op() == (p_positive ? Junctor.OR : Junctor.AND)) {
             return hasPurePosPath(p_t.sub(0), p_positive, caches)
                     || hasPurePosPath(p_t.sub(1), p_positive, caches);
-
-        else if (p_t.op() == Junctor.NOT)
+        } else if (p_t.op() == Junctor.NOT) {
             return hasPurePosPath(p_t.sub(0), !p_positive, caches);
-
-        else if (p_positive && p_t.op() == Junctor.IMP)
+        } else if (p_positive && p_t.op() == Junctor.IMP) {
             return hasPurePosPath(p_t.sub(0), !p_positive, caches)
                     || hasPurePosPath(p_t.sub(1), p_positive, caches);
-
-        else if (!p_positive && p_t.op() == Junctor.IMP)
+        } else if (!p_positive && p_t.op() == Junctor.IMP) {
             return hasPurePosPath(p_t.sub(0), !p_positive, caches)
                     && hasPurePosPath(p_t.sub(1), p_positive, caches);
-
-        else if (p_positive && p_t.op() == Equality.EQV)
+        } else if (p_positive && p_t.op() == Equality.EQV) {
             return (hasPurePosPath(p_t.sub(0), p_positive, caches)
                     && hasPurePosPath(p_t.sub(1), p_positive, caches))
                     || (hasPurePosPath(p_t.sub(0), !p_positive, caches)
                             && hasPurePosPath(p_t.sub(1), !p_positive, caches));
-
-        else if (!p_positive && p_t.op() == Equality.EQV)
+        } else if (!p_positive && p_t.op() == Equality.EQV) {
             return (hasPurePosPath(p_t.sub(0), !p_positive, caches)
                     && hasPurePosPath(p_t.sub(1), p_positive, caches))
                     || (hasPurePosPath(p_t.sub(0), p_positive, caches)
                             && hasPurePosPath(p_t.sub(1), !p_positive, caches));
-
-        else if (alwaysReplace(p_t))
+        } else if (alwaysReplace(p_t)) {
             return true;
+        }
 
         return !p_positive;
     }
 
     private static boolean containsNegAtomHelp(Term p_t, boolean p_positive, ServiceCaches caches) {
-        if (p_t.op() == Junctor.AND || p_t.op() == Junctor.OR)
+        if (p_t.op() == Junctor.AND || p_t.op() == Junctor.OR) {
             return containsNegAtom(p_t.sub(0), p_positive, caches)
                     || containsNegAtom(p_t.sub(1), p_positive, caches);
-
-        else if (p_t.op() == Junctor.NOT)
+        } else if (p_t.op() == Junctor.NOT) {
             return containsNegAtom(p_t.sub(0), !p_positive, caches);
-
-        else if (p_t.op() == Junctor.IMP)
+        } else if (p_t.op() == Junctor.IMP) {
             return containsNegAtom(p_t.sub(0), !p_positive, caches)
                     || containsNegAtom(p_t.sub(1), p_positive, caches);
-
-        else if (p_t.op() == Equality.EQV || alwaysReplace(p_t))
+        } else if (p_t.op() == Equality.EQV || alwaysReplace(p_t)) {
             return true;
+        }
 
         return !p_positive;
     }
 
     private static boolean containsQuantifierHelp(Term p_t, ServiceCaches caches) {
         if (p_t.op() == Junctor.AND || p_t.op() == Junctor.OR || p_t.op() == Junctor.IMP
-                || p_t.op() == Equality.EQV)
+                || p_t.op() == Equality.EQV) {
             return containsQuantifier(p_t.sub(0), caches) || containsQuantifier(p_t.sub(1), caches);
-        else if (p_t.op() == Junctor.NOT)
+        } else if (p_t.op() == Junctor.NOT) {
             return containsQuantifier(p_t.sub(0), caches);
-        else
+        } else {
             return alwaysReplace(p_t);
+        }
     }
 
     private static TermInfo.Candidate candidateHelp(Term p_t, TermInfo p_ti) {
-        if (p_t.op() == Junctor.IMP || p_t.op() == Junctor.OR)
+        if (p_t.op() == Junctor.IMP || p_t.op() == Junctor.OR) {
             return isBetaCandidateHelp(p_ti, false) ? TermInfo.Candidate.CAND_LEFT
                     : TermInfo.Candidate.CAND_NEVER;
-        else if (p_t.op() == Junctor.AND)
+        } else if (p_t.op() == Junctor.AND) {
             return isBetaCandidateHelp(p_ti, true) ? TermInfo.Candidate.CAND_RIGHT
                     : TermInfo.Candidate.CAND_NEVER;
-        else if (p_t.op() == Equality.EQV) {
-            if (isBetaCandidateHelp(p_ti, true))
+        } else if (p_t.op() == Equality.EQV) {
+            if (isBetaCandidateHelp(p_ti, true)) {
                 return isBetaCandidateHelp(p_ti, false) ? TermInfo.Candidate.CAND_BOTH
                         : TermInfo.Candidate.CAND_RIGHT;
-            else
+            } else {
                 return isBetaCandidateHelp(p_ti, false) ? TermInfo.Candidate.CAND_LEFT
                         : TermInfo.Candidate.CAND_NEVER;
+            }
         }
 
         return TermInfo.Candidate.CAND_NEVER;

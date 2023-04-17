@@ -4,9 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -20,6 +17,9 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 
 public final class ContractAxiom extends ClassAxiom {
@@ -100,18 +100,18 @@ public final class ContractAxiom extends ClassAxiom {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || this.getClass() != o.getClass())
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
+        }
         final ContractAxiom other = (ContractAxiom) o;
 
-        if (!name.equals(other.name))
+        if (!name.equals(other.name)) {
             return false;
-        if (!target.equals(other.target))
+        }
+        if (!target.equals(other.target)) {
             return false;
-        if (!kjt.equals(other.kjt))
-            return false;
-
-        return true;
+        }
+        return kjt.equals(other.kjt);
     }
 
     @Override

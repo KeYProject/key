@@ -19,7 +19,7 @@ public class UpdateSimplificationMacro extends AbstractPropositionalExpansionMac
             "applyOnRigidFormula", "applyOnElementary", "applyOnParallel", "applyOnSkip",
             "applyOnPV", "parallelWithSkip1", "parallelWithSkip2", "applySkip1", "applySkip2", };
 
-    private static final Set<String> ADMITTED_RULE_NAMES_AS_SET = new HashSet<String>();
+    private static final Set<String> ADMITTED_RULE_NAMES_AS_SET = new HashSet<>();
     static {
         Collections.addAll(ADMITTED_RULE_NAMES_AS_SET, ADMITTED_RULE_NAMES);
     }

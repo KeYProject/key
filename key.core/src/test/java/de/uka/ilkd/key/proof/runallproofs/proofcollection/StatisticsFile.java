@@ -1,18 +1,20 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.Statistics;
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.Statistics;
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class for managing a file which contains statistics recorded during a {@link RunAllProofsTest}
@@ -168,13 +170,14 @@ public class StatisticsFile implements Serializable {
      * @throws IOException In case statistics file is not accessible for some reason.
      */
     private void writeLine(List<String> entries) throws IOException {
-        final FileWriter statisticsFileWriter = new FileWriter(statisticsFile, true);
+        final FileWriter statisticsFileWriter =
+            new FileWriter(statisticsFile, StandardCharsets.UTF_8, true);
         final PrintWriter statPrinter = new PrintWriter(statisticsFileWriter);
-        String line = "";
+        StringBuilder line = new StringBuilder();
         boolean first = true;
         for (String entry : entries) {
-            line += first ? "" : "|";
-            line += entry;
+            line.append(first ? "" : "|");
+            line.append(entry);
             first = false;
         }
         statPrinter.println(line);
@@ -204,7 +207,8 @@ public class StatisticsFile implements Serializable {
      * Print sum for each column as last line when closing statistics file.
      */
     public void computeSumsAndAverages() throws IOException {
-        try (BufferedReader br = new BufferedReader(new FileReader(statisticsFile))) {
+        try (BufferedReader br =
+            new BufferedReader(new FileReader(statisticsFile, StandardCharsets.UTF_8))) {
             // strip first line containing column names
             br.readLine();
 
@@ -212,7 +216,7 @@ public class StatisticsFile implements Serializable {
             @SuppressWarnings("unchecked")
             List<String>[] lists = new List[columns.length];
             for (int i = 0; i < lists.length; i++) {
-                lists[i] = new LinkedList<String>();
+                lists[i] = new LinkedList<>();
             }
             for (String row; (row = br.readLine()) != null;) {
                 String[] column = row.split("\\|");

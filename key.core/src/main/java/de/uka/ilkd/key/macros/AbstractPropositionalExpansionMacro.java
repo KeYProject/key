@@ -11,11 +11,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCostCollector;
-import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.*;
 
 /**
  * The Class AbstractPropositionalExpansionMacro applies purely propositional rules.
@@ -33,7 +29,7 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
      * convert a string array to a set of strings
      */
     protected static Set<String> asSet(String... strings) {
-        return Collections.unmodifiableSet(new LinkedHashSet<String>(Arrays.asList(strings)));
+        return Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(strings)));
     }
 
     @Override
@@ -76,7 +72,7 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
      * This strategy accepts all rule apps for which the rule name is in the admitted set and
      * rejects everything else.
      */
-    private class PropExpansionStrategy implements Strategy {
+    private static class PropExpansionStrategy implements Strategy {
 
         private final Name NAME = new Name(PropExpansionStrategy.class.getSimpleName());
 
@@ -105,8 +101,9 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
                 final RuleAppCost origCost = delegate.computeCost(ruleApp, pio, goal);
                 // pass through negative costs
                 if (origCost instanceof NumberRuleAppCost
-                        && ((NumberRuleAppCost) origCost).getValue() < 0)
+                        && ((NumberRuleAppCost) origCost).getValue() < 0) {
                     return origCost;
+                }
                 // cap costs at zero
                 return NumberRuleAppCost.getZeroCost();
             } else {

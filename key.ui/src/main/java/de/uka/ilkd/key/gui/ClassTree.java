@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.gui;
 
+import java.awt.*;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.tree.*;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -12,12 +17,8 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.Pair;
-import org.key_project.util.collection.ImmutableSet;
 
-import javax.swing.*;
-import javax.swing.tree.*;
-import java.awt.*;
-import java.util.*;
+import org.key_project.util.collection.ImmutableSet;
 
 
 public class ClassTree extends JTree {
@@ -60,7 +61,7 @@ public class ClassTree extends JTree {
 
                     if (result instanceof JLabel) {
                         ((JLabel) result).setIcon(ClassTree.this.targetIcons.get(
-                            new Pair<KeYJavaType, IObserverFunction>(entry.kjt, entry.target)));
+                            new Pair<>(entry.kjt, entry.target)));
                     }
                 }
 
@@ -72,7 +73,7 @@ public class ClassTree extends JTree {
 
     public ClassTree(boolean addContractTargets, boolean skipLibraryClasses, Services services) {
         this(addContractTargets, skipLibraryClasses, services,
-            new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>, Icon>());
+            new LinkedHashMap<>());
     }
 
 
@@ -120,7 +121,7 @@ public class ClassTree extends JTree {
         do {
             // get next part of the name
             int lastIndex = index;
-            index = fullClassName.indexOf(".", ++index);
+            index = fullClassName.indexOf('.', ++index);
             if (index == -1) {
                 index = length;
             }
@@ -185,8 +186,9 @@ public class ClassTree extends JTree {
             if (numGrandChildren == 1) {
                 DefaultMutableTreeNode grandChild = (DefaultMutableTreeNode) child.getFirstChild();
                 // stop compressing at method name
-                if (((Entry) grandChild.getUserObject()).target != null)
+                if (((Entry) grandChild.getUserObject()).target != null) {
                     continue;
+                }
                 child.removeFromParent();
                 root.add(grandChild);
                 Entry e1 = (Entry) child.getUserObject();
@@ -214,7 +216,7 @@ public class ClassTree extends JTree {
      * @return The display name for the given {@link ObserverFunction}.
      */
     public static final String getDisplayName(Services services, IObserverFunction ov) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         String prettyName = HeapLDT.getPrettyFieldName(ov);
         if (prettyName != null) {
             sb.append(prettyName);
@@ -243,25 +245,19 @@ public class ClassTree extends JTree {
             boolean skipLibraryClasses, Services services) {
         // get all classes
         final Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
-        final Iterator<KeYJavaType> it = kjts.iterator();
-        while (it.hasNext()) {
-            KeYJavaType kjt = it.next();
-            if (!(kjt.getJavaType() instanceof ClassDeclaration
-                    || kjt.getJavaType() instanceof InterfaceDeclaration)
-                    || (((TypeDeclaration) kjt.getJavaType()).isLibraryClass()
-                            && skipLibraryClasses)) {
-                it.remove();
-            }
-        }
+        kjts.removeIf(kjt -> !(kjt.getJavaType() instanceof ClassDeclaration
+                || kjt.getJavaType() instanceof InterfaceDeclaration)
+                || (((TypeDeclaration) kjt.getJavaType()).isLibraryClass()
+                        && skipLibraryClasses));
 
         // sort classes alphabetically
-        final KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[kjts.size()]);
-        Arrays.sort(kjtsarr, (o1, o2) -> o1.getFullName().compareTo(o2.getFullName()));
+        final KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[0]);
+        Arrays.sort(kjtsarr, Comparator.comparing(KeYJavaType::getFullName));
 
         // build tree
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(new Entry(""));
-        for (int i = 0; i < kjtsarr.length; i++) {
-            insertIntoTree(rootNode, kjtsarr[i], addContractTargets, services);
+        for (KeYJavaType keYJavaType : kjtsarr) {
+            insertIntoTree(rootNode, keYJavaType, addContractTargets, services);
         }
 
         compressLinearPaths(rootNode);
@@ -271,12 +267,12 @@ public class ClassTree extends JTree {
 
     private void open(KeYJavaType kjt, IObserverFunction target) {
         // get tree path to class
-        Vector<DefaultMutableTreeNode> pathVector = new Vector<DefaultMutableTreeNode>();
+        ArrayList<DefaultMutableTreeNode> pathVector = new ArrayList<>();
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) getModel().getRoot();
         assert node != null;
         pathVector.add(node);
         // Collect inner classes
-        Deque<KeYJavaType> types = new LinkedList<KeYJavaType>();
+        Deque<KeYJavaType> types = new LinkedList<>();
         KeYJavaType currentKjt = kjt;
         types.addFirst(currentKjt);
         while (KeYTypeUtil.isInnerType(services, currentKjt)) {

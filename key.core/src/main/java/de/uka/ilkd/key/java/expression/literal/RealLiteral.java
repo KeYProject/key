@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.RealLDT;
 import de.uka.ilkd.key.logic.Name;
+
 import org.key_project.util.ExtList;
 
 /**
@@ -34,15 +35,15 @@ public class RealLiteral extends Literal {
     }
 
     public RealLiteral(int value) {
-        this("" + value + ".0");
+        this(value + ".0");
     }
 
     public RealLiteral(double value) {
-        this.value = "" + value;
+        this.value = String.valueOf(value);
     }
 
     public RealLiteral(java.math.BigDecimal value) {
-        this.value = "" + value;
+        this.value = String.valueOf(value);
     }
 
     public RealLiteral(ExtList children, String value) {

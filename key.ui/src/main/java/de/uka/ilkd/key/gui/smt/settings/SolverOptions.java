@@ -1,15 +1,14 @@
 package de.uka.ilkd.key.gui.smt.settings;
 
+import java.math.RoundingMode;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
-
-import javax.swing.*;
-
-import java.math.RoundingMode;
 
 import static de.uka.ilkd.key.gui.smt.settings.SMTSettingsProvider.BUNDLE;
 
@@ -56,13 +55,12 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     private static final String versionInfo(String info, String versionString) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(info);
-        builder.append(" ");
-        builder.append("(");
-        builder.append(versionString);
-        builder.append(")");
-        return builder.toString();
+        String builder = info +
+            " " +
+            "(" +
+            versionString +
+            ")";
+        return builder;
     }
 
     protected JButton createDefaultButton() {
@@ -74,9 +72,8 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     private String createSupportedVersionText() {
-        StringBuilder result = new StringBuilder("The following minimal version is supported: ");
-        result.append(solverType.getMinimumSupportedVersion());
-        return result.toString();
+        return "The following minimal version is supported: "
+            + solverType.getMinimumSupportedVersion();
     }
 
     private String getSolverSupportText() {

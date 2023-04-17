@@ -15,7 +15,7 @@ public class SMTTermUnaryOp extends SMTTerm {
 
     public enum Op {
         NOT, BVNOT, BVNEG
-    };
+    }
 
     private Op operator;
     private SMTTerm sub;
@@ -113,8 +113,9 @@ public class SMTTermUnaryOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public SMTTerm substitute(SMTTerm a, SMTTerm b) {
-        if (this.equals(a))
+        if (this.equals(a)) {
             return b;
+        }
 
         // return new TermUnaryOp(operator, (Term) sub.substitute(a, b));
         return sub.substitute(a, b).unaryOp(operator);
@@ -141,14 +142,17 @@ public class SMTTermUnaryOp extends SMTTerm {
 
     @Override
     public boolean equals(Object term) {
-        if (term == null)
+        if (term == null) {
             return false;
+        }
 
-        if (this == term)
+        if (this == term) {
             return true;
+        }
 
-        if (!(term instanceof SMTTermUnaryOp))
+        if (!(term instanceof SMTTermUnaryOp)) {
             return false;
+        }
         SMTTermUnaryOp ut = (SMTTermUnaryOp) term;
 
         return this.operator.equals(ut.operator) && this.sub.equals(ut.sub);

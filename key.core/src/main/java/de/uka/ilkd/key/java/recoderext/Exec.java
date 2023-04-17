@@ -86,8 +86,9 @@ public class Exec extends BranchStatement implements StatementContainer, Variabl
         if (proto.branches != null) {
             branches = proto.branches.deepClone();
         }
-        if (proto.variableDeclarations != null)
+        if (proto.variableDeclarations != null) {
             variableDeclarations = proto.variableDeclarations.deepClone();
+        }
         makeParentRoleValid();
     }
 
@@ -136,10 +137,12 @@ public class Exec extends BranchStatement implements StatementContainer, Variabl
     @Override
     public int getChildCount() {
         int result = 0;
-        if (body != null)
+        if (body != null) {
             result++;
-        if (branches != null)
+        }
+        if (branches != null) {
             result += branches.size();
+        }
         result += variableDeclarations == null ? 0 : variableDeclarations.size();
         return result;
     }
@@ -154,13 +157,15 @@ public class Exec extends BranchStatement implements StatementContainer, Variabl
     @Override
     public ProgramElement getChildAt(int index) {
         if (variableDeclarations != null) {
-            if (index < variableDeclarations.size())
+            if (index < variableDeclarations.size()) {
                 return variableDeclarations.get(index);
+            }
             index -= variableDeclarations.size();
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         if (branches != null) {
@@ -361,9 +366,10 @@ public class Exec extends BranchStatement implements StatementContainer, Variabl
     @Override
     public List<VariableSpecification> getVariablesInScope() {
         if (variableDeclarations != null) {
-            List<VariableSpecification> res = new ArrayList<VariableSpecification>();
-            for (LocalVariableDeclaration vd : variableDeclarations)
+            List<VariableSpecification> res = new ArrayList<>();
+            for (LocalVariableDeclaration vd : variableDeclarations) {
                 res.addAll(vd.getVariables());
+            }
             return res;
         }
         return Collections.emptyList();
@@ -373,8 +379,9 @@ public class Exec extends BranchStatement implements StatementContainer, Variabl
     public VariableSpecification getVariableInScope(String name) {
         Debug.assertNonnull(name);
         for (VariableSpecification vs : getVariablesInScope()) {
-            if (vs.getName().equals(name))
+            if (vs.getName().equals(name)) {
                 return vs;
+            }
         }
         return null;
     }

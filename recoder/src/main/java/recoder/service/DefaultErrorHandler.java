@@ -1,10 +1,10 @@
 package recoder.service;
 
+import java.util.EventObject;
+
 import recoder.ModelElement;
 import recoder.ModelException;
 import recoder.java.ProgramElement;
-
-import java.util.EventObject;
 
 public class DefaultErrorHandler implements ErrorHandler {
 
@@ -134,4 +134,3 @@ public class DefaultErrorHandler implements ErrorHandler {
         }
     }
 }
-

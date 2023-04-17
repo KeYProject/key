@@ -1,10 +1,13 @@
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.recoderext.adt.EmptyMapLiteral;
 import de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral;
 import de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral;
 import de.uka.ilkd.key.java.recoderext.expression.literal.RealLiteral;
 import de.uka.ilkd.key.util.Debug;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.*;
 import recoder.java.*;
@@ -17,8 +20,6 @@ import recoder.java.reference.TypeReference;
 import recoder.java.reference.VariableReference;
 import recoder.kit.TwoPassTransformation;
 import recoder.service.DefaultCrossReferenceSourceInfo;
-
-import java.util.*;
 
 /**
  * The Java DL requires some implicit fields, that are available in each Java class. The name of the
@@ -35,8 +36,8 @@ import java.util.*;
  * transformation set has been outsourced to a transformation cache.
  */
 public abstract class RecoderModelTransformer extends TwoPassTransformation {
-    protected CrossReferenceServiceConfiguration services;
-    protected TransformerCache cache;
+    protected final CrossReferenceServiceConfiguration services;
+    protected final TransformerCache cache;
 
     /**
      * creates a transormder for the recoder model
@@ -336,8 +337,8 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     }
 
     private static class TypeAndClassDeclarationCollector extends SourceVisitorExtended {
-        private Set<ClassDeclaration> result = new LinkedHashSet<>();
-        private Set<TypeDeclaration> types = new LinkedHashSet<>();
+        private final Set<ClassDeclaration> result = new LinkedHashSet<>();
+        private final Set<TypeDeclaration> types = new LinkedHashSet<>();
 
         public TypeAndClassDeclarationCollector() {
             super();

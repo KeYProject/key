@@ -25,8 +25,8 @@ public abstract class AbstractCallStackBasedStopCondition implements StopConditi
     /**
      * Maps a {@link Goal} to the initial call stack size at which the auto mode was started.
      */
-    private Map<Goal, NodeStartEntry> startingCallStackSizePerGoal =
-        new LinkedHashMap<Goal, NodeStartEntry>();
+    private final Map<Goal, NodeStartEntry> startingCallStackSizePerGoal =
+        new LinkedHashMap<>();
 
     /**
      * {@inheritDoc}
@@ -71,15 +71,11 @@ public abstract class AbstractCallStackBasedStopCondition implements StopConditi
                             Node parentSetNode = SymbolicExecutionUtil.findParentSetNode(node);
                             int parentStackSize = SymbolicExecutionUtil
                                     .computeStackSize(parentSetNode.getAppliedRuleApp());
-                            if (isCallStackSizeReached(
+                            // Parent node also don't fulfill the call stack limit, stop now
+                            // Parent node is deeper in call stack, so continue
+                            return !isCallStackSizeReached(
                                 startingCallStackSizeEntry.getNodeCallStackSize(),
-                                parentStackSize)) {
-                                // Parent node also don't fulfill the call stack limit, stop now
-                                return false;
-                            } else {
-                                // Parent node is deeper in call stack, so continue
-                                return true;
-                            }
+                                parentStackSize);
                         } else {
                             // Currently deeper in call stack, continue
                             return true;
@@ -164,12 +160,12 @@ public abstract class AbstractCallStackBasedStopCondition implements StopConditi
         /**
          * The initial {@link Node} of a {@link Goal} on that the auto mode was started.
          */
-        private Node node;
+        private final Node node;
 
         /**
          * The call stack size of {@link #node}.
          */
-        private int nodeCallStackSize;
+        private final int nodeCallStackSize;
 
         /**
          * Constructor.

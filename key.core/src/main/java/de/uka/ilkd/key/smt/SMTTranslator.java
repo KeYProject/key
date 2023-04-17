@@ -1,11 +1,7 @@
 package de.uka.ilkd.key.smt;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
 
 
 /**
@@ -23,7 +19,7 @@ public interface SMTTranslator {
      * @return a representation of the term in the given syntax.
      * @throws IllegalFormulaException
      */
-    public CharSequence translateProblem(Sequent sequent, Services services, SMTSettings settings)
+    CharSequence translateProblem(Sequent sequent, Services services, SMTSettings settings)
             throws IllegalFormulaException;
 
 }

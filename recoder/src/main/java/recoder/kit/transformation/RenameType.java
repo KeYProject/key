@@ -2,6 +2,9 @@
 
 package recoder.kit.transformation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
 import recoder.abstraction.Constructor;
@@ -12,9 +15,6 @@ import recoder.java.reference.TypeReference;
 import recoder.kit.ProblemReport;
 import recoder.kit.TwoPassTransformation;
 import recoder.service.NameInfo;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Transformation that renames a type declaration and all known references to that type. The new
@@ -67,7 +67,7 @@ public class RenameType extends TwoPassTransformation {
      * @return the problem report.
      */
     public ProblemReport analyze() {
-        refs = new ArrayList<TypeReference>();
+        refs = new ArrayList<>();
         if (newName.equals(type.getName())) {
             return setProblemReport(IDENTITY);
         }
@@ -75,7 +75,7 @@ public class RenameType extends TwoPassTransformation {
         refs.addAll(getCrossReferenceSourceInfo().getReferences(type));
         cons = type.getConstructors();
         if (cons == null) {
-            cons = new ArrayList<Constructor>(0);
+            cons = new ArrayList<>(0);
         }
         Type atype = ni.getArrayType(type);
         while (atype != null) {
@@ -108,4 +108,3 @@ public class RenameType extends TwoPassTransformation {
         }
     }
 }
-

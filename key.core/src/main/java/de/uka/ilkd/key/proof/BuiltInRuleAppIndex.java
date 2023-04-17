@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.proof;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -11,6 +8,9 @@ import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 public class BuiltInRuleAppIndex {
 
@@ -34,7 +34,7 @@ public class BuiltInRuleAppIndex {
      */
     public ImmutableList<IBuiltInRuleApp> getBuiltInRule(Goal goal, PosInOccurrence pos) {
 
-        ImmutableList<IBuiltInRuleApp> result = ImmutableSLList.<IBuiltInRuleApp>nil();
+        ImmutableList<IBuiltInRuleApp> result = ImmutableSLList.nil();
 
         ImmutableList<BuiltInRule> rules = index.rules();
         while (!rules.isEmpty()) {

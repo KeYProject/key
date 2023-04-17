@@ -1,24 +1,9 @@
 package de.uka.ilkd.key.rule.merge;
 
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.closeMergePartnerGoal;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getConjunctiveElementsFor;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getLocationVariables;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateLeftSideLocations;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateRightSideFor;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isProvableWithSplitting;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isUpdateNormalForm;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -53,6 +38,21 @@ import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.closeMergePartnerGoal;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getConjunctiveElementsFor;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getLocationVariables;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateLeftSideLocations;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateRightSideFor;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isProvableWithSplitting;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isUpdateNormalForm;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
 
 /**
  * Base for implementing merge rules. Extend this class, implement method mergeValuesInStates(...)
@@ -163,8 +163,8 @@ public class MergeRule implements BuiltInRule {
         // The merge loop
         SymbolicExecutionState mergedState =
             new SymbolicExecutionState(thisSEState.first, thisSEState.second, newGoal.node());
-        LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
-        LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<Term>();
+        LinkedHashSet<Name> newNames = new LinkedHashSet<>();
+        LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<>();
         HashMap<Node, SymbolicExecutionState> mergePartnerNodesToStates = new HashMap<>();
 
         int cnt = 0;
@@ -216,7 +216,7 @@ public class MergeRule implements BuiltInRule {
         // the case of insert_hidden taclets). However, taclets that are present
         // in all partner goals may be safely kept.
         final ArrayList<NoPosTacletApp> partInstNoPosTacletsToRemove =
-            new ArrayList<NoPosTacletApp>();
+            new ArrayList<>();
         newGoal.indexOfTaclets().getPartialInstantiatedApps().forEach(app -> {
             for (final MergePartner mergePartner : mergePartners) {
                 if (!mergePartner.getGoal().indexOfTaclets().getPartialInstantiatedApps()
@@ -309,11 +309,11 @@ public class MergeRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
 
         // Newly introduced names
-        final LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
+        final LinkedHashSet<Name> newNames = new LinkedHashSet<>();
 
         // Side conditions remaining to be proven, e.g. after predicate
         // abstraction.
-        final LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<Term>();
+        final LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<>();
 
         // Construct path condition as (optimized) disjunction
         // NOTE: Deactivated this; This optimization can create shorter
@@ -383,7 +383,7 @@ public class MergeRule implements BuiltInRule {
 
                 // Apply merge procedure: Different values
 
-                Sort heapSort = (Sort) services.getNamespaces().sorts().lookup("Heap");
+                Sort heapSort = services.getNamespaces().sorts().lookup("Heap");
 
                 if (v.sort().equals(heapSort)) {
 
@@ -432,7 +432,7 @@ public class MergeRule implements BuiltInRule {
         // Note: We apply the symbolic state to the new constraints to enable
         // merge techniques, in particular predicate abstraction, to make
         // references to the values of other variables involved in the merge.
-        return new Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>>(
+        return new Triple<>(
             new SymbolicExecutionState(newSymbolicState,
                 newAdditionalConstraints == null ? newPathCondition
                         : tb.and(newPathCondition,
@@ -465,9 +465,9 @@ public class MergeRule implements BuiltInRule {
 
         final TermBuilder tb = services.getTermBuilder();
         ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
-        LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
+        LinkedHashSet<Name> newNames = new LinkedHashSet<>();
 
-        final LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<Term>();
+        final LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<>();
 
         if (heap1.equals(heap2)) {
             // Keep equal heaps
@@ -482,14 +482,14 @@ public class MergeRule implements BuiltInRule {
                 newNames, sideConditionsToProve);
         }
 
-        final Function storeFunc = (Function) services.getNamespaces().functions().lookup("store");
+        final Function storeFunc = services.getNamespaces().functions().lookup("store");
         final Function createFunc =
-            (Function) services.getNamespaces().functions().lookup("create");
+            services.getNamespaces().functions().lookup("create");
         // Note: Check if there are other functions that should be covered.
         // Unknown functions are treated by if-then-else procedure.
 
-        if (((Function) heap1.op()).equals(storeFunc)
-                && ((Function) heap2.op()).equals(storeFunc)) {
+        if (heap1.op().equals(storeFunc)
+                && heap2.op().equals(storeFunc)) {
 
             // Store operations.
 
@@ -537,8 +537,8 @@ public class MergeRule implements BuiltInRule {
 
             } // end if (pointer1.equals(pointer2) && field1.equals(field2))
 
-        } else if (((Function) heap1.op()).equals(createFunc)
-                && ((Function) heap2.op()).equals(createFunc)) {
+        } else if (heap1.op().equals(createFunc)
+                && heap2.op().equals(createFunc)) {
 
             // Create operations.
 
@@ -705,8 +705,8 @@ public class MergeRule implements BuiltInRule {
     }
 
     @FunctionalInterface
-    public static interface MergeRuleProgressListener {
-        public void signalProgress(int progress);
+    public interface MergeRuleProgressListener {
+        void signalProgress(int progress);
     }
 
 }

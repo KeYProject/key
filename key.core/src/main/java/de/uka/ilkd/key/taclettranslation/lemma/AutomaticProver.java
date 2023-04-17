@@ -5,11 +5,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * A very simple type of prover, but it is sufficient for the automatic lemmata handling: Normally
@@ -19,9 +19,9 @@ import de.uka.ilkd.key.rule.RuleApp;
  */
 public class AutomaticProver {
 
-    private ReentrantLock lock = new ReentrantLock();
-    private Condition sleepCondition = lock.newCondition();
-    private ReentrantLock awaitShutdown = new ReentrantLock();
+    private final ReentrantLock lock = new ReentrantLock();
+    private final Condition sleepCondition = lock.newCondition();
+    private final ReentrantLock awaitShutdown = new ReentrantLock();
 
     /**
      * Starts the prover with the following parameters.
@@ -67,8 +67,8 @@ public class AutomaticProver {
      * The core of the automatic prover runs in an own thread.
      */
     private class Worker implements Runnable {
-        private Proof proof;
-        private int maxNumberOfRules;
+        private final Proof proof;
+        private final int maxNumberOfRules;
         private Throwable exception;
 
         public Worker(Proof proof, int maxNumberOfRules) {
@@ -78,7 +78,7 @@ public class AutomaticProver {
         }
 
         private LinkedList<Goal> copyGoals(ImmutableList<Goal> goals) {
-            LinkedList<Goal> result = new LinkedList<Goal>();
+            LinkedList<Goal> result = new LinkedList<>();
             for (Goal goal : goals) {
                 result.add(goal);
             }

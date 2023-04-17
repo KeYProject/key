@@ -2,9 +2,9 @@
 
 package recoder.kit;
 
-import recoder.abstraction.ClassType;
-
 import java.util.List;
+
+import recoder.abstraction.ClassType;
 
 
 /**

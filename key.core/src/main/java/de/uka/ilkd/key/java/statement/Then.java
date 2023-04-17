@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
 import org.key_project.util.ExtList;
 
 /**
@@ -18,7 +19,7 @@ public class Then extends BranchImp {
      * Body.
      */
 
-    protected Statement body;
+    protected final Statement body;
 
 
     /**
@@ -75,8 +76,9 @@ public class Then extends BranchImp {
 
     public ProgramElement getChildAt(int index) {
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

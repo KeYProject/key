@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.java;
 
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.util.Debug;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
+
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.util.Debug;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class KeYRecoderMapping {
@@ -21,10 +22,10 @@ public class KeYRecoderMapping {
     /**
      * maps a recoder programelement (or something similar, e.g. Type) to the KeY-equivalent
      */
-    private HashMap<Object, Object> map;
+    private final HashMap<Object, Object> map;
 
     /** maps a KeY programelement to the Recoder-equivalent */
-    private HashMap<Object, Object> revMap;
+    private final HashMap<Object, Object> revMap;
 
     /** a pseudo super class for all arrays used to declare length */
     private KeYJavaType superArrayType = null;

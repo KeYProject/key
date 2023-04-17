@@ -4,7 +4,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 public class OracleConstant implements OracleTerm {
 
-    private String value;
+    private final String value;
 
     private Sort sort;
 

@@ -1,6 +1,24 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.core.Main;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.text.*;
+import javax.swing.text.html.HTML;
+import javax.swing.text.html.HTMLDocument;
+
 import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
 import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -14,27 +32,13 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ExceptionTools;
+
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.text.*;
-import javax.swing.text.html.HTML;
-import javax.swing.text.html.HTMLDocument;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * A dialog for showing (possibly multiple) issues with a preview window. It can either display
@@ -370,7 +374,7 @@ public final class IssueDialog extends JDialog {
                                 textPane.fireHyperlinkUpdate(new HyperlinkEvent(textPane,
                                     HyperlinkEvent.EventType.ACTIVATED, new URL(href)));
                             } catch (MalformedURLException exc) {
-                                exc.printStackTrace();
+                                LOGGER.warn("Failed to update hyperlink", exc);
                             }
                         }
                     }
@@ -440,7 +444,7 @@ public final class IssueDialog extends JDialog {
                     try {
                         Desktop.getDesktop().browse(hle.getURL().toURI());
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        LOGGER.warn("Failed to browse", ex);
                     }
                 }
             });
@@ -602,9 +606,11 @@ public final class IssueDialog extends JDialog {
             String resourceLocation = "";
             Position pos = Position.UNDEFINED;
             Location location = ExceptionTools.getLocation(exception);
+            if (location != null && !location.getPosition().isNegative()) {
+                pos = location.getPosition();
+            }
             if (Location.isValidLocation(location)) {
                 resourceLocation = location.getFileURL().toString();
-                pos = location.getPosition();
             }
             return new PositionedIssueString(message == null ? exception.toString() : message,
                 resourceLocation, pos, info);
@@ -629,8 +635,8 @@ public final class IssueDialog extends JDialog {
         } else {
             fTextField.setText("");
         }
-        cTextField.setText("Column: " + issue.pos.getColumn());
-        lTextField.setText("Line: " + issue.pos.getLine());
+        cTextField.setText("Column: " + issue.pos.column());
+        lTextField.setText("Line: " + issue.pos.line());
 
         btnEditFile.setEnabled(issue.pos != Position.UNDEFINED);
 
@@ -658,7 +664,7 @@ public final class IssueDialog extends JDialog {
             int offset = issue.pos.isNegative() ? 0 : getOffsetFromLineColumn(source, issue.pos);
             txtSource.setCaretPosition(offset);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to update preview", e);
         }
         validate();
     }
@@ -710,7 +716,7 @@ public final class IssueDialog extends JDialog {
 
     public static int getOffsetFromLineColumn(String source, Position pos) {
         // Position has 1-based line and column, we need them 0-based
-        return getOffsetFromLineColumn(source, pos.getLine() - 1, pos.getColumn() - 1);
+        return getOffsetFromLineColumn(source, pos.line() - 1, pos.column() - 1);
     }
 
     private static int getOffsetFromLineColumn(String source, int line, int column) {
@@ -746,7 +752,7 @@ public final class IssueDialog extends JDialog {
                     try {
                         Desktop.getDesktop().browse(hle.getURL().toURI());
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        LOGGER.warn("Failed to browse", ex);
                     }
                 }
             });

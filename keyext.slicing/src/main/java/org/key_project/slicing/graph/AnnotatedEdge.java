@@ -1,6 +1,7 @@
 package org.key_project.slicing.graph;
 
 import de.uka.ilkd.key.proof.Node;
+
 import org.key_project.util.collection.DefaultEdge;
 
 /**

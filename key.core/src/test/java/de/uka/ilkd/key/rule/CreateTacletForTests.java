@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.rule;
 
 
+import java.io.IOException;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -11,11 +13,11 @@ import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
+
 import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -65,7 +67,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 
     static NamespaceSet nss;
 
-    public Services services;
+    public final Services services;
 
     public CreateTacletForTests() {
         services = new Services(AbstractProfile.getDefaultProfile());

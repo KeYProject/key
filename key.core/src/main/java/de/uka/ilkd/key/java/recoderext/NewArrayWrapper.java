@@ -9,7 +9,7 @@ public class NewArrayWrapper extends NewArray {
      *
      */
     private static final long serialVersionUID = -3838799869300845065L;
-    private Identifier scope;
+    private final Identifier scope;
 
     public NewArrayWrapper(NewArray proto, Identifier scope) {
         super(proto);

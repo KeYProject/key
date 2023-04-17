@@ -1,10 +1,6 @@
 package de.uka.ilkd.key.rule.label;
 
-import java.util.Iterator;
 import java.util.List;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -21,6 +17,9 @@ import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This {@link TermLabelRefactoring} removes the supported {@link TermLabel} in check branches.
@@ -96,12 +95,6 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
     public void refactorLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Term term, List<TermLabel> labels) {
-        Iterator<TermLabel> iter = labels.iterator();
-        while (iter.hasNext()) {
-            TermLabel next = iter.next();
-            if (termLabelNameToRemove.equals(next.name())) {
-                iter.remove();
-            }
-        }
+        labels.removeIf(next -> termLabelNameToRemove.equals(next.name()));
     }
 }

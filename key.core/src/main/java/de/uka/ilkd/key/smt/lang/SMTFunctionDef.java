@@ -5,14 +5,14 @@ import java.util.List;
 
 public class SMTFunctionDef extends SMTFunction {
 
-    private SMTTerm sub;
-    private List<SMTTermVariable> vars;
+    private final SMTTerm sub;
+    private final List<SMTTermVariable> vars;
 
 
 
     public SMTFunctionDef(String id, List<SMTTermVariable> vars, SMTSort image, SMTTerm sub) {
 
-        List<SMTSort> domain = new LinkedList<SMTSort>();
+        List<SMTSort> domain = new LinkedList<>();
         for (SMTTermVariable v : vars) {
             domain.add(v.getSort());
         }
@@ -25,12 +25,12 @@ public class SMTFunctionDef extends SMTFunction {
     }
 
     public SMTFunctionDef(String id, SMTTermVariable var, SMTSort image, SMTTerm sub) {
-        List<SMTSort> domain = new LinkedList<SMTSort>();
+        List<SMTSort> domain = new LinkedList<>();
         domain.add(var.getSort());
         this.id = Util.processName(id);
         this.domainSorts = domain;
         this.imageSort = image;
-        this.vars = new LinkedList<SMTTermVariable>();
+        this.vars = new LinkedList<>();
         vars.add(var);
         this.sub = sub;
     }
@@ -47,7 +47,7 @@ public class SMTFunctionDef extends SMTFunction {
         this.id = f.getId();
         this.domainSorts = f.getDomainSorts();
         this.imageSort = f.getImageSort();
-        this.vars = new LinkedList<SMTTermVariable>();
+        this.vars = new LinkedList<>();
         vars.add(var);
         this.sub = sub;
     }
@@ -67,7 +67,7 @@ public class SMTFunctionDef extends SMTFunction {
     @Override
     public String toString() {
 
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
 
         buff.append("(define-fun ");
         buff.append(id);

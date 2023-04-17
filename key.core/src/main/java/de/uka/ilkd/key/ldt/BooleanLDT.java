@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.ldt;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -14,6 +12,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.ExtList;
 
 
 /**
@@ -140,7 +140,7 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public final Type getType(Term t) {
+    public Type getType(Term t) {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_BOOLEAN;
         } else {

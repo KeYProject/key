@@ -1,20 +1,22 @@
 package de.uka.ilkd.key.util.parsing;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.util.MiscTools;
-import org.antlr.v4.runtime.*;
-import org.key_project.util.java.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.java.StringUtil;
+
+import org.antlr.v4.runtime.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An ANTLR4 error listener that stores the errors internally. You can disable the additional
@@ -86,8 +88,9 @@ public class SyntaxErrorReporter extends BaseErrorListener {
      * @see #hasErrors()
      */
     public void throwException() {
-        if (hasErrors())
+        if (hasErrors()) {
             throw new ParserException("", errors);
+        }
     }
 
 
@@ -190,7 +193,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
                 SyntaxError e = errors.get(0);
                 // e.charPositionInLine is 0 based!
                 return new Location(MiscTools.parseURL(e.source),
-                    Position.newOneZeroBased(e.line, e.charPositionInLine));
+                    Position.fromOneZeroBased(e.line, e.charPositionInLine));
             }
             return null;
         }

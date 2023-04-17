@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.proof_references.testcase;
 
+import java.io.File;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.function.Predicate;
+
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Choice;
@@ -18,18 +24,13 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.CollectionUtil;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -62,7 +63,8 @@ public abstract class AbstractProofReferenceTestCase {
             IProofReferencesAnalyst analyst, ExpectedProofReferences... expectedReferences)
             throws Exception {
         doReferenceFunctionTest(baseDir, javaPathInBaseDir, containerTypeName, targetName,
-            useContracts, analyst, null, expectedReferences);
+            useContracts, analyst,
+            null, expectedReferences);
     }
 
     /**
@@ -155,7 +157,7 @@ public abstract class AbstractProofReferenceTestCase {
             // Filter references
             if (currentReferenceFilter != null) {
                 LinkedHashSet<IProofReference<?>> filteredReferences =
-                    new LinkedHashSet<IProofReference<?>>();
+                    new LinkedHashSet<>();
                 for (IProofReference<?> reference : references) {
                     if (currentReferenceFilter.test(reference)) {
                         filteredReferences.add(reference);
@@ -178,7 +180,7 @@ public abstract class AbstractProofReferenceTestCase {
      */
     protected LinkedHashSet<IProofReference<?>> findReferences(
             LinkedHashSet<IProofReference<?>> references, Node node) {
-        LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
+        LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<>();
         for (IProofReference<?> reference : references) {
             if (reference.getNodes().contains(node)) {
                 result.add(reference);
@@ -305,7 +307,7 @@ public abstract class AbstractProofReferenceTestCase {
         assertNotNull(tester);
         KeYEnvironment<?> environment = null;
         Proof proof = null;
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         boolean usePrettyPrinting = ProofIndependentSettings.isUsePrettyPrinting();
         try {
             // Disable pretty printing to make tests more robust against different term
@@ -378,7 +380,7 @@ public abstract class AbstractProofReferenceTestCase {
         assertNotNull(tester);
         KeYEnvironment<?> environment = null;
         Proof proof = null;
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         boolean usePrettyPrinting = ProofIndependentSettings.isUsePrettyPrinting();
         try {
             // Disable pretty printing to make tests more robust against different term

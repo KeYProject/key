@@ -2,7 +2,9 @@ package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.rule.MatchConditions;
+
 import org.key_project.util.ExtList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,7 +127,7 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
      */
     public String reuseSignature(Services services, ExecutionContext ec) {
         final String s = getClass().toString();
-        return s.substring(s.lastIndexOf('.') + 1, s.length());
+        return s.substring(s.lastIndexOf('.') + 1);
     }
 
 

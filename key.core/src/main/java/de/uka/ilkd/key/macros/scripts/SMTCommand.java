@@ -1,21 +1,27 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.*;
+
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
-import java.util.*;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SMTCommand.class);
+
     private static final Map<String, SolverType> SOLVER_MAP = computeSolverMap();
 
     public SMTCommand() {
@@ -23,7 +29,7 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
     }
 
     private static Map<String, SolverType> computeSolverMap() {
-        Map<String, SolverType> result = new HashMap<String, SolverType>();
+        Map<String, SolverType> result = new HashMap<>();
 
         for (SolverType type : SolverTypes.getSolverTypes()) {
             result.put(type.getName(), type);
@@ -82,14 +88,14 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
                 IBuiltInRuleApp app = RuleAppSMT.rule.createApp(null).setTitle(args.solver);
                 problem.getGoal().apply(app);
             }
-            System.err.println("SMT Runtime, goal " + goal.node().serialNr() + ": "
-                + timerListener.getRuntime() + " ms; " + finalResult);
+            LOGGER.info("Finished run on goal " + goal.node().serialNr() + " in "
+                + timerListener.getRuntime() + "ms, result is " + finalResult);
         }
     }
 
     private SolverTypeCollection computeSolvers(String value) throws ScriptException {
         String[] parts = value.split(" *, *");
-        List<SolverType> types = new ArrayList<SolverType>();
+        List<SolverType> types = new ArrayList<>();
         for (String name : parts) {
             SolverType type = SOLVER_MAP.get(name);
             if (type == null) {
@@ -132,7 +138,7 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
         }
     }
 
-    private class SMTSettingsTimeoutWrapper extends DefaultSMTSettings {
+    private static class SMTSettingsTimeoutWrapper extends DefaultSMTSettings {
         private final int timeout;
 
         public SMTSettingsTimeoutWrapper(DefaultSMTSettings settings, int timeout) {

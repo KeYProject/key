@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.gui.mergerule;
 
+import java.awt.event.ActionEvent;
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.java.Services;
@@ -10,9 +13,6 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
 
 /**
  * The menu item for the state merging rule.
@@ -62,9 +62,8 @@ public class MergeRuleMenuItem extends JMenuItem {
                                     completedApp.getMergePartners().size()));
                         mediator.getUI().taskProgress(0);
 
-                        completedApp.registerProgressListener(progress -> {
-                            mediator.getUI().setProgress(progress);
-                        });
+                        completedApp.registerProgressListener(
+                            progress -> mediator.getUI().setProgress(progress));
 
                         new SwingWorker<Void, Void>() {
                             private long duration;
@@ -88,9 +87,7 @@ public class MergeRuleMenuItem extends JMenuItem {
                                 mediator.getSelectionModel().setSelectedGoal(goal);
                             }
                         }.execute();
-                    } catch (final Exception exc) {
-                        signalError(exc, mediator);
-                    } catch (final AssertionError exc) {
+                    } catch (final Exception | AssertionError exc) {
                         signalError(exc, mediator);
                     }
                 }

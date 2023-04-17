@@ -90,8 +90,9 @@ public class SourceData {
      * @return the ProgramElement to be matched next or <tt>null</tt> if there is no such element
      */
     public ProgramElement getSource() {
-        if (childPos == -1)
+        if (childPos == -1) {
             return element;
+        }
 
         final NonTerminalProgramElement ntpe = (NonTerminalProgramElement) element;
 

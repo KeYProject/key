@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 import org.key_project.util.ExtList;
 
 /**
@@ -83,8 +84,9 @@ public class ContextStatementBlock extends StatementBlock {
 
     public int getChildCount() {
         int count = 0;
-        if (executionContext != null)
+        if (executionContext != null) {
             count++;
+        }
         count += super.getChildCount();
         return count;
     }
@@ -118,12 +120,11 @@ public class ContextStatementBlock extends StatementBlock {
 
     /* toString */
     public String toString() {
-        StringBuffer result = new StringBuffer();
-        result.append("..");
-        result.append(super.toString());
-        result.append("\n");
-        result.append("...");
-        return result.toString();
+        String result = ".." +
+            super.toString() +
+            "\n" +
+            "...";
+        return result;
     }
 
 

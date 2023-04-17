@@ -2,12 +2,6 @@
 
 package recoder.bytecode;
 
-import recoder.ParserException;
-import recoder.abstraction.ElementValuePair;
-import recoder.abstraction.TypeArgument;
-import recoder.abstraction.TypeArgument.WildcardMode;
-import recoder.convenience.Naming;
-
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -16,6 +10,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import recoder.ParserException;
+import recoder.abstraction.ElementValuePair;
+import recoder.abstraction.TypeArgument;
+import recoder.abstraction.TypeArgument.WildcardMode;
+import recoder.convenience.Naming;
 
 /**
  * Simple ByteCode parser.
@@ -42,7 +42,7 @@ public class ByteCodeParser {
     /**
      * TODO this is a very, very ugly hack and might not always work (see readMethodInfo())
      */
-    private final Set<String> staticInners = new HashSet<String>(256);
+    private final Set<String> staticInners = new HashSet<>(256);
     /**
      * wether or not to read java 5 signatures (i.e. generic information etc...)
      */
@@ -164,13 +164,13 @@ public class ByteCodeParser {
             interfaceNames[i] = interfaceNames[i].replace('/', '.').replace('$', '.');
         }
         int fieldsCount = inStr.readUnsignedShort();
-        fields = new ArrayList<FieldInfo>(fieldsCount);
+        fields = new ArrayList<>(fieldsCount);
         for (int i = 0; i < fieldsCount; i += 1) {
             fields.add(readFieldInfo());
         }
         int methodsCount = inStr.readUnsignedShort();
-        methods = new ArrayList<MethodInfo>();
-        constructors = new ArrayList<ConstructorInfo>();
+        methods = new ArrayList<>();
+        constructors = new ArrayList<>();
         for (int i = 0; i < methodsCount; i += 1) {
             MethodInfo minfo = readMethodInfo();
             if (minfo == null) {
@@ -181,10 +181,10 @@ public class ByteCodeParser {
                 methods.add(minfo);
             }
         }
-        ArrayList<AnnotationUseInfo> annotations = new ArrayList<AnnotationUseInfo>();
-        ArrayList<TypeParameterInfo> typeParams = new ArrayList<TypeParameterInfo>();
-        ArrayList<List<TypeArgumentInfo>> typeArgList = new ArrayList<List<TypeArgumentInfo>>();
-        ArrayList<String> typeNames = new ArrayList<String>();
+        ArrayList<AnnotationUseInfo> annotations = new ArrayList<>();
+        ArrayList<TypeParameterInfo> typeParams = new ArrayList<>();
+        ArrayList<List<TypeArgumentInfo>> typeArgList = new ArrayList<>();
+        ArrayList<String> typeNames = new ArrayList<>();
         innerClasses = readAttributesForClassFile(annotations, typeParams, typeArgList, typeNames);
         annotations.trimToSize();
         typeParams.trimToSize();
@@ -212,8 +212,9 @@ public class ByteCodeParser {
                 @SuppressWarnings("unchecked")
                 ArrayList<TypeArgumentInfo>[] arrayLists = new ArrayList[typeArgList.size() - 1];
                 cf.superInterfacesTypeArguments = arrayLists;
-                for (int i = 1; i < typeArgList.size(); i++)
+                for (int i = 1; i < typeArgList.size(); i++) {
                     cf.superInterfacesTypeArguments[i - 1] = typeArgList.get(i);
+                }
             }
         }
 
@@ -377,10 +378,10 @@ public class ByteCodeParser {
                 if (readJava5Signatures) {
                     List<TypeArgumentInfo>[] typeArgInfos =
                         readMethodSignature(prereadParams, typeParams);
-                    for (int jj = 0; jj < typeArgs.length; jj++)
-                        typeArgs[jj] = typeArgInfos[jj];
-                } else
+                    System.arraycopy(typeArgInfos, 0, typeArgs, 0, typeArgs.length);
+                } else {
                     in.skipBytes(length);
+                }
             } else if ("RuntimeVisibleAnnotation".equals(name)
                     || "RuntimeInvisibleAnnotation".equals(name)) {
                 if (readJava5Signatures) {
@@ -389,8 +390,9 @@ public class ByteCodeParser {
                     for (int j = 0; j < number; j++) {
                         emptyListForAnnotations.add(readAnnotation());
                     }
-                } else
+                } else {
                     in.skipBytes(length);
+                }
             } else if ("RuntimeVisibleParameterAnnotations".equals(name)
                     || "RuntimeInvisibleParameterAnnotations".equals(name)) {
                 if (readJava5Signatures) {
@@ -403,15 +405,18 @@ public class ByteCodeParser {
                             currentParamAnnotations[j][k] = readAnnotation();
                         }
                     }
-                } else
+                } else {
                     in.skipBytes(length);
+                }
             } else if ("AnnotationDefault".equals(name)) {
                 if (readJava5Signatures) {
-                    if (currentDefaultValue != null)
+                    if (currentDefaultValue != null) {
                         throw new ByteCodeFormatException("Multiple annotation defaults!");
+                    }
                     currentDefaultValue = readElementValue();
-                } else
+                } else {
                     in.skipBytes(length);
+                }
             } else {
                 in.skipBytes(length);
             }
@@ -443,8 +448,9 @@ public class ByteCodeParser {
                 int k = 0;
                 for (int j = 0; j < number; j++) {
                     String s = readInnerClassInfo();
-                    if (s != null)
+                    if (s != null) {
                         innerClassesRes[k++] = s;
+                    }
                 }
                 if (k != number) {
                     String[] tmpInnerClassesRes = new String[k];
@@ -462,8 +468,9 @@ public class ByteCodeParser {
                     for (int j = 0; j < number; j++) {
                         emptyListForAnnotations.add(readAnnotation());
                     }
-                } else
+                } else {
                     in.skipBytes(length);
+                }
             } else if ("EnclosingMethod".equals(name)) {
                 in.skipBytes(length);
             } else if ("Synthetic".equals(name)) {
@@ -474,14 +481,18 @@ public class ByteCodeParser {
             } else if ("Signature".equals(name)) {
                 if (readJava5Signatures) {
                     ReadClassSignatureResult res = readClassSignature();
-                    for (TypeParameterInfo tai : res.typeParams)
+                    for (TypeParameterInfo tai : res.typeParams) {
                         emptyListForTypeParams.add(tai);
-                    for (List<TypeArgumentInfo> tai : res.typeArgumentArray)
+                    }
+                    for (List<TypeArgumentInfo> tai : res.typeArgumentArray) {
                         emptyListForTypeArgumentLists.add(tai);
-                    for (String n : res.typeNameArray)
+                    }
+                    for (String n : res.typeNameArray) {
                         emptyListForTypeNames.add(n);
-                } else
+                    }
+                } else {
                     in.skipBytes(length);
+                }
             } else if ("Deprecated".equals(name)) {
                 in.skipBytes(length);
             } else {
@@ -508,10 +519,11 @@ public class ByteCodeParser {
                 }
                 constant = pool[in.readUnsignedShort()];
             } else if ("Signature".equals(id)) {
-                if (readJava5Signatures)
+                if (readJava5Signatures) {
                     type = readFieldSignature(pool[in.readUnsignedShort()], emptyListForTypeArgs);
-                else
+                } else {
                     in.skipBytes(length);
+                }
             } else if ("RuntimeVisibleAnnotation".equals(id)
                     || "RuntimeInvisibleAnnotation".equals(id)) {
                 if (readJava5Signatures) {
@@ -520,8 +532,9 @@ public class ByteCodeParser {
                     for (int j = 0; j < number; j++) {
                         emptyListForAnnotations.add(readAnnotation());
                     }
-                } else
+                } else {
                     in.skipBytes(length);
+                }
             } else {
                 in.skipBytes(length);
             }
@@ -533,14 +546,15 @@ public class ByteCodeParser {
         int fieldAccessFlags = in.readUnsignedShort();
         String name = pool[in.readUnsignedShort()]; // name
         String type = decodeType(pool[in.readUnsignedShort()]); // descriptor
-        ArrayList<AnnotationUseInfo> annotations = new ArrayList<AnnotationUseInfo>();
-        ArrayList<TypeArgumentInfo> typeArgs = new ArrayList<TypeArgumentInfo>();
+        ArrayList<AnnotationUseInfo> annotations = new ArrayList<>();
+        ArrayList<TypeArgumentInfo> typeArgs = new ArrayList<>();
         String[] tmp = readAttributesForField(annotations, typeArgs); // constant value, typeargs,
                                                                       // annotations, possibly
                                                                       // different type
         String constant = tmp[0];
-        if (tmp[1] != null)
+        if (tmp[1] != null) {
             type = tmp[1];
+        }
         FieldInfo res = new FieldInfo(fieldAccessFlags, name, type, cf, constant, typeArgs);
         res.setAnnotations(annotations);
         return res;
@@ -557,12 +571,12 @@ public class ByteCodeParser {
             isInitializer = "<clinit>".equals(name);
         }
         String[] types = decodeTypes(pool[in.readUnsignedShort()]); // descriptor
-        ArrayList<AnnotationUseInfo> annotations = new ArrayList<AnnotationUseInfo>();
+        ArrayList<AnnotationUseInfo> annotations = new ArrayList<>();
         currentDefaultValue = null;
         currentParamAnnotations = null;
         @SuppressWarnings("unchecked")
         List<TypeArgumentInfo>[] typeArgs = new List[types.length];
-        ArrayList<TypeParameterInfo> typeParams = new ArrayList<TypeParameterInfo>();
+        ArrayList<TypeParameterInfo> typeParams = new ArrayList<>();
         String[] exceptions = readAttributesForMethod(annotations, types, typeArgs, typeParams);
         String rtype = types[types.length - 1];
         int firstParam = 0;
@@ -589,14 +603,15 @@ public class ByteCodeParser {
             return null;
         }
         MethodInfo res;
-        if (isConstructor)
+        if (isConstructor) {
             res = new ConstructorInfo(methAccessFlags, name, ptypes, exceptions, cf);
-        else {
-            if ((accessFlags & 0x2000) != 0)
+        } else {
+            if ((accessFlags & 0x2000) != 0) {
                 res = new AnnotationPropertyInfo(methAccessFlags, rtype, name, cf,
                     currentDefaultValue);
-            else
+            } else {
                 res = new MethodInfo(methAccessFlags, rtype, name, ptypes, exceptions, cf);
+            }
         }
         res.setAnnotations(annotations);
         res.paramAnnotations = currentParamAnnotations;
@@ -612,9 +627,10 @@ public class ByteCodeParser {
     }
 
     private void setTypeArgParentRec(List<? extends TypeArgument>[] typeArgs, MethodInfo res) {
-        for (int i = 0; i < typeArgs.length; i++) {
-            if (typeArgs[i] != null)
-                setTypeArgParentRec(typeArgs[i], res);
+        for (List<? extends TypeArgument> typeArg : typeArgs) {
+            if (typeArg != null) {
+                setTypeArgParentRec(typeArg, res);
+            }
         }
     }
 
@@ -645,11 +661,13 @@ public class ByteCodeParser {
         }
         if (name != null) {
             // we may still reject this: it might not be a member type!
-            if (!fullName.equals(name.substring(0, name.lastIndexOf('.'))))
+            if (!fullName.equals(name.substring(0, name.lastIndexOf('.')))) {
                 name = null; // this indicates that that type is used, but not that that type is
-                             // declared here!
-            else if (!Character.isJavaIdentifierStart(name.charAt(name.lastIndexOf('.') + 1)))
+            }
+            // declared here!
+            else if (!Character.isJavaIdentifierStart(name.charAt(name.lastIndexOf('.') + 1))) {
                 name = null; // anonymous class
+            }
         }
         return name;
         // return new InnerClassInfo(accessFlags, name, cf);
@@ -665,7 +683,7 @@ public class ByteCodeParser {
             break;
         case 'C':
             // TODO this needs to be verified !!!!
-            res = Character.valueOf(pool[in.readUnsignedShort()].toCharArray()[0]);
+            res = pool[in.readUnsignedShort()].toCharArray()[0];
             break;
         case 'D':
             res = Double.valueOf(pool[in.readUnsignedShort()]);
@@ -716,11 +734,12 @@ public class ByteCodeParser {
 
     private AnnotationUseInfo readAnnotation() throws IOException, ByteCodeFormatException {
         String name = pool[in.readUnsignedShort()]; // annotation index
-        if (name == null)
+        if (name == null) {
             throw new ByteCodeFormatException();
+        }
         name = name.replace('/', '.').replace('$', '.').substring(1, name.length() - 1);
         int number = in.readUnsignedShort();
-        List<ElementValuePair> evpl = new ArrayList<ElementValuePair>(number);
+        List<ElementValuePair> evpl = new ArrayList<>(number);
         for (int i = 0; i < number; i++) {
             String elementName = pool[in.readUnsignedShort()];
             Object value = readElementValue();
@@ -739,33 +758,36 @@ public class ByteCodeParser {
             res.typeParams = readFormalTypeParameters(sig);
             start = 1;
             for (int o = 1; o > 0; start++) {
-                if (sig.charAt(start) == '<')
+                if (sig.charAt(start) == '<') {
                     o++;
-                else if (sig.charAt(start) == '>')
+                } else if (sig.charAt(start) == '>') {
                     o--;
+                }
             }
         }
-        List<List<TypeArgumentInfo>> l1 = new ArrayList<List<TypeArgumentInfo>>();
-        List<String> l2 = new ArrayList<String>();
+        List<List<TypeArgumentInfo>> l1 = new ArrayList<>();
+        List<String> l2 = new ArrayList<>();
         while (start != sig.length()) {
             // read proper super types
             int end = start;
             int o = 0;
             while (sig.charAt(++end) != ';' || o > 0) {
-                if (sig.charAt(end) == '<')
+                if (sig.charAt(end) == '<') {
                     o++;
-                else if (sig.charAt(end) == '>')
+                } else if (sig.charAt(end) == '>') {
                     o--;
+                }
             }
             end++;
             String sig2 = sig.substring(start, end);
-            ArrayList<TypeArgumentInfo> ral = new ArrayList<TypeArgumentInfo>();
+            ArrayList<TypeArgumentInfo> ral = new ArrayList<>();
             l2.add(readFieldSignature(sig2, ral));
             l1.add(ral);
             start = end;
         }
-        if (res.typeParams == null)
-            res.typeParams = new ArrayList<TypeParameterInfo>();
+        if (res.typeParams == null) {
+            res.typeParams = new ArrayList<>();
+        }
         res.typeArgumentArray = l1;
         res.typeNameArray = l2;
         return res;
@@ -773,7 +795,7 @@ public class ByteCodeParser {
 
     private List<TypeParameterInfo> readFormalTypeParameters(String sig)
             throws ByteCodeFormatException {
-        List<TypeParameterInfo> res = new ArrayList<TypeParameterInfo>();
+        List<TypeParameterInfo> res = new ArrayList<>();
         int rpos = 1;
         int lpos;
         int cnt = 0;
@@ -786,8 +808,8 @@ public class ByteCodeParser {
                 rpos++;
             }
             String paramName = sig.substring(lpos, rpos); // parameter name
-            List<String> boundNames = new ArrayList<String>();
-            List<List<TypeArgumentInfo>> boundArgs = new ArrayList<List<TypeArgumentInfo>>();
+            List<String> boundNames = new ArrayList<>();
+            List<List<TypeArgumentInfo>> boundArgs = new ArrayList<>();
             do {
                 rpos++; // consume ':'
                 lpos = rpos; // first character
@@ -835,7 +857,7 @@ public class ByteCodeParser {
     }
 
     private List<TypeArgumentInfo> makeTypeArgs(String tn) throws ByteCodeFormatException {
-        ArrayList<TypeArgumentInfo> res = new ArrayList<TypeArgumentInfo>();
+        ArrayList<TypeArgumentInfo> res = new ArrayList<>();
         assert tn.charAt(0) == '<';
         int pos = 1; // skip first character
         do {
@@ -870,82 +892,95 @@ public class ByteCodeParser {
                 case 'L':
                     int o = 1;
                     while (rpos < tn.length() && o > 0 && !(tn.charAt(rpos) == ';' && o == 1)) {
-                        if (tn.charAt(rpos) == '<')
+                        if (tn.charAt(rpos) == '<') {
                             o++;
-                        if (tn.charAt(rpos) == '>')
+                        }
+                        if (tn.charAt(rpos) == '>') {
                             o--;
+                        }
                         rpos++;
                     }
                     typeName = tn.substring(pos + 1, rpos).replace('/', '.');
-                    if (typeName.equals(""))
+                    if (typeName.equals("")) {
                         typeName = "java.lang.Object"; // allowed for class bound only, but
+                    }
                     // we assume that bytecode isn't corrupted.
-                    while (typeName.endsWith(";") || typeName.endsWith(">"))
+                    while (typeName.endsWith(";") || typeName.endsWith(">")) {
                         typeName = typeName.substring(0, typeName.length() - 1);
+                    }
                     typeName = Naming.toArrayTypeName(typeName, dim);
                     rpos++; // skip ';'
                     break;
                 case 'T':
-                    while (rpos < tn.length() && Character.isJavaIdentifierPart(tn.charAt(rpos)))
+                    while (rpos < tn.length() && Character.isJavaIdentifierPart(tn.charAt(rpos))) {
                         rpos++;
+                    }
                     typeName = tn.substring(pos + 1, rpos);
                     typeName = Naming.toArrayTypeName(typeName, dim);
                     isTypeVariable = true;
                     rpos++;
                     break;
                 case 'B':
-                    if (dim == 0)
+                    if (dim == 0) {
                         throw new ByteCodeFormatException(
                             "primitive type not allowed as type argument");
+                    }
                     typeName = "byte";
                     rpos++;
                     break;
                 case 'C':
-                    if (dim == 0)
+                    if (dim == 0) {
                         throw new ByteCodeFormatException(
                             "primitive type not allowed as type argument");
+                    }
                     typeName = "char";
                     rpos++;
                     break;
                 case 'D':
-                    if (dim == 0)
+                    if (dim == 0) {
                         throw new ByteCodeFormatException(
                             "primitive type not allowed as type argument");
+                    }
                     typeName = "double";
                     rpos++;
                     break;
                 case 'F':
-                    if (dim == 0)
+                    if (dim == 0) {
                         throw new ByteCodeFormatException(
                             "primitive type not allowed as type argument");
+                    }
                     typeName = "float";
                     rpos++;
                     break;
                 case 'I':
-                    if (dim == 0)
+                    if (dim == 0) {
                         throw new ByteCodeFormatException(
                             "primitive type not allowed as type argument");
+                    }
                     typeName = "int";
                     rpos++;
                     break;
                 case 'J':
-                    if (dim == 0)
+                    if (dim == 0) {
                         throw new ByteCodeFormatException(
                             "primitive type not allowed as type argument");
+                    }
                     typeName = "long";
                     rpos++;
                     break;
                 case 'S':
-                    if (dim == 0)
+                    if (dim == 0) {
                         throw new ByteCodeFormatException(
                             "primitive type not allowed as type argument");
+                    }
                     typeName = "short";
                     rpos++;
                     break;
                 case 'Z':
-                    if (dim == 0)
+                    if (dim == 0) {
                         throw new ByteCodeFormatException(
                             "primitive type not allowed as type argument");
+                    }
                     typeName = "boolean";
                     rpos++;
                     break;
@@ -990,10 +1025,12 @@ public class ByteCodeParser {
                     int o = 1;
                     while (o > 0) {
                         rpos++;
-                        if (sig.charAt(rpos) == '<')
+                        if (sig.charAt(rpos) == '<') {
                             o++;
-                        if (sig.charAt(rpos) == '>')
+                        }
+                        if (sig.charAt(rpos) == '>') {
                             o--;
+                        }
                     }
                     String targs = sig.substring(talpos, rpos);
                     emptyListForTypeArgs.addAll(makeTypeArgs(targs));
@@ -1008,8 +1045,9 @@ public class ByteCodeParser {
             break;
         case 'T':
             lpos = rpos;
-            while (sig.charAt(rpos) != ';')
+            while (sig.charAt(rpos) != ';') {
                 rpos++;
+            }
             res = Naming.toArrayTypeName(sig.substring(lpos + 1, rpos), dim);
             rpos++;
             break;
@@ -1061,10 +1099,12 @@ public class ByteCodeParser {
                         int o = 1;
                         while (o > 0) {
                             rpos++;
-                            if (sig.charAt(rpos) == '<')
+                            if (sig.charAt(rpos) == '<') {
                                 o++;
-                            if (sig.charAt(rpos) == '>')
+                            }
+                            if (sig.charAt(rpos) == '>') {
                                 o--;
+                            }
                         }
                         String targs = sig.substring(talpos, rpos);
                         res[cur] = makeTypeArgs(targs);
@@ -1076,8 +1116,9 @@ public class ByteCodeParser {
                 break;
             case 'T':
                 lpos = rpos;
-                while (sig.charAt(rpos) != ';')
+                while (sig.charAt(rpos) != ';') {
                     rpos++;
+                }
 
                 prereadParams[cur] = Naming.toArrayTypeName(sig.substring(lpos + 1, rpos), dim);
                 rpos++;

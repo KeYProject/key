@@ -28,7 +28,7 @@ public class RMethodCallStatement extends JavaStatement
     private ProgramVariableSVWrapper resultVar;
 
     /** schemavariable needed by method call */
-    private ExecutionContext ecsvw;
+    private final ExecutionContext ecsvw;
 
     /**
      * Body.
@@ -63,12 +63,15 @@ public class RMethodCallStatement extends JavaStatement
 
     public int getChildCount() {
         int result = 0;
-        if (resultVar != null)
+        if (resultVar != null) {
             result++;
-        if (ecsvw != null)
+        }
+        if (ecsvw != null) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -82,18 +85,21 @@ public class RMethodCallStatement extends JavaStatement
 
     public ProgramElement getChildAt(int index) {
         if (resultVar != null) {
-            if (index == 0)
+            if (index == 0) {
                 return resultVar;
+            }
             index--;
         }
         if (ecsvw != null) {
-            if (index == 0)
+            if (index == 0) {
                 return ecsvw;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();

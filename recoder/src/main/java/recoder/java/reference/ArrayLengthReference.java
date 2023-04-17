@@ -112,8 +112,9 @@ public class ArrayLengthReference extends JavaNonTerminalProgramElement
      */
 
     public ProgramElement getChildAt(int index) {
-        if (prefix != null && index == 0)
+        if (prefix != null && index == 0) {
             return prefix;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

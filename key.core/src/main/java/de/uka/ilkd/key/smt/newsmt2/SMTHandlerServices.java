@@ -1,21 +1,23 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.smt.solvertypes.SolverPropertiesLoader;
-import org.key_project.util.Streams;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
-import javax.annotation.Nonnull;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.smt.solvertypes.SolverPropertiesLoader;
+
+import org.key_project.util.Streams;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class provides some infrastructure to the smt translation process.
@@ -63,7 +65,7 @@ public class SMTHandlerServices {
     private final Object handlerModificationLock = new Object();
 
     /** A collection of the properties */
-    private List<SMTHandlerProperty<?>> smtProperties = makeBuiltinProperties();
+    private final List<SMTHandlerProperty<?>> smtProperties = makeBuiltinProperties();
 
     /**
      * Get the instance of this singleton.
@@ -102,8 +104,9 @@ public class SMTHandlerServices {
         // If handlerNames is empty, use default handlerNames list.
         if (handlerNames.length == 0) {
             InputStream stream = SolverPropertiesLoader.class.getResourceAsStream(DEFAULT_HANDLERS);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-            handlerNames = reader.lines().collect(Collectors.toList()).toArray(new String[0]);
+            BufferedReader reader =
+                new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+            handlerNames = reader.lines().toArray(String[]::new);
         }
         Collection<SMTHandler> result = new LinkedList<>();
         for (String name : handlerNames) {
@@ -246,8 +249,7 @@ public class SMTHandlerServices {
     }
 
     private List<SMTHandlerProperty<?>> makeBuiltinProperties() {
-        List<SMTHandlerProperty<?>> result = new ArrayList<>();
-        result.addAll(HandlerUtil.GLOBAL_PROPERTIES);
+        List<SMTHandlerProperty<?>> result = new ArrayList<>(HandlerUtil.GLOBAL_PROPERTIES);
         return result;
     }
 

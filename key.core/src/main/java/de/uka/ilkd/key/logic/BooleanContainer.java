@@ -8,11 +8,11 @@ public final class BooleanContainer {
         bool = false;
     }
 
-    public final boolean val() {
+    public boolean val() {
         return bool;
     }
 
-    public final void setVal(boolean b) {
+    public void setVal(boolean b) {
         bool = b;
     }
 }

@@ -2,18 +2,18 @@ package de.uka.ilkd.key.rule;
 
 import java.util.List;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.BlockContractImpl;
+import de.uka.ilkd.key.speclang.HeapContext;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Application of {@link AbstractBlockContractRule}.
@@ -61,10 +61,10 @@ public abstract class AbstractBlockContractBuiltInRuleApp
         final ImmutableSet<BlockContract> contracts =
             AbstractBlockContractRule.getApplicableContracts(instantiation, goal, services);
         setStatement(instantiation.statement);
-        ImmutableSet<BlockContract> cons = DefaultImmutableSet.<BlockContract>nil();
+        ImmutableSet<BlockContract> cons = DefaultImmutableSet.nil();
         for (BlockContract cont : contracts) {
-            if (cont.getBlock().getStartPosition().getLine() == getStatement().getStartPosition()
-                    .getLine()) {
+            if (cont.getBlock().getStartPosition().line() == getStatement().getStartPosition()
+                    .line()) {
                 cons = cons.add(cont);
             }
         }

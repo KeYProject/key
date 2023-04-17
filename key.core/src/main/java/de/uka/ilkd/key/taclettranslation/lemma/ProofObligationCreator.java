@@ -2,8 +2,6 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.Collection;
 
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
@@ -18,6 +16,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletVisitor;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
+
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**

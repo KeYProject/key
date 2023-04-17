@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import org.key_project.util.LRUCache;
-
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -13,6 +11,8 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.LRUCache;
 
 /**
  * This class is used to prove some simple arithmetic problem which are a==b, a>=b, a<=b; Besides it
@@ -122,7 +122,7 @@ public class HandleArith {
      * @return trueT if true, falseT if false, and atom if can't be prove;
      */
     public static Term provedByArith(Term problem, Term axiom, Services services) {
-        final Pair<Term, Term> key = new Pair<Term, Term>(problem, axiom);
+        final Pair<Term, Term> key = new Pair<>(problem, axiom);
         final LRUCache<Pair<Term, Term>, Term> provedByArithCache =
             services.getCaches().getProvedByArithSndCache();
         Term result;

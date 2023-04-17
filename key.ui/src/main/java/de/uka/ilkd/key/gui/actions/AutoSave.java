@@ -2,10 +2,10 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 
-import org.key_project.util.java.IOUtil;
-
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
+import org.key_project.util.java.IOUtil;
 
 public class AutoSave extends MainWindowAction {
     private static final long serialVersionUID = -2598146925208531491L;

@@ -27,14 +27,14 @@ public class SVInstantiationParserException extends SVInstantiationExceptionWith
     }
 
     public String getMessage() {
-        int column = getPosition().getColumn();
+        int column = getPosition().column();
 
         String msg = super.getMessage();
         // needs non-prop font: msg +="\n"+inst;
         if (column > 0) {
             // needs non-prop font: msg +="\n"+space(column-1)+"^";
             String[] rows = instantiation.split("\n");
-            StringBuilder sb = new StringBuilder(rows[getPosition().getLine() - 1]);
+            StringBuilder sb = new StringBuilder(rows[getPosition().line() - 1]);
             sb.insert(column - 1, " ~~> ");
             msg += "\noccurred at: " + sb;
         } else {

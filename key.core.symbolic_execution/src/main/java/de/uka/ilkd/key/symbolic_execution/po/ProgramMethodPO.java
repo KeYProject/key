@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.symbolic_execution.po;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -20,15 +26,10 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
 
 /**
  * <p>
@@ -58,12 +59,12 @@ public class ProgramMethodPO extends AbstractOperationPO {
     /**
      * The {@link IProgramMethod} to execute code parts from.
      */
-    private IProgramMethod pm;
+    private final IProgramMethod pm;
 
     /**
      * The precondition in JML syntax.
      */
-    private String precondition;
+    private final String precondition;
 
     /**
      * Constructor.
@@ -136,7 +137,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
         // Get program method to execute
         IProgramMethod pm = getProgramMethod();
         // Extracts code parts of the method
-        ImmutableArray<Expression> args = new ImmutableArray<Expression>(
+        ImmutableArray<Expression> args = new ImmutableArray<>(
             formalParVars.toArray(new ProgramVariable[formalParVars.size()]));
         MethodBodyStatement mbs = new MethodBodyStatement(pm, selfVar, resultVar, args);
         StatementBlock result = new StatementBlock(mbs);
@@ -349,10 +350,10 @@ public class ProgramMethodPO extends AbstractOperationPO {
             throw new IOException("Can't find type \"" + className + "\".");
         }
         ImmutableList<KeYJavaType> parameterTypes = ImmutableSLList.nil();
-        for (int i = 0; i < types.length; i++) {
-            KeYJavaType paramType = javaInfo.getKeYJavaType(types[i].trim());
+        for (String s : types) {
+            KeYJavaType paramType = javaInfo.getKeYJavaType(s.trim());
             if (paramType == null) {
-                throw new IOException("Can't find type \"" + types[i] + "\".");
+                throw new IOException("Can't find type \"" + s + "\".");
             }
             parameterTypes = parameterTypes.append(paramType);
         }

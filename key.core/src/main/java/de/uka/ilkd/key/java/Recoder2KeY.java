@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.java;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.util.*;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.NullType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -12,10 +18,12 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
-import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.*;
+import de.uka.ilkd.key.util.LinkedHashMap;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.ModelException;
@@ -37,11 +45,6 @@ import recoder.service.ChangeHistory;
 import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.KeYCrossReferenceSourceInfo;
 import recoder.service.UnresolvedReferenceException;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
-import java.util.*;
 
 /**
  * This class is the bridge between recoder ast data structures and KeY data structures. Syntactical
@@ -174,18 +177,22 @@ public class Recoder2KeY implements JavaReader {
     private Recoder2KeY(Services services, KeYCrossReferenceServiceConfiguration servConf,
             String classPath, KeYRecoderMapping rec2key, NamespaceSet nss, TypeConverter tc) {
 
-        if (servConf == null)
+        if (servConf == null) {
             throw new IllegalArgumentException("service configuration is null");
+        }
 
-        if (rec2key == null)
+        if (rec2key == null) {
             throw new IllegalArgumentException("rec2key mapping is null");
+        }
 
-        if (nss == null)
+        if (nss == null) {
             throw new IllegalArgumentException("namespaces is null");
+        }
 
-        if (!(servConf.getProjectSettings().getErrorHandler() instanceof KeYRecoderExcHandler))
+        if (!(servConf.getProjectSettings().getErrorHandler() instanceof KeYRecoderExcHandler)) {
             throw new IllegalArgumentException(
                 "Recoder2KeY needs a KeyRecoderExcHandler as exception handler");
+        }
 
         this.services = services;
         this.servConf = servConf;
@@ -333,7 +340,8 @@ public class Recoder2KeY implements JavaReader {
      * @throws ParseExceptionInFile exceptions are wrapped into this to provide location information
      */
     private CompilationUnit readWithoutFileRepo(String filename) throws ParseExceptionInFile {
-        try (Reader fr = new FileReader(filename); BufferedReader br = new BufferedReader(fr)) {
+        try (Reader fr = new FileReader(filename, StandardCharsets.UTF_8);
+                BufferedReader br = new BufferedReader(fr)) {
             return servConf.getProgramFactory().parseCompilationUnit(br);
         } catch (Exception e) {
             throw new ParseExceptionInFile(filename, e);
@@ -524,7 +532,7 @@ public class Recoder2KeY implements JavaReader {
         while (walker.step()) {
             DataLocation loc = walker.getCurrentDataLocation();
             try (InputStream is = walker.openCurrent(fileRepo);
-                    Reader isr = new InputStreamReader(is);
+                    Reader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
                     Reader f = new BufferedReader(isr)) {
 
                 recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
@@ -592,7 +600,7 @@ public class Recoder2KeY implements JavaReader {
             while (walker.step()) {
                 currentDataLocation = walker.getCurrentDataLocation();
                 try (InputStream is = walker.openCurrent(fileRepo);
-                        Reader isr = new InputStreamReader(is);
+                        Reader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
                         Reader f = new BufferedReader(isr)) {
 
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
@@ -612,7 +620,7 @@ public class Recoder2KeY implements JavaReader {
             while (walker.step()) {
                 currentDataLocation = walker.getCurrentDataLocation();
                 try (InputStream is = walker.openCurrent(fileRepo);
-                        Reader isr = new InputStreamReader(is);
+                        Reader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
                         Reader f = new BufferedReader(isr)) {
 
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
@@ -675,7 +683,7 @@ public class Recoder2KeY implements JavaReader {
                 MethodDeclaration methDecl = (MethodDeclaration) pe;
                 if (!allowed && methDecl.getBody() != null) {
                     LOGGER.warn("Method body ({}) should not be allowed: {}", methDecl.getName(),
-                        rcu.getDataLocation(), Recoder2KeY.class.getName());
+                        rcu.getDataLocation());
                 }
                 methDecl.setBody(null);
             }
@@ -963,7 +971,7 @@ public class Recoder2KeY implements JavaReader {
             classContext.setMembers(list);
         }
 
-        l: while (it.hasNext()) {
+        while (it.hasNext()) {
             VariableSpecification keyVarSpec;
             ProgramVariable var = it.next();
             if (names.contains(var.name().toString())) {
@@ -987,8 +995,9 @@ public class Recoder2KeY implements JavaReader {
 
             String typeName;
             Type javaType = var.getKeYJavaType().getJavaType();
-            if (javaType == null)
+            if (javaType == null) {
                 continue;
+            }
             typeName = javaType.getFullName();
 
 
@@ -1182,8 +1191,9 @@ public class Recoder2KeY implements JavaReader {
      * reduce the size of a string to a maximum of length.
      */
     private static String trim(String s, int length) {
-        if (s.length() > length)
+        if (s.length() > length) {
             return s.substring(0, length - 5) + "[...]";
+        }
         return s;
     }
 
@@ -1192,25 +1202,37 @@ public class Recoder2KeY implements JavaReader {
     /**
      * tries to parse recoders exception position information
      */
-    private static int[] extractPositionInfo(String errorMessage) {
+    private static Pair<String, Position> extractPositionInfo(String errorMessage) {
         if (errorMessage == null || errorMessage.indexOf('@') == -1) {
-            return new int[0];
+            return null;
         }
+        String url = null;
+        int fileStart = errorMessage.indexOf("\"FILE:");
+        fileStart = fileStart == -1 ? errorMessage.indexOf("\"URL:") : fileStart;
+        fileStart = fileStart == -1 ? errorMessage.indexOf("\"ARCHIVE:") : fileStart;
+        if (fileStart != -1) {
+            fileStart += 1;
+            int fileEnd = errorMessage.indexOf("\"", fileStart);
+
+            url =
+                errorMessage.substring(fileStart, fileEnd == -1 ? errorMessage.length() : fileEnd);
+        }
+
         int line = -1;
         int column = -1;
         try {
-            String pos = errorMessage.substring(errorMessage.indexOf("@") + 1);
-            pos = pos.substring(0, pos.indexOf(" "));
+            String pos = errorMessage.substring(errorMessage.indexOf('@') + 1);
+            pos = pos.substring(0, pos.indexOf(' '));
             line = Integer.parseInt(pos.substring(0, pos.indexOf('/')));
             column = Integer.parseInt(pos.substring(pos.indexOf('/') + 1));
         } catch (NumberFormatException nfe) {
             LOGGER.debug(
                 "recoder2key:unresolved reference at " + "line:" + line + " column:" + column);
-            return new int[0];
+            return null;
         } catch (StringIndexOutOfBoundsException siexc) {
-            return new int[0];
+            return null;
         }
-        return new int[] { line, column };
+        return new Pair<>(url, Position.newOneBased(line, column));
     }
 
     /**
@@ -1232,15 +1254,16 @@ public class Recoder2KeY implements JavaReader {
             throw (PosConvertException) cause;
         }
 
-        int[] pos = extractPositionInfo(cause.toString());
-        reportErrorWithPositionInFile(message, cause, pos, null);
+        var pos = extractPositionInfo(cause.toString());
+        reportErrorWithPositionInFile(message, cause, pos.second, pos.first);
     }
 
-    public static void reportErrorWithPositionInFile(String message, Throwable cause, int[] pos,
+    public static void reportErrorWithPositionInFile(String message, Throwable cause,
+            @Nullable Position pos,
             String file) {
         final RuntimeException rte;
-        if (pos.length > 0) {
-            rte = new PosConvertException(message, new Position(pos[0], pos[1]), file);
+        if (pos != null) {
+            rte = new PosConvertException(message, pos, file);
             rte.initCause(cause);
         } else {
             rte = new ConvertException(message, cause);

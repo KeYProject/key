@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.proof;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Implementation of the NewRuleListener interface that does nothing

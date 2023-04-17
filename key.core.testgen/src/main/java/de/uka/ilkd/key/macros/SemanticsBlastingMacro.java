@@ -24,7 +24,7 @@ public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
         super();
         semanticsFilter = new SemanticsRuleFilter();
         equalityRuleFilter = new EqualityRuleFilter();
-        allowedPullOut = new HashSet<String>(20);
+        allowedPullOut = new HashSet<>(20);
 
         allowedPullOut.add("store");
         allowedPullOut.add("create");
@@ -81,10 +81,10 @@ public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
 
 
 
-    private class SemanticsRuleFilter implements RuleFilter {
-        protected HashSet<String> allowedRulesNames;
+    private static class SemanticsRuleFilter implements RuleFilter {
+        protected final HashSet<String> allowedRulesNames;
         {
-            allowedRulesNames = new HashSet<String>(100);
+            allowedRulesNames = new HashSet<>(100);
             allowedRulesNames.add("selectOfStore");
             allowedRulesNames.add("selectOfCreate");
             allowedRulesNames.add("selectOfAnon");
@@ -158,10 +158,10 @@ public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
         }
     }
 
-    private class EqualityRuleFilter implements RuleFilter {
-        private HashSet<String> allowedRulesNames;
+    private static class EqualityRuleFilter implements RuleFilter {
+        private final HashSet<String> allowedRulesNames;
         {
-            allowedRulesNames = new HashSet<String>();
+            allowedRulesNames = new HashSet<>();
             allowedRulesNames.add("equalityToElementOf");
             allowedRulesNames.add("equalityToSelect");
             allowedRulesNames.add("equalityToSeqGetAndSeqLen");

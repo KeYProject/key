@@ -2,9 +2,6 @@ package de.uka.ilkd.key.strategy.feature.instantiator;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -17,6 +14,9 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**
@@ -64,8 +64,9 @@ public class SVInstantiationCP implements Feature {
         final ImmutableSet<SchemaVariable> vars = app.uninstantiatedVars();
         for (SchemaVariable var : vars) {
             final SchemaVariable svt = var;
-            if (svt.name().equals(svToInstantiate))
+            if (svt.name().equals(svToInstantiate)) {
                 return svt;
+            }
         }
 
         Debug.fail("Did not find schema variable " + svToInstantiate
@@ -89,9 +90,10 @@ public class SVInstantiationCP implements Feature {
         }
 
         public Iterator<CPBranch> getBranches(RuleApp oldApp) {
-            if (!(oldApp instanceof TacletApp))
+            if (!(oldApp instanceof TacletApp)) {
                 Debug.fail("Instantiation feature is only applicable to " + "taclet apps, but got "
                     + oldApp);
+            }
             final TacletApp tapp = (TacletApp) oldApp;
 
             final SchemaVariable sv = findSVWithName(tapp);

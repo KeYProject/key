@@ -32,7 +32,7 @@ public class JoinIsApplicable {
      */
     public List<ProspectivePartner> isApplicable(Goal goal, PosInOccurrence pio) {
         if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
-            return new LinkedList<ProspectivePartner>();
+            return new LinkedList<>();
         }
         return computeProspecitvePartner(goal, pio);
     }
@@ -46,7 +46,7 @@ public class JoinIsApplicable {
      */
     public List<ProspectivePartner> computeProspecitvePartner(Goal goal, PosInOccurrence pio) {
         assert !pio.isInAntec();
-        List<ProspectivePartner> partners = new LinkedList<ProspectivePartner>();
+        List<ProspectivePartner> partners = new LinkedList<>();
 
         for (Goal g2 : goal.proof().openGoals()) {
             if (g2 != goal) {

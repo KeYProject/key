@@ -1,11 +1,12 @@
 package de.uka.ilkd.key.smt.communication;
 
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.io.StringReader;
 
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class BufferedMessageReaderTest {
 
@@ -27,7 +28,7 @@ public class BufferedMessageReaderTest {
         assertEquals("a", br.readMessage());
         assertEquals("b", br.readMessage());
         assertEquals("c", br.readMessage());
-        assertEquals(null, br.readMessage());
+        assertNull(br.readMessage());
     }
 
     @Test
@@ -45,7 +46,7 @@ public class BufferedMessageReaderTest {
         assertEquals("a", br.readMessage());
         assertEquals("b", br.readMessage());
         assertEquals("c", br.readMessage());
-        assertEquals(null, br.readMessage());
+        assertNull(br.readMessage());
     }
 
     @Test
@@ -55,7 +56,7 @@ public class BufferedMessageReaderTest {
         assertEquals("a", br.readMessage());
         assertEquals("b", br.readMessage());
         assertEquals("c", br.readMessage());
-        assertEquals(null, br.readMessage());
+        assertNull(br.readMessage());
     }
 
 }

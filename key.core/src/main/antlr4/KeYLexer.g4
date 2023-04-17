@@ -1,15 +1,8 @@
 lexer grammar KeYLexer;
 
 @header {
-    import java.io.InputStream;
-    import de.uka.ilkd.key.util.*;
     import java.util.HashMap;
     import java.util.LinkedHashMap;
-    import antlr.CharStreamException;
-    import antlr.TokenStreamException;
-    import org.antlr.runtime.*;
-    import java.util.NoSuchElementException;
-    import java.io.*;
 }
 
 @annotateclass{ @SuppressWarnings("all") } 

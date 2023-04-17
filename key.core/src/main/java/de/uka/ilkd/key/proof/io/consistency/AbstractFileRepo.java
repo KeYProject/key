@@ -1,23 +1,13 @@
 package de.uka.ilkd.key.proof.io.consistency;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -324,7 +314,8 @@ public abstract class AbstractFileRepo implements FileRepo {
         // TODO: may replace/filter too much (e.g. in comments)
 
         try (InputStream is = getInputStreamInternal(p); // get concrete source from repo
-                Stream<String> lines = new BufferedReader(new InputStreamReader(is)).lines()) {
+                Stream<String> lines =
+                    new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8)).lines()) {
 
             // create an in-memory copy of the file, modify it, prepend the classpath,
             // and return an InputStream
@@ -389,7 +380,7 @@ public abstract class AbstractFileRepo implements FileRepo {
             index = 0;
         }
 
-        return keyFileContent.substring(0, index) + System.lineSeparator() + sb.toString()
+        return keyFileContent.substring(0, index) + System.lineSeparator() + sb
                 + keyFileContent.substring(index);
     }
 
@@ -409,10 +400,10 @@ public abstract class AbstractFileRepo implements FileRepo {
             throw new IllegalStateException("Classpath is already set!");
         }
         if (paths != null) {
-            classpath = paths.stream().filter(p -> p != null) // to be sure it contains no null
-                                                              // elements
-                                                              // convert Files to Paths and
-                                                              // normalize
+            classpath = paths.stream().filter(Objects::nonNull) // to be sure it contains no null
+                                                                // elements
+                                                                // convert Files to Paths and
+                                                                // normalize
                     .map(p -> p.toPath().toAbsolutePath().normalize()).collect(Collectors.toList());
         }
     }

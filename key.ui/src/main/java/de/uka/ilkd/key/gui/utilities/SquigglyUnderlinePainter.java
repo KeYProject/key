@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.gui.utilities;
 
+import java.awt.*;
 import javax.swing.plaf.TextUI;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
-import java.awt.*;
 
 /**
  * A highlight painter for drawing a squiggly line under the selection. Color and width of the line

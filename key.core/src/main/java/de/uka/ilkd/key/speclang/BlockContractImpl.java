@@ -5,11 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.MapUtil;
-
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -23,6 +18,11 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.MapUtil;
 
 /**
  * Default implementation of {@link BlockContract}.
@@ -123,10 +123,10 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
     @Override
     public String getUniqueName() {
         if (getTarget() != null) {
-            return "Block Contract " + getBlock().getStartPosition().getLine() + " "
+            return "Block Contract " + getBlock().getStartPosition().line() + " "
                 + getTarget().getUniqueName();
         } else {
-            return "Block Contract " + getBlock().getStartPosition().getLine() + " "
+            return "Block Contract " + getBlock().getStartPosition().line() + " "
                 + Math.abs(getBlock().hashCode());
         }
     }
@@ -286,13 +286,13 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             }
 
             final BlockContract head = contracts[0];
-            String baseName = head.getBaseName();
+            StringBuilder baseName = new StringBuilder(head.getBaseName());
 
             for (int i = 1; i < contracts.length; i++) {
                 assert contracts[i].getBlock().equals(head.getBlock());
 
-                baseName += SpecificationRepository.CONTRACT_COMBINATION_MARKER
-                        + contracts[i].getBaseName();
+                baseName.append(SpecificationRepository.CONTRACT_COMBINATION_MARKER)
+                        .append(contracts[i].getBaseName());
             }
 
             placeholderVariables = head.getPlaceholderVariables();
@@ -306,7 +306,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 functionalContracts = functionalContracts.union(contract.getFunctionalContracts());
             }
 
-            Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<LocationVariable, Boolean>();
+            Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 boolean hm = false;
 
@@ -316,7 +316,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 hasMod.put(heap, hm);
             }
 
-            BlockContractImpl result = new BlockContractImpl(baseName, head.getBlock(),
+            BlockContractImpl result = new BlockContractImpl(baseName.toString(), head.getBlock(),
                 head.getLabels(), head.getMethod(), head.getModality(), preconditions,
                 freePreconditions, contracts[0].getMby(), postconditions, freePostconditions,
                 modifiesClauses, head.getInfFlowSpecs(), placeholderVariables,
