@@ -4,7 +4,7 @@ dependencies {
     api project(':key.util')
     api project(':key.core')
 
-    def JP_VERSION = "3.25.2-K2-SNAPSHOT"
+    def JP_VERSION = "3.25.2-K3-SNAPSHOT"
     api "com.github.javaparser:javaparser-core:$JP_VERSION"
     api "com.github.javaparser:javaparser-core-serialization:$JP_VERSION"
     api "com.github.javaparser:javaparser-symbol-solver-core:$JP_VERSION"
