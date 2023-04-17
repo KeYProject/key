@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.PosTacletApp;
@@ -59,11 +60,16 @@ public final class SMTFocusResults {
         FindTaclet hideRight = (FindTaclet) goal.proof().getEnv().getInitConfigForEnvironment()
                 .lookupActiveTaclet(new Name("hide_right"));
 
-        Semisequent antecedent = goal.node().sequent().antecedent();
+        // cache the goal node, because we will apply rules on the goal
+        // (changing the result of goal.node())
+        Node goalNode = goal.node();
+        Semisequent antecedent = goalNode.sequent().antecedent();
+        Semisequent succedent = goalNode.sequent().succedent();
+
         int i = 1;
         for (SequentFormula sf : antecedent) {
             PosInOccurrence pio =
-                PosInOccurrence.findInSequent(goal.node().sequent(), i, PosInTerm.getTopLevel());
+                PosInOccurrence.findInSequent(goalNode.sequent(), i, PosInTerm.getTopLevel());
             if (!unsatCore.contains(pio)) {
                 // TODO: ugly way of acessing. Can be done better?!
                 SchemaVariable schema = hideLeft.collectSchemaVars().iterator().next();
@@ -76,10 +82,9 @@ public final class SMTFocusResults {
             i++;
         }
 
-        Semisequent succedent = goal.node().sequent().succedent();
         for (SequentFormula sf : succedent) {
             PosInOccurrence pio =
-                PosInOccurrence.findInSequent(goal.node().sequent(), i, PosInTerm.getTopLevel());
+                PosInOccurrence.findInSequent(goalNode.sequent(), i, PosInTerm.getTopLevel());
             if (!unsatCore.contains(pio)) {
                 // TODO: ugly way of acessing. Can be done better?!
                 SchemaVariable schema = hideRight.collectSchemaVars().iterator().next();
