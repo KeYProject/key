@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.smt;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Optional;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -10,14 +14,12 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Optional;
 
 /**
  * Compute unsat core from SMT problems and hide all irrelevant formulas from sequent.
@@ -53,16 +55,16 @@ public final class SMTFocusResults {
         ImmutableList<PosInOccurrence> unsatCore = unsatCoreFormulas.get();
 
         Goal goal = smtProblem.getGoal();
-
-        FindTaclet hideLeft = (FindTaclet) goal.proof().getEnv().getInitConfigForEnvironment()
-                .lookupActiveTaclet(new Name("hide_left"));
-
-        FindTaclet hideRight = (FindTaclet) goal.proof().getEnv().getInitConfigForEnvironment()
-                .lookupActiveTaclet(new Name("hide_right"));
-
         // cache the goal node, because we will apply rules on the goal
         // (changing the result of goal.node())
-        Node goalNode = goal.node();
+        Node goalNode = smtProblem.getNode();
+
+        FindTaclet hideLeft = (FindTaclet) goalNode.proof().getEnv().getInitConfigForEnvironment()
+                .lookupActiveTaclet(new Name("hide_left"));
+
+        FindTaclet hideRight = (FindTaclet) goalNode.proof().getEnv().getInitConfigForEnvironment()
+                .lookupActiveTaclet(new Name("hide_right"));
+
         Semisequent antecedent = goalNode.sequent().antecedent();
         Semisequent succedent = goalNode.sequent().succedent();
 
@@ -135,26 +137,26 @@ public final class SMTFocusResults {
             return Optional.empty();
         }
 
-        Goal goal = problem.getGoal();
+        Node goalNode = problem.getNode();
 
         HashSet<Integer> unsatCore = new HashSet<>(Arrays.asList(numbers));
         ImmutableList<PosInOccurrence> unsatCoreFormulas = ImmutableSLList.nil();
 
-        Semisequent antecedent = goal.node().sequent().antecedent();
+        Semisequent antecedent = goalNode.sequent().antecedent();
         int i = 1;
         for (SequentFormula sf : antecedent) {
             if (unsatCore.contains(i)) {
                 unsatCoreFormulas = unsatCoreFormulas.prepend(PosInOccurrence
-                        .findInSequent(goal.node().sequent(), i, PosInTerm.getTopLevel()));
+                        .findInSequent(goalNode.sequent(), i, PosInTerm.getTopLevel()));
             }
             i++;
         }
 
-        Semisequent succedent = goal.node().sequent().succedent();
+        Semisequent succedent = goalNode.sequent().succedent();
         for (SequentFormula sf : succedent) {
             if (unsatCore.contains(i)) {
                 unsatCoreFormulas = unsatCoreFormulas.prepend(PosInOccurrence
-                        .findInSequent(goal.node().sequent(), i, PosInTerm.getTopLevel()));
+                        .findInSequent(goalNode.sequent(), i, PosInTerm.getTopLevel()));
             }
             i++;
         }

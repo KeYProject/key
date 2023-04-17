@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.smt;
 
+import java.io.File;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -9,12 +11,12 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.helper.FindResources;
 
-import java.io.File;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the unsat core saving infrastructure.

@@ -1,7 +1,9 @@
 package de.uka.ilkd.key.gui.actions.useractions;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Optional;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.smt.SolverListener;
@@ -15,10 +17,8 @@ import de.uka.ilkd.key.smt.SMTFocusResults;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolverResult;
-import org.key_project.util.collection.ImmutableList;
 
-import java.util.HashSet;
-import java.util.Optional;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * User action to apply the results of running SMT solvers.

@@ -20,11 +20,11 @@ import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.ProgressDialogListener;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
@@ -39,7 +39,6 @@ import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
-import org.key_project.util.collection.ImmutableList;
 
 public class SolverListener implements SolverLauncherListener {
     private ProgressDialog progressDialog;
@@ -226,6 +225,7 @@ public class SolverListener implements SolverLauncherListener {
             Set<Goal> failedToFocus = new HashSet<>();
             for (InternSMTProblem problem : problems) {
                 Goal goal = problem.problem.getGoal();
+                Node goalNode = goal.node();
                 if (focusedGoals.contains(goal)
                         || problem.solver.getFinalResult().isValid() != ThreeValuedTruth.VALID) {
                     continue; // already done
@@ -233,6 +233,11 @@ public class SolverListener implements SolverLauncherListener {
                 if (SMTFocusResults.focus(problem.problem, mediator.getServices())) {
                     focusedGoals.add(goal);
                     failedToFocus.remove(goal);
+
+                    // focus SMT application
+                    if (goalNode == mediator.getSelectedNode()) {
+                        mediator.getSelectionModel().setSelectedNode(goal.node());
+                    }
                 } else {
                     failedToFocus.add(goal);
                 }
