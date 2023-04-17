@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.proof;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -8,27 +10,25 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 public class BuiltInRuleAppIndex {
-
+    public static final AtomicLong PERF_CREATE_ALL = new AtomicLong();
+    public static final AtomicLong PERF_UPDATE = new AtomicLong();
     private final BuiltInRuleIndex index;
 
-    private NewRuleListener newRuleListener = NullNewRuleListener.INSTANCE;
+    private SequentChangeInfo sequentChangeInfo = null;
 
     public BuiltInRuleAppIndex(BuiltInRuleIndex index) {
         this.index = index;
     }
 
-
-    public BuiltInRuleAppIndex(BuiltInRuleIndex index, NewRuleListener p_newRuleListener) {
+    private BuiltInRuleAppIndex(BuiltInRuleIndex index, SequentChangeInfo sequentChangeInfo) {
         this.index = index;
-        this.newRuleListener = p_newRuleListener;
+        this.sequentChangeInfo = sequentChangeInfo;
     }
-
 
     /**
      * returns a list of built-in rules application applicable for the given goal and position
      */
     public ImmutableList<IBuiltInRuleApp> getBuiltInRule(Goal goal, PosInOccurrence pos) {
-
         ImmutableList<IBuiltInRuleApp> result = ImmutableSLList.nil();
 
         ImmutableList<BuiltInRule> rules = index.rules();
@@ -48,11 +48,8 @@ public class BuiltInRuleAppIndex {
      * returns a copy of this index
      */
     public BuiltInRuleAppIndex copy() {
-        return new BuiltInRuleAppIndex(index.copy());
-    }
-
-    public void setNewRuleListener(NewRuleListener p_newRuleListener) {
-        newRuleListener = p_newRuleListener;
+        return new BuiltInRuleAppIndex(index.copy(),
+            sequentChangeInfo == null ? null : sequentChangeInfo.copy());
     }
 
     public BuiltInRuleIndex builtInRuleIndex() {
@@ -79,7 +76,8 @@ public class BuiltInRuleAppIndex {
         }
     }
 
-    private void scanSimplificationRule(ImmutableList<BuiltInRule> rules, Goal goal, boolean antec,
+    private static void scanSimplificationRule(ImmutableList<BuiltInRule> rules, Goal goal,
+            boolean antec,
             NewRuleListener listener) {
         final Node node = goal.node();
         final Sequent seq = node.sequent();
@@ -89,7 +87,8 @@ public class BuiltInRuleAppIndex {
         }
     }
 
-    private void scanSimplificationRule(ImmutableList<BuiltInRule> rules, Goal goal, boolean antec,
+    private static void scanSimplificationRule(ImmutableList<BuiltInRule> rules, Goal goal,
+            boolean antec,
             SequentFormula cfma, NewRuleListener listener) {
         final PosInOccurrence pos = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
         ImmutableList<BuiltInRule> subrules = ImmutableSLList.nil();
@@ -107,7 +106,7 @@ public class BuiltInRuleAppIndex {
     }
 
     // TODO: optimise?
-    private void scanSimplificationRule(ImmutableList<BuiltInRule> rules, Goal goal,
+    private static void scanSimplificationRule(ImmutableList<BuiltInRule> rules, Goal goal,
             PosInOccurrence pos, NewRuleListener listener) {
         ImmutableList<BuiltInRule> it = rules;
         while (!it.isEmpty()) {
@@ -124,7 +123,10 @@ public class BuiltInRuleAppIndex {
     }
 
     public void reportRuleApps(NewRuleListener l, Goal goal) {
+        var time = System.nanoTime();
         scanSimplificationRule(goal, l);
+        sequentChangeInfo = null;
+        PERF_CREATE_ALL.getAndAdd(System.nanoTime() - time);
     }
 
     /**
@@ -132,12 +134,36 @@ public class BuiltInRuleAppIndex {
      *
      * @param sci SequentChangeInfo describing the change of the sequent
      */
-    public void sequentChanged(Goal goal, SequentChangeInfo sci, NewRuleListener listener) {
-        scanAddedFormulas(goal, true, sci, listener);
-        scanAddedFormulas(goal, false, sci, listener);
+    public void sequentChanged(SequentChangeInfo sci) {
+        if (!sci.hasChanged()) {
+            return;
+        }
+        assert sci.getOriginalSequent() != sci.sequent();
+        if (sequentChangeInfo == null) {
+            // Nothing stored, store change
+            sequentChangeInfo = sci.copy();
+        } else {
+            assert sequentChangeInfo.sequent() == sci.getOriginalSequent();
+            sequentChangeInfo.combine(sci);
+        }
+    }
 
-        scanModifiedFormulas(goal, true, sci, listener);
-        scanModifiedFormulas(goal, false, sci, listener);
+    public void resetSequentChanges() {
+        sequentChangeInfo = null;
+    }
+
+    public void flushSequentChanges(Goal goal, NewRuleListener listener) {
+        if (sequentChangeInfo == null) {
+            return;
+        }
+        var time = System.nanoTime();
+        scanAddedFormulas(goal, true, sequentChangeInfo, listener);
+        scanAddedFormulas(goal, false, sequentChangeInfo, listener);
+
+        scanModifiedFormulas(goal, true, sequentChangeInfo, listener);
+        scanModifiedFormulas(goal, false, sequentChangeInfo, listener);
+        sequentChangeInfo = null;
+        PERF_UPDATE.getAndAdd(System.nanoTime() - time);
     }
 
     private void scanAddedFormulas(Goal goal, boolean antec, SequentChangeInfo sci,
