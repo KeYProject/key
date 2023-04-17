@@ -3,14 +3,15 @@ package de.uka.ilkd.key.java.declaration;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.key_project.util.ExtList;
-
-import recoder.java.declaration.EnumConstantDeclaration;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
+import org.key_project.util.ExtList;
+
+import recoder.java.declaration.EnumConstantDeclaration;
 
 /**
  * This class is used for wrapping an enum into a standard class type.
@@ -28,7 +29,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
     /**
      * store the program variables which represent the enum constants
      */
-    private List<IProgramVariable> constants = new ArrayList<IProgramVariable>();
+    private final List<IProgramVariable> constants = new ArrayList<>();
 
     /**
      * create a new EnumClassDeclaration that describes an enum defintion. It merely wraps a
@@ -77,8 +78,9 @@ public class EnumClassDeclaration extends ClassDeclaration {
      */
     private boolean isLocalEnumConstant(IProgramVariable pv) {
         for (IProgramVariable cnst : constants) {
-            if (cnst.equals(pv))
+            if (cnst.equals(pv)) {
                 return true;
+            }
         }
         return false;
     }
@@ -91,8 +93,9 @@ public class EnumClassDeclaration extends ClassDeclaration {
      */
     private int localIndexOf(ProgramVariable pv) {
         for (int i = 0; i < constants.size(); i++) {
-            if (constants.get(i).equals(pv))
+            if (constants.get(i).equals(pv)) {
                 return i;
+            }
         }
         return -1;
     }
@@ -115,20 +118,22 @@ public class EnumClassDeclaration extends ClassDeclaration {
     public static boolean isEnumConstant(IProgramVariable attribute) {
         KeYJavaType kjt = attribute.getKeYJavaType();
         Type type = kjt.getJavaType();
-        if (type instanceof EnumClassDeclaration)
+        if (type instanceof EnumClassDeclaration) {
             return ((EnumClassDeclaration) type).isLocalEnumConstant(attribute);
-        else
+        } else {
             return false;
+        }
     }
 
     // TODO DOC
     public static int indexOf(ProgramVariable attribute) {
         KeYJavaType kjt = attribute.getKeYJavaType();
         Type type = kjt.getJavaType();
-        if (type instanceof EnumClassDeclaration)
+        if (type instanceof EnumClassDeclaration) {
             return ((EnumClassDeclaration) type).localIndexOf(attribute);
-        else
+        } else {
             return -1;
+        }
     }
 
 }

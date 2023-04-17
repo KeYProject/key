@@ -14,7 +14,7 @@ public enum Behavior {
     private final String name;
 
 
-    private Behavior(String name) {
+    Behavior(String name) {
         this.name = name;
     }
 

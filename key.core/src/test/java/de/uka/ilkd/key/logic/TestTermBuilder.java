@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.logic;
 
+import java.io.File;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TestJavaInfo;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
@@ -7,10 +9,9 @@ import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;

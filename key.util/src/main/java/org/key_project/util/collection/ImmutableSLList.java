@@ -1,11 +1,7 @@
 package org.key_project.util.collection;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -47,8 +43,9 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
      */
     @Override
     public ImmutableList<T> reverse() {
-        if (size() <= 1)
+        if (size() <= 1) {
             return this;
+        }
 
         ImmutableList<T> rest = this;
         ImmutableList<T> rev = nil();
@@ -115,7 +112,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
     protected ImmutableList<T> prepend(T[] array, int n) {
         ImmutableSLList<T> res = this;
         while (n-- != 0) {
-            res = new Cons<T>(array[n], res);
+            res = new Cons<>(array[n], res);
         }
         return res;
     }
@@ -134,7 +131,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
     public ImmutableList<T> prependReverse(Iterable<T> collection) {
         ImmutableSLList<T> tmp = this;
         for (T elem : collection) {
-            tmp = new Cons<T>(elem, tmp);
+            tmp = new Cons<>(elem, tmp);
         }
         return tmp;
     }
@@ -148,14 +145,16 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
      */
     @Override
     public ImmutableList<T> take(int n) {
-        if (n < 0 || n > size())
+        if (n < 0 || n > size()) {
             throw new IndexOutOfBoundsException(
                 "Unable to take " + n + " elements from list " + this);
+        }
 
         ImmutableList<T> rest = this;
 
-        while (n-- != 0)
+        while (n-- != 0) {
             rest = rest.tail();
+        }
 
         return rest;
     }
@@ -206,7 +205,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
          */
         @Override
         public ImmutableList<S> prepend(S e) {
-            return new Cons<S>(e, this);
+            return new Cons<>(e, this);
         }
 
         /**
@@ -340,7 +339,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
         /** @return iterator through list */
         @Override
         public Iterator<S> iterator() {
-            return new SLListIterator<S>(this);
+            return new SLListIterator<>(this);
         }
 
         /** @return int the number of elements in list */
@@ -356,8 +355,9 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
             S t;
             while (!list.isEmpty()) {
                 t = list.head();
-                if (t == null ? obj == null : t.equals(obj))
+                if (Objects.equals(t, obj)) {
                     return true;
+                }
                 list = list.tail();
             }
             return false;
@@ -385,9 +385,9 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
             while (!rest.isEmpty()) {
                 t = rest.head();
                 rest = (ImmutableSLList<S>) rest.tail();
-                if (!(t == null ? obj == null : t.equals(obj)))
+                if (!(Objects.equals(t, obj))) {
                     res[i++] = t;
-                else {
+                } else {
                     unmodifiedTail = rest;
                     return unmodifiedTail.prepend(res, i);
                 }
@@ -412,10 +412,11 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
             while (!rest.isEmpty()) {
                 t = rest.head();
                 rest = (ImmutableSLList<S>) rest.tail();
-                if (!(t == null ? obj == null : t.equals(obj)))
+                if (!(Objects.equals(t, obj))) {
                     res[i++] = t;
-                else
+                } else {
                     unmodifiedTail = rest;
+                }
             }
 
             return unmodifiedTail.prepend(res, i - unmodifiedTail.size());
@@ -424,19 +425,22 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof ImmutableList))
+            if (!(o instanceof ImmutableList)) {
                 return false;
+            }
             final ImmutableList<S> o1 = (ImmutableList<S>) o;
-            if (o1.size() != size())
+            if (o1.size() != size()) {
                 return false;
+            }
 
             final Iterator<S> p = iterator();
             final Iterator<S> q = o1.iterator();
             while (p.hasNext()) {
                 S ep = p.next();
                 S eq = q.next();
-                if ((ep == null && eq != null) || (ep != null && !ep.equals(eq)))
+                if ((ep == null && eq != null) || (ep != null && !ep.equals(eq))) {
                     return false;
+                }
             }
             return true;
         }
@@ -503,7 +507,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
     private static class NIL<S> extends ImmutableSLList<S> {
 
-        final static ImmutableList<?> NIL = new NIL<Object>();
+        final static ImmutableList<?> NIL = new NIL<>();
 
         /**
          * serial id
@@ -540,7 +544,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
         @Override
         public ImmutableList<S> prepend(S element) {
-            return new Cons<S>(element);
+            return new Cons<>(element);
         }
 
         @Override
@@ -555,7 +559,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
         @Override
         public ImmutableList<S> append(S element) {
-            return new Cons<S>(element);
+            return new Cons<>(element);
         }
 
         @Override
@@ -663,12 +667,12 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
         @Override
         public Supplier<List<T>> supplier() {
-            return () -> new ArrayList<>();
+            return ArrayList::new;
         }
 
         @Override
         public BiConsumer<List<T>, T> accumulator() {
-            return (list, entry) -> list.add(entry);
+            return List::add;
         }
 
         @Override

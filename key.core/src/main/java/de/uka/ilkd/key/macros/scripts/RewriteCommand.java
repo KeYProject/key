@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -11,11 +15,9 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletApp;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * This class provides the command <code>rewrite</code>.
@@ -40,12 +42,12 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
     /**
      * List of PosInOcc that haven't been successfully replaced
      */
-    private List<PosInOccurrence> failposInOccs = new ArrayList<>();
+    private final List<PosInOccurrence> failposInOccs = new ArrayList<>();
 
     /**
      * List of PosInOcc that successfully replaced
      */
-    private List<PosInOccurrence> succposInOccs = new ArrayList<>();
+    private final List<PosInOccurrence> succposInOccs = new ArrayList<>();
 
     /**
      * Constructs this rewrite command.
@@ -185,7 +187,6 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
             failposInOccs.remove(pta.posInOccurrence());
             succposInOccs.add(pta.posInOccurrence());
             goalold.apply(pta);
-            return;
         } else {
             throw new IllegalArgumentException(
                 "Unsuccessful application of rewrite taclet " + pta.taclet().displayName());
@@ -250,4 +251,3 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         public Term formula;
     }
 }
-

@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.rule.inst;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.ProgramElement;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * This class is used to store the instantiation of a schemavariable if it is a ProgramElement.

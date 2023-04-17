@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValue;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

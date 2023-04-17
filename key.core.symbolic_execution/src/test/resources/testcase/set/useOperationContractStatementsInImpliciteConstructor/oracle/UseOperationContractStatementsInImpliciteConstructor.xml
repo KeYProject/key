@@ -9,7 +9,7 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <branchStatement name="if (array!=null)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+      <branchStatement name="if (array != null)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <variable name="self" isArrayIndex="false">
             <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
             </value>
@@ -84,10 +84,7 @@
                <operationContract name="result_sum = self.sum(array) catch(exc_0)
 pre: (  !array = null
  &amp; ((self.&lt;inv&gt;&lt;&lt;impl&gt;&gt; &amp; (!array = null)&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;))&lt;&lt;SC&gt;&gt;
-post: (  result_sum
-   = javaCastInt(bsum{int i;}(0,
-                              array.length,
-                              array[i]))
+post:   (result_sum = bsum{int i;}(0, array.length, array[i])
 &amp; self.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
 &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;
 mod: allLocs
@@ -113,7 +110,7 @@ termination: diamond" pathCondition="not(equals(array,null))" pathConditionChang
                      </value>
                   </variable>
                   <callStackEntry path="/0"/>
-                  <statement name="return sum_1/array.length;" pathCondition="not(equals(array,null))" pathConditionChanged="false">
+                  <statement name="return sum_1 / array.length;" pathCondition="not(equals(array,null))" pathConditionChanged="false">
                      <variable name="self" isArrayIndex="false">
                         <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         </value>
@@ -348,7 +345,8 @@ as result of self.average(array)&gt;" isReturnValueComputed="true" methodReturnC
                </value>
             </variable>
             <callStackEntry path="/0"/>
-            <statement name="throw new IllegalArgumentException (&quot;Array can&apos;t be null.&quot;);" pathCondition="equals(array,null)" pathConditionChanged="false">
+            <statement name="throw
+new IllegalArgumentException(&quot;Array can&apos;t be null.&quot;);" pathCondition="equals(array,null)" pathConditionChanged="false">
                <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   </value>

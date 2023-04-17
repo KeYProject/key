@@ -2,17 +2,17 @@
 
 package recoder.java;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import recoder.abstraction.ClassType;
 import recoder.io.DataLocation;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.java.declaration.TypeDeclarationContainer;
 import recoder.list.generic.ASTList;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A node representing a single source file containing {@link TypeDeclaration}s and an optional
@@ -234,12 +234,15 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
 
     public int getChildCount() {
         int result = 0;
-        if (packageSpec != null)
+        if (packageSpec != null) {
             result++;
-        if (imports != null)
+        }
+        if (imports != null) {
             result += imports.size();
-        if (typeDeclarations != null)
+        }
+        if (typeDeclarations != null) {
             result += typeDeclarations.size();
+        }
         return result;
     }
 
@@ -254,8 +257,9 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     public ProgramElement getChildAt(int index) {
         int len;
         if (packageSpec != null) {
-            if (index == 0)
+            if (index == 0) {
                 return packageSpec;
+            }
             index--;
         }
         if (imports != null) {
@@ -421,8 +425,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     public TypeDeclaration getPrimaryTypeDeclaration() {
         TypeDeclaration res = null;
         int s = typeDeclarations.size();
-        for (int i = 0; i < s; i += 1) {
-            TypeDeclaration t = typeDeclarations.get(i);
+        for (TypeDeclaration t : typeDeclarations) {
             if (t.isPublic()) {
                 if (res == null || !res.isPublic()) {
                     res = t;
@@ -454,9 +457,9 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
 
     public List<ClassType> getTypesInScope() {
         if (name2type == null || name2type.isEmpty()) {
-            return new ArrayList<ClassType>(0);
+            return new ArrayList<>(0);
         }
-        List<ClassType> res = new ArrayList<ClassType>();
+        List<ClassType> res = new ArrayList<>();
         for (ClassType ct : name2type.values()) {
             res.add(ct);
         }
@@ -474,7 +477,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     public void addTypeToScope(ClassType type, String name) {
         Debug.assertNonnull(type, name);
         if (name2type == null || name2type == UNDEFINED_SCOPE) {
-            name2type = new HashMap<String, ClassType>();
+            name2type = new HashMap<>();
         }
         name2type.put(name, type);
     }

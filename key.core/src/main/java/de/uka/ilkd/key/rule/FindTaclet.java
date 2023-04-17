@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.*;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**
@@ -20,7 +20,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 public abstract class FindTaclet extends Taclet {
 
     /** contains the find term */
-    protected Term find;
+    protected final Term find;
 
     /** Set of schemavariables of the if and the (optional) find part */
     private ImmutableSet<SchemaVariable> ifFindVariables = null;

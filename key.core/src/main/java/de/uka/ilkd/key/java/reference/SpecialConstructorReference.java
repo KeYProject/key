@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.java.reference;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Occurs in a constructor declaration as the first statement as this(...) or super(...) reference.
@@ -32,7 +32,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      * @param arguments an expression mutable list.
      */
     public SpecialConstructorReference(Expression[] arguments) {
-        this.arguments = new ImmutableArray<Expression>(arguments);
+        this.arguments = new ImmutableArray<>(arguments);
     }
 
 
@@ -54,7 +54,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      */
     public SpecialConstructorReference(ExtList children) {
         super(children);
-        this.arguments = new ImmutableArray<Expression>(children.collect(Expression.class));
+        this.arguments = new ImmutableArray<>(children.collect(Expression.class));
     }
 
     /**
@@ -65,7 +65,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      */
     public SpecialConstructorReference(ExtList children, PositionInfo pi) {
         super(children, pi);
-        this.arguments = new ImmutableArray<Expression>(children.collect(Expression.class));
+        this.arguments = new ImmutableArray<>(children.collect(Expression.class));
     }
 
 

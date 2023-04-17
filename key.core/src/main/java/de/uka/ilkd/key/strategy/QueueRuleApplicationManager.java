@@ -2,14 +2,14 @@ package de.uka.ilkd.key.strategy;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.RuleApp;
+
 import org.key_project.util.collection.ImmutableHeap;
 import org.key_project.util.collection.ImmutableLeftistHeap;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 
 /**
  * Implementation of {@link AutomatedRuleApplicationManager} that stores possible {@link RuleApp}s

@@ -16,7 +16,7 @@ import recoder.kit.TypeKit;
  */
 
 public class TestComment {
-    protected static CrossReferenceServiceConfiguration sc =
+    protected static final CrossReferenceServiceConfiguration sc =
         new CrossReferenceServiceConfiguration();
 
     public static CompilationUnit registerCU(String compilationUnit) throws ParserException {

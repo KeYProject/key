@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.symbolic_execution.testcase.util;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
@@ -13,15 +19,11 @@ import de.uka.ilkd.key.symbolic_execution.util.event.ISideProofStoreListener;
 import de.uka.ilkd.key.symbolic_execution.util.event.SideProofStoreEvent;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofUserManager;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.java.ArrayUtil;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

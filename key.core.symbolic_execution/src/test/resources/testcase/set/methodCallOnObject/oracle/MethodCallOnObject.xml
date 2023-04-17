@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call MethodCallOnObject.main()&gt;" pathCondition="true" pathConditionChanged="false">
-      <statement name="MethodCallOnObject x = new MethodCallOnObject ();" pathCondition="true" pathConditionChanged="false">
+      <statement name="MethodCallOnObject x = new MethodCallOnObject();" pathCondition="true" pathConditionChanged="false">
          <methodCall name="&lt;call MethodCallOnObject()&gt;" pathCondition="true" pathConditionChanged="false">
             <methodReturn name="&lt;return of MethodCallOnObject&gt;" signature="&lt;return of MethodCallOnObject()&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of MethodCallOnObject&gt;" signatureIncludingReturnValue="&lt;return of MethodCallOnObject()&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                <statement name="return x.doSomething();" pathCondition="true" pathConditionChanged="false">

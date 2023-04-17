@@ -1,14 +1,14 @@
 package de.uka.ilkd.key.parser;
 
+import java.net.URL;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.parser.proofjava.Token;
 import de.uka.ilkd.key.util.parsing.LocatableException;
+
 import recoder.java.Expression;
 import recoder.java.reference.UncollatedReferenceQualifier;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * @author Alexander Weigl

@@ -1,11 +1,13 @@
 package org.key_project.slicing;
 
-import de.uka.ilkd.key.util.Pair;
-import org.junit.jupiter.api.Test;
-import org.key_project.slicing.graph.DependencyGraph;
-
 import java.util.List;
 import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.slicing.graph.DependencyGraph;
+
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.java;
 
+import java.net.MalformedURLException;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.parsing.HasLocation;
-import recoder.parser.ParseException;
 
-import javax.annotation.Nullable;
-import java.net.MalformedURLException;
+import recoder.parser.ParseException;
 
 /**
  * This exception extends recoder's {@link ParseException} by a filename.

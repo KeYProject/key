@@ -2,6 +2,11 @@
 
 package recoder.kit;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import recoder.ProgramFactory;
 import recoder.abstraction.ArrayType;
 import recoder.abstraction.ClassType;
@@ -25,11 +30,6 @@ import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
 import recoder.util.Order;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class UnitKit {
 
@@ -79,10 +79,12 @@ public class UnitKit {
 
     private static boolean isNecessaryMultiTypeImport(CrossReferenceSourceInfo xrsi, Import imp,
             Set coveredTypes) {
-        if (!imp.isMultiImport())
+        if (!imp.isMultiImport()) {
             return false;
-        if (imp.isStaticImport())
+        }
+        if (imp.isStaticImport()) {
             return true; // TODO Gutzmann
+        }
         TypeReferenceInfix ref = imp.getTypeReference();
         CompilationUnit cu = imp.getParent();
         List<? extends ClassType> types;
@@ -129,10 +131,10 @@ public class UnitKit {
         }
         List<Import> removalList = new ArrayList<>();
         Set<ClassType> coveredTypes = new HashSet<>();
-        for (int i = 0, s = il.size(); i < s; i += 1) {
-            Import imp = il.get(i);
-            if (imp.isStaticImport())
+        for (Import imp : il) {
+            if (imp.isStaticImport()) {
                 continue; // TODO
+            }
             if (!imp.isMultiImport()) {
                 ClassType ct = getNecessaryImportedType(xrsi, imp);
                 if (ct != null) {
@@ -142,10 +144,10 @@ public class UnitKit {
                 }
             }
         }
-        for (int i = 0, s = il.size(); i < s; i += 1) {
-            Import imp = il.get(i);
-            if (imp.isStaticImport())
+        for (Import imp : il) {
+            if (imp.isStaticImport()) {
                 continue; // TODO
+            }
             if (imp.isMultiImport() && !isNecessaryMultiTypeImport(xrsi, imp, coveredTypes)) {
                 removalList.add(imp);
             }
@@ -235,8 +237,9 @@ public class UnitKit {
         // now, remove the no longer used imports including all multi imports
         for (int i = ilsize - 1; i >= 0; i -= 1) {
             Import imp = il.get(i);
-            if (imp.isStaticImport())
+            if (imp.isStaticImport()) {
                 continue; // TODO - Gutzmann
+            }
             if ((imp.isMultiImport() && removeMultiTypeImports) || (!imp.isMultiImport()
                     && removeSingleTypeImports && importedTypes.contains(classTypes[i]))) {
                 MiscKit.remove(ch, imp);

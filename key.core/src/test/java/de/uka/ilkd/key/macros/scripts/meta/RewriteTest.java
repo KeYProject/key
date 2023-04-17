@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.macros.scripts.meta;
 
+import java.io.File;
+import java.io.IOException;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
@@ -7,10 +10,8 @@ import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.io.IOException;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

@@ -2,13 +2,13 @@
 
 package recoder.java.declaration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.java.Declaration;
 import recoder.java.JavaNonTerminalProgramElement;
 import recoder.java.declaration.modifier.*;
 import recoder.list.generic.ASTList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Java declaration.
@@ -64,13 +64,14 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      *         reflect changes on the AST!
      */
     public List<Modifier> getModifiers() {
-        if (declarationSpecifiers == null)
-            return new ArrayList<Modifier>(0);
-        List<Modifier> mml = new ArrayList<Modifier>();
-        for (int i = 0, max = declarationSpecifiers.size(); i < max; i++) {
-            DeclarationSpecifier ds = declarationSpecifiers.get(i);
-            if (ds instanceof Modifier)
+        if (declarationSpecifiers == null) {
+            return new ArrayList<>(0);
+        }
+        List<Modifier> mml = new ArrayList<>();
+        for (DeclarationSpecifier ds : declarationSpecifiers) {
+            if (ds instanceof Modifier) {
                 mml.add((Modifier) ds);
+            }
         }
         return mml;
     }
@@ -79,15 +80,16 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * @return a list of annotations
      */
     public List<AnnotationUseSpecification> getAnnotations() {
-        if (declarationSpecifiers == null)
-            return new ArrayList<AnnotationUseSpecification>(0);
+        if (declarationSpecifiers == null) {
+            return new ArrayList<>(0);
+        }
         List<AnnotationUseSpecification> result =
-            new ArrayList<AnnotationUseSpecification>(declarationSpecifiers.size());
+            new ArrayList<>(declarationSpecifiers.size());
         int s = declarationSpecifiers.size();
-        for (int i = 0; i < s; i++) {
-            DeclarationSpecifier ds = declarationSpecifiers.get(i);
-            if (ds instanceof AnnotationUseSpecification)
+        for (DeclarationSpecifier ds : declarationSpecifiers) {
+            if (ds instanceof AnnotationUseSpecification) {
                 result.add((AnnotationUseSpecification) ds);
+            }
         }
         return result;
     }

@@ -269,14 +269,15 @@ public final class PosInOccurrence {
         public int next() {
             int res;
 
-            if (currentSubTerm == null)
+            if (currentSubTerm == null) {
                 currentSubTerm = sequentFormula.formula();
-            else
+            } else {
                 currentSubTerm = currentSubTerm.sub(child);
+            }
 
-            if (currentPathIt.hasNext())
+            if (currentPathIt.hasNext()) {
                 res = currentPathIt.next();
-            else {
+            } else {
                 res = -1;
                 currentPathIt = null;
             }

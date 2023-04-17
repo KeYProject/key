@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.symbolic_execution.object_model;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.AbstractSymbolicAssociationValueContainer;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * <p>
@@ -27,7 +27,7 @@ public interface ISymbolicAssociationValueContainer extends ISymbolicElement {
      *
      * @return The contained associations.
      */
-    public ImmutableList<ISymbolicAssociation> getAssociations();
+    ImmutableList<ISymbolicAssociation> getAssociations();
 
     /**
      * Returns the {@link ISymbolicAssociation} with the given {@link IProgramVariable}.
@@ -40,7 +40,7 @@ public interface ISymbolicAssociationValueContainer extends ISymbolicElement {
      * @return The found {@link ISymbolicAssociation} or {@code null} if no
      *         {@link ISymbolicAssociation} is available with the given {@link IProgramVariable}.
      */
-    public ISymbolicAssociation getAssociation(IProgramVariable programVariable,
+    ISymbolicAssociation getAssociation(IProgramVariable programVariable,
             boolean isArrayIndex, Term arrayIndex, Term condition);
 
     /**
@@ -48,7 +48,7 @@ public interface ISymbolicAssociationValueContainer extends ISymbolicElement {
      *
      * @return The contained values.
      */
-    public ImmutableList<ISymbolicValue> getValues();
+    ImmutableList<ISymbolicValue> getValues();
 
     /**
      * Returns the {@link ISymbolicValue} with the given {@link IProgramVariable}.
@@ -61,6 +61,6 @@ public interface ISymbolicAssociationValueContainer extends ISymbolicElement {
      * @return The found {@link ISymbolicValue} or {@code null} if no {@link ISymbolicValue} is
      *         available with the given {@link IProgramVariable}.
      */
-    public ISymbolicValue getValue(IProgramVariable programVariable, boolean isArrayIndex,
+    ISymbolicValue getValue(IProgramVariable programVariable, boolean isArrayIndex,
             Term arrayIndex, Term condition);
 }

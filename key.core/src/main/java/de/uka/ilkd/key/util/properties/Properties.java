@@ -6,8 +6,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public interface Properties {
 
-    public final static class Property<T> {
-        private static AtomicInteger counter = new AtomicInteger(-1);
+    final class Property<T> {
+        private static final AtomicInteger counter = new AtomicInteger(-1);
         private final String name;
         private final Class<T> type;
         private final int number = counter.incrementAndGet();
@@ -35,24 +35,24 @@ public interface Properties {
         }
     }
 
-    public static interface PropertyListener {
-        public <T> void propertyChanged(Property<T> property, T oldValue, T newValue);
+    interface PropertyListener {
+        <T> void propertyChanged(Property<T> property, T oldValue, T newValue);
     }
 
-    public <T> void put(Property<T> property, T value);
+    <T> void put(Property<T> property, T value);
 
-    public <T> T get(Property<T> property);
+    <T> T get(Property<T> property);
 
-    public <T> void remove(Property<T> property);
+    <T> void remove(Property<T> property);
 
-    public void addPropertyListener(Property<?> property, PropertyListener listener);
+    void addPropertyListener(Property<?> property, PropertyListener listener);
 
-    public void removePropertyListener(Property<?> property, PropertyListener listener);
+    void removePropertyListener(Property<?> property, PropertyListener listener);
 
-    public void removePropertyListener(PropertyListener listener);
+    void removePropertyListener(PropertyListener listener);
 
-    public Properties clone();
+    Properties clone();
 
-    public int size();
+    int size();
 
 }

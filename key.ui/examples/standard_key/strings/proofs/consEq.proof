@@ -66,7 +66,7 @@ l_91 = cons(c_92, l_91) <-> false
    (rule "allRight" (formula "2") (inst "sk=c_0") (userinteraction))
    (rule "impRight" (formula "2") (userinteraction))
    (rule "andLeft" (formula "1") (userinteraction))
-   (rule "inChar" (formula "1") (userinteraction))
+   (rule "expandInChar" (formula "1") (userinteraction))
    (rule "true_left" (formula "1") (userinteraction))
    (rule "notLeft" (formula "1") (userinteraction))
    (rule "notRight" (formula "3") (userinteraction))

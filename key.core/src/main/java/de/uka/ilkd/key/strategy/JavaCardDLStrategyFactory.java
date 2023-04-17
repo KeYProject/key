@@ -443,7 +443,7 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                 + "can be defined in the \\rules-section of a .key-problem file. For<br>"
                 + "automatic application, the taclets have to contain a clause<br>"
                 + "\\heuristics(userTaclets1), \\heuristics(userTaclets2), etc." + "</html>",
-            -1, props.toArray(new AbstractStrategyPropertyDefinition[props.size()]));
+            -1, props.toArray(new AbstractStrategyPropertyDefinition[0]));
     }
 
     public Strategy create(Proof proof, StrategyProperties strategyProperties) {

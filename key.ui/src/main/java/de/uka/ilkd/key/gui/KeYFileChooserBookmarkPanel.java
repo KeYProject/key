@@ -1,19 +1,19 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.ViewSettings;
-import javax.annotation.Nonnull;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import javax.annotation.Nonnull;
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+
+import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
 
 /**
  * This is a Panel used as accessory for the JFileChooser.

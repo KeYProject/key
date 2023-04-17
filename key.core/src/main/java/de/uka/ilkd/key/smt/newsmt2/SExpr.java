@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -72,7 +71,7 @@ public class SExpr implements Writable {
     private final Type type;
 
     /** The collection of the direct child s-expr of this object. Not null */
-    private List<SExpr> children;
+    private final List<SExpr> children;
 
     /**
      * Create a new s-expr without children, but with a given type.

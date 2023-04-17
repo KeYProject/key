@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.java.declaration;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.Constructor;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
+
+import org.key_project.util.ExtList;
 
 
 /**

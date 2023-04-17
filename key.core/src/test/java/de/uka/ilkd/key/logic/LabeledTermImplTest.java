@@ -5,10 +5,12 @@ import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.rule.TacletForTests;
+
+import org.key_project.util.collection.ImmutableArray;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.key_project.util.collection.ImmutableArray;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 

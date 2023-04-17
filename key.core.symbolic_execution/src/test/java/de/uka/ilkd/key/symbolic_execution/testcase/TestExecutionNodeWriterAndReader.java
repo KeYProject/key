@@ -1,5 +1,12 @@
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import javax.xml.parsers.ParserConfigurationException;
+
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.*;
@@ -7,15 +14,9 @@ import de.uka.ilkd.key.symbolic_execution.ExecutionNodeWriter;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
+
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

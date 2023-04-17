@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+
 import recoder.io.DataFileLocation;
 import recoder.io.DataLocation;
 
@@ -27,7 +28,7 @@ import recoder.io.DataLocation;
 public class DirectoryFileCollection implements FileCollection {
 
     /** directory under inspection */
-    private File directory;
+    private final File directory;
 
     /**
      * create a new File collection for a given directory The argument may be a single file also. A
@@ -45,8 +46,9 @@ public class DirectoryFileCollection implements FileCollection {
     private static void addAllFiles(File dir, String extension, List<File> files) {
         File[] listFiles = dir.listFiles();
 
-        if (listFiles == null)
+        if (listFiles == null) {
             throw new IllegalArgumentException(dir + " is not a directory or cannot be read!");
+        }
 
         for (File file : listFiles) {
             if (file.isDirectory()) {
@@ -69,18 +71,19 @@ public class DirectoryFileCollection implements FileCollection {
     private static void sortFiles(List<File> files) {
         for (int a = 0; a < files.size() - 1; a++) {
             for (int b = a + 1; b < files.size(); b++) {
-                if (!(a < b))
+                if (!(a < b)) {
                     throw new RuntimeException("Incorrect sorting algorithms.");
+                }
                 File fa = files.get(a);
                 File fb = files.get(b);
 
                 // Check if the path A contains the substring "JAVA/LANG"
                 String pathA = fa.getPath().toUpperCase().replace('\\', '/');
-                boolean A_isObjectClass = pathA.indexOf("JAVA/LANG/OBJECT.JAVA") != -1;
+                boolean A_isObjectClass = pathA.contains("JAVA/LANG/OBJECT.JAVA");
 
                 // Check if the path B contains the substring "JAVA/LANG/OBJECT.JAVA"
                 String pathB = fb.getPath().toUpperCase().replace('\\', '/');
-                boolean B_inJavaLang = pathB.indexOf("JAVA/LANG") != -1;
+                boolean B_inJavaLang = pathB.contains("JAVA/LANG");
 
                 // Switch files to ensure the desired order of files
                 if (B_inJavaLang && !A_isObjectClass) {
@@ -98,7 +101,7 @@ public class DirectoryFileCollection implements FileCollection {
      * @see de.uka.ilkd.key.util.FileCollection#createWalker(java.lang.String)
      */
     public Walker createWalker(String extension) {
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
         addAllFiles(directory, extension, files);
         sortFiles(files);
         return new Walker(files.iterator());
@@ -111,7 +114,7 @@ public class DirectoryFileCollection implements FileCollection {
      * @see de.uka.ilkd.key.util.FileCollection#createWalker(java.lang.String[])
      */
     public Walker createWalker(String[] extensions) {
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
         for (String extension : extensions) {
             addAllFiles(directory, extension, files);
         }
@@ -125,7 +128,7 @@ public class DirectoryFileCollection implements FileCollection {
      */
     private static class Walker implements FileCollection.Walker {
 
-        private Iterator<File> iterator;
+        private final Iterator<File> iterator;
         private File currentFile;
 
         public Walker(Iterator<File> iterator) {
@@ -133,17 +136,19 @@ public class DirectoryFileCollection implements FileCollection {
         }
 
         public String getCurrentName() {
-            if (currentFile == null)
+            if (currentFile == null) {
                 throw new NoSuchElementException();
-            else
+            } else {
                 return currentFile.getPath();
+            }
         }
 
         public InputStream openCurrent() throws IOException {
-            if (currentFile == null)
+            if (currentFile == null) {
                 throw new NoSuchElementException();
-            else
+            } else {
                 return new FileInputStream(currentFile);
+            }
 
         }
 

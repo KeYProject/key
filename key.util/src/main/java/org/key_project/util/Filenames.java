@@ -24,13 +24,13 @@ public class Filenames {
      */
     public static List<String> disectFilename(String filename) {
         final char sep = File.separatorChar;
-        List<String> res = new ArrayList<String>();
+        List<String> res = new ArrayList<>();
         // if filename contains slashes, take it as UNIX filename, otherwise Windows
-        if (filename.indexOf("/") != -1)
+        if (filename.contains("/")) {
             assert sep == '/' : "\"" + filename + "\" contains both / and \\";
-        else if (filename.indexOf("\\") != -1)
+        } else if (filename.contains("\\")) {
             assert sep == '\\' : "\"" + filename + "\" contains both / and \\";
-        else {
+        } else {
             res.add(filename);
             return res;
         }
@@ -38,16 +38,19 @@ public class Filenames {
         while (i < filename.length()) {
             int j = filename.indexOf(sep, i);
             if (j == -1) { // no slash anymore
-                final String s = filename.substring(i, filename.length());
-                if (!s.equals("."))
+                final String s = filename.substring(i);
+                if (!s.equals(".")) {
                     res.add(s);
+                }
                 break;
             }
             if (i == j) {
                 // empty string between slashes
                 if (i == 0)
-                    // leading slash
+                // leading slash
+                {
                     res.add("");
+                }
             } else {
                 // contains "/./"
                 final String s = filename.substring(i, j);
@@ -69,29 +72,31 @@ public class Filenames {
      */
     public static String makeFilenameRelative(String origFilename, String toFilename) {
         final List<String> origFileNameSections = disectFilename(origFilename);
-        String[] a = origFileNameSections.toArray(new String[origFileNameSections.size()]);
+        String[] a = origFileNameSections.toArray(new String[0]);
         final List<String> destinationFilenameSections = disectFilename(toFilename);
         String[] b =
-            destinationFilenameSections.toArray(new String[destinationFilenameSections.size()]);
+            destinationFilenameSections.toArray(new String[0]);
 
         // check for Windows paths
         if (File.separatorChar == '\\' && a[0].length() == 2 && a[0].charAt(1) == ':') {
             char drive = Character.toUpperCase(a[0].charAt(0));
             if (!(b[0].length() == 2 && Character.toUpperCase(b[0].charAt(0)) == drive
-                    && b[0].charAt(1) == ':'))
+                    && b[0].charAt(1) == ':')) {
                 throw new RuntimeException("cannot make paths on different drives relative");
+            }
             // remove drive letter
             a[0] = "";
             b[0] = "";
         }
         int i;
-        String s = "";
-        String t = "";
+        StringBuilder s = new StringBuilder();
+        StringBuilder t = new StringBuilder();
 
         if (a[0].equals("")) { // not already relative
-            if (!b[0].equals(""))
+            if (!b[0].equals("")) {
                 throw new RuntimeException("\"" + toFilename
                     + "\" is a relative path. Please use absolute paths to make others relative to them.");
+            }
 
             // remove ".." from paths
             a = removeDotDot(a);
@@ -103,30 +108,35 @@ public class Filenames {
             boolean diff = false;
             while (i < b.length) {
                 // shared until i
-                if (i >= a.length || !a[i].equals(b[i]))
+                if (i >= a.length || !a[i].equals(b[i])) {
                     diff = true;
+                }
                 // add ".." for each remaining element in b
                 // and collect the remaining elements of a
                 if (diff) {
-                    s = s + "../";
-                    if (i < a.length)
-                        t = t + (a[i].equals("") ? "" : "/") + a[i];
+                    s.append("../");
+                    if (i < a.length) {
+                        t.append(a[i].equals("") ? "" : "/").append(a[i]);
+                    }
                 }
                 i++;
             }
         } else {
             i = 0;
         }
-        while (i < a.length)
-            t = t + (a[i].equals("") ? "" : "/") + a[i++];
+        while (i < a.length) {
+            t.append(a[i].equals("") ? "" : "/").append(a[i++]);
+        }
         // strip leading slash
-        if (t.length() > 0 && t.charAt(0) == '/')
-            t = t.substring(1);
+        if (t.length() > 0 && t.charAt(0) == '/') {
+            t = new StringBuilder(t.substring(1));
+        }
         // strip ending slash
-        t = s + t;
-        if (t.length() > 0 && t.charAt(t.length() - 1) == '/')
-            t = t.substring(0, t.length() - 1);
-        return t;
+        t.insert(0, s);
+        if (t.length() > 0 && t.charAt(t.length() - 1) == '/') {
+            t = new StringBuilder(t.substring(0, t.length() - 1));
+        }
+        return t.toString();
     }
 
 
@@ -136,8 +146,9 @@ public class Filenames {
         for (int j = 0; j < a.length - 1; j++) {
             if (a[j].equals("..") || !a[j + 1].equals("..")) {
                 newa[k++] = a[j];
-            } else
+            } else {
                 j++;
+            }
         }
         if (!a[a.length - 1].equals("..")) {
             newa[k++] = a[a.length - 1];

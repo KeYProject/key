@@ -2,14 +2,14 @@ package de.uka.ilkd.key.gui.nodeviews;
 
 import javax.swing.JFrame;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * This item groups all insert hidden taclets and offers a more convienient user interface to add
@@ -48,8 +48,9 @@ public class InsertHiddenTacletMenuItem extends InsertionTacletBrowserMenuItem {
         }
 
         final ImmutableList<TacletGoalTemplate> goalTemplates = t.goalTemplates();
-        if (goalTemplates.size() != 1)
+        if (goalTemplates.size() != 1) {
             return null;
+        }
         return goalTemplates.head().sequent();
     }
 }

@@ -22,49 +22,49 @@ public interface ISymbolicAssociation extends ISymbolicElement {
      *
      * @return A human readable name.
      */
-    public String getName();
+    String getName();
 
     /**
      * Checks if an array index or a program variable is represented.
      *
      * @return {@code true} array index, {@code false} program variable.
      */
-    public boolean isArrayIndex();
+    boolean isArrayIndex();
 
     /**
      * Returns the represented array index or {@code null} if a program variable is represented..
      *
      * @return The represented array index or {@code null} if a program variable is represented..
      */
-    public Term getArrayIndex();
+    Term getArrayIndex();
 
     /**
      * Returns the human readable array index or {@code null} if a program variable is represented..
      *
      * @return The human readable array index or {@code null} if a program variable is represented..
      */
-    public String getArrayIndexString();
+    String getArrayIndexString();
 
     /**
      * Returns the represented {@link IProgramVariable}.
      *
      * @return The represented {@link IProgramVariable}.
      */
-    public IProgramVariable getProgramVariable();
+    IProgramVariable getProgramVariable();
 
     /**
      * Returns the represented {@link IProgramVariable} as human readable {@link String}.
      *
      * @return The represented {@link IProgramVariable} as human readable {@link String}.
      */
-    public String getProgramVariableString();
+    String getProgramVariableString();
 
     /**
      * Returns the target {@link ISymbolicObject}.
      *
      * @return The target {@link ISymbolicObject}.
      */
-    public ISymbolicObject getTarget();
+    ISymbolicObject getTarget();
 
     /**
      * <p>
@@ -77,7 +77,7 @@ public interface ISymbolicAssociation extends ISymbolicElement {
      *
      * @return The optional condition under which this association is valid.
      */
-    public Term getCondition();
+    Term getCondition();
 
     /**
      * <p>
@@ -92,5 +92,5 @@ public interface ISymbolicAssociation extends ISymbolicElement {
      * @return The optional condition under which this association is valid as human readable
      *         {@link String}.
      */
-    public String getConditionString();
+    String getConditionString();
 }

@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.symbolic_execution.object_model;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutExtractor;
 import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader;
 import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutWriter;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicLayout;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * <p>
@@ -33,19 +33,19 @@ public interface ISymbolicLayout extends ISymbolicElement {
      *
      * @return The equivalence classes.
      */
-    public ImmutableList<ISymbolicEquivalenceClass> getEquivalenceClasses();
+    ImmutableList<ISymbolicEquivalenceClass> getEquivalenceClasses();
 
     /**
      * Returns the symbolic state.
      *
      * @return the symbolic state.
      */
-    public ISymbolicState getState();
+    ISymbolicState getState();
 
     /**
      * Returns all available symbolic objects.
      *
      * @return The available symbolic objects.
      */
-    public ImmutableList<ISymbolicObject> getObjects();
+    ImmutableList<ISymbolicObject> getObjects();
 }

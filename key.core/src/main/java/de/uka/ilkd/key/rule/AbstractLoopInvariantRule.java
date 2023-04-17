@@ -3,10 +3,7 @@ package de.uka.ilkd.key.rule;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
@@ -14,28 +11,19 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.Transformer;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * An abstract super class for loop invariant rules. Extending rules should usually call
@@ -101,7 +89,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final ImmutableSet<ProgramVariable> localOuts = MiscTools.getLocalOuts(inst.loop, services);
 
         final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop = //
-            new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+            new LinkedHashMap<>();
 
         // Create update for values before loop
         Term beforeLoopUpdate =
@@ -119,8 +107,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final Term variantPO = variantUpdAndPO.second;
 
         // Prepare common assumption
-        final Term reachableOut = localOuts.stream().map(pv -> tb.reachableValue(pv))
-                .reduce(tb.tt(), (Term acc, Term term) -> tb.and(acc, term));
+        final Term reachableOut = localOuts.stream().map(tb::reachableValue)
+                .reduce(tb.tt(), tb::and);
 
         final Term[] uAnon = new Term[] { inst.u, additionalHeapTerms.anonUpdate };
         final Term[] uBeforeLoopDefAnonVariant =
@@ -187,7 +175,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
         Term beforeLoopUpdate = null;
         for (LocationVariable heap : heapContext) {
-            heapToBeforeLoop.put(heap, new LinkedHashMap<Term, Term>());
+            heapToBeforeLoop.put(heap, new LinkedHashMap<>());
             final LocationVariable lv =
                 tb.locationVariable(heap + "Before_LOOP", heap.sort(), true);
             progVarNS.addSafely(lv);
@@ -233,7 +221,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             services.getNamespaces().functions().addSafely(anonFunc);
 
             return tb.elementary((LocationVariable) pv, tb.func(anonFunc));
-        }).reduce(tb.skip(), (acc, t) -> tb.parallel(acc, t));
+        }).reduce(tb.skip(), tb::parallel);
     }
 
     /**
@@ -286,9 +274,9 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
         //@formatter:off
         return listOfT.stream()
-                .map(t -> fct.apply(t))
-                .filter(term -> term != null)
-                .reduce(tb.tt(), (acc, term) -> tb.and(acc, term));
+                .map(fct)
+                .filter(Objects::nonNull)
+                .reduce(tb.tt(), tb::and);
         //@formatter:on
     }
 
@@ -311,7 +299,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final Term variantUpdate = dia ? tb.elementary(variantPV, variant) : tb.skip();
         final Term variantPO = dia ? tb.prec(variant, tb.var(variantPV)) : tb.tt();
 
-        return new Pair<Term, Term>(variantUpdate, variantPO);
+        return new Pair<>(variantUpdate, variantPO);
     }
 
     /**
@@ -323,10 +311,10 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      */
     protected static Pair<Term, Term> splitUpdates(Term focusTerm, TermServices services) {
         if (focusTerm.op() instanceof UpdateApplication) {
-            return new Pair<Term, Term>(UpdateApplication.getUpdate(focusTerm),
+            return new Pair<>(UpdateApplication.getUpdate(focusTerm),
                 UpdateApplication.getTarget(focusTerm));
         } else {
-            return new Pair<Term, Term>(services.getTermBuilder().skip(), focusTerm);
+            return new Pair<>(services.getTermBuilder().skip(), focusTerm);
         }
     }
 
@@ -489,11 +477,11 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         Term frameCondition = null;
         Term reachableState = null;
 
-        final Map<LocationVariable, Term> mods = new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> mods = new LinkedHashMap<>();
         heapContext.forEach(
             heap -> mods.put(heap, inst.inv.getModifies(heap, inst.selfTerm, atPres, services)));
 
-        ImmutableList<AnonUpdateData> anonUpdateData = ImmutableSLList.<AnonUpdateData>nil();
+        ImmutableList<AnonUpdateData> anonUpdateData = ImmutableSLList.nil();
         for (LocationVariable heap : heapContext) {
             // weigl: prevent NPE
             Term modifiesTerm = mods.get(heap);

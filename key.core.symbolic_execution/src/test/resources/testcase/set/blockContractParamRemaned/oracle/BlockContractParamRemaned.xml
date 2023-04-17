@@ -1,31 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="&lt;call BlockContractParamRemaned.main(_x,_y)&gt;" pathCondition="true" pathConditionChanged="false">
-      <statement name="return magic(_x,_y);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call BlockContractParamRemaned.main(_x, _y)&gt;" pathCondition="true" pathConditionChanged="false">
+      <statement name="return magic(_x, _y);" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
-         <methodCall name="&lt;call BlockContractParamRemaned.magic(x_3,y_1)&gt;" pathCondition="true" pathConditionChanged="false">
+         <methodCall name="&lt;call BlockContractParamRemaned.magic(x_3, y_1)&gt;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <statement name="x_3=2;" pathCondition="true" pathConditionChanged="false">
+            <statement name="x_3 = 2;" pathCondition="true" pathConditionChanged="false">
                <callStackEntry path="/0/0/0"/>
                <callStackEntry path="/0"/>
-               <statement name="y_1=3;" pathCondition="true" pathConditionChanged="false">
+               <statement name="y_1 = 3;" pathCondition="true" pathConditionChanged="false">
                   <callStackEntry path="/0/0/0"/>
                   <callStackEntry path="/0"/>
                   <blockContract name="magic()) catch(exc_0)
 pre measuredByEmpty &amp; x_3 = 2
 post exc_0 = null &amp; x_3 = -2
-mod {}termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true">
+mod {}termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false">
                      <callStackEntry path="/0/0/0"/>
                      <callStackEntry path="/0"/>
-                     <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Validity">
-                        <callStackEntry path="/0/0/0"/>
-                        <callStackEntry path="/0"/>
-                        <statement name="x_3=-2;" pathCondition="true" pathConditionChanged="false">
-                           <callStackEntry path="/0/0/0"/>
-                           <termination name="&lt;block contract end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="BLOCK_CONTRACT_NORMAL" branchVerified="true">
-                           </termination>
-                        </statement>
-                     </branchCondition>
                      <branchCondition name="and(and(and(wellFormed(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;),equals(exc_0,null)),equals(anon_x_3,Z(neglit(2(#))))),or(or(equals(boolean::select(anon_heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE),equals(exc_0,null)),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE)))" pathCondition="imp(equals(boolean::select(anon_heap,exc_0,java.lang.Object::&lt;created&gt;),java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;),and(and(and(wellFormed(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;),equals(exc_0,null)),equals(anon_x_3,Z(neglit(2(#))))),or(or(equals(java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;,TRUE),equals(exc_0,null)),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))))" pathConditionChanged="true" branchCondition="and(and(and(wellFormed(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;),equals(exc_0,null)),equals(anon_x_3,Z(neglit(2(#))))),or(or(equals(boolean::select(anon_heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE),equals(exc_0,null)),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Usage">
                         <callStackEntry path="/0/0/0"/>
                         <callStackEntry path="/0"/>
@@ -35,12 +26,12 @@ mod {}termination diamond" pathCondition="true" pathConditionChanged="false" pre
                            <statement name="return x_3;" pathCondition="imp(equals(boolean::select(anon_heap,exc_0,java.lang.Object::&lt;created&gt;),java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;),and(and(and(wellFormed(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;),equals(exc_0,null)),equals(anon_x_3,Z(neglit(2(#))))),or(or(equals(java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;,TRUE),equals(exc_0,null)),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))))" pathConditionChanged="false">
                               <callStackEntry path="/0/0/0"/>
                               <callStackEntry path="/0"/>
-                              <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of BlockContractParamRemaned.magic(x_3,y_1)&gt;" pathCondition="imp(equals(boolean::select(anon_heap,exc_0,java.lang.Object::&lt;created&gt;),java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;),and(and(and(wellFormed(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;),equals(exc_0,null)),equals(anon_x_3,Z(neglit(2(#))))),or(or(equals(java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;,TRUE),equals(exc_0,null)),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(2(#))) as result of magic&gt;" signatureIncludingReturnValue="&lt;return Z(neglit(2(#))) as result of BlockContractParamRemaned.magic(x_3,y_1)&gt;" isReturnValueComputed="true" methodReturnCondition="imp(equals(boolean::select(anon_heap,exc_0,java.lang.Object::&lt;created&gt;),java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;),and(and(and(wellFormed(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;),equals(exc_0,null)),equals(anon_x_3,Z(neglit(2(#))))),or(or(equals(java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;,TRUE),equals(exc_0,null)),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))))">
+                              <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of BlockContractParamRemaned.magic(x_3, y_1)&gt;" pathCondition="imp(equals(boolean::select(anon_heap,exc_0,java.lang.Object::&lt;created&gt;),java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;),and(and(and(wellFormed(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;),equals(exc_0,null)),equals(anon_x_3,Z(neglit(2(#))))),or(or(equals(java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;,TRUE),equals(exc_0,null)),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(2(#))) as result of magic&gt;" signatureIncludingReturnValue="&lt;return Z(neglit(2(#))) as result of BlockContractParamRemaned.magic(x_3, y_1)&gt;" isReturnValueComputed="true" methodReturnCondition="imp(equals(boolean::select(anon_heap,exc_0,java.lang.Object::&lt;created&gt;),java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;),and(and(and(wellFormed(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;),equals(exc_0,null)),equals(anon_x_3,Z(neglit(2(#))))),or(or(equals(java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;,TRUE),equals(exc_0,null)),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))))">
                                  <methodReturnValue name="Z(neglit(2(#)))" returnValueString="Z(neglit(2(#)))" hasCondition="false">
                                  </methodReturnValue>
                                  <callStackEntry path="/0/0/0"/>
                                  <callStackEntry path="/0"/>
-                                 <methodReturn name="&lt;return of main&gt;" signature="&lt;return of BlockContractParamRemaned.main(_x,_y)&gt;" pathCondition="imp(equals(boolean::select(anon_heap,exc_0,java.lang.Object::&lt;created&gt;),java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;),and(and(and(wellFormed(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;),equals(exc_0,null)),equals(anon_x_3,Z(neglit(2(#))))),or(or(equals(java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;,TRUE),equals(exc_0,null)),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(2(#))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(neglit(2(#))) as result of BlockContractParamRemaned.main(_x,_y)&gt;" isReturnValueComputed="true" methodReturnCondition="imp(equals(boolean::select(anon_heap,exc_0,java.lang.Object::&lt;created&gt;),java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;),and(and(and(wellFormed(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;),equals(exc_0,null)),equals(anon_x_3,Z(neglit(2(#))))),or(or(equals(java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;,TRUE),equals(exc_0,null)),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))))">
+                                 <methodReturn name="&lt;return of main&gt;" signature="&lt;return of BlockContractParamRemaned.main(_x, _y)&gt;" pathCondition="imp(equals(boolean::select(anon_heap,exc_0,java.lang.Object::&lt;created&gt;),java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;),and(and(and(wellFormed(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;),equals(exc_0,null)),equals(anon_x_3,Z(neglit(2(#))))),or(or(equals(java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;,TRUE),equals(exc_0,null)),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(2(#))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(neglit(2(#))) as result of BlockContractParamRemaned.main(_x, _y)&gt;" isReturnValueComputed="true" methodReturnCondition="imp(equals(boolean::select(anon_heap,exc_0,java.lang.Object::&lt;created&gt;),java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;),and(and(and(wellFormed(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;),equals(exc_0,null)),equals(anon_x_3,Z(neglit(2(#))))),or(or(equals(java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;,TRUE),equals(exc_0,null)),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))))">
                                     <methodReturnValue name="Z(neglit(2(#)))" returnValueString="Z(neglit(2(#)))" hasCondition="false">
                                     </methodReturnValue>
                                     <callStackEntry path="/0"/>
@@ -54,11 +45,10 @@ mod {}termination diamond" pathCondition="true" pathConditionChanged="false" pre
                   </blockContract>
                </statement>
             </statement>
-            <methodReturnEntry path="/0/0/0/0/0/0/1/0/0/0"/>
+            <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0"/>
          </methodCall>
       </statement>
-      <methodReturnEntry path="/0/0/0/0/0/0/1/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
-   <terminationEntry path="/0/0/0/0/0/0/0/0/0"/>
-   <terminationEntry path="/0/0/0/0/0/0/1/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
 </start>

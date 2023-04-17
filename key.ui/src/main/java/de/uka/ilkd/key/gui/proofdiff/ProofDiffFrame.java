@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.gui.proofdiff;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.Iterator;
+import java.util.LinkedList;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -7,12 +13,6 @@ import de.uka.ilkd.key.gui.proofdiff.diff_match_patch.Diff;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.Iterator;
-import java.util.LinkedList;
 
 /**
  * Proof-of-concept implementation of a textual sequent comparison.
@@ -158,7 +158,6 @@ public class ProofDiffFrame extends JFrame {
             to.setText(Integer.toString(node.serialNr()));
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            return;
         }
     }
 
@@ -323,8 +322,9 @@ public class ProofDiffFrame extends JFrame {
             Node n = it.next();
             if (n.serialNr() <= number) {
                 Node result = findNode(n, number);
-                if (result != null)
+                if (result != null) {
                     return result;
+                }
             }
         }
 

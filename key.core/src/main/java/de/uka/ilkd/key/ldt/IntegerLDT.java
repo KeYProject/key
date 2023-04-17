@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.ldt;
 
-import org.key_project.util.ExtList;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -18,10 +18,11 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.ExtList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
 
 
 /**
@@ -86,6 +87,8 @@ public final class IntegerLDT extends LDT {
     private final Function binaryAnd;
     private final Function orJint;
     private final Function orJlong;
+    private final Function bitwiseNegateJint;
+    private final Function bitwiseNegateJlong;
     private final Function andJint;
     private final Function andJlong;
     private final Function xorJint;
@@ -97,7 +100,8 @@ public final class IntegerLDT extends LDT {
     private final Function moduloChar;
     private final Function checkedUnaryMinusInt;
     private final Function checkedUnaryMinusLong;
-    private final Function checkedBitwiseNegation;
+    private final Function checkedBitwiseNegateInt;
+    private final Function checkedBitwiseNegateLong;
     private final Function checkedAddInt;
     private final Function checkedAddLong;
     private final Function checkedSubInt;
@@ -158,7 +162,7 @@ public final class IntegerLDT extends LDT {
         // initialise caches for function symbols from integerHeader.key
         sharp = addFunction(services, "#");
         for (int i = 0; i < 10; i++) {
-            numberSymbol[i] = addFunction(services, "" + i);
+            numberSymbol[i] = addFunction(services, String.valueOf(i));
         }
         neglit = addFunction(services, NEGATIVE_LITERAL_STRING);
         numbers = addFunction(services, NUMBERS_NAME.toString());
@@ -199,6 +203,8 @@ public final class IntegerLDT extends LDT {
         binaryOr = addFunction(services, "binaryOr");
         binaryAnd = addFunction(services, "binaryAnd");
         binaryXOr = addFunction(services, "binaryXOr");
+        bitwiseNegateJint = addFunction(services, "bitwiseNegateJint");
+        bitwiseNegateJlong = addFunction(services, "bitwiseNegateJlong");
         orJint = addFunction(services, "orJint");
         orJlong = addFunction(services, "orJlong");
         andJint = addFunction(services, "andJint");
@@ -213,7 +219,8 @@ public final class IntegerLDT extends LDT {
 
         checkedUnaryMinusInt = addFunction(services, "checkedUnaryMinusInt");
         checkedUnaryMinusLong = addFunction(services, "checkedUnaryMinusLong");
-        checkedBitwiseNegation = addFunction(services, "checkedBitwiseNegation");
+        checkedBitwiseNegateInt = addFunction(services, "checkedBitwiseNegateInt");
+        checkedBitwiseNegateLong = addFunction(services, "checkedBitwiseNegateLong");
         checkedAddInt = addFunction(services, "checkedAddInt");
         checkedAddLong = addFunction(services, "checkedAddLong");
         checkedSubInt = addFunction(services, "checkedSubInt");
@@ -454,6 +461,14 @@ public final class IntegerLDT extends LDT {
         return unsignedshiftrightJlong;
     }
 
+    public Function getBitwiseNegateJint() {
+        return bitwiseNegateJint;
+    }
+
+    public Function getBitwiseNegateJlong() {
+        return bitwiseNegateJlong;
+    }
+
     public Function getOrJint() {
         return orJint;
     }
@@ -522,8 +537,12 @@ public final class IntegerLDT extends LDT {
         return checkedUnaryMinusLong;
     }
 
-    public Function getCheckedBitwiseNegation() {
-        return checkedBitwiseNegation;
+    public Function getCheckedBitwiseNegateInt() {
+        return checkedBitwiseNegateInt;
+    }
+
+    public Function getCheckedBitwiseNegateLong() {
+        return checkedBitwiseNegateLong;
     }
 
     public Function getCheckedAddInt() {
@@ -754,7 +773,6 @@ public final class IntegerLDT extends LDT {
             result = services.getTermBuilder().zTerm(((AbstractIntegerLiteral) lit).getValue());
         }
 
-        LOGGER.debug("integerldt: result of translating literal (lit {}, result {}):", lit, result);
         return result;
     }
 
@@ -764,7 +782,7 @@ public final class IntegerLDT extends LDT {
     }
 
     public String toNumberString(Term t) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         Operator f = t.op();
         while (isNumberLiteral(f)) {
             sb.insert(0, f.name().toString().charAt(0));
@@ -799,7 +817,7 @@ public final class IntegerLDT extends LDT {
 
 
     @Override
-    public final Type getType(Term t) {
+    public Type getType(Term t) {
         assert false : "IntegerLDT: Cannot get Java type for term: " + t;
         return null;
     }

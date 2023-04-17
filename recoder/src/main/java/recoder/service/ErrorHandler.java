@@ -41,4 +41,3 @@ public interface ErrorHandler extends ModelUpdateListener {
      */
     void reportError(Exception e) throws RuntimeException;
 }
-

@@ -1,11 +1,16 @@
 package de.uka.ilkd.key.gui.fonticons;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import javax.swing.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class IconFontSwing {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IconFontSwing.class);
+
     /**
      * Builds an image.
      *
@@ -96,8 +101,8 @@ public final class IconFontSwing {
             Font f = iconCode.getFont();
             return f.deriveFont(size);
         } catch (Exception e) {
-            e.printStackTrace();
-            return new Font(Font.MONOSPACED, 0, (int) size);
+            LOGGER.warn("Building font failed", e);
+            return new Font(Font.MONOSPACED, Font.PLAIN, (int) size);
         }
     }
 }

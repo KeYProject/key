@@ -6,8 +6,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Observer;
 import java.util.Optional;
-
-import org.key_project.util.collection.ImmutableList;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
@@ -22,7 +21,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
 
-import javax.annotation.Nonnull;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * @author Alexander Weigl
@@ -32,13 +31,13 @@ public class EngineState {
     private final static DefaultTermParser PARSER = new DefaultTermParser();
     // private final Map<String, Object> arbitraryVariables = new HashMap<>();
     private final Proof proof;
-    private AbbrevMap abbrevMap = new AbbrevMap();
+    private final AbbrevMap abbrevMap = new AbbrevMap();
     /**
      * nullable
      */
     private Observer observer;
     private File baseFileName = new File(".");
-    private ValueInjector valueInjector = ValueInjector.createDefault();
+    private final ValueInjector valueInjector = ValueInjector.createDefault();
     private Goal goal;
     private Node lastSetGoalNode;
 
@@ -144,7 +143,7 @@ public class EngineState {
     }
 
     private Goal findGoalFromRoot(final Node rootNode, boolean checkAutomatic) {
-        final Deque<Node> choices = new LinkedList<Node>();
+        final Deque<Node> choices = new LinkedList<>();
 
         Goal result = null;
         Node node = rootNode;

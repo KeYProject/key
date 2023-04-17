@@ -1,23 +1,19 @@
 package de.uka.ilkd.key.proof;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * A multi-threaded taclet index implementation. It executes method
@@ -32,8 +28,9 @@ import de.uka.ilkd.key.rule.Taclet;
  */
 final class MultiThreadedTacletIndex extends TacletIndex {
 
-    private static ForkJoinPool execs = ForkJoinPool.commonPool(); // <- Use this once we switch to
-                                                                   // Java 8
+    private static final ForkJoinPool execs = ForkJoinPool.commonPool(); // <- Use this once we
+                                                                         // switch to
+    // Java 8
 
     MultiThreadedTacletIndex(Iterable<Taclet> tacletSet) {
         super(tacletSet);
@@ -71,7 +68,7 @@ final class MultiThreadedTacletIndex extends TacletIndex {
     protected ImmutableList<NoPosTacletApp> matchTaclets(ImmutableList<NoPosTacletApp> tacletApps,
             RuleFilter p_filter, PosInOccurrence pos, Services services) {
 
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+        ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
         if (tacletApps == null) {
             return result;
         }
@@ -79,26 +76,25 @@ final class MultiThreadedTacletIndex extends TacletIndex {
         if (tacletApps.size() > 256) {
             NoPosTacletApp[] toMatch = tacletApps.toArray(NoPosTacletApp.class);
             final int localParallelism =
-                (toMatch.length >> 5 > execs.getParallelism() ? execs.getParallelism()
-                        : toMatch.length >> 5);
+                (Math.min(toMatch.length >> 5, execs.getParallelism()));
             final int partitionSize = toMatch.length / localParallelism;
 
             List<TacletSetMatchTask> forks = new ArrayList<>();
 
             for (int lower = 0; lower < toMatch.length; lower += partitionSize) {
                 int upper = lower + partitionSize;
-                upper = upper <= toMatch.length ? upper : toMatch.length;
+                upper = Math.min(upper, toMatch.length);
                 forks.add(new TacletSetMatchTask(toMatch, lower, upper, pos, p_filter, services));
             }
 
-            List<NoPosTacletApp> matchedRules = new LinkedList<NoPosTacletApp>();
+            List<NoPosTacletApp> matchedRules = new LinkedList<>();
 
             try {
                 for (Future<List<NoPosTacletApp>> res : execs.invokeAll(forks)) {
                     matchedRules.addAll(res.get());
                 }
             } catch (InterruptedException | ExecutionException e) {
-                throw (IllegalStateException) new IllegalStateException().initCause(e);
+                throw new IllegalStateException(e);
             }
             result = result.prependReverse(matchedRules);
         } else {
@@ -120,12 +116,12 @@ final class MultiThreadedTacletIndex extends TacletIndex {
      * The callable implementing the actual matching task.
      */
     static class TacletSetMatchTask implements Callable<List<NoPosTacletApp>> {
-        private NoPosTacletApp[] toMatch;
+        private final NoPosTacletApp[] toMatch;
         private final int lower;
         private final int upper;
-        private Services services;
-        private PosInOccurrence pos;
-        private RuleFilter ruleFilter;
+        private final Services services;
+        private final PosInOccurrence pos;
+        private final RuleFilter ruleFilter;
 
         /**
          * Creates a task which matches all taclets in {@code toMatch} from {@code lower} including

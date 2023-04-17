@@ -11,7 +11,7 @@ public class SMTSolverResult {
      * it has a counterexample), UNKNOWN otherwise (I'm not sure if this holds if an error occurs)
      * Note: Currently (1.12.'09) the SMT Solvers do not check if a node is FALSE.
      */
-    public static enum ThreeValuedTruth {
+    public enum ThreeValuedTruth {
         VALID {
             @Override
             public String toString() {

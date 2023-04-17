@@ -1,15 +1,15 @@
 package de.uka.ilkd.key.logic.sort;
 
-import de.uka.ilkd.key.rule.HasOrigin;
-import org.key_project.util.collection.ImmutableSet;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.rule.HasOrigin;
 
-import javax.annotation.Nullable;
+import org.key_project.util.collection.ImmutableSet;
 
 
 public interface Sort extends Named, HasOrigin {
@@ -17,37 +17,37 @@ public interface Sort extends Named, HasOrigin {
     /**
      * Formulas are represented as "terms" of this sort.
      */
-    public final Sort FORMULA = new SortImpl(new Name("Formula"));
+    Sort FORMULA = new SortImpl(new Name("Formula"));
 
     /**
      * Updates are represented as "terms" of this sort.
      */
-    public final Sort UPDATE = new SortImpl(new Name("Update"));
+    Sort UPDATE = new SortImpl(new Name("Update"));
 
     /**
      * Term labels are represented as "terms" of this sort.
      */
-    public final Sort TERMLABEL = new SortImpl(new Name("TermLabel"));
+    Sort TERMLABEL = new SortImpl(new Name("TermLabel"));
 
     /**
      * Any is a supersort of all sorts.
      */
-    public final Sort ANY = new SortImpl(new Name("any"));
+    Sort ANY = new SortImpl(new Name("any"));
 
     /**
      * Name of {@link #getCastSymbol(TermServices)}.
      */
-    public final Name CAST_NAME = new Name("cast");
+    Name CAST_NAME = new Name("cast");
 
     /**
      * Name of {@link #getInstanceofSymbol(TermServices)}.
      */
-    final Name INSTANCE_NAME = new Name("instance");
+    Name INSTANCE_NAME = new Name("instance");
 
     /**
      * Name of {@link #getExactInstanceofSymbol(TermServices)}.
      */
-    final Name EXACT_INSTANCE_NAME = new Name("exactInstance");
+    Name EXACT_INSTANCE_NAME = new Name("exactInstance");
 
 
     /**

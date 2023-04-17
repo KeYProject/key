@@ -2,6 +2,7 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.sort.Sort;
+
 import org.key_project.util.EqualsModProofIrrelevancy;
 
 

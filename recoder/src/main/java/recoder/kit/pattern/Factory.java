@@ -2,14 +2,14 @@
 
 package recoder.kit.pattern;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.ModelElement;
 import recoder.ModelException;
 import recoder.abstraction.Constructor;
 import recoder.abstraction.DefaultConstructor;
 import recoder.java.declaration.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Factory implements DesignPattern {
 
@@ -28,16 +28,15 @@ public class Factory implements DesignPattern {
             throw new NullPointerException();
         }
         int n = products.size();
-        factoryMethods = new ArrayList<FactoryMethod>(n);
-        for (int i = 0; i < n; i++) {
-            TypeDeclaration td = products.get(i);
+        factoryMethods = new ArrayList<>(n);
+        for (TypeDeclaration td : products) {
             if (td instanceof ClassDeclaration) {
                 addFactoryMethods((ClassDeclaration) td);
             }
         }
         List<MemberDeclaration> members = factoryClass.getMembers();
-        for (int i = 0; i < factoryMethods.size(); i += 1) {
-            members.add(factoryMethods.get(i).getProducer());
+        for (FactoryMethod factoryMethod : factoryMethods) {
+            members.add(factoryMethod.getProducer());
         }
         factoryClass.makeParentRoleValid();
     }
@@ -48,13 +47,13 @@ public class Factory implements DesignPattern {
      */
     public void addFactoryMethods(ClassDeclaration decl) {
         List<? extends Constructor> cl = decl.getConstructors();
-        for (int i = 0; i < cl.size(); i++) {
-            if (cl.get(i) instanceof DefaultConstructor) {
+        for (Constructor constructor : cl) {
+            if (constructor instanceof DefaultConstructor) {
                 FactoryMethod m = new FactoryMethod(decl);
                 addFactoryMethod(m);
                 return;
             }
-            ConstructorDeclaration cons = (ConstructorDeclaration) cl.get(i);
+            ConstructorDeclaration cons = (ConstructorDeclaration) constructor;
             if (cons.isPublic()) {
                 FactoryMethod m = new FactoryMethod(cons);
                 addFactoryMethod(m);
@@ -102,8 +101,7 @@ public class Factory implements DesignPattern {
                 "Factories must contain at least one factory method");
         }
         TypeDeclaration parent = null;
-        for (int i = 0, s = factoryMethods.size(); i < s; i += 1) {
-            FactoryMethod m = factoryMethods.get(i);
+        for (FactoryMethod m : factoryMethods) {
             m.validate();
             if (parent == null) {
                 parent = m.getProducer().getMemberParent();

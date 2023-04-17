@@ -1,13 +1,10 @@
 package de.uka.ilkd.key.settings;
 
-import java.util.EventObject;
-import java.util.LinkedList;
 import java.util.Properties;
 
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.util.Debug;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,24 +13,18 @@ import org.slf4j.LoggerFactory;
  *
  * @author lanzinger
  */
-public class TermLabelSettings implements Settings, Cloneable {
+public class TermLabelSettings extends AbstractSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(TermLabelSettings.class);
 
     /**
      * Property key for {@link #getUseOriginLabels()}
      */
-    private static final String USE_ORIGIN_LABELS = "[Labels]UseOriginLabels";
+    public static final String USE_ORIGIN_LABELS = "[Labels]UseOriginLabels";
 
     /**
      * @see {@link #getUseOriginLabels()}
      */
     private boolean useOriginLabels = true;
-
-    /**
-     * @see #addSettingsListener(SettingsListener)
-     * @see #removeSettingsListener(SettingsListener)
-     */
-    private final LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
 
     @Override
     public void readSettings(Properties props) {
@@ -67,32 +58,8 @@ public class TermLabelSettings implements Settings, Cloneable {
      * @param useOriginLabels whether {@link OriginTermLabel}s should be used.
      */
     public void setUseOriginLabels(boolean useOriginLabels) {
-        if (this.useOriginLabels != useOriginLabels) {
-            this.useOriginLabels = useOriginLabels;
-            fireSettingsChanged();
-        }
-    }
-
-    @Override
-    public void addSettingsListener(SettingsListener l) {
-        listenerList.add(l);
-    }
-
-    /**
-     * Removes a listener from this settings object.
-     *
-     * @param l the listener to remove.
-     */
-    public void removeSettingsListener(SettingsListener l) {
-        listenerList.remove(l);
-    }
-
-    /**
-     * Notify all listeners of the current state of this settings object.
-     */
-    protected void fireSettingsChanged() {
-        for (SettingsListener aListenerList : listenerList) {
-            aListenerList.settingsChanged(new EventObject(this));
-        }
+        var old = this.useOriginLabels;
+        this.useOriginLabels = useOriginLabels;
+        firePropertyChange(USE_ORIGIN_LABELS, old, useOriginLabels);
     }
 }

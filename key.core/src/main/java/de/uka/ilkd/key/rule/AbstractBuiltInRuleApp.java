@@ -3,13 +3,13 @@ package de.uka.ilkd.key.rule;
 import java.util.List;
 import java.util.Objects;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 
@@ -22,7 +22,7 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
             ImmutableList<PosInOccurrence> ifInsts) {
         this.builtInRule = rule;
         this.pio = pio;
-        this.ifInsts = (ifInsts == null ? ImmutableSLList.<PosInOccurrence>nil() : ifInsts);
+        this.ifInsts = (ifInsts == null ? ImmutableSLList.nil() : ifInsts);
     }
 
     protected AbstractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio) {

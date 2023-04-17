@@ -2,8 +2,7 @@ package de.uka.ilkd.key.ldt;
 
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.key_project.util.ExtList;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -20,7 +19,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-import javax.annotation.Nullable;
+import org.key_project.util.ExtList;
 
 /**
  * An "LDT" or "language data type" class corresponds to a standard rule file shipped with KeY.
@@ -43,19 +42,21 @@ public abstract class LDT implements Named {
     // -------------------------------------------------------------------------
 
     protected LDT(Name name, TermServices services) {
-        sort = (Sort) services.getNamespaces().sorts().lookup(name);
-        if (sort == null)
+        sort = services.getNamespaces().sorts().lookup(name);
+        if (sort == null) {
             throw new RuntimeException("LDT " + name + " not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
+        }
         this.name = name;
     }
 
 
     protected LDT(Name name, Sort targetSort, TermServices services) {
         sort = targetSort;
-        if (sort == null)
+        if (sort == null) {
             throw new RuntimeException("LDT " + name + " not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
+        }
         this.name = name;
     }
 
@@ -81,10 +82,11 @@ public abstract class LDT implements Named {
      */
     protected final Function addFunction(TermServices services, String funcName) {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
-        final Function f = (Function) funcNS.lookup(new Name(funcName));
-        if (f == null)
+        final Function f = funcNS.lookup(new Name(funcName));
+        if (f == null) {
             throw new RuntimeException("LDT: Function " + funcName + " not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
+        }
         return addFunction(f);
     }
 
@@ -119,7 +121,7 @@ public abstract class LDT implements Named {
     public static Map<Name, LDT> getNewLDTInstances(Services s) {
 
         // TreeMap ensures the map is sorted according to the natural order of its keys.
-        Map<Name, LDT> ret = new TreeMap<Name, LDT>();
+        Map<Name, LDT> ret = new TreeMap<>();
 
         ret.put(IntegerLDT.NAME, new IntegerLDT(s));
         ret.put(BooleanLDT.NAME, new BooleanLDT(s));

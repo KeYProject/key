@@ -14,9 +14,9 @@ public class SpecDataLocation implements DataLocation {
     /** unknown location (e.g. if the location does not denote a file) */
     public static final DataLocation UNKNOWN_LOCATION = new SpecDataLocation("UNKNOWN", "unknown");
 
-    String type;
+    final String type;
 
-    String location;
+    final String location;
 
     public SpecDataLocation(String type, String location) {
         this.type = type;

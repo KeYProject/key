@@ -2,9 +2,7 @@ package de.uka.ilkd.key.proof.io.intermediate;
 
 import java.util.ArrayDeque;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
-import java.util.function.Consumer;
 
 /**
  * Node in an intermediate proof representation. Responsible for storing information about children

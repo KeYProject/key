@@ -12,11 +12,11 @@ import de.uka.ilkd.key.logic.op.Operator;
  */
 public class OpCollector extends DefaultVisitor {
     /** the found operators */
-    private HashSet<Operator> ops;
+    private final HashSet<Operator> ops;
 
     /** creates the Op collector */
     public OpCollector() {
-        ops = new LinkedHashSet<Operator>();
+        ops = new LinkedHashSet<>();
     }
 
     public void visit(Term t) {

@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.informationflow.macros;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.informationflow.po.BlockExecutionPO;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
@@ -20,6 +18,8 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.rule.BlockContractInternalBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
+
+import org.key_project.util.collection.ImmutableList;
 
 
 /**

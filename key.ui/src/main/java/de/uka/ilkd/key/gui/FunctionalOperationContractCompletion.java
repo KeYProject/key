@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.gui;
 
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule.Instantiation;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**

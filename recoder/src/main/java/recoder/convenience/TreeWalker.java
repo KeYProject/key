@@ -55,4 +55,3 @@ public class TreeWalker extends AbstractTreeWalker {
     }
 
 }
-

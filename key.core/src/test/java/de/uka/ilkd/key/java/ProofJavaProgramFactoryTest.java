@@ -1,13 +1,20 @@
 package de.uka.ilkd.key.java;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.function.Predicate;
+
 import de.uka.ilkd.key.java.recoderext.Ghost;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.abstraction.Method;
@@ -27,11 +34,6 @@ import recoder.java.reference.VariableReference;
 import recoder.java.statement.EmptyStatement;
 import recoder.java.statement.For;
 import recoder.list.generic.ASTList;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Optional;
-import java.util.function.Predicate;
 
 /**
  * @author Alexander Weigl
@@ -136,6 +138,7 @@ public class ProofJavaProgramFactoryTest {
     @Test
     public void testAttachCommentsCompilationUnit_SmansEtAlArrayList() throws IOException {
         File inputFile = new File("../key.ui/examples/heap/SmansEtAl/src/ArrayList.java");
+        // Regenerate this file by copying the console output
         File expectedFile = new File(FindResources.getTestResourcesDirectory(),
             "de/uka/ilkd/key/java/testAttachCommentsCompilationUnit_SmansEtAlArrayList.txt");
         String expected = StringUtil.replaceNewlines(IOUtil.readFrom(expectedFile), "\n");
@@ -152,6 +155,7 @@ public class ProofJavaProgramFactoryTest {
     @Test
     public void testAttachCommentsCompilationUnit_LockSpec() throws IOException {
         File inputFile = new File("../key.ui/examples/heap/permissions/lockspec/src/LockSpec.java");
+        // Regenerate this file by copying the console output
         File expectedFile = new File(FindResources.getTestResourcesDirectory(),
             "de/uka/ilkd/key/java/testAttachCommentsCompilationUnit_LockSpec.txt");
         String expected = StringUtil.replaceNewlines(IOUtil.readFrom(expectedFile), "\n");

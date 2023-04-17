@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.taclettranslation;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -11,12 +13,11 @@ import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.Taclet;
+
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 public class TestTacletTranslator {
 

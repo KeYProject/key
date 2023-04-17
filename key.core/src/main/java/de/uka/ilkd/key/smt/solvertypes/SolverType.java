@@ -13,12 +13,12 @@
 
 package de.uka.ilkd.key.smt.solvertypes;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 
 /**
@@ -202,4 +202,3 @@ public interface SolverType {
     AbstractSolverSocket getSocket(ModelExtractor query);
 
 }
-

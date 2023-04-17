@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.actions.useractions;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.actions.useractions.ProofModifyingUserAction;
 import de.uka.ilkd.key.proof.Proof;
 
 /**

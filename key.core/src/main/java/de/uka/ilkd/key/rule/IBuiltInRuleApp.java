@@ -1,14 +1,12 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
+
+import org.key_project.util.collection.ImmutableList;
 
 public interface IBuiltInRuleApp extends RuleApp {
 

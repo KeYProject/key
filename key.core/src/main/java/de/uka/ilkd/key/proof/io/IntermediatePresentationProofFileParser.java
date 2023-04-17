@@ -1,20 +1,20 @@
 package de.uka.ilkd.key.proof.io;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-
-import de.uka.ilkd.key.proof.io.intermediate.*;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.io.intermediate.*;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Parses a KeY proof file into an intermediate representation. The parsed intermediate result can
@@ -60,7 +60,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     private Proof proof = null;
 
     /* + Open Branches */
-    private Stack<NodeIntermediate> stack = new Stack<NodeIntermediate>();
+    private final ArrayDeque<NodeIntermediate> stack = new ArrayDeque<>();
 
     /* + State Information */
     private RuleInformation ruleInfo = null;
@@ -68,7 +68,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     /* + State information that is returned after parsing */
     private BranchNodeIntermediate root = null; // the "dummy ID" branch
     private NodeIntermediate currNode = null;
-    private LinkedList<Throwable> errors = new LinkedList<Throwable>();
+    private final LinkedList<Throwable> errors = new LinkedList<>();
 
     /**
      * @param proof Proof object for storing meta information about the parsed proof.
@@ -130,7 +130,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         {
             TacletInformation tacletInfo = (TacletInformation) ruleInfo;
             if (tacletInfo.loadedInsts == null) {
-                tacletInfo.loadedInsts = new LinkedList<String>();
+                tacletInfo.loadedInsts = new LinkedList<>();
             }
             tacletInfo.loadedInsts.add(str);
         }
@@ -155,14 +155,14 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
 
         case KeY_USER: // UserLog
             if (proof.userLog == null) {
-                proof.userLog = new Vector<String>();
+                proof.userLog = new ArrayList<>();
             }
             proof.userLog.add(str);
             break;
 
         case KeY_VERSION: // Version log
             if (proof.keyVersionLog == null) {
-                proof.keyVersionLog = new Vector<String>();
+                proof.keyVersionLog = new ArrayList<>();
             }
             proof.keyVersionLog.add(str);
             break;
@@ -189,7 +189,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
             BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
 
             if (builtinInfo.builtinIfInsts == null) {
-                builtinInfo.builtinIfInsts = ImmutableSLList.<Pair<Integer, PosInTerm>>nil();
+                builtinInfo.builtinIfInsts = ImmutableSLList.nil();
             }
             builtinInfo.currIfInstFormula = 0;
             builtinInfo.currIfInstPosInTerm = PosInTerm.getTopLevel();
@@ -197,9 +197,9 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
 
         case NEW_NAMES: // newnames
             final String[] newNames = str.split(",");
-            ruleInfo.currNewNames = ImmutableSLList.<Name>nil();
-            for (int in = 0; in < newNames.length; in++) {
-                ruleInfo.currNewNames = ruleInfo.currNewNames.append(new Name(newNames[in]));
+            ruleInfo.currNewNames = ImmutableSLList.nil();
+            for (String newName : newNames) {
+                ruleInfo.currNewNames = ruleInfo.currNewNames.append(new Name(newName));
             }
             break;
 
@@ -297,7 +297,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         case ASSUMES_INST_BUILT_IN: // ifInst (for built in rules)
             BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
             builtinInfo.builtinIfInsts =
-                builtinInfo.builtinIfInsts.append(new Pair<Integer, PosInTerm>(
+                builtinInfo.builtinIfInsts.append(new Pair<>(
                     builtinInfo.currIfInstFormula, builtinInfo.currIfInstPosInTerm));
             break;
 
@@ -337,7 +337,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     private TacletAppIntermediate constructTacletApp() {
         TacletInformation tacletInfo = (TacletInformation) ruleInfo;
         return new TacletAppIntermediate(tacletInfo.currRuleName,
-            new Pair<Integer, PosInTerm>(tacletInfo.currFormula, tacletInfo.currPosInTerm),
+            new Pair<>(tacletInfo.currFormula, tacletInfo.currPosInTerm),
             tacletInfo.loadedInsts, tacletInfo.ifSeqFormulaList, tacletInfo.ifDirectFormulaList,
             tacletInfo.currNewNames);
     }
@@ -353,7 +353,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         if (builtinInfo.currRuleName.equals("MergeRule")) {
             result =
                 new MergeAppIntermediate(builtinInfo.currRuleName,
-                    new Pair<Integer, PosInTerm>(builtinInfo.currFormula,
+                    new Pair<>(builtinInfo.currFormula,
                         builtinInfo.currPosInTerm),
                     builtinInfo.currMergeNodeId, builtinInfo.currMergeProc,
                     builtinInfo.currNrPartners, builtinInfo.currNewNames,
@@ -361,7 +361,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
                     builtinInfo.currAbstractionPredicates, builtinInfo.currUserChoices);
         } else if (builtinInfo.currRuleName.equals("CloseAfterMerge")) {
             result = new MergePartnerAppIntermediate(builtinInfo.currRuleName,
-                new Pair<Integer, PosInTerm>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
+                new Pair<>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
                 builtinInfo.currCorrespondingMergeNodeId, builtinInfo.currNewNames);
         } else if (builtinInfo.currRuleName.equals("SMTRule")) {
             result = new SMTAppIntermediate(builtinInfo.currRuleName,
@@ -369,7 +369,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
                 builtinInfo.solver);
         } else {
             result = new BuiltInAppIntermediate(builtinInfo.currRuleName,
-                new Pair<Integer, PosInTerm>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
+                new Pair<>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
                 builtinInfo.currContract, builtinInfo.builtinIfInsts, builtinInfo.currNewNames);
         }
 
@@ -425,8 +425,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     private static class TacletInformation extends RuleInformation {
         /* + Taclet Information */
         protected LinkedList<String> loadedInsts = null;
-        protected ImmutableList<String> ifSeqFormulaList = ImmutableSLList.<String>nil();
-        protected ImmutableList<String> ifDirectFormulaList = ImmutableSLList.<String>nil();
+        protected ImmutableList<String> ifSeqFormulaList = ImmutableSLList.nil();
+        protected ImmutableList<String> ifDirectFormulaList = ImmutableSLList.nil();
 
         public TacletInformation(String ruleName) {
             super(ruleName);
@@ -455,7 +455,6 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
             null;
         protected String currAbstractionPredicates = null;
         protected String currUserChoices = null;
-
         protected String solver;
 
         public BuiltinRuleInformation(String ruleName) {
@@ -469,8 +468,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      * @author Dominic Scheurer
      */
     static class Result {
-        private List<Throwable> errors;
-        private String status;
+        private final List<Throwable> errors;
+        private final String status;
         private BranchNodeIntermediate parsedResult = null;
 
         public Result(List<Throwable> errors, String status, BranchNodeIntermediate parsedResult) {

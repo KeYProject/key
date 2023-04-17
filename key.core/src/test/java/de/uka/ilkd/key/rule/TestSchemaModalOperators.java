@@ -12,14 +12,16 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestSchemaModalOperators {
 
-    String[] strs = { "i=5", "\\<{ while(i>0) {i--;} }\\> i=0", "i=3",
+    final String[] strs = { "i=5", "\\<{ while(i>0) {i--;} }\\> i=0", "i=3",
         "\\[{ if(i==3) {i++;} else {i--;} }\\] i=3", "i=3",
         "\\[{ if(i==3) {i++;} else {i--;} }\\] i=3" };
     Proof[] proof;

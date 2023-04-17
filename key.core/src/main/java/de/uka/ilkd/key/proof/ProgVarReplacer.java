@@ -3,36 +3,25 @@ package de.uka.ilkd.key.proof;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.SemisequentChangeInfo;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
-import de.uka.ilkd.key.rule.inst.OperatorInstantiation;
-import de.uka.ilkd.key.rule.inst.ProgramInstantiation;
-import de.uka.ilkd.key.rule.inst.ProgramListInstantiation;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.inst.TermInstantiation;
+import de.uka.ilkd.key.rule.inst.*;
+
+import org.key_project.util.collection.*;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMapEntry;
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**
@@ -109,12 +98,10 @@ public final class ProgVarReplacer {
     public void replace(TacletIndex tacletIndex) {
         ImmutableList<NoPosTacletApp> noPosTacletApps = tacletIndex.getPartialInstantiatedApps();
         ImmutableSet<NoPosTacletApp> appsToBeRemoved, appsToBeAdded;
-        appsToBeRemoved = DefaultImmutableSet.<NoPosTacletApp>nil();
-        appsToBeAdded = DefaultImmutableSet.<NoPosTacletApp>nil();
+        appsToBeRemoved = DefaultImmutableSet.nil();
+        appsToBeAdded = DefaultImmutableSet.nil();
 
-        Iterator<NoPosTacletApp> it = noPosTacletApps.iterator();
-        while (it.hasNext()) {
-            NoPosTacletApp noPosTacletApp = it.next();
+        for (NoPosTacletApp noPosTacletApp : noPosTacletApps) {
             SVInstantiations insts = noPosTacletApp.instantiations();
 
             SVInstantiations newInsts = replace(insts);
@@ -179,7 +166,7 @@ public final class ProgVarReplacer {
                 }
 
                 if (changedSomething) {
-                    ImmutableArray<ProgramElement> newA = new ImmutableArray<ProgramElement>(array);
+                    ImmutableArray<ProgramElement> newA = new ImmutableArray<>(array);
                     result = result.replace(sv, newA, services);
                 }
             } else if (ie instanceof TermInstantiation) {
@@ -254,9 +241,9 @@ public final class ProgVarReplacer {
 
     private Term replaceProgramVariable(Term t) {
         final ProgramVariable pv = (ProgramVariable) t.op();
-        Object o = map.get(pv);
+        ProgramVariable o = map.get(pv);
         if (o instanceof ProgramVariable) {
-            return services.getTermFactory().createTerm((ProgramVariable) o, t.getLabels());
+            return services.getTermFactory().createTerm(o, t.getLabels());
         } else if (o instanceof Term) {
             return (Term) o;
         }
@@ -267,7 +254,7 @@ public final class ProgVarReplacer {
     private Term standardReplace(Term t) {
         Term result = t;
 
-        final Term newSubTerms[] = new Term[t.arity()];
+        final Term[] newSubTerms = new Term[t.arity()];
 
         boolean changedSubTerm = false;
 

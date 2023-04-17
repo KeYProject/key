@@ -1,20 +1,20 @@
 package de.uka.ilkd.key.gui.help;
 
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CButton;
-import de.uka.ilkd.key.core.Main;
-import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+
+import bibliothek.gui.dock.common.action.CAction;
+import bibliothek.gui.dock.common.action.CButton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A gate to the KeY documentation system.
@@ -27,6 +27,7 @@ import java.net.URLEncoder;
  * @version 1 (10.04.19)
  */
 public class HelpFacade {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HelpFacade.class);
     /**
      * System property key for setting the base url of the help system.
      */
@@ -54,7 +55,7 @@ public class HelpFacade {
         try {
             Desktop.getDesktop().browse(new URI(url));
         } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to open help in browser", e);
         }
     }
 
@@ -84,10 +85,11 @@ public class HelpFacade {
      */
     public static void openHelp(Component path) {
         while (path != null) {
-            if (openHelpOfClass(path.getClass()))
+            if (openHelpOfClass(path.getClass())) {
                 break;
-            else
+            } else {
                 path = path.getParent();
+            }
         }
     }
 

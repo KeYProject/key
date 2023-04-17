@@ -30,9 +30,9 @@ public class AssertCommand extends AbstractCommand<AssertCommand.Parameters> {
             throw new ScriptException("No parameter specified!");
         }
 
-        if (state.getProof().openEnabledGoals().size() != args.goals.intValue()) {
+        if (state.getProof().openEnabledGoals().size() != args.goals) {
             throw new ScriptException("Assertion failed: number of open goals is "
-                + state.getProof().openGoals().size() + ", but should be " + args.goals.intValue());
+                + state.getProof().openGoals().size() + ", but should be " + args.goals);
         }
     }
 

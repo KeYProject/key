@@ -1,5 +1,12 @@
 package de.uka.ilkd.key.gui.extension;
 
+import java.awt.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.impl.Extension;
 import de.uka.ilkd.key.gui.extension.impl.ExtensionSettings;
@@ -8,14 +15,8 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import net.miginfocom.layout.CC;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import net.miginfocom.layout.CC;
 
 /**
  * @author Alexander Weigl

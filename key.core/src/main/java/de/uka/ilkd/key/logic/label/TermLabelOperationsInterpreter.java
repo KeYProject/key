@@ -3,11 +3,11 @@ package de.uka.ilkd.key.logic.label;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
+import de.uka.ilkd.key.logic.Term;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.logic.Term;
 
 /**
  * A collection of static methods to deal with {@link TermLabel}.
@@ -18,37 +18,37 @@ class TermLabelOperationsInterpreter {
 
     public static ImmutableArray<TermLabel> intersection(ImmutableArray<TermLabel> left,
             ImmutableArray<TermLabel> right) {
-        final HashSet<TermLabel> set = new LinkedHashSet<TermLabel>();
+        final HashSet<TermLabel> set = new LinkedHashSet<>();
         for (TermLabel r : right) {
             if (left.contains(r)) {
                 set.add(r);
             }
         }
-        return new ImmutableArray<TermLabel>(set.toArray(new TermLabel[set.size()]));
+        return new ImmutableArray<>(set.toArray(new TermLabel[0]));
     }
 
     public static ImmutableArray<TermLabel> union(ImmutableArray<TermLabel> left,
             ImmutableArray<TermLabel> right) {
-        final HashSet<TermLabel> set = new LinkedHashSet<TermLabel>();
+        final HashSet<TermLabel> set = new LinkedHashSet<>();
         for (TermLabel l : left) {
             set.add(l);
         }
         for (TermLabel l : right) {
             set.add(l);
         }
-        return new ImmutableArray<TermLabel>(set.toArray(new TermLabel[set.size()]));
+        return new ImmutableArray<>(set.toArray(new TermLabel[0]));
     }
 
     public static ImmutableArray<TermLabel> sub(ImmutableArray<TermLabel> left,
             ImmutableArray<TermLabel> right) {
-        final HashSet<TermLabel> set = new LinkedHashSet<TermLabel>();
+        final HashSet<TermLabel> set = new LinkedHashSet<>();
         for (TermLabel l : left) {
             set.add(l);
         }
         for (TermLabel l : right) {
             set.remove(l);
         }
-        return new ImmutableArray<TermLabel>(set.toArray(new TermLabel[set.size()]));
+        return new ImmutableArray<>(set.toArray(new TermLabel[0]));
     }
 
     /**
@@ -67,7 +67,7 @@ class TermLabelOperationsInterpreter {
      * @return a list which represents a redundancy free result of merging labels in t1 and t2
      */
     public static ImmutableList<Term> resolveRedundancy(Term t1, Term t2) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = ImmutableSLList.nil();
         if (!t2.hasLabels()) {
             return result.prepend(t1);
         } else if (!t1.hasLabels()) {

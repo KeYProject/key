@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.speclang.translation;
 
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.MemberDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -8,11 +11,9 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 
 /**
@@ -25,7 +26,7 @@ public abstract class SLResolverManager {
     public final SLExceptionFactory excManager;
 
     private ImmutableList<SLExpressionResolver> resolvers =
-        ImmutableSLList.<SLExpressionResolver>nil();
+        ImmutableSLList.nil();
     private final KeYJavaType specInClass;
     private final ParsableVariable selfVar;
     private final boolean useLocalVarsAsImplicitReceivers;
@@ -34,8 +35,8 @@ public abstract class SLResolverManager {
     private ImmutableList<Namespace<?>> /* ParsableVariable */
     localVariablesNamespaces = ImmutableSLList.nil();
 
-    private Map<ParsableVariable, KeYJavaType> kjts =
-        new LinkedHashMap<ParsableVariable, KeYJavaType>();
+    private final Map<ParsableVariable, KeYJavaType> kjts =
+        new LinkedHashMap<>();
 
     // -------------------------------------------------------------------------
     // constructors
@@ -63,12 +64,12 @@ public abstract class SLResolverManager {
 
 
     private String getShortName(String name) {
-        return name.substring(name.lastIndexOf(".") + 1);
+        return name.substring(name.lastIndexOf('.') + 1);
     }
 
 
     private boolean isFullyQualified(String name) {
-        return name.indexOf(".") > -1;
+        return name.contains(".");
     }
 
 
@@ -119,9 +120,7 @@ public abstract class SLResolverManager {
         if (specInClass != null) {
             SLExpression receiver = new SLExpression(specInClass);
             SLExpression result = resolveExplicit(receiver, name, parameters);
-            if (result != null) {
-                return result;
-            }
+            return result;
         }
 
         return null;

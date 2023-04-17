@@ -3,8 +3,6 @@ package de.uka.ilkd.key.strategy.termgenerator;
 import java.math.BigInteger;
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -18,6 +16,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -60,12 +60,14 @@ public class RootsGenerator implements TermGenerator {
 
         final Monomial mon = Monomial.create(powerRel.sub(0), services);
         final int pow = mon.getParts().size();
-        if (pow <= 1 || !mon.getCoefficient().equals(one))
+        if (pow <= 1 || !mon.getCoefficient().equals(one)) {
             return emptyIterator();
+        }
 
         final Term var = mon.getParts().head();
-        if (!mon.getParts().removeAll(var).isEmpty())
+        if (!mon.getParts().removeAll(var).isEmpty()) {
             return emptyIterator();
+        }
 
         if (op == numbers.getLessOrEquals()) {
             return toIterator(breakDownLeq(var, lit, pow, services));
@@ -189,8 +191,9 @@ public class RootsGenerator implements TermGenerator {
      */
     private BigInteger rootRoundingUpwards(BigInteger prod, int exp) {
         final BigInteger res = root(prod, exp);
-        if (power(res, exp).compareTo(prod) < 0)
+        if (power(res, exp).compareTo(prod) < 0) {
             return res.add(one);
+        }
         return res;
     }
 
@@ -206,8 +209,9 @@ public class RootsGenerator implements TermGenerator {
             assert exp % 2 != 0;
 
             BigInteger res = posRoot(prod.abs(), exp).negate();
-            while (power(res, exp).compareTo(prod) > 0)
+            while (power(res, exp).compareTo(prod) > 0) {
                 res = res.subtract(one);
+            }
 
             return res;
         }
@@ -239,12 +243,14 @@ public class RootsGenerator implements TermGenerator {
 
         BigInteger res = BigInteger.ONE;
         while (true) {
-            if (exp % 2 != 0)
+            if (exp % 2 != 0) {
                 res = res.multiply(base);
+            }
 
             exp >>= 1;
-            if (exp == 0)
+            if (exp == 0) {
                 return res;
+            }
 
             base = base.multiply(base);
         }

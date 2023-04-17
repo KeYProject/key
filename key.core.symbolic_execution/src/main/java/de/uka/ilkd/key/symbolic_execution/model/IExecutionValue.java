@@ -25,7 +25,7 @@ public interface IExecutionValue extends IExecutionElement {
      * @return The condition.
      * @throws ProofInputException Occurred Exception.
      */
-    public Term getCondition() throws ProofInputException;
+    Term getCondition() throws ProofInputException;
 
     /**
      * Returns the condition under which the variable ({@link #getVariable()}) has this value as
@@ -34,7 +34,7 @@ public interface IExecutionValue extends IExecutionElement {
      * @return The condition as human readable {@link String}.
      * @throws ProofInputException Occurred Exception.
      */
-    public String getConditionString() throws ProofInputException;
+    String getConditionString() throws ProofInputException;
 
     /**
      * <p>
@@ -67,21 +67,21 @@ public interface IExecutionValue extends IExecutionElement {
      *
      * @return {@code true} value is unknown, {@code false} value is known.
      */
-    public boolean isValueUnknown() throws ProofInputException;
+    boolean isValueUnknown() throws ProofInputException;
 
     /**
      * Returns the value of the variable.
      *
      * @return The value of the variable.
      */
-    public Term getValue() throws ProofInputException;
+    Term getValue() throws ProofInputException;
 
     /**
      * Returns the value of the variable as human readable string representation.
      *
      * @return The value of the variable as human readable string representation.
      */
-    public String getValueString() throws ProofInputException;
+    String getValueString() throws ProofInputException;
 
     /**
      * <p>
@@ -97,28 +97,28 @@ public interface IExecutionValue extends IExecutionElement {
      *         parent {@link IExecutionValue}.
      * @throws ProofInputException Occurred Exception.
      */
-    public boolean isValueAnObject() throws ProofInputException;
+    boolean isValueAnObject() throws ProofInputException;
 
     /**
      * Returns the type of the variable as human readable string.
      *
      * @return The type of the variable as human readable string.
      */
-    public String getTypeString() throws ProofInputException;
+    String getTypeString() throws ProofInputException;
 
     /**
      * Returns the parent {@link IExecutionVariable}.
      *
      * @return The parent {@link IExecutionVariable}.
      */
-    public IExecutionVariable getVariable();
+    IExecutionVariable getVariable();
 
     /**
      * Returns contained child variables which forms complex data types.
      *
      * @return The contained child variables.
      */
-    public IExecutionVariable[] getChildVariables() throws ProofInputException;
+    IExecutionVariable[] getChildVariables() throws ProofInputException;
 
     /**
      * Returns all available {@link IExecutionConstraint}s.
@@ -126,5 +126,5 @@ public interface IExecutionValue extends IExecutionElement {
      * @return The available {@link IExecutionConstraint}s.
      * @throws ProofInputException Occurred Exception.
      */
-    public IExecutionConstraint[] getConstraints() throws ProofInputException;
+    IExecutionConstraint[] getConstraints() throws ProofInputException;
 }

@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.gui.join;
 
 
+import javax.swing.*;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-
-import javax.swing.*;
 
 
 public class SequentViewer extends JTextPane {

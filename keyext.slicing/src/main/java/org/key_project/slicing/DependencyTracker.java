@@ -1,5 +1,14 @@
 package org.key_project.slicing;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.BranchLocation;
@@ -25,6 +34,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.util.Pair;
+
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.analysis.DependencyAnalyzer;
 import org.key_project.slicing.graph.AddedRule;
@@ -36,17 +46,9 @@ import org.key_project.slicing.graph.PseudoInput;
 import org.key_project.slicing.graph.PseudoOutput;
 import org.key_project.slicing.graph.TrackedFormula;
 import org.key_project.util.collection.ImmutableList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * Tracks proof steps as they are applied on the proof.

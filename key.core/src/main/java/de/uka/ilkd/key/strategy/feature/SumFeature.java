@@ -21,9 +21,9 @@ public class SumFeature implements Feature {
         // <code>createSum</code>)
         RuleAppCost res = features[0].computeCost(app, pos, goal);
 
-        for (int i = 1; i < features.length && !(res instanceof TopRuleAppCost); i++)
-
+        for (int i = 1; i < features.length && !(res instanceof TopRuleAppCost); i++) {
             res = res.add(features[i].computeCost(app, pos, goal));
+        }
 
         return res;
     }

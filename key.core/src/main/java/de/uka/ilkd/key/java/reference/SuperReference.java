@@ -3,6 +3,7 @@ package de.uka.ilkd.key.java.reference;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
 import org.key_project.util.ExtList;
 
 /**
@@ -71,8 +72,9 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
      */
     public int getChildCount() {
         int count = 0;
-        if (prefix != null)
+        if (prefix != null) {
             count++;
+        }
         return count;
     }
 
@@ -85,8 +87,9 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0)
+            if (index == 0) {
                 return prefix;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

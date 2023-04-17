@@ -2,12 +2,12 @@
 
 package recoder.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.ModelException;
 import recoder.abstraction.ProgramModelElement;
 import recoder.java.Reference;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Exception indicating that a particular reference is ambiguous.
@@ -46,7 +46,7 @@ public class AmbiguousReferenceException extends ModelException {
     public AmbiguousReferenceException(Reference r, ProgramModelElement choice1,
             ProgramModelElement choice2) {
         reference = r;
-        List<ProgramModelElement> list = new ArrayList<ProgramModelElement>(2);
+        List<ProgramModelElement> list = new ArrayList<>(2);
         list.add(choice1);
         list.add(choice2);
         this.choices = list;
@@ -78,7 +78,7 @@ public class AmbiguousReferenceException extends ModelException {
             ProgramModelElement choice2) {
         super(s);
         reference = r;
-        List<ProgramModelElement> list = new ArrayList<ProgramModelElement>(2);
+        List<ProgramModelElement> list = new ArrayList<>(2);
         list.add(choice1);
         list.add(choice2);
         this.choices = list;

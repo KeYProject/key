@@ -3,9 +3,6 @@ package de.uka.ilkd.key.smt;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -14,6 +11,9 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Represents a problem that can be passed to a solver. This class was introduced because the SMT
@@ -27,7 +27,7 @@ public class SMTProblem {
     private final Collection<SMTSolver> solvers = new LinkedList<>();
     private final Goal goal;
     private Sequent sequent;
-    private String name;
+    private final String name;
 
     /* ############# public interface ############# */
     /**

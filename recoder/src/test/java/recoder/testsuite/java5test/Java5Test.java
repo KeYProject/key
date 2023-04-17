@@ -1,11 +1,18 @@
 package recoder.testsuite.java5test;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.EventObject;
+import java.util.List;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
-import recoder.abstraction.Package;
 import recoder.abstraction.*;
+import recoder.abstraction.Package;
 import recoder.bytecode.AnnotationUseInfo;
 import recoder.bytecode.MethodInfo;
 import recoder.convenience.ForestWalker;
@@ -28,15 +35,7 @@ import recoder.service.*;
 import recoder.service.ConstantEvaluator.EvaluationResult;
 import recoder.util.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.EventObject;
-import java.util.List;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /*
  * Created on 11.03.2005
@@ -89,8 +88,8 @@ public class Java5Test {
             // crsc.getProjectSettings().setProperty(ProjectSettings.Java_5, Boolean.toString(b));
         }
         List<CompilationUnit> cul = dsfr.getCompilationUnits();
-        for (int i = 0; i < cul.size(); i++) {
-            cul.get(i).validateAll();
+        for (CompilationUnit compilationUnit : cul) {
+            compilationUnit.validateAll();
         }
     }
 
@@ -130,8 +129,8 @@ public class Java5Test {
          * Var Args
          */
         cul = dsfr.getCompilationUnits();
-        for (int i = 0, s = cul.size(); i < s; i++) {
-            new ResolveVarArgs(crsc, cul.get(i)).execute();
+        for (CompilationUnit value : cul) {
+            new ResolveVarArgs(crsc, value).execute();
         }
 
         System.out.println("VarArgs done");
@@ -140,8 +139,7 @@ public class Java5Test {
          * Annotations
          */
         cul = dsfr.getCompilationUnits();
-        for (int i = 0; i < cul.size(); i++) {
-            CompilationUnit cu = cul.get(i);
+        for (CompilationUnit cu : cul) {
             RemoveAnnotations t = new RemoveAnnotations(crsc, cu);
             t.execute();
         }
@@ -152,8 +150,8 @@ public class Java5Test {
          * Static imports
          */
         cul = dsfr.getCompilationUnits();
-        for (int i = 0, s = cul.size(); i < s; i++) {
-            new RemoveStaticImports(crsc, cul.get(i)).execute();
+        for (CompilationUnit unit : cul) {
+            new RemoveStaticImports(crsc, unit).execute();
         }
 
         System.out.println("static imports done");
@@ -162,8 +160,8 @@ public class Java5Test {
          * Enums
          */
         cul = dsfr.getCompilationUnits();
-        for (int i = 0, s = cul.size(); i < s; i++) {
-            new ReplaceEnums(crsc, cul.get(i)).execute();
+        for (CompilationUnit compilationUnit : cul) {
+            new ReplaceEnums(crsc, compilationUnit).execute();
         }
 
         System.out.println("Enums done");
@@ -172,8 +170,7 @@ public class Java5Test {
          * trinary operators & intersection types
          */
         cul = dsfr.getCompilationUnits();
-        for (int i = 0; i < cul.size(); i++) {
-            CompilationUnit cu = cul.get(i);
+        for (CompilationUnit cu : cul) {
             MakeConditionalCompatible t = new MakeConditionalCompatible(crsc, cu);
             t.execute();
         }
@@ -194,8 +191,7 @@ public class Java5Test {
          * now boxing
          */
         cul = dsfr.getCompilationUnits();
-        for (int i = 0; i < cul.size(); i++) {
-            CompilationUnit cu = cul.get(i);
+        for (CompilationUnit cu : cul) {
             ResolveBoxing t = new ResolveBoxing(crsc, cu);
             t.execute();
         }
@@ -229,10 +225,9 @@ public class Java5Test {
             ProgramElement pe = fw.getProgramElement();
             List<Comment> cl = pe.getComments();
             if (cl != null) {
-                for (int i = 0; i < cl.size(); i++) {
-                    Comment c = cl.get(i);
+                for (Comment c : cl) {
                     String name = pe.getClass().getSimpleName();
-                    if (c.getText().indexOf(name) == -1) {
+                    if (!c.getText().contains(name)) {
                         // System.err.println(pe.getClass().getName() + " - " + c.getText());
                     }
                 }
@@ -261,7 +256,7 @@ public class Java5Test {
             public void modelUpdating(EventObject event) { /* ignore */ }
 
             public void modelUpdated(EventObject event) {
-                assertTrue("Not enough errors", errNum == 10);
+                assertEquals("Not enough errors", 10, errNum);
             }
 
             public void reportError(Exception e) throws RuntimeException {
@@ -321,38 +316,39 @@ public class Java5Test {
         NameInfo ni = dsfr.getServiceConfiguration().getNameInfo();
         Package p = ni.getPackage("annotationtest");
         List<? extends AnnotationUse> ann = p.getPackageAnnotations();
-        assertTrue(ann.size() == 1);
+        assertEquals(1, ann.size());
         ByteCodeInfo bi = dsfr.getServiceConfiguration().getByteCodeInfo();
-        assertTrue(getAnnotationName(ann.get(0)).equals("annotationtest.Annot"));
+        assertEquals("annotationtest.Annot", getAnnotationName(ann.get(0)));
 
         p = ni.getPackage("a");
         ann = p.getPackageAnnotations();
-        assertTrue(ann.size() == 1);
-        assertTrue(getAnnotationName(ann.get(0)).equals("a.B"));
-        assertTrue(ni.getType("annotationtest.package-info") == null);
-        assertTrue(ni.getType("a.package-info") == null);
+        assertEquals(1, ann.size());
+        assertEquals("a.B", getAnnotationName(ann.get(0)));
+        assertNull(ni.getType("annotationtest.package-info"));
+        assertNull(ni.getType("a.package-info"));
 
         // test bytecode annotation support
         ClassType ct = ni.getClassType("java.lang.annotation.Retention");
-        assertTrue(ct != null);
+        assertNotNull(ct);
         assertTrue(ct.isAnnotationType());
-        assertTrue(ct.getAllSupertypes().size() == 3);
+        assertEquals(3, ct.getAllSupertypes().size());
 
         ct = ni.getClassType("a.C");
         List<? extends Method> ml = ct.getMethods();
-        for (int i = 0, s = ml.size(); i < s; i++) {
-            MethodInfo m = (MethodInfo) ml.get(i);
+        for (Method method : ml) {
+            MethodInfo m = (MethodInfo) method;
             String[] param = m.getParameterTypeNames();
 
             System.out.print(m.getName() + "(");
             boolean first = true;
             for (int j = 0; j < param.length; j++) {
-                if (!first)
+                if (!first) {
                     System.out.print(",");
+                }
                 first = false;
                 AnnotationUseInfo[] annot = m.getAnnotationsForParam(j);
-                for (int k = 0; k < annot.length; k++) {
-                    System.out.print(annot[k] + " ");
+                for (AnnotationUseInfo annotationUseInfo : annot) {
+                    System.out.print(annotationUseInfo + " ");
                 }
                 System.out.print(param[j]);
             }
@@ -371,7 +367,7 @@ public class Java5Test {
         EnumDeclaration etd = (EnumDeclaration) ni.getType("enumtest.Color");
         Constructor c = etd.getConstructors().get(0);
         List<ConstructorReference> crl = crsc.getCrossReferenceSourceInfo().getReferences(c);
-        assertTrue(crl.size() == 3);
+        assertEquals(3, crl.size());
 
         EnumConstantSpecification ecd =
             (EnumConstantSpecification) ni.getField("enumtest.jls.Operation.PLUS");
@@ -393,8 +389,8 @@ public class Java5Test {
             Method m = td.getMethods().get(i);
             if (m.getName().equals("foobar")) {
                 MethodDeclaration md = (MethodDeclaration) m;
-                assertTrue("List<List<Map<String, List<String>>>>"
-                        .equals(md.getTypeReference().toSource().trim()));
+                assertEquals("List<List<Map<String, List<String>>>>",
+                    md.getTypeReference().toSource().trim());
                 // TreeWalker tw = new TreeWalker(md);
                 // while (tw.next()) {
                 // ProgramElement pe = tw.getProgramElement();
@@ -428,10 +424,12 @@ public class Java5Test {
                         // TODO deal with numbers of different length...
                         int j = i + 1;
                         while (Character.isDigit(oldBuf.charAt(j))
-                                && Character.isDigit(newBuf.charAt(j)) && j < i + 10)
+                                && Character.isDigit(newBuf.charAt(j)) && j < i + 10) {
                             j++;
-                        if (j - i > 6)
+                        }
+                        if (j - i > 6) {
                             i = j;
+                        }
                         continue;
                     }
                     // System.err.println(i);
@@ -449,15 +447,16 @@ public class Java5Test {
     private void scrubOutputPath(String path) {
         File myPath = new File(path);
         File[] list = myPath.listFiles();
-        if (list == null)
+        if (list == null) {
             return;
-        for (int i = 0; i < list.length; i++) {
-            File current = list[i];
+        }
+        for (File current : list) {
             if (current.isDirectory()) {
                 scrubOutputPath(current.getAbsolutePath());
                 current.delete(); // if possible...
-            } else if (current.isFile() && current.getName().endsWith(".java"))
+            } else if (current.isFile() && current.getName().endsWith(".java")) {
                 current.delete();
+            }
         }
     }
 
@@ -467,7 +466,7 @@ public class Java5Test {
         runIt();
         ClassDeclaration cd = (ClassDeclaration) crsc.getNameInfo().getClassType("A");
         List<? extends Field> fl = cd.getFields();
-        ASTList<Comment> cml = new ASTArrayList<Comment>(1);
+        ASTList<Comment> cml = new ASTArrayList<>(1);
         cml.add(new Comment("/*comment to field spec 'a'*/", true));
         ((FieldSpecification) fl.get(0)).setComments(cml);
         MiscKit.unindent((FieldSpecification) fl.get(0));
@@ -510,16 +509,15 @@ public class Java5Test {
                 n += 1;
             }
         }
-        StringBuffer line = new StringBuffer(1024);
+        StringBuilder line = new StringBuilder(1024);
         int number = 1;
-        for (int i = 0; i < uarray.length; i += 1) {
-            CompilationUnit unit = uarray[i];
+        for (CompilationUnit unit : uarray) {
             TreeWalker tw = new TreeWalker(unit);
             Position oldPos = Position.UNDEFINED;
             while (tw.next()) {
                 ProgramElement pe = tw.getProgramElement();
-                line.append(
-                    "(" + (pe.getComments() == null ? 0 : pe.getComments().size()) + " comments)");
+                line.append("(").append(pe.getComments() == null ? 0 : pe.getComments().size())
+                        .append(" comments)");
                 // line.append(number);
                 // line.append(' ');
                 Position pos = pe.getFirstElement().getStartPosition();
@@ -550,7 +548,7 @@ public class Java5Test {
                         }
                         if (crsc.getConstantEvaluator().isCompileTimeConstant((Expression) pe,
                             res)) {
-                            line.append(" ==" + res);
+                            line.append(" ==").append(res);
                         }
                     }
                 }
@@ -570,8 +568,9 @@ public class Java5Test {
                 if (pe instanceof Variable) {
                     ref = crsc.getCrossReferenceSourceInfo().getReferences((Variable) pe).size();
                 }
-                if (ref != -1)
-                    line.append("(" + ref + " refs)");
+                if (ref != -1) {
+                    line.append("(").append(ref).append(" refs)");
+                }
 
                 ProgramModelElement dest = null;
                 if (pe instanceof ConstructorReference) {

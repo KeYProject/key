@@ -8,12 +8,12 @@ import de.uka.ilkd.key.rule.RuleSet;
 
 public class NamespaceSet {
 
-    private Namespace<QuantifiableVariable> varNS = new Namespace<QuantifiableVariable>();
-    private Namespace<IProgramVariable> progVarNS = new Namespace<IProgramVariable>();
-    private Namespace<Function> funcNS = new Namespace<Function>();
-    private Namespace<RuleSet> ruleSetNS = new Namespace<RuleSet>();
-    private Namespace<Sort> sortNS = new Namespace<Sort>();
-    private Namespace<Choice> choiceNS = new Namespace<Choice>();
+    private Namespace<QuantifiableVariable> varNS = new Namespace<>();
+    private Namespace<IProgramVariable> progVarNS = new Namespace<>();
+    private Namespace<Function> funcNS = new Namespace<>();
+    private Namespace<RuleSet> ruleSetNS = new Namespace<>();
+    private Namespace<Sort> sortNS = new Namespace<>();
+    private Namespace<Choice> choiceNS = new Namespace<>();
 
     public NamespaceSet() {
     }
@@ -41,10 +41,10 @@ public class NamespaceSet {
 
     // TODO MU: Rename into sth with wrap or similar
     public NamespaceSet copyWithParent() {
-        return new NamespaceSet(new Namespace<QuantifiableVariable>(variables()),
-            new Namespace<Function>(functions()), new Namespace<Sort>(sorts()),
-            new Namespace<RuleSet>(ruleSets()), new Namespace<Choice>(choices()),
-            new Namespace<IProgramVariable>(programVariables()));
+        return new NamespaceSet(new Namespace<>(variables()),
+            new Namespace<>(functions()), new Namespace<>(sorts()),
+            new Namespace<>(ruleSets()), new Namespace<>(choices()),
+            new Namespace<>(programVariables()));
     }
 
     public Namespace<QuantifiableVariable> variables() {
@@ -148,8 +148,9 @@ public class NamespaceSet {
     private Named lookup(Name name, final Namespace<?>[] spaces) {
         for (Namespace<?> space : spaces) {
             final Named n = space.lookup(name);
-            if (n != null)
+            if (n != null) {
                 return n;
+            }
         }
         return null;
     }

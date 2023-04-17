@@ -13,11 +13,11 @@ import de.uka.ilkd.key.java.SourceElement;
  */
 public class LabelCollector extends JavaASTVisitor {
 
-    private HashSet<Label> labels;
+    private final HashSet<Label> labels;
 
     public LabelCollector(ProgramElement root, Services services) {
         super(root, services);
-        this.labels = new LinkedHashSet<Label>(20);
+        this.labels = new LinkedHashSet<>(20);
     }
 
     public boolean contains(Label l) {

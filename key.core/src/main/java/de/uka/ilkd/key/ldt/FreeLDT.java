@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.ldt;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -13,6 +11,8 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
+
+import org.key_project.util.ExtList;
 
 /**
  * Generic data type, which has no predefined theory. It is meant as a basis to implement an
@@ -26,7 +26,7 @@ public final class FreeLDT extends LDT {
     public static final Name NAME = new Name("Free");
 
     // neutral element, the only pre-defined function
-    private Function atom;
+    private final Function atom;
 
     public FreeLDT(TermServices services) {
         super(NAME, services);

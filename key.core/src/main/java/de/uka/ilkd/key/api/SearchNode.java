@@ -4,18 +4,19 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.MatchConditions;
+
 import org.key_project.util.collection.ImmutableList;
 
 /**
  * Created by sarah on 5/2/17.
  */
 public class SearchNode {
-    SequentFormula[] pattern;
+    final SequentFormula[] pattern;
     int pos = 0;
     int succAntPos = 0;
-    public MatchConditions mc;
-    ImmutableList<IfFormulaInstantiation> antec;
-    ImmutableList<IfFormulaInstantiation> succ;
+    public final MatchConditions mc;
+    final ImmutableList<IfFormulaInstantiation> antec;
+    final ImmutableList<IfFormulaInstantiation> succ;
 
 
 

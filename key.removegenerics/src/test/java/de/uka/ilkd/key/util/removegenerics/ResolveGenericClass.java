@@ -1,15 +1,16 @@
 package de.uka.ilkd.key.util.removegenerics;
 
+import java.util.regex.Pattern;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.ProgramFactory;
 import recoder.java.CompilationUnit;
 
-import java.util.regex.Pattern;
-
 public class ResolveGenericClass {
 
-    protected CrossReferenceServiceConfiguration sc = new CrossReferenceServiceConfiguration();
+    protected final CrossReferenceServiceConfiguration sc =
+        new CrossReferenceServiceConfiguration();
 
     public CompilationUnit registerCU(String compilationUnit) throws ParserException {
         ProgramFactory f = sc.getProgramFactory();
@@ -47,12 +48,14 @@ public class ResolveGenericClass {
             }
         } catch (Exception ex) {
             StringBuilder sb = new StringBuilder();
-            if (cu1before != null)
+            if (cu1before != null) {
                 sb.append("CU1 (before): " + cu1before.toSource() + "\n");
-            else
+            } else {
                 sb.append("CU1 (source): " + string1 + "\n");
-            if (cu1 != null)
+            }
+            if (cu1 != null) {
                 sb.append("CU1 (after) : " + cu1.toSource() + "\n");
+            }
             sb.append("CU2         : " + string2 + "\n");
             throw new Exception(sb.toString(), ex);
         }
@@ -74,16 +77,18 @@ public class ResolveGenericClass {
 
         int minlength = Math.min(s1.length(), s2.length());
         for (int i = 0; i < minlength; i++) {
-            if (s1.charAt(i) != s2.charAt(i))
+            if (s1.charAt(i) != s2.charAt(i)) {
                 return "'" + s1.substring(i, Math.min(i + 10, s1.length())) + "' vs. '"
                     + s2.substring(i, Math.min(i + 10, s2.length())) + "' @" + (i + 1);
+            }
         }
 
-        if (s1.length() != s2.length())
+        if (s1.length() != s2.length()) {
             return "'" + s1.substring(minlength) + "' vs. '" + s2.substring(minlength) + "' @"
                 + (minlength + 1);
-        else
+        } else {
             return null;
+        }
     }
 
 }

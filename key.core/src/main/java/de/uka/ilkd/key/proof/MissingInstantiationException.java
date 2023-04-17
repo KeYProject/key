@@ -9,7 +9,7 @@ public class MissingInstantiationException extends SVInstantiationExceptionWithP
      *
      */
     private static final long serialVersionUID = 6424217152885699595L;
-    private String toInstantiate;
+    private final String toInstantiate;
 
     public MissingInstantiationException(String toInstantiate, Position position,
             boolean inIfSequent) {

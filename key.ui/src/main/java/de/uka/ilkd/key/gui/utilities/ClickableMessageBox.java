@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.gui.utilities;
 
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
 
 /**
  * A simple textpane that supports lines that can be clicked by the users in order to trigger
@@ -23,9 +23,9 @@ public class ClickableMessageBox extends JTextPane {
         void eventMessageClicked(Object object);
     }
 
-    private final ArrayList<Object> items = new ArrayList<Object>();
+    private final ArrayList<Object> items = new ArrayList<>();
     private final LinkedList<ClickableMessageBoxListener> listeners =
-        new LinkedList<ClickableMessageBoxListener>();
+        new LinkedList<>();
     private final HTMLEditorKit kit = new HTMLEditorKit();
     private final HTMLDocument doc = new HTMLDocument();
 

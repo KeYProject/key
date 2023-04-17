@@ -2,8 +2,6 @@ package de.uka.ilkd.key.rule.merge;
 
 import java.util.Set;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -13,6 +11,8 @@ import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Rule application class for close-after-merge rule applications.

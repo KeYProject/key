@@ -7,7 +7,7 @@ package recoder.util;
  */
 public abstract class OptionException extends Exception {
 
-    protected String opt;
+    protected final String opt;
 
     protected OptionException(String opt) {
         this.opt = opt;

@@ -14,7 +14,7 @@ class DefaultBuiltInRuleMenuItem extends JMenuItem implements BuiltInRuleMenuIte
      *
      */
     private static final long serialVersionUID = 2104546363767367689L;
-    private BuiltInRule connectedTo;
+    private final BuiltInRule connectedTo;
     private final boolean forced;
 
 

@@ -1,21 +1,11 @@
 package de.uka.ilkd.key.java.visitor;
 
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Stack;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
@@ -25,6 +15,8 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
+import org.key_project.util.ExtList;
 
 public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
 
@@ -37,9 +29,9 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     private final ProgramVariable returnValue;
     private final ProgramVariable exception;
 
-    private final Stack<ExtList> stack = new Stack<ExtList>();
-    private final Stack<Label> labels = new Stack<Label>();
-    private final Stack<MethodFrame> frames = new Stack<MethodFrame>();
+    private final ArrayDeque<ExtList> stack = new ArrayDeque<>();
+    private final ArrayDeque<Label> labels = new ArrayDeque<>();
+    private final ArrayDeque<MethodFrame> frames = new ArrayDeque<>();
     private int loopAndSwitchCascadeDepth;
 
     private StatementBlock result;
@@ -52,7 +44,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             final Services services) {
         super(block, services);
         for (Label label : alwaysInnerLabels) {
-            this.labels.add(label);
+            this.labels.push(label);
         }
         this.breakOut = new Break(breakOutLabel);
         this.breakFlags = breakFlags;
@@ -146,12 +138,12 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
 
     private boolean isJumpToOuterLabel(final LabelJumpStatement x) {
         return loopAndSwitchCascadeDepth == 0 && x.getProgramElementName() == null
-                || x.getLabel() != null && labels.search(x.getLabel()) == -1;
+                || x.getLabel() != null && !labels.contains(x.getLabel());
     }
 
     @Override
     public void performActionOnReturn(final Return x) {
-        if (frames.empty()) {
+        if (frames.isEmpty()) {
             final ExtList changeList = stack.peek();
             if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();

@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -19,6 +16,9 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Try to rewrite a monomial (term) <code>source</code> so that it becomes a multiple of another
@@ -54,13 +54,15 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         final Monomial sourceM = Monomial.create(source.toTerm(app, pos, goal), services);
         final Monomial targetM = Monomial.create(target.toTerm(app, pos, goal), services);
 
-        if (targetM.divides(sourceM))
+        if (targetM.divides(sourceM)) {
             return toIterator(targetM.reduce(sourceM).toTerm(services));
+        }
 
         final List<CofactorPolynomial> cofactorPolys = extractPolys(goal, services);
 
-        if (cofactorPolys.isEmpty())
+        if (cofactorPolys.isEmpty()) {
             return ImmutableSLList.<Term>nil().iterator();
+        }
 
         return computeMultiples(sourceM, targetM, cofactorPolys, services).iterator();
     }
@@ -78,9 +80,9 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
      */
     private ImmutableList<Term> computeMultiples(Monomial sourceM, Monomial targetM,
             List<CofactorPolynomial> cofactorPolys, Services services) {
-        ImmutableList<Term> res = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> res = ImmutableSLList.nil();
 
-        final List<CofactorItem> cofactorMonos = new ArrayList<CofactorItem>();
+        final List<CofactorItem> cofactorMonos = new ArrayList<>();
         cofactorMonos.add(new CofactorMonomial(targetM, Polynomial.ONE));
 
         boolean changed = true;
@@ -119,8 +121,9 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
             final Polynomial quotient = cofactor.multiply(mono.reduce(sourceM));
 
             // do not return zero, that's too easy
-            if (!quotient.getParts().isEmpty() || quotient.getConstantTerm().signum() != 0)
+            if (!quotient.getParts().isEmpty() || quotient.getConstantTerm().signum() != 0) {
                 return res.prepend(quotient.toTerm(services));
+            }
         }
         return res;
     }
@@ -135,14 +138,15 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
     private List<CofactorPolynomial> extractPolys(Goal goal, Services services) {
         final IntegerLDT numbers = services.getTypeConverter().getIntegerLDT();
 
-        final List<CofactorPolynomial> res = new ArrayList<CofactorPolynomial>();
+        final List<CofactorPolynomial> res = new ArrayList<>();
 
         for (final SequentFormula cfm : goal.sequent().antecedent()) {
 
             final Term t = cfm.formula();
             if (t.op() != Equality.EQUALS || t.sub(0).sort() != numbers.targetSort()
-                    || t.sub(1).sort() != numbers.targetSort())
+                    || t.sub(1).sort() != numbers.targetSort()) {
                 continue;
+            }
 
             final Polynomial left = Polynomial.create(t.sub(0), services);
             final Polynomial right = Polynomial.create(t.sub(1), services);
@@ -204,11 +208,13 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
                     res = res.add(mono, coeff.multiply(BigInteger.valueOf(-1)));
                 }
             }
-            if (res.poly.getParts().size() == 1 && res.poly.getConstantTerm().signum() == 0)
+            if (res.poly.getParts().size() == 1 && res.poly.getConstantTerm().signum() == 0) {
                 return new CofactorMonomial(res.poly.getParts().head(), res.cofactor);
-            if (res.poly.getParts().size() == 0 && res.poly.getConstantTerm().signum() != 0)
+            }
+            if (res.poly.getParts().size() == 0 && res.poly.getConstantTerm().signum() != 0) {
                 return new CofactorMonomial(Monomial.ONE.multiply(res.poly.getConstantTerm()),
                     res.cofactor);
+            }
             return res;
         }
     }

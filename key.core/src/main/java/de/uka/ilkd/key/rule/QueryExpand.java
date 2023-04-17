@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.rule;
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
@@ -16,13 +18,13 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 
 /**
@@ -253,9 +255,8 @@ public class QueryExpand implements BuiltInRule {
     public Term evaluateQueries(Services services, Term term, boolean positiveContext,
             boolean allowExpandBelowInstQuantifier) {
         final int depth = term.depth();
-        List<QueryEvalPos> qeps = new Vector<>();
-        Vector<Integer> path = new Vector<>(depth);
-        path.setSize(depth);
+        List<QueryEvalPos> qeps = new ArrayList<>();
+        int[] path = new int[depth];
         final ImmutableSLList<QuantifiableVariable> instVars;
         if (allowExpandBelowInstQuantifier) {
             instVars = ImmutableSLList.nil();
@@ -274,8 +275,6 @@ public class QueryExpand implements BuiltInRule {
             Pair<Term, Term> queryExp =
                 QueryExpand.INSTANCE.queryEvalTerm(services, qep.query, qep.instVars);
             Term queryExpTerm = tb.and(queryExp.first, tb.equals(qep.query, queryExp.second));
-            Iterator<Integer> it = qep.pathInTerm.iterator();
-            it.next(); // Skip the first element
             final Term termToInsert;
             if (qep.positivePosition) {
                 termToInsert = tb.imp(queryExpTerm, qep.getTermOnPath(term));
@@ -284,7 +283,7 @@ public class QueryExpand implements BuiltInRule {
             }
             // Attention, when the term is modified, then the paths in the term have changed.
             // Perform the changes in a depth-first order.
-            term = replace(term, termToInsert, it, services);
+            term = replace(term, termToInsert, qep.pathInTerm, 1, services);
         }
         return term;
     }
@@ -313,7 +312,7 @@ public class QueryExpand implements BuiltInRule {
      * @author gladisch
      */
     @SuppressWarnings("unchecked")
-    private void findQueriesAndEvaluationPositions(Term t, int level, Vector<Integer> pathInTerm,
+    private void findQueriesAndEvaluationPositions(Term t, int level, int[] pathInTerm,
             ImmutableList<QuantifiableVariable> instVars, boolean curPosIsPositive, int qepLevel,
             boolean qepIsPositive, List<QueryEvalPos> qeps) {
         if (t == null) {
@@ -322,45 +321,42 @@ public class QueryExpand implements BuiltInRule {
         final Operator op = t.op();
         final int nextLevel = level + 1;
         if (op instanceof IProgramMethod && !((IProgramMethod) op).isModel()) { // Query found
-            QueryEvalPos qep = new QueryEvalPos(t, (Vector<Integer>) pathInTerm.clone(),
-                qepLevel + 1, instVars, qepIsPositive);
+            QueryEvalPos qep = new QueryEvalPos(t, Arrays.copyOf(pathInTerm, qepLevel + 1),
+                instVars, qepIsPositive);
             qeps.add(qep);
-            return;
         } else if (op == Junctor.AND || op == Junctor.OR) {
-            pathInTerm.set(nextLevel, 0);
+            pathInTerm[nextLevel] = 0;
             findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars,
                 curPosIsPositive, qepLevel, qepIsPositive, qeps);
-            pathInTerm.set(nextLevel, 1);
+            pathInTerm[nextLevel] = 1;
             findQueriesAndEvaluationPositions(t.sub(1), nextLevel, pathInTerm, instVars,
                 curPosIsPositive, qepLevel, qepIsPositive, qeps);
         } else if (op == Junctor.IMP) {
-            pathInTerm.set(nextLevel, 0);
+            pathInTerm[nextLevel] = 0;
             findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars,
                 !curPosIsPositive, qepLevel, qepIsPositive, qeps);
-            pathInTerm.set(nextLevel, 1);
+            pathInTerm[nextLevel] = 1;
             findQueriesAndEvaluationPositions(t.sub(1), nextLevel, pathInTerm, instVars,
                 curPosIsPositive, qepLevel, qepIsPositive, qeps);
         } else if (op == Junctor.NOT) {
-            pathInTerm.set(nextLevel, 0);
+            pathInTerm[nextLevel] = 0;
             findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars,
                 !curPosIsPositive, qepLevel, qepIsPositive, qeps);
         } else if (op == Equality.EQV) {
             // Each subformula of "<->" is in both, positive and negative scope. Query expansion
             // below it would be unsound.
             // Alternatively "<->" could be converted into "->" and "<-"
-            return;
         } else if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) { // do not descend below java
                                                                  // blocks.
-            return;
         } else if (op == Quantifier.ALL) {
             if (curPosIsPositive) { // Quantifier that will be Skolemized
                 // This is a potential query evaluation position.
-                pathInTerm.set(nextLevel, 0);
+                pathInTerm[nextLevel] = 0;
                 findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars,
                     curPosIsPositive, nextLevel, curPosIsPositive, qeps);
             } else { // Quantifier that will be instantiated. Warning: this may explode!
                 if (instVars != null) {
-                    pathInTerm.set(nextLevel, 0);
+                    pathInTerm[nextLevel] = 0;
                     assert t.boundVars().get(0) instanceof LogicVariable;
                     instVars = instVars.append(t.boundVars());
                     findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars,
@@ -371,7 +367,7 @@ public class QueryExpand implements BuiltInRule {
             if (curPosIsPositive) { // Quantifier that will be instantiated. Warning: this may
                                     // explode!
                 if (instVars != null) {
-                    pathInTerm.set(nextLevel, 0);
+                    pathInTerm[nextLevel] = 0;
                     assert t.boundVars().get(0) instanceof LogicVariable;
                     instVars = instVars.append(t.boundVars());
                     findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars,
@@ -379,23 +375,23 @@ public class QueryExpand implements BuiltInRule {
                 }
             } else { // Quantifier that will be Skolemized
                 // This is a potential query evaluation position.
-                pathInTerm.set(nextLevel, 0);
+                pathInTerm[nextLevel] = 0;
                 findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars,
                     curPosIsPositive, nextLevel, curPosIsPositive, qeps);
             }
         } else if (t.sort() == Sort.FORMULA) {
-            Vector<Term> queries = collectQueries(t);
+            ArrayList<Term> queries = collectQueries(t);
             for (Term query : queries) {
-                QueryEvalPos qep = new QueryEvalPos(query, (Vector<Integer>) pathInTerm.clone(),
-                    qepLevel + 1, instVars, qepIsPositive);
+                QueryEvalPos qep = new QueryEvalPos(query, Arrays.copyOf(pathInTerm, qepLevel + 1),
+                    instVars, qepIsPositive);
                 qeps.add(qep);
             }
         }
     }
 
 
-    private Vector<Term> collectQueries(Term t) {
-        Vector<Term> queries = new Vector<>();
+    private ArrayList<Term> collectQueries(Term t) {
+        ArrayList<Term> queries = new ArrayList<>();
         collectQueriesRecursively(t, queries);
         return queries;
     }
@@ -460,16 +456,14 @@ public class QueryExpand implements BuiltInRule {
          * inserted. The first element has no meaning and should be null. The path starts with the
          * second element.
          */
-        public final Vector<Integer> pathInTerm;
+        public final int[] pathInTerm;
 
         public final LogicVariable[] instVars;
 
-        @SuppressWarnings("unchecked")
-        public QueryEvalPos(Term query, Vector<Integer> path, int level,
-                ImmutableList<QuantifiableVariable> iVars, boolean isPositive) {
+        public QueryEvalPos(Term query, int[] path, ImmutableList<QuantifiableVariable> iVars,
+                boolean isPositive) {
             this.query = query;
-            pathInTerm = (Vector<Integer>) path.clone();
-            pathInTerm.setSize(level);
+            pathInTerm = path;
             positivePosition = isPositive;
             if (iVars != null) {
                 instVars = new LogicVariable[iVars.size()];
@@ -481,11 +475,11 @@ public class QueryExpand implements BuiltInRule {
 
 
         public String toString() {
-            String pathstr = "[";
-            for (Integer in : pathInTerm) {
-                pathstr += in + ", ";
+            StringBuilder pathstr = new StringBuilder("[");
+            for (int in : pathInTerm) {
+                pathstr.append(in).append(", ");
             }
-            pathstr += "]";
+            pathstr.append("]");
             return "QueryEvalPos of " + (query != null ? query.toString() : "NOQUERY") + " in "
                 + (positivePosition ? "positive" : "negative") + " position "
                 + (instVars.length > 0 ? "  instVar:" + instVars[0] + " " : "") + " insertPath:"
@@ -494,21 +488,21 @@ public class QueryExpand implements BuiltInRule {
 
         public Term getTermOnPath(Term root) {
             Term result = root;
-            for (int i = 1 /* skip the first */; i < pathInTerm.size(); i++) {
-                result = result.sub(pathInTerm.get(i));
+            for (int i = 1 /* skip the first */; i < pathInTerm.length; i++) {
+                result = result.sub(pathInTerm[i]);
             }
             return result;
         }
 
 
         public boolean subsumes(QueryEvalPos other) {
-            if (!query.equals(other.query) || pathInTerm.size() > other.pathInTerm.size()
+            if (!query.equals(other.query) || pathInTerm.length > other.pathInTerm.length
                     || !Arrays.deepEquals(instVars, other.instVars)) {
                 return false;
             }
             // query.equals(other.query) && pathInTerm.size()<=other.pathInTerm.size()
-            for (int i = 0; i < pathInTerm.size(); i++) {
-                if (pathInTerm.get(i).intValue() != other.pathInTerm.get(i).intValue()) {
+            for (int i = 0; i < pathInTerm.length; i++) {
+                if (pathInTerm[i] != other.pathInTerm[i]) {
                     return false;
                 }
             }
@@ -521,9 +515,9 @@ public class QueryExpand implements BuiltInRule {
          */
         @Override
         public int compareTo(QueryEvalPos other) {
-            final int otherSize = other.pathInTerm.size();
-            final int thisSize = pathInTerm.size();
-            return (thisSize < otherSize ? 1 : (thisSize > otherSize ? -1 : 0));
+            final int otherSize = other.pathInTerm.length;
+            final int thisSize = pathInTerm.length;
+            return (Integer.compare(otherSize, thisSize));
         }
     }
 
@@ -538,19 +532,19 @@ public class QueryExpand implements BuiltInRule {
      * @return Resulting term after replacement.
      * @note Was originally implemented in QueryExpand.java.
      */
-    protected Term replace(Term term, Term with, Iterator<Integer> it, TermServices services) {
-        if (!it.hasNext()) {
+    protected Term replace(Term term, Term with, int[] it, int idx, TermServices services) {
+        if (!(idx < it.length)) {
             return with;
         }
 
         final int arity = term.arity();
         final Term[] newSubTerms = new Term[arity];
         boolean changedSubTerm = false;
-        int next = it.next();
+        int next = it[idx++];
         for (int i = 0; i < arity; i++) {
             Term subTerm = term.sub(i);
             if (i == next) {
-                newSubTerms[i] = replace(subTerm, with, it, services);
+                newSubTerms[i] = replace(subTerm, with, it, idx, services);
                 if (newSubTerms[i] != subTerm) {
                     changedSubTerm = true;
                 }

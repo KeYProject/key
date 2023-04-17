@@ -1,6 +1,8 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.io.File;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
@@ -9,14 +11,14 @@ import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -92,8 +94,9 @@ public class TestTacletIndex {
 
     private boolean isRuleIn(ImmutableList<? extends TacletApp> l, TacletApp rule) {
         for (TacletApp aL : l) {
-            if (aL.taclet() == rule.taclet())
+            if (aL.taclet() == rule.taclet()) {
                 return true;
+            }
         }
         return false;
     }

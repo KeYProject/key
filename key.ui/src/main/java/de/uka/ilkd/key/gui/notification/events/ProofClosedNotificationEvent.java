@@ -15,7 +15,7 @@ import de.uka.ilkd.key.proof.Proof;
 public class ProofClosedNotificationEvent extends NotificationEvent {
 
     /** the closed proof */
-    private Proof proof;
+    private final Proof proof;
 
     /**
      * creates a proof closed notification event

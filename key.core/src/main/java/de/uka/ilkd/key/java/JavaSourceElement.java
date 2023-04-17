@@ -1,11 +1,13 @@
 package de.uka.ilkd.key.java;
 
+import java.net.URI;
+
 import de.uka.ilkd.key.pp.PrettyPrinter;
+
 import org.key_project.util.ExtList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.URI;
 
 
 /**

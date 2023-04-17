@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodCall;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * <p>
@@ -27,14 +27,14 @@ public interface IExecutionMethodCall extends IExecutionNode<MethodBodyStatement
      *
      * @return The {@link MethodReference} of the called method.
      */
-    public MethodReference getMethodReference();
+    MethodReference getMethodReference();
 
     /**
      * Returns the called {@link IProgramMethod}.
      *
      * @return The called {@link IProgramMethod}.
      */
-    public IProgramMethod getProgramMethod();
+    IProgramMethod getProgramMethod();
 
     /**
      * Checks if an implicit constructor is called.
@@ -42,7 +42,7 @@ public interface IExecutionMethodCall extends IExecutionNode<MethodBodyStatement
      * @return {@code true} implicit constructor is called, {@code false} method or explicit
      *         constructor is called.
      */
-    public boolean isImplicitConstructor();
+    boolean isImplicitConstructor();
 
     /**
      * Returns a copy of the {@link MethodReference} which calls the explicit constructor instead of
@@ -51,19 +51,19 @@ public interface IExecutionMethodCall extends IExecutionNode<MethodBodyStatement
      * @return The {@link MethodReference} to the explicit constructor or {@code null} if no
      *         constructor is called.
      */
-    public MethodReference getExplicitConstructorMethodReference();
+    MethodReference getExplicitConstructorMethodReference();
 
     /**
      * Returns the explicit constructor.
      *
      * @return The explicit constructor or {@code null} if no constructor is called.
      */
-    public IProgramMethod getExplicitConstructorProgramMethod();
+    IProgramMethod getExplicitConstructorProgramMethod();
 
     /**
      * Returns the up to now discovered {@link IExecutionBaseMethodReturn}s.
      *
      * @return The up to now discovered {@link IExecutionBaseMethodReturn}s.
      */
-    public ImmutableList<IExecutionBaseMethodReturn<?>> getMethodReturns();
+    ImmutableList<IExecutionBaseMethodReturn<?>> getMethodReturns();
 }

@@ -6,8 +6,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 public class Assert extends JavaStatement implements ExpressionContainer {
 
-    private Expression condition;
-    private Expression message;
+    private final Expression condition;
+    private final Expression message;
 
     public Assert(Expression condition, Expression message, PositionInfo pos) {
         super(pos);

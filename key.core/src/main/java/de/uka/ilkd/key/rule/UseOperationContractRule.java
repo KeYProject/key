@@ -4,12 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
@@ -71,6 +65,12 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Implements the rule which inserts operation contracts for a method call.
@@ -149,7 +149,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                 && !(rp instanceof TypeReference)) {
             return null;
         } else {
-            return new Pair<Expression, MethodOrConstructorReference>(actualResult, mr);
+            return new Pair<>(actualResult, mr);
         }
     }
 
@@ -183,7 +183,7 @@ public final class UseOperationContractRule implements BuiltInRule {
             }
         } else {
             New n = (New) mr;
-            ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
+            ImmutableList<KeYJavaType> sig = ImmutableSLList.nil();
             for (Expression e : n.getArguments()) {
                 sig = sig.append(e.getKeYJavaType(services, ec));
             }
@@ -213,7 +213,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
     private static ImmutableList<Term> getActualParams(MethodOrConstructorReference mr,
             ExecutionContext ec, Services services) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = ImmutableSLList.nil();
         for (Expression expr : mr.getArguments()) {
             Term actualParam = services.getTypeConverter().convertToLogicElement(expr, ec);
             result = result.append(actualParam);
@@ -231,7 +231,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     public static ImmutableSet<FunctionalOperationContract> getApplicableContracts(
             Instantiation inst, Services services) {
         if (inst == null) {
-            return DefaultImmutableSet.<FunctionalOperationContract>nil();
+            return DefaultImmutableSet.nil();
         }
 
         // there must be applicable contracts for the operation
@@ -594,7 +594,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Term contractSelf = computeSelf(baseHeapTerm, atPres, baseHeap, inst,
             contractResult == null && resultVar != null ? tb.var(resultVar) : contractResult,
             services.getTermFactory());
-        Map<LocationVariable, Term> heapTerms = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> heapTerms = new LinkedHashMap<>();
         for (LocationVariable h : heapContext) {
             heapTerms.put(h, tb.var(h));
         }
@@ -611,7 +611,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Term post = globalDefs == null ? originalPost : tb.apply(globalDefs, originalPost);
         final Term freeSpecPost =
             globalDefs == null ? originalFreePost : tb.apply(globalDefs, originalFreePost);
-        final Map<LocationVariable, Term> mods = new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> mods = new LinkedHashMap<>();
 
         for (LocationVariable heap : heapContext) {
             final Term m =
@@ -653,7 +653,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         Term wellFormedAnon = null;
         Term atPreUpdates = null;
         Term reachableState = null;
-        ImmutableList<AnonUpdateData> anonUpdateDatas = ImmutableSLList.<AnonUpdateData>nil();
+        ImmutableList<AnonUpdateData> anonUpdateDatas = ImmutableSLList.nil();
 
         for (LocationVariable heap : heapContext) {
             final AnonUpdateData tAnon;
@@ -730,7 +730,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                 mbyOk = tb.tt();
             }
             finalPreTerm = tb.applySequential(new Term[] { inst.u, atPreUpdates },
-                tb.and(new Term[] { pre, reachableState, mbyOk }));
+                tb.and(pre, reachableState, mbyOk));
         } else {
             // termination has already been shown in the functional proof,
             // thus we do not need to show it again in information flow proofs.
@@ -759,7 +759,7 @@ public final class UseOperationContractRule implements BuiltInRule {
             tb.prog(inst.mod, postJavaBlock, inst.progPost.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, postGoal, "PostModality", null,
-                    inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, postJavaBlock,
+                    inst.mod, new ImmutableArray<>(inst.progPost.sub(0)), null, postJavaBlock,
                     inst.progPost.getLabels())),
             null);
         postGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
@@ -778,7 +778,7 @@ public final class UseOperationContractRule implements BuiltInRule {
             inst.progPost.sub(0),
             TermLabelManager.instantiateLabels(termLabelState, services, ruleApp.posInOccurrence(),
                 this, ruleApp, excPostGoal, "ExceptionalPostModality", null, inst.mod,
-                new ImmutableArray<Term>(inst.progPost.sub(0)), null, excJavaBlock,
+                new ImmutableArray<>(inst.progPost.sub(0)), null, excJavaBlock,
                 inst.progPost.getLabels())),
             null);
         final Term excPost =

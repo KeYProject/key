@@ -1,17 +1,18 @@
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
+import java.awt.*;
+import java.util.List;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.lemmatagenerator.ItemChooser.ItemFilter;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
 
 /**
  * The core of the Selection-Dialog is the class SelectionPanel which extends JPanel. It contains a
@@ -32,10 +33,10 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
     private JPanel buttonPanel;
     private JPanel contentPanel;
     private ItemChooser<TacletInfo> tacletChooser;
-    private ItemFilter<TacletInfo> showOnlySupportedTaclets =
+    private final ItemFilter<TacletInfo> showOnlySupportedTaclets =
         itemData -> !itemData.isNotSupported();
 
-    private ItemFilter<TacletInfo> filterForMovingTaclets =
+    private final ItemFilter<TacletInfo> filterForMovingTaclets =
         itemData -> !itemData.isNotSupported() && !itemData.isAlreadyInUse();
 
 
@@ -142,7 +143,7 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
 
     private ItemChooser<TacletInfo> getTacletChooser() {
         if (tacletChooser == null) {
-            tacletChooser = new ItemChooser<TacletInfo>("Search for taclets with names containing");
+            tacletChooser = new ItemChooser<>("Search for taclets with names containing");
             tacletChooser.addFilterForMovingItems(filterForMovingTaclets);
             tacletChooser.addFilter(showOnlySupportedTaclets);
         }

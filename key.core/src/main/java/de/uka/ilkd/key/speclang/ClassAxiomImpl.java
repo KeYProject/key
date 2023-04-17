@@ -3,11 +3,6 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -22,6 +17,11 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Represents an axiom specified in a class.
@@ -90,12 +90,12 @@ public final class ClassAxiomImpl extends ClassAxiom {
             return false;
         }
         if (originalSelfVar != null) {
+            // not interested in names
             if (other.originalSelfVar == null) {
                 return false;
-            } else if (!originalSelfVar.getKeYJavaType()
-                    .equals(other.originalSelfVar.getKeYJavaType())) {
-                // not interested in names
-                return false;
+            } else {
+                return originalSelfVar.getKeYJavaType()
+                        .equals(other.originalSelfVar.getKeYJavaType());
             }
         }
         return true;
@@ -128,14 +128,14 @@ public final class ClassAxiomImpl extends ClassAxiom {
     @Override
     public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
-        ImmutableList<ProgramVariable> replaceVars = ImmutableSLList.<ProgramVariable>nil();
+        ImmutableList<ProgramVariable> replaceVars = ImmutableSLList.nil();
         replaceVars = replaceVars.append(services.getTypeConverter().getHeapLDT().getHeap());
         if (!isStatic) {
             replaceVars = replaceVars.append(originalSelfVar);
         }
         Term rep = services.getTermBuilder().convertToFormula(originalRep);
         TacletGenerator TG = TacletGenerator.getInstance();
-        ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil();
+        ImmutableSet<Taclet> taclets = DefaultImmutableSet.nil();
         final int c = services.getCounter("classAxiom").getCountPlusPlus();
         final String namePP = "Class axiom " + c + " in " + kjt.getFullName();
         final Name tacletName = MiscTools.toValidTacletName(namePP);

@@ -23,4 +23,3 @@ public class IllegalName extends Problem {
         return element;
     }
 }
-

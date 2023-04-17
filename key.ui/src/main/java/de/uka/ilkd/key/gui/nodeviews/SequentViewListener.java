@@ -2,7 +2,6 @@ package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 import javax.swing.event.PopupMenuEvent;

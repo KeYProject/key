@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.logic;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSet;
 
 public class WaryClashFreeSubst extends ClashFreeSubst {
 

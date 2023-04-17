@@ -18,7 +18,7 @@ import de.uka.ilkd.key.speclang.RepresentsAxiom;
 
 public class OracleInvariantTranslator {
 
-    private Services services;
+    private final Services services;
 
     public OracleInvariantTranslator(Services services) {
         this.services = services;

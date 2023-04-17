@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.proof.init;
 
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -22,13 +26,10 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -73,13 +74,13 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @see #buildUninterpretedPredicate(ImmutableList, String)
      * @see #getUninterpretedPredicateName()
      */
-    private boolean addUninterpretedPredicate;
+    private final boolean addUninterpretedPredicate;
 
     /**
      * If this is {@code true} the {@link SymbolicExecutionTermLabel} will be added to the initial
      * modality which is proven.
      */
-    private boolean addSymbolicExecutionLabel;
+    private final boolean addSymbolicExecutionLabel;
 
     /**
      * The used uninterpreted predicate created via
@@ -92,7 +93,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * Additional uninterpreted predicates, e.g. used in the validity branch of applied block
      * contracts.
      */
-    private final Set<Term> additionalUninterpretedPredicates = new HashSet<Term>();
+    private final Set<Term> additionalUninterpretedPredicates = new HashSet<>();
 
 
     /**
@@ -221,7 +222,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      */
     protected static boolean isAddUninterpretedPredicate(Properties properties) {
         String value = properties.getProperty(IPersistablePO.PROPERTY_ADD_UNINTERPRETED_PREDICATE);
-        return value != null && !value.isEmpty() ? Boolean.valueOf(value) : false;
+        return value != null && !value.isEmpty() ? Boolean.parseBoolean(value) : false;
     }
 
     /**
@@ -232,15 +233,15 @@ public abstract class AbstractOperationPO extends AbstractPO {
      */
     protected static boolean isAddSymbolicExecutionLabel(Properties properties) {
         String value = properties.getProperty(IPersistablePO.PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL);
-        return value != null && !value.isEmpty() ? Boolean.valueOf(value) : false;
+        return value != null && !value.isEmpty() ? Boolean.parseBoolean(value) : false;
     }
 
     private static void collectHeapAtPres(final List<LocationVariable> modHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars, final TermBuilder tb) {
         final Map<LocationVariable, Map<Term, Term>> heapToAtPre =
-            new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+            new LinkedHashMap<>();
         for (LocationVariable heap : modHeaps) {
-            heapToAtPre.put(heap, new LinkedHashMap<Term, Term>());
+            heapToAtPre.put(heap, new LinkedHashMap<>());
             heapToAtPre.get(heap).put(tb.var(heap), tb.var(atPreVars.get(heap)));
         }
     }
@@ -291,7 +292,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     private static List<LocationVariable> addPreHeaps(final IObserverFunction target,
             final List<LocationVariable> modHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars) {
-        final List<LocationVariable> heaps = new ArrayList<LocationVariable>();
+        final List<LocationVariable> heaps = new ArrayList<>();
         for (LocationVariable heap : modHeaps) {
             if (target.getStateCount() >= 1) {
                 heaps.add(heap);
@@ -318,7 +319,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
     private static Map<Term, Term> createHeapToAtPres(final List<LocationVariable> modHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars, final TermBuilder tb) {
-        final Map<Term, Term> heapToAtPre = new LinkedHashMap<Term, Term>();
+        final Map<Term, Term> heapToAtPre = new LinkedHashMap<>();
         for (LocationVariable heap : modHeaps) {
             heapToAtPre.put(tb.var(heap), tb.var(atPreVars.get(heap)));
         }
@@ -375,7 +376,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         assert proofConfig == null;
         final Services proofServices = postInit();
         final IProgramMethod pm = getProgramMethod();
-        List<Term> termPOs = new ArrayList<Term>();
+        List<Term> termPOs = new ArrayList<>();
 
         // prepare variables, program method
         boolean makeNamesUnique = isMakeNamesUnique();
@@ -431,7 +432,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 .collect(Collectors.toList());
 
         // save in field
-        assignPOTerms(termPOs.toArray(new Term[termPOs.size()]));
+        assignPOTerms(termPOs.toArray(new Term[0]));
 
         // add axioms
         collectClassAxioms(getCalleeKeYJavaType(), proofConfig);
@@ -486,11 +487,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
         super.fillSaveProperties(properties);
         if (isAddUninterpretedPredicate()) {
             properties.setProperty(IPersistablePO.PROPERTY_ADD_UNINTERPRETED_PREDICATE,
-                isAddUninterpretedPredicate() + "");
+                String.valueOf(isAddUninterpretedPredicate()));
         }
         if (isAddSymbolicExecutionLabel()) {
             properties.setProperty(IPersistablePO.PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL,
-                isAddSymbolicExecutionLabel() + "");
+                String.valueOf(isAddSymbolicExecutionLabel()));
         }
     }
 
@@ -810,7 +811,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
         // create java block
         final JavaBlock jb = buildJavaBlock(formalParamVars, selfVar, resultVar, exceptionVar,
-            atPreVars.keySet().contains(getSavedHeap(services)), sb);
+            atPreVars.containsKey(getSavedHeap(services)), sb);
 
         // create program term
         Term programTerm = tb.prog(getTerminationMarker(), jb, postTerm);
@@ -978,7 +979,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     private ImmutableList<LocationVariable> createFormalParamVars(
             final ImmutableList<ProgramVariable> paramVars, final Services proofServices) {
         // create arguments from formal parameters for method call
-        ImmutableList<LocationVariable> formalParamVars = ImmutableSLList.<LocationVariable>nil();
+        ImmutableList<LocationVariable> formalParamVars = ImmutableSLList.nil();
         for (ProgramVariable paramVar : paramVars) {
             if (isCopyOfMethodArgumentsUsed()) {
                 ProgramElementName pen = new ProgramElementName("_" + paramVar.name());
@@ -999,7 +1000,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     private ImmutableList<FunctionalOperationContract> collectLookupContracts(
             final IProgramMethod pm, final Services proofServices) {
         ImmutableList<FunctionalOperationContract> lookupContracts =
-            ImmutableSLList.<FunctionalOperationContract>nil();
+            ImmutableSLList.nil();
         ImmutableSet<FunctionalOperationContract> cs = proofServices.getSpecificationRepository()
                 .getOperationContracts(getCalleeKeYJavaType(), pm);
         for (KeYJavaType superType : proofServices.getJavaInfo()
@@ -1036,8 +1037,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
         // register the variables so they are declared in proof header
         // if the proof is saved to a file
         register(paramVars, proofServices);
-        for (int i = 0; i < vars.length; i++) {
-            register(vars[i], proofServices);
+        for (ProgramVariable var : vars) {
+            register(var, proofServices);
         }
         for (LocationVariable lv : atPreVars) {
             register(lv, proofServices);

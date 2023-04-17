@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.rule;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -10,15 +12,15 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import java.util.Iterator;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -173,8 +175,8 @@ public class TestApplyTaclet {
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
-        RuleApp rApp = rApplist.head();
-        rApp = ((TacletApp) rApp).tryToInstantiate(TacletForTests.services());
+        TacletApp rApp = rApplist.head();
+        rApp = rApp.tryToInstantiate(TacletForTests.services());
         assertTrue(rApp.complete(), "Rule App should be complete");
         ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
         assertEquals(1, goals.size(), "Too many or zero goals for all-right.");
@@ -565,9 +567,10 @@ public class TestApplyTaclet {
         assertEquals(4, rApplist.size(), "Expected four rule applications.");
 
         ImmutableList<TacletApp> appList = ImmutableSLList.nil();
-        for (TacletApp aRApplist : rApplist)
+        for (TacletApp aRApplist : rApplist) {
             appList =
                 appList.prepend(aRApplist.findIfFormulaInstantiations(goal.sequent(), services));
+        }
 
         assertEquals(1, appList.size(), "Expected one match.");
         assertTrue(appList.head().complete(), "Rule App should be complete");
@@ -596,9 +599,10 @@ public class TestApplyTaclet {
 
         ImmutableList<TacletApp> appList = ImmutableSLList.nil();
         Iterator<TacletApp> appIt = rApplist.iterator();
-        while (appIt.hasNext())
+        while (appIt.hasNext()) {
             appList =
                 appList.prepend(appIt.next().findIfFormulaInstantiations(goal.sequent(), services));
+        }
 
         assertEquals(0, appList.size(), "Did not expect a match.");
 
@@ -610,8 +614,9 @@ public class TestApplyTaclet {
         while (appIt.hasNext()) {
             TacletApp a =
                 appIt.next().setIfFormulaInstantiations(ifInsts, TacletForTests.services());
-            if (a != null)
+            if (a != null) {
                 appList = appList.prepend(a);
+            }
         }
 
         assertEquals(1, appList.size(), "Expected one match.");

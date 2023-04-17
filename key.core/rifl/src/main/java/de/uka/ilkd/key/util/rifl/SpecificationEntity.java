@@ -11,7 +11,7 @@ import java.util.Arrays;
  */
 public abstract class SpecificationEntity {
 
-    static enum Type {
+    enum Type {
         SOURCE, SINK
     }
 
@@ -47,7 +47,7 @@ public abstract class SpecificationEntity {
 
         @Override
         public String qualifiedName() {
-            return (inPackage == "" ? "" : inPackage + ".") + inClass + "#" + name;
+            return (inPackage.isEmpty() ? "" : inPackage + ".") + inClass + "#" + name;
         }
     }
 
@@ -108,14 +108,15 @@ public abstract class SpecificationEntity {
 
         @Override
         public String qualifiedName() {
-            final StringBuffer sb = new StringBuffer();
-            if (!"".equals(inPackage))
-                sb.append(inPackage + ".");
-            sb.append(inClass + "#" + methodName + "(");
+            final StringBuilder sb = new StringBuilder();
+            if (!"".equals(inPackage)) {
+                sb.append(inPackage).append(".");
+            }
+            sb.append(inClass).append("#").append(methodName).append("(");
             int i = 1;
             for (final String p : paramTypes) {
                 if (i++ == position) {
-                    sb.append(position + ":");
+                    sb.append(position).append(":");
                 }
                 sb.append(p);
                 sb.append(',');
@@ -178,10 +179,11 @@ public abstract class SpecificationEntity {
 
         @Override
         public String qualifiedName() {
-            final StringBuffer sb = new StringBuffer();
-            if (!"".equals(inPackage))
-                sb.append(inPackage + ".");
-            sb.append(inClass + "#" + methodName + "(");
+            final StringBuilder sb = new StringBuilder();
+            if (!"".equals(inPackage)) {
+                sb.append(inPackage).append(".");
+            }
+            sb.append(inClass).append("#").append(methodName).append("(");
             for (final String p : paramTypes) {
                 sb.append(p);
                 sb.append(',');

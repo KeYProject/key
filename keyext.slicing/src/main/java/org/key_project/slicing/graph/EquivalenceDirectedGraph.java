@@ -1,14 +1,14 @@
 package org.key_project.slicing.graph;
 
-import org.key_project.util.EqualsModProofIrrelevancy;
-import org.key_project.util.EqualsModProofIrrelevancyWrapper;
-import org.key_project.util.collection.DirectedGraph;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.EqualsModProofIrrelevancyWrapper;
+import org.key_project.util.collection.DirectedGraph;
 
 /**
  * A directed graph, extended to store equivalence groups of vertices.

@@ -52,6 +52,8 @@ public interface SourceElement {
     /**
      * Returns the end position of the primary token of this element. To get the end position of the
      * syntactical first token, call the corresponding method of <CODE>getLastElement()</CODE>.
+     * <br>
+     * The end position is <b>inclusive</b>.
      *
      * @return the end position of the primary token.
      */
@@ -301,9 +303,7 @@ public interface SourceElement {
 
         public String toString() {
             if (this != UNDEFINED) {
-                StringBuffer buf = new StringBuffer();
-                buf.append(line).append('/').append(column - 1);
-                return buf.toString();
+                return String.valueOf(line) + '/' + (column - 1);
             } else {
                 return "??/??";
             }

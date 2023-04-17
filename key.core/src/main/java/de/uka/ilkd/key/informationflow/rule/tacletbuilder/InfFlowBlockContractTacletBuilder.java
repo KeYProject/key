@@ -1,10 +1,5 @@
 package de.uka.ilkd.key.informationflow.rule.tacletbuilder;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
@@ -15,6 +10,11 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**
@@ -77,7 +77,7 @@ public final class InfFlowBlockContractTacletBuilder
         ImmutableSet<BlockContract> ifContracts =
             services.getSpecificationRepository().getBlockContracts(blockContract.getBlock());
         ifContracts = filterContracts(ifContracts);
-        ImmutableList<Term> contractsApplications = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> contractsApplications = ImmutableSLList.nil();
         for (BlockContract cont : ifContracts) {
             InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(cont, contAppData,
                 contAppData2, executionContext, services);
@@ -90,10 +90,10 @@ public final class InfFlowBlockContractTacletBuilder
 
 
     ImmutableSet<BlockContract> filterContracts(ImmutableSet<BlockContract> ifContracts) {
-        ImmutableSet<BlockContract> result = DefaultImmutableSet.<BlockContract>nil();
+        ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
         for (BlockContract cont : ifContracts) {
-            if ((cont.getBlock().getStartPosition().getLine() == blockContract.getBlock()
-                    .getStartPosition().getLine())
+            if ((cont.getBlock().getStartPosition().line() == blockContract.getBlock()
+                    .getStartPosition().line())
                     && cont.getTarget().getUniqueName()
                             .equalsIgnoreCase(blockContract.getTarget().getUniqueName())) {
                 result = result.add(cont);

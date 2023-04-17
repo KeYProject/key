@@ -1,5 +1,12 @@
 package de.uka.ilkd.key.gui.prooftree;
 
+import java.awt.event.ActionEvent;
+import java.util.Iterator;
+import java.util.function.Predicate;
+import javax.swing.*;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -17,15 +24,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Pair;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import javax.swing.*;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-import java.awt.event.ActionEvent;
-import java.util.Iterator;
-import java.util.function.Predicate;
 
 public class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
@@ -185,22 +183,24 @@ public class ProofTreePopupFactory {
                     }
                 }
 
-                String stats;
+                StringBuilder stats;
                 if (openGoals > 0) {
-                    stats = openGoals + " open goal" + (openGoals > 1 ? "s." : ".");
+                    stats =
+                        new StringBuilder(openGoals + " open goal" + (openGoals > 1 ? "s." : "."));
                 } else {
-                    stats = "Closed.";
+                    stats = new StringBuilder("Closed.");
                 }
-                stats += "\n\n";
+                stats.append("\n\n");
 
                 for (Pair<String, String> x : context.invokedNode.statistics().getSummary()) {
                     if ("".equals(x.second)) {
-                        stats += "\n";
+                        stats.append("\n");
                     }
-                    stats += x.first + ": " + x.second + "\n";
+                    stats.append(x.first).append(": ").append(x.second).append("\n");
                 }
 
-                JOptionPane.showMessageDialog(MainWindow.getInstance(), stats, "Proof Statistics",
+                JOptionPane.showMessageDialog(MainWindow.getInstance(), stats.toString(),
+                    "Proof Statistics",
                     JOptionPane.INFORMATION_MESSAGE);
             }
         }
@@ -303,16 +303,16 @@ public class ProofTreePopupFactory {
             }
             Object sibling = context.delegateModel.getChild(parent,
                 context.delegateModel.getIndexOfChild(parent, node) - 1);
-            if (!(sibling != null && sibling instanceof GUIBranchNode)) {
+            if (!(sibling instanceof GUIBranchNode)) {
                 int index = context.delegateModel.getIndexOfChild(parent, node);
                 for (int i = parent.getChildCount(); i > index; i--) {
                     sibling = context.delegateModel.getChild(parent, i);
-                    if (sibling != null && sibling instanceof GUIBranchNode) {
+                    if (sibling instanceof GUIBranchNode) {
                         break;
                     }
                 }
             }
-            if (sibling != null && sibling instanceof GUIBranchNode) {
+            if (sibling instanceof GUIBranchNode) {
                 context.proofTreeView.selectBranchNode((GUIBranchNode) sibling);
             }
         }
@@ -336,16 +336,16 @@ public class ProofTreePopupFactory {
             }
             Object sibling = context.delegateModel.getChild(parent,
                 context.delegateModel.getIndexOfChild(parent, node) + 1);
-            if (!(sibling != null && sibling instanceof GUIBranchNode)) {
+            if (!(sibling instanceof GUIBranchNode)) {
                 int index = context.delegateModel.getIndexOfChild(parent, node);
                 for (int i = 0; i < index; i++) {
                     sibling = context.delegateModel.getChild(parent, i);
-                    if (sibling != null && sibling instanceof GUIBranchNode) {
+                    if (sibling instanceof GUIBranchNode) {
                         break;
                     }
                 }
             }
-            if (sibling != null && sibling instanceof GUIBranchNode) {
+            if (sibling instanceof GUIBranchNode) {
                 context.proofTreeView.selectBranchNode((GUIBranchNode) sibling);
             }
         }

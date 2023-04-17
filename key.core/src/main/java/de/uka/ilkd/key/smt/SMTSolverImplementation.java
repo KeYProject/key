@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.smt;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Sequent;
@@ -13,11 +19,8 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
-import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.concurrent.atomic.AtomicInteger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents a concrete instance of a running solver process on the KeY side. Amongst others
@@ -33,6 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Wolfram Pfeifer (SMT communication overhaul)
  */
 public final class SMTSolverImplementation implements SMTSolver, Runnable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SMTSolverImplementation.class);
 
     /**
      * used to generate unique ids for each running solver instance
@@ -307,7 +311,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
             return SMTBeautifier.indent(string);
         } catch (Exception ex) {
             // fall back if pretty printing fails
-            ex.printStackTrace();
+            LOGGER.warn("Beautifier failed", ex);
             return string;
         }
     }

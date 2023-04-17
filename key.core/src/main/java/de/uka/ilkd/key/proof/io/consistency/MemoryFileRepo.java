@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.proof.io.consistency;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -17,7 +16,7 @@ import de.uka.ilkd.key.proof.io.RuleSource;
 public class MemoryFileRepo extends AbstractFileRepo {
 
     @Override
-    public InputStream getInputStream(Path path) throws FileNotFoundException, IOException {
+    public InputStream getInputStream(Path path) throws IOException {
         // TODO Auto-generated method stub
         return null;
     }

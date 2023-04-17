@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.smt;
 
-import org.key_project.util.java.StringUtil;
-
 import java.util.ArrayList;
 import java.util.List;
 

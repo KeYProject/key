@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.gui.actions;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.SelectionHistory;
 import de.uka.ilkd.key.gui.SelectionHistoryChangeListener;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 /**
  * Action to navigate forward in proof node selection history.

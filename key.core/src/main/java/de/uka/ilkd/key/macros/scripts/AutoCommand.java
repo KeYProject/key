@@ -3,9 +3,6 @@ package de.uka.ilkd.key.macros.scripts;
 import java.util.Map;
 import java.util.Optional;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
@@ -18,6 +15,9 @@ import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * The AutoCommand invokes the automatic strategy "Auto".
@@ -37,13 +37,10 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, String> arguments) {
+    public Parameters evaluateArguments(EngineState state, Map<String, String> arguments)
+            throws Exception {
         Parameters args = new Parameters();
-        try {
-            ValueInjector.getInstance().inject(this, args, arguments);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        ValueInjector.getInstance().inject(this, args, arguments);
         return args;
     }
 
@@ -75,8 +72,9 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
 
         // set the max number of steps if given
         int oldNumberOfSteps = state.getMaxAutomaticSteps();
-        if (arguments.getSteps() > 0)
+        if (arguments.getSteps() > 0) {
             state.setMaxAutomaticSteps(arguments.getSteps());
+        }
 
         // Give some feedback
         applyStrategy.addProverTaskObserver(uiControl);
