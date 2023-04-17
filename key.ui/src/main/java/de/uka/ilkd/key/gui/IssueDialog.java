@@ -606,9 +606,11 @@ public final class IssueDialog extends JDialog {
             String resourceLocation = "";
             Position pos = Position.UNDEFINED;
             Location location = ExceptionTools.getLocation(exception);
+            if (location != null && !location.getPosition().isNegative()) {
+                pos = location.getPosition();
+            }
             if (Location.isValidLocation(location)) {
                 resourceLocation = location.getFileURL().toString();
-                pos = location.getPosition();
             }
             return new PositionedIssueString(message == null ? exception.toString() : message,
                 resourceLocation, pos, info);
