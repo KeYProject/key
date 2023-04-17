@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.settings;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.logic.Choice;
