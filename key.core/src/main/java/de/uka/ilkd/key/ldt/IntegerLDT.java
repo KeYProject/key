@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.ldt;
 
-import org.key_project.util.ExtList;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -18,10 +18,11 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.ExtList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
 
 
 /**
@@ -161,7 +162,7 @@ public final class IntegerLDT extends LDT {
         // initialise caches for function symbols from integerHeader.key
         sharp = addFunction(services, "#");
         for (int i = 0; i < 10; i++) {
-            numberSymbol[i] = addFunction(services, "" + i);
+            numberSymbol[i] = addFunction(services, String.valueOf(i));
         }
         neglit = addFunction(services, NEGATIVE_LITERAL_STRING);
         numbers = addFunction(services, NUMBERS_NAME.toString());
@@ -772,7 +773,6 @@ public final class IntegerLDT extends LDT {
             result = services.getTermBuilder().zTerm(((AbstractIntegerLiteral) lit).getValue());
         }
 
-        LOGGER.debug("integerldt: result of translating literal (lit {}, result {}):", lit, result);
         return result;
     }
 
@@ -782,7 +782,7 @@ public final class IntegerLDT extends LDT {
     }
 
     public String toNumberString(Term t) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         Operator f = t.op();
         while (isNumberLiteral(f)) {
             sb.insert(0, f.name().toString().charAt(0));
@@ -817,7 +817,7 @@ public final class IntegerLDT extends LDT {
 
 
     @Override
-    public final Type getType(Term t) {
+    public Type getType(Term t) {
         assert false : "IntegerLDT: Cannot get Java type for term: " + t;
         return null;
     }

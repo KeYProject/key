@@ -1822,7 +1822,7 @@ public enum MaterialDesignRegular implements IconFont {
     WORK('\ue8f9'), WRAP_TEXT('\ue25b'), YOUTUBE_SEARCHED_FOR('\ue8fa'), ZOOM_IN('\ue8ff'),
     ZOOM_OUT('\ue900'), ZOOM_OUT_MAP('\ue56b');
 
-    private char codepoint;
+    private final char codepoint;
     private Font font;
 
     MaterialDesignRegular(char c) {
@@ -1831,9 +1831,10 @@ public enum MaterialDesignRegular implements IconFont {
 
     @Override
     public Font getFont() throws IOException, FontFormatException {
-        if (font == null)
+        if (font == null) {
             font = Font.createFont(Font.TRUETYPE_FONT,
                 getClass().getResourceAsStream("/fonts/MaterialIcons-Regular.ttf"));
+        }
         return font;
     }
 

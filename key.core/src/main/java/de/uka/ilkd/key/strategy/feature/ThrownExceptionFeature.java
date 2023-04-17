@@ -35,7 +35,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
      * @param services the Services
      */
     private ThrownExceptionFeature(String[] p_filteredExceptions, Services services) {
-        final List<Sort> filtered = new ArrayList<Sort>();
+        final List<Sort> filtered = new ArrayList<>();
 
         final JavaInfo javaInfo = services.getJavaInfo();
 
@@ -45,7 +45,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
                 filtered.add(nullPointer.getSort());
             }
         }
-        filteredExceptions = filtered.toArray(new Sort[filtered.size()]);
+        filteredExceptions = filtered.toArray(new Sort[0]);
     }
 
     private boolean blockedExceptions(Sort excType) {
@@ -78,8 +78,9 @@ public class ThrownExceptionFeature extends BinaryFeature {
      * @return the first executable statement
      */
     private ProgramElement getFirstExecutableStatement(Term term) {
-        if (term.javaBlock().isEmpty())
+        if (term.javaBlock().isEmpty()) {
             return null;
+        }
 
         final ProgramElement jb = term.javaBlock().program();
         final ProgramElement fstActive;

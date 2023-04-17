@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.api;
 
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.proof.Node;
-
 import java.util.List;
 import java.util.Set;
+
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.proof.Node;
 
 /**
  * Object that represents one result goal of a script command It holds a reference to its parent

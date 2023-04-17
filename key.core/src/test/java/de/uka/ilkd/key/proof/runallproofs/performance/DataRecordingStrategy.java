@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
 import java.io.File;
-import java.io.IOException;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;

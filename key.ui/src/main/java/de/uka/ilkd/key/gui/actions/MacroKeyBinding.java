@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
@@ -9,8 +8,8 @@ import javax.swing.KeyStroke;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.actions.useractions.ProofMacroUserAction;
-import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
+import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.pp.PosInSequent;

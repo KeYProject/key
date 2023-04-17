@@ -6,11 +6,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import org.key_project.util.LRUCache;
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+
+import org.key_project.util.LRUCache;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Direct-mapped cache of lists of formulas (potential instantiations of if-formulas of taclets)

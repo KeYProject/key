@@ -2,6 +2,10 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <variable name="self" isArrayIndex="false">
       <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+      </value>
+   </variable>
+   <variable name="self" isArrayIndex="false">
+      <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
          <variable name="array" isArrayIndex="false">
             <value name="array {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                <variable name="length" isArrayIndex="false">
@@ -23,6 +27,10 @@
    <methodCall name="&lt;call self.magic()&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="self" isArrayIndex="false">
          <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+         </value>
+      </variable>
+      <variable name="self" isArrayIndex="false">
+         <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
             <variable name="index" isArrayIndex="false">
                <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
@@ -41,7 +49,11 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <statement name="this.array[this.index]=42;" pathCondition="true" pathConditionChanged="false">
+      <statement name="this.array[this.index] = 42;" pathCondition="true" pathConditionChanged="false">
+         <variable name="self" isArrayIndex="false">
+            <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
          <variable name="self" isArrayIndex="false">
             <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                <variable name="index" isArrayIndex="false">
@@ -62,7 +74,59 @@
             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
-         <statement name="return this.array[this.index];" pathCondition="true" pathConditionChanged="false">
+         <branchCondition name="or(lt(length(int[]::select(heap,self,VariableArrayIndex::$array)),Z(0(#))),and(and(not(equals(int[]::select(heap,self,VariableArrayIndex::$array),null)),geq(int::select(heap,self,VariableArrayIndex::$index),Z(0(#)))),lt(int::select(heap,self,VariableArrayIndex::$index),length(int[]::select(heap,self,VariableArrayIndex::$array)))))" pathCondition="imp(geq(length(int[]::select(heap,self,VariableArrayIndex::$array)),Z(0(#))),and(and(not(equals(int[]::select(heap,self,VariableArrayIndex::$array),null)),geq(int::select(heap,self,VariableArrayIndex::$index),Z(0(#)))),lt(int::select(heap,self,VariableArrayIndex::$index),length(int[]::select(heap,self,VariableArrayIndex::$array)))))" pathConditionChanged="true" branchCondition="or(lt(length(int[]::select(heap,self,VariableArrayIndex::$array)),Z(0(#))),and(and(not(equals(int[]::select(heap,self,VariableArrayIndex::$array),null)),geq(int::select(heap,self,VariableArrayIndex::$index),Z(0(#)))),lt(int::select(heap,self,VariableArrayIndex::$index),length(int[]::select(heap,self,VariableArrayIndex::$array)))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <variable name="self" isArrayIndex="false">
+               <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  <variable name="array" isArrayIndex="false">
+                     <value name="array {and(equals(int[]::select(heap,self,VariableArrayIndex::$array),x_arr_1),equals(int::select(heap,self,VariableArrayIndex::$index),x))}" typeString="int[]" valueString="x_arr_1" isValueAnObject="true" isValueUnknown="false" conditionString="and(equals(int[]::select(heap,self,VariableArrayIndex::$array),x_arr_1),equals(int::select(heap,self,VariableArrayIndex::$index),x))">
+                        <variable name="length" isArrayIndex="false">
+                           <value name="length {and(equals(int[]::select(heap,self,VariableArrayIndex::$array),x_arr_1),equals(int::select(heap,self,VariableArrayIndex::$index),x))}" typeString="int" valueString="length(x_arr_1)" isValueAnObject="false" isValueUnknown="false" conditionString="and(equals(int[]::select(heap,self,VariableArrayIndex::$array),x_arr_1),equals(int::select(heap,self,VariableArrayIndex::$index),x))">
+                           </value>
+                        </variable>
+                        <variable name="[x]" arrayIndex="x" isArrayIndex="true">
+                           <value name="[x] {and(equals(int[]::select(heap,self,VariableArrayIndex::$array),x_arr_1),equals(int::select(heap,self,VariableArrayIndex::$index),x))}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="and(equals(int[]::select(heap,self,VariableArrayIndex::$array),x_arr_1),equals(int::select(heap,self,VariableArrayIndex::$index),x))">
+                           </value>
+                        </variable>
+                     </value>
+                     <value name="array {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="length" isArrayIndex="false">
+                           <value name="length {true}" typeString="int" valueString="length(int[]::select(heap,self,VariableArrayIndex::$array))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="index" isArrayIndex="false">
+                     <value name="index {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                     <value name="index {and(not(equals(int::select(heap,self,VariableArrayIndex::$index),x)),or(not(equals(int[]::select(heap,self,VariableArrayIndex::$array),x_arr_1)),not(equals(int::select(heap,self,VariableArrayIndex::$index),x))))}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(int::select(heap,self,VariableArrayIndex::$index),x)),or(not(equals(int[]::select(heap,self,VariableArrayIndex::$array),x_arr_1)),not(equals(int::select(heap,self,VariableArrayIndex::$index),x))))">
+                     </value>
+                  </variable>
+               </value>
+            </variable>
+            <variable name="x_arr_1" isArrayIndex="false">
+               <value name="x_arr_1 {and(equals(int[]::select(heap,self,VariableArrayIndex::$array),x_arr_1),equals(int::select(heap,self,VariableArrayIndex::$index),x))}" typeString="int[]" valueString="x_arr_1" isValueAnObject="true" isValueUnknown="false" conditionString="and(equals(int[]::select(heap,self,VariableArrayIndex::$array),x_arr_1),equals(int::select(heap,self,VariableArrayIndex::$index),x))">
+                  <variable name="length" isArrayIndex="false">
+                     <value name="length {and(equals(int[]::select(heap,self,VariableArrayIndex::$array),x_arr_1),equals(int::select(heap,self,VariableArrayIndex::$index),x))}" typeString="int" valueString="length(x_arr_1)" isValueAnObject="false" isValueUnknown="false" conditionString="and(equals(int[]::select(heap,self,VariableArrayIndex::$array),x_arr_1),equals(int::select(heap,self,VariableArrayIndex::$index),x))">
+                     </value>
+                  </variable>
+                  <variable name="[x]" arrayIndex="x" isArrayIndex="true">
+                     <value name="[x] {and(equals(int[]::select(heap,self,VariableArrayIndex::$array),x_arr_1),equals(int::select(heap,self,VariableArrayIndex::$index),x))}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="and(equals(int[]::select(heap,self,VariableArrayIndex::$array),x_arr_1),equals(int::select(heap,self,VariableArrayIndex::$index),x))">
+                     </value>
+                  </variable>
+               </value>
+               <value name="x_arr_1 {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  <variable name="length" isArrayIndex="false">
+                     <value name="length {true}" typeString="int" valueString="length(int[]::select(heap,self,VariableArrayIndex::$array))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+               </value>
+            </variable>
+            <variable name="x" isArrayIndex="false">
+               <value name="x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+               <value name="x {and(not(equals(int::select(heap,self,VariableArrayIndex::$index),x)),or(not(equals(int[]::select(heap,self,VariableArrayIndex::$array),x_arr_1)),not(equals(int::select(heap,self,VariableArrayIndex::$index),x))))}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(int::select(heap,self,VariableArrayIndex::$index),x)),or(not(equals(int[]::select(heap,self,VariableArrayIndex::$array),x_arr_1)),not(equals(int::select(heap,self,VariableArrayIndex::$index),x))))">
+               </value>
+            </variable>
             <variable name="self" isArrayIndex="false">
                <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="index" isArrayIndex="false">
@@ -75,10 +139,6 @@
                            <value name="length {true}" typeString="int" valueString="length(int[]::select(heap,self,VariableArrayIndex::$array))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="[int::select(heap,self,VariableArrayIndex::$index)]" arrayIndex="int::select(heap,self,VariableArrayIndex::$index)" isArrayIndex="true">
-                           <value name="[int::select(heap,self,VariableArrayIndex::$index)] {true}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                           </value>
-                        </variable>
                      </value>
                   </variable>
                </value>
@@ -87,13 +147,9 @@
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of self.magic()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+            <statement name="return this.array[this.index];" pathCondition="imp(geq(length(int[]::select(heap,self,VariableArrayIndex::$array)),Z(0(#))),and(and(not(equals(int[]::select(heap,self,VariableArrayIndex::$array),null)),geq(int::select(heap,self,VariableArrayIndex::$index),Z(0(#)))),lt(int::select(heap,self,VariableArrayIndex::$index),length(int[]::select(heap,self,VariableArrayIndex::$array)))))" pathConditionChanged="false">
                <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                     <variable name="index" isArrayIndex="false">
-                        <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                        </value>
-                     </variable>
                      <variable name="array" isArrayIndex="false">
                         <value name="array {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="length" isArrayIndex="false">
@@ -106,19 +162,35 @@
                            </variable>
                         </value>
                      </variable>
+                     <variable name="index" isArrayIndex="false">
+                        <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="self" isArrayIndex="false">
+                  <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="index" isArrayIndex="false">
+                        <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="array" isArrayIndex="false">
+                        <value name="array {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="length" isArrayIndex="false">
+                              <value name="length {true}" typeString="int" valueString="length(int[]::select(heap,self,VariableArrayIndex::$array))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
                   </value>
                </variable>
                <variable name="exc" isArrayIndex="false">
                   <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+               <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of self.magic()&gt;" pathCondition="imp(geq(length(int[]::select(heap,self,VariableArrayIndex::$array)),Z(0(#))),and(and(not(equals(int[]::select(heap,self,VariableArrayIndex::$array),null)),geq(int::select(heap,self,VariableArrayIndex::$index),Z(0(#)))),lt(int::select(heap,self,VariableArrayIndex::$index),length(int[]::select(heap,self,VariableArrayIndex::$array)))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="imp(geq(length(int[]::select(heap,self,VariableArrayIndex::$array)),Z(0(#))),and(and(not(equals(int[]::select(heap,self,VariableArrayIndex::$array),null)),geq(int::select(heap,self,VariableArrayIndex::$index),Z(0(#)))),lt(int::select(heap,self,VariableArrayIndex::$index),length(int[]::select(heap,self,VariableArrayIndex::$array)))))">
                   <variable name="self" isArrayIndex="false">
                      <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                        <variable name="index" isArrayIndex="false">
-                           <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                           </value>
-                        </variable>
                         <variable name="array" isArrayIndex="false">
                            <value name="array {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <variable name="length" isArrayIndex="false">
@@ -131,13 +203,241 @@
                               </variable>
                            </value>
                         </variable>
+                        <variable name="index" isArrayIndex="false">
+                           <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="self" isArrayIndex="false">
+                     <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="index" isArrayIndex="false">
+                           <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="array" isArrayIndex="false">
+                           <value name="array {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {true}" typeString="int" valueString="length(int[]::select(heap,self,VariableArrayIndex::$array))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
                      </value>
                   </variable>
                   <variable name="exc" isArrayIndex="false">
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
+                  <termination name="&lt;end&gt;" pathCondition="imp(geq(length(int[]::select(heap,self,VariableArrayIndex::$array)),Z(0(#))),and(and(not(equals(int[]::select(heap,self,VariableArrayIndex::$array),null)),geq(int::select(heap,self,VariableArrayIndex::$index),Z(0(#)))),lt(int::select(heap,self,VariableArrayIndex::$index),length(int[]::select(heap,self,VariableArrayIndex::$array)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                     <variable name="self" isArrayIndex="false">
+                        <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="array" isArrayIndex="false">
+                              <value name="array {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 <variable name="length" isArrayIndex="false">
+                                    <value name="length {true}" typeString="int" valueString="length(int[]::select(heap,self,VariableArrayIndex::$array))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                                 <variable name="[int::select(heap,self,VariableArrayIndex::$index)]" arrayIndex="int::select(heap,self,VariableArrayIndex::$index)" isArrayIndex="true">
+                                    <value name="[int::select(heap,self,VariableArrayIndex::$index)] {true}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </variable>
+                           <variable name="index" isArrayIndex="false">
+                              <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <variable name="self" isArrayIndex="false">
+                        <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="index" isArrayIndex="false">
+                              <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="array" isArrayIndex="false">
+                              <value name="array {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 <variable name="length" isArrayIndex="false">
+                                    <value name="length {true}" typeString="int" valueString="length(int[]::select(heap,self,VariableArrayIndex::$array))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <variable name="exc" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </termination>
+                  <callStateVariable name="self" isArrayIndex="false">
+                     <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="array" isArrayIndex="false">
+                           <value name="array {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {true}" typeString="int" valueString="length(int[]::select(heap,self,VariableArrayIndex::$array))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <variable name="index" isArrayIndex="false">
+                           <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="self" isArrayIndex="false">
+                     <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="index" isArrayIndex="false">
+                           <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="array" isArrayIndex="false">
+                           <value name="array {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {true}" typeString="int" valueString="length(int[]::select(heap,self,VariableArrayIndex::$array))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+               </methodReturn>
+            </statement>
+         </branchCondition>
+         <branchCondition name="equals(int[]::select(heap,self,VariableArrayIndex::$array),null)" pathCondition="equals(int[]::select(heap,self,VariableArrayIndex::$array),null)" pathConditionChanged="true" branchCondition="equals(int[]::select(heap,self,VariableArrayIndex::$array),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <variable name="self" isArrayIndex="false">
+               <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  <variable name="array" isArrayIndex="false">
+                     <value name="array {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="index" isArrayIndex="false">
+                     <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+               </value>
+            </variable>
+            <variable name="x_arr_1" isArrayIndex="false">
+               <value name="x_arr_1 {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="self" isArrayIndex="false">
+               <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  <variable name="index" isArrayIndex="false">
+                     <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="array" isArrayIndex="false">
+                     <value name="array {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="length" isArrayIndex="false">
+                           <value name="length {true}" typeString="int" valueString="length(int[]::select(heap,self,VariableArrayIndex::$array))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+               </value>
+            </variable>
+            <variable name="exc" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="x" isArrayIndex="false">
+               <value name="x {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call self.magic()&gt;&gt;" pathCondition="equals(int[]::select(heap,self,VariableArrayIndex::$array),null)" pathConditionChanged="false" methodReturnCondition="equals(int[]::select(heap,self,VariableArrayIndex::$array),null)">
+               <variable name="self" isArrayIndex="false">
+                  <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="array" isArrayIndex="false">
+                        <value name="array {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="self" isArrayIndex="false">
+                  <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="index" isArrayIndex="false">
+                        <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="array" isArrayIndex="false">
+                        <value name="array {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="length" isArrayIndex="false">
+                              <value name="length {true}" typeString="int" valueString="length(int[]::select(heap,self,VariableArrayIndex::$array))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="n" isArrayIndex="false">
+                  <value name="n {true}" typeString="java.lang.NullPointerException" valueString="n_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <variable name="message" isArrayIndex="false">
+                        <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="cause" isArrayIndex="false">
+                        <value name="cause {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(int[]::select(heap,self,VariableArrayIndex::$array),null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                  <variable name="self" isArrayIndex="false">
+                     <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="array" isArrayIndex="false">
+                           <value name="array {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="self" isArrayIndex="false">
+                     <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="index" isArrayIndex="false">
+                           <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="array" isArrayIndex="false">
+                           <value name="array {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {true}" typeString="int" valueString="length(int[]::select(heap,self,VariableArrayIndex::$array))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="java.lang.NullPointerException" valueString="n_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <variable name="message" isArrayIndex="false">
+                           <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="cause" isArrayIndex="false">
+                           <value name="cause {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
                </termination>
+               <callStateVariable name="self" isArrayIndex="false">
+                  <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="array" isArrayIndex="false">
+                        <value name="array {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </callStateVariable>
                <callStateVariable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="index" isArrayIndex="false">
@@ -158,10 +458,196 @@
                   <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </callStateVariable>
-            </methodReturn>
-         </statement>
+            </exceptionalMethodReturn>
+         </branchCondition>
+         <branchCondition name="or(lt(length(int[]::select(heap,self,VariableArrayIndex::$array)),Z(0(#))),and(not(equals(int[]::select(heap,self,VariableArrayIndex::$array),null)),or(leq(int::select(heap,self,VariableArrayIndex::$index),Z(neglit(1(#)))),geq(int::select(heap,self,VariableArrayIndex::$index),length(int[]::select(heap,self,VariableArrayIndex::$array))))))" pathCondition="imp(geq(length(int[]::select(heap,self,VariableArrayIndex::$array)),Z(0(#))),and(not(equals(int[]::select(heap,self,VariableArrayIndex::$array),null)),or(leq(int::select(heap,self,VariableArrayIndex::$index),Z(neglit(1(#)))),geq(int::select(heap,self,VariableArrayIndex::$index),length(int[]::select(heap,self,VariableArrayIndex::$array))))))" pathConditionChanged="true" branchCondition="or(lt(length(int[]::select(heap,self,VariableArrayIndex::$array)),Z(0(#))),and(not(equals(int[]::select(heap,self,VariableArrayIndex::$array),null)),or(leq(int::select(heap,self,VariableArrayIndex::$index),Z(neglit(1(#)))),geq(int::select(heap,self,VariableArrayIndex::$index),length(int[]::select(heap,self,VariableArrayIndex::$array))))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <variable name="self" isArrayIndex="false">
+               <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  <variable name="array" isArrayIndex="false">
+                     <value name="array {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="length" isArrayIndex="false">
+                           <value name="length {true}" typeString="int" valueString="length(int[]::select(heap,self,VariableArrayIndex::$array))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="index" isArrayIndex="false">
+                     <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+               </value>
+            </variable>
+            <variable name="x_arr_1" isArrayIndex="false">
+               <value name="x_arr_1 {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  <variable name="length" isArrayIndex="false">
+                     <value name="length {true}" typeString="int" valueString="length(int[]::select(heap,self,VariableArrayIndex::$array))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+               </value>
+            </variable>
+            <variable name="x" isArrayIndex="false">
+               <value name="x {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="self" isArrayIndex="false">
+               <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  <variable name="index" isArrayIndex="false">
+                     <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="array" isArrayIndex="false">
+                     <value name="array {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="length" isArrayIndex="false">
+                           <value name="length {true}" typeString="int" valueString="length(int[]::select(heap,self,VariableArrayIndex::$array))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+               </value>
+            </variable>
+            <variable name="exc" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <exceptionalMethodReturn name="&lt;throw java.lang.ArrayIndexOutOfBoundsException&gt;" signature="&lt;exceptional return of &lt;call self.magic()&gt;&gt;" pathCondition="imp(geq(length(int[]::select(heap,self,VariableArrayIndex::$array)),Z(0(#))),and(not(equals(int[]::select(heap,self,VariableArrayIndex::$array),null)),or(leq(int::select(heap,self,VariableArrayIndex::$index),Z(neglit(1(#)))),geq(int::select(heap,self,VariableArrayIndex::$index),length(int[]::select(heap,self,VariableArrayIndex::$array))))))" pathConditionChanged="false" methodReturnCondition="imp(geq(length(int[]::select(heap,self,VariableArrayIndex::$array)),Z(0(#))),and(not(equals(int[]::select(heap,self,VariableArrayIndex::$array),null)),or(leq(int::select(heap,self,VariableArrayIndex::$index),Z(neglit(1(#)))),geq(int::select(heap,self,VariableArrayIndex::$index),length(int[]::select(heap,self,VariableArrayIndex::$array))))))">
+               <variable name="self" isArrayIndex="false">
+                  <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="array" isArrayIndex="false">
+                        <value name="array {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="length" isArrayIndex="false">
+                              <value name="length {true}" typeString="int" valueString="length(int[]::select(heap,self,VariableArrayIndex::$array))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <variable name="index" isArrayIndex="false">
+                        <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="self" isArrayIndex="false">
+                  <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="index" isArrayIndex="false">
+                        <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="array" isArrayIndex="false">
+                        <value name="array {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="length" isArrayIndex="false">
+                              <value name="length {true}" typeString="int" valueString="length(int[]::select(heap,self,VariableArrayIndex::$array))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="a" isArrayIndex="false">
+                  <value name="a {true}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <variable name="message" isArrayIndex="false">
+                        <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="cause" isArrayIndex="false">
+                        <value name="cause {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <termination name="&lt;uncaught java.lang.ArrayIndexOutOfBoundsException&gt;" pathCondition="imp(geq(length(int[]::select(heap,self,VariableArrayIndex::$array)),Z(0(#))),and(not(equals(int[]::select(heap,self,VariableArrayIndex::$array),null)),or(leq(int::select(heap,self,VariableArrayIndex::$index),Z(neglit(1(#)))),geq(int::select(heap,self,VariableArrayIndex::$index),length(int[]::select(heap,self,VariableArrayIndex::$array))))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                  <variable name="self" isArrayIndex="false">
+                     <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="array" isArrayIndex="false">
+                           <value name="array {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {true}" typeString="int" valueString="length(int[]::select(heap,self,VariableArrayIndex::$array))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <variable name="index" isArrayIndex="false">
+                           <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="self" isArrayIndex="false">
+                     <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="index" isArrayIndex="false">
+                           <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="array" isArrayIndex="false">
+                           <value name="array {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="length" isArrayIndex="false">
+                                 <value name="length {true}" typeString="int" valueString="length(int[]::select(heap,self,VariableArrayIndex::$array))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <variable name="message" isArrayIndex="false">
+                           <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="cause" isArrayIndex="false">
+                           <value name="cause {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+               </termination>
+               <callStateVariable name="self" isArrayIndex="false">
+                  <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="array" isArrayIndex="false">
+                        <value name="array {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="length" isArrayIndex="false">
+                              <value name="length {true}" typeString="int" valueString="length(int[]::select(heap,self,VariableArrayIndex::$array))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <variable name="index" isArrayIndex="false">
+                        <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </callStateVariable>
+               <callStateVariable name="self" isArrayIndex="false">
+                  <value name="self {true}" typeString="VariableArrayIndex" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="index" isArrayIndex="false">
+                        <value name="index {true}" typeString="int" valueString="int::select(heap,self,VariableArrayIndex::$index)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="array" isArrayIndex="false">
+                        <value name="array {true}" typeString="int[]" valueString="int[]::select(heap,self,VariableArrayIndex::$array)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="length" isArrayIndex="false">
+                              <value name="length {true}" typeString="int" valueString="length(int[]::select(heap,self,VariableArrayIndex::$array))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                  </value>
+               </callStateVariable>
+               <callStateVariable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </callStateVariable>
+            </exceptionalMethodReturn>
+         </branchCondition>
       </statement>
-      <methodReturnEntry path="/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/1/0"/>
+      <methodReturnEntry path="/0/0/2/0"/>
    </methodCall>
-   <terminationEntry path="/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0"/>
+   <terminationEntry path="/0/0/2/0/0"/>
 </start>

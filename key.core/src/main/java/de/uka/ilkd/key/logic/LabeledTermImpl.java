@@ -3,12 +3,13 @@ package de.uka.ilkd.key.logic;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.key_project.util.EqualsModProofIrrelevancy;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.java.CollectionUtil;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+
+import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * The labeled term class is used for terms that have a label attached.

@@ -6,6 +6,9 @@
  */
 package recoder.java.declaration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.ModelException;
 import recoder.java.Identifier;
 import recoder.java.ProgramElement;
@@ -14,9 +17,6 @@ import recoder.java.declaration.modifier.Abstract;
 import recoder.java.declaration.modifier.Final;
 import recoder.list.generic.ASTList;
 import recoder.service.IllegalModifierException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Tobias Gutzmann
@@ -94,63 +94,77 @@ public class EnumDeclaration extends TypeDeclaration {
         // role 2: implements
         // role 3 (IDX): members
         int idx = declarationSpecifiers.indexOf(child);
-        if (idx != -1)
+        if (idx != -1) {
             return (idx << 4) | 0;
-        if (child == name)
+        }
+        if (child == name) {
             return 1;
-        if (child == implementing)
+        }
+        if (child == implementing) {
             return 2;
+        }
         idx = members.indexOf(child);
-        if (idx != -1)
+        if (idx != -1) {
             return (idx << 4) | 3;
+        }
         return -1;
     }
 
     public int getChildCount() {
         int res = 0;
-        if (declarationSpecifiers != null)
+        if (declarationSpecifiers != null) {
             res += declarationSpecifiers.size();
-        if (name != null)
+        }
+        if (name != null) {
             res++;
-        if (implementing != null)
+        }
+        if (implementing != null) {
             res++;
-        if (members != null)
+        }
+        if (members != null) {
             res += members.size();
+        }
         return res;
     }
 
     public ProgramElement getChildAt(int index) {
         if (declarationSpecifiers != null) {
-            if (index < declarationSpecifiers.size())
+            if (index < declarationSpecifiers.size()) {
                 return declarationSpecifiers.get(index);
+            }
             index -= declarationSpecifiers.size();
         }
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (implementing != null) {
-            if (index == 0)
+            if (index == 0) {
                 return implementing;
+            }
             index--;
         }
         return members.get(index);
     }
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null)
+        if (p == null) {
             throw new NullPointerException();
+        }
         if (name == p) {
             name = (Identifier) q;
-            if (name != null)
+            if (name != null) {
                 name.setParent(this);
+            }
             return true;
         }
         if (implementing == p) {
             implementing = (Implements) q;
-            if (implementing != null)
+            if (implementing != null) {
                 implementing.setParent(this);
+            }
             return true;
         }
         if (declarationSpecifiers != null) {
@@ -201,8 +215,7 @@ public class EnumDeclaration extends TypeDeclaration {
     @Override
     public boolean isFinal() {
         boolean res = true;
-        for (int i = 0; i < members.size(); i++) {
-            MemberDeclaration m = members.get(i);
+        for (MemberDeclaration m : members) {
             if (m instanceof EnumConstantDeclaration) {
                 if (((EnumConstantDeclaration) m).getEnumConstantSpecification()
                         .getConstructorReference().getClassDeclaration() != null) {
@@ -228,12 +241,14 @@ public class EnumDeclaration extends TypeDeclaration {
 
     @Override
     public void validate() throws ModelException {
-        if (containsModifier(Abstract.class))
+        if (containsModifier(Abstract.class)) {
             throw new IllegalModifierException(
                 "Illegal abstract modifier in EnumDeclaration " + getFullName());
-        if (containsModifier(Final.class))
+        }
+        if (containsModifier(Final.class)) {
             throw new IllegalModifierException(
                 "Illegal final modifier in EnumDeclaration " + getFullName());
+        }
         // TODO this appears wrong, check again:
         // if (getASTParent() instanceof TypeDeclaration &&
         // !((TypeDeclaration)getASTParent()).isStatic())
@@ -254,13 +269,14 @@ public class EnumDeclaration extends TypeDeclaration {
      * @return the enum constants
      */
     public List<EnumConstantDeclaration> getConstants() {
-        if (members == null)
-            return new ArrayList<EnumConstantDeclaration>(0);
-        List<EnumConstantDeclaration> result = new ArrayList<EnumConstantDeclaration>();
-        for (int i = 0; i < members.size(); i++) {
-            MemberDeclaration m = members.get(i);
-            if (m instanceof EnumConstantDeclaration)
+        if (members == null) {
+            return new ArrayList<>(0);
+        }
+        List<EnumConstantDeclaration> result = new ArrayList<>();
+        for (MemberDeclaration m : members) {
+            if (m instanceof EnumConstantDeclaration) {
                 result.add((EnumConstantDeclaration) m);
+            }
         }
         return result;
     }
@@ -272,13 +288,14 @@ public class EnumDeclaration extends TypeDeclaration {
      * @return a list of the members excluding constants
      */
     public List<MemberDeclaration> getNonConstantMembers() {
-        if (members == null)
-            return new ArrayList<MemberDeclaration>(0);
-        List<MemberDeclaration> result = new ArrayList<MemberDeclaration>();
-        for (int i = 0; i < members.size(); i++) {
-            MemberDeclaration m = members.get(i);
-            if (!(m instanceof EnumConstantDeclaration))
+        if (members == null) {
+            return new ArrayList<>(0);
+        }
+        List<MemberDeclaration> result = new ArrayList<>();
+        for (MemberDeclaration m : members) {
+            if (!(m instanceof EnumConstantDeclaration)) {
                 result.add(m);
+            }
         }
         return result;
     }

@@ -1,9 +1,31 @@
 package de.uka.ilkd.key.gui.sourceview;
 
+import java.awt.*;
+import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseMotionListener;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
+import javax.swing.text.Document;
+import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.HighlightPainter;
+import javax.swing.text.SimpleAttributeSet;
+
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.TaskTree;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
@@ -25,33 +47,13 @@ import de.uka.ilkd.key.proof.ProofJavaSourceCollection;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.Pair;
+
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.LineInformation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
-import javax.swing.text.Document;
-import javax.swing.text.Highlighter;
-import javax.swing.text.Highlighter.HighlightPainter;
-import javax.swing.text.SimpleAttributeSet;
-import java.awt.Dimension;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import java.awt.event.MouseMotionListener;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.*;
 
 /**
  * This class is responsible for showing the source code and visualizing the symbolic execution path
@@ -66,7 +68,7 @@ import java.util.*;
  * @author Wolfram Pfeifer, lanzinger
  */
 public final class SourceView extends JComponent {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TaskTree.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SourceView.class);
 
     private static final long serialVersionUID = -94424677425561025L;
 
@@ -531,7 +533,7 @@ public final class SourceView extends JComponent {
      *
      * @see NodeInfo#getRelevantFiles()
      */
-    private void addFiles() throws IOException {
+    private void addFiles() {
         ImmutableSet<URI> fileURIs = mainWindow.getMediator().getSelectedProof()
                 .lookup(ProofJavaSourceCollection.class).getRelevantFiles();
 
@@ -548,7 +550,11 @@ public final class SourceView extends JComponent {
         }
 
         for (URI fileURI : fileURIs) {
-            addFile(fileURI);
+            try {
+                addFile(fileURI);
+            } catch (IOException e) {
+                LOGGER.debug("Exception while adding file: ", e);
+            }
         }
     }
 
@@ -612,11 +618,7 @@ public final class SourceView extends JComponent {
                 return;
             }
 
-            try {
-                addFiles();
-            } catch (IOException e) {
-                LOGGER.debug("Caught exception!", e);
-            }
+            addFiles();
         }
 
         tabs.values().forEach(Tab::paintSymbExHighlights);
@@ -635,7 +637,7 @@ public final class SourceView extends JComponent {
                             tabPane.setSelectedIndex(i);
 
                             // scroll to most recent highlight
-                            int line = lines.getFirst().second.getEndPosition().getLine();
+                            int line = lines.getFirst().second.getEndPosition().line();
                             t.scrollToLine(line);
                         }
                     }
@@ -934,7 +936,7 @@ public final class SourceView extends JComponent {
 
         private String extractFileName(URI uri) {
             String s = uri.toString();
-            int index = s.lastIndexOf("/");
+            int index = s.lastIndexOf('/');
             if (index < 0) {
                 return s; // fallback: return whole URI
             } else {
@@ -944,7 +946,8 @@ public final class SourceView extends JComponent {
 
         private void initLineInfo() {
             try {
-                InputStream inStream = new ByteArrayInputStream(source.getBytes());
+                InputStream inStream =
+                    new ByteArrayInputStream(source.getBytes(StandardCharsets.UTF_8));
                 lineInformation = IOUtil.computeLineInformation(inStream);
             } catch (IOException e) {
                 LOGGER.debug("Error while computing line information from {}", absoluteFileName, e);
@@ -1105,7 +1108,7 @@ public final class SourceView extends JComponent {
                     Pair<Node, PositionInfo> l = lines.get(i);
 
                     if (absoluteFileName.equals(l.second.getURI())) {
-                        int line = l.second.getStartPosition().getLine();
+                        int line = l.second.getStartPosition().line();
 
                         // use a different color for most recent
                         if (i == 0) {
@@ -1366,7 +1369,7 @@ public final class SourceView extends JComponent {
                 // jump in proof tree (get corresponding node from list)
                 Node n = null;
                 for (Pair<Node, PositionInfo> p : lines) {
-                    if (p.second.getStartPosition().getLine() == line + 1
+                    if (p.second.getStartPosition().line() == line + 1
                             && p.second.getURI().equals(fileURI)) {
                         n = p.first;
                         break;

@@ -2,10 +2,12 @@
 
 package recoder.service;
 
+import java.util.*;
+
 import recoder.ServiceConfiguration;
 import recoder.TuningParameters;
-import recoder.abstraction.Package;
 import recoder.abstraction.*;
+import recoder.abstraction.Package;
 import recoder.convenience.Format;
 import recoder.convenience.TreeWalker;
 import recoder.io.SourceFileRepository;
@@ -18,8 +20,6 @@ import recoder.java.expression.operator.New;
 import recoder.java.reference.*;
 import recoder.util.Debug;
 import recoder.util.ProgressEvent;
-
-import java.util.*;
 
 /**
  * Implements queries for cross referencing.
@@ -35,7 +35,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
     // private final MutableMap/* <ProgramModelElement, Set <Reference>> */
     // element2references = new IdentityHashTable(256);
     private final Map<ProgramModelElement, Set<Reference>> element2references =
-        new HashMap<ProgramModelElement, Set<Reference>>(256);
+        new HashMap<>(256);
 
     /**
      * Creates a new service.
@@ -65,8 +65,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         listeners.fireProgressEvent(0, 3 * s, "Building Scopes");
 
         // detached first
-        for (int i = 0; i < s; i += 1) {
-            TreeChange tc = changed.get(i);
+        for (TreeChange tc : changed) {
             if (tc instanceof DetachChange) {
                 if (!tc.isMinor()) {
                     processChange(tc);
@@ -74,8 +73,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
                 listeners.fireProgressEvent(++c);
             }
         }
-        for (int i = 0; i < s; i += 1) {
-            TreeChange tc = changed.get(i);
+        for (TreeChange tc : changed) {
             if (tc instanceof AttachChange) {
                 if (!tc.isMinor()) {
                     processChange(tc);
@@ -89,8 +87,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         TreeWalker tw = new TreeWalker(null);
         // TreeChangeList changed = changes.getChanges();
         // int s = changed.size();
-        for (int i = 0; i < s; i += 1) {
-            TreeChange tc = changed.get(i);
+        for (TreeChange tc : changed) {
             if (tc instanceof DetachChange) {
                 if (!tc.isMinor()) {
                     ProgramElement pe = tc.getChangeRoot();
@@ -142,8 +139,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
                 listeners.fireProgressEvent(++c);
             }
         }
-        for (int i = 0; i < s; i += 1) {
-            TreeChange tc = changed.get(i);
+        for (TreeChange tc : changed) {
             if (tc instanceof AttachChange) {
                 if (!tc.isMinor()) {
                     ProgramElement pe = tc.getChangeRoot();
@@ -190,8 +186,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
                 listeners.fireProgressEvent(++c);
             }
         }
-        for (int i = 0; i < s; i += 1) {
-            TreeChange tc = changed.get(i);
+        for (TreeChange tc : changed) {
             if (!tc.isMinor() && (tc instanceof AttachChange)) {
                 AttachChange ac = (AttachChange) tc;
                 ProgramElement pe = ac.getChangeRoot();
@@ -225,13 +220,13 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         updateModel();
         Set references = element2references.get(m);
         if (references == null) {
-            return new ArrayList<MemberReference>(0);
+            return new ArrayList<>(0);
         }
         int s = references.size();
         if (s == 0) {
-            return new ArrayList<MemberReference>(0);
+            return new ArrayList<>(0);
         }
-        List<MemberReference> result = new ArrayList<MemberReference>(s);
+        List<MemberReference> result = new ArrayList<>(s);
         for (Object o : references) {
             result.add((MemberReference) o);
         }
@@ -250,13 +245,13 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         updateModel();
         Set<Reference> references = element2references.get(c);
         if (references == null) {
-            return new ArrayList<ConstructorReference>(0);
+            return new ArrayList<>(0);
         }
         int s = references.size();
         if (s == 0) {
-            return new ArrayList<ConstructorReference>(0);
+            return new ArrayList<>(0);
         }
-        List<ConstructorReference> result = new ArrayList<ConstructorReference>(s);
+        List<ConstructorReference> result = new ArrayList<>(s);
         for (Reference o : references) {
             result.add((ConstructorReference) o);
         }
@@ -275,13 +270,13 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         updateModel();
         Set references = element2references.get(v);
         if (references == null) {
-            return new ArrayList<VariableReference>(0);
+            return new ArrayList<>(0);
         }
         int s = references.size();
         if (s == 0) {
-            return new ArrayList<VariableReference>(0);
+            return new ArrayList<>(0);
         }
-        List<VariableReference> result = new ArrayList<VariableReference>(s);
+        List<VariableReference> result = new ArrayList<>(s);
         for (Object o : references) {
             result.add((VariableReference) o);
         }
@@ -300,13 +295,13 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         updateModel();
         Set references = element2references.get(f);
         if (references == null) {
-            return new ArrayList<FieldReference>(0);
+            return new ArrayList<>(0);
         }
         int s = references.size();
         if (s == 0) {
-            return new ArrayList<FieldReference>(0);
+            return new ArrayList<>(0);
         }
-        List<FieldReference> result = new ArrayList<FieldReference>(s);
+        List<FieldReference> result = new ArrayList<>(s);
         for (Object o : references) {
             result.add((FieldReference) o);
         }
@@ -325,13 +320,13 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         updateModel();
         Set<Reference> references = element2references.get(t);
         if (references == null) {
-            return new ArrayList<TypeReference>(0);
+            return new ArrayList<>(0);
         }
         int s = references.size();
         if (s == 0) {
-            return new ArrayList<TypeReference>(0);
+            return new ArrayList<>(0);
         }
-        List<TypeReference> result = new ArrayList<TypeReference>(s);
+        List<TypeReference> result = new ArrayList<>(s);
         for (Reference r : references) {
             result.add((TypeReference) r);
         }
@@ -350,13 +345,13 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         updateModel();
         Set<Reference> references = element2references.get(p);
         if (references == null) {
-            return new ArrayList<PackageReference>(0);
+            return new ArrayList<>(0);
         }
         int s = references.size();
         if (s == 0) {
-            return new ArrayList<PackageReference>(0);
+            return new ArrayList<>(0);
         }
-        List<PackageReference> result = new ArrayList<PackageReference>(s);
+        List<PackageReference> result = new ArrayList<>(s);
         for (Reference pr : references) {
             result.add((PackageReference) pr);
         }
@@ -364,11 +359,8 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
     }
 
     private void registerReference(Reference ref, ProgramModelElement pme) {
-        Set<Reference> set = element2references.get(pme);
-        if (set == null) {
-            element2references.put(pme, set = new HashSet<Reference>(
-                TuningParameters.INITIAL_CROSS_REFERENCER_ELEMENT2REFERENCE_HASH_SET_SIZE));
-        }
+        Set<Reference> set = element2references.computeIfAbsent(pme, k -> new HashSet<>(
+            TuningParameters.INITIAL_CROSS_REFERENCER_ELEMENT2REFERENCE_HASH_SET_SIZE));
         set.add(ref);
     }
 
@@ -381,7 +373,6 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         Set set = element2references.get(pme);
         if (set == null) {
             // ThisReference
-            return;
         } else {
             set.remove(ref);
         }
@@ -423,8 +414,9 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
             } else if (pe instanceof TypeReference) {
                 TypeReference tr = (TypeReference) pe;
                 Type t = getType(tr);
-                if (t instanceof ParameterizedType)
+                if (t instanceof ParameterizedType) {
                     t = ((ParameterizedType) t).getGenericType();
+                }
                 if (t != null) { // void type otherwise
                     if (!(t instanceof DefaultNameInfo.UnknownClassType)) {
                         registerReference(tr, t);
@@ -573,4 +565,3 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         }
     }
 }
-

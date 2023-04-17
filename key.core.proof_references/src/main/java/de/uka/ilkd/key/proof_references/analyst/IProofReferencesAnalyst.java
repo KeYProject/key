@@ -31,5 +31,5 @@ public interface IProofReferencesAnalyst {
      * @return The found {@link IProofReference} or {@code null}/empty set if the applied rule is
      *         not supported.
      */
-    public LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services);
+    LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services);
 }

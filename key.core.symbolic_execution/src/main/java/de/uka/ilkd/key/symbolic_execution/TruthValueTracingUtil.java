@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.java.ArrayUtil;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Name;
@@ -43,6 +40,9 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.java.ArrayUtil;
+
 /**
  * Provides functionality to evaluate the truth value of labeled formulas (predicates and junctors).
  *
@@ -62,7 +62,7 @@ public final class TruthValueTracingUtil {
      * @return {@code true} is predicate, {@code false} is something else.
      */
     public static boolean isPredicate(SequentFormula sequentFormula) {
-        return sequentFormula != null ? isPredicate(sequentFormula.formula()) : false;
+        return sequentFormula != null && isPredicate(sequentFormula.formula());
     }
 
     /**
@@ -72,7 +72,7 @@ public final class TruthValueTracingUtil {
      * @return {@code true} is predicate, {@code false} is something else.
      */
     public static boolean isPredicate(Term term) {
-        return term != null ? isPredicate(term.op()) : false;
+        return term != null && isPredicate(term.op());
     }
 
     /**
@@ -125,11 +125,8 @@ public final class TruthValueTracingUtil {
             return operator != Junctor.TRUE && operator != Junctor.FALSE;
         } else if (operator == Equality.EQV) {
             return true;
-        } else if (isIfThenElseFormula(operator, subs)) {
-            return true;
-        } else {
-            return false;
-        }
+        } else
+            return isIfThenElseFormula(operator, subs);
     }
 
     /**
@@ -180,8 +177,8 @@ public final class TruthValueTracingUtil {
             boolean useUnicode, boolean usePrettyPrinting) throws ProofInputException {
         TruthValueTracingResult result = new TruthValueTracingResult();
         Deque<Map<String, MultiEvaluationResult>> evaluationStack =
-            new LinkedList<Map<String, MultiEvaluationResult>>();
-        evaluationStack.addFirst(new HashMap<String, MultiEvaluationResult>());
+            new LinkedList<>();
+        evaluationStack.addFirst(new HashMap<>());
         Services services = node.proof().getServices();
         NodePreorderIterator iterator = new NodePreorderIterator(node);
         while (iterator.hasNext()) {
@@ -192,7 +189,7 @@ public final class TruthValueTracingUtil {
             // Create child result for current node
             final Map<String, MultiEvaluationResult> topResults = evaluationStack.getFirst();
             Map<String, MultiEvaluationResult> nodeResults =
-                new HashMap<String, MultiEvaluationResult>(topResults);
+                new HashMap<>(topResults);
             evaluationStack.addFirst(nodeResults);
             // Analyze node
             evaluateNode(node, useUnicode, usePrettyPrinting, next, childIndexOnParnt,
@@ -221,7 +218,8 @@ public final class TruthValueTracingUtil {
      * @param services The {@link Services} to use.
      * @throws ProofInputException Occurred exception.
      */
-    protected static void evaluateNode(final Node evaluationNode, final boolean useUnicode,
+    private static void evaluateNode(
+            final Node evaluationNode, final boolean useUnicode,
             final boolean usePrettyPrinting, final Node child, final int childIndexOnParent,
             final Name termLabelName, Map<String, MultiEvaluationResult> nodeResult,
             final TruthValueTracingResult result, final Services services)
@@ -235,7 +233,7 @@ public final class TruthValueTracingUtil {
                 List<LabelOccurrence> labels =
                     findInvolvedLabels(parent.sequent(), tacletApp, termLabelName);
                 if (!labels.isEmpty()) {
-                    Taclet taclet = ((TacletApp) tacletApp).taclet();
+                    Taclet taclet = tacletApp.taclet();
                     if (!isClosingRule(taclet)) { // Not a closing taclet
                         checkPerformed = true;
                         TacletGoalTemplate tacletGoal =
@@ -306,7 +304,7 @@ public final class TruthValueTracingUtil {
      * @param taclet The {@link Taclet} to check.
      * @return {@code true} is closing, {@code false} is not closing.
      */
-    protected static boolean isClosingRule(Taclet taclet) {
+    private static boolean isClosingRule(Taclet taclet) {
         return taclet.goalTemplates().isEmpty();
     }
 
@@ -318,9 +316,10 @@ public final class TruthValueTracingUtil {
      * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
      * @return The found {@link LabelOccurrence}s.
      */
-    protected static List<LabelOccurrence> findInvolvedLabels(Sequent sequent, TacletApp tacletApp,
+    private static List<LabelOccurrence> findInvolvedLabels(
+            Sequent sequent, TacletApp tacletApp,
             Name termLabelName) {
-        List<LabelOccurrence> result = new LinkedList<LabelOccurrence>();
+        List<LabelOccurrence> result = new LinkedList<>();
         // Search for labels in find part
         PosInOccurrence pio = tacletApp.posInOccurrence();
         if (pio != null) {
@@ -414,7 +413,8 @@ public final class TruthValueTracingUtil {
      * @param servies The {@link Services} to use.
      * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
-    protected static void analyzeTacletGoal(Node parent, TacletApp tacletApp,
+    private static void analyzeTacletGoal(
+            Node parent, TacletApp tacletApp,
             TacletGoalTemplate tacletGoal, List<LabelOccurrence> labels, Services services,
             Map<String, MultiEvaluationResult> results) {
         Object replaceObject = tacletGoal.replaceWithExpressionAsObject();
@@ -444,7 +444,8 @@ public final class TruthValueTracingUtil {
      * @param tb The {@link TermBuilder} to use.
      * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
-    protected static void updatePredicateResultBasedOnNewMinorIdsOSS(final PosInOccurrence childPio,
+    private static void updatePredicateResultBasedOnNewMinorIdsOSS(
+            final PosInOccurrence childPio,
             final PosInOccurrence parentPio, final Name termLabelName, final TermBuilder tb,
             final Map<String, MultiEvaluationResult> results) {
         if (parentPio != null) {
@@ -476,7 +477,8 @@ public final class TruthValueTracingUtil {
      * @param tb The {@link TermBuilder} to use.
      * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
-    protected static void checkForNewMinorIdsOSS(SequentFormula onlyChangedChildSF, Term term,
+    private static void checkForNewMinorIdsOSS(
+            SequentFormula onlyChangedChildSF, Term term,
             Name termLabelName, PosInOccurrence parentPio, TermBuilder tb,
             Map<String, MultiEvaluationResult> results) {
         TermLabel label = term.getLabel(termLabelName);
@@ -499,11 +501,12 @@ public final class TruthValueTracingUtil {
      * @param tb The {@link TermBuilder} to use.
      * @return The computed instruction {@link Term} or {@code null} if not available.
      */
-    protected static Term checkForNewMinorIdsOSS(SequentFormula onlyChangedChildSF,
+    private static Term checkForNewMinorIdsOSS(
+            SequentFormula onlyChangedChildSF,
             FormulaTermLabel label, boolean antecedentRuleApplication, TermBuilder tb) {
         // Search replacements
-        List<Term> antecedentReplacements = new LinkedList<Term>();
-        List<Term> succedentReplacements = new LinkedList<Term>();
+        List<Term> antecedentReplacements = new LinkedList<>();
+        List<Term> succedentReplacements = new LinkedList<>();
         if (antecedentRuleApplication) {
             listLabelReplacements(onlyChangedChildSF, label.name(), label.getId(),
                 antecedentReplacements);
@@ -524,7 +527,8 @@ public final class TruthValueTracingUtil {
      * @param tb The {@link TermBuilder} to use.
      * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
-    protected static void updatePredicateResultBasedOnNewMinorIds(final Node childNode,
+    private static void updatePredicateResultBasedOnNewMinorIds(
+            final Node childNode,
             final Name termLabelName, final TermBuilder tb,
             final Map<String, MultiEvaluationResult> results) {
         final Node parentNode = childNode.parent();
@@ -571,7 +575,8 @@ public final class TruthValueTracingUtil {
      * @param tb The {@link TermBuilder} to use.
      * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
-    protected static void checkForNewMinorIds(Node childNode, Term term, Name termLabelName,
+    private static void checkForNewMinorIds(
+            Node childNode, Term term, Name termLabelName,
             PosInOccurrence parentPio, TermBuilder tb, Map<String, MultiEvaluationResult> results) {
         TermLabel label = term.getLabel(termLabelName);
         if (label instanceof FormulaTermLabel) {
@@ -593,11 +598,12 @@ public final class TruthValueTracingUtil {
      * @param tb The {@link TermBuilder} to use.
      * @return The computed instruction {@link Term} or {@code null} if not available.
      */
-    protected static Term checkForNewMinorIds(Node childNode, FormulaTermLabel label,
+    private static Term checkForNewMinorIds(
+            Node childNode, FormulaTermLabel label,
             boolean antecedentRuleApplication, TermBuilder tb) {
         // Search replacements
-        List<Term> antecedentReplacements = new LinkedList<Term>();
-        List<Term> succedentReplacements = new LinkedList<Term>();
+        List<Term> antecedentReplacements = new LinkedList<>();
+        List<Term> succedentReplacements = new LinkedList<>();
         for (SequentFormula sf : childNode.sequent().antecedent()) {
             listLabelReplacements(sf, label.name(), label.getId(), antecedentReplacements);
         }
@@ -617,7 +623,8 @@ public final class TruthValueTracingUtil {
      * @param labelId The label ID of interest.
      * @param resultToFill The result {@link List} to fill.
      */
-    protected static void listLabelReplacements(final SequentFormula sf, final Name labelName,
+    private static void listLabelReplacements(
+            final SequentFormula sf, final Name labelName,
             final String labelId, final List<Term> resultToFill) {
         sf.formula().execPreOrder(new DefaultVisitor() {
             @Override
@@ -632,7 +639,7 @@ public final class TruthValueTracingUtil {
                 }
             }
 
-            protected boolean hasLabelOfInterest(Term visited) {
+            private boolean hasLabelOfInterest(Term visited) {
                 TermLabel visitedLabel = visited.getLabel(labelName);
                 if (visitedLabel instanceof FormulaTermLabel) {
                     FormulaTermLabel pLabel = (FormulaTermLabel) visitedLabel;
@@ -656,7 +663,8 @@ public final class TruthValueTracingUtil {
      * @param tb The {@link TermBuilder} to use.
      * @return The computed instruction {@link Term} or {@code null} if not available.
      */
-    protected static Term computeInstructionTerm(List<Term> antecedentReplacements,
+    private static Term computeInstructionTerm(
+            List<Term> antecedentReplacements,
             List<Term> succedentReplacements, boolean antecedentRuleApplication, TermBuilder tb) {
         if (!antecedentReplacements.isEmpty() || !succedentReplacements.isEmpty()) {
             Term left = tb.andPreserveLabels(antecedentReplacements);
@@ -679,7 +687,8 @@ public final class TruthValueTracingUtil {
      * @param instructionTerm The new instruction {@link Term} to set.
      * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
-    protected static void updatePredicateResult(FormulaTermLabel label, Term instructionTerm,
+    private static void updatePredicateResult(
+            FormulaTermLabel label, Term instructionTerm,
             Map<String, MultiEvaluationResult> results) {
         MultiEvaluationResult result = results.get(label.getId());
         if (result == null) {
@@ -699,7 +708,8 @@ public final class TruthValueTracingUtil {
      *        label evaluates at least once to false.
      * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
-    protected static void updatePredicateResult(FormulaTermLabel label, boolean evaluationResult,
+    private static void updatePredicateResult(
+            FormulaTermLabel label, boolean evaluationResult,
             Map<String, MultiEvaluationResult> results) {
         MultiEvaluationResult result = results.get(label.getId());
         if (result == null) {
@@ -1004,7 +1014,7 @@ public final class TruthValueTracingUtil {
         /**
          * The {@link BranchResult}s.
          */
-        private final List<BranchResult> branchResults = new LinkedList<BranchResult>();
+        private final List<BranchResult> branchResults = new LinkedList<>();
 
         /**
          * Adds a {@link BranchResult}.
@@ -1031,7 +1041,7 @@ public final class TruthValueTracingUtil {
          */
         @Override
         public String toString() {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             boolean afterFirst = false;
             for (BranchResult result : branchResults) {
                 if (afterFirst) {
@@ -1202,7 +1212,7 @@ public final class TruthValueTracingUtil {
          */
         @Override
         public String toString() {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append("Goal ");
             sb.append(leafNode.serialNr());
             sb.append("\n");
@@ -1228,7 +1238,7 @@ public final class TruthValueTracingUtil {
          * @return The pretty printed {@link String}.
          */
         public String toPrettyString() {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append("Goal ");
             sb.append(leafNode.serialNr());
             sb.append("\n");
@@ -1269,7 +1279,7 @@ public final class TruthValueTracingUtil {
      *
      * @author Martin Hentschel
      */
-    public static enum TruthValue {
+    public enum TruthValue {
         /**
          * True.
          */

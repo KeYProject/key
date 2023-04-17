@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.proof.io;
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import javax.annotation.Nonnull;
-
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Objects;
+import javax.annotation.Nonnull;
+
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 
 public class FileRuleSource extends RuleSource {
 
@@ -16,7 +16,7 @@ public class FileRuleSource extends RuleSource {
      */
     protected @Nonnull final File ruleFile;
 
-    private long numberOfChars;
+    private final long numberOfChars;
 
     FileRuleSource(File ruleFile) {
         this.ruleFile = Objects.requireNonNull(ruleFile);

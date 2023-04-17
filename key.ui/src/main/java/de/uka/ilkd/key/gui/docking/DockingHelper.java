@@ -3,12 +3,20 @@ package de.uka.ilkd.key.gui.docking;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
-
+import javax.annotation.Nonnull;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 
-import javax.annotation.Nonnull;
+import de.uka.ilkd.key.gui.GoalList;
+import de.uka.ilkd.key.gui.InfoView;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.StrategySelectionView;
+import de.uka.ilkd.key.gui.TaskTree;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import de.uka.ilkd.key.gui.nodeviews.MainFrame;
+import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
+import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
@@ -20,15 +28,6 @@ import bibliothek.gui.dock.common.action.CCheckBox;
 import bibliothek.gui.dock.common.action.core.CommonDecoratableDockAction;
 import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.intern.action.CDecorateableAction;
-import de.uka.ilkd.key.gui.GoalList;
-import de.uka.ilkd.key.gui.InfoView;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.StrategySelectionView;
-import de.uka.ilkd.key.gui.TaskTree;
-import de.uka.ilkd.key.gui.extension.api.TabPanel;
-import de.uka.ilkd.key.gui.nodeviews.MainFrame;
-import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
-import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 
 public class DockingHelper {
     public final static List<String> LEFT_TOP_PANEL = new LinkedList<>();

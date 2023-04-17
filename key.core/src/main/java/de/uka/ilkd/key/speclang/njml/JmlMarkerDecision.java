@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.speclang.njml;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 
 /**
  * Externalize algorithm to decide whether a JML comment is active given a set of enabled keys.
@@ -88,8 +88,9 @@ public class JmlMarkerDecision {
 
         try {
             // matching the expected start of the comment
-            if (consume(expectedCommentStart))
+            if (consume(expectedCommentStart)) {
                 return false;
+            }
 
             // consume until '@' is hit, or else it is not a JML comment
             StringBuilder markerBuilder = new StringBuilder();

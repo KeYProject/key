@@ -3,8 +3,6 @@ package de.uka.ilkd.key.strategy.feature;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -13,6 +11,8 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -26,8 +26,9 @@ public class RuleSetDispatchFeature implements Feature {
     private final Map<RuleSet, Feature> rulesetToFeature = new LinkedHashMap<>();
 
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-        if (!(app instanceof TacletApp))
+        if (!(app instanceof TacletApp)) {
             return NumberRuleAppCost.getZeroCost();
+        }
 
         RuleAppCost res = NumberRuleAppCost.getZeroCost();
         ImmutableList<RuleSet> ruleSetsOfAppliedTaclet = ((TacletApp) app).taclet().getRuleSets();
@@ -57,10 +58,11 @@ public class RuleSetDispatchFeature implements Feature {
      */
     public void add(RuleSet ruleSet, Feature f) {
         Feature combinedF = rulesetToFeature.get(ruleSet);
-        if (combinedF == null)
+        if (combinedF == null) {
             combinedF = f;
-        else
+        } else {
             combinedF = SumFeature.createSum(combinedF, f);
+        }
 
         rulesetToFeature.put(ruleSet, combinedF);
     }

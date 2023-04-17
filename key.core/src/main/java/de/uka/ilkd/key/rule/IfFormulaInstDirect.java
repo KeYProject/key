@@ -14,7 +14,7 @@ public class IfFormulaInstDirect implements IfFormulaInstantiation {
     /**
      * Simply the formula
      */
-    private SequentFormula cf;
+    private final SequentFormula cf;
 
     public IfFormulaInstDirect(SequentFormula p_cf) {
         cf = p_cf;

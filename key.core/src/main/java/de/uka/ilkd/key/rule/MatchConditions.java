@@ -1,11 +1,12 @@
 package de.uka.ilkd.key.rule;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import org.key_project.util.EqualsModProofIrrelevancy;
 
-import java.util.Objects;
+import org.key_project.util.EqualsModProofIrrelevancy;
 
 
 /**
@@ -36,10 +37,11 @@ public class MatchConditions implements EqualsModProofIrrelevancy {
     }
 
     public MatchConditions setInstantiations(SVInstantiations p_instantiations) {
-        if (instantiations == p_instantiations)
+        if (instantiations == p_instantiations) {
             return this;
-        else
+        } else {
             return new MatchConditions(p_instantiations, renameTable);
+        }
     }
 
     public MatchConditions extendRenameTable() {

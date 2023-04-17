@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.proof.proverules;
 
+import java.io.File;
+import java.util.*;
+import java.util.stream.Stream;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
@@ -12,14 +16,12 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.helper.FindResources;
+
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestFactory;
-import org.key_project.util.helper.FindResources;
-
-import java.io.File;
-import java.util.*;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;

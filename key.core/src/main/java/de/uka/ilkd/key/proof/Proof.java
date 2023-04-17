@@ -1,27 +1,17 @@
 package de.uka.ilkd.key.proof;
 
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
-
-import javax.swing.SwingUtilities;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import javax.swing.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -40,10 +30,12 @@ import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.lookup.Lookup;
 
 
@@ -106,19 +98,19 @@ public class Proof implements Named {
      * when different users load and save a proof this vector fills up with Strings containing the
      * usernames.
      */
-    public Vector<String> userLog;
+    public List<String> userLog;
 
     /**
      * when load and save a proof with different versions of key this vector fills up with Strings
      * containing the GIT versions.
      */
-    public Vector<String> keyVersionLog;
+    public List<String> keyVersionLog;
 
     private long autoModeTime = 0;
 
     private Strategy activeStrategy;
 
-    private SettingsListener settingsListener;
+    private PropertyChangeListener settingsListener;
 
     /**
      * Set to true if the proof has been abandoned and the dispose method has been called on this
@@ -165,7 +157,7 @@ public class Proof implements Named {
 
         localMgt = new ProofCorrectnessMgt(this);
 
-        initConfig.getSettings().getStrategySettings().addSettingsListener(settingsListener);
+        initConfig.getSettings().getStrategySettings().addPropertyChangeListener(settingsListener);
 
         pis = ProofIndependentSettings.DEFAULT_INSTANCE;
     }
@@ -269,7 +261,8 @@ public class Proof implements Named {
                                             // contained in a static List
         }
         // remove setting listener from settings
-        initConfig.getSettings().getStrategySettings().removeSettingsListener(settingsListener);
+        initConfig.getSettings().getStrategySettings()
+                .removePropertyChangeListener(settingsListener);
         // set every reference (except the name) to null
         root = null;
         env = null;
@@ -283,8 +276,6 @@ public class Proof implements Named {
         keyVersionLog = null;
         activeStrategy = null;
         settingsListener = null;
-        ruleAppListenerList.clear();
-        listenerList.clear();
         disposed = true;
         userData = null;
         fireProofDisposed(new ProofDisposedEvent(this));
@@ -894,11 +885,13 @@ public class Proof implements Named {
         queue.add(root);
         while (!queue.isEmpty()) {
             Node cur = queue.poll();
-            if (pred.test(cur))
+            if (pred.test(cur)) {
                 return cur;
+            }
             Iterator<Node> iter = cur.childrenIterator();
-            while (iter.hasNext())
+            while (iter.hasNext()) {
                 queue.add(iter.next());
+            }
         }
         return null;
     }
@@ -1283,7 +1276,7 @@ public class Proof implements Named {
      */
     public ProofDisposedListener[] getProofDisposedListeners() {
         return proofDisposedListener
-                .toArray(new ProofDisposedListener[proofDisposedListener.size()]);
+                .toArray(new ProofDisposedListener[0]);
     }
 
     /**
@@ -1416,8 +1409,9 @@ public class Proof implements Named {
      * @return the associated lookup
      */
     public @Nonnull Lookup getUserData() {
-        if (userData == null)
+        if (userData == null) {
             userData = new Lookup();
+        }
         return userData;
     }
 }

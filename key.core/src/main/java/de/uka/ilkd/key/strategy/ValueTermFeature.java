@@ -2,8 +2,9 @@ package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
-import static de.uka.ilkd.key.strategy.StaticFeatureCollection.op;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+
+import static de.uka.ilkd.key.strategy.StaticFeatureCollection.op;
 
 class ValueTermFeature {
 

@@ -127,7 +127,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      */
     @Override
     public String getName() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (isArrayRange()) {
             sb.append("[");
             if (getArrayStartIndex() != null) {

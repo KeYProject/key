@@ -33,11 +33,11 @@ public interface ProgressMonitor {
      * A progress monitor that does nothing. This is a singleton, use
      * {@link ProgressMonitor.Empty#getInstance} to get one.
      */
-    public static class Empty implements ProgressMonitor {
+    class Empty implements ProgressMonitor {
 
         private Empty() {}
 
-        private static Empty INSTANCE = new Empty();
+        private static final Empty INSTANCE = new Empty();
 
         /** Return a do-nothing progress monitor. */
         public static Empty getInstance() {

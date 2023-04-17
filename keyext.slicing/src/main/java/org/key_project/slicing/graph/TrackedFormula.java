@@ -1,12 +1,13 @@
 package org.key_project.slicing.graph;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.BranchLocation;
-import org.key_project.util.EqualsModProofIrrelevancy;
 
-import java.util.Objects;
+import org.key_project.util.EqualsModProofIrrelevancy;
 
 /**
  * A sequent formula tracked by the dependency graph.

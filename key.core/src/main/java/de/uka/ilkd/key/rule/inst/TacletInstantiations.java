@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.rule.inst;
 
 
-import org.key_project.util.collection.ImmutableMap;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
+
+import org.key_project.util.collection.ImmutableMap;
 
 /**
  * this class contains a Taclet together with its suggested instantiations.
@@ -13,9 +13,9 @@ import de.uka.ilkd.key.rule.Taclet;
 public class TacletInstantiations {
 
     /** the rule */
-    private Taclet rule;
+    private final Taclet rule;
     /** the instantations */
-    private ImmutableMap<SchemaVariable, Term> instantiations;
+    private final ImmutableMap<SchemaVariable, Term> instantiations;
 
     public TacletInstantiations(Taclet rule, ImmutableMap<SchemaVariable, Term> instantiations) {
         this.rule = rule;

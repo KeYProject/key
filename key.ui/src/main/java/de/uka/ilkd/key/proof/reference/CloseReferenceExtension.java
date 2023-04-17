@@ -9,8 +9,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
-import de.uka.ilkd.key.proof.reference.ClosedBy;
-import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
+
 import org.key_project.util.collection.ImmutableList;
 
 @KeYGuiExtension.Info(name = "Proof Caching", optional = true,

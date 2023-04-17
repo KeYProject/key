@@ -1,9 +1,9 @@
 package org.key_project.util;
 
+import java.util.Objects;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-
-import java.util.Objects;
 
 /**
  * Utility methods for the {@link EqualsModProofIrrelevancy} interface.

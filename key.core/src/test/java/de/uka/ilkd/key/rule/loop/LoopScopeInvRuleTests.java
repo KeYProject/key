@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.rule.loop;
 
+import java.io.File;
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
-import java.util.Objects;
 
 /**
  * Test cases for the {@link LoopScopeInvariantRule}. Should shine a light on more subtle and exotic

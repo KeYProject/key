@@ -107,7 +107,7 @@
   * /*@ model_behavior         accessible<heapAtPre> \
   * /*@ model_behavior         requires \old(lockRef()
   * /*@model @*/
-(60/61) -- de.uka.ilkd.key.java.recoderext.JMLTransformer$1
+(61/61) -- de.uka.ilkd.key.java.recoderext.JMLTransformer$1
   * //@ public instance ghost LockSpec spec;
   * /*@ normal_behavior         requires spec.lockStat
   * /*@instance ghost @*/
@@ -232,7 +232,7 @@
   * /*@ model boolean lockStatus(boolean locked) { ret
   * /*@ normal_behavior          requires lockStatus(\
   * /*@model @*/
-(-1/82) -- recoder.java.reference.TypeReference
+(82/82) -- recoder.java.reference.TypeReference
   * /*@ non_null @*/
 (104/108) -- recoder.java.declaration.MethodDeclaration
   * //@ invariant this.lock != \dl_currentThread() &&

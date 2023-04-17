@@ -1,14 +1,14 @@
 package de.uka.ilkd.key.proof.reference;
 
+import java.util.Optional;
+import javax.swing.*;
+
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-
-import javax.swing.*;
-import java.util.Optional;
 
 public class ReferenceSearcher {
     private ReferenceSearcher() {

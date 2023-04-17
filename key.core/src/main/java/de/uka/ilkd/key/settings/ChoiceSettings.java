@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.settings;
 
-import java.util.EventObject;
+import java.beans.PropertyChangeListener;
+import java.util.*;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -11,20 +11,26 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import javax.annotation.Nonnull;
+
+import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
+/**
+ *
+ */
+public class ChoiceSettings extends AbstractSettings {
 
-public class ChoiceSettings implements Settings, Cloneable {
-
-    private static final String DEFAULTCHOICES_KEY = "[Choice]DefaultChoices";
-    private final LinkedList<SettingsListener> listenerList = new LinkedList<>();
+    private static final String KEY_DEFAULT_CHOICES = "[Choice]DefaultChoices";
+    private final LinkedList<PropertyChangeListener> listenerList = new LinkedList<>();
+    private static final String PROP_CHOICE_DEFAULT = "category2Default";
+    private static final String PROP_CHOICE_CATEGORIES = "category2Choices";
     private HashMap<String, String> category2Default;
 
 
@@ -32,7 +38,7 @@ public class ChoiceSettings implements Settings, Cloneable {
      * maps categories to a set of Strings(representing the choices which are options for this
      * category).
      */
-    private HashMap<String, Set<String>> category2Choices = new LinkedHashMap<>();
+    private Map<String, Set<String>> category2Choices = new LinkedHashMap<>();
 
 
     public ChoiceSettings() {
@@ -40,49 +46,47 @@ public class ChoiceSettings implements Settings, Cloneable {
     }
 
 
-    public ChoiceSettings(HashMap<String, String> category2Default) {
-        this.category2Default = category2Default;
+    public ChoiceSettings(Map<String, String> category2Default) {
+        this.category2Default = new HashMap<>(category2Default);
     }
 
 
-    public void setDefaultChoices(HashMap<String, String> category2Default) {
-        HashMap<String, String> category2Defaultold = this.category2Default;
-        this.category2Default = category2Default;
-        if (category2Defaultold != null && !category2Defaultold.equals(category2Default)) {
-            fireSettingsChanged();
-        }
+    public void setDefaultChoices(Map<String, String> category2Default) {
+        var old = this.category2Default;
+        this.category2Default = new HashMap<>(category2Default);
+        firePropertyChange(PROP_CHOICE_DEFAULT, old, this.category2Default);
     }
 
 
     /**
-     * returns a copy of the HashMap that maps categories to their choices.
+     * returns a copy of the HashMap that maps categories to
+     * their choices.
      */
-    @SuppressWarnings("unchecked")
-    public HashMap<String, Set<String>> getChoices() {
-        return (HashMap<String, Set<String>>) category2Choices.clone();
+    public Map<String, Set<String>> getChoices() {
+        return Collections.unmodifiableMap(category2Choices);
     }
 
-
     /**
-     * returns a copy of the HashMap that maps categories to their currently selected choices.
-     *
+     * Returns an immutable view of the current mapping between category and default choices.
+     * <p>
      * The method name is somewhat misleading.
      */
-    @SuppressWarnings("unchecked")
-    public HashMap<String, String> getDefaultChoices() {
-        return (HashMap<String, String>) category2Default.clone();
+    @Nonnull
+    public Map<String, String> getDefaultChoices() {
+        return Collections.unmodifiableMap(category2Default);
     }
 
 
     /**
-     * returns the current selected choices as set
+     * returns the current selected choices as an immutable set
      */
+    @Nonnull
     public ImmutableSet<Choice> getDefaultChoicesAsSet() {
         return choiceMap2choiceSet(category2Default);
     }
 
 
-    private static ImmutableSet<Choice> choiceMap2choiceSet(HashMap<String, String> ccc) {
+    private static ImmutableSet<Choice> choiceMap2choiceSet(Map<String, String> ccc) {
         ImmutableList<Choice> choices = ImmutableSLList.nil();
         for (final Map.Entry<String, String> entry : ccc.entrySet()) {
             choices = choices.prepend(new Choice(new Name(entry.getValue()), entry.getKey()));
@@ -90,6 +94,11 @@ public class ChoiceSettings implements Settings, Cloneable {
         return DefaultImmutableSet.fromImmutableList(choices);
     }
 
+    private void setChoiceCategories(HashMap<String, Set<String>> c2C) {
+        var old = category2Choices;
+        this.category2Choices = new HashMap<>(c2C);
+        firePropertyChange(PROP_CHOICE_CATEGORIES, old, category2Choices);
+    }
 
     /**
      * updates <code>category2Choices</code> if new entries are found in <code>choiceNS</code> or if
@@ -98,64 +107,46 @@ public class ChoiceSettings implements Settings, Cloneable {
      * @param remove remove entries not present in <code>choiceNS</code>
      */
     public void updateChoices(Namespace<Choice> choiceNS, boolean remove) {
-        Iterator<Choice> it = choiceNS.allElements().iterator();
-        HashMap<String, Set<String>> c2C = new LinkedHashMap<String, Set<String>>();
-        Choice c;
-        Set<String> soc;
-        while (it.hasNext()) {
-            c = (Choice) it.next();
-            if (c2C.containsKey(c.category())) {
-                soc = c2C.get(c.category());
-                soc.add(c.name().toString());
-                c2C.put(c.category(), soc);
-            } else {
-                soc = new LinkedHashSet<String>();
-                soc.add(c.name().toString());
-                c2C.put(c.category(), soc);
-            }
+        // Translate the given namespace into a map of 'string -> list[string]'
+        HashMap<String, Set<String>> c2C = new LinkedHashMap<>();
+        for (Choice c : choiceNS.allElements()) {
+            Set<String> soc = c2C.computeIfAbsent(c.category(), k -> new LinkedHashSet<>());
+            soc.add(c.name().toString());
         }
+
+        // if there differences in the stored defaults, changed it accordingly
         if (!c2C.equals(category2Choices)) {
-            if (remove) {
-                category2Choices = c2C;
-                fireSettingsChanged();
+            var tmp = new HashMap<>(category2Choices);
+            if (!remove) {
+                tmp.putAll(c2C);
+                setChoiceCategories(tmp);
             } else {
-                category2Choices.putAll(c2C);
-                ProofSettings.DEFAULT_SETTINGS.saveSettings();
+                setChoiceCategories(c2C);
             }
         }
-        for (final String s : getDefaultChoices().keySet()) {
+
+        var defaultTmp = new HashMap<>(category2Default);
+        for (var pair : category2Default.entrySet()) {
+            var s = pair.getKey();
+            var v = pair.getValue();
+            // if key is known then the default value should exist
             if (category2Choices.containsKey(s)) {
-                if (!category2Choices.get(s).contains(category2Default.get(s))) {
-                    category2Default.put(s, category2Choices.get(s).iterator().next());
-                    fireSettingsChanged();
+                if (!category2Choices.get(s).contains(v)) {
+                    defaultTmp.put(s, category2Choices.get(s).iterator().next());
                 }
             } else {
-                category2Default.remove(s);
-                fireSettingsChanged();
+                defaultTmp.remove(s);
             }
         }
+        setDefaultChoices(defaultTmp);
     }
-
-
-    /**
-     * sends the message that the state of this setting has been changed to its registered listeners
-     * (not thread-safe)
-     */
-    protected void fireSettingsChanged() {
-        Iterator<SettingsListener> it = listenerList.iterator();
-        ProofSettings.DEFAULT_SETTINGS.saveSettings();
-        while (it.hasNext()) {
-            it.next().settingsChanged(new EventObject(this));
-        }
-    }
-
 
     /**
      * gets a Properties object and has to perform the necessary steps in order to change this
      * object in a way that it represents the stored settings
      */
     public void readSettings(Properties props) {
-        String choiceSequence = props.getProperty(DEFAULTCHOICES_KEY);
+        String choiceSequence = props.getProperty(KEY_DEFAULT_CHOICES);
         // set choices
         if (choiceSequence != null) {
             StringTokenizer st = new StringTokenizer(choiceSequence, ",");
@@ -172,20 +163,24 @@ public class ChoiceSettings implements Settings, Cloneable {
 
     /**
      * implements the method required by the Settings interface. The settings are written to the
-     * given Properties object. Only entries of the form &lt; key &gt; = &lt; value &gt; (,&lt;
+     * given Properties object. Only entries of
+     * the form &lt; key &gt; = &lt; value &gt; (,&lt;
      * value &gt;)* are allowed.
      *
-     * @param props the Properties object where to write the settings as (key, value) pair
+     ** @param props the Properties object where to write the
+     *        settings as (key, value) pair
      */
+    @Override
     public void writeSettings(Properties props) {
-        String choiceSequence = "";
-        for (final Map.Entry<String, String> entry : category2Default.entrySet()) {
+        StringBuilder choiceSequence = new StringBuilder();
+        var keys = category2Default.keySet().stream().sorted().toArray(String[]::new);
+        for (var key : keys) {
             if (choiceSequence.length() > 0) {
-                choiceSequence += " , ";
+                choiceSequence.append(", ");
             }
-            choiceSequence += entry.getKey() + "-" + entry.getValue();
+            choiceSequence.append(key).append("-").append(category2Default.get(key));
         }
-        props.setProperty(DEFAULTCHOICES_KEY, choiceSequence);
+        props.setProperty(KEY_DEFAULT_CHOICES, choiceSequence.toString());
     }
 
 
@@ -194,21 +189,6 @@ public class ChoiceSettings implements Settings, Cloneable {
             category2Default.put(c.category(), c.name().toString());
         }
         return this;
-    }
-
-
-    /**
-     * adds a listener to the settings object
-     *
-     * @param l the listener
-     */
-    public void addSettingsListener(SettingsListener l) {
-        listenerList.add(l);
-    }
-
-    @Override
-    public void removeSettingsListener(SettingsListener l) {
-        listenerList.remove(l);
     }
 
     @Override

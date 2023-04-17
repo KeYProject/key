@@ -2,9 +2,9 @@
 
 package recoder.java;
 
-import recoder.ProgramFactory;
-
 import java.io.Serializable;
+
+import recoder.ProgramFactory;
 
 /**
  * Top level implementation of a Java {@link SourceElement}. This class already knows its
@@ -19,7 +19,7 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
      * The JavaProgramFactory.
      */
 
-    protected static JavaProgramFactory factory = JavaProgramFactory.getInstance();
+    protected static final JavaProgramFactory factory = JavaProgramFactory.getInstance();
 
     /**
      * Position bit encoding. Internal format is start line: 16 | start column: 8 | end line: 16 |
@@ -191,5 +191,9 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
 
     public String toSource() {
         return factory.toSource(this);
+    }
+
+    public String toString() {
+        return getClass().getName() + "@" + getStartPosition();
     }
 }

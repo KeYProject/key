@@ -5,17 +5,15 @@
 
 package de.uka.ilkd.key.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.*;
 import java.net.URL;
 import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * KeYResourceManager controls the access to the properties and resources used in the KeY system.
@@ -26,7 +24,7 @@ public class KeYResourceManager {
 
     private static final String DEFAULT_VERSION = "x.z.y";
     private static final Set<String> INVISIBLE_BRANCHES =
-        Collections.unmodifiableSet(new HashSet<>(Collections.singletonList("master")));
+        Set.copyOf(Collections.singletonList("master"));
 
     /**
      * the unique instance
@@ -170,11 +168,11 @@ public class KeYResourceManager {
 
 
                 long actualTransferredByte;
-                try (final ReadableByteChannel sourceStream =
+                try (ReadableByteChannel sourceStream =
                     Channels.newChannel(resourceURL.openStream());
-                        FileChannel targetStream = new FileOutputStream(targetFile).getChannel()) {
+                        FileOutputStream out = new FileOutputStream(targetFile)) {
                     actualTransferredByte =
-                        targetStream.transferFrom(sourceStream, 0, Long.MAX_VALUE);
+                        out.getChannel().transferFrom(sourceStream, 0, Long.MAX_VALUE);
                 }
                 if (actualTransferredByte < 0 || actualTransferredByte == Long.MAX_VALUE) {
                     throw new RuntimeException("File " + resourcename + " too big.");

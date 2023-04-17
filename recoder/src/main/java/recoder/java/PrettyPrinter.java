@@ -2,6 +2,13 @@
 
 package recoder.java;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
+
 import recoder.io.PropertyNames;
 import recoder.java.SourceElement.Position;
 import recoder.java.declaration.*;
@@ -12,12 +19,6 @@ import recoder.java.expression.operator.*;
 import recoder.java.reference.*;
 import recoder.java.statement.*;
 import recoder.util.StringUtils;
-
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 
 /**
  * A configurable pretty printer for Java source elements. The settings of the pretty printer is
@@ -33,12 +34,8 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
     private static final char[] FEEDS = new char[8];
 
     static {
-        for (int i = 0; i < FEEDS.length; i++) {
-            FEEDS[i] = '\n';
-        }
-        for (int i = 0; i < BLANKS.length; i++) {
-            BLANKS[i] = ' ';
-        }
+        Arrays.fill(FEEDS, '\n');
+        Arrays.fill(BLANKS, ' ');
     }
 
     /**
@@ -49,7 +46,7 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
      * Worklist of single line comments that must be delayed till the next linefeed.
      */
     private final List<SingleLineComment> singleLineCommentWorkList =
-        new ArrayList<SingleLineComment>();
+        new ArrayList<>();
     /**
      * Shared and reused position object.
      */
@@ -111,7 +108,7 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
      */
     protected static String encodeUnicodeChars(String str) {
         int len = str.length();
-        StringBuffer buf = new StringBuffer(len + 4);
+        StringBuilder buf = new StringBuilder(len + 4);
         for (int i = 0; i < len; i += 1) {
             char c = str.charAt(i);
             if (c >= 0x0100) {
@@ -231,8 +228,9 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
     protected Position setElementIndentation(int minlf, int minblanks, SourceElement element) {
         Position indent = element.getRelativePosition();
         if (hasJustPrintedComment && element.getStartPosition() == SourceElement.Position.UNDEFINED
-                && element.getEndPosition() == SourceElement.Position.UNDEFINED)
+                && element.getEndPosition() == SourceElement.Position.UNDEFINED) {
             minlf = Math.max(1, minlf);
+        }
         hasJustPrintedComment = false; // Not sure if necessary, but can't hurt
         if (indent == Position.UNDEFINED) {
             if (minlf > 0) {
@@ -393,8 +391,8 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         int size = singleLineCommentWorkList.size();
         if (size > 0) {
             isPrintingSingleLineComments = true;
-            for (int i = 0; i < size; i++) {
-                singleLineCommentWorkList.get(i).accept(this);
+            for (SingleLineComment singleLineComment : singleLineCommentWorkList) {
+                singleLineComment.accept(this);
             }
             singleLineCommentWorkList.clear();
             isPrintingSingleLineComments = false;
@@ -564,8 +562,9 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
     }
 
     private SourceElement findFirstElementInclComment(SourceElement x) {
-        if (!(x instanceof ProgramElement))
+        if (!(x instanceof ProgramElement)) {
             return x.getFirstElement();
+        }
         List<Comment> cl = ((ProgramElement) x).getComments();
         int s = cl == null ? 0 : cl.size();
         for (int i = 0; i < s; i++) {
@@ -945,8 +944,9 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         }
         if (x.getIdentifier() != null) {
             printElementIndentation(m, x);
-            if (annotation)
+            if (annotation) {
                 print("@");
+            }
             print("interface");
             printElement(1, x.getIdentifier());
         }
@@ -1037,10 +1037,11 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
             printKeywordList(x.getDeclarationSpecifiers());
         }
         if (x.getTypeParameters() != null && x.getTypeParameters().size() > 0) {
-            if (m > 0)
+            if (m > 0) {
                 print(' ');
-            else
+            } else {
                 printElementIndentation(x);
+            }
             print('<');
             printCommaList(x.getTypeParameters());
             print('>');
@@ -1114,16 +1115,18 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
             Position blockEndPosition = x.getEndPosition();
             if (x.getBody().size() > 1 || firstStatementEndPosition.equals(Position.UNDEFINED)
                     || blockEndPosition.equals(Position.UNDEFINED)
-                    || firstStatementEndPosition.getLine() < blockEndPosition.getLine())
+                    || firstStatementEndPosition.getLine() < blockEndPosition.getLine()) {
                 printIndentation(1, getTotalIndentation());
-            else
+            } else {
                 printIndentation(0,
                     blockEndPosition.getColumn() - firstStatementEndPosition.getColumn() - 1);
+            }
         } else if (!doNotPossiblyPrintIndentation) {
             // keep old indentation
             int lf = x.getEndPosition().getLine() - x.getStartPosition().getLine();
-            if (lf > 0)
+            if (lf > 0) {
                 printIndentation(lf, getIndentation());
+            }
         }
         print('}');
         printFooter(x);
@@ -1448,8 +1451,9 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printHeader(x);
         printElementIndentation(x);
         print("import");
-        if (x.isStaticImport())
+        if (x.isStaticImport()) {
             print(" static");
+        }
         printElement(1, x.getReference());
         if (x.isMultiImport()) {
             print(".*;");
@@ -2328,16 +2332,18 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
             print("? super ");
             break;
         }
-        if (x.getTypeReferenceCount() == 1)
+        if (x.getTypeReferenceCount() == 1) {
             printElement(x.getTypeReferenceAt(0));
+        }
         printFooter(x);
     }
 
 
     public void visitTypeParameter(TypeParameterDeclaration x) {
         printHeader(x);
-        if (x.getIdentifier() != null)
+        if (x.getIdentifier() != null) {
             printElement(x.getIdentifier());
+        }
         if (x.getBounds() != null && x.getBounds().size() != 0) {
             print(" extends ");
             printProgramElementList(0, 0, 0, "&", 0, 1, x.getBounds());

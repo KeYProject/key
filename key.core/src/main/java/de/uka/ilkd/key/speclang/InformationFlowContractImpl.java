@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.informationflow.po.InfFlowContractPO;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -22,6 +20,8 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.util.InfFlowSpec;
+
+import org.key_project.util.collection.ImmutableList;
 
 
 
@@ -63,7 +63,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     // constructors
     // -------------------------------------------------------------------------
 
-    protected InformationFlowContractImpl(String baseName, String name, KeYJavaType forClass,
+    private InformationFlowContractImpl(
+            String baseName, String name, KeYJavaType forClass,
             IProgramMethod pm, KeYJavaType specifiedIn, Modality modality, Term pre, Term freePre,
             Term mby, Term mod, boolean hasRealMod, Term self, ImmutableList<Term> params,
             Term result, Term exc, Term heapAtPre, Term dep,
@@ -313,7 +314,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     }
 
 
-    protected String getHTMLFor(Term originalTerm, String htmlName, Services services) {
+    private String getHTMLFor(Term originalTerm, String htmlName, Services services) {
         if (originalTerm == null) {
             return "";
         } else {
@@ -324,47 +325,48 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     private String getHTMLFor(Iterable<Term> originalTerms, Services services) {
-        String result;
+        StringBuilder result;
         final Iterator<Term> it = originalTerms.iterator();
         if (!it.hasNext()) {
-            result = LogicPrinter.quickPrintTerm(services.getTermBuilder().empty(), services);
+            result = new StringBuilder(
+                LogicPrinter.quickPrintTerm(services.getTermBuilder().empty(), services));
         } else {
-            result = "";
+            result = new StringBuilder();
         }
         while (it.hasNext()) {
             Term term = it.next();
             final String quickPrint = LogicPrinter.quickPrintTerm(term, services);
-            result += LogicPrinter.escapeHTML(quickPrint, false);
+            result.append(LogicPrinter.escapeHTML(quickPrint, false));
             if (it.hasNext()) {
-                result += ", ";
+                result.append(", ");
             }
         }
-        return result;
+        return result.toString();
     }
 
 
     private String getHTMLFor(ImmutableList<InfFlowSpec> originalInfFlowSpecs, String htmlName,
             Services services) {
-        String infFlowSpecString = "";
+        StringBuilder infFlowSpecString = new StringBuilder();
         if (hasInfFlowSpec()) {
-            infFlowSpecString = "<br><b>" + htmlName + "</b> ";
+            infFlowSpecString = new StringBuilder("<br><b>" + htmlName + "</b> ");
             Iterator<InfFlowSpec> it = originalInfFlowSpecs.iterator();
             while (it.hasNext()) {
                 final InfFlowSpec infFlowSpec = it.next();
-                infFlowSpecString += getHTMLFor(infFlowSpec.postExpressions, services);
-                infFlowSpecString +=
-                    " <b>by</b> " + getHTMLFor(infFlowSpec.preExpressions, services);
+                infFlowSpecString.append(getHTMLFor(infFlowSpec.postExpressions, services));
+                infFlowSpecString.append(" <b>by</b> ")
+                        .append(getHTMLFor(infFlowSpec.preExpressions, services));
                 if (!infFlowSpec.newObjects.isEmpty()) {
-                    infFlowSpecString +=
-                        ", <b>new objects</b> " + getHTMLFor(infFlowSpec.newObjects, services);
+                    infFlowSpecString.append(", <b>new objects</b> ")
+                            .append(getHTMLFor(infFlowSpec.newObjects, services));
                 }
                 if (it.hasNext()) {
-                    infFlowSpecString += "<br>" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-                        + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "<b>and</b> ";
+                    infFlowSpecString.append("<br>" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                        + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "<b>and</b> ");
                 }
             }
         }
-        return infFlowSpecString;
+        return infFlowSpecString.toString();
     }
 
 
@@ -378,7 +380,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public final ContractPO createProofObl(InitConfig initConfig) {
+    public ContractPO createProofObl(InitConfig initConfig) {
         return (ContractPO) createProofObl(initConfig, this);
     }
 
@@ -394,7 +396,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     }
 
     @Override
-    public final ProofOblInput createProofObl(InitConfig initConfig, Contract contract,
+    public ProofOblInput createProofObl(InitConfig initConfig, Contract contract,
             boolean addSymbolicExecutionLabel) {
         if (addSymbolicExecutionLabel) {
             throw new IllegalStateException("Symbolic Execution API is not supported.");
@@ -489,7 +491,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     public boolean equals(Contract c) {
-        if (c == null || !(c instanceof InformationFlowContract)) {
+        if (!(c instanceof InformationFlowContract)) {
             return false;
         }
         assert name != null;

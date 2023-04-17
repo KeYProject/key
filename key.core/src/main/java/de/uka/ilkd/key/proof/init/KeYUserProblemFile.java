@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.proof.init;
 
+import java.io.File;
+import java.io.IOException;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nparser.ChoiceInformation;
@@ -16,14 +20,12 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.Triple;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.Token;
-import javax.annotation.Nonnull;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-import java.io.File;
-import java.io.IOException;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.Token;
 
 
 /**
@@ -231,7 +233,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      *         is defined by the file.
      * @throws Exception Occurred Exception.
      */
-    protected Profile readProfileFromFile() throws Exception {
+    private Profile readProfileFromFile() throws Exception {
         @Nonnull
         ProblemInformation pi = getProblemInformation();
         String profileName = pi.getProfile();
@@ -247,7 +249,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      *
      * @return The default {@link Profile}.
      */
-    protected Profile getDefaultProfile() {
+    private Profile getDefaultProfile() {
         return super.getProfile();
     }
 

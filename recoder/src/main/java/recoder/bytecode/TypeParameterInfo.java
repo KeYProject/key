@@ -6,25 +6,25 @@
  */
 package recoder.bytecode;
 
+import java.util.List;
+
 import recoder.ModelException;
-import recoder.abstraction.Package;
 import recoder.abstraction.*;
+import recoder.abstraction.Package;
 import recoder.convenience.Naming;
 import recoder.service.ProgramModelInfo;
-
-import java.util.List;
 
 /**
  * @author Tobias Gutzmann
  */
 public class TypeParameterInfo implements TypeParameter, ClassType {
-    protected String name;
+    protected final String name;
 
-    protected String[] boundNames;
+    protected final String[] boundNames;
 
-    protected List<TypeArgumentInfo>[] boundArgs;
+    protected final List<TypeArgumentInfo>[] boundArgs;
 
-    protected ClassFile containingClassFile;
+    protected final ClassFile containingClassFile;
 
     /**
      *

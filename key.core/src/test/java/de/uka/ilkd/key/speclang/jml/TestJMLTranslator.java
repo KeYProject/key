@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.speclang.jml;
 
+import java.io.File;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -10,15 +14,13 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.io.File;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;

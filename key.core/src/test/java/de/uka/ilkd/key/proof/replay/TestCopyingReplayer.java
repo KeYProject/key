@@ -1,16 +1,16 @@
 package de.uka.ilkd.key.proof.replay;
 
+import java.io.File;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.GeneralSettings;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.helper.FindResources;
 
-import java.io.File;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for {@link CopyingProofReplayer}.

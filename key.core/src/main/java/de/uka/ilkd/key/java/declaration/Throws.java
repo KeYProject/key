@@ -6,6 +6,7 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -36,7 +37,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      * @param exception a type reference.
      */
     public Throws(TypeReference exception) {
-        this.exceptions = new ImmutableArray<TypeReference>(exception);
+        this.exceptions = new ImmutableArray<>(exception);
     }
 
     /**
@@ -45,7 +46,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      * @param list a type reference array.
      */
     public Throws(TypeReference[] list) {
-        this.exceptions = new ImmutableArray<TypeReference>(list);
+        this.exceptions = new ImmutableArray<>(list);
     }
 
 
@@ -58,7 +59,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      */
     public Throws(ExtList children) {
         super(children);
-        this.exceptions = new ImmutableArray<TypeReference>(children.collect(TypeReference.class));
+        this.exceptions = new ImmutableArray<>(children.collect(TypeReference.class));
     }
 
     public SourceElement getLastElement() {
@@ -75,8 +76,9 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      */
     public int getChildCount() {
         int result = 0;
-        if (exceptions != null)
+        if (exceptions != null) {
             result += exceptions.size();
+        }
         return result;
     }
 

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call VerifiedTest.loop(_x)&gt;" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (_x&lt;0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+      <branchStatement name="if (_x &lt; 0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <branchCondition name="lt(x,Z(0(#)))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <statement name="_x=-_x;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false">
+            <statement name="_x = -_x;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false">
                <loopInvariant name="invariant: _x &gt;= 0;
 variant: _x
 mod: allLocs" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initiallyValid="true">
                   <branchCondition name="gt(_x_0,Z(0(#)))" pathCondition="and(geq(_x_0,Z(1(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="true" branchCondition="gt(_x_0,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
-                     <loopCondition name="_x&gt;0" pathCondition="and(geq(_x_0,Z(1(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false" blockOpened="false">
+                     <loopCondition name="_x &gt; 0;" pathCondition="and(geq(_x_0,Z(1(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false" blockOpened="false">
                         <statement name="_x--;" pathCondition="and(geq(_x_0,Z(1(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false">
                            <termination name="&lt;loop body end&gt;" pathCondition="and(geq(_x_0,Z(1(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
                            </termination>
@@ -32,7 +32,7 @@ mod: allLocs" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initial
 variant: _x
 mod: allLocs" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" initiallyValid="true">
                <branchCondition name="gt(_x_0,Z(0(#)))" pathCondition="and(geq(_x_0,Z(1(#))),geq(x,Z(0(#))))" pathConditionChanged="true" branchCondition="gt(_x_0,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
-                  <loopCondition name="_x&gt;0" pathCondition="and(geq(_x_0,Z(1(#))),geq(x,Z(0(#))))" pathConditionChanged="false" blockOpened="false">
+                  <loopCondition name="_x &gt; 0;" pathCondition="and(geq(_x_0,Z(1(#))),geq(x,Z(0(#))))" pathConditionChanged="false" blockOpened="false">
                      <statement name="_x--;" pathCondition="and(geq(_x_0,Z(1(#))),geq(x,Z(0(#))))" pathConditionChanged="false">
                         <termination name="&lt;loop body end&gt;" pathCondition="and(geq(_x_0,Z(1(#))),geq(x,Z(0(#))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
                         </termination>

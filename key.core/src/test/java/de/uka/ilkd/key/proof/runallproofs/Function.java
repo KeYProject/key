@@ -5,5 +5,5 @@ package de.uka.ilkd.key.proof.runallproofs;
  * 8.
  */
 public interface Function<A, B> {
-    public B apply(A a);
+    B apply(A a);
 }

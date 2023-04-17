@@ -1,5 +1,9 @@
 package org.key_project.exploration;
 
+import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -9,11 +13,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.*;
-import org.key_project.util.collection.ImmutableList;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Objects;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * ExplorationAction that handles the addition of formulas to the sequent. This action is
@@ -93,10 +94,11 @@ public class ProofExplorationService {
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
         app = app.addCheckedInstantiation(sv, semisequent.getFirst().formula(), services, true);
         ExplorationNodeData explorationNodeData = new ExplorationNodeData();
-        if (antecedent)
+        if (antecedent) {
             explorationNodeData.setExplorationAction("Added " + t + " ==>");
-        else
+        } else {
             explorationNodeData.setExplorationAction("Added ==> " + t);
+        }
 
         g.node().register(explorationNodeData, ExplorationNodeData.class);
 

@@ -6,6 +6,7 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
 import org.key_project.util.ExtList;
 
 /**
@@ -44,10 +45,12 @@ public class Instanceof extends TypeOperator {
 
     public int getChildCount() {
         int result = 0;
-        if (children != null)
+        if (children != null) {
             result += children.size();
-        if (typeReference != null)
+        }
+        if (typeReference != null) {
             result++;
+        }
         return result;
     }
 
@@ -73,8 +76,9 @@ public class Instanceof extends TypeOperator {
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

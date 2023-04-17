@@ -2,26 +2,12 @@ package de.uka.ilkd.key.logic.label;
 
 import java.io.File;
 import java.net.URI;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.key_project.util.collection.ImmutableArray;
+import java.util.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -30,10 +16,11 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
-import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.ImmutableArray;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * <p>
@@ -122,7 +109,7 @@ public class OriginTermLabel implements TermLabel {
      *
      * @see #getOrigin()
      */
-    private Origin origin;
+    private final Origin origin;
 
     /**
      * The origins of the term's sub-terms and former sub-terms.
@@ -448,7 +435,7 @@ public class OriginTermLabel implements TermLabel {
 
     @Override
     public String toString() {
-        return "" + NAME + "(" + origin + ") (" + subtermOrigins + ")";
+        return NAME + "(" + origin + ") (" + subtermOrigins + ")";
     }
 
     @Override
@@ -673,13 +660,10 @@ public class OriginTermLabel implements TermLabel {
                 return false;
             }
             if (ruleName == null) {
-                if (other.ruleName != null) {
-                    return false;
-                }
-            } else if (!ruleName.equals(other.ruleName)) {
-                return false;
+                return other.ruleName == null;
+            } else {
+                return ruleName.equals(other.ruleName);
             }
-            return true;
         }
 
         @Override
@@ -769,10 +753,7 @@ public class OriginTermLabel implements TermLabel {
             } else if (!fileName.equals(other.fileName)) {
                 return false;
             }
-            if (line != other.line) {
-                return false;
-            }
-            return true;
+            return line == other.line;
         }
     }
 
@@ -782,7 +763,7 @@ public class OriginTermLabel implements TermLabel {
      * @author lanzinger
      * @see OriginTermLabel.Origin
      */
-    public static enum SpecType {
+    public enum SpecType {
 
         /**
          * accessible
@@ -888,14 +869,14 @@ public class OriginTermLabel implements TermLabel {
         /**
          * This {@code SpecType}'s string representation.
          */
-        private String name;
+        private final String name;
 
         /**
          * Creates a new {@code SpecType}
          *
          * @param name the {@code SpecType}'s string representation.
          */
-        private SpecType(String name) {
+        SpecType(String name) {
             this.name = name;
         }
 

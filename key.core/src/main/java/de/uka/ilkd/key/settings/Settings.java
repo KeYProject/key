@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.settings;
 
+import java.beans.PropertyChangeListener;
 import java.util.Properties;
 
 /**
@@ -21,17 +22,13 @@ public interface Settings {
      */
     void writeSettings(Properties props);
 
-    /**
-     * adds a listener to the settings object
-     *
-     * @param l the listener
-     */
-    void addSettingsListener(SettingsListener l);
+    void addPropertyChangeListener(PropertyChangeListener listener);
 
-    /**
-     * removes a listener to the settings object
-     *
-     * @param l the listener
-     */
-    void removeSettingsListener(SettingsListener l);
+    void removePropertyChangeListener(PropertyChangeListener listener);
+
+    PropertyChangeListener[] getPropertyChangeListeners();
+
+    void addPropertyChangeListener(String propertyName, PropertyChangeListener listener);
+
+    void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);
 }

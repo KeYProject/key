@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -9,6 +7,8 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionOperationContract;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * <p>
@@ -29,21 +29,21 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      *
      * @return The applied {@link Contract}.
      */
-    public Contract getContract();
+    Contract getContract();
 
     /**
      * Returns the {@link IProgramMethod} of the applied {@link Contract}.
      *
      * @return The {@link IProgramMethod} of the applied {@link Contract}.
      */
-    public IProgramMethod getContractProgramMethod();
+    IProgramMethod getContractProgramMethod();
 
     /**
      * Checks if the precondition is complied.
      *
      * @return {@code true} precondition complied, {@code false} precondition not complied.
      */
-    public boolean isPreconditionComplied();
+    boolean isPreconditionComplied();
 
     /**
      * Checks if a not null check is available (instance method) or not (static method or
@@ -51,14 +51,14 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      *
      * @return {@code true} not null check available, {@code false} not null check is not available.
      */
-    public boolean hasNotNullCheck();
+    boolean hasNotNullCheck();
 
     /**
      * Checks if the not null check is complied.
      *
      * @return {@code true} not null check complied, {@code false} not null check not complied.
      */
-    public boolean isNotNullCheckComplied();
+    boolean isNotNullCheckComplied();
 
     /**
      * Returns the result {@link Term} in which the result of the applied {@link Contract} is
@@ -68,7 +68,7 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      *         stored.
      * @throws ProofInputException Occurred Exception.
      */
-    public Term getResultTerm() throws ProofInputException;
+    Term getResultTerm() throws ProofInputException;
 
     /**
      * Returns the exception {@link Term} in which a by the {@link Contract} thrown
@@ -78,7 +78,7 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      *         {@link Exception} is stored.
      * @throws ProofInputException Occurred Exception.
      */
-    public Term getExceptionTerm() throws ProofInputException;
+    Term getExceptionTerm() throws ProofInputException;
 
     /**
      * Returns the self {@link Term} of the called method for which a {@link Contract} is applied.
@@ -86,7 +86,7 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      * @return The self {@link Term} or {@code null} if not available.
      * @throws ProofInputException Occurred Exception.
      */
-    public Term getSelfTerm() throws ProofInputException;
+    Term getSelfTerm() throws ProofInputException;
 
     /**
      * Returns the parameters of the called method for which a {@link Contract} is applied.
@@ -94,7 +94,7 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      * @return The parameters of the called method for which a {@link Contract} is applied.
      * @throws ProofInputException Occurred Exception.
      */
-    public ImmutableList<Term> getContractParams() throws ProofInputException;
+    ImmutableList<Term> getContractParams() throws ProofInputException;
 
     /**
      * Returns the human readable result {@link Term} in which the result of the applied
@@ -104,7 +104,7 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      *         {@link Contract} is stored.
      * @throws ProofInputException Occurred Exception.
      */
-    public String getFormatedResultTerm() throws ProofInputException;
+    String getFormatedResultTerm() throws ProofInputException;
 
     /**
      * Returns the human readable exception {@link Term} in which a by the {@link Contract} thrown
@@ -114,7 +114,7 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      *         {@link Exception} is stored.
      * @throws ProofInputException Occurred Exception.
      */
-    public String getFormatedExceptionTerm() throws ProofInputException;
+    String getFormatedExceptionTerm() throws ProofInputException;
 
     /**
      * Returns the human readable self {@link Term} of the called method for which a
@@ -123,7 +123,7 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      * @return The human readable self {@link Term} or {@code null} if not available.
      * @throws ProofInputException Occurred Exception.
      */
-    public String getFormatedSelfTerm() throws ProofInputException;
+    String getFormatedSelfTerm() throws ProofInputException;
 
     /**
      * Returns the human readable parameters of the called method for which a {@link Contract} is
@@ -133,5 +133,5 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      *         applied.
      * @throws ProofInputException Occurred Exception.
      */
-    public String getFormatedContractParams() throws ProofInputException;
+    String getFormatedContractParams() throws ProofInputException;
 }

@@ -9,7 +9,6 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -284,7 +283,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
             includes, poPropertiesToForce, forceNewProfileOfNewProofs, callbackProofLoaded);
         InitConfig initConfig = loader.getInitConfig();
 
-        return new KeYEnvironment<DefaultUserInterfaceControl>(ui, initConfig, loader.getProof(),
+        return new KeYEnvironment<>(ui, initConfig, loader.getProof(),
             loader.getProofScript(), loader.getResult());
     }
 

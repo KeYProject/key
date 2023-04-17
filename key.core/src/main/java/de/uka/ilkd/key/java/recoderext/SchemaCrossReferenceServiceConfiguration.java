@@ -1,9 +1,10 @@
 // This file is part of the RECODER library and protected by the LGPL.
 package de.uka.ilkd.key.java.recoderext;
 
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+
 import recoder.ProgramFactory;
 import recoder.service.SourceInfo;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public class SchemaCrossReferenceServiceConfiguration
         extends KeYCrossReferenceServiceConfiguration {

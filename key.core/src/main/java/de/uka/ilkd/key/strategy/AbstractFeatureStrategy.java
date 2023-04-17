@@ -1,10 +1,6 @@
 package de.uka.ilkd.key.strategy;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -24,6 +20,9 @@ import de.uka.ilkd.key.strategy.feature.instantiator.SVInstantiationCP;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 public abstract class AbstractFeatureStrategy extends StaticFeatureCollection implements Strategy {
 
@@ -60,9 +59,10 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
     }
 
     protected TacletFilter getFilterFor(String[] p_names) {
-        ImmutableList<RuleSet> heur = ImmutableSLList.<RuleSet>nil();
-        for (int i = 0; i != p_names.length; ++i)
+        ImmutableList<RuleSet> heur = ImmutableSLList.nil();
+        for (int i = 0; i != p_names.length; ++i) {
             heur = heur.prepend(getHeuristic(p_names[i]));
+        }
         return new IHTacletFilter(false, heur);
     }
 
@@ -72,11 +72,11 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         assert nss != null : "Rule set namespace not available.";
 
         final Namespace<RuleSet> ns = nss.ruleSets();
-        final Named h = ns.lookup(new Name(p_name));
+        final RuleSet h = ns.lookup(new Name(p_name));
 
         assert h != null : "Did not find the rule set " + p_name;
 
-        return (RuleSet) h;
+        return h;
     }
 
     protected void bindRuleSet(RuleSetDispatchFeature d, RuleSet ruleSet, Feature f) {
@@ -110,11 +110,13 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         btManager.setup(app);
         do {
             final RuleAppCost cost = instantiateApp(app, pio, goal);
-            if (cost instanceof TopRuleAppCost)
+            if (cost instanceof TopRuleAppCost) {
                 continue;
+            }
             final RuleApp res = btManager.getResultingapp();
-            if (res == app || res == null)
+            if (res == app || res == null) {
                 continue;
+            }
             collector.collect(res, cost);
         } while (btManager.backtrack());
     }
@@ -148,17 +150,19 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
     }
 
     protected Feature instantiate(Name sv, ProjectionToTerm value) {
-        if (instantiateActive)
+        if (instantiateActive) {
             return SVInstantiationCP.create(sv, value, btManager);
-        else
+        } else {
             return longConst(0);
+        }
     }
 
     protected Feature instantiateTriggeredVariable(ProjectionToTerm value) {
-        if (instantiateActive)
+        if (instantiateActive) {
             return SVInstantiationCP.createTriggeredVarCP(value, btManager);
-        else
+        } else {
             return longConst(0);
+        }
     }
 
     protected Feature instantiate(String sv, ProjectionToTerm value) {

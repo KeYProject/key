@@ -2,14 +2,14 @@
 
 package recoder.kit.transformation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Package;
 import recoder.java.reference.PackageReference;
 import recoder.kit.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Transformation that renames a package by renaming all known references to that package. The new
@@ -56,7 +56,7 @@ public class RenamePackage extends TwoPassTransformation {
      */
     public ProblemReport analyze() {
         if (newName.equals(pkg.getName())) {
-            refs = new ArrayList<PackageReference>(0);
+            refs = new ArrayList<>(0);
             return setProblemReport(IDENTITY);
         }
         Package pkg2 = getNameInfo().getPackage(newName);
@@ -88,4 +88,3 @@ public class RenamePackage extends TwoPassTransformation {
 
     }
 }
-

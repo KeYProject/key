@@ -1,11 +1,9 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import de.uka.ilkd.key.java.Position;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
-
-import javax.annotation.Nullable;
-import java.net.URL;
 
 public class ScriptException extends Exception implements HasLocation {
 

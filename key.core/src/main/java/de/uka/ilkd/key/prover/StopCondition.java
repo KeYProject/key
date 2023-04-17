@@ -45,7 +45,7 @@ public interface StopCondition {
      * @param proof The current {@link Proof}.
      * @return The maximal amount of work or {@code 0} if it is unknown.
      */
-    public int getMaximalWork(int maxApplications, long timeout, Proof proof);
+    int getMaximalWork(int maxApplications, long timeout, Proof proof);
 
     /**
      * Checks if it is allowed to apply the next rule on the selected {@link Goal} chosen by the
@@ -63,7 +63,7 @@ public interface StopCondition {
      * @return {@code true} rule application is allowed, {@code false} rule application is not
      *         allowed so stop apply strategy
      */
-    public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, long startTime,
+    boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, long startTime,
             int countApplied, Goal goal);
 
     /**
@@ -82,7 +82,7 @@ public interface StopCondition {
      * @param goal The current {@link Goal} on which the next rule will be applied.
      * @return
      */
-    public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof,
+    String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof,
             long startTime, int countApplied, Goal goal);
 
     /**
@@ -100,7 +100,7 @@ public interface StopCondition {
      * @param singleRuleApplicationInfo An optional {@link SingleRuleApplicationInfo}.
      * @return {@code true} stop strategy, {@code false} continue strategy and apply next rule.
      */
-    public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime,
+    boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime,
             int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo);
 
     /**
@@ -119,6 +119,6 @@ public interface StopCondition {
      * @param singleRuleApplicationInfo An optional {@link SingleRuleApplicationInfo}.
      * @return The human readable message which explains the stop reason.
      */
-    public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime,
+    String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime,
             int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo);
 }

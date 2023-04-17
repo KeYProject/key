@@ -17,7 +17,7 @@
          <value name="y {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <statement name="int main = y-2;" pathCondition="true" pathConditionChanged="false">
+      <statement name="int main = y - 2;" pathCondition="true" pathConditionChanged="false">
          <variable name="exc" isArrayIndex="false">
             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
@@ -52,7 +52,7 @@
                   <value name="x_1 {true}" typeString="int" valueString="add(Z(neglit(2(#))),y)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <statement name="int sub = x_1+2;" pathCondition="true" pathConditionChanged="false">
+               <statement name="int sub = x_1 + 2;" pathCondition="true" pathConditionChanged="false">
                   <variable name="y" isArrayIndex="false">
                      <value name="y {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>

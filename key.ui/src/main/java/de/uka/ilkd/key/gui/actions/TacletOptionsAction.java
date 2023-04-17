@@ -3,9 +3,9 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.settings.ProofSettings;
 

@@ -2,7 +2,6 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;

@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.logic.Name;
+
 import org.key_project.util.ExtList;
 
 /**
@@ -32,7 +33,7 @@ public class FloatLiteral extends Literal {
      */
 
     public FloatLiteral(float value) {
-        this.value = "" + value;
+        this.value = String.valueOf(value);
     }
 
     /**

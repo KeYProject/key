@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.api;
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
@@ -11,12 +13,12 @@ import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.match.legacy.LegacyTacletMatcher;
-import org.antlr.v4.runtime.CharStreams;
+
 import org.key_project.util.collection.ImmutableList;
+
+import org.antlr.v4.runtime.CharStreams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 /**
  * Matcher to deal with matching a string pattern against a sequent
@@ -81,8 +83,9 @@ public class Matcher {
 
             SequentFormula[] patternArray = new SequentFormula[patternSeq.size()];
             int i = 0;
-            for (SequentFormula fm : patternSeq)
+            for (SequentFormula fm : patternSeq) {
                 patternArray[i++] = fm;
+            }
 
 
             Queue<SearchNode> queue = new LinkedList<>();

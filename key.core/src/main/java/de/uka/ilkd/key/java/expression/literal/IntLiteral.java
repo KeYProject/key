@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
 import org.key_project.util.ExtList;
 
 /**
@@ -37,7 +38,7 @@ public class IntLiteral extends AbstractIntegerLiteral {
      */
     public IntLiteral(int value) {
         this.value = value;
-        this.valueStr = ("" + value).intern();
+        this.valueStr = (String.valueOf(value)).intern();
     }
 
     /**

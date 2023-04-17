@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.logic;
 
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -24,12 +29,8 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
-import org.key_project.util.collection.*;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import org.key_project.util.collection.*;
 
 /**
  * <p>
@@ -98,11 +99,11 @@ public class TermBuilder {
 
     public String shortBaseName(Sort s) {
         String result = s.name().toString();
-        int index = result.lastIndexOf(".");
+        int index = result.lastIndexOf('.');
         if (index == -1) {
-            result = result.charAt(0) + "";
+            result = String.valueOf(result.charAt(0));
         } else {
-            result = result.substring(index).charAt(1) + "";
+            result = String.valueOf(result.substring(index).charAt(1));
         }
         return result.toLowerCase();
     }
@@ -224,7 +225,7 @@ public class TermBuilder {
                 name = ((IProgramMethod) obs).getParameterDeclarationAt(i)
                         .getVariableSpecification().getName();
             } else {
-                name = paramType.getSort().name().toString().charAt(0) + "";
+                name = String.valueOf(paramType.getSort().name().toString().charAt(0));
             }
             final LocationVariable paramVar = locationVariable(name, paramType, makeNamesUnique);
             result = result.append(paramVar);
@@ -447,8 +448,9 @@ public class TermBuilder {
      * Construct a term with the \ifEx operator.
      */
     public Term ifEx(ImmutableList<QuantifiableVariable> qvs, Term cond, Term _then, Term _else) {
-        if (qvs.isEmpty())
+        if (qvs.isEmpty()) {
             throw new TermCreationException("no quantifiable variables in ifEx term");
+        }
         if (qvs.size() == 1) {
             return ifEx(qvs.head(), cond, _then, _else);
         } else {
@@ -785,9 +787,10 @@ public class TermBuilder {
     public Term pair(Term first, Term second) {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = funcNS.lookup(new Name("pair"));
-        if (f == null)
+        if (f == null) {
             throw new RuntimeException("LDT: Function pair not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
+        }
 
         return func(f, first, second);
 
@@ -796,9 +799,10 @@ public class TermBuilder {
     public Term prec(Term mby, Term mbyAtPre) {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = funcNS.lookup(new Name("prec"));
-        if (f == null)
+        if (f == null) {
             throw new RuntimeException("LDT: Function prec not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
+        }
 
         return func(f, mby, mbyAtPre);
     }
@@ -806,27 +810,30 @@ public class TermBuilder {
     public Term measuredByCheck(Term mby) {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = funcNS.lookup(new Name("measuredByCheck"));
-        if (f == null)
+        if (f == null) {
             throw new RuntimeException("LDT: Function measuredByCheck not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
+        }
         return func(f, mby);
     }
 
     public Term measuredBy(Term mby) {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = funcNS.lookup(new Name("measuredBy"));
-        if (f == null)
+        if (f == null) {
             throw new RuntimeException("LDT: Function measuredBy not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
+        }
         return func(f, mby);
     }
 
     public Function getMeasuredByEmpty() {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = funcNS.lookup(new Name("measuredByEmpty"));
-        if (f == null)
+        if (f == null) {
             throw new RuntimeException("LDT: Function measuredByEmpty not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
+        }
         return f;
     }
 
@@ -839,10 +846,12 @@ public class TermBuilder {
      */
     public Term convertToFormula(Term a) {
         BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
-        if (booleanLDT == null)
+        if (booleanLDT == null) {
             throw new IllegalStateException("boolean ldt is not set in services");
-        if (a == null)
+        }
+        if (a == null) {
             throw new NullPointerException();
+        }
         if (a.sort() == Sort.FORMULA) {
             return a;
         } else if (a.sort() == booleanLDT.targetSort()) {
@@ -851,11 +860,12 @@ public class TermBuilder {
                 assert a.arity() == 3;
                 assert a.sub(0).sort() == Sort.FORMULA;
                 if (a.sub(1).op() == booleanLDT.getTrueConst()
-                        && a.sub(2).op() == booleanLDT.getFalseConst())
+                        && a.sub(2).op() == booleanLDT.getFalseConst()) {
                     return a.sub(0);
-                else if (a.sub(1).op() == booleanLDT.getFalseConst()
-                        && a.sub(2).op() == booleanLDT.getTrueConst())
+                } else if (a.sub(1).op() == booleanLDT.getFalseConst()
+                        && a.sub(2).op() == booleanLDT.getTrueConst()) {
                     return not(a.sub(0));
+                }
             }
             return equals(a, TRUE());
         } else {
@@ -945,8 +955,8 @@ public class TermBuilder {
 
     public Term parallel(Term... updates) {
         Term result = skip();
-        for (int i = 0; i < updates.length; i++) {
-            result = parallel(result, updates[i]);
+        for (Term update : updates) {
+            result = parallel(result, update);
         }
         return result;
     }

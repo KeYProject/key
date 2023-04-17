@@ -1,14 +1,14 @@
 package de.uka.ilkd.key.settings;
 
-import org.key_project.util.Streams;
-
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+
+import org.key_project.util.Streams;
 
 /**
  * Utility class providing various methods to read properties.

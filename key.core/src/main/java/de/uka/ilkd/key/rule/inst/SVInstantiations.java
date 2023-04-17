@@ -2,15 +2,6 @@ package de.uka.ilkd.key.rule.inst;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.TermImpl;
-import org.key_project.util.EqualsModProofIrrelevancy;
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -18,6 +9,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermImpl;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -26,6 +18,14 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.collection.DefaultImmutableMap;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableMapEntry;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This class wraps a ImmMap<SchemaVariable,InstantiationEntry<?>> and is used to store
@@ -72,10 +72,10 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
     /** creates a new SVInstantions object with an empty map */
     private SVInstantiations() {
-        genericSortConditions = ImmutableSLList.<GenericSortCondition>nil();
-        updateContext = ImmutableSLList.<UpdateLabelPair>nil();
-        map = DefaultImmutableMap.<SchemaVariable, InstantiationEntry<?>>nilMap();
-        interesting = DefaultImmutableMap.<SchemaVariable, InstantiationEntry<?>>nilMap();
+        genericSortConditions = ImmutableSLList.nil();
+        updateContext = ImmutableSLList.nil();
+        map = DefaultImmutableMap.nilMap();
+        interesting = DefaultImmutableMap.nilMap();
     }
 
     /**
@@ -147,7 +147,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
 
     public SVInstantiations addList(SchemaVariable sv, Object[] list, Services services) {
-        return add(sv, new ListInstantiation(sv, ImmutableSLList.<Object>nil().prepend(list)),
+        return add(sv, new ListInstantiation(sv, ImmutableSLList.nil().prepend(list)),
             services);
     }
 
@@ -174,7 +174,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     public SVInstantiations addInterestingList(SchemaVariable sv, Object[] list,
             Services services) {
         return addInteresting(sv,
-            new ListInstantiation(sv, ImmutableSLList.<Object>nil().prepend(list)), services);
+            new ListInstantiation(sv, ImmutableSLList.nil().prepend(list)), services);
     }
 
 
@@ -214,7 +214,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
         if (b == null) {
             return rebuildSorts(services);
-        } else if (!b.booleanValue()) {
+        } else if (!b) {
             throw INCOMPATIBLE_INSTANTIATION_EXCEPTION;
         }
         if (p_forceRebuild) {
@@ -227,12 +227,14 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
             Services services) {
         Boolean b = getGenericSortInstantiations().checkCondition(p_c);
 
-        if (b == null)
+        if (b == null) {
             return rebuildSorts(services);
-        else if (!b.booleanValue())
+        } else if (!b) {
             throw UNSOLVABLE_SORT_CONDITIONS_EXCEPTION;
-        if (p_forceRebuild)
+        }
+        if (p_forceRebuild) {
             return rebuildSorts(services);
+        }
         return this;
     }
 
@@ -427,9 +429,9 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     }
 
     public static class UpdateLabelPair {
-        private Term update;
+        private final Term update;
 
-        private ImmutableArray<TermLabel> updateApplicationlabels;
+        private final ImmutableArray<TermLabel> updateApplicationlabels;
 
         public UpdateLabelPair(Term update, ImmutableArray<TermLabel> updateApplicationlabels) {
             this.update = update;
@@ -475,7 +477,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
             // avoid unnecessary creation of SVInstantiations
             return this;
         }
-        return new SVInstantiations(map, interesting(), ImmutableSLList.<UpdateLabelPair>nil(),
+        return new SVInstantiations(map, interesting(), ImmutableSLList.nil(),
             getGenericSortInstantiations(), getGenericSortConditions());
     }
 
@@ -623,15 +625,11 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     public SVInstantiations union(SVInstantiations other, Services services) {
         ImmutableMap<SchemaVariable, InstantiationEntry<?>> result = map;
 
-        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
-            other.map.iterator();
-
-        while (it.hasNext()) {
-            final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry = it.next();
+        for (ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry : other.map) {
             result = result.put(entry.key(), entry.value());
         }
 
-        ImmutableList<UpdateLabelPair> updates = ImmutableSLList.<UpdateLabelPair>nil();
+        ImmutableList<UpdateLabelPair> updates = ImmutableSLList.nil();
 
         if (other.getUpdateContext().isEmpty()) {
             updates = getUpdateContext();
@@ -654,7 +652,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
     @Override
     public String toString() {
-        StringBuffer result = new StringBuffer("SV Instantiations: ");
+        StringBuilder result = new StringBuilder("SV Instantiations: ");
         return (result.append(map.toString())).toString();
     }
 
@@ -677,12 +675,10 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     }
 
     public ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> lookupEntryForSV(Name name) {
-        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
-            map.iterator();
-        while (it.hasNext()) {
-            final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
-            if (e.key().name().equals(name))
+        for (ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e : map) {
+            if (e.key().name().equals(name)) {
                 return e;
+            }
         }
         return null; // handle this better!
     }

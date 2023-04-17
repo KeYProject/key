@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.parser;
 
+import java.io.File;
+import java.io.IOException;
+
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -11,9 +14,6 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
-
-import java.io.File;
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

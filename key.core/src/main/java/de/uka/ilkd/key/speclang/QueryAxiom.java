@@ -4,13 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -42,6 +35,12 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**
@@ -125,7 +124,7 @@ public final class QueryAxiom extends ClassAxiom {
         final TermBuilder tb = services.getTermBuilder();
 
         // create schema variables
-        final List<SchemaVariable> heapSVs = new ArrayList<SchemaVariable>();
+        final List<SchemaVariable> heapSVs = new ArrayList<>();
         for (int i = 0; i < target.getHeapCount(services); i++) {
             heapSVs.add(SchemaVariableFactory.createTermSV(new Name("h" + i), heapLDT.targetSort(),
                 false, false));
@@ -181,7 +180,7 @@ public final class QueryAxiom extends ClassAxiom {
         final IProgramMethod targetImpl =
             services.getJavaInfo().getProgramMethod(kjt, target.getName(), sig, kjt);
         final MethodBodyStatement mbs = new MethodBodyStatement(targetImpl, selfProgSV,
-            resultProgSV, new ImmutableArray<Expression>(paramProgSVs));
+            resultProgSV, new ImmutableArray<>(paramProgSVs));
         final StatementBlock sb = new StatementBlock(mbs);
         final JavaBlock jb = JavaBlock.createJavaBlock(sb);
 
@@ -208,8 +207,8 @@ public final class QueryAxiom extends ClassAxiom {
             subs[offset] = tb.var(selfSV);
             offset++;
         }
-        for (int i = 0; i < paramSVs.length; i++) {
-            subs[offset] = tb.var(paramSVs[i]);
+        for (SchemaVariable paramSV : paramSVs) {
+            subs[offset] = tb.var(paramSV);
             offset++;
         }
         final Term find = tb.func(target, subs);
@@ -226,7 +225,7 @@ public final class QueryAxiom extends ClassAxiom {
 
         // build taclet
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder =
-            new RewriteTacletBuilder<RewriteTaclet>();
+            new RewriteTacletBuilder<>();
         tacletBuilder.setFind(find);
         for (SchemaVariable heapSV : heapSVs) {
             tacletBuilder.addVarsNewDependingOn(skolemSV, heapSV);
@@ -243,7 +242,7 @@ public final class QueryAxiom extends ClassAxiom {
         tacletBuilder.addVarsNew(resultProgSV, target.getReturnType());
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
         tacletBuilder.addTacletGoalTemplate(
-            new RewriteTacletGoalTemplate(addedSeq, ImmutableSLList.<Taclet>nil(), replacewith));
+            new RewriteTacletGoalTemplate(addedSeq, ImmutableSLList.nil(), replacewith));
         tacletBuilder.setName(MiscTools.toValidTacletName(name));
         tacletBuilder.addRuleSet(new RuleSet(new Name("query_axiom")));
         // Originally used to be "simplify"

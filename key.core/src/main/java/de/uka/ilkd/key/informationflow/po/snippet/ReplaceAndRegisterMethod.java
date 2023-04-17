@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
+import java.util.*;
+
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
@@ -13,11 +15,10 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.LinkedHashMap;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.*;
 
 
 /**
@@ -171,8 +172,9 @@ abstract class ReplaceAndRegisterMethod {
         @Override
         public void visit(Term visited) {
             final ImmutableArray<QuantifiableVariable> boundVars = visited.boundVars();
-            for (QuantifiableVariable var : boundVars)
+            for (QuantifiableVariable var : boundVars) {
                 vars.add(var);
+            }
         }
 
         @Override

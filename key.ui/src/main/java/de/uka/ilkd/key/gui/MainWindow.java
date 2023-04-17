@@ -1,10 +1,29 @@
 package de.uka.ilkd.key.gui;
 
-import bibliothek.gui.dock.StackDockStation;
-import bibliothek.gui.dock.common.CControl;
-import bibliothek.gui.dock.common.SingleCDockable;
-import bibliothek.gui.dock.common.intern.CDockable;
-import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.List;
+import java.util.function.Function;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
+import java.util.stream.Stream;
+import javax.annotation.Nonnull;
+import javax.swing.*;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import javax.swing.event.MouseInputAdapter;
+
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -37,34 +56,18 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.*;
+
+import bibliothek.gui.dock.StackDockStation;
+import bibliothek.gui.dock.common.CControl;
+import bibliothek.gui.dock.common.SingleCDockable;
+import bibliothek.gui.dock.common.intern.CDockable;
+import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import javax.swing.event.MouseInputAdapter;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.*;
-import java.util.function.Function;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
-import java.util.stream.Stream;
 
 @HelpInfo()
 public final class MainWindow extends JFrame {
@@ -242,7 +245,7 @@ public final class MainWindow extends JFrame {
             return noSolverSelected;
         }
         for (SolverType type : types) {
-            builder.append(type.getName() + ", ");
+            builder.append(type.getName()).append(", ");
         }
         builder.delete(builder.length() - 2, builder.length());
         SolverTypeCollection chosenSolvers =
@@ -484,7 +487,7 @@ public final class MainWindow extends JFrame {
         // FIXME do this NOT in layout of GUI
         // minimize interaction
         final boolean stupidMode =
-            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter();
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().getTacletFilter();
         userInterface.getProofControl().setMinimizeInteraction(stupidMode);
 
         // set up actions
@@ -573,7 +576,7 @@ public final class MainWindow extends JFrame {
         Stream<TabPanel> defaultPanels =
             Stream.of(proofTreeView, infoView, strategySelectionView, openGoalsView);
         Stream.concat(defaultPanels, extensionPanels).map(DockingHelper::createSingleDock)
-                .forEach(it -> dockControl.addDockable(it));
+                .forEach(dockControl::addDockable);
         dockControl.addDockable(dockProofListView);
         dockControl.addDockable(dockSequent);
         dockControl.addDockable(dockSourceView);
@@ -739,7 +742,7 @@ public final class MainWindow extends JFrame {
     /**
      * @return the status line object
      */
-    protected MainStatusLine getStatusLine() {
+    MainStatusLine getStatusLine() {
         return statusLine;
     }
 
@@ -755,7 +758,7 @@ public final class MainWindow extends JFrame {
      * Make the status line display a standard message, make progress bar and abort button invisible
      */
     public void setStandardStatusLine() {
-        ThreadUtilities.invokeOnEventQueue(() -> setStandardStatusLineImmediately());
+        ThreadUtilities.invokeOnEventQueue(this::setStandardStatusLineImmediately);
     }
 
     private void setStatusLineImmediately(String str, int max) {
@@ -1085,7 +1088,7 @@ public final class MainWindow extends JFrame {
         GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
         JRadioButtonMenuItem jmlButton =
-            new JRadioButtonMenuItem("Source File Comments Are JML", gs.useJML());
+            new JRadioButtonMenuItem("Source File Comments Are JML", gs.isUseJML());
         result.add(jmlButton);
         group.add(jmlButton);
         jmlButton.setIcon(IconFactory.jmlLogo(15));
@@ -1095,7 +1098,7 @@ public final class MainWindow extends JFrame {
         });
 
         JRadioButtonMenuItem noneButton =
-            new JRadioButtonMenuItem("Source File Comments Are Ignored", !gs.useJML());
+            new JRadioButtonMenuItem("Source File Comments Are Ignored", !gs.isUseJML());
         result.add(noneButton);
         group.add(noneButton);
         noneButton.addActionListener(e -> {
@@ -1181,7 +1184,7 @@ public final class MainWindow extends JFrame {
                 // such that the entire app needs to be closed. Just print
                 // the exception and pretend everything was good. (Like would
                 // happen when incoked on the event queue.
-                ex.printStackTrace();
+                LOGGER.warn("Sequent updater exception", ex);
             }
         } else {
             SwingUtilities.invokeLater(sequentUpdater);
@@ -1261,7 +1264,7 @@ public final class MainWindow extends JFrame {
      * @param component the non-null component whose preferences are to be set
      * @see PreferenceSaver
      */
-    public final void loadPreferences(Component component) {
+    public void loadPreferences(Component component) {
         prefSaver.load(component);
     }
 
@@ -1272,12 +1275,12 @@ public final class MainWindow extends JFrame {
      *
      * @see PreferenceSaver
      */
-    public final void syncPreferences() {
+    public void syncPreferences() {
         try {
             prefSaver.flush();
         } catch (BackingStoreException e) {
             // it is not tragic if the preferences cannot be stored.
-            e.printStackTrace();
+            LOGGER.warn("Failed to save preferences", e);
         }
     }
 
@@ -1452,8 +1455,8 @@ public final class MainWindow extends JFrame {
      */
     private static class GlassPaneListener extends MouseInputAdapter {
         Component currentComponent = null;
-        Component glassPane;
-        Container contentPane;
+        final Component glassPane;
+        final Container contentPane;
 
         public GlassPaneListener(Component glassPane, Container contentPane) {
             this.glassPane = glassPane;
@@ -1565,20 +1568,20 @@ public final class MainWindow extends JFrame {
 
         private void setToolBarDisabled() {
             assert EventQueue.isDispatchThread() : "toolbar disabled from wrong thread";
-            doNotReenable = new LinkedHashSet<Component>();
+            doNotReenable = new LinkedHashSet<>();
             Component[] cs = controlToolBar.getComponents();
-            for (int i = 0; i < cs.length; i++) {
-                if (!cs[i].isEnabled()) {
-                    doNotReenable.add(cs[i]);
+            for (Component component : cs) {
+                if (!component.isEnabled()) {
+                    doNotReenable.add(component);
                 }
-                cs[i].setEnabled(false);
+                component.setEnabled(false);
             }
             cs = fileOpToolBar.getComponents();
-            for (int i = 0; i < cs.length; i++) {
-                if (!cs[i].isEnabled()) {
-                    doNotReenable.add(cs[i]);
+            for (Component c : cs) {
+                if (!c.isEnabled()) {
+                    doNotReenable.add(c);
                 }
-                cs[i].setEnabled(false);
+                c.setEnabled(false);
             }
         }
 
@@ -1591,15 +1594,15 @@ public final class MainWindow extends JFrame {
             }
 
             Component[] cs = controlToolBar.getComponents();
-            for (int i = 0; i < cs.length; i++) {
-                if (!doNotReenable.contains(cs[i])) {
-                    cs[i].setEnabled(true);
+            for (Component component : cs) {
+                if (!doNotReenable.contains(component)) {
+                    component.setEnabled(true);
                 }
             }
             cs = fileOpToolBar.getComponents();
-            for (int i = 0; i < cs.length; i++) {
-                if (!doNotReenable.contains(cs[i])) {
-                    cs[i].setEnabled(true);
+            for (Component c : cs) {
+                if (!doNotReenable.contains(c)) {
+                    c.setEnabled(true);
                 }
             }
 
@@ -1646,7 +1649,8 @@ public final class MainWindow extends JFrame {
 
     }
 
-    class MainProofListener implements AutoModeListener, KeYSelectionListener, SettingsListener {
+    class MainProofListener
+            implements AutoModeListener, KeYSelectionListener, PropertyChangeListener {
 
         Proof proof = null;
 
@@ -1669,11 +1673,11 @@ public final class MainWindow extends JFrame {
             LOGGER.debug("Main: initialize with new proof");
 
             if (proof != null && !proof.isDisposed()) {
-                proof.getSettings().getStrategySettings().removeSettingsListener(this);
+                proof.getSettings().getStrategySettings().removePropertyChangeListener(this);
             }
             proof = e.getSource().getSelectedProof();
             if (proof != null) {
-                proof.getSettings().getStrategySettings().addSettingsListener(this);
+                proof.getSettings().getStrategySettings().removePropertyChangeListener(this);
             }
 
             disableCurrentGoalView = false;
@@ -1686,7 +1690,7 @@ public final class MainWindow extends JFrame {
          */
         @Override
         public synchronized void autoModeStarted(ProofEvent e) {
-            LOGGER.info("Automode started");
+            LOGGER.debug("Automode started");
             disableCurrentGoalView = true;
             getMediator().removeKeYSelectionListener(proofListener);
             freezeExceptAutoModeButton();
@@ -1697,21 +1701,16 @@ public final class MainWindow extends JFrame {
          */
         @Override
         public synchronized void autoModeStopped(ProofEvent e) {
-            if (Debug.ENABLE_DEBUG) {
-                LOGGER.info("Automode stopped");
-            }
+            LOGGER.debug("Automode stopped");
             unfreezeExceptAutoModeButton();
             disableCurrentGoalView = false;
             updateSequentView();
             getMediator().addKeYSelectionListenerChecked(proofListener);
         }
 
-        /**
-         * invoked when the strategy of a proof has been changed
-         */
         @Override
-        public synchronized void settingsChanged(EventObject e) {
-            if (proof.getSettings().getStrategySettings() == e.getSource()) {
+        public synchronized void propertyChange(PropertyChangeEvent evt) {
+            if (proof.getSettings().getStrategySettings() == evt.getSource()) {
                 // updateAutoModeConfigButton();
             }
         }

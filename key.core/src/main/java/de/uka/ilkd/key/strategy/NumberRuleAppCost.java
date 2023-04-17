@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.strategy;
 
-import org.key_project.util.LRUCache;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.util.Debug;
 
-import javax.annotation.Nonnull;
+import org.key_project.util.LRUCache;
 
 public abstract class NumberRuleAppCost implements RuleAppCost {
 
@@ -13,22 +13,24 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
      * Requires thread save access as multiple proofs may be performed in parallel (Eclipse).
      */
     private static final LRUCache<Integer, NumberRuleAppCost> cache =
-        new LRUCache<Integer, NumberRuleAppCost>(255);
+        new LRUCache<>(255);
 
     public static RuleAppCost getZeroCost() {
         return ZERO_COST;
     }
 
     public static RuleAppCost create(int p_cost) {
-        if (p_cost == 0)
+        if (p_cost == 0) {
             return NumberRuleAppCost.getZeroCost();
+        }
 
         NumberRuleAppCost ac;
         synchronized (cache) { // Ensure thread save access which is required for parallel proofs
                                // (e.g. in Eclipse)
             ac = cache.get(p_cost);
-            if (ac != null)
+            if (ac != null) {
                 return ac;
+            }
 
             ac = new IntRuleAppCost(p_cost);
             cache.put(p_cost, ac);
@@ -66,8 +68,9 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
 
     @Override
     public int compareTo(RuleAppCost o) {
-        if (o instanceof TopRuleAppCost)
+        if (o instanceof TopRuleAppCost) {
             return -1;
+        }
         return compareTo((NumberRuleAppCost) o);
     }
 
@@ -75,7 +78,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
     public int compareTo(NumberRuleAppCost c) {
         final long this_cost = getValue();
         final long other_cost = c.getValue();
-        return (this_cost < other_cost ? -1 : (this_cost == other_cost ? 0 : 1));
+        return (Long.compare(this_cost, other_cost));
     }
 
 
@@ -115,7 +118,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
 
     @Override
     public String toString() {
-        return "" + getValue();
+        return String.valueOf(getValue());
     }
 
     /**
@@ -127,12 +130,12 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
 
         private final long cost;
 
-        protected LongRuleAppCost(long p_cost) {
+        private LongRuleAppCost(long p_cost) {
             cost = p_cost;
         }
 
         @Override
-        public final long getValue() {
+        public long getValue() {
             return cost;
         }
     }
@@ -142,13 +145,13 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
 
         private final int cost;
 
-        protected IntRuleAppCost(int p_cost) {
+        private IntRuleAppCost(int p_cost) {
             this.cost = p_cost;
         }
 
 
         @Override
-        public final long getValue() {
+        public long getValue() {
             return cost;
         }
     }

@@ -60,7 +60,7 @@ public class LinkedHashMap<K, V> extends java.util.LinkedHashMap<K, V>
     }
 
     public Iterator<Pair<K, V>> iterator() {
-        return new PairIterator<K, V>(this);
+        return new PairIterator<>(this);
     }
 
     private static class PairIterator<K, V> implements Iterator<Pair<K, V>> {
@@ -82,7 +82,7 @@ public class LinkedHashMap<K, V> extends java.util.LinkedHashMap<K, V>
         @Override
         public Pair<K, V> next() {
             last = keyIt.next();
-            return new Pair<K, V>(last, map.get(last));
+            return new Pair<>(last, map.get(last));
         }
 
         @Override

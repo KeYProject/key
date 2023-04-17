@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import de.uka.ilkd.key.prover.GoalChooserBuilder;
 import de.uka.ilkd.key.prover.GoalChooser;
+import de.uka.ilkd.key.prover.GoalChooserBuilder;
 
 /**
  * This {@link GoalChooserBuilder} creates a special {@link GoalChooser} for symbolic execution.

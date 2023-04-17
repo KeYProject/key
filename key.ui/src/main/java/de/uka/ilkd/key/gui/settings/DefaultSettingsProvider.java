@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.gui.settings;
 
-import de.uka.ilkd.key.gui.MainWindow;
-
-import javax.swing.*;
 import java.util.List;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.MainWindow;
 
 /**
  * @author Alexander Weigl
@@ -13,7 +13,7 @@ public class DefaultSettingsProvider implements SettingsProvider {
     private String description;
     private JComponent panel;
     private List<SettingsProvider> children;
-    private String keywords = "";
+    private final String keywords = "";
     private int priority;
     private Icon icon;
 

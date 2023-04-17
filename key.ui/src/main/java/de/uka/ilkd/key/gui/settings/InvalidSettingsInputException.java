@@ -8,8 +8,8 @@ import javax.swing.*;
  */
 public class InvalidSettingsInputException extends Exception {
     private static final long serialVersionUID = -7504257775646675899L;
-    private SettingsProvider panel;
-    private JComponent focusable;
+    private final SettingsProvider panel;
+    private final JComponent focusable;
 
     public InvalidSettingsInputException(SettingsProvider panel, JComponent focusable) {
         this.panel = panel;

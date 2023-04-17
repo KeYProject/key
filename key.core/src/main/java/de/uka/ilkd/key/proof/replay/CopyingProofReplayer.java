@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.proof.replay;
 
+import java.util.ArrayDeque;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
-import org.key_project.util.collection.ImmutableList;
 
-import java.util.ArrayDeque;
+import org.key_project.util.collection.ImmutableList;
 
 public class CopyingProofReplayer extends AbstractProofReplayer {
     public CopyingProofReplayer(Proof originalProof, Proof proof) {

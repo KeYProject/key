@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.visitor.Visitor;
+
 import org.key_project.util.ExtList;
 
 /**
@@ -28,8 +29,9 @@ public class CcatchBreakLabelParameterDeclaration extends CcatchNonstandardParam
     @Override
     public ProgramElement getChildAt(int index) {
         if (label != null) {
-            if (index == 0)
+            if (index == 0) {
                 return label;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

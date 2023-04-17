@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -181,10 +182,12 @@ public class SynchronizedBlock extends JavaStatement
 
     public int getChildCount() {
         int result = 0;
-        if (expression != null)
+        if (expression != null) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -198,13 +201,15 @@ public class SynchronizedBlock extends JavaStatement
 
     public ProgramElement getChildAt(int index) {
         if (expression != null) {
-            if (index == 0)
+            if (index == 0) {
                 return expression;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

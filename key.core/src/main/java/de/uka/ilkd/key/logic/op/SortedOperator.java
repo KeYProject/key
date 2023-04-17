@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.logic.op;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.util.collection.ImmutableArray;
 
 
 /**
@@ -14,5 +14,5 @@ public interface SortedOperator extends Operator {
 
     Sort argSort(int i);
 
-    public ImmutableArray<Sort> argSorts();
+    ImmutableArray<Sort> argSorts();
 }

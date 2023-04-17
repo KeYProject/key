@@ -3,7 +3,7 @@ package de.uka.ilkd.key.symbolic_execution.util;
 import java.util.Map.Entry;
 
 public class DefaultEntry<K, V> implements Entry<K, V> {
-    private K key;
+    private final K key;
 
     private V value;
 

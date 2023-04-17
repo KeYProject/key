@@ -1,16 +1,16 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+
+import org.key_project.util.collection.DefaultImmutableMap;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Matching triggers within another quantifier expression. Problems with the current implementation:
@@ -64,13 +64,13 @@ class TwoSidedMatching {
     ImmutableSet<Substitution> getSubstitutions(Services services) {
         if (triggerWithMVs == null || targetWithMVs == null) {
             // non ground subs not supported yet
-            return DefaultImmutableSet.<Substitution>nil();
+            return DefaultImmutableSet.nil();
         }
         return getAllSubstitutions(targetWithMVs, services);
     }
 
     private ImmutableSet<Substitution> getAllSubstitutions(Term target, Services services) {
-        ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
+        ImmutableSet<Substitution> allsubs = DefaultImmutableSet.nil();
         Substitution sub = match(triggerWithMVs, target, services);
         if (sub != null
                 && (trigger.isElementOfMultitrigger() || sub.isTotalOn(trigger.getUniVariables())
@@ -93,7 +93,7 @@ class TwoSidedMatching {
         final Constraint c = Constraint.BOTTOM.unify(targetTerm, triggerTerm, services);
         if (c.isSatisfiable()) {
             ImmutableMap<QuantifiableVariable, Term> sub =
-                DefaultImmutableMap.<QuantifiableVariable, Term>nilMap();
+                DefaultImmutableMap.nilMap();
             for (QuantifiableVariable quantifiableVariable : trigger.getUniVariables()) {
                 QuantifiableVariable q = quantifiableVariable;
                 Term mv = triggerSubstWithMVs.getSubstitutedTerm(q);

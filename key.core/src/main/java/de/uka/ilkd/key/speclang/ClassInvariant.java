@@ -6,7 +6,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 
@@ -23,32 +22,32 @@ public interface ClassInvariant extends SpecificationElement {
     /**
      * Returns the invariant formula without implicit all-quantification over the receiver object.
      */
-    public Term getInv(ParsableVariable selfVar, TermServices services);
+    Term getInv(ParsableVariable selfVar, TermServices services);
 
 
     /**
      * Returns the invariant formula without implicit all-quantification over the receiver object.
      */
-    public Term getOriginalInv();
+    Term getOriginalInv();
 
 
     /**
      * Tells whether the invariant is static (i.e., does not refer to a receiver object).
      */
-    public boolean isStatic();
+    boolean isStatic();
 
     /**
      * Returns another class invariant like this one, except that it refers to the passed
      * KeYJavaType.
      */
-    public ClassInvariant setKJT(KeYJavaType kjt);
+    ClassInvariant setKJT(KeYJavaType kjt);
 
     /**
      * Returns the original Self Variable to replace it easier.
      */
-    public OriginalVariables getOrigVars();
+    OriginalVariables getOrigVars();
 
     @Override
-    public ClassInvariant map(UnaryOperator<Term> op, Services services);
+    ClassInvariant map(UnaryOperator<Term> op, Services services);
 
 }

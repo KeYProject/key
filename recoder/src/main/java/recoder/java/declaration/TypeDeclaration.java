@@ -2,19 +2,19 @@
 
 package recoder.java.declaration;
 
-import recoder.abstraction.Package;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import recoder.abstraction.*;
+import recoder.abstraction.Package;
 import recoder.convenience.Naming;
 import recoder.java.*;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.ProgramModelInfo;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Type declaration.
@@ -244,8 +244,9 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
                 }
             }
         }
-        if (getTypeParameters() != null)
+        if (getTypeParameters() != null) {
             count += getTypeParameters().size();
+        }
         return count;
     }
 
@@ -501,9 +502,9 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
 
     public List<TypeDeclaration> getTypesInScope() {
         if (name2type == null || name2type.isEmpty()) {
-            return new ArrayList<TypeDeclaration>(0);
+            return new ArrayList<>(0);
         }
-        List<TypeDeclaration> res = new ArrayList<TypeDeclaration>();
+        List<TypeDeclaration> res = new ArrayList<>();
         for (TypeDeclaration td : name2type.values()) {
             res.add(td);
         }
@@ -521,7 +522,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     public void addTypeToScope(ClassType type, String tname) {
         Debug.assertNonnull(type, tname);
         if (name2type == null || name2type == UNDEFINED_SCOPE) {
-            name2type = new HashMap<String, TypeDeclaration>();
+            name2type = new HashMap<>();
         }
         name2type.put(tname, (TypeDeclaration) type);
     }
@@ -536,9 +537,9 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
 
     public List<FieldSpecification> getFieldsInScope() {
         if (name2field == null || name2field.isEmpty()) {
-            return new ASTArrayList<FieldSpecification>(0);
+            return new ASTArrayList<>(0);
         }
-        ASTList<FieldSpecification> res = new ASTArrayList<FieldSpecification>();
+        ASTList<FieldSpecification> res = new ASTArrayList<>();
         for (FieldSpecification fs : name2field.values()) {
             res.add(fs);
         }
@@ -561,7 +562,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
         Debug.assertBoolean(var instanceof FieldSpecification
                 || (var instanceof EnumConstantSpecification && this instanceof EnumDeclaration));
         if (name2field == null || name2field == UNDEFINED_SCOPE) {
-            name2field = new HashMap<String, FieldSpecification>();
+            name2field = new HashMap<>();
         }
         name2field.put(var.getName(), (FieldSpecification) var);
     }

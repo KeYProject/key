@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
@@ -19,6 +17,8 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.rule.metaconstruct.EnhancedForElimination;
 import de.uka.ilkd.key.util.InfFlowSpec;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * <p>
@@ -38,7 +38,7 @@ public interface LoopContract extends AuxiliaryContract {
      *
      * @return this loop contract's decreases clause.
      */
-    public Term getDecreases();
+    Term getDecreases();
 
     /**
      *
@@ -47,7 +47,7 @@ public interface LoopContract extends AuxiliaryContract {
      * @param services services.
      * @return this loop contract's decreases clause on the specified heap.
      */
-    public Term getDecreases(Term heap, Term self, Services services);
+    Term getDecreases(Term heap, Term self, Services services);
 
     /**
      *
@@ -55,7 +55,7 @@ public interface LoopContract extends AuxiliaryContract {
      * @param services services.
      * @return this loop contract's decreases clause.
      */
-    public Term getDecreases(Variables variables, Services services);
+    Term getDecreases(Variables variables, Services services);
 
     /**
      * <p>
@@ -68,39 +68,39 @@ public interface LoopContract extends AuxiliaryContract {
      *
      * @return statements to execute before the loop.
      */
-    public StatementBlock getHead();
+    StatementBlock getHead();
 
     /**
      * @return the loop guard.
      */
-    public Expression getGuard();
+    Expression getGuard();
 
     /**
      * @return the loop body.
      */
-    public StatementBlock getBody();
+    StatementBlock getBody();
 
     /**
      * @return all statements after the loop.
      */
-    public StatementBlock getTail();
+    StatementBlock getTail();
 
     /**
      * @return a loop of the form <code> while(&lt;getGuard()&gt;) { &lt;getBody()&gt; } </code>
      */
-    public LoopStatement getLoop();
+    LoopStatement getLoop();
 
     /**
      * @return all labels that belong to the loop, or an empty list if the loop is not a labeled
      *         statement.
      */
-    public List<Label> getLoopLabels();
+    List<Label> getLoopLabels();
 
     /**
      * @return {@code true} if this contract belongs to a block, {@code false} if it belongs to a
      *         loop.
      */
-    public boolean isOnBlock();
+    boolean isOnBlock();
 
     /**
      *
@@ -164,23 +164,23 @@ public interface LoopContract extends AuxiliaryContract {
      * @return a new loop contract equal to this one except that it belongs to a different target.
      */
     @Override
-    public LoopContract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
+    LoopContract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
 
     /**
      * @param newBlock the new block.
      * @return a new loop contract equal to this one except that it belongs to a different block.
      */
     @Override
-    public LoopContract setBlock(StatementBlock newBlock);
+    LoopContract setBlock(StatementBlock newBlock);
 
     @Override
-    public LoopContract map(UnaryOperator<Term> op, Services services);
+    LoopContract map(UnaryOperator<Term> op, Services services);
 
     /**
      * @param newLoop the new loop.
      * @return a new loop contract equal to this one except that it belongs to a different loop.
      */
-    public LoopContract setLoop(LoopStatement newLoop);
+    LoopContract setLoop(LoopStatement newLoop);
 
     /**
      * Replaces {@code \index} and {@code \values} with the proper variables in all terms of this
@@ -191,13 +191,13 @@ public interface LoopContract extends AuxiliaryContract {
      * @return a new loop contract equal to this one except that it belongs to the new block, and
      *         {@code \index} and {@code \values} are replaced by proper variables in all terms.
      */
-    public LoopContract replaceEnhancedForVariables(StatementBlock newBlock, Services services);
+    LoopContract replaceEnhancedForVariables(StatementBlock newBlock, Services services);
 
     /**
      * @return {@code true} iff this contract should only be applied using
      *         {@link LoopContractInternalRule}.
      */
-    public boolean isInternalOnly();
+    boolean isInternalOnly();
 
     /**
      * Returns a {@code BlockContract} for {@link #getBlock()}.
@@ -208,5 +208,5 @@ public interface LoopContract extends AuxiliaryContract {
      *
      * @return a valid {@code BlockContract} for {@link #getBlock()}.
      */
-    public BlockContract toBlockContract();
+    BlockContract toBlockContract();
 }

@@ -4,33 +4,26 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.proof.*;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.DelegationBasedAutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
-import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -211,8 +204,9 @@ public abstract class AbstractProofControl implements ProofControl {
                 }
                 TacletApp tmpApp =
                     firstApp.tryToInstantiate(services.getOverlay(goal.getLocalNamespaces()));
-                if (tmpApp != null)
+                if (tmpApp != null) {
                     firstApp = tmpApp;
+                }
 
             }
             if (ifSeqInteraction || !firstApp.complete()) {
@@ -406,7 +400,6 @@ public abstract class AbstractProofControl implements ProofControl {
                 goal.apply(app);
             }
 
-            return;
         }
     }
 
@@ -545,7 +538,7 @@ public abstract class AbstractProofControl implements ProofControl {
      */
     protected void fireAutoModeStarted(ProofEvent e) {
         AutoModeListener[] listener =
-            autoModeListener.toArray(new AutoModeListener[autoModeListener.size()]);
+            autoModeListener.toArray(new AutoModeListener[0]);
         for (AutoModeListener aListenerList : listener) {
             aListenerList.autoModeStarted(e);
         }
@@ -556,7 +549,7 @@ public abstract class AbstractProofControl implements ProofControl {
      */
     protected void fireAutoModeStopped(ProofEvent e) {
         AutoModeListener[] listener =
-            autoModeListener.toArray(new AutoModeListener[autoModeListener.size()]);
+            autoModeListener.toArray(new AutoModeListener[0]);
         for (AutoModeListener aListenerList : listener) {
             aListenerList.autoModeStopped(e);
         }

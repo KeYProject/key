@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.logic.label;
 
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.op.IfExThenElse;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 
 /**

@@ -1,13 +1,5 @@
 package de.uka.ilkd.key.gui.settings;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-
-import javax.swing.*;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -16,6 +8,14 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.swing.*;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 /**
  * @author Alexander Weigl
@@ -28,9 +28,9 @@ public class SettingsUi extends JPanel {
 
     private final JSplitPane root;
     private DefaultTreeModel treeModel = new DefaultTreeModel(null, false);
-    private JTree treeSettingsPanels = new JTree(treeModel);
-    private JTextField txtSearch = new JTextField();
-    private MainWindow mainWindow;
+    private final JTree treeSettingsPanels = new JTree(treeModel);
+    private final JTextField txtSearch = new JTextField();
+    private final MainWindow mainWindow;
     // private JScrollPane center;
 
     public SettingsUi(MainWindow mainWindow) {
@@ -129,7 +129,7 @@ public class SettingsUi extends JPanel {
         treeSettingsPanels.setModel(treeModel);
         LinkedList<TreePath> list = new LinkedList<>();
         getPaths(new TreePath(treeModel.getPathToRoot(root)), list);
-        list.forEach(it -> treeSettingsPanels.expandPath(it));
+        list.forEach(treeSettingsPanels::expandPath);
 
         if (!providers.isEmpty()) {
             setSettingsPanel(providers.get(0).getPanel(mainWindow));

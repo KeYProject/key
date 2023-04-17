@@ -2,7 +2,7 @@ package de.uka.ilkd.key.java;
 
 public class ParentIsInterfaceDeclaration {
 
-    private boolean value;
+    private final boolean value;
 
     public ParentIsInterfaceDeclaration(boolean val) {
         this.value = val;

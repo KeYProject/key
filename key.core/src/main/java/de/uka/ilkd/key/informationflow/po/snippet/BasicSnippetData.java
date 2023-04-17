@@ -3,10 +3,6 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 import java.util.EnumMap;
 import java.util.List;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
@@ -18,13 +14,13 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.speclang.AuxiliaryContract;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.InformationFlowContract;
-import de.uka.ilkd.key.speclang.LoopSpecification;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**
@@ -55,7 +51,7 @@ class BasicSnippetData {
     /**
      * Unified contract content.
      */
-    private final EnumMap<Key, Object> contractContents = new EnumMap<Key, Object>(Key.class) {
+    private final EnumMap<Key, Object> contractContents = new EnumMap<>(Key.class) {
 
         private static final long serialVersionUID = -8548805965130100236L;
 
@@ -70,7 +66,7 @@ class BasicSnippetData {
     /**
      * Keys to access the unified contract content.
      */
-    static enum Key {
+    enum Key {
 
         /**
          * Returns the KeYJavaType representing the class/interface to which the specification
@@ -113,7 +109,7 @@ class BasicSnippetData {
         public Class<?> getType() {
             return type;
         }
-    };
+    }
 
 
     BasicSnippetData(FunctionalOperationContract contract, Services services) {
@@ -152,7 +148,7 @@ class BasicSnippetData {
         // add guard term to information flow specs (necessary for soundness)
         // and add the modified specs to the table
         ImmutableList<InfFlowSpec> infFlowSpecs = invariant.getInfFlowSpecs(services);
-        ImmutableList<InfFlowSpec> modifedSpecs = ImmutableSLList.<InfFlowSpec>nil();
+        ImmutableList<InfFlowSpec> modifedSpecs = ImmutableSLList.nil();
         for (InfFlowSpec infFlowSpec : infFlowSpecs) {
             ImmutableList<Term> modifiedPreExps = infFlowSpec.preExpressions.append(guardTerm);
             ImmutableList<Term> modifiedPostExps = infFlowSpec.postExpressions.append(guardTerm);
@@ -215,7 +211,7 @@ class BasicSnippetData {
         contractContents.put(Key.MODALITY, contract.getModality());
         contractContents.put(Key.INF_FLOW_SPECS, contract.getInfFlowSpecs());
         List<Label> labels = contract.getLabels();
-        contractContents.put(Key.LABELS, labels.toArray(new Label[labels.size()]));
+        contractContents.put(Key.LABELS, labels.toArray(new Label[0]));
         contractContents.put(Key.EXECUTION_CONTEXT, context);
 
         final Term heap = tb.getBaseHeap();
@@ -236,7 +232,7 @@ class BasicSnippetData {
 
 
     private ImmutableList<Term> toTermList(ImmutableSet<ProgramVariable> vars) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = ImmutableSLList.nil();
         for (ProgramVariable v : vars) {
             result = result.append(tb.var(v));
         }

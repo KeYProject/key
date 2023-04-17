@@ -14,10 +14,12 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.speclang.ContractFactory;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +66,7 @@ public final class ProgramMethod extends ObserverFunction
             result[i] = md.getParameterDeclarationAt(i).getVariableSpecification()
                     .getProgramVariable().getKeYJavaType();
         }
-        return new ImmutableArray<KeYJavaType>(result);
+        return new ImmutableArray<>(result);
     }
 
     // -------------------------------------------------------------------------
@@ -258,7 +260,7 @@ public final class ProgramMethod extends ObserverFunction
      */
     @Override
     public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        if (se == null || !(se instanceof IProgramMethod)) {
+        if (!(se instanceof IProgramMethod)) {
             return false;
         }
 
@@ -442,14 +444,13 @@ public final class ProgramMethod extends ObserverFunction
             source.next();
             return matchCond;
         } else {
-            LOGGER.debug("Program match failed (pattern {}, source {})", this, src);
             return null;
         }
     }
 
     @Override
     public ImmutableList<LocationVariable> collectParameters() {
-        ImmutableList<LocationVariable> paramVars = ImmutableSLList.<LocationVariable>nil();
+        ImmutableList<LocationVariable> paramVars = ImmutableSLList.nil();
         int numParams = getParameterDeclarationCount();
         for (int i = numParams - 1; i >= 0; i--) {
             ParameterDeclaration pd = getParameterDeclarationAt(i);

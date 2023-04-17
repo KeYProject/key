@@ -3,9 +3,6 @@ package de.uka.ilkd.key.proof_references.analyst;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
@@ -22,6 +19,9 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Extracts used {@link ClassAxiom} and {@link ClassInvariant}s.
@@ -66,19 +66,19 @@ public class ClassAxiomAndInvariantProofReferencesAnalyst implements IProofRefer
                     // Invariant was applied
                     PartialInvAxiom axiom = (PartialInvAxiom) found;
                     DefaultProofReference<ClassInvariant> reference =
-                        new DefaultProofReference<ClassInvariant>(IProofReference.USE_INVARIANT,
+                        new DefaultProofReference<>(IProofReference.USE_INVARIANT,
                             node, axiom.getInv());
                     LinkedHashSet<IProofReference<?>> result =
-                        new LinkedHashSet<IProofReference<?>>();
+                        new LinkedHashSet<>();
                     result.add(reference);
                     return result;
                 } else if (found != null) {
                     // ClassAxiom was applied
                     DefaultProofReference<ClassAxiom> reference =
-                        new DefaultProofReference<ClassAxiom>(IProofReference.USE_AXIOM, node,
+                        new DefaultProofReference<>(IProofReference.USE_AXIOM, node,
                             found);
                     LinkedHashSet<IProofReference<?>> result =
-                        new LinkedHashSet<IProofReference<?>>();
+                        new LinkedHashSet<>();
                     result.add(reference);
                     return result;
                 } else {

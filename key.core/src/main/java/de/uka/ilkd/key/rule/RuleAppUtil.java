@@ -1,14 +1,14 @@
 package de.uka.ilkd.key.rule;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.smt.RuleAppSMT;
-
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 /**
  * Utilities for working with rule applications.

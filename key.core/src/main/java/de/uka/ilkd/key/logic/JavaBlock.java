@@ -2,9 +2,11 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.pp.PrettyPrinter;
+
 import org.key_project.util.EqualsModProofIrrelevancy;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

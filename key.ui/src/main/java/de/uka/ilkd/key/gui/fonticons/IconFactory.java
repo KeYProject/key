@@ -1,15 +1,14 @@
 package de.uka.ilkd.key.gui.fonticons;
 
-import de.uka.ilkd.key.util.Debug;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
 import java.awt.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import javax.swing.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class IconFactory {
     public static final IconFontProvider QUIT = new IconFontProvider(FontAwesomeSolid.WINDOW_CLOSE);
@@ -154,21 +153,21 @@ public final class IconFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IconFactory.class);
 
-    private static Image keyHole = getImage("images/ekey-mono.gif");
-    private static Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
-    private static Image keyHoleInteractive = getImage("images/keyinteractive.gif");
-    private static Image keyHoleLinked = getImage("images/keylinked.gif");
-    private static Image keyLogo = getImage("images/key-color.png");
+    private static final Image keyHole = getImage("images/ekey-mono.gif");
+    private static final Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
+    private static final Image keyHoleInteractive = getImage("images/keyinteractive.gif");
+    private static final Image keyHoleLinked = getImage("images/keylinked.gif");
+    private static final Image keyLogo = getImage("images/key-color.png");
     private static final Image keyLogoShadow = getImage("images/key-shadow.png");
     // The following should be updated with every major version step.
     // private static final Image keyVersionLogo = getImage("images/key-shadow-2.8.png");
     private static final Image keyVersionLogo = getImage("images/key-shadow-2.10.png");
-    private static Image keyLogoSmall = getImage("images/key-color-icon-square.gif");
-    private static Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png");
+    private static final Image keyLogoSmall = getImage("images/key-color-icon-square.gif");
+    private static final Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png");
 
-    private static Image junit = getImage("images/toolbar/junit_logo.png");
-    private static Image jml = getImage("images/toolbar/jml.png");
-    private static Image uml = getImage("images/toolbar/uml.png");
+    private static final Image junit = getImage("images/toolbar/junit_logo.png");
+    private static final Image jml = getImage("images/toolbar/jml.png");
+    private static final Image uml = getImage("images/toolbar/uml.png");
 
     // private static Image expandGoals = getImage("images/toolbar/expandGoals.png");
     // private static Image scriptAppLogo = getImage("images/scriptAppLogo.png");
@@ -176,38 +175,32 @@ public final class IconFactory {
     // private static Image testgenerationImage = getImage("images/toolbar/tg.png");
     // private static Image heatmapImage = getImage("images/toolbar/heatmap.png");
 
-    private static HashMap<String, Icon> cache = new HashMap<String, Icon>();
+    private static final HashMap<String, Icon> cache = new HashMap<>();
 
     private IconFactory() {
     }
 
     public static Image getImage(String s) {
-        ImageIcon ii = createImageIcon(IconFactory.class, s);
+        ImageIcon ii = createImageIcon(s);
         return ii != null ? ii.getImage() : null;
     }
 
     /**
-     * Creates an icon from an image contained in a resource. The resource is fist search using the
-     * package name of the given class and if the resource is not found the package name of its
-     * superclass is used recursively.
+     * Creates an icon from an image contained in a resource.
      *
-     * @param cl the Class the resource is looked for
      * @param filename String the name of the file to search (only relative pathname to the path of
-     *        the calling class)
+     *        this class)
      * @return the newly created image
      */
-    private static ImageIcon createImageIcon(Class<?> cl, String filename) {
+    private static ImageIcon createImageIcon(String filename) {
         filename = "/de/uka/ilkd/key/gui/" + filename;
-        URL iconURL = cl.getResource(filename);
-        LOGGER.debug("Load Resource:" + filename + " of class " + cl);
-        if (iconURL == null && cl.getSuperclass() != null) {
-            return createImageIcon(cl.getSuperclass(), filename);
-        } else if (iconURL == null && cl.getSuperclass() == null) {
+        URL iconURL = IconFactory.class.getResource(filename);
+        if (iconURL == null) {
             // error message Resource not found
-            LOGGER.warn("No image resource " + filename + " found");
+            LOGGER.warn("No resource " + filename + " found");
             return null;
         } else {
-            LOGGER.trace("Done.");
+            LOGGER.trace("Loaded resource: " + filename);
             return new ImageIcon(iconURL);
         }
     }

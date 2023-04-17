@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.rule.tacletbuilder;
 
+import java.io.File;
+
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -9,11 +11,11 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.parsing.BuildingException;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.io.File;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;

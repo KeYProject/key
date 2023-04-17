@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.gui.actions.useractions;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * User action that modifies the proof in some way.

@@ -60,7 +60,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
      * This strategy accepts all rule apps for which the rule name starts with a string in the
      * admitted set and rejects everything else.
      */
-    protected class RemovePostStrategy extends AbstractFeatureStrategy {
+    protected static class RemovePostStrategy extends AbstractFeatureStrategy {
 
         private final Name NAME = new Name("RemovePostStrategy");
 

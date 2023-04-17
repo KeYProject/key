@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.gui.utilities;
 
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
-import java.awt.*;
 
 
 /**
@@ -53,7 +53,7 @@ class TrafficLight extends JPanel {
 
     public void setGreen(boolean b) {
         isGreen = b;
-        SwingUtilities.invokeLater(() -> repaint());
+        SwingUtilities.invokeLater(this::repaint);
     }
 
 }

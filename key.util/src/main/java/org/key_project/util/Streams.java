@@ -17,7 +17,7 @@ public class Streams {
         while ((count = is.read(buf)) >= 0) {
             baos.write(buf, 0, count);
         }
-        return new String(baos.toByteArray());
+        return baos.toString();
     }
 
 }

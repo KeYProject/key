@@ -1,5 +1,16 @@
 package de.uka.ilkd.key.nparser;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.stream.Stream;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -9,22 +20,13 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import javax.annotation.Nonnull;
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.stream.Stream;
 
 /**
  * This class provides regression tests for KeY Taclets.
@@ -51,22 +53,27 @@ public class TestTacletEquality {
         InputStream is = TestTacletEquality.class.getResourceAsStream("taclets.old.txt");
         Assumptions.assumeTrue(is != null);
         var seq = Stream.<Arguments>builder();
-        try (BufferedReader r = new BufferedReader(new InputStreamReader(is))) {
+        try (BufferedReader r =
+            new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             String tmp;
             while ((tmp = r.readLine()) != null) {
-                if (tmp.trim().isEmpty())
+                if (tmp.trim().isEmpty()) {
                     continue;
-                if (tmp.startsWith("#"))
+                }
+                if (tmp.startsWith("#")) {
                     continue;
+                }
                 if (tmp.startsWith("== ")) {
                     StringBuilder expected = new StringBuilder();
                     int nameEnd = tmp.indexOf(' ', 4);
                     String name = tmp.substring(3, nameEnd + 1).trim();
                     while ((tmp = r.readLine()) != null) {
-                        if (tmp.trim().isEmpty())
+                        if (tmp.trim().isEmpty()) {
                             continue;
-                        if (tmp.startsWith("#"))
+                        }
+                        if (tmp.startsWith("#")) {
                             continue;
+                        }
                         if (tmp.startsWith("---")) {
                             seq.add(Arguments.of(name, expected.toString()));
                             break;
@@ -95,6 +102,7 @@ public class TestTacletEquality {
         }
     }
 
+    @SuppressWarnings("unused")
     public static void createNewOracle() {
         var path = Paths.get("src/test/resources/de/uka/ilkd/key/nparser/taclets.new.txt");
         var taclets = new ArrayList<>(initConfig.activatedTaclets());
@@ -112,8 +120,7 @@ public class TestTacletEquality {
                 out.format("-----------------------------------------------------\n");
             }
         } catch (IOException e) {
-            System.out.println("Exception for opening " + path);
-            e.printStackTrace();
+            Assertions.fail("Exception for opening " + path, e);
         }
     }
 

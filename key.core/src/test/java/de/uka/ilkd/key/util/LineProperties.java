@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -28,7 +29,7 @@ public class LineProperties {
     private final Map<String, String> map = new LinkedHashMap<>();
 
     public void read(InputStream is) throws IOException {
-        read(new InputStreamReader(is));
+        read(new InputStreamReader(is, StandardCharsets.UTF_8));
     }
 
     public void read(Reader reader) throws IOException {

@@ -2,9 +2,6 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.expression.Assignment;
@@ -20,14 +17,18 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
     @Override
     public Term produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        ImmutableList<Term> posts = ImmutableSLList.<Term>nil();
-        if (poVars.post.self != null)
+        ImmutableList<Term> posts = ImmutableSLList.nil();
+        if (poVars.post.self != null) {
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
+        }
 
         if (poVars.pre.guard != null) {
             final JavaBlock guardJb = buildJavaBlock(d).second;
@@ -39,8 +40,9 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
         while (localVars.hasNext()) {
             Term i = localVars.next();
             Term o = localVarsAtPost.next();
-            if (i != null && o != null)
+            if (i != null && o != null) {
                 posts = posts.append(d.tb.equals(o, i));
+            }
         }
         posts = posts.append(d.tb.equals(poVars.post.heap, d.tb.getBaseHeap()));
 
@@ -107,6 +109,6 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
         final Statement s = new MethodFrame(null, context, sb);
         final JavaBlock res = JavaBlock.createJavaBlock(new StatementBlock(s));
 
-        return new Pair<JavaBlock, JavaBlock>(res, guardJb);
+        return new Pair<>(res, guardJb);
     }
 }

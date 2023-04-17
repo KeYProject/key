@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.gui.sourceview;
 
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.HashMap;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -10,10 +14,6 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.*;
-import java.awt.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.HashMap;
 
 /**
  * This class will display line numbers for a related text component. The text component must use
@@ -35,7 +35,7 @@ public class TextLineNumber extends JPanel
 
     // Text component this TextTextLineNumber component is in sync with
 
-    private JTextComponent component;
+    private final JTextComponent component;
 
     // Properties that can be changed
 
@@ -288,7 +288,7 @@ public class TextLineNumber extends JPanel
         } else {
             // We need to check all the attributes for font changes
             if (fonts == null) {
-                fonts = new HashMap<String, FontMetrics>();
+                fonts = new HashMap<>();
             }
 
             Element root = component.getDocument().getDefaultRootElement();

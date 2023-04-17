@@ -11,6 +11,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
 import de.uka.ilkd.key.util.properties.Properties;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -24,7 +25,7 @@ public class InfFlowContractAppTacletExecutor
      */
     @SuppressWarnings("unchecked")
     public static final Properties.Property<ImmutableList<Term>> INF_FLOW_CONTRACT_APPL_PROPERTY =
-        new Properties.Property<ImmutableList<Term>>(
+        new Properties.Property<>(
             (Class<ImmutableList<Term>>) (Class<?>) ImmutableList.class,
             "information flow contract applicaton property");
 
@@ -58,7 +59,7 @@ public class InfFlowContractAppTacletExecutor
     private void updateStrategyInfo(Goal goal, final Term applFormula) {
         ImmutableList<Term> applFormulas = goal.getStrategyInfo(INF_FLOW_CONTRACT_APPL_PROPERTY);
         if (applFormulas == null) {
-            applFormulas = ImmutableSLList.<Term>nil();
+            applFormulas = ImmutableSLList.nil();
         }
         applFormulas = applFormulas.append(applFormula);
         StrategyInfoUndoMethod undo = strategyInfos -> {

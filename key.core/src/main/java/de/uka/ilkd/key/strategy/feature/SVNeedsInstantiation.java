@@ -12,7 +12,7 @@ public class SVNeedsInstantiation extends InstantiatedSVFeature {
         return new SVNeedsInstantiation(new Name(svName));
     }
 
-    private Name svName;
+    private final Name svName;
 
     protected SVNeedsInstantiation(Name svName) {
         super(svName);
@@ -22,7 +22,7 @@ public class SVNeedsInstantiation extends InstantiatedSVFeature {
     @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
         boolean res = super.filter(app, pos, goal);
-        if (res == false) {
+        if (!res) {
             for (SchemaVariable sv : app.uninstantiatedVars()) {
                 if (sv.name().equals(svName)) {
                     return true;
