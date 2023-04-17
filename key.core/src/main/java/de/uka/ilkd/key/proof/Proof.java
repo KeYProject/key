@@ -136,6 +136,11 @@ public class Proof implements Named {
     private Lookup userData;
 
     /**
+     * Whether closing the proof should emit a {@link ProofEvent}.
+     */
+    private boolean mutedProofCloseEvents = false;
+
+    /**
      * constructs a new empty proof with name
      */
     private Proof(Name name, InitConfig initConfig) {
@@ -994,6 +999,9 @@ public class Proof implements Named {
      * event when the last goal in list is removed.
      */
     protected void fireProofClosed() {
+        if (mutedProofCloseEvents) {
+            return;
+        }
         ProofTreeEvent e = new ProofTreeEvent(this);
         synchronized (listenerList) {
             for (ProofTreeListener listener : listenerList) {
@@ -1413,5 +1421,9 @@ public class Proof implements Named {
             userData = new Lookup();
         }
         return userData;
+    }
+
+    public void setMutedProofCloseEvents(boolean mutedProofCloseEvents) {
+        this.mutedProofCloseEvents = mutedProofCloseEvents;
     }
 }

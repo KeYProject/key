@@ -50,10 +50,27 @@ import org.key_project.util.collection.ImmutableSet;
 
 import static de.uka.ilkd.key.proof.io.OutputStreamProofSaver.printAnything;
 
+/**
+ * Abstract proof replayer/constructor. Always works based on a previous/original proof
+ * and a "new" proof.
+ *
+ * @author Arne Keller
+ */
 public abstract class AbstractProofReplayer {
+    /**
+     * The original proof used when constructing the new proof.
+     */
     private final Proof originalProof;
+    /**
+     * The new proof.
+     */
     private final Proof proof;
 
+    /**
+     * Instantiate a new replayer.
+     * @param originalProof previous proof
+     * @param proof new proof
+     */
     protected AbstractProofReplayer(Proof originalProof, Proof proof) {
         this.originalProof = originalProof;
         this.proof = proof;

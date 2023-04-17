@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof.replay;
 
 import java.util.ArrayDeque;
+import java.util.Deque;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -10,16 +11,28 @@ import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import org.key_project.util.collection.ImmutableList;
 
+/**
+ * Replayer that copies proof steps from one proof to another.
+ *
+ * @author Arne Keller
+ */
 public class CopyingProofReplayer extends AbstractProofReplayer {
     public CopyingProofReplayer(Proof originalProof, Proof proof) {
         super(originalProof, proof);
     }
 
+    /**
+     * Copy steps from <code>originalNode</code> to <code>newNode</code>
+     * @param originalNode original proof
+     * @param newNode open goal in new proof
+     * @throws IntermediateProofReplayer.BuiltInConstructionException on error
+     */
     public void copy(Node originalNode, Goal newNode)
             throws IntermediateProofReplayer.BuiltInConstructionException {
+        newNode.proof().setMutedProofCloseEvents(true);
         OneStepSimplifier.refreshOSS(newNode.proof());
-        var nodeQueue = new ArrayDeque<Node>();
-        var queue = new ArrayDeque<Goal>();
+        Deque<Node> nodeQueue = new ArrayDeque<>();
+        Deque<Goal> queue = new ArrayDeque<>();
         queue.add(newNode);
         nodeQueue.add(originalNode);
         while (!nodeQueue.isEmpty()) {
@@ -37,5 +50,6 @@ public class CopyingProofReplayer extends AbstractProofReplayer {
                 queue.addFirst(g);
             }
         }
+        newNode.proof().setMutedProofCloseEvents(false);
     }
 }
