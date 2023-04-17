@@ -7,6 +7,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import org.key_project.util.collection.ImmutableList;
 
 public class CopyingProofReplayer extends AbstractProofReplayer {
@@ -16,16 +17,13 @@ public class CopyingProofReplayer extends AbstractProofReplayer {
 
     public void copy(Node originalNode, Goal newNode)
             throws IntermediateProofReplayer.BuiltInConstructionException {
+        OneStepSimplifier.refreshOSS(newNode.proof());
         var nodeQueue = new ArrayDeque<Node>();
         var queue = new ArrayDeque<Goal>();
         queue.add(newNode);
         nodeQueue.add(originalNode);
         while (!nodeQueue.isEmpty()) {
             Node nextNode = nodeQueue.pop();
-            System.out.println("working on " + nextNode.serialNr());
-            if (nextNode.getAppliedRuleApp() != null) {
-                System.out.println(nextNode.getAppliedRuleApp().rule().displayName());
-            }
             Goal nextGoal = queue.pop();
             for (int i = nextNode.childrenCount() - 1; i >= 0; i--) {
                 nodeQueue.addFirst(nextNode.child(i));
