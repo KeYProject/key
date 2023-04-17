@@ -10,17 +10,26 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+/**
+ * Utility class for proof caching.
+ *
+ * @author Arne Keller
+ */
 public class ReferenceSearcher {
     private ReferenceSearcher() {
 
     }
 
+    /**
+     * Try to find a closed branch in another proof that is equivalent to the <code>newNode</code>.
+     *
+     * @param previousProofs old proofs
+     * @param newNode new node (must be an open goal)
+     * @return a reference (or null, if none found)
+     */
     public static ClosedBy findPreviousProof(DefaultListModel<Proof> previousProofs, Node newNode) {
         // TODO:
         // - disallow closing by reference to merged branch
-        // - once the other proof is disposed, copy the steps into the new proof
-        // - when saving the new proof, copy the steps automatically
-        // - Tests
 
         // first verify that the new node does not contain any terms that depend on external
         // influences
@@ -36,7 +45,7 @@ public class ReferenceSearcher {
                 return null;
             }
         }
-        var proofs = previousProofs;
+        DefaultListModel<Proof> proofs = previousProofs;
         for (int i = 0; i < proofs.size(); i++) {
             Proof p = proofs.get(i);
             // only search in compatible proofs

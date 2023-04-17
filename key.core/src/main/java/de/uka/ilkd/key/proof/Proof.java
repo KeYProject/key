@@ -19,9 +19,12 @@ import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
+import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.merge.MergePartner;
@@ -554,6 +557,9 @@ public class Proof implements Named {
      * This is, for instance, needed for the {@link MergeRule}: In a situation where a merge node
      * and its associated partners have been closed and the merge node is then pruned away, the
      * partners have to be reopened again. Otherwise, we have a soundness issue.
+     * <p>
+     * This does not add the goal to the list of open goals, use {@link #add(Goal)} for that.
+     * </p>
      *
      * @param goal The goal to be opened again.
      */
@@ -1425,5 +1431,34 @@ public class Proof implements Named {
 
     public void setMutedProofCloseEvents(boolean mutedProofCloseEvents) {
         this.mutedProofCloseEvents = mutedProofCloseEvents;
+    }
+
+    /**
+     * For each branch closed by reference to another proof,
+     * copy the relevant proof steps into this proof.
+     *
+     * @param referencedFrom filter, if not null copy only from that proof
+     */
+    public void copyCachedGoals(Proof referencedFrom) {
+        // first, ensure that all cached goals are copied over
+        List<Goal> goals = closedGoals().toList();
+        for (Goal g : goals) {
+            Node node = g.node();
+            ClosedBy c = node.lookup(ClosedBy.class);
+            if (c == null) {
+                continue;
+            }
+            if (referencedFrom != null && referencedFrom != c.getProof()) {
+                continue;
+            }
+            add(g);
+            reOpenGoal(g);
+            node.deregister(c, ClosedBy.class);
+            try {
+                new CopyingProofReplayer(c.getProof(), this).copy(c.getNode(), g);
+            } catch (IntermediateProofReplayer.BuiltInConstructionException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

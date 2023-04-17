@@ -18,7 +18,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PrettyPrinter;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -28,8 +27,6 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.IProofFileParser.ProofElementID;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
-import de.uka.ilkd.key.proof.reference.ClosedBy;
-import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -150,21 +147,7 @@ public class OutputStreamProofSaver {
     }
 
     public void save(OutputStream out) throws IOException {
-        // first, ensure that all cached goals are copied over
-        List<Goal> goals = proof.closedGoals().toList();
-        for (Goal g : goals) {
-            Node node = g.node();
-            ClosedBy c = node.lookup(ClosedBy.class);
-            if (c == null) {
-                continue;
-            }
-            proof.reOpenGoal(g);
-            try {
-                new CopyingProofReplayer(c.getProof(), proof).copy(c.getNode(), g);
-            } catch (IntermediateProofReplayer.BuiltInConstructionException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        proof.copyCachedGoals(null);
         try (var ps = new PrintWriter(out, true, StandardCharsets.UTF_8)) {
             final ProofOblInput po =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);

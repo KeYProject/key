@@ -9,6 +9,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -49,6 +51,7 @@ public class CloseReferenceExtension
             if (c != null) {
                 p.closeGoal(goal);
                 goal.node().register(c, ClosedBy.class);
+                c.getProof().addProofDisposedListener(new CopyBeforeDispose(c.getProof(), p));
             }
         }
     }
@@ -57,5 +60,37 @@ public class CloseReferenceExtension
     public void init(MainWindow window, KeYMediator mediator) {
         this.mediator = mediator;
         mediator.addKeYSelectionListener(this);
+    }
+
+    /**
+     * Listener that ensures steps are copied before the referenced proof is disposed.
+     */
+    private static class CopyBeforeDispose implements ProofDisposedListener {
+
+        private final Proof referencedProof;
+        private final Proof newProof;
+
+        /**
+         * Construct new listener.
+         *
+         * @param referencedProof referenced proof
+         * @param newProof new proof
+         */
+        CopyBeforeDispose(Proof referencedProof, Proof newProof) {
+            this.referencedProof = referencedProof;
+            this.newProof = newProof;
+        }
+
+        @Override
+        public void proofDisposing(ProofDisposedEvent e) {
+            if (!newProof.isDisposed()) {
+                newProof.copyCachedGoals(referencedProof);
+            }
+        }
+
+        @Override
+        public void proofDisposed(ProofDisposedEvent e) {
+
+        }
     }
 }

@@ -68,6 +68,7 @@ public abstract class AbstractProofReplayer {
 
     /**
      * Instantiate a new replayer.
+     *
      * @param originalProof previous proof
      * @param proof new proof
      */
