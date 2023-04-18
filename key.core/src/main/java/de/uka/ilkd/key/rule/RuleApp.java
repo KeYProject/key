@@ -33,6 +33,7 @@ public interface RuleApp extends EqualsModProofIrrelevancy {
      * @param services the Services encapsulating all java information
      * @return list of new created goals
      */
+    @Nullable
     ImmutableList<Goal> execute(Goal goal, Services services);
 
     /**

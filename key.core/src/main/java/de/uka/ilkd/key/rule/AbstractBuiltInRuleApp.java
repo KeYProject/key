@@ -68,7 +68,7 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
      * @return list of new created goals
      */
     @Override
-    public ImmutableList<Goal> execute(Goal goal, Services services) {
+    public @Nullable ImmutableList<Goal> execute(Goal goal, Services services) {
         var time = System.nanoTime();
         var timeSetSequent = Goal.PERF_SET_SEQUENT.get();
         try {

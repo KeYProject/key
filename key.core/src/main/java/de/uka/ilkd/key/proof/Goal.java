@@ -619,28 +619,26 @@ public final class Goal {
         } finally {
             PERF_APP_EXECUTE.getAndAdd(System.nanoTime() - time);
         }
+        // can be null when the taclet failed to apply (RuleAbortException)
+        if (goalList == null) {
+            return null;
+        }
 
         proof.getServices().saveNameRecorder(n);
 
-        if (goalList != null) { // TODO: can goalList be null?
-            if (goalList.isEmpty()) {
-                proof.closeGoal(this);
-            } else {
-                proof.replace(this, goalList);
-                if (ruleApp instanceof TacletApp && ((TacletApp) ruleApp).taclet().closeGoal()) {
-                    // the first new goal is the one to be closed
-                    proof.closeGoal(goalList.head());
-                }
+        if (goalList.isEmpty()) {
+            proof.closeGoal(this);
+        } else {
+            proof.replace(this, goalList);
+            if (ruleApp instanceof TacletApp && ((TacletApp) ruleApp).taclet().closeGoal()) {
+                // the first new goal is the one to be closed
+                proof.closeGoal(goalList.head());
             }
         }
 
         adaptNamespacesNewGoals(goalList);
-
         final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(ruleApp);
-
-        if (goalList != null) {
-            proof.fireRuleApplied(new ProofEvent(proof, ruleAppInfo, goalList));
-        }
+        proof.fireRuleApplied(new ProofEvent(proof, ruleAppInfo, goalList));
         return goalList;
     }
 
