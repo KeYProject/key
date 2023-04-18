@@ -82,30 +82,50 @@ public abstract class PredicateRefiner {
             }
         }
 
-        boolean doNotAdd = false;
         for (SequentFormula sequentFormula : originalSequent.antecedent()) {
+            boolean doNotAdd = false;
             Operator sfOp = sequentFormula.formula().op();
-            for (Operator op: strongestOp(sfOp,depLDT)) {
-                if (labels.containsKey(op)) {
-                    HashMap<Term, Term> loc2label = labels.get(op);
-                    Term minLabel = loc2label.get(sequentFormula.formula().sub(0));
-                    if (minLabel == null ||
-                            (minLabel.op() != numberSymbol || minLabel.equalsModRenaming(sequentFormula.formula().sub(1)))) {
-                        //sequent = sequent.addFormula(sequentFormula, true, false).sequent();
-                        doNotAdd = (sfOp != op);
-                        break;
+            if (depLDT.isHistoryPredicate(sfOp)) {
+                for (Operator op: strongestOp(sfOp,depLDT)) {
+                    if (labels.containsKey(op)) {
+                        HashMap<Term, Term> loc2label = labels.get(op);
+                        Term minLabel = loc2label.get(sequentFormula.formula().sub(0));
+
+                        if (minLabel == null && op != sfOp) {
+                            continue;
+                        } else if (minLabel != null) {
+                            if (minLabel.op() != numberSymbol) {
+                                continue;
+                            } else if (!minLabel.equalsModRenaming(sequentFormula.formula().sub(1))) {
+                                doNotAdd = true;
+                                break;
+                            } else {
+                                if (sfOp != op) {
+                                    continue;
+                                } else {
+                                    doNotAdd = false;
+                                }
+                            }
+                        } else {
+                            doNotAdd = false;
+                        }
+
+
+//                    if (minLabel == null ||
+//                            (minLabel.op() != numberSymbol || minLabel.equalsModRenaming(sequentFormula.formula().sub(1)))) {
+//                        //sequent = sequent.addFormula(sequentFormula, true, false).sequent();
+//                        doNotAdd = (sfOp != op);
+//                        break;
+//                    }
+//
+//                    doNotAdd = true;
                     }
-                   /* else {
-                     System.out.println("Discarding " + ProofSaver.printAnything(sequentFormula.formula(), null));
-                    }*/
-                    doNotAdd = true;
-                } else {
-                    doNotAdd =
-                            depLDT.isHistoryPredicate(op);
                 }
             }
             if (!doNotAdd) {
                 sequent = sequent.addFormula(sequentFormula, true, false).sequent();
+            } else {
+                System.out.println("Discarding " + ProofSaver.printAnything(sequentFormula.formula(), null));
             }
         }
 
@@ -131,7 +151,7 @@ public abstract class PredicateRefiner {
     }
 
     protected boolean sequentImpliesPredicate(Term pred) {
-//        System.out.println("sequentImpliesPredicate is called for: "+pred);
+        System.out.println("sequentImpliesPredicate is called for: "+ProofSaver.printAnything(pred, null));
 
 //        Sequent sequent = Sequent.EMPTY_SEQUENT;
 
@@ -142,7 +162,7 @@ public abstract class PredicateRefiner {
 
 
 
-        final boolean provable = sProof.isProvable(sideSeq, services);
+        final boolean provable = sProof.isProvable(sideSeq, 120000,services);
             //SideProof.isProvable(sideSeq, 100000, 3000, true, services);
 
 

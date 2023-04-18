@@ -325,10 +325,8 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 
 			Term subLoc;
 			if (sProof.proofLT(tb.zero(), newOutHigh)) {
-				if (sProof.proofLT(newOutLow, newOutHigh)) {
+				if (sProof.proofLEQ(newOutLow, newOutHigh)) {
 					subLoc = tb.matrixRange(heap, arr, newOutLow, newOutHigh, inLow, inHigh);
-				} else if (sProof.proofEquality(newOutLow, newOutHigh)) {
-					subLoc = tb.matrixRange(heap, arr, newOutLow, newOutLow, inLow, inHigh);
 				} else {
 					// should not happen, weaken to essentially true
 					subLoc = tb.empty();
@@ -344,17 +342,14 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 		}
 
 		if (!sProof.proofEquality(inLow, inHigh)) {
-//			final Term lowArr = tb.matrixRange(heap, arr , outLow, outHigh, inLow, inLow);//=empty
-//			final Term highArr = tb.matrixRange(heap, arr , outLow, outHigh, inHigh, inHigh);//=empty
+			final Term lowArr = tb.matrixRange(heap, arr , outLow, outHigh, inLow, inLow);
+			final Term highArr = tb.matrixRange(heap, arr , outLow, outHigh, inHigh, inHigh);
 
 			Term subLoc;
 			if (sProof.proofLT(tb.zero(), newInHigh)) {
-				if (sProof.proofLT(newInLow, newInHigh)) {
-					subLoc = tb.matrixRange(heap, arr, inLow, inHigh, newInLow, newInHigh);
+				if (sProof.proofLEQ(newInLow, newInHigh)) {
+					subLoc = tb.matrixRange(heap, arr, outLow, outHigh, newInLow, newInHigh);
 				}
-//				else if (sProof.proofEquality(newInLow, newInHigh)) {
-//					subLoc = tb.matrixRange(heap, arr, inLow, inHigh, newInLow, newInLow);//=empty
-//				}
 				else {
 					// should not happen, weaken to essentially true
 					subLoc = tb.empty();
@@ -363,8 +358,8 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 				if (depLDT.isDependencePredicate(unProven.op())) {
 					final Function op = (Function) unProven.op();
 					result.add(tb.func(op, subLoc));
-//					result.add(tb.func(op, lowArr));
-//					result.add(tb.func(op, highArr));
+					result.add(tb.func(op, lowArr));
+					result.add(tb.func(op, highArr));
 				}
 			}
 		}
@@ -642,18 +637,18 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 			Term lowToInner, innerToHigh;
 			Term lowToOuter, outerToHigh;
 			if(arr == arrInner){
-				if (!sProof.proofEquality(inLow, indexInner)) {
+				if (sProof.proofLEQ(inLow, indexInner)) {
 					lowToInner = tb.matrixRange(heap, arr, outLow, outHigh,inLow, indexInner);
-					if (!sProof.proofEquality(indexInner, inHigh)) {
+					if (sProof.proofLEQ(indexInner, inHigh)) {
 						innerToHigh = tb.matrixRange(heap, arr, outLow, outHigh ,indexInner, inHigh);
-					} else {
+					} else{
 						innerToHigh = tb.empty();
 					}
 				} else {
 					lowToInner = tb.empty();
-					if (!sProof.proofEquality(indexInner, inHigh)) {
+					if (sProof.proofLEQ(indexInner, inHigh)) {
 						innerToHigh = tb.matrixRange(heap, arr, outLow, outHigh,indexInner, inHigh);
-					} else {
+					} else  {
 						innerToHigh = tb.empty();
 					}
 				}
@@ -666,19 +661,19 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 				}
 			}
 			if(arr == arrOuter) {
-				if (!sProof.proofEquality(outLow, indexOuter)) {
+				if (sProof.proofLEQ(outLow, indexOuter)) {
 					lowToOuter = tb.matrixRange(heap, arr, outLow, indexOuter, inLow, inHigh);
-					if (!sProof.proofEquality(indexOuter, outHigh)) {
+					if (sProof.proofLEQ(indexOuter, outHigh)) {
 						outerToHigh = tb.matrixRange(heap, arr, indexOuter, outHigh, inLow, inHigh);
 					} else {
-						outerToHigh = tb.matrixRange(heap,arr,indexOuter, indexOuter,inLow, inHigh);//matrixRange(heap, arr, indexOuter, indexOuter, inLow, inHigh)
+						outerToHigh = tb.empty();
 					}
 				} else {
 					lowToOuter = tb.matrixRange(heap, arr, indexOuter, indexOuter, inLow, inHigh); //tb.arrayRange(arr, inLow, inHigh);//
-					if (!sProof.proofEquality(indexOuter, outHigh)) {
+					if (sProof.proofLEQ(indexOuter, outHigh)) {
 						outerToHigh = tb.matrixRange(heap, arr, indexOuter, outHigh, inLow, inHigh);
 					} else {
-						outerToHigh = tb.matrixRange(heap,arr,indexOuter, indexOuter,inLow, inHigh);//matrixRange(heap, arr, indexOuter, indexOuter, inLow, inHigh)
+						outerToHigh = tb.empty();//matrixRange(heap, arr, indexOuter, indexOuter, inLow, inHigh)
 					}
 				}
 				if (lowToOuter != null && outerToHigh != null) {

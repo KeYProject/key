@@ -57,7 +57,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 			}
 			else {
 				unProvenDepPreds.add(pred);
-				System.out.println("Here: 2");
+//				System.out.println("Here: 2");
 			}
 		}
 		depPredicates.removeAll(unProvenDepPreds);
@@ -71,7 +71,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 			if (locSetToPredicate.hasVertex(w.sub(0))) {
 				if(locSetToPredicate.hasEdge(w.sub(0),w)) {
 					depPredicates.add(w);
-					System.out.println("In lattice: " + w);
+//					System.out.println("In lattice: " + w);
 					inlattice++;
 				}
 			}
@@ -176,10 +176,12 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
 //		System.out.println("Weaken by Index for "+unProven);
 			result.addAll(weakenByIndexANDPredicate(unProven));
+			System.out.println("Weakening for iteration: " + itrNumber);
 			if (itrNumber < 1) {
 //			System.out.println("Weaken by Subset for "+unProven);
 				result.addAll(weakenBySubSet(unProven));
 			}
+
 //		System.out.println("index added: ");
 //		result.addAll(weakenByIndex(unProven));// 0 or 2
 //		System.out.println("subset added: ");
@@ -219,11 +221,11 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 			result.add(tb.relaxedNoWaW(unProven.sub(0), tb.empty(), tb.empty()));
 		}
 
-		System.out.println("weaken by pred symb "+ unProven +" with "+ result);
+//		System.out.println("weaken by pred symb "+ unProven +" with "+ result);
 		for(Term r:result){
 			if(locSetToPredicate.hasVertex(r.sub(0))){
 				locSetToPredicate.addEdge(r.sub(0), r, false);
-				System.out.println("added 1");
+//				System.out.println("added 1");
 			}
 		}
 		return result;
@@ -275,11 +277,12 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 			}
 		}
 
-		System.out.println("weaken by subset "+ unProven +" with "+ result);
+//		System.out.println("weaken by subset "+ unProven +" with "+ result);
 		return result;
 
 	}
-	private Set<Term> weakenBySubSetForMatrixRangeOrig(Term unProven) {
+
+	private Set<Term> weakenBySubSetForMatrixRange(Term unProven) {
 		Set<Term> result = new HashSet<>();
 		final Term locSet = unProven.sub(0);
 
@@ -303,10 +306,8 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
 			Term subLoc;
 			if (sProof.proofLT(tb.zero(), newOutHigh)) {
-				if (sProof.proofLT(newOutLow, newOutHigh)) {
+				if (sProof.proofLEQ(newOutLow, newOutHigh)) {
 					subLoc = tb.matrixRange(heap, arr, newOutLow, newOutHigh, inLow, inHigh);
-				} else if (sProof.proofEquality(newOutLow, newOutHigh)) {
-					subLoc = tb.matrixRange(heap, arr, newOutLow, newOutLow, inLow, inHigh);
 				} else {
 					// should not happen, weaken to essentially true
 					subLoc = tb.empty();
@@ -327,11 +328,8 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
 			Term subLoc;
 			if (sProof.proofLT(tb.zero(), newInHigh)) {
-				if (sProof.proofLT(newInLow, newInHigh)) {
-					subLoc = tb.matrixRange(heap, arr, inLow, inHigh, newInLow, newInHigh);
-				}
-				else if (sProof.proofEquality(newInLow, newInHigh)) {
-					subLoc = tb.matrixRange(heap, arr, inLow, inHigh, newInLow, newInLow);
+				if (sProof.proofLEQ(newInLow, newInHigh)) {
+					subLoc = tb.matrixRange(heap, arr, outLow, outHigh, newInLow, newInHigh);
 				}
 				else {
 					// should not happen, weaken to essentially true
@@ -346,61 +344,9 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 				}
 			}
 		}
-
-
+		System.out.println(result);
 		return result;
 	}
-
-
-	private Set<Term> weakenBySubSetForMatrixRange(Term unProven) {
-		Set<Term> result = new HashSet<>();
-		final Term locSet = unProven.sub(0);
-
-		final Term heap = locSet.sub(0);
-		final Term arr = locSet.sub(1);
-		final Term outLow = locSet.sub(2);
-		final Term outHigh = locSet.sub(3);
-		final Term inLow = locSet.sub(4);
-		final Term inHigh = locSet.sub(5);
-
-
-		final Term newOutLow = tb.add(outLow, tb.one());
-		final Term newOutHigh = tb.sub(outHigh, tb.one());
-
-		final Term newInLow = tb.add(inLow, tb.one());
-		final Term newInHigh = tb.sub(inHigh, tb.one());
-
-		final Term lowArr = tb.matrixRange(heap, arr , outLow, outLow, inLow, inHigh);
-		final Term highArr = tb.matrixRange(heap, arr , outHigh, outHigh, inLow, inHigh);
-
-		Term subLoc = tb.matrixRange(heap, arr, newOutLow, newOutHigh, inLow, inHigh);
-
-		if (depLDT.isDependencePredicate(unProven.op())) {
-			final Function op = (Function) unProven.op();
-			result.add(tb.func(op, subLoc));
-			result.add(tb.func(op, lowArr));
-			result.add(tb.func(op, highArr));
-		}
-
-
-		subLoc = tb.matrixRange(heap, arr, outLow, outHigh, newInLow, newInHigh);
-
-		if (depLDT.isDependencePredicate(unProven.op())) {
-			final Function op = (Function) unProven.op();
-			result.add(tb.func(op, subLoc));
-//					result.add(tb.func(op, lowArr));
-//					result.add(tb.func(op, highArr));
-		}
-
-		for(Term r : result){
-			if(locSetToPredicate.hasVertex(r.sub(0))){
-				locSetToPredicate.addEdge(r.sub(0), r, false);
-				System.out.println("added 3");
-			}
-		}
-		return result;
-	}
-
 
 	private Set<Term> weakenBySubSet(Term pred) {
 		if(pred.sub(0).op()  == locsetLDT.getArrayRange())
@@ -534,7 +480,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 			}
 //		System.out.println(result);
 		}
-		System.out.println("weaken by index & pred symb "+ pred +" with "+ result);
+//		System.out.println("weaken by index & pred symb "+ pred +" with "+ result);
 		return result;
 
 	}
@@ -542,87 +488,42 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 		Set<Term> result = new HashSet<>();
 		Term locSet = pred.sub(0);
 
-		final Term heap = locSet.sub(0);
-		final Term arr = locSet.sub(1);
-		final Term outLow = locSet.sub(2);
-		final Term outHigh = locSet.sub(3);
-		final Term inLow = locSet.sub(4);
-		final Term inHigh = locSet.sub(5);
+		if (locSet != null) {
+			final Term heap = locSet.sub(0);
+			final Term arr = locSet.sub(1);
+			final Term outLow = locSet.sub(2);
+			final Term outHigh = locSet.sub(3);
+			final Term inLow = locSet.sub(4);
+			final Term inHigh = locSet.sub(5);
 
-		Term lowToInner, innerToHigh;
-		Term lowToOuter, outerToHigh;
+			Term lowToInner, innerToHigh;
 
-
-		if (!inLow.equalsModRenaming(index)) {
-			lowToInner = tb.matrixRange(heap, arr, outLow, outHigh, inLow, index);
-			if (!index.equalsModRenaming(inHigh)) {
-				innerToHigh = tb.matrixRange(heap, arr, outLow, outHigh ,index, inHigh);
-			} else {
-				innerToHigh = tb.empty();
-			}
-		} else {
-			lowToInner = tb.empty();
-			if (!index.equalsModRenaming(inHigh)) {
-				innerToHigh = tb.matrixRange(heap, arr, outLow, outHigh,index, inHigh);
-			} else {
-				innerToHigh = tb.empty();
-			}
-		}
-		if (lowToInner != null && innerToHigh != null) {
-			if (depLDT.isDependencePredicate(pred.op())) {
-				final Function dependencyOp = (Function) pred.op();
-				result.add(tb.func(dependencyOp, lowToInner));
-				result.add(tb.func(dependencyOp, innerToHigh));
-			}
-		}
-		if (!outLow.equalsModRenaming(indexOuter)) {
-			lowToOuter = tb.matrixRange(heap, arr, outLow, indexOuter, inLow, inHigh);
-			if (!indexOuter.equalsModRenaming(outHigh)) {
-				outerToHigh = tb.matrixRange(heap, arr, indexOuter, outHigh, inLow, inHigh);
-			} else {
-				outerToHigh = tb.matrixRange(heap,arr,indexOuter, indexOuter,inLow, inHigh);//matrixRange(heap, arr, indexOuter, indexOuter, inLow, inHigh)
-			}
-		} else {
-			lowToOuter = tb.matrixRange(heap, arr, indexOuter, indexOuter, inLow, inHigh); //tb.arrayRange(arr, inLow, inHigh);//
-			if (!indexOuter.equalsModRenaming(outHigh)) {
-				outerToHigh = tb.matrixRange(heap, arr, indexOuter, outHigh, inLow, inHigh);
-			} else {
-				outerToHigh = tb.matrixRange(heap,arr,indexOuter, indexOuter,inLow, inHigh);//matrixRange(heap, arr, indexOuter, indexOuter, inLow, inHigh)
-			}
-		}
-		if (lowToOuter != null && outerToHigh != null) {
-			if (depLDT.isDependencePredicate(pred.op())) {
-				final Function dependencyOp = (Function) pred.op();
-				result.add(tb.func(dependencyOp, lowToOuter));
-				result.add(tb.func(dependencyOp, outerToHigh));
-
-				if (!lowToOuter.sub(2).equalsModRenaming(lowToOuter.sub(3))) {
-					result.add(tb.func(dependencyOp, tb.matrixRange(heap, arr,
-							lowToOuter.sub(2),
-							tb.sub(lowToOuter.sub(3), tb.one()),
-							lowToOuter.sub(4),
-							lowToOuter.sub(5))));
+			if (sProof.proofLEQ(inLow, index)) {
+				lowToInner = tb.matrixRange(heap, arr, outLow, outHigh,inLow, index);
+				if (sProof.proofLEQ(index, inHigh)) {
+					innerToHigh = tb.matrixRange(heap, arr, outLow, outHigh ,index, inHigh);
+				} else{
+					innerToHigh = tb.empty();
 				}
-
-
-				result.add(tb.func(dependencyOp, outerToHigh));
-
-				if (!outerToHigh.sub(2).equalsModRenaming(outerToHigh.sub(3))) {
-					result.add(tb.func(dependencyOp, tb.matrixRange(outerToHigh.sub(0), outerToHigh.sub(1),
-							tb.add(outerToHigh.sub(2), tb.one()),
-							outerToHigh.sub(3),
-							outerToHigh.sub(4),
-							outerToHigh.sub(5))));
+			} else {
+				lowToInner = tb.empty();
+				if (sProof.proofLEQ(index, inHigh)) {
+					innerToHigh = tb.matrixRange(heap, arr, outLow, outHigh,index, inHigh);
+				} else  {
+					innerToHigh = tb.empty();
 				}
 			}
-		}
+			if (lowToInner != null && innerToHigh != null) {
+				if (depLDT.isDependencePredicate(pred.op())) {
+					final Function dependencyOp = (Function) pred.op();
+					result.add(tb.func(dependencyOp, lowToInner));
+					result.add(tb.func(dependencyOp, innerToHigh));
+				}
+			}
+
+	}
+
 		System.out.println("weakening res for: "+ pred + " is:"+ result);
-		for(Term r : result){
-			if(locSetToPredicate.hasVertex(r.sub(0))){
-				locSetToPredicate.addEdge(r.sub(0), r, false);
-				System.out.println("added 2");
-			}
-		}
 		return result;
 	}
 
@@ -771,7 +672,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 		}
 //		}
 
-		System.out.println("weakening res for: "+ pred + " is:"+ result);
+//		System.out.println("weakening res for: "+ pred + " is:"+ result);
 		return result;
 	}
 

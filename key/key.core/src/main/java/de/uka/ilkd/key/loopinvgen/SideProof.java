@@ -352,6 +352,11 @@ public class SideProof {
 		return isProvable(seq2prove, maxRuleApp, true, services);
 	}
 
+	protected boolean isProvable(Sequent seq2prove, int timeout, Services services) {
+//		System.out.println(seq2prove);
+		return isProvable(seq2prove, maxRuleApp, timeout, true, services);
+	}
+
 	private Set<Term> collectProgramAndLogicVariables(Term term) {
 		Set<Term> res = new HashSet<>();
 		if (!term.containsJavaBlockRecursive()) {
