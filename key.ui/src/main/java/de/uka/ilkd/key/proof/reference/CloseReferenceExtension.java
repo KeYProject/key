@@ -11,11 +11,12 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.util.collection.ImmutableList;
 
 @KeYGuiExtension.Info(name = "Proof Caching", optional = true,
-    description = "TODO",
+    description = "Functionality related to reusing previous proof results in similar proofs",
     experimental = false)
 public class CloseReferenceExtension
         implements KeYGuiExtension, KeYGuiExtension.Startup, KeYSelectionListener, RuleAppListener {
@@ -37,6 +38,9 @@ public class CloseReferenceExtension
 
     @Override
     public void ruleApplied(ProofEvent e) {
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getProofCachingSettings().getEnabled()) {
+            return;
+        }
         Proof p = e.getSource();
         if (e.getRuleAppInfo().getOriginalNode().getNodeInfo().getInteractiveRuleApplication()) {
             return; // only applies for automatic proof search
