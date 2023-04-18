@@ -362,10 +362,15 @@ public final class Goal {
     /**
      * sets the sequent of the node
      *
-     * @param sci SequentChangeInfo containing the sequent to be set and desribing the applied
-     *        changes to the sequent of the parent node
+     * @param sci SequentChangeInfo containing the sequent to be set and describing the applied
+     *        changes to the sequent of the node currently pointed to by this goal
      */
     public void setSequent(SequentChangeInfo sci) {
+        assert sci.getOriginalSequent() == node().sequent();
+        if (!sci.hasChanged()) {
+            assert sci.sequent().equals(sci.getOriginalSequent());
+            return;
+        }
         node().setSequent(sci.sequent());
         node().getNodeInfo().setSequentChangeInfo(sci);
         // VK reminder: now update the index
