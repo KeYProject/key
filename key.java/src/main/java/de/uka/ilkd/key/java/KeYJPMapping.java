@@ -105,8 +105,8 @@ public class KeYJPMapping {
 
     public void put(Node rec, Object key) {
         Object formerValue = map.put(rec, key);
-        Debug.assertTrue(formerValue == null,
-                "keyrecodermapping: duplicate registration of type:", key);
+        if (formerValue != null)
+            LOGGER.error("Duplicate registration of type: {}, formerValue: {}", key, formerValue);
         revMap.put(key, rec);
         LOGGER.warn("Size of rec2key: {} entries", map.size());
     }

@@ -9,6 +9,9 @@ import org.key_project.util.ExtList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 
 /**
  * Top level implementation of a Java {@link SourceElement}. taken from COMPOST and changed to
@@ -17,6 +20,7 @@ import org.slf4j.LoggerFactory;
 public abstract class JavaSourceElement implements SourceElement {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaSourceElement.class);
 
+    @Nonnull
     private final PositionInfo posInfo;
 
 
@@ -58,14 +62,9 @@ public abstract class JavaSourceElement implements SourceElement {
      * @return if <tt>p</tt> is <tt>null</tt> the undefined position
      *         ({@link PositionInfo#UNDEFINED}) is returned otherwise <tt>p</tt>
      */
-    private PositionInfo getPosInfo(PositionInfo p) {
-        final PositionInfo pos;
-        if (p == null) {
-            pos = PositionInfo.UNDEFINED;
-        } else {
-            pos = p;
-        }
-        return pos;
+    @Nonnull
+    private static PositionInfo getPosInfo(@Nullable PositionInfo p) {
+        return p == null ? PositionInfo.UNDEFINED : p;
     }
 
 

@@ -37,6 +37,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
+import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import javax.annotation.Nullable;
@@ -316,13 +317,19 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         Position startPos = Position.newOneBased(r.begin.line, r.begin.column);
         Position endPos = Position.newOneBased(r.end.line, r.end.column);
         //TODO weigl what to do with a relative position? what is this thing?
-        recoder.java.SourceElement.Position relPos = new recoder.java.SourceElement.Position(-1, -1);
+        recoder.java.SourceElement.Position relPos = recoder.java.SourceElement.Position.UNDEFINED;
         return new PositionInfo(relPos, startPos, endPos, uri);
     }
 
     @Override
-    public Object visit(ClassOrInterfaceType n, Void arg) {
-        return super.visit(n, arg);
+    public TypeReference visit(ClassOrInterfaceType n, Void arg) {
+        if(n.getTypeArguments().isPresent()) {
+            reportError(n, "Type arguments found.");
+        }
+        var rt = n.resolve();
+        var kjt = getKeyJavaType(rt);
+        TypeReference tr = new TypeRef(kjt);
+        return tr;
     }
 
     @Override
@@ -340,7 +347,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     private <T> ImmutableArray<T> map(NodeList<? extends Visitable> nodes) {
-        var seq = nodes.stream().map(it -> (T) it.accept(this, null)).collect(Collectors.toList());
+        var seq = nodes.stream().map(it -> (T) Objects.requireNonNull(it.accept(this, null)))
+                .collect(Collectors.toList());
         return new ImmutableArray<>(seq);
     }
 

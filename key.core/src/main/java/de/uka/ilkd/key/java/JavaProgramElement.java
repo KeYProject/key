@@ -2,12 +2,12 @@ package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.rule.MatchConditions;
-
 import org.key_project.util.ExtList;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -19,6 +19,7 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
 
     private static final Comment[] NO_COMMENTS = new Comment[0];
 
+    @Nonnull
     private final Comment[] comments;
 
     private int hashCode = -1;
@@ -55,9 +56,9 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
         comments = extractComments(children);
     }
 
-    public JavaProgramElement(PositionInfo pi, List<Comment> comments) {
+    public JavaProgramElement(@Nonnull PositionInfo pi, @Nullable List<Comment> comments) {
         super(pi);
-        this.comments = comments.toArray(new Comment[0]);
+        this.comments = comments == null ? NO_COMMENTS : comments.toArray(new Comment[0]);
     }
 
 
@@ -145,9 +146,10 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
 
 
         public static final NameAbstractionTableDisabled INSTANCE =
-            new NameAbstractionTableDisabled();
+                new NameAbstractionTableDisabled();
 
-        public void add(SourceElement pe1, SourceElement pe2) {}
+        public void add(SourceElement pe1, SourceElement pe2) {
+        }
 
         public boolean sameAbstractName(SourceElement pe1, SourceElement pe2) {
             return pe1.equals(pe2);

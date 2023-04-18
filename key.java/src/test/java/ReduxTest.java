@@ -1,8 +1,18 @@
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
+import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.resolution.TypeSolver;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
+import de.uka.ilkd.key.java.JP2KeYConverter;
+import de.uka.ilkd.key.java.KeYJPMapping;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
 import java.io.IOException;
@@ -16,7 +26,20 @@ import java.util.stream.Stream;
  * @version 1 (17.04.23)
  */
 public class ReduxTest {
-    public static final String PATHTOREDUX = "../key.core/src/main/resources/de/uka/ilkd/key/java/JavaRedux/java";
+    public static final String PATHTOREDUX = "../key.core/src/main/resources/de/uka/ilkd/key/java/JavaRedux";
+
+    private final JP2KeYConverter converter = new JP2KeYConverter(
+            new Services(JavaProfile.getDefaultProfile()),
+            new KeYJPMapping(), new Namespace<>());
+    private final TypeSolver typeSolver = new JavaParserTypeSolver(Paths.get(PATHTOREDUX));
+    private final JavaSymbolSolver javaSymbolSolver = new JavaSymbolSolver(typeSolver);
+
+    private final JavaParser parser = new JavaParser(new ParserConfiguration().setSymbolResolver(javaSymbolSolver));
+
+    @Test
+    void testJavaLangObject() {
+        typeSolver.getSolvedJavaLangObject();
+    }
 
     @TestFactory
     Stream<DynamicTest> testRedux() throws IOException {
@@ -25,13 +48,19 @@ public class ReduxTest {
                 .map(it -> DynamicTest.dynamicTest(it.toString(), () -> parse(it)));
     }
 
-    JavaParser parser = new JavaParser();
 
-    private void parse(Path it) throws IOException {
-        ParseResult<CompilationUnit> res = parser.parse(it);
-        if (!res.isSuccessful()) {
-            res.getProblems().forEach(System.out::println);
-            Assertions.fail("Problems in file: " + it);
+    private CompilationUnit parse(Path it) {
+        try {
+            ParseResult<CompilationUnit> res = parser.parse(it);
+            if (!res.isSuccessful()) {
+                res.getProblems().forEach(System.out::println);
+                Assertions.fail("Problems in file: " + it);
+            }
+            var r = converter.processCompilationUnit(res.getResult().get());
+            System.out.println(r);
+            return res.getResult().get();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }
