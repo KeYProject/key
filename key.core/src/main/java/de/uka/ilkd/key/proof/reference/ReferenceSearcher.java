@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 
 /**
  * Utility class for proof caching.
@@ -28,9 +29,6 @@ public class ReferenceSearcher {
      * @return a reference (or null, if none found)
      */
     public static ClosedBy findPreviousProof(DefaultListModel<Proof> previousProofs, Node newNode) {
-        // TODO:
-        // - disallow closing by reference to merged branch
-
         // first verify that the new node does not contain any terms that depend on external
         // influences
         if (!suitableForCloseByReference(newNode)) {
@@ -47,11 +45,19 @@ public class ReferenceSearcher {
             Optional<Node> match = p.closedGoals().stream().map(goal -> {
                 // first, find the initial node in this branch
                 Node n = goal.node();
+                if (n.parent() != null
+                        && n.parent().getAppliedRuleApp().rule() == CloseAfterMerge.INSTANCE) {
+                    // cannot reference this kind of branch
+                    return null;
+                }
                 while (n.parent() != null && n.parent().childrenCount() == 1) {
                     n = n.parent();
                 }
                 return n;
             }).filter(node -> {
+                if (node == null) {
+                    return false;
+                }
                 // check that all formulas are also present in the new proof
                 Semisequent ante = node.sequent().antecedent();
                 Semisequent succ = node.sequent().succedent();
