@@ -33,17 +33,8 @@ public class ReferenceSearcher {
 
         // first verify that the new node does not contain any terms that depend on external
         // influences
-        ProgramMethodFinder f = new ProgramMethodFinder();
-        Sequent seq = newNode.sequent();
-        for (int i = 1; i <= seq.size(); i++) {
-            Term term = seq.getFormulabyNr(i).formula();
-            if (term.containsJavaBlockRecursive()) {
-                return null;
-            }
-            term.execPreOrder(f);
-            if (f.getFoundProgramMethod()) {
-                return null;
-            }
+        if (!suitableForCloseByReference(newNode)) {
+            return null;
         }
         DefaultListModel<Proof> proofs = previousProofs;
         for (int i = 0; i < proofs.size(); i++) {
@@ -95,6 +86,30 @@ public class ReferenceSearcher {
                 }
             }
             if (!found) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Check whether a node is suitable for closing by reference.
+     * This is not the case if it contains any terms influenced by external factors:
+     * Java blocks or program methods (query terms).
+     *
+     * @param node the node to check
+     * @return whether it can be closed by reference
+     */
+    public static boolean suitableForCloseByReference(Node node) {
+        ProgramMethodFinder f = new ProgramMethodFinder();
+        Sequent seq = node.sequent();
+        for (int i = 1; i <= seq.size(); i++) {
+            Term term = seq.getFormulabyNr(i).formula();
+            if (term.containsJavaBlockRecursive()) {
+                return false;
+            }
+            term.execPreOrder(f);
+            if (f.getFoundProgramMethod()) {
                 return false;
             }
         }
