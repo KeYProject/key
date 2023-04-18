@@ -13,7 +13,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
         java: [11, 17]
-        tests: [:key.core.proof_references:test, :key.core.symbolic_execution:test]
+        tests: [":key.core.proof_references:test", ":key.core.symbolic_execution:test"]
     runs-on: ${{matrix.os}}
     steps:
       - uses: actions/checkout@v3
