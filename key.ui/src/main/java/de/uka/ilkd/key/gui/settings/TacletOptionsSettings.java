@@ -264,7 +264,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         }
         if (c.unsound) {
             JLabel lbl = new JLabel(IconFactory.WARNING_UNSOUND.get());
-            lbl.setToolTipText("Unsound " + button.getToolTipText());
+            lbl.setToolTipText("Unsound");
             b.add(lbl);
         }
         if (c.information != null) {
