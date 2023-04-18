@@ -8,7 +8,7 @@ package de.uka.ilkd.key.core;
 public class KeYSelectionEvent {
 
     /** the source of this event */
-    private KeYSelectionModel source;
+    private final KeYSelectionModel source;
 
     /**
      * creates a new SelectedNodeEvent

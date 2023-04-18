@@ -34,7 +34,7 @@ public class BuiltInRuleAppIndex {
      */
     public ImmutableList<IBuiltInRuleApp> getBuiltInRule(Goal goal, PosInOccurrence pos) {
 
-        ImmutableList<IBuiltInRuleApp> result = ImmutableSLList.<IBuiltInRuleApp>nil();
+        ImmutableList<IBuiltInRuleApp> result = ImmutableSLList.nil();
 
         ImmutableList<BuiltInRule> rules = index.rules();
         while (!rules.isEmpty()) {

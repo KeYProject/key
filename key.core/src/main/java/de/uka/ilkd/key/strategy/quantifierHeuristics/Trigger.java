@@ -12,8 +12,8 @@ public interface Trigger {
      * @param services
      * @return all substitution that found from the targeTerm by matching this trigger to targeTerm.
      */
-    public abstract ImmutableSet<Substitution> getSubstitutionsFromTerms(
+    ImmutableSet<Substitution> getSubstitutionsFromTerms(
             ImmutableSet<Term> targetTerm, Services services);
 
-    public abstract Term getTriggerTerm();
+    Term getTriggerTerm();
 }

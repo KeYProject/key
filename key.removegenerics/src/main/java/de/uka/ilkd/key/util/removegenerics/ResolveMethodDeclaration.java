@@ -8,7 +8,7 @@ import recoder.list.generic.ASTList;
 
 class ResolveMethodDeclaration extends GenericResolutionTransformation {
 
-    private MethodDeclaration declaration;
+    private final MethodDeclaration declaration;
 
     public ResolveMethodDeclaration(MethodDeclaration declaration,
             CrossReferenceServiceConfiguration sc) {
@@ -31,8 +31,9 @@ class ResolveMethodDeclaration extends GenericResolutionTransformation {
     @Override
     public void transform() {
 
-        if (getProblemReport() == IDENTITY)
+        if (getProblemReport() == IDENTITY) {
             return;
+        }
 
         declaration.setTypeParameters(null);
 

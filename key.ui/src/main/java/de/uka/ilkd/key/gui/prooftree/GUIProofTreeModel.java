@@ -37,11 +37,11 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(GUIProofTreeModel.class);
 
     private static final long serialVersionUID = 4253914848471158358L;
-    private Proof proof;
-    private ProofTreeListener proofTreeListener;
+    private final Proof proof;
+    private final ProofTreeListener proofTreeListener;
     private NodeFilter activeNodeFilter = null;
 
-    private EventListenerList listenerList = new EventListenerList();
+    private final EventListenerList listenerList = new EventListenerList();
 
     private boolean attentive = true;
 
@@ -59,8 +59,9 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
 
         // set initial active node filter
         for (ProofTreeViewFilter f : ProofTreeViewFilter.ALL) {
-            if (f instanceof NodeFilter && f.isActive())
+            if (f instanceof NodeFilter && f.isActive()) {
                 activeNodeFilter = (NodeFilter) f;
+            }
         }
 
         GoalListener goalListener = new GoalListener() {
@@ -90,8 +91,9 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
 
         @Override
         public void proofStructureChanged(ProofTreeEvent e) {
-            if (pruningInProcess != null)
+            if (pruningInProcess != null) {
                 return;
+            }
             Node n = e.getNode();
             // we assume that there already is a "node" event for every other
             // type of event
@@ -126,12 +128,14 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
 
         @Override
         public void proofGoalRemoved(ProofTreeEvent e) {
-            if (pruningInProcess != null)
+            if (pruningInProcess != null) {
                 return;
+            }
             if (globalFilterActive()) {
                 updateTree((TreeNode) null);
-            } else
+            } else {
                 proofStructureChanged(e);
+            }
         }
 
     }
@@ -250,8 +254,9 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
     public void setFilter(ProofTreeViewFilter filter, boolean active) {
         if (active != filter.isActive()) {
             if (!filter.global()) {
-                if (activeNodeFilter != null)
+                if (activeNodeFilter != null) {
                     activeNodeFilter.setActive(false);
+                }
                 activeNodeFilter = active ? (NodeFilter) filter : null;
             }
             filter.setActive(active);
@@ -368,8 +373,8 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      */
     private void updateTree(TreeNode trn) {
         if (trn == null || trn == getRoot()) { // bigger change, redraw whole tree
-            proofTreeNodes = new WeakHashMap<Node, GUIAbstractTreeNode>();
-            branchNodes = new WeakHashMap<Node, GUIBranchNode>();
+            proofTreeNodes = new WeakHashMap<>();
+            branchNodes = new WeakHashMap<>();
             fireTreeStructureChanged(new Object[] { getRoot() });
             return;
         }
@@ -394,8 +399,9 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
         Node n = ((GUIAbstractTreeNode) trn).getNode();
         while (true) {
             final Node p = n.parent();
-            if (p == null || ((GUIAbstractTreeNode) trn).findChild(p) == null)
+            if (p == null || ((GUIAbstractTreeNode) trn).findChild(p) == null) {
                 break;
+            }
             n = p;
         }
 
@@ -403,24 +409,26 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
     }
 
     private void flushCaches(Node n) {
-        final Stack<Node> workingList = new Stack<Node>();
-        workingList.add(n);
-        while (!workingList.empty()) {
+        final ArrayDeque<Node> workingList = new ArrayDeque<>();
+        workingList.push(n);
+        while (!workingList.isEmpty()) {
             Node node = workingList.pop();
             final GUIBranchNode treeNode = findBranch(node);
-            if (treeNode == null)
+            if (treeNode == null) {
                 continue;
+            }
             treeNode.flushCache();
             while (true) {
                 final Node nextN = treeNode.findChild(node);
-                if (nextN == null)
+                if (nextN == null) {
                     break;
+                }
                 node = nextN;
             }
 
             for (int i = 0; i != node.childrenCount(); ++i) {
                 if (!ProofTreeViewFilter.hiddenByGlobalFilters(node.child(i))) {
-                    workingList.add(node.child(i));
+                    workingList.push(node.child(i));
                 }
             }
         }
@@ -439,8 +447,9 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == TreeModelListener.class) {
                 // Lazily create the event:
-                if (event == null)
+                if (event == null) {
                     event = new TreeModelEvent(this, path);
+                }
                 ((TreeModelListener) listeners[i + 1]).treeStructureChanged(event);
             }
         }
@@ -450,8 +459,8 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
     // generated to represent the nodes resp. subtrees of the Proof.
 
     private WeakHashMap<Node, GUIAbstractTreeNode> proofTreeNodes =
-        new WeakHashMap<Node, GUIAbstractTreeNode>();
-    private WeakHashMap<Node, GUIBranchNode> branchNodes = new WeakHashMap<Node, GUIBranchNode>();
+        new WeakHashMap<>();
+    private WeakHashMap<Node, GUIBranchNode> branchNodes = new WeakHashMap<>();
 
     /**
      * Return the GUIProofTreeNode corresponding to node n, if one has already been generated, and

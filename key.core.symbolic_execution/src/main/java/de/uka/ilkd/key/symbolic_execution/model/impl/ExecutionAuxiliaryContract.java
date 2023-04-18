@@ -94,9 +94,9 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
         }
         assert usagePrecondition.op() == UpdateApplication.UPDATE_APPLICATION
                 : "Block Contract Rule has changed.";
-        Map<LocationVariable, Term> remembranceHeaps = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> remembranceHeaps = new LinkedHashMap<>();
         Map<LocationVariable, Term> remembranceLocalVariables =
-            new LinkedHashMap<LocationVariable, Term>();
+            new LinkedHashMap<>();
         collectRemembranceVariables(usagePrecondition.sub(0), remembranceHeaps,
             remembranceLocalVariables);
         // Find remaining information

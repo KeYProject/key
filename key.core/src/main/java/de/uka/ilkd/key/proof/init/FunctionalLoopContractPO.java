@@ -44,7 +44,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      * Transaction tags.
      */
     private static final Map<Boolean, String> TRANSACTION_TAGS =
-        new LinkedHashMap<Boolean, String>();
+        new LinkedHashMap<>();
 
     static {
         TRANSACTION_TAGS.put(false, "transaction_inactive");
@@ -54,7 +54,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
     /**
      * The contract from which this PO is generated.
      */
-    private FunctionalLoopContract contract;
+    private final FunctionalLoopContract contract;
 
     /**
      * The initial proof configuration.
@@ -153,13 +153,10 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
             return false;
         }
         if (environmentConfig == null) {
-            if (other.environmentConfig != null) {
-                return false;
-            }
-        } else if (!environmentConfig.equals(other.environmentConfig)) {
-            return false;
+            return other.environmentConfig == null;
+        } else {
+            return environmentConfig.equals(other.environmentConfig);
         }
-        return true;
     }
 
     @Override
@@ -333,7 +330,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
     private static Map<LocationVariable, Function> createAnonInHeaps(
             final List<LocationVariable> heaps, final Services services, final TermBuilder tb) {
         Map<LocationVariable, Function> anonInHeaps =
-            new LinkedHashMap<LocationVariable, Function>(40);
+            new LinkedHashMap<>(40);
 
         for (LocationVariable heap : heaps) {
             final String anonymisationName =
@@ -356,7 +353,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
     private Map<LocationVariable, Function> createAnonOutHeaps(final List<LocationVariable> heaps,
             final Services services, final TermBuilder tb) {
         Map<LocationVariable, Function> anonOutHeaps =
-            new LinkedHashMap<LocationVariable, Function>(40);
+            new LinkedHashMap<>(40);
         for (LocationVariable heap : heaps) {
             if (contract.hasModifiesClause(heap)) {
                 final String anonymisationName =

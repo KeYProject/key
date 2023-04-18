@@ -26,17 +26,17 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
     /**
      * The line of the Breakpoint in the respective class.
      */
-    private int lineNumber;
+    private final int lineNumber;
 
     /**
      * The start of the method containing the associated Breakpoint
      */
-    protected int methodStart;
+    protected final int methodStart;
 
     /**
      * The end of the method containing the associated Breakpoint
      */
-    protected int methodEnd;
+    protected final int methodEnd;
 
     /**
      * Creates a new {@link LineBreakpoint}.
@@ -109,10 +109,7 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
      *         to true and the Hitcount is exceeded, false otherwise
      */
     protected boolean shouldStopInLine(int line, String path) {
-        if (lineNumber == line && getClassPath().equals(path)) {
-            return true;
-        }
-        return false;
+        return lineNumber == line && getClassPath().equals(path);
     }
 
     @Override

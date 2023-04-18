@@ -16,7 +16,7 @@ public interface Formats {
      *
      * &#64;23/45 in FILE:/tmp/Foo.java</TT>.
      */
-    String ELEMENT_LONG = "%c \"%s\" @%p in %f";
+    String ELEMENT_LONG = "%c \"%s\" @%p in \"%f\"";
 
     /**
      * Long formatting string for program elements, omitting file information. Derives messages such
@@ -33,5 +33,5 @@ public interface Formats {
      *
      * &#64;23/45 in FILE:/tmp/Foo.java</TT>.
      */
-    String ELEMENT_SHORT = "%c \"%N\" @%p in %f";
+    String ELEMENT_SHORT = "%c \"%N\" @%p in \"%f\"";
 }

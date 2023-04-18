@@ -19,7 +19,7 @@ import org.key_project.util.collection.ImmutableSet;
 public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
     /** term that replaces another one */
-    private Term replacewith;
+    private final Term replacewith;
 
     /**
      * creates new Goaldescription
@@ -38,12 +38,12 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
     public RewriteTacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules,
             Term replacewith) {
-        this(addedSeq, addedRules, replacewith, DefaultImmutableSet.<SchemaVariable>nil());
+        this(addedSeq, addedRules, replacewith, DefaultImmutableSet.nil());
     }
 
 
     public RewriteTacletGoalTemplate(Term replacewith) {
-        this(Sequent.EMPTY_SEQUENT, ImmutableSLList.<Taclet>nil(), replacewith);
+        this(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), replacewith);
     }
 
 

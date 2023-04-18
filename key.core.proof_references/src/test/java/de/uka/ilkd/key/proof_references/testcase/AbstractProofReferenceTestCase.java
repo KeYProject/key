@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.proof_references.testcase;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -63,7 +63,8 @@ public abstract class AbstractProofReferenceTestCase {
             IProofReferencesAnalyst analyst, ExpectedProofReferences... expectedReferences)
             throws Exception {
         doReferenceFunctionTest(baseDir, javaPathInBaseDir, containerTypeName, targetName,
-            useContracts, analyst, null, expectedReferences);
+            useContracts, analyst,
+            null, expectedReferences);
     }
 
     /**
@@ -156,7 +157,7 @@ public abstract class AbstractProofReferenceTestCase {
             // Filter references
             if (currentReferenceFilter != null) {
                 LinkedHashSet<IProofReference<?>> filteredReferences =
-                    new LinkedHashSet<IProofReference<?>>();
+                    new LinkedHashSet<>();
                 for (IProofReference<?> reference : references) {
                     if (currentReferenceFilter.test(reference)) {
                         filteredReferences.add(reference);
@@ -179,7 +180,7 @@ public abstract class AbstractProofReferenceTestCase {
      */
     protected LinkedHashSet<IProofReference<?>> findReferences(
             LinkedHashSet<IProofReference<?>> references, Node node) {
-        LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
+        LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<>();
         for (IProofReference<?> reference : references) {
             if (reference.getNodes().contains(node)) {
                 result.add(reference);
@@ -306,7 +307,7 @@ public abstract class AbstractProofReferenceTestCase {
         assertNotNull(tester);
         KeYEnvironment<?> environment = null;
         Proof proof = null;
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         boolean usePrettyPrinting = ProofIndependentSettings.isUsePrettyPrinting();
         try {
             // Disable pretty printing to make tests more robust against different term
@@ -379,7 +380,7 @@ public abstract class AbstractProofReferenceTestCase {
         assertNotNull(tester);
         KeYEnvironment<?> environment = null;
         Proof proof = null;
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         boolean usePrettyPrinting = ProofIndependentSettings.isUsePrettyPrinting();
         try {
             // Disable pretty printing to make tests more robust against different term

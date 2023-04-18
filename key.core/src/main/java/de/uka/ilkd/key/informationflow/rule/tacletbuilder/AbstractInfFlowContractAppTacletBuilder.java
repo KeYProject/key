@@ -6,11 +6,7 @@ import java.util.Map;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.InfFlowContractAppTaclet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -184,7 +180,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         Term selfAtPostSV = (appData.pre.self == appData.post.self ? selfAtPreSV
                 : createTermSV(appData.post.self, schemaPrefix, services));
 
-        ImmutableList<Term> localVarsAtPostSVs = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> localVarsAtPostSVs = ImmutableSLList.nil();
         Iterator<Term> appDataPreLocalVarsIt = appData.pre.localVars.iterator();
         Iterator<Term> schemaLocalVarsAtPreIt = localVarsAtPreSVs.iterator();
         for (Term appDataPostLocalVar : appData.post.localVars) {
@@ -259,7 +255,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
         tacletBuilder.setIfSequent(assumesSeq);
         RewriteTacletGoalTemplate goalTemplate = new RewriteTacletGoalTemplate(replaceWithSeq,
-            ImmutableSLList.<Taclet>nil(), schemaFind);
+            ImmutableSLList.nil(), schemaFind);
         tacletBuilder.addTacletGoalTemplate(goalTemplate);
         tacletBuilder.addRuleSet(new RuleSet(new Name(IF_CONTRACT_APPLICATION)));
         tacletBuilder.setSurviveSmbExec(true);
@@ -278,7 +274,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
      * UseInformationFlowContractMacro and PrepareInfFlowContractPreBranchesMacro to decide how to
      * prepare the formulas resulting from information flow contract applications.
      */
-    private class InfFlowContractAppRewriteTacletBuilder
+    private static class InfFlowContractAppRewriteTacletBuilder
             extends RewriteTacletBuilder<InfFlowContractAppTaclet> {
 
         InfFlowContractAppRewriteTacletBuilder() {

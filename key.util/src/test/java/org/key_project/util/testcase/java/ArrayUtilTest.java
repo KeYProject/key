@@ -340,7 +340,7 @@ public class ArrayUtilTest {
         assertEquals("A", result[0]);
         assertEquals("B", result[1]);
         assertEquals("C", result[2]);
-        assertEquals(null, result[3]);
+        assertNull(result[3]);
         // Test null new element on null array
         try {
             ArrayUtil.add(null, null);

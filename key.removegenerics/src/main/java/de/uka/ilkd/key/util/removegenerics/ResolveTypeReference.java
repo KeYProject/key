@@ -22,11 +22,11 @@ import recoder.service.CrossReferenceSourceInfo;
 
 public class ResolveTypeReference extends GenericResolutionTransformation {
 
-    private TypeReference reference;
+    private final TypeReference reference;
 
     private TypeReference replaceWith;
 
-    private CrossReferenceSourceInfo sourceInfo;
+    private final CrossReferenceSourceInfo sourceInfo;
 
     public ResolveTypeReference(TypeReference reference, CrossReferenceServiceConfiguration sc) {
         super(sc);

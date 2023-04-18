@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -77,7 +76,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     public static final int TOO_MANY_TACLETS_THRESHOLD = 15; // reduce for debugging.
 
     private KeYMediator mediator;
-    private TacletAppComparator comp = new TacletAppComparator();
+    private final TacletAppComparator comp = new TacletAppComparator();
 
     /**
      * Creates an empty menu.
@@ -130,11 +129,9 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * @return list without RewriteTaclets
      */
     public static ImmutableList<TacletApp> removeRewrites(ImmutableList<TacletApp> list) {
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
-        Iterator<TacletApp> it = list.iterator();
+        ImmutableList<TacletApp> result = ImmutableSLList.nil();
 
-        while (it.hasNext()) {
-            TacletApp tacletApp = it.next();
+        for (TacletApp tacletApp : list) {
             Taclet taclet = tacletApp.taclet();
             result = (taclet instanceof RewriteTaclet ? result : result.prepend(tacletApp));
         }
@@ -145,7 +142,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         clutterRuleSets = vs.getClutterRuleSets();
         clutterRules = vs.getClutterRules();
-        vs.addSettingsListener(e -> {
+        vs.addPropertyChangeListener(e -> {
             clutterRuleSets = vs.getClutterRuleSets();
             clutterRules = vs.getClutterRules();
         });
@@ -211,9 +208,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
         if (!builtInList.isEmpty()) {
             addSeparator();
-            Iterator<BuiltInRule> it = builtInList.iterator();
-            while (it.hasNext()) {
-                addBuiltInRuleItem(it.next(), control);
+            for (BuiltInRule builtInRule : builtInList) {
+                addBuiltInRuleItem(builtInRule, control);
             }
         }
     }
@@ -331,15 +327,15 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      */
     public static ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds,
             TacletAppComparator comp) {
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+        ImmutableList<TacletApp> result = ImmutableSLList.nil();
 
-        List<TacletApp> list = new ArrayList<TacletApp>(finds.size());
+        List<TacletApp> list = new ArrayList<>(finds.size());
 
         for (final TacletApp app : finds) {
             list.add(app);
         }
 
-        Collections.sort(list, comp);
+        list.sort(comp);
 
         for (final TacletApp app : list) {
             result = result.prepend(app);
@@ -519,7 +515,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                             goal.proof().getSettings().getNewSMTSettings(), goal.proof());
                     SolverLauncher launcher = new SolverLauncher(settings);
                     launcher.addListener(new SolverListener(settings, goal.proof()));
-                    Collection<SMTProblem> list = new LinkedList<SMTProblem>();
+                    Collection<SMTProblem> list = new LinkedList<>();
                     list.add(new SMTProblem(goal));
                     launcher.launch(solverUnion.getTypes(), list, goal.proof().getServices());
                 }, "SMTRunner");
@@ -662,9 +658,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
          */
         private int measureGoalComplexity(ImmutableList<TacletGoalTemplate> l) {
             int result = 0;
-            Iterator<TacletGoalTemplate> it = l.iterator();
-            while (it.hasNext()) {
-                TacletGoalTemplate gt = it.next();
+            for (TacletGoalTemplate gt : l) {
                 if (gt instanceof RewriteTacletGoalTemplate) {
                     if (((RewriteTacletGoalTemplate) gt).replaceWith() != null) {
                         result += ((RewriteTacletGoalTemplate) gt).replaceWith().depth();
@@ -734,7 +728,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
          * divergence point.
          */
         public LinkedHashMap<String, Integer> score(TacletApp o1) {
-            LinkedHashMap<String, Integer> map = new LinkedHashMap<String, Integer>();
+            LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
 
             final Taclet taclet1 = o1.taclet();
 
@@ -765,7 +759,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 TacletSchemaVariableCollector coll1 = new TacletSchemaVariableCollector();
                 find1.execPostOrder(coll1);
                 formulaSV1 = countFormulaSV(coll1);
-                cmpVar1 += -coll1.size();
+                cmpVar1 -= coll1.size();
                 map.put("num_sv", -cmpVar1);
 
             } else {

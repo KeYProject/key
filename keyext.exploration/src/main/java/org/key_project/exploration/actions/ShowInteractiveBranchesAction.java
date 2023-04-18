@@ -28,7 +28,7 @@ public class ShowInteractiveBranchesAction extends KeyAction {
         model.addPropertyChangeListener(ExplorationModeModel.PROP_EXPLORE_MODE,
             e -> updateEnable());
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                .addSettingsListener(e -> updateEnable());
+                .addPropertyChangeListener(e -> updateEnable());
         updateEnable();
     }
 

@@ -218,15 +218,17 @@ public class Namespace<E extends Named> implements java.io.Serializable {
 
     public String toString() {
         String res = "Namespace: [local:" + symbols;
-        if (parent != null)
+        if (parent != null) {
             res = res + "; parent:" + parent;
+        }
         return res + "]";
     }
 
     public Namespace<E> copy() {
         Namespace<E> copy = new Namespace<>(parent);
-        if (symbols != null)
+        if (symbols != null) {
             copy.add(symbols.values());
+        }
 
         return copy;
     }

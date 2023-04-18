@@ -218,7 +218,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             // Order of children is not relevant.
             ExecutionNodePreorderIterator expectedIter =
                 new ExecutionNodePreorderIterator(expected);
-            Set<IExecutionNode<?>> currentVisitedNodes = new LinkedHashSet<IExecutionNode<?>>();
+            Set<IExecutionNode<?>> currentVisitedNodes = new LinkedHashSet<>();
             while (expectedIter.hasNext()) {
                 IExecutionNode<?> expectedNext = expectedIter.next();
                 IExecutionNode<?> currentNext = searchExecutionNode(current, expectedNext);
@@ -254,7 +254,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         assertNotNull(toSearchIn);
         assertNotNull(childToSearch);
         // Collect parents
-        Deque<IExecutionNode<?>> parents = new LinkedList<IExecutionNode<?>>();
+        Deque<IExecutionNode<?>> parents = new LinkedList<>();
         IExecutionNode<?> parent = childToSearch;
         while (parent != null) {
             parents.addFirst(parent);
@@ -1383,7 +1383,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         SymbolicExecutionUtil.initializeStrategy(builder);
         builder.analyse();
         assertNotNull(builder.getStartNode());
-        return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
+        return new SymbolicExecutionEnvironment<>(environment, builder);
     }
 
     /**
@@ -1450,7 +1450,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         SymbolicExecutionUtil.initializeStrategy(builder);
         builder.analyse();
         assertNotNull(builder.getStartNode());
-        return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
+        return new SymbolicExecutionEnvironment<>(environment, builder);
     }
 
     private static void setupTacletOptions(KeYEnvironment<?> env) {
@@ -1521,7 +1521,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         SymbolicExecutionUtil.initializeStrategy(builder);
         builder.analyse();
         assertNotNull(builder.getStartNode());
-        return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
+        return new SymbolicExecutionEnvironment<>(environment, builder);
     }
 
     /**
@@ -1591,7 +1591,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         SymbolicExecutionUtil.initializeStrategy(builder);
         builder.analyse();
         assertNotNull(builder.getStartNode());
-        return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
+        return new SymbolicExecutionEnvironment<>(environment, builder);
     }
 
     /**
@@ -1731,11 +1731,11 @@ public abstract class AbstractSymbolicExecutionTestCase {
             throws ProofInputException, IOException, ParserConfigurationException, SAXException,
             ProblemLoaderException {
         assertNotNull(maximalNumberOfExecutedSetNodesPerRun);
-        for (int i = 0; i < maximalNumberOfExecutedSetNodesPerRun.length; i++) {
+        for (int j : maximalNumberOfExecutedSetNodesPerRun) {
             SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(baseDir,
                 javaPathInBaseDir, containerTypeName, methodFullName, precondition,
                 oraclePathInBaseDirFile, includeConstraints, includeVariables, includeCallStack,
-                includeReturnValues, maximalNumberOfExecutedSetNodesPerRun[i],
+                includeReturnValues, j,
                 mergeBranchConditions, useOperationContracts, useLoopInvariants,
                 blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode,
                 usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
@@ -1919,7 +1919,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             boolean simplifyConditions) throws ProofInputException, IOException,
             ParserConfigurationException, SAXException, ProblemLoaderException {
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
-        SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
+        SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env;
         try {
             // Make sure that parameter are valid.
             assertNotNull(proofFilePathInBaseDir);
@@ -2012,7 +2012,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             boolean variablesAreOnlyComputedFromUpdates, boolean simplifyConditions)
             throws ProofInputException, IOException, ParserConfigurationException, SAXException,
             ProblemLoaderException {
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
         try {
             // Make sure that parameter are valid.
@@ -2105,7 +2105,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             boolean variablesAreOnlyComputedFromUpdates, boolean truthValueEvaluationEnabled,
             boolean simplifyConditions) throws ProofInputException, IOException,
             ParserConfigurationException, SAXException, ProblemLoaderException {
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         try {
             // Make sure that parameter are valid.
             assertNotNull(javaPathInBaseDir);
@@ -2169,8 +2169,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
             Map<Goal, Integer> executedSetNodesPerGoal = stopCondition.getExectuedSetNodesPerGoal();
             for (Integer value : executedSetNodesPerGoal.values()) {
                 assertNotNull(value);
-                assertTrue(value.intValue() <= maximalNumberOfExecutedSetNodes,
-                    value.intValue() + " is not less equal to " + maximalNumberOfExecutedSetNodes);
+                assertTrue(value <= maximalNumberOfExecutedSetNodes,
+                    value + " is not less equal to " + maximalNumberOfExecutedSetNodes);
             }
         } while (stopCondition.wasSetNodeExecuted() && nodeCount != env.getProof().countNodes());
         // Create new oracle file if required in a temporary directory
@@ -2195,13 +2195,16 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * @throws ProblemLoaderException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    public static HashMap<String, String> setDefaultTacletOptions(File baseDir,
+    public static Map<String, String> setDefaultTacletOptions(File baseDir,
             String javaPathInBaseDir, String baseContractName)
             throws ProblemLoaderException, ProofInputException {
         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
             SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env =
                 createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInBaseDir,
-                    baseContractName, false, false, false, false, false, false, false, false, false,
+                    baseContractName,
+                    false, false, false,
+                    false, false, false,
+                    false, false, false,
                     false, false);
             env.dispose();
         }
@@ -2219,14 +2222,18 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * @throws ProblemLoaderException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    public static HashMap<String, String> setDefaultTacletOptions(File baseDir,
-            String javaPathInBaseDir, String containerTypeName, String methodFullName)
+    public static Map<String, String> setDefaultTacletOptions(File baseDir,
+            String javaPathInBaseDir,
+            String containerTypeName,
+            String methodFullName)
             throws ProblemLoaderException, ProofInputException {
         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
             SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env =
                 createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName,
-                    methodFullName, null, false, false, false, false, false, false, false, false,
-                    false, false);
+                    methodFullName,
+                    null, false, false, false,
+                    false, false, false, false,
+                    false, false, false);
             env.dispose();
         }
         return setDefaultTacletOptions();
@@ -2242,7 +2249,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * @throws ProblemLoaderException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    public static HashMap<String, String> setDefaultTacletOptionsForTarget(File javaFile,
+    public static Map<String, String> setDefaultTacletOptionsForTarget(File javaFile,
             String containerTypeName, final String targetName)
             throws ProblemLoaderException, ProofInputException {
         return HelperClassForTests.setDefaultTacletOptionsForTarget(javaFile, containerTypeName,
@@ -2254,8 +2261,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
      *
      * @return The original settings which are overwritten.
      */
-    public static HashMap<String, String> setDefaultTacletOptions() {
-        HashMap<String, String> original = HelperClassForTests.setDefaultTacletOptions();
+    public static Map<String, String> setDefaultTacletOptions() {
+        Map<String, String> original = HelperClassForTests.setDefaultTacletOptions();
         ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
         ImmutableSet<Choice> cs = DefaultImmutableSet.nil();
         cs = cs.add(new Choice("noRestriction", "methodExpansion"));
@@ -2268,7 +2275,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
      *
      * @param options The taclet options to restore.
      */
-    public static void restoreTacletOptions(HashMap<String, String> options) {
+    public static void restoreTacletOptions(Map<String, String> options) {
         HelperClassForTests.restoreTacletOptions(options);
     }
 

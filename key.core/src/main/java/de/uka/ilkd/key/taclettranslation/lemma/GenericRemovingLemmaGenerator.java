@@ -28,7 +28,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
     /**
      * The map from generic sorts to proxy sorts.
      */
-    private final Map<Sort, Sort> sortMap = new HashMap<Sort, Sort>();
+    private final Map<Sort, Sort> sortMap = new HashMap<>();
 
 
     /**

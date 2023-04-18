@@ -35,7 +35,7 @@ public class TermLabelCondition extends VariableConditionAdapter {
         assert instMap.getInstantiation(l) instanceof ImmutableArray<?>;
         ImmutableArray<?> tInsts = (ImmutableArray<?>) instMap.getInstantiation(l);
         boolean hasLabel = hasLabel(tInsts, ln);
-        return negated ? !hasLabel : hasLabel;
+        return negated != hasLabel;
     }
 
     /**

@@ -35,7 +35,7 @@ public class TextLineNumber extends JPanel
 
     // Text component this TextTextLineNumber component is in sync with
 
-    private JTextComponent component;
+    private final JTextComponent component;
 
     // Properties that can be changed
 
@@ -288,7 +288,7 @@ public class TextLineNumber extends JPanel
         } else {
             // We need to check all the attributes for font changes
             if (fonts == null) {
-                fonts = new HashMap<String, FontMetrics>();
+                fonts = new HashMap<>();
             }
 
             Element root = component.getDocument().getDefaultRootElement();

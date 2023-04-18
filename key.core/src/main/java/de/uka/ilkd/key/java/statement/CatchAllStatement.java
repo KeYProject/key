@@ -10,8 +10,8 @@ import org.key_project.util.ExtList;
 
 public class CatchAllStatement extends JavaNonTerminalProgramElement
         implements Statement, NonTerminalProgramElement, StatementContainer {
-    private StatementBlock body;
-    private LocationVariable param;
+    private final StatementBlock body;
+    private final LocationVariable param;
 
     public CatchAllStatement(StatementBlock body, LocationVariable param) {
         this.body = body;
@@ -43,10 +43,12 @@ public class CatchAllStatement extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int i = 0;
-        if (body != null)
+        if (body != null) {
             i++;
-        if (param != null)
+        }
+        if (param != null) {
             i++;
+        }
         return i;
     }
 

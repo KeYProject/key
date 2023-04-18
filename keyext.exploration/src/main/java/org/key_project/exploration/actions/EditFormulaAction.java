@@ -40,8 +40,9 @@ public class EditFormulaAction extends ExplorationAction {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (posInSeq.isSequent())
+        if (posInSeq.isSequent()) {
             return;
+        }
 
         TermBuilder tb = getMediator().getServices().getTermBuilder();
         PosInOccurrence pio = posInSeq.getPosInOccurrence();

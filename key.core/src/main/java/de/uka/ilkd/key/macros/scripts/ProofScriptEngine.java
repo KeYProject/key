@@ -43,7 +43,7 @@ public class ProofScriptEngine {
 
     public ProofScriptEngine(File file) throws IOException {
         this.initialLocation = new Location(file.toURI().toURL(), Position.newOneBased(1, 1));
-        this.script = new String(Files.readAllBytes(file.toPath()));
+        this.script = Files.readString(file.toPath());
         this.initiallySelectedGoal = null;
     }
 
@@ -140,7 +140,7 @@ public class ProofScriptEngine {
                 }
 
                 if (!name.startsWith(SYSTEM_COMMAND_PREFIX) && stateMap.isEchoOn()) {
-                    LOGGER.info("{}: {}", ++cnt, cmd);
+                    LOGGER.debug("{}: {}", ++cnt, cmd);
                 }
 
                 Object o = command.evaluateArguments(stateMap, argMap);

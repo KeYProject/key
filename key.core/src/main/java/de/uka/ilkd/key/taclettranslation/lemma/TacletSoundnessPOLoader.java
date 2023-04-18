@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.*;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.proof.CompoundProof;
 import de.uka.ilkd.key.proof.Proof;
@@ -44,7 +45,7 @@ public class TacletSoundnessPOLoader {
     public interface LoaderListener {
         void started();
 
-        void stopped(ProofAggregate p, ImmutableSet<Taclet> taclets, boolean addAsAxioms);
+        void stopped(@Nullable ProofAggregate p, ImmutableSet<Taclet> taclets, boolean addAsAxioms);
 
         void stopped(Throwable exception);
 
@@ -225,7 +226,7 @@ public class TacletSoundnessPOLoader {
     private ImmutableSet<Taclet> computeCommonTaclets(ImmutableList<Taclet> taclets,
             ImmutableSet<Taclet> reference) {
         TreeSet<Taclet> treeSet =
-            new TreeSet<Taclet>((o1, o2) -> o1.name().toString().compareTo(o2.name().toString()));
+            new TreeSet<>(Comparator.comparing(o -> o.name().toString()));
         for (Taclet taclet : reference) {
             treeSet.add(taclet);
         }
@@ -240,7 +241,8 @@ public class TacletSoundnessPOLoader {
     }
 
 
-    private void computeResultingTaclets(List<TacletInfo> collectionOfTacletInfo) {
+    private void computeResultingTaclets(List<TacletInfo> collectionOfTacletInfo)
+            throws ProofInputException {
         resultingTaclets = tacletFilter.filter(collectionOfTacletInfo);
         if (!isUsedOnlyForProvingTaclets()) {
             assert tacletLoader instanceof TacletLoader.TacletFromFileLoader;
@@ -273,7 +275,7 @@ public class TacletSoundnessPOLoader {
         ProofObligationCreator creator = new ProofObligationCreator();
 
 
-        List<Taclet> tacletsToProveList = new ArrayList<Taclet>();
+        List<Taclet> tacletsToProveList = new ArrayList<>();
         for (Taclet taclet : tacletsToProve) {
             tacletsToProveList.add(taclet);
         }
@@ -291,11 +293,12 @@ public class TacletSoundnessPOLoader {
 
 
         if (isUsedOnlyForProvingTaclets()) {
-            for (InitConfig proofConfig : proofConfigs)
+            for (InitConfig proofConfig : proofConfigs) {
                 for (Taclet taclet : proofConfig.getTaclets()) {
                     proofConfig.getJustifInfo().addJustification(taclet,
                         AxiomJustification.INSTANCE);
                 }
+            }
         }
 
         registerProofs(p, proofEnvForTaclets);

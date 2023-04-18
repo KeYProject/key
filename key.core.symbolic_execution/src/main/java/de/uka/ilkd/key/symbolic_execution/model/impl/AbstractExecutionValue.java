@@ -12,11 +12,7 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
-import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
+import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -86,7 +82,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
      */
     protected IExecutionConstraint[] lazyComputeConstraints() throws ProofInputException {
         if (!isDisposed() && !isValueUnknown()) {
-            List<IExecutionConstraint> constraints = new LinkedList<IExecutionConstraint>();
+            List<IExecutionConstraint> constraints = new LinkedList<>();
             IExecutionConstraint[] allConstraints = getNodeConstraints();
             Set<Term> relevantTerms = collectRelevantTerms(getServices(), getValue());
             for (IExecutionConstraint constraint : allConstraints) {
@@ -94,7 +90,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
                     constraints.add(constraint);
                 }
             }
-            return constraints.toArray(new IExecutionConstraint[constraints.size()]);
+            return constraints.toArray(new IExecutionConstraint[0]);
         } else {
             return new IExecutionConstraint[0];
         }
@@ -116,7 +112,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
      * @return The relevant {@link Term}s.
      */
     protected Set<Term> collectRelevantTerms(Services services, Term term) {
-        final Set<Term> terms = new HashSet<Term>();
+        final Set<Term> terms = new HashSet<>();
         fillRelevantTerms(services, term, terms);
         return terms;
     }

@@ -106,7 +106,7 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
     public void mouseEntered(MouseEvent me) {
     }
 
-    public final synchronized void setModalDragNDropEnabled(boolean allowDragNDrop) {
+    public synchronized void setModalDragNDropEnabled(boolean allowDragNDrop) {
         modalDragNDropEnabled = allowDragNDrop;
     }
 

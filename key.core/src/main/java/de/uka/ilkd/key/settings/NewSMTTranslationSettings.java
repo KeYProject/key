@@ -1,12 +1,8 @@
 package de.uka.ilkd.key.settings;
 
 
-
 import java.util.Collections;
-import java.util.EventObject;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -26,15 +22,12 @@ import java.util.Properties;
  *
  * @author Mattias Ulbrich
  */
-public class NewSMTTranslationSettings implements Settings, Cloneable {
-
+public class NewSMTTranslationSettings extends AbstractSettings {
     private static final String PREFIX = "[NewSMT]";
 
     // Using a linked hash map to make the order deterministic in writing to
     // file
     private final Map<String, String> map = new LinkedHashMap<>();
-
-    private final List<SettingsListener> listeners = new LinkedList<>();
 
     /**
      * Creates a new settings object in which no option is set.
@@ -111,26 +104,12 @@ public class NewSMTTranslationSettings implements Settings, Cloneable {
      * @return the value that was in the map prior to the call (see {@link Map#put(Object, Object)}.
      */
     public String put(String key, String value) {
+        var old = map.get(key);
         String result = map.put(Objects.requireNonNull(key), Objects.requireNonNull(value));
-        for (SettingsListener listener : listeners) {
-            listener.settingsChanged(new EventObject(this));
-        }
+        firePropertyChange(key, old, value);
         return result;
     }
 
-    @Override
-    public void addSettingsListener(SettingsListener l) {
-        listeners.add(l);
-    }
-
-    @Override
-    public void removeSettingsListener(SettingsListener l) {
-        listeners.remove(l);
-    }
-
-    /**
-     * see {@link SMTSettings#copy(SMTSettings)}
-     */
     public void copy(NewSMTTranslationSettings newTranslationSettings) {
         this.map.clear();
         this.map.putAll(newTranslationSettings.map);

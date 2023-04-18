@@ -17,8 +17,7 @@ public class CloneTest extends TestCase {
         SourceFileRepository sfr = BasicTestsSuite.getConfig().getSourceFileRepository();
         ProgramFactory pf = BasicTestsSuite.getConfig().getProgramFactory();
         List<CompilationUnit> units = sfr.getCompilationUnits();
-        for (int i = 0; i < units.size(); i += 1) {
-            CompilationUnit cu = units.get(i);
+        for (CompilationUnit cu : units) {
             String buffer1 = cu.toSource();
             CompilationUnit cv = cu.deepClone();
             if (!ProgramElement.STRUCTURAL_EQUALITY.equals(cu, cv)) {

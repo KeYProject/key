@@ -25,12 +25,12 @@ public class ExceptionBreakpoint extends AbstractHitCountBreakpoint {
     /**
      * The exception to watch for
      */
-    private String exceptionName;
+    private final String exceptionName;
 
     /**
      * a list of nodes of the Symbolic Execution Tree whose children represent exceptions
      */
-    private Set<Node> exceptionParentNodes;
+    private final Set<Node> exceptionParentNodes;
 
     /**
      * a flag whether to watch for an uncaught exception
@@ -63,7 +63,7 @@ public class ExceptionBreakpoint extends AbstractHitCountBreakpoint {
             boolean suspendOnSubclasses, boolean enabled, int hitCount) {
         super(hitCount, proof, enabled);
         this.exceptionName = exceptionName;
-        exceptionParentNodes = new HashSet<Node>();
+        exceptionParentNodes = new HashSet<>();
         this.caught = caught;
         this.uncaught = uncaught;
         this.suspendOnSubclasses = suspendOnSubclasses;
@@ -100,7 +100,7 @@ public class ExceptionBreakpoint extends AbstractHitCountBreakpoint {
     public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
             Node node) {
         Node SETParent = SymbolicExecutionUtil.findParentSetNode(node);
-        if (activeStatement != null && activeStatement instanceof Throw && isEnabled()) {
+        if (activeStatement instanceof Throw && isEnabled()) {
             Throw throwStatement = (Throw) activeStatement;
             for (int i = 0; i < throwStatement.getChildCount(); i++) {
                 SourceElement childElement = throwStatement.getChildAt(i);

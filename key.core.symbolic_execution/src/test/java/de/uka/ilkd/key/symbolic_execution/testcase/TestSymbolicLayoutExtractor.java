@@ -3,9 +3,9 @@ package de.uka.ilkd.key.symbolic_execution.testcase;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutExtractor;
@@ -23,6 +23,7 @@ import org.key_project.util.java.StringUtil;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 
 /**
  * Tests {@link SymbolicLayoutExtractor}.
@@ -529,7 +530,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
             String precondition, int numberOfReturnNodeInMostLeftBranch,
             int expectedNumberOfLayouts, boolean useOperationContracts,
             boolean onReturnStatementNode) throws Exception {
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
         try {
@@ -637,7 +638,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
         extractor.analyse();
         // Test the initial memory layouts (first time with lazy computation)
         List<ISymbolicLayout> initialLayoutsFirstTime =
-            new ArrayList<ISymbolicLayout>(extractor.getLayoutsCount());
+            new ArrayList<>(extractor.getLayoutsCount());
         assertEquals(expectedNumberOfLayouts, extractor.getLayoutsCount());
         for (int i = 0; i < extractor.getLayoutsCount(); i++) {
             ISymbolicLayout current = extractor.getInitialLayout(i);
@@ -659,7 +660,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
         }
         // Test the current memory layouts (first time with lazy computation)
         List<ISymbolicLayout> currentLayoutsFirstTime =
-            new ArrayList<ISymbolicLayout>(extractor.getLayoutsCount());
+            new ArrayList<>(extractor.getLayoutsCount());
         for (int i = 0; i < extractor.getLayoutsCount(); i++) {
             ISymbolicLayout current = extractor.getCurrentLayout(i);
             currentLayoutsFirstTime.add(current);

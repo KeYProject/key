@@ -8,7 +8,7 @@ package de.uka.ilkd.key.java.abstraction;
  */
 public class Package implements ClassTypeContainer {
 
-    private String name;
+    private final String name;
 
     /**
      * Creates a new package with the given name, organized by the given program model info.

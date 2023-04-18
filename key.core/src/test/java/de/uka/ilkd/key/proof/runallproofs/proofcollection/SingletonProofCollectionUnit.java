@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 
@@ -24,7 +24,7 @@ public class SingletonProofCollectionUnit extends ProofCollectionUnit {
 
     @Override
     public RunAllProofsTestUnit createRunAllProofsTestUnit(String testName) throws IOException {
-        return new RunAllProofsTestUnit(testName, settings, Arrays.asList(file), true);
+        return new RunAllProofsTestUnit(testName, settings, Collections.singletonList(file), true);
     }
 
     @Override

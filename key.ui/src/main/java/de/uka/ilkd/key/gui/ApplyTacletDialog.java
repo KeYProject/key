@@ -34,13 +34,13 @@ public abstract class ApplyTacletDialog extends JDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplyTacletDialog.class);
 
     // buttons
-    protected JButton cancelButton;
-    protected JButton applyButton;
+    protected final JButton cancelButton;
+    protected final JButton applyButton;
 
-    protected KeYMediator mediator;
-    protected boolean checkAfterEachInput = true;
+    protected final KeYMediator mediator;
+    protected final boolean checkAfterEachInput = true;
 
-    protected TacletInstantiationModel[] model;
+    protected final TacletInstantiationModel[] model;
     private JTextArea statusArea;
 
     public ApplyTacletDialog(Frame parent, TacletInstantiationModel[] model, KeYMediator mediator) {
@@ -79,7 +79,7 @@ public abstract class ApplyTacletDialog extends JDialog {
     private int countLines(String s) {
         int i = 0;
         int p = 0;
-        while ((p = s.indexOf("\n", p)) >= 0) {
+        while ((p = s.indexOf('\n', p)) >= 0) {
             i++;
             p++;
         }
@@ -123,8 +123,9 @@ public abstract class ApplyTacletDialog extends JDialog {
         // show taclet
         JScrollPane scroll = new JScrollPane();
         int nolines = countLines(model[0].taclet().toString()) + 1;
-        if (nolines > 10)
+        if (nolines > 10) {
             nolines = 11;
+        }
         JTextArea text = new JTextArea(tacletSB.toString(), nolines, 68);
         text.setEditable(false);
         scroll.setViewportView(text);

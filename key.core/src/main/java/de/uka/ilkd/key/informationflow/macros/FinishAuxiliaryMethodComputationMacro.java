@@ -31,9 +31,7 @@ public class FinishAuxiliaryMethodComputationMacro extends AbstractFinishAuxilia
         if (proof != null && proof.getServices() != null) {
             final ProofOblInput poForProof =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
-            if (poForProof instanceof SymbolicExecutionPO) {
-                return true;
-            }
+            return poForProof instanceof SymbolicExecutionPO;
         }
         return false;
     }

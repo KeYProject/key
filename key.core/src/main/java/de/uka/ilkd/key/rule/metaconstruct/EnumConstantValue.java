@@ -55,8 +55,9 @@ public final class EnumConstantValue extends AbstractTermTransformer {
             } else {
                 // enum constant
                 value = EnumClassDeclaration.indexOf(pv);
-                if (value == -1)
+                if (value == -1) {
                     throw new IllegalArgumentException(term + " is not an enum constant");
+                }
             }
 
             final IntLiteral valueLiteral = KeYJavaASTFactory.intLiteral(value);

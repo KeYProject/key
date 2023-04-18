@@ -11,7 +11,7 @@ public interface InfFlowPOSnippetFactory {
     /**
      * The snippets which can be produced by this factory.
      */
-    public static enum Snippet {
+    enum Snippet {
         // ( {s1}respects = {s2}respects
         // & {s1}declassifies = {s2}declassifies )
         // -> {s1_post}respects = {s2_post}respects
@@ -52,9 +52,9 @@ public interface InfFlowPOSnippetFactory {
         Snippet(Class<?> c) {
             this.c = c;
         }
-    };
+    }
 
 
-    public Term create(Snippet snippet) throws UnsupportedOperationException;
+    Term create(Snippet snippet) throws UnsupportedOperationException;
 
 }

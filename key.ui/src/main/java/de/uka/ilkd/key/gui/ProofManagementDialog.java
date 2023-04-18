@@ -67,7 +67,7 @@ public final class ProofManagementDialog extends JDialog {
     private ContractSelectionPanel contractPanelByProof;
     private JButton startButton;
     private JButton cancelButton;
-    private KeYMediator mediator;
+    private final KeYMediator mediator;
     private final InitConfig initConfig;
     private ProofEnvironment env;
 
@@ -80,7 +80,7 @@ public final class ProofManagementDialog extends JDialog {
         this.initConfig = initConfig;
 
         // create class tree
-        targetIcons = new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>, Icon>();
+        targetIcons = new LinkedHashMap<>();
         classTree = new ClassTree(true, true, initConfig.getServices(), targetIcons);
         classTree.addMouseListener(new MouseAdapter() {
             @Override
@@ -404,8 +404,9 @@ public final class ProofManagementDialog extends JDialog {
 
     private void select(KeYJavaType kjt, IObserverFunction target) {
         tabbedPane.setSelectedIndex(0);
-        if (classTree != null)
+        if (classTree != null) {
             classTree.select(kjt, target);
+        }
     }
 
     private void select(Proof p) {
@@ -530,15 +531,15 @@ public final class ProofManagementDialog extends JDialog {
                 pan.setGrayOutAuxiliaryContracts(Objects.equals(
                     targetIcons.get(new Pair<>(entry.kjt, entry.target)), keyClosedIcon));
             } else {
-                pan.setContracts(DefaultImmutableSet.<Contract>nil(), "Contracts");
+                pan.setContracts(DefaultImmutableSet.nil(), "Contracts");
             }
         } else if (pan == contractPanelByProof) {
             if (proofList.getSelectedValue() != null) {
-                final Proof p = ((ProofWrapper) proofList.getSelectedValue()).proof;
+                final Proof p = proofList.getSelectedValue().proof;
                 final ImmutableSet<Contract> usedContracts = p.mgt().getUsedContracts();
                 pan.setContracts(usedContracts, "Contracts used in proof \"" + p.name() + "\"");
             } else {
-                pan.setContracts(DefaultImmutableSet.<Contract>nil(), "Contracts");
+                pan.setContracts(DefaultImmutableSet.nil(), "Contracts");
             }
         }
         updateStartButton();

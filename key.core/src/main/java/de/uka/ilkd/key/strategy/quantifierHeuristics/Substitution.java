@@ -36,8 +36,9 @@ public class Substitution {
 
     public boolean isTotalOn(ImmutableSet<QuantifiableVariable> vars) {
         for (QuantifiableVariable var : vars) {
-            if (!varMap.containsKey(var))
+            if (!varMap.containsKey(var)) {
                 return false;
+            }
         }
         return true;
     }
@@ -110,8 +111,9 @@ public class Substitution {
     }
 
     public boolean equals(Object arg0) {
-        if (!(arg0 instanceof Substitution))
+        if (!(arg0 instanceof Substitution)) {
             return false;
+        }
         final Substitution s = (Substitution) arg0;
         return varMap.equals(s.varMap);
     }
@@ -121,14 +123,15 @@ public class Substitution {
     }
 
     public String toString() {
-        return "" + varMap;
+        return String.valueOf(varMap);
     }
 
     public boolean termContainsValue(Term term) {
         Iterator<Term> it = varMap.valueIterator();
         while (it.hasNext()) {
-            if (recOccurCheck(it.next(), term))
+            if (recOccurCheck(it.next(), term)) {
                 return true;
+            }
         }
         return false;
     }
@@ -137,11 +140,13 @@ public class Substitution {
      * check whether term "sub" is in term "term"
      */
     private boolean recOccurCheck(Term sub, Term term) {
-        if (sub.equals(term))
+        if (sub.equals(term)) {
             return true;
+        }
         for (int i = 0; i < term.arity(); i++) {
-            if (recOccurCheck(sub, term.sub(i)))
+            if (recOccurCheck(sub, term.sub(i))) {
                 return true;
+            }
         }
         return false;
     }

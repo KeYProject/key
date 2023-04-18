@@ -25,12 +25,12 @@ public interface IExecutionLoopCondition extends IExecutionBlockStartNode<JavaSt
      *
      * @return The executed loop expression.
      */
-    public Expression getGuardExpression();
+    Expression getGuardExpression();
 
     /**
      * Returns the code position of the executed loop expression ({@link #getGuardExpression()}).
      *
      * @return The code of the executed loop expression.
      */
-    public PositionInfo getGuardExpressionPositionInfo();
+    PositionInfo getGuardExpressionPositionInfo();
 }

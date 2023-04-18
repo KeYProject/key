@@ -62,9 +62,9 @@ class ContextualBlock {
      */
     public static final int PREDICATE_TYPE = 1;
 
-    private int Start;
-    private int End;
-    private int Type;
+    private final int Start;
+    private final int End;
+    private final int Type;
 
     /**
      *

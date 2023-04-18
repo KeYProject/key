@@ -287,6 +287,7 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
             }
         }
 
+        proof.addAutoModeTime(originalProof.getAutoModeTime());
         return saveProof(originalProof, proof);
     }
 
@@ -334,6 +335,7 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
         } else {
             filename = MiscTools.removeFileExtension(currentProof.name().toString());
         }
+        filename = MiscTools.toValidFileName(filename);
         int prevSlice = filename.indexOf("_slice");
         if (prevSlice != -1) {
             int sliceNr = Integer.parseInt(filename.substring(prevSlice + "_slice".length()));
@@ -491,6 +493,10 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
         } else {
             ourApp = NoPosTacletApp.createNoPosTacletApp(t);
         }
+        if (ourApp == null) {
+            throw new IllegalStateException("slicer failed to find taclet with name " + tacletName);
+        }
+
         Services services = proof.getServices();
 
         PosInOccurrence oldPos = originalStep.getAppliedRuleApp().posInOccurrence();

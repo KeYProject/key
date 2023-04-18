@@ -24,7 +24,7 @@ public class OneStepProofMacro extends StrategyProofMacro {
     @Override
     public String getScriptCommandName() {
         return "onestep";
-    };
+    }
 
     @Override
     public String getCategory() {
@@ -52,7 +52,7 @@ public class OneStepProofMacro extends StrategyProofMacro {
 
         private static final Name NAME = new Name(OneStepStrategy.class.getSimpleName());
         private int counter;
-        public Strategy delegate;
+        public final Strategy delegate;
 
         public OneStepStrategy(Strategy delegate) {
             this.delegate = delegate;

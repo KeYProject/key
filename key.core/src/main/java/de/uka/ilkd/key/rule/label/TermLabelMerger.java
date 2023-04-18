@@ -40,7 +40,7 @@ public interface TermLabelMerger {
      * @return {@code true} if the {@link List} of {@link TermLabel} was modified and {@code false}
      *         otherwise.
      */
-    public boolean mergeLabels(SequentFormula existingSF, Term existingTerm,
+    boolean mergeLabels(SequentFormula existingSF, Term existingTerm,
             TermLabel existingLabel, SequentFormula rejectedSF, Term rejectedTerm,
             TermLabel rejectedLabel, List<TermLabel> mergedLabels);
 }

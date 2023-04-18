@@ -1,7 +1,10 @@
 package org.key_project.slicing;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.concurrent.atomic.AtomicReference;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -32,6 +35,7 @@ public final class Main {
      * Help option.
      */
     private static final String HELP = "--help";
+    private static final String OVERWRITE = "--overwrite";
 
     /**
      * Logger.
@@ -40,6 +44,29 @@ public final class Main {
 
     private Main() {
 
+    }
+
+    private static void processFileOrDir(Path path, boolean overwrite) {
+        var file = path.toFile();
+        if (file.isFile()) {
+            try {
+                if (!path.toString().endsWith(".proof")) {
+                    LOGGER.debug("Ignoring non proof file " + path);
+                    return;
+                }
+                processFile(file, overwrite);
+            } catch (Exception e) {
+                LOGGER.error("error occurred in slicing ", e);
+            }
+        } else if (file.isDirectory()) {
+            try (var s = Files.newDirectoryStream(file.toPath())) {
+                for (Path child : s) {
+                    processFileOrDir(child, overwrite);
+                }
+            } catch (IOException e) {
+                LOGGER.error("error walking dir ", e);
+            }
+        }
     }
 
     /**
@@ -54,9 +81,13 @@ public final class Main {
             Log.configureLogging(2);
             evaluateOptions(cl);
             var fileArguments = cl.getFileArguments();
+            var overwrite = cl.isSet("--overwrite");
+            if (overwrite) {
+                LOGGER.info("--overwrite given, writing files");
+            }
             for (File file : fileArguments) {
                 try {
-                    processFile(file);
+                    processFileOrDir(file.toPath(), overwrite);
                 } catch (Exception e) {
                     LOGGER.error("error occurred in slicing", e);
                 }
@@ -69,7 +100,7 @@ public final class Main {
         }
     }
 
-    private static void processFile(File proofFile) throws Exception {
+    private static void processFile(File proofFile, boolean overwrite) throws Exception {
         LOGGER.info("Processing proof: {}", proofFile.getName());
         GeneralSettings.noPruningClosed = false;
         AtomicReference<DependencyTracker> tracker = new AtomicReference<>();
@@ -99,7 +130,13 @@ public final class Main {
                     slicedProof.countNodes() - slicedProof.allGoals().size(),
                     slicedProof.countBranches());
 
-                Files.delete(saved.toPath());
+                if (overwrite) {
+                    LOGGER.info("Saving sliced proof");
+                    Files.move(saved.toPath(), proofFile.toPath(),
+                        StandardCopyOption.REPLACE_EXISTING);
+                } else {
+                    Files.delete(saved.toPath());
+                }
             } finally {
                 environment2.dispose();
             }
@@ -115,6 +152,7 @@ public final class Main {
         cl.addText("Usage: ./key [options] [filename]\n\n", false);
         cl.addSection("Options");
         cl.addOption(HELP, null, "display this text");
+        cl.addOption(OVERWRITE, null, "overwrite all files with their sliced counterpart");
         // cl.addOption(OUTPUT, "<filename>", "output file (required)");
         return cl;
     }

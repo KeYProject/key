@@ -81,10 +81,12 @@ public abstract class ChoiceExpr {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o)
+            if (this == o) {
                 return true;
-            if (!(o instanceof Proposition))
+            }
+            if (!(o instanceof Proposition)) {
                 return false;
+            }
             Proposition that = (Proposition) o;
             return choice.equals(that.choice);
         }
@@ -116,10 +118,12 @@ public abstract class ChoiceExpr {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o)
+            if (this == o) {
                 return true;
-            if (!(o instanceof And))
+            }
+            if (!(o instanceof And)) {
                 return false;
+            }
             And and = (And) o;
             return left.equals(and.left) && right.equals(and.right);
         }
@@ -151,10 +155,12 @@ public abstract class ChoiceExpr {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o)
+            if (this == o) {
                 return true;
-            if (!(o instanceof Or))
+            }
+            if (!(o instanceof Or)) {
                 return false;
+            }
             Or or = (Or) o;
             return left.equals(or.left) && right.equals(or.right);
         }
@@ -184,10 +190,12 @@ public abstract class ChoiceExpr {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o)
+            if (this == o) {
                 return true;
-            if (!(o instanceof Not))
+            }
+            if (!(o instanceof Not)) {
                 return false;
+            }
             Not not = (Not) o;
             return sub.equals(not.sub);
         }

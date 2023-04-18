@@ -60,15 +60,15 @@ public class GoalList extends JList<Goal> implements TabPanel {
     /**
      * interactive prover listener
      */
-    private GoalListInteractiveListener interactiveListener;
+    private final GoalListInteractiveListener interactiveListener;
     /**
      * KeYSelection-Listener
      */
-    private GoalListSelectionListener selectionListener;
+    private final GoalListSelectionListener selectionListener;
     /**
      * listens to gui events
      */
-    private GoalListGUIListener guiListener;
+    private final GoalListGUIListener guiListener;
 
     public GoalList(KeYMediator mediator) {
         this();
@@ -205,8 +205,9 @@ public class GoalList extends JList<Goal> implements TabPanel {
         if (mediator() != null) {
             try {
                 final Goal selGoal = mediator().getSelectedGoal();
-                if (selGoal != null)
+                if (selGoal != null) {
                     setSelectedValue(selGoal, true);
+                }
             } catch (IllegalStateException e) {
                 // this exception occurs if no proof is loaded
                 // do nothing
@@ -244,7 +245,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         /**
          *
          */
-        private List<Goal> goals;
+        private final List<Goal> goals;
         /**
          * is used to indicate if the model has to be updated
          */
@@ -369,8 +370,9 @@ public class GoalList extends JList<Goal> implements TabPanel {
              * invoked if the list of goals changed (goals were added, removed etc.
              */
             public void proofGoalRemoved(ProofTreeEvent e) {
-                if (pruningInProcess)
+                if (pruningInProcess) {
                     return;
+                }
                 remove(e.getGoal());
             }
 
@@ -378,8 +380,9 @@ public class GoalList extends JList<Goal> implements TabPanel {
              * invoked if the current goal of the proof changed
              */
             public void proofGoalsAdded(ProofTreeEvent e) {
-                if (pruningInProcess)
+                if (pruningInProcess) {
                     return;
+                }
                 add(e.getGoals());
             }
 
@@ -387,15 +390,17 @@ public class GoalList extends JList<Goal> implements TabPanel {
              * invoked if the current goal of the proof changed
              */
             public void proofGoalsChanged(ProofTreeEvent e) {
-                if (pruningInProcess)
+                if (pruningInProcess) {
                     return;
+                }
                 clear();
                 add(e.getGoals());
             }
 
             public void proofStructureChanged(ProofTreeEvent e) {
-                if (pruningInProcess)
+                if (pruningInProcess) {
                     return;
+                }
                 clear();
                 add(e.getSource().openGoals());
             }
@@ -442,7 +447,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         @Override
         public Iterable<Goal> getGoalList() {
             final Goal selectedObject = getSelectedValue();
-            final ArrayList<Goal> selectedGoals = new ArrayList<Goal>();
+            final ArrayList<Goal> selectedGoals = new ArrayList<>();
 
             if (selectedObject != null) {
                 selectedGoals.add(selectedObject);
@@ -497,9 +502,9 @@ public class GoalList extends JList<Goal> implements TabPanel {
             final List<Goal> selectedGoals = new ArrayList<>();
 
             for (int i = 0, sz = getModel().getSize(); i < sz; i++) {
-                final Object o = getModel().getElementAt(i);
+                final Goal o = getModel().getElementAt(i);
                 if (o != null && o != selectedObject) {
-                    selectedGoals.add((Goal) o);
+                    selectedGoals.add(o);
                 }
             }
             return selectedGoals;
@@ -627,8 +632,9 @@ public class GoalList extends JList<Goal> implements TabPanel {
         }
 
         public Goal getElementAt(int i) {
-            if (i < 0 || i >= getSize())
+            if (i < 0 || i >= getSize()) {
                 return null;
+            }
             return delegate.getElementAt(getDelegateIndex(i));
         }
 
@@ -680,8 +686,9 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
             for (int i = delegateBegin; i < delegateEnd; ++i) {
                 final Goal goal = delegate.getElementAt(i);
-                if (!isHiddenGoal(goal))
+                if (!isHiddenGoal(goal)) {
                     entries.add(ind++, i);
+                }
             }
 
             return ind;
@@ -708,8 +715,9 @@ public class GoalList extends JList<Goal> implements TabPanel {
             // an usable algorithm for this purpose in the Java library?)
 
             for (int res = 0; res != entries.size(); ++res) {
-                if (getDelegateIndex(res) >= delegateIndex)
+                if (getDelegateIndex(res) >= delegateIndex) {
                     return res;
+                }
             }
             return entries.size();
         }
@@ -719,8 +727,9 @@ public class GoalList extends JList<Goal> implements TabPanel {
          * amount
          */
         private void shiftTail(int begin, int amount) {
-            for (; begin != entries.size(); ++begin)
+            for (; begin != entries.size(); ++begin) {
                 entries.set(begin, getDelegateIndex(begin) + amount);
+            }
         }
 
         private int delegateSizeChange() {
@@ -756,8 +765,9 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
                 final int changeBegin = begin;
                 final int changeEnd = end - 1;
-                if (changeEnd >= changeBegin)
+                if (changeEnd >= changeBegin) {
                     fireContentsChanged(this, changeBegin, changeEnd);
+                }
             }
 
             public void intervalAdded(ListDataEvent e) {
@@ -769,8 +779,9 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
                 final int addBegin = end - (entries.size() - oldSize);
                 final int addEnd = end - 1;
-                if (addEnd >= addBegin)
+                if (addEnd >= addBegin) {
                     fireIntervalAdded(this, addBegin, addEnd);
+                }
             }
 
             public void intervalRemoved(ListDataEvent e) {
@@ -782,8 +793,9 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
                 final int remBegin = begin;
                 final int remEnd = begin + (oldSize - entries.size()) - 1;
-                if (remEnd >= remBegin)
+                if (remEnd >= remBegin) {
                     fireIntervalRemoved(this, remBegin, remEnd);
+                }
             }
         }
 
@@ -822,7 +834,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 statusIcon = ((Goal) value).isLinked() ? linkedGoalIcon
                         : ((Goal) value).isAutomatic() ? keyIcon : disabledGoalIcon;
             } else {
-                valueStr = "" + value;
+                valueStr = String.valueOf(value);
                 statusIcon = keyIcon;
             }
 

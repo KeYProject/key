@@ -155,8 +155,9 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
                     NamedModelElement p = (NamedModelElement) parent;
                     return p.getName() + "::" + name;
                 }
-            } else
+            } else {
                 return name;
+            }
         }
 
         if (object instanceof Collection<?>) {
@@ -168,8 +169,9 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
             return ret + "]";
         }
 
-        if (object == null)
+        if (object == null) {
             return "(null)";
+        }
 
         return object.toString();
     }

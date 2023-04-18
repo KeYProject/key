@@ -77,7 +77,7 @@ public final class InfFlowBlockContractTacletBuilder
         ImmutableSet<BlockContract> ifContracts =
             services.getSpecificationRepository().getBlockContracts(blockContract.getBlock());
         ifContracts = filterContracts(ifContracts);
-        ImmutableList<Term> contractsApplications = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> contractsApplications = ImmutableSLList.nil();
         for (BlockContract cont : ifContracts) {
             InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(cont, contAppData,
                 contAppData2, executionContext, services);
@@ -90,7 +90,7 @@ public final class InfFlowBlockContractTacletBuilder
 
 
     ImmutableSet<BlockContract> filterContracts(ImmutableSet<BlockContract> ifContracts) {
-        ImmutableSet<BlockContract> result = DefaultImmutableSet.<BlockContract>nil();
+        ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
         for (BlockContract cont : ifContracts) {
             if ((cont.getBlock().getStartPosition().line() == blockContract.getBlock()
                     .getStartPosition().line())

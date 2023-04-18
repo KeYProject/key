@@ -151,8 +151,9 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * @return The created {@link ChoiceEntry}s.
      */
     public static List<ChoiceEntry> createChoiceEntries(Collection<String> choices) {
-        if (choices == null)
+        if (choices == null) {
             return Collections.emptyList();
+        }
         return choices.stream().map(TacletOptionsSettings::createChoiceEntry)
                 .collect(Collectors.toList());
     }
@@ -294,8 +295,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
 
     private void setChoiceSettings(ChoiceSettings choiceSettings) {
         this.settings = choiceSettings;
-        category2Choice = settings.getDefaultChoices();
-        category2Choices = settings.getChoices();
+        category2Choice = new HashMap<>(settings.getDefaultChoices());
+        category2Choices = new HashMap<>(settings.getChoices());
         layoutChoiceSelector();
     }
 

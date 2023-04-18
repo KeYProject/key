@@ -128,8 +128,9 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
     public static String getFullText(ParserRuleContext context) {
         if (context.start == null || context.stop == null || context.start.getStartIndex() < 0
-                || context.stop.getStopIndex() < 0)
+                || context.stop.getStopIndex() < 0) {
             return context.getText(); // Fallback
+        }
         return context.start.getInputStream()
                 .getText(Interval.of(context.start.getStartIndex(), context.stop.getStopIndex()));
     }
@@ -395,8 +396,9 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
     private void transformAssertStatement(TextualJMLAssertStatement stat,
             Comment[] originalComments) throws SLTranslationException {
-        if (originalComments.length <= 0)
+        if (originalComments.length == 0) {
             throw new IllegalArgumentException();
+        }
 
         // determine parent, child index
         StatementBlock astParent = (StatementBlock) originalComments[0].getParent().getASTParent();
@@ -535,8 +537,9 @@ public final class JMLTransformer extends RecoderModelTransformer {
             transformMethodlevelCommentsHelper(aChildren, fileName);
         }
 
-        if (pe instanceof MethodDeclaration)
+        if (pe instanceof MethodDeclaration) {
             return;
+        }
 
         // get comments
         Comment[] comments = getCommentsAndSetParent(pe);
@@ -647,7 +650,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
     public void makeExplicit() {
         // abort if JML is disabled
         // if(!ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().useJML()) {
-        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().useJML()) {
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isUseJML()) {
             return;
         }
 

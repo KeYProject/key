@@ -276,18 +276,15 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                         } else {
                             // Group equal values of different branches
                             Map<Term, List<Node>> valueNodeMap =
-                                new LinkedHashMap<Term, List<Node>>();
+                                new LinkedHashMap<>();
                             for (Goal goal : info.getProof().openGoals()) {
                                 Term returnValue = SymbolicExecutionSideProofUtil
                                         .extractOperatorValue(goal, input.getOperator());
                                 assert returnValue != null;
                                 returnValue = SymbolicExecutionUtil.replaceSkolemConstants(
                                     goal.node().sequent(), returnValue, services);
-                                List<Node> nodeList = valueNodeMap.get(returnValue);
-                                if (nodeList == null) {
-                                    nodeList = new LinkedList<Node>();
-                                    valueNodeMap.put(returnValue, nodeList);
-                                }
+                                List<Node> nodeList = valueNodeMap.computeIfAbsent(returnValue,
+                                    k -> new LinkedList<>());
                                 nodeList.add(goal.node());
                             }
                             // Create result
@@ -301,7 +298,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                                     new IExecutionMethodReturnValue[valueNodeMap.size()];
                                 int i = 0;
                                 for (Entry<Term, List<Node>> entry : valueNodeMap.entrySet()) {
-                                    List<Term> conditions = new LinkedList<Term>();
+                                    List<Term> conditions = new LinkedList<>();
                                     for (Node node : entry.getValue()) {
                                         Term condition = SymbolicExecutionUtil.computePathCondition(
                                             node, getSettings().isSimplifyConditions(), false);
@@ -357,7 +354,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                 if ("methodCallReturn".equals(MiscTools.getRuleDisplayName(node))) {
                     SymbolicExecutionTermLabel currentLabel =
                         SymbolicExecutionUtil.getSymbolicExecutionLabel(node.getAppliedRuleApp());
-                    if (currentLabel != null && origianlLabel.equals(currentLabel)) {
+                    if (origianlLabel.equals(currentLabel)) {
                         resultNode = node;
                     }
                 }

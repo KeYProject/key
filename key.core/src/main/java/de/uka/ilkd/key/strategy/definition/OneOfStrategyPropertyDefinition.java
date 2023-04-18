@@ -79,7 +79,7 @@ public class OneOfStrategyPropertyDefinition extends AbstractStrategyPropertyDef
             StrategyPropertyValueDefinition... values) {
         super(apiKey, name, tooltip, subProperties);
         this.columnsPerRow = columnsPerRow;
-        this.values = new ImmutableArray<StrategyPropertyValueDefinition>(values);
+        this.values = new ImmutableArray<>(values);
     }
 
     /**

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
 /**
  * A table in which data is stored during a {@link RunAllProofsTestWithComputeCostProfiling} test
@@ -21,14 +22,15 @@ public class DataRecordingTable implements AutoCloseable {
         boolean exists = location.exists();
 
         try {
-            w = new PrintWriter(new FileOutputStream(location, true /* append = true */));
+            w = new PrintWriter(new FileOutputStream(location, true /* append = true */), false,
+                StandardCharsets.UTF_8);
             if (!exists) {
                 // First line will be the table description
                 w.println("# " + description);
                 // Second line will be a list of columns.
                 StringBuilder sb = new StringBuilder("#");
                 for (String s : columns) {
-                    sb.append(" " + s);
+                    sb.append(" ").append(s);
                 }
                 w.println(sb);
             }

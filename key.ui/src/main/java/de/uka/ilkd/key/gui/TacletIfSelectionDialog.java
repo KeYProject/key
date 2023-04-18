@@ -189,7 +189,7 @@ public class TacletIfSelectionDialog extends JPanel {
          */
         private static final long serialVersionUID = -7145932915948630147L;
         private final Services services;
-        private DefaultListCellRenderer cellRenderer = new DefaultListCellRenderer();
+        private final DefaultListCellRenderer cellRenderer = new DefaultListCellRenderer();
 
         public IfComboRenderer(Services services) {
             this.services = services;

@@ -21,7 +21,7 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 public class MainWindowTabbedPane extends JTabbedPane {
     private static final long serialVersionUID = 1L;
     public static final float TAB_ICON_SIZE = 16f;
-    private ProofTreeView proofTreeView;
+    private final ProofTreeView proofTreeView;
 
     MainWindowTabbedPane(MainWindow mainWindow, KeYMediator mediator,
             AutoModeAction autoModeAction) {
@@ -56,8 +56,9 @@ public class MainWindowTabbedPane extends JTabbedPane {
     }
 
     protected void setEnabledForAllTabs(boolean b) {
-        for (int i = 0; i < getTabCount(); i++)
+        for (int i = 0; i < getTabCount(); i++) {
             getComponentAt(i).setEnabled(b);
+        }
     }
 
     public ProofTreeView getProofTreeView() {

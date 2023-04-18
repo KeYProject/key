@@ -65,7 +65,7 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
                 // Compute this reference
                 PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
                 // Compute modified locations
-                List<Location> modifiedLocations = new LinkedList<Location>();
+                List<Location> modifiedLocations = new LinkedList<>();
                 Term loopConditionModalityTerm =
                     SymbolicExecutionUtil.posInOccurrenceInOtherNode(node, pio, previousChild);
                 if (loopConditionModalityTerm.op() != UpdateApplication.UPDATE_APPLICATION) {

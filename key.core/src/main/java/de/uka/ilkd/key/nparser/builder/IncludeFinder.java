@@ -50,8 +50,9 @@ public class IncludeFinder extends AbstractBuilder<Void> {
 
     private void addInclude(String filename, boolean relativePath) throws MalformedURLException {
         RuleSource source;
-        if (!filename.endsWith(".key"))
+        if (!filename.endsWith(".key")) {
             filename += ".key";
+        }
 
         if (relativePath) {
             filename = filename.replace('/', File.separatorChar); // Not required for Windows, but

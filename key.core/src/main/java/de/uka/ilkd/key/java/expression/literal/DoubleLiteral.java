@@ -41,7 +41,7 @@ public class DoubleLiteral extends Literal {
      */
 
     public DoubleLiteral(double value) {
-        this.value = "" + value;
+        this.value = String.valueOf(value);
     }
 
     /**

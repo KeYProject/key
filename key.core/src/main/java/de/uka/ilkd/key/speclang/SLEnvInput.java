@@ -71,7 +71,7 @@ public final class SLEnvInput extends AbstractEnvInput {
 
     public static String getLanguage() {
         GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-        if (gs.useJML()) {
+        if (gs.isUseJML()) {
             return "JML";
         } else {
             return "no";
@@ -280,7 +280,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         // sort types alphabetically (necessary for deterministic names)
         final Set<KeYJavaType> allKeYJavaTypes = javaInfo.getAllKeYJavaTypes();
         final KeYJavaType[] kjts =
-            sortKJTs(allKeYJavaTypes.toArray(new KeYJavaType[allKeYJavaTypes.size()]));
+            sortKJTs(allKeYJavaTypes.toArray(new KeYJavaType[0]));
 
         // create specifications for all types
         for (KeYJavaType kjt : kjts) {
@@ -357,7 +357,7 @@ public final class SLEnvInput extends AbstractEnvInput {
 
         final GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
-        if (gs.useJML()) {
+        if (gs.isUseJML()) {
             return createSpecs(new JMLSpecExtractor(initConfig.getServices()));
         } else {
             return null;

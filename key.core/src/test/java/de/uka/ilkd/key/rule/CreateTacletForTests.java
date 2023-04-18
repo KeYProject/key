@@ -67,7 +67,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 
     static NamespaceSet nss;
 
-    public Services services;
+    public final Services services;
 
     public CreateTacletForTests() {
         services = new Services(AbstractProfile.getDefaultProfile());

@@ -28,9 +28,9 @@ public class SettingsTreeModel extends DefaultTreeModel {
 
     private static final long serialVersionUID = -3282304543262262159L;
 
-    private ProofSettings proofSettings;
+    private final ProofSettings proofSettings;
 
-    private ProofIndependentSettings independentSettings;
+    private final ProofIndependentSettings independentSettings;
 
     public SettingsTreeModel(ProofSettings proofSettings,
             ProofIndependentSettings independentSettings) {

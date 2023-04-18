@@ -70,10 +70,12 @@ public class Instanceof extends TypeOperator {
 
     public int getChildCount() {
         int result = 0;
-        if (children != null)
+        if (children != null) {
             result += children.size();
-        if (typeReference != null)
+        }
+        if (typeReference != null) {
             result++;
+        }
         return result;
     }
 
@@ -99,8 +101,9 @@ public class Instanceof extends TypeOperator {
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();

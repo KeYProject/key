@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -40,20 +41,23 @@ public class ClasslevelTranslatorTest {
             throws IOException {
         List<String> seq = new LinkedList<>();
         try (InputStream s = resourceAsStream;
-                BufferedReader reader = new BufferedReader(new InputStreamReader(s))) {
+                BufferedReader reader =
+                    new BufferedReader(new InputStreamReader(s, StandardCharsets.UTF_8))) {
             String l;
             StringBuilder content = new StringBuilder();
             while ((l = reader.readLine()) != null) {
-                if (l.trim().isEmpty() || l.startsWith("#"))
+                if (l.trim().isEmpty() || l.startsWith("#")) {
                     continue;
+                }
                 content.append(l).append('\n');
             }
             final String[] split = content.toString().split("---\\s*Contract\\s*---\n");
             LOGGER.debug("cases: {}", split.length);
             for (String value : split) {
                 value = value.trim();
-                if (!value.isEmpty())
+                if (!value.isEmpty()) {
                     seq.add(value.replaceAll("---Contract---", ""));
+                }
             }
         }
         return seq.stream().map(it -> DynamicTest.dynamicTest(it, () -> fn.accept(it)));

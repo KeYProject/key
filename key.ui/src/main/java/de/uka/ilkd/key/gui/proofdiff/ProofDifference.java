@@ -20,8 +20,10 @@ public class ProofDifference {
     private List<String> leftAntec = new LinkedList<>(), rightAntec = new LinkedList<>(),
             rightSucc = new LinkedList<>(), leftSucc = new LinkedList<>();
 
-    private Set<String> exclusiveAntec = new HashSet<>(), commonSucc = new HashSet<>(),
-            exclusiveSucc = new HashSet<>(), commonAntec = new HashSet<>();
+    private final Set<String> exclusiveAntec = new HashSet<>();
+    private final Set<String> commonSucc = new HashSet<>();
+    private final Set<String> exclusiveSucc = new HashSet<>();
+    private final Set<String> commonAntec = new HashSet<>();
 
     public static ProofDifference create(Services services, Node left, Node right) {
         return create(left, right, (Term t) -> LogicPrinter.quickPrintTerm(t, services));
@@ -99,8 +101,8 @@ public class ProofDifference {
              * if(t.third>=THRESHOLD) { break; }
              */
             if (!matchedLeft[t.first] && !matchedRight[t.second]) {
-                String l = left.get((int) t.first);
-                String r = right.get((int) t.second);
+                String l = left.get(t.first);
+                String r = right.get(t.second);
                 pairs.add(new Matching(l, r, t.third));
                 matchedLeft[t.first] = true;
                 matchedRight[t.second] = true;
@@ -108,12 +110,14 @@ public class ProofDifference {
         }
 
         for (int i = 0; i < matchedLeft.length; i++) {
-            if (!matchedLeft[i])
+            if (!matchedLeft[i]) {
                 pairs.add(new Matching(left.get(i), null, left.get(i).length()));
+            }
         }
         for (int i = 0; i < matchedRight.length; i++) {
-            if (!matchedRight[i])
+            if (!matchedRight[i]) {
                 pairs.add(new Matching(null, right.get(i), right.get(i).length()));
+            }
         }
 
         return pairs;

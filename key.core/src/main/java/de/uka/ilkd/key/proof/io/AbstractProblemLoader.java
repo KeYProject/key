@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.proof.io;
 
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,10 +8,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipFile;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -25,12 +26,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.io.consistency.SimpleFileRepo;
@@ -48,6 +43,8 @@ import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import org.antlr.runtime.MismatchedTokenException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -65,6 +62,8 @@ import org.antlr.runtime.MismatchedTokenException;
  * @author Martin Hentschel
  */
 public abstract class AbstractProblemLoader {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractProblemLoader.class);
+
     /**
      * If set to true, only the given Java file will be parsed and loaded.
      *
@@ -74,9 +73,9 @@ public abstract class AbstractProblemLoader {
 
     public static class ReplayResult {
 
-        private Node node;
-        private List<Throwable> errors;
-        private String status;
+        private final Node node;
+        private final List<Throwable> errors;
+        private final String status;
 
         public ReplayResult(String status, List<Throwable> errors, Node node) {
             this.status = status;
@@ -197,11 +196,11 @@ public abstract class AbstractProblemLoader {
 
     static {
         // format: (expected, found)
-        mismatchErrors = new HashMap<Pair<Integer, Integer>, String>();
-        mismatchErrors.put(new Pair<Integer, Integer>(KeYLexer.SEMI, KeYLexer.COMMA),
+        mismatchErrors = new HashMap<>();
+        mismatchErrors.put(new Pair<>(KeYLexer.SEMI, KeYLexer.COMMA),
             "there may be only one declaration per line");
 
-        missedErrors = new HashMap<Integer, String>();
+        missedErrors = new HashMap<>();
         missedErrors.put(KeYLexer.RPAREN, "closing parenthesis");
         missedErrors.put(KeYLexer.RBRACE, "closing brace");
         missedErrors.put(KeYLexer.SEMI, "semicolon");
@@ -357,8 +356,9 @@ public abstract class AbstractProblemLoader {
      * Find first 'non-wrapper' exception type in cause chain.
      */
     private Throwable unwrap(Throwable e) {
-        while (e instanceof ExceptionHandlerException || e instanceof ProblemLoaderException)
+        while (e instanceof ExceptionHandlerException || e instanceof ProblemLoaderException) {
             e = e.getCause();
+        }
         return e;
     }
 
@@ -390,7 +390,7 @@ public abstract class AbstractProblemLoader {
                         (MismatchedTokenException) c0;
                     final String genericMsg = "expected " + mte.expecting + ", but found " + mte.c;
                     final String readable =
-                        mismatchErrors.get(new Pair<Integer, Integer>(mte.expecting, mte.c));
+                        mismatchErrors.get(new Pair<>(mte.expecting, mte.c));
                     final String msg = "Syntax error: " + (readable == null ? genericMsg : readable)
                         + " (" + mte.input.getSourceName() + ":" + mte.line + ")";
                     return new ProblemLoaderException(this, msg, mte);
@@ -481,13 +481,13 @@ public abstract class AbstractProblemLoader {
 
             // hook for deleting tmpDir + content at program exit
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                try {
+                try (Stream<Path> s = Files.walk(tmpDir)) {
                     // delete the temporary directory with all contained files
-                    Files.walk(tmpDir).sorted(Comparator.reverseOrder()).map(Path::toFile)
+                    s.sorted(Comparator.reverseOrder()).map(Path::toFile)
                             .forEach(File::delete);
                 } catch (IOException e) {
                     // this is called at program exist, so we only print a console message
-                    e.printStackTrace();
+                    LOGGER.warn("Failed to clean up temp dir", e);
                 }
             }));
 
@@ -514,8 +514,8 @@ public abstract class AbstractProblemLoader {
                 includes);
         } else {
             if (filename.lastIndexOf('.') != -1) {
-                throw new IllegalArgumentException("Unsupported file extension \'"
-                    + filename.substring(filename.lastIndexOf('.')) + "\' of read-in file "
+                throw new IllegalArgumentException("Unsupported file extension '"
+                    + filename.substring(filename.lastIndexOf('.')) + "' of read-in file "
                     + filename + ". Allowed extensions are: .key, .proof, .java or "
                     + "complete directories.");
             } else {
@@ -573,7 +573,7 @@ public abstract class AbstractProblemLoader {
             return new LoadedPOContainer((ProofOblInput) envInput);
         } else if (chooseContract != null && chooseContract.length() > 0) {
             int proofNum = 0;
-            String baseContractName = null;
+            String baseContractName;
             int ind = -1;
             for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
                 ind = chooseContract.indexOf("." + tag);
@@ -598,7 +598,8 @@ public abstract class AbstractProblemLoader {
         } else if (proofObligation != null && proofObligation.length() > 0) {
             // Load proof obligation settings
             final Properties properties = new Properties();
-            properties.load(new ByteArrayInputStream(proofObligation.getBytes()));
+            properties.load(
+                new ByteArrayInputStream(proofObligation.getBytes(StandardCharsets.UTF_8)));
             properties.setProperty(IPersistablePO.PROPERTY_FILENAME, file.getAbsolutePath());
             if (poPropertiesToForce != null) {
                 properties.putAll(poPropertiesToForce);
@@ -678,7 +679,7 @@ public abstract class AbstractProblemLoader {
         KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
 
         Triple<String, Integer, Integer> script = kupf.readProofScript();
-        URL url = null;
+        URL url;
         try {
             url = kupf.getInitialFile().toURI().toURL();
         } catch (MalformedURLException e) {
@@ -686,7 +687,7 @@ public abstract class AbstractProblemLoader {
         }
         Location location = new Location(url, Position.newOneBased(script.second, script.third));
 
-        return new Pair<String, Location>(script.first, location);
+        return new Pair<>(script.first, location);
     }
 
     public Pair<String, Location> getProofScript() throws ProblemLoaderException {
@@ -704,10 +705,9 @@ public abstract class AbstractProblemLoader {
     private ReplayResult replayProof(Proof proof)
             throws ProofInputException, ProblemLoaderException {
         String status = "";
-        List<Throwable> errors = new LinkedList<Throwable>();
+        List<Throwable> errors = new LinkedList<>();
         Node lastTouchedNode = proof.root();
 
-        IProofFileParser parser = null;
         IntermediateProofReplayer replayer = null;
         IntermediatePresentationProofFileParser.Result parserResult = null;
         IntermediateProofReplayer.Result replayResult = null;
@@ -718,9 +718,10 @@ public abstract class AbstractProblemLoader {
         try {
             assert envInput instanceof KeYUserProblemFile;
 
-            parser = new IntermediatePresentationProofFileParser(proof);
+            IntermediatePresentationProofFileParser parser =
+                new IntermediatePresentationProofFileParser(proof);
             problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
-            parserResult = ((IntermediatePresentationProofFileParser) parser).getResult();
+            parserResult = parser.getResult();
 
             // Parser is no longer needed, set it to null to free memory.
             parser = null;

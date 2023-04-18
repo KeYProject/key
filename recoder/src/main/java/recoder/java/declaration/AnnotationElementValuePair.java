@@ -65,10 +65,12 @@ public class AnnotationElementValuePair extends JavaNonTerminalProgramElement
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (element != null)
+        if (element != null) {
             element.setParent(this);
-        if (elementValue != null)
+        }
+        if (elementValue != null) {
             elementValue.setExpressionContainer(this);
+        }
     }
 
     /*
@@ -78,10 +80,12 @@ public class AnnotationElementValuePair extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int res = 0;
-        if (element != null)
+        if (element != null) {
             res++;
-        if (elementValue != null)
+        }
+        if (elementValue != null) {
             res++;
+        }
         return res;
     }
 
@@ -93,13 +97,15 @@ public class AnnotationElementValuePair extends JavaNonTerminalProgramElement
     public ProgramElement getChildAt(int index) {
         int i = index;
         if (element != null) {
-            if (i == 0)
+            if (i == 0) {
                 return element;
+            }
             i--;
         }
         if (elementValue != null) {
-            if (i == 0)
+            if (i == 0) {
                 return elementValue;
+            }
             i--;
         }
         throw new ArrayIndexOutOfBoundsException(index);
@@ -123,10 +129,12 @@ public class AnnotationElementValuePair extends JavaNonTerminalProgramElement
     public int getChildPositionCode(ProgramElement child) {
         // role 0: element
         // role 1: elementValue
-        if (child == element)
+        if (child == element) {
             return 0;
-        if (child == elementValue)
+        }
+        if (child == elementValue) {
             return 1;
+        }
         return -1;
     }
 
@@ -137,18 +145,21 @@ public class AnnotationElementValuePair extends JavaNonTerminalProgramElement
      * recoder.java.ProgramElement)
      */
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null)
+        if (p == null) {
             throw new NullPointerException();
+        }
         if (p == element) {
             element = (AnnotationPropertyReference) q;
-            if (element != null)
+            if (element != null) {
                 element.setParent(this);
+            }
             return true;
         }
         if (p == elementValue) {
             elementValue = (Expression) q;
-            if (elementValue != null)
+            if (elementValue != null) {
                 elementValue.setExpressionContainer(this);
+            }
             return true;
         }
         return false;
@@ -212,8 +223,9 @@ public class AnnotationElementValuePair extends JavaNonTerminalProgramElement
      * @see recoder.java.ExpressionContainer#getExpressionAt(int)
      */
     public Expression getExpressionAt(int index) {
-        if (index == 0 && elementValue != null)
+        if (index == 0 && elementValue != null) {
             return elementValue;
+        }
         throw new ArrayIndexOutOfBoundsException(index);
     }
 
@@ -230,8 +242,9 @@ public class AnnotationElementValuePair extends JavaNonTerminalProgramElement
     }
 
     public String getElementName() {
-        if (element == null)
+        if (element == null) {
             return "(default value)"; // TODO correct text
+        }
         return element.getIdentifier().getText();
     }
 

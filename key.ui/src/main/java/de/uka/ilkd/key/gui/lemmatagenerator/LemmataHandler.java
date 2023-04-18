@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
@@ -74,7 +75,7 @@ public class LemmataHandler implements TacletFilter {
             }
 
             @Override
-            public void stopped(ProofAggregate pa, ImmutableSet<Taclet> taclets,
+            public void stopped(@Nullable ProofAggregate pa, ImmutableSet<Taclet> taclets,
                     boolean addAsAxioms) {
                 if (pa == null) {
                     println("There is no taclet to be proven.");
@@ -119,7 +120,7 @@ public class LemmataHandler implements TacletFilter {
     }
 
     private Collection<File> createFilesForAxioms(Collection<String> filenames) {
-        Collection<File> list = new LinkedList<File>();
+        Collection<File> list = new LinkedList<>();
         for (String filename : filenames) {
             list.add(new File(filename));
         }

@@ -4,7 +4,7 @@ package de.uka.ilkd.key.proof;
 /** Proof-specific counter object: taclet names, var names, node numbers, &c */
 public class Counter {
 
-    private String name;
+    private final String name;
     private int count;
 
     public Counter(String name) {

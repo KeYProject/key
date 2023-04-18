@@ -99,6 +99,6 @@ public class BooleanLiteral extends Literal {
     }
 
     public Object getEquivalentJavaType() {
-        return Boolean.valueOf(value);
+        return value;
     }
 }

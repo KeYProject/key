@@ -1,11 +1,6 @@
 package de.uka.ilkd.key.proof.io.consistency;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -56,7 +51,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
                 deleteDiskContent();
             } catch (IOException e) {
                 // this is called at program exist, so we only print a console message
-                e.printStackTrace();
+                LOGGER.info("Failed to delete tmp", e);
             }
         }));
     }
@@ -325,7 +320,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
             // delete the temporary directory with all contained files
             deleteDiskContent();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.info("Failed to delete disk content", e);
         }
 
         // set every held reference to null
@@ -341,16 +336,18 @@ public final class DiskFileRepo extends AbstractFileRepo {
      */
     private void deleteDiskContent() throws IOException {
         if (!isDisposed() && !GeneralSettings.keepFileRepos) {
-            Files.walk(tmpDir).sorted(Comparator.reverseOrder())
-                    // .map(Path::toFile)
-                    .forEach(path -> {
-                        try {
-                            Files.delete(path);
-                            // path.delete();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    });
+            try (var s = Files.walk(tmpDir)) {
+                s.sorted(Comparator.reverseOrder())
+                        // .map(Path::toFile)
+                        .forEach(path -> {
+                            try {
+                                Files.delete(path);
+                                // path.delete();
+                            } catch (IOException e) {
+                                LOGGER.info("Failed to delete file", e);
+                            }
+                        });
+            }
         }
     }
 }

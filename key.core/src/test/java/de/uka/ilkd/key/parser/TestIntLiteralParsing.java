@@ -10,8 +10,8 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
+import de.uka.ilkd.key.util.RecognitionException;
 
-import org.antlr.runtime.RecognitionException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
@@ -195,10 +195,9 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
      * This method tests if meaningful ("out of bounds") error messages get printed for int literals
      * which are just outside the range of int.
      *
-     * @throws RecognitionException if a parsing error occurs
      */
     @TestFactory
-    public Stream<DynamicTest> testIntRange() throws RecognitionException {
+    public Stream<DynamicTest> testIntRange() {
         return Arrays.stream(INTRANGESTRINGS).map(it -> DynamicTest.dynamicTest(it, () -> {
             RuntimeException ex = assertThrows(RuntimeException.class, () -> parseTerm(it));
             assertTrue(ex.getCause().getMessage().startsWith("Number constant out of bounds"));
@@ -208,8 +207,6 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
     /**
      * This method tests if meaningful ("out of bounds") error messages get printed for long
      * literals which are just outside the range of long.
-     *
-     * @return
      */
     @TestFactory
     public Stream<DynamicTest> testLongRange() {

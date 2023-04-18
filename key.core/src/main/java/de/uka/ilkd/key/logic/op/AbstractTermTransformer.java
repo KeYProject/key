@@ -29,7 +29,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 
     /** A map from String names to meta operators **/
     public static final Map<String, AbstractTermTransformer> NAME_TO_META_OP =
-        new LinkedHashMap<String, AbstractTermTransformer>(70);
+        new LinkedHashMap<>(70);
 
     // TODO: This seems to be better handled using a ServiceLoader
 

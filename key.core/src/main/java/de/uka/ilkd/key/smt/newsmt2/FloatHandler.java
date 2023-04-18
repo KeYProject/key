@@ -37,7 +37,7 @@ public class FloatHandler implements SMTHandler {
         SMT, AXIOMS
     }
 
-    public static final EnumProperty<SqrtMode> SQRT_PROPERTY = new EnumProperty<SqrtMode>(
+    public static final EnumProperty<SqrtMode> SQRT_PROPERTY = new EnumProperty<>(
         "sqrtSMTTranslation", "Translation of \"sqrt\" function",
         "Either SMT for a builtin bit-precise translation, or AXIOMS for a fast approximation using axioms",
         SqrtMode.class);

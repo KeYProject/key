@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.gui.sourceview;
 
 import java.awt.Color;
+import java.beans.PropertyChangeListener;
 import java.util.*;
 import java.util.regex.Pattern;
 import javax.swing.text.*;
 
 import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
 
 import static de.uka.ilkd.key.speclang.jml.JMLUtils.isJmlCommentStarter;
 
@@ -72,7 +72,7 @@ public class JavaDocument extends DefaultStyledDocument {
         /** parser is currently inside a JML annotation (starting with "&#47;&#42;&#64;") */
         JML,
         /** parser is currently inside a JML keyword */
-        JML_KEYWORD;
+        JML_KEYWORD
     }
 
     /**
@@ -102,7 +102,7 @@ public class JavaDocument extends DefaultStyledDocument {
          */
         JML_ANNOTATION_LINE,
         /** last processed char was "&#42;" */
-        MAYBEEND;
+        MAYBEEND
     }
 
     /**
@@ -251,7 +251,7 @@ public class JavaDocument extends DefaultStyledDocument {
     /**
      * The settings listener of this document (registered in the static listener list).
      */
-    private final transient SettingsListener listener = e -> updateStyles();
+    private final transient PropertyChangeListener listener = e -> updateStyles();
 
     /**
      * Creates a new JavaDocument and sets the syntax highlighting styles (as in eclipse default
@@ -259,7 +259,7 @@ public class JavaDocument extends DefaultStyledDocument {
      */
     public JavaDocument() {
         updateStyles();
-        ColorSettings.getInstance().addSettingsListener(listener);
+        ColorSettings.getInstance().addPropertyChangeListener(listener);
         // workaround for #1641: typing "enter" key shall insert only "\n", even on Windows
         putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
 
@@ -272,7 +272,7 @@ public class JavaDocument extends DefaultStyledDocument {
      * Dispose this object.
      */
     public void dispose() {
-        ColorSettings.getInstance().removeSettingsListener(listener);
+        ColorSettings.getInstance().removePropertyChangeListener(listener);
     }
 
     private void updateStyles() {

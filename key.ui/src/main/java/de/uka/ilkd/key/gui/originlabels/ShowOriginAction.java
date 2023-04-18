@@ -20,7 +20,7 @@ public class ShowOriginAction extends MainWindowAction {
 
     private static final long serialVersionUID = 4557953425770258852L;
 
-    private PosInSequent pos;
+    private final PosInSequent pos;
 
     /**
      * Creates a new {@link ShowOriginAction}.
@@ -36,7 +36,7 @@ public class ShowOriginAction extends MainWindowAction {
 
         setName("Show origin");
         setEnabled(settings.getUseOriginLabels());
-        settings.addSettingsListener(event -> setEnabled(settings.getUseOriginLabels()));
+        settings.addPropertyChangeListener(event -> setEnabled(settings.getUseOriginLabels()));
         setMenuPath("View");
         lookupAcceleratorKey();
     }

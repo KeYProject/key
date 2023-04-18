@@ -30,7 +30,7 @@ public class SVNameCorrespondenceCollector extends DefaultVisitor {
      * This map contains (a, b) if there is a substitution {b a} somewhere in the taclet
      */
     private ImmutableMap<SchemaVariable, SchemaVariable> nameCorrespondences =
-        DefaultImmutableMap.<SchemaVariable, SchemaVariable>nilMap();
+        DefaultImmutableMap.nilMap();
 
     private final HeapLDT heapLDT;
 
@@ -53,8 +53,9 @@ public class SVNameCorrespondenceCollector extends DefaultVisitor {
         if (top instanceof SubstOp) {
             final Operator substTermOp = t.sub(0).op();
             final QuantifiableVariable substVar = t.varsBoundHere(1).get(0);
-            if (substTermOp instanceof SchemaVariable && substVar instanceof SchemaVariable)
+            if (substTermOp instanceof SchemaVariable && substVar instanceof SchemaVariable) {
                 addNameCorrespondence((SchemaVariable) substTermOp, (SchemaVariable) substVar);
+            }
         }
 
     }
@@ -121,8 +122,9 @@ public class SVNameCorrespondenceCollector extends DefaultVisitor {
             if (gt instanceof RewriteTacletGoalTemplate) {
                 final Term replaceWithTerm = ((RewriteTacletGoalTemplate) gt).replaceWith();
                 replaceWithTerm.execPostOrder(this);
-                if (findSV != null && replaceWithTerm.op() instanceof SchemaVariable)
+                if (findSV != null && replaceWithTerm.op() instanceof SchemaVariable) {
                     addNameCorrespondence((SchemaVariable) replaceWithTerm.op(), findSV);
+                }
             } else {
                 if (gt instanceof AntecSuccTacletGoalTemplate) {
                     visit(((AntecSuccTacletGoalTemplate) gt).replaceWith());

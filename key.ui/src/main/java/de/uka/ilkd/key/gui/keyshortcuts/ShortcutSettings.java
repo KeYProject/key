@@ -89,8 +89,9 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
                             && ks.getKeyCode() != KeyEvent.VK_SHIFT
                             && ks.getKeyCode() != KeyEvent.VK_ALT;
 
-                if (shortcutComplete)
+                if (shortcutComplete) {
                     cellEditor.stopCellEditing();
+                }
             }
 
             @Override
@@ -177,8 +178,9 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
                         .replaceAll("([a-z]\\w*\\.)*", "");
             case 1:
                 Action a = actions.get(rowIndex);
-                if (a == null)
+                if (a == null) {
                     return "";
+                }
                 Object val = a.getValue(Action.SHORT_DESCRIPTION);
                 return val != null ? val.toString() : "";
             case 2:

@@ -31,13 +31,13 @@ public class EngineState {
     private final static DefaultTermParser PARSER = new DefaultTermParser();
     // private final Map<String, Object> arbitraryVariables = new HashMap<>();
     private final Proof proof;
-    private AbbrevMap abbrevMap = new AbbrevMap();
+    private final AbbrevMap abbrevMap = new AbbrevMap();
     /**
      * nullable
      */
     private Observer observer;
     private File baseFileName = new File(".");
-    private ValueInjector valueInjector = ValueInjector.createDefault();
+    private final ValueInjector valueInjector = ValueInjector.createDefault();
     private Goal goal;
     private Node lastSetGoalNode;
 
@@ -143,7 +143,7 @@ public class EngineState {
     }
 
     private Goal findGoalFromRoot(final Node rootNode, boolean checkAutomatic) {
-        final Deque<Node> choices = new LinkedList<Node>();
+        final Deque<Node> choices = new LinkedList<>();
 
         Goal result = null;
         Node node = rootNode;

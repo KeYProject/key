@@ -73,7 +73,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
 
         String[] sizes =
             Arrays.stream(Config.SIZES).boxed().map(it -> it + " pt").toArray(String[]::new);
-        spFontSizeTreeSequent = this.<String>createSelection(sizes, emptyValidator());
+        spFontSizeTreeSequent = this.createSelection(sizes, emptyValidator());
         addTitledComponent("Tree and sequent font factor: ", spFontSizeTreeSequent, "");
 
 
@@ -149,7 +149,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         chkRightClickMacros.setSelected(generalSettings.isRightClickMacro());
         chkConfirmExit.setSelected(vs.confirmExit());
         spAutoSaveProof.setValue(generalSettings.autoSavePeriod());
-        chkMinimizeInteraction.setSelected(generalSettings.tacletFilter());
+        chkMinimizeInteraction.setSelected(generalSettings.getTacletFilter());
         spFontSizeTreeSequent.setSelectedIndex(vs.sizeIndex());
 
         return this;
@@ -184,7 +184,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         vs.setConfirmExit(chkConfirmExit.isSelected());
         gs.setAutoSave((Integer) spAutoSaveProof.getValue());
         gs.setTacletFilter(chkMinimizeInteraction.isSelected());
-        vs.setFontIndex((Integer) spFontSizeTreeSequent.getSelectedIndex());
+        vs.setFontIndex(spFontSizeTreeSequent.getSelectedIndex());
         FontSizeFacade.resizeFonts(vs.getUIFontSizeFactor());
         Config.DEFAULT.setDefaultFonts();
         Config.DEFAULT.fireConfigChange();

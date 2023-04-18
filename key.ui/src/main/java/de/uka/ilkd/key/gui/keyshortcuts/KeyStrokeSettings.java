@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import javax.swing.*;
 
@@ -46,7 +47,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     /**
      * default {@link KeyStroke}s
      */
-    private static Properties DEFAULT_KEYSTROKES = new Properties();
+    private static final Properties DEFAULT_KEYSTROKES = new Properties();
 
     static {
         if (KeyStrokeManager.FKEY_MACRO_SCHEME) {
@@ -124,8 +125,9 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     private KeyStrokeSettings(Properties init) {
         this.properties.putAll(DEFAULT_KEYSTROKES);
         init.forEach((key, value) -> {
-            if (value != null && !value.toString().isEmpty())
+            if (value != null && !value.toString().isEmpty()) {
                 this.properties.put(key, value);
+            }
         });
         save();
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
@@ -144,8 +146,9 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     }
 
     public static KeyStrokeSettings getInstance() {
-        if (INSTANCE == null)
+        if (INSTANCE == null) {
             INSTANCE = KeyStrokeSettings.loadFromConfig();
+        }
         return INSTANCE;
     }
 
@@ -158,31 +161,32 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     }
 
     void setKeyStroke(String key, KeyStroke stroke, boolean override) {
-        boolean exists = properties.contains(key);
-        if (override || !exists) {
+        var old = getKeyStroke(key, null);
+        if (override || (old == null)) {
             properties.setProperty(key, stroke != null ? stroke.toString() : "");
-            fireSettingsChange();
+            firePropertyChange(key, old, stroke);
         }
     }
 
     KeyStroke getKeyStroke(String key, KeyStroke defaultValue) {
         try {
             KeyStroke ks = KeyStroke.getKeyStroke(properties.getProperty(key));
-            if (ks != null)
+            if (ks != null) {
                 return ks;
-        } catch (Exception e) {
+            }
+        } catch (Exception ignored) {
         }
         return defaultValue;
     }
 
     public void save() {
-        LOGGER.info("Save keyboard shortcuts to: " + SETTINGS_FILE.getAbsolutePath());
+        LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE.getAbsolutePath());
         SETTINGS_FILE.getParentFile().mkdirs();
-        try (Writer writer = new FileWriter(SETTINGS_FILE)) {
+        try (Writer writer = new FileWriter(SETTINGS_FILE, StandardCharsets.UTF_8)) {
             properties.store(writer, "KeY's KeyStrokes");
             writer.flush();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Failed to save", ex);
         }
     }
 }

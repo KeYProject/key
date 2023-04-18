@@ -557,7 +557,7 @@ public abstract class Notation {
             }
 
             do {
-                final String opName = t.op().name() + "";
+                final String opName = String.valueOf(t.op().name());
 
                 if (t.arity() != 1
                         || (opName.length() != 1 || !Character.isDigit(opName.charAt(0)))) {
@@ -606,8 +606,9 @@ public abstract class Notation {
             try {
                 intVal = Integer.parseInt(result);
                 charVal = (char) intVal;
-                if (intVal - charVal != 0)
+                if (intVal - charVal != 0) {
                     throw new NumberFormatException(); // overflow!
+                }
 
             } catch (NumberFormatException ex) {
                 LOGGER.error("Oops. {} is not of type char", result);
@@ -765,13 +766,13 @@ public abstract class Notation {
 
 
         private String printStringTerm(Term t) {
-            String result = "\"";
+            StringBuilder result = new StringBuilder("\"");
             Term term = t;
             while (term.op().arity() == 2) {
-                result = result + CharLiteral.printCharTerm(term.sub(0).sub(0)).charAt(1);
+                result.append(CharLiteral.printCharTerm(term.sub(0).sub(0)).charAt(1));
                 term = term.sub(1);
             }
-            result = result + CharLiteral.printCharTerm(term.sub(0)).charAt(1);
+            result.append(CharLiteral.printCharTerm(term.sub(0)).charAt(1));
             return (result + "\"");
         }
 

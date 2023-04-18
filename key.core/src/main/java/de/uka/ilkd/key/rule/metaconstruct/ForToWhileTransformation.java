@@ -46,8 +46,9 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
         if (replaceBreakWithNoLabel == 0) {
             // most outer for loop
 
-            if (changeList.getFirst() == CHANGED)
+            if (changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
+            }
 
             ILoopInit inits = null;
             IForUpdates updates = null;
@@ -80,7 +81,7 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
 
             final int updateSize = (updates == null ? 0 : updates.size());
 
-            Statement innerBlockStatements[] = new Statement[updateSize + 1];
+            Statement[] innerBlockStatements = new Statement[updateSize + 1];
             innerBlockStatements[0] = body;
             if (updates != null) {
                 for (int copyStatements = 0; copyStatements < updateSize; copyStatements++) {
@@ -90,7 +91,7 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
             }
 
             final int initSize = (inits == null ? 0 : inits.size());
-            Statement outerBlockStatements[] = new Statement[initSize + 1];
+            Statement[] outerBlockStatements = new Statement[initSize + 1];
 
             if (inits != null) {
                 for (int copyStatements = 0; copyStatements < initSize; copyStatements++) {

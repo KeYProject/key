@@ -106,8 +106,9 @@ public final class EnhancedFor2For extends TwoPassTransformation {
             iteratorType = sc.getSourceInfo().getType(mr);
         } else if (guardType instanceof ArrayType) {
             iteratorType = null;
-        } else
+        } else {
             throw new IllegalStateException("Broken Model");
+        }
         return setProblemReport(EQUIVALENCE);
     }
 
@@ -131,12 +132,12 @@ public final class EnhancedFor2For extends TwoPassTransformation {
             guard = pf.createLessThan(pf.createVariableReference(pf.createIdentifier(iteratorName)),
                 pf.createArrayLengthReference(
                     pf.createVariableReference(pf.createIdentifier(arrayReferenceName))));
-            update = new ASTArrayList<Expression>(pf.createPostIncrement(
+            update = new ASTArrayList<>(pf.createPostIncrement(
                 pf.createVariableReference(pf.createIdentifier(iteratorName))));
             firstStmnt.getVariableSpecifications().get(0)
                     .setInitializer(pf.createArrayReference(
                         pf.createVariableReference(pf.createIdentifier(arrayReferenceName)),
-                        new ASTArrayList<Expression>(
+                        new ASTArrayList<>(
                             pf.createVariableReference(pf.createIdentifier(iteratorName)))));
         } else {
             // Iterable
@@ -156,7 +157,7 @@ public final class EnhancedFor2For extends TwoPassTransformation {
                         pf.createIdentifier("next")));
         }
 
-        ASTList<Statement> statements = new ASTArrayList<Statement>(2);
+        ASTList<Statement> statements = new ASTArrayList<>(2);
 
         statements.add(firstStmnt);
         if (enhancedFor.getStatementCount() > 0) {
@@ -172,7 +173,7 @@ public final class EnhancedFor2For extends TwoPassTransformation {
             }
         }
 
-        For newFor = new For(new ASTArrayList<LoopInitializer>(init), guard, update,
+        For newFor = new For(new ASTArrayList<>(init), guard, update,
             new StatementBlock(statements));
         newFor.makeAllParentRolesValid();
 
@@ -180,7 +181,7 @@ public final class EnhancedFor2For extends TwoPassTransformation {
         Statement replacee;
 
         if (iteratorType == null) {
-            ASTArrayList<Statement> sml = new ASTArrayList<Statement>(2);
+            ASTArrayList<Statement> sml = new ASTArrayList<>(2);
             // create array name reference
             LocalVariableDeclaration lvd =
                 pf.createLocalVariableDeclaration(null, TypeKit.createTypeReference(pf, guardType),

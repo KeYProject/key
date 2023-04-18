@@ -90,11 +90,7 @@ public final class RepresentsAxiom extends ClassAxiom {
         if (target != other.target) {
             return false;
         }
-        if (!kjt.equals(other.kjt)) {
-            return false;
-        }
-
-        return true;
+        return kjt.equals(other.kjt);
     }
 
     @Override
@@ -113,7 +109,7 @@ public final class RepresentsAxiom extends ClassAxiom {
         assert heapVar != null;
         assert (selfVar == null) == target.isStatic();
         final Map<ProgramVariable, ParsableVariable> map =
-            new LinkedHashMap<ProgramVariable, ParsableVariable>();
+            new LinkedHashMap<>();
         map.put(services.getTypeConverter().getHeapLDT().getHeap(), heapVar);
         if (selfVar != null) {
             map.put(originalSelfVar, selfVar);
@@ -145,7 +141,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     @Override
     public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             final Services services) {
-        List<LocationVariable> heaps = new ArrayList<LocationVariable>();
+        List<LocationVariable> heaps = new ArrayList<>();
         int hc = 0;
         for (LocationVariable h : HeapContext.getModHeaps(services, false)) {
             if (hc >= target.getHeapCount(services)) {
@@ -158,7 +154,7 @@ public final class RepresentsAxiom extends ClassAxiom {
         Name tacletName = MiscTools.toValidTacletName(name);
         TacletGenerator tg = TacletGenerator.getInstance();
         if (isFunctional(services)) {
-            ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
+            ImmutableSet<Taclet> res = DefaultImmutableSet.nil();
             res = res.union(
                 tg.generateFunctionalRepresentsTaclets(tacletName, originalPre, originalRep, kjt,
                     target, heaps, self, originalParamVars, atPreVars, toLimit, true, services));

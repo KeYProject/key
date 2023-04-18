@@ -13,7 +13,6 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -40,8 +39,6 @@ public class TestFile implements Serializable {
     private final TestProperty testProperty;
     private final String path;
     private final ProofCollectionSettings settings;
-
-    public final RunAllProofsDirectories directories;
 
     /**
      * In order to ensure that the implementation is independent of working directory, this method
@@ -80,18 +77,17 @@ public class TestFile implements Serializable {
         return ret;
     }
 
-    protected TestFile(TestProperty testProperty, String path, ProofCollectionSettings settings,
-            RunAllProofsDirectories directories) {
+    protected TestFile(TestProperty testProperty, String path, ProofCollectionSettings settings)
+            throws IOException {
         this.path = path;
         this.testProperty = testProperty;
         this.settings = settings;
-        this.directories = directories;
+        getKeYFile();
     }
 
     public static TestFile createInstance(TestProperty testProperty, String path,
-            ProofCollectionSettings settings) {
-        return new TestFile(testProperty, path, settings,
-            new RunAllProofsDirectories(settings.runStart));
+            ProofCollectionSettings settings) throws IOException {
+        return new TestFile(testProperty, path, settings);
     }
 
     /**
@@ -135,8 +131,7 @@ public class TestFile implements Serializable {
      *         {@link Exception} object with original exception as cause.
      */
     public TestResult runKey() throws Exception {
-
-        boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
+        boolean verbose = settings.getVerboseOutput();
 
         // Initialize KeY settings.
         String gks = settings.getGlobalKeYSettings();
@@ -147,7 +142,7 @@ public class TestFile implements Serializable {
         // Name resolution for the available KeY file.
         File keyFile = getKeYFile();
         if (verbose) {
-            LOGGER.debug("Now processing file {}", keyFile);
+            LOGGER.info("Now processing file {}", keyFile);
         }
         // File that the created proof will be saved to.
         File proofFile = new File(keyFile.getAbsolutePath() + ".proof");
@@ -179,9 +174,11 @@ public class TestFile implements Serializable {
 
             replayResult = env.getReplayResult();
             if (replayResult.hasErrors() && verbose) {
-                LOGGER.info("... error(s) while loading");
-                for (Throwable error : replayResult.getErrorList()) {
-                    error.printStackTrace();
+                LOGGER.warn("... error(s) while loading");
+                List<Throwable> errors = replayResult.getErrorList();
+                for (int i = 0; i < errors.size(); i++) {
+                    Throwable error = errors.get(i);
+                    LOGGER.warn("Error " + (i + 1) + ":", error);
                 }
             }
 
@@ -196,6 +193,10 @@ public class TestFile implements Serializable {
             }
 
             autoMode(env, loadedProof, script);
+
+            if (testProperty == TestProperty.PROVABLE || testProperty == TestProperty.NOTPROVABLE) {
+                loadedProof.saveToFile(new File(keyFile.getAbsolutePath() + ".save.proof"));
+            }
 
             boolean closed = loadedProof.closed();
             success = (testProperty == TestProperty.PROVABLE) == closed;
@@ -293,7 +294,7 @@ public class TestFile implements Serializable {
             if (result.hasErrors()) {
                 List<Throwable> errorList = result.getErrorList();
                 for (Throwable ex : errorList) {
-                    ex.printStackTrace();
+                    LOGGER.warn("Replay exception", ex);
                 }
                 throw errorList.get(0);
             }

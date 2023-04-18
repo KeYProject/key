@@ -6,7 +6,6 @@ package de.uka.ilkd.key.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * {@code Debug} offers some methods for assertions, debug output and so on.
  */
@@ -16,7 +15,7 @@ public final class Debug {
     /**
      * has to be set in order to enable assertion
      */
-    public static boolean ENABLE_ASSERTION =
+    public static final boolean ENABLE_ASSERTION =
         Boolean.parseBoolean(System.getProperty("KeyAssertionFlag", "true"));
 
     /**
@@ -82,8 +81,9 @@ public final class Debug {
      */
     public static void assertDeepNonNull(Iterable<?> iterable, String message) {
         if (ENABLE_ASSERTION) {
-            if (iterable == null)
+            if (iterable == null) {
                 fail("Null pointer: " + message);
+            }
             for (Object object : iterable) {
                 if (object == null) {
                     fail("Null element in collection:" + message);

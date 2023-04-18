@@ -1,7 +1,9 @@
 package de.uka.ilkd.key.settings;
 
+import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -45,32 +47,21 @@ public class ProofSettings {
     /**
      * all setting objects in the following order: heuristicSettings
      */
-    private List<Settings> settings = new LinkedList<>();
+    private final List<Settings> settings = new LinkedList<>();
 
     /**
      * the default listener to settings
      */
-    private final SettingsListener listener = e -> saveSettings();
+    private final PropertyChangeListener listener = e -> saveSettings();
 
-    // NOTE: This was commented out in commit
-    // 4932e4d1210356455c04a1e9fb7f2fa1f21b3e9d, 2012/11/08, in the process of
-    // separating proof independent from proof dependent settings.
-    // Is not in ProofIndependentSettings. I don't know why these code
-    // corpses have been left here as comments, therefore I don't removed them.
-    // (DS, 2017-05-11)
-
-    // private final static int strategySettings = 0;
-    // private final static int GENERAL_SETTINGS = 1;
-    // private final static int choiceSettings = 2;
-    // private final static int smtSettings = 3;
-    // private final static int VIEW_SETTINGS = 4;
     private final StrategySettings strategySettings = new StrategySettings();
     private final ChoiceSettings choiceSettings = new ChoiceSettings();
     private final ProofDependentSMTSettings smtSettings =
         ProofDependentSMTSettings.getDefaultSettingsData();
     private final NewSMTTranslationSettings newSMTSettings = new NewSMTTranslationSettings();
-    private Properties lastLoadedProperties = null;
     private final TermLabelSettings termLabelSettings = new TermLabelSettings();
+
+    private Properties lastLoadedProperties = null;
 
     /**
      * create a proof settings object. When you add a new settings object, PLEASE UPDATE THE LIST
@@ -102,7 +93,7 @@ public class ProofSettings {
 
     public void addSettings(Settings settings) {
         this.settings.add(settings);
-        settings.addSettingsListener(listener);
+        settings.addPropertyChangeListener(listener);
         if (lastLoadedProperties != null) {
             settings.readSettings(lastLoadedProperties);
         }
@@ -138,7 +129,7 @@ public class ProofSettings {
             if (!PROVER_CONFIG_FILE.exists()) {
                 PROVER_CONFIG_FILE.getParentFile().mkdirs();
             }
-            try (Writer out = new FileWriter(PROVER_CONFIG_FILE)) {
+            try (Writer out = new FileWriter(PROVER_CONFIG_FILE, StandardCharsets.UTF_8)) {
                 settingsToStream(out);
             }
         } catch (IOException e) {
@@ -184,7 +175,7 @@ public class ProofSettings {
      * Loads the the former settings from configuration file.
      */
     public void loadSettings() {
-        try (FileReader in = new FileReader(PROVER_CONFIG_FILE)) {
+        try (FileReader in = new FileReader(PROVER_CONFIG_FILE, StandardCharsets.UTF_8)) {
             if (Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
                 LOGGER.warn("The settings in {} are *not* read.", PROVER_CONFIG_FILE);
             } else {

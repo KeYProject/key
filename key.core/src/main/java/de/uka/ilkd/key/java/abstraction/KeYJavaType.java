@@ -67,16 +67,19 @@ public class KeYJavaType implements Type {
      * @return the default value of the given type according to JLS Sect. 4.5.5
      */
     public Literal getDefaultValue() {
-        if (javaType == null)
+        if (javaType == null) {
             return null;
+        }
         return javaType.getDefaultValue();
     }
 
     public String toString() {
-        if (this == VOID_TYPE)
+        if (this == VOID_TYPE) {
             return "KeYJavaType:void";
-        if (javaType == null)
+        }
+        if (javaType == null) {
             return "KeYJavaType:null," + sort;
+        }
         return "(type, sort): (" + javaType.getName() + "," + sort + ")";
     }
 
@@ -115,11 +118,11 @@ public class KeYJavaType implements Type {
     public PackageReference createPackagePrefix() {
         PackageReference ref = null;
         String rest = getFullName();
-        if (rest.indexOf(".") > 0) {
-            rest = rest.substring(0, rest.lastIndexOf(".") + 1);
-            while (rest.indexOf(".") > 0) {
-                String name = rest.substring(0, rest.indexOf("."));
-                rest = rest.substring(rest.indexOf(".") + 1);
+        if (rest.indexOf('.') > 0) {
+            rest = rest.substring(0, rest.lastIndexOf('.') + 1);
+            while (rest.indexOf('.') > 0) {
+                String name = rest.substring(0, rest.indexOf('.'));
+                rest = rest.substring(rest.indexOf('.') + 1);
                 ref = new PackageReference(new ProgramElementName(name), ref);
             }
         }

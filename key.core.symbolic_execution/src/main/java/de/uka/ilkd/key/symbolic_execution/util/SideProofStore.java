@@ -44,13 +44,13 @@ public final class SideProofStore {
     /**
      * All contained {@link Entry}s.
      */
-    private final List<Entry> entries = new LinkedList<Entry>();
+    private final List<Entry> entries = new LinkedList<>();
 
     /**
      * All available {@link ISideProofStoreListener}.
      */
     private final List<ISideProofStoreListener> listener =
-        new LinkedList<ISideProofStoreListener>();
+        new LinkedList<>();
 
     /**
      * The enabled state.
@@ -60,7 +60,7 @@ public final class SideProofStore {
     /**
      * The {@link PropertyChangeSupport}.
      */
-    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     /**
      * Forbid other instances.
@@ -127,7 +127,7 @@ public final class SideProofStore {
      * Removes all {@link Entry}s.
      */
     public void clearProofs() {
-        removeEntries(new LinkedList<Entry>(entries));
+        removeEntries(new LinkedList<>(entries));
     }
 
     /**
@@ -226,7 +226,7 @@ public final class SideProofStore {
      *
      * @param e The event.
      */
-    protected void fireEntriesAdded(SideProofStoreEvent e) {
+    private void fireEntriesAdded(SideProofStoreEvent e) {
         ISideProofStoreListener[] listener = getProofStoreListener();
         for (ISideProofStoreListener l : listener) {
             l.entriesAdded(e);
@@ -238,7 +238,7 @@ public final class SideProofStore {
      *
      * @param e The event.
      */
-    protected void fireEntriesRemoved(SideProofStoreEvent e) {
+    private void fireEntriesRemoved(SideProofStoreEvent e) {
         ISideProofStoreListener[] listener = getProofStoreListener();
         for (ISideProofStoreListener l : listener) {
             l.entriesRemoved(e);
@@ -314,7 +314,7 @@ public final class SideProofStore {
             this.description = description;
             this.proof = proof;
             DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl();
-            this.environment = new KeYEnvironment<DefaultUserInterfaceControl>(ui,
+            this.environment = new KeYEnvironment<>(ui,
                 proof.getInitConfig(), proof, null, null);
         }
 

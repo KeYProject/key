@@ -22,10 +22,10 @@ public class KeYRecoderMapping {
     /**
      * maps a recoder programelement (or something similar, e.g. Type) to the KeY-equivalent
      */
-    private HashMap<Object, Object> map;
+    private final HashMap<Object, Object> map;
 
     /** maps a KeY programelement to the Recoder-equivalent */
-    private HashMap<Object, Object> revMap;
+    private final HashMap<Object, Object> revMap;
 
     /** a pseudo super class for all arrays used to declare length */
     private KeYJavaType superArrayType = null;

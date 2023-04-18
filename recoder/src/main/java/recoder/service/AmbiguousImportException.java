@@ -68,7 +68,7 @@ public class AmbiguousImportException extends ModelException {
      * Returns the possible imported class types.
      */
     public List<ClassType> getChoices() {
-        List<ClassType> list = new ArrayList<ClassType>(2);
+        List<ClassType> list = new ArrayList<>(2);
         list.add(version1);
         list.add(version2);
         return list;
