@@ -163,14 +163,14 @@ public final class Goal {
 
     public void setRuleAppManager(AutomatedRuleApplicationManager manager) {
         if (ruleAppManager != null) {
-            ruleAppIndex().removeNewRuleListener(ruleAppManager);
+            ruleAppIndex.setNewRuleListener(null);
             ruleAppManager.setGoal(null);
         }
 
         ruleAppManager = manager;
 
         if (ruleAppManager != null) {
-            ruleAppIndex().addNewRuleListener(ruleAppManager);
+            ruleAppIndex.setNewRuleListener(ruleAppManager);
             ruleAppManager.setGoal(this);
         }
     }
@@ -222,7 +222,7 @@ public final class Goal {
         getFormulaTagManager().sequentChanged(this, sci);
         var time1 = System.nanoTime();
         PERF_UPDATE_TAG_MANAGER.getAndAdd(time1 - time);
-        ruleAppIndex().sequentChanged(this, sci);
+        ruleAppIndex.sequentChanged(sci);
         var time2 = System.nanoTime();
         PERF_UPDATE_RULE_APP_INDEX.getAndAdd(time2 - time1);
         for (GoalListener listener : listeners) {
@@ -237,7 +237,7 @@ public final class Goal {
         }
     }
 
-    private void fireAautomaticStateChanged(boolean oldAutomatic, boolean newAutomatic) {
+    private void fireAutomaticStateChanged(boolean oldAutomatic, boolean newAutomatic) {
         for (GoalListener listener : listeners) {
             listener.automaticStateChanged(this, oldAutomatic, newAutomatic);
         }
@@ -326,7 +326,7 @@ public final class Goal {
         boolean oldAutomatic = automatic;
         automatic = t;
         node().clearNameCache();
-        fireAautomaticStateChanged(oldAutomatic, automatic);
+        fireAutomaticStateChanged(oldAutomatic, automatic);
     }
 
     /**
@@ -336,15 +336,6 @@ public final class Goal {
      */
     public boolean isLinked() {
         return this.linkedGoal != null;
-    }
-
-    /**
-     * Returns the goal that this goal is linked to.
-     *
-     * @return The goal that this goal is linked to (or null if there is no such one).
-     */
-    public Goal getLinkedGoal() {
-        return this.linkedGoal;
     }
 
     /**
@@ -373,8 +364,8 @@ public final class Goal {
         }
         node().setSequent(sci.sequent());
         node().getNodeInfo().setSequentChangeInfo(sci);
-        // VK reminder: now update the index
         var time = System.nanoTime();
+        // updates the index
         fireSequentChanged(sci);
         PERF_SET_SEQUENT.getAndAdd(System.nanoTime() - time);
     }
