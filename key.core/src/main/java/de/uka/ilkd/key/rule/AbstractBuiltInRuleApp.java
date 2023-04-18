@@ -3,6 +3,7 @@ package de.uka.ilkd.key.rule;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -67,7 +68,7 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
      * @return list of new created goals
      */
     @Override
-    public ImmutableList<Goal> execute(Goal goal, Services services) {
+    public @Nullable ImmutableList<Goal> execute(Goal goal, Services services) {
         var time = System.nanoTime();
         var timeSetSequent = Goal.PERF_SET_SEQUENT.get();
         try {
