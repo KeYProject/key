@@ -1,8 +1,6 @@
 package de.uka.ilkd.key.proof;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -38,8 +36,7 @@ public final class RuleAppIndex {
 
     private final BuiltInRuleAppIndex builtInRuleAppIndex;
 
-    private final List<NewRuleListener> listenerList =
-        Collections.synchronizedList(new ArrayList<>(10));
+    private NewRuleListener ruleListener = null;
 
     /**
      * The current mode of the index: For <code>autoMode==true</code>, the index
@@ -128,17 +125,8 @@ public final class RuleAppIndex {
      *
      * @param l the AppIndexListener to add
      */
-    public void addNewRuleListener(NewRuleListener l) {
-        listenerList.add(l);
-    }
-
-    /**
-     * removes a change listener to the index
-     *
-     * @param l the AppIndexListener to remove
-     */
-    public void removeNewRuleListener(NewRuleListener l) {
-        listenerList.remove(l);
+    public void setNewRuleListener(@Nullable NewRuleListener l) {
+        ruleListener = l;
     }
 
     /**
@@ -301,15 +289,14 @@ public final class RuleAppIndex {
     /**
      * called if a formula has been replaced
      *
-     * @param g the Goal which sequent has been changed
      * @param sci SequentChangeInfo describing the change of the sequent
      */
-    public void sequentChanged(Goal g, SequentChangeInfo sci) {
+    public void sequentChanged(SequentChangeInfo sci) {
         if (!autoMode) {
             interactiveTacletAppIndex.sequentChanged(sci);
         }
         automatedTacletAppIndex.sequentChanged(sci);
-        builtInRuleAppIndex().sequentChanged(g, sci, newRuleListener);
+        builtInRuleAppIndex.sequentChanged(goal, sci, newRuleListener);
     }
 
     /**
@@ -349,7 +336,7 @@ public final class RuleAppIndex {
      */
     public void reportAutomatedRuleApps(NewRuleListener l, Services services) {
         automatedTacletAppIndex.reportRuleApps(l, services);
-        builtInRuleAppIndex().reportRuleApps(l, goal);
+        builtInRuleAppIndex.reportRuleApps(l, goal);
     }
 
     /**
@@ -365,8 +352,8 @@ public final class RuleAppIndex {
      * informs all observers, if a formula has been added, changed or removed
      */
     private void informNewRuleListener(RuleApp p_app, PosInOccurrence p_pos) {
-        for (final NewRuleListener listener : listenerList) {
-            listener.ruleAdded(p_app, p_pos);
+        if (ruleListener != null) {
+            ruleListener.ruleAdded(p_app, p_pos);
         }
     }
 
@@ -375,8 +362,8 @@ public final class RuleAppIndex {
      */
     private void informNewRuleListener(ImmutableList<? extends RuleApp> p_apps,
             PosInOccurrence p_pos) {
-        for (final NewRuleListener listener : listenerList) {
-            listener.rulesAdded(p_apps, p_pos);
+        if (ruleListener != null) {
+            ruleListener.rulesAdded(p_apps, p_pos);
         }
     }
 
