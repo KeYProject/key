@@ -73,7 +73,7 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
         try {
             goal.addAppliedRuleApp(this);
             try {
-                return builtInRule.apply(goal, services, this);
+                return Objects.requireNonNull(builtInRule.apply(goal, services, this));
             } catch (RuleAbortException rae) {
                 goal.removeLastAppliedRuleApp();
                 goal.node().setAppliedRuleApp(null);
