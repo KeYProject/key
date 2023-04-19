@@ -115,7 +115,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         chkRightClickMacros =
             addCheckBox("Right click for proof macros", "", false, emptyValidator());
         chkEnableProofCaching =
-            addCheckBox("Enable Proof Caching", "", true, emptyValidator());
+            addCheckBox("Enable Proof Caching in Auto Mode", "", true, emptyValidator());
     }
 
 

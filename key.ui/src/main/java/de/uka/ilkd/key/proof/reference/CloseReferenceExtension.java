@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.proof.reference;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -19,9 +22,12 @@ import org.key_project.util.collection.ImmutableList;
     description = "Functionality related to reusing previous proof results in similar proofs",
     experimental = false)
 public class CloseReferenceExtension
-        implements KeYGuiExtension, KeYGuiExtension.Startup, KeYSelectionListener, RuleAppListener {
+        implements KeYGuiExtension, KeYGuiExtension.Startup, KeYSelectionListener, RuleAppListener,
+        ProofDisposedListener {
 
     private KeYMediator mediator;
+
+    private final Set<Proof> trackedProofs = new HashSet<>();
 
     @Override
     public void selectedNodeChanged(KeYSelectionEvent e) {
@@ -30,10 +36,12 @@ public class CloseReferenceExtension
     @Override
     public void selectedProofChanged(KeYSelectionEvent e) {
         Proof p = e.getSource().getSelectedProof();
-        if (p == null) {
+        if (p == null || trackedProofs.contains(p)) {
             return;
         }
+        trackedProofs.add(p);
         p.addRuleAppListener(this);
+        p.addProofDisposedListener(this);
     }
 
     @Override
@@ -64,6 +72,16 @@ public class CloseReferenceExtension
     public void init(MainWindow window, KeYMediator mediator) {
         this.mediator = mediator;
         mediator.addKeYSelectionListener(this);
+    }
+
+    @Override
+    public void proofDisposing(ProofDisposedEvent e) {
+        trackedProofs.remove(e.getSource());
+    }
+
+    @Override
+    public void proofDisposed(ProofDisposedEvent e) {
+
     }
 
     /**
