@@ -21,10 +21,6 @@ import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
-import de.uka.ilkd.key.proof.reference.ClosedBy;
-import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
-import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Pair;
@@ -89,8 +85,6 @@ public class ProofTreePopupFactory {
     private static void initMenu(JPopupMenu menu, ProofTreeContext ctx) {
         menu.add(new RunStrategyOnNode(ctx));
         menu.add(new Prune(ctx));
-        menu.add(new CloseByReference(ctx));
-        menu.add(new CopyReferencedProof(ctx));
 
         initMacroMenu(menu, ctx);
         if (Main.isExperimentalMode()) {
@@ -413,48 +407,6 @@ public class ProofTreePopupFactory {
             context.delegateModel.updateTree(null);
             context.delegateModel.setAttentive(true);
             context.proofTreeView.makeNodeVisible(context.invokedNode);
-        }
-    }
-
-    static class CloseByReference extends ProofTreeAction {
-        public CloseByReference(ProofTreeContext context) {
-            super(context);
-            setName("Close by reference to other proof");
-            setEnabled(context.invokedNode.leaf() && !context.invokedNode.isClosed());
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            // search other proofs for matching nodes
-            ClosedBy c = ReferenceSearcher.findPreviousProof(
-                context.mediator.getCurrentlyOpenedProofs(), context.invokedNode);
-            if (c != null) {
-                Node toClose = context.invokedNode;
-                Proof newProof = context.proof;
-                newProof.closeGoal(newProof.getGoal(toClose));
-                toClose.register(c, ClosedBy.class);
-            }
-        }
-    }
-
-    static class CopyReferencedProof extends ProofTreeAction {
-        public CopyReferencedProof(ProofTreeContext context) {
-            super(context);
-            setName("Copy referenced proof steps here");
-            setEnabled(context.invokedNode.leaf() && context.invokedNode.isClosed()
-                    && context.invokedNode.lookup(ClosedBy.class) != null);
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            ClosedBy c = context.invokedNode.lookup(ClosedBy.class);
-            Goal current = context.proof.getClosedGoal(context.invokedNode);
-            context.proof.reOpenGoal(current);
-            try {
-                new CopyingProofReplayer(c.getProof(), context.proof).copy(c.getNode(), current);
-            } catch (IntermediateProofReplayer.BuiltInConstructionException ex) {
-                throw new RuntimeException(ex);
-            }
         }
     }
 

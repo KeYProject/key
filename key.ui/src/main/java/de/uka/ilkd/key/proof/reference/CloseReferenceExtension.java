@@ -1,19 +1,29 @@
 package de.uka.ilkd.key.proof.reference;
 
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import javax.annotation.Nonnull;
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
+import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
+import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.util.collection.ImmutableList;
@@ -22,7 +32,8 @@ import org.key_project.util.collection.ImmutableList;
     description = "Functionality related to reusing previous proof results in similar proofs",
     experimental = false)
 public class CloseReferenceExtension
-        implements KeYGuiExtension, KeYGuiExtension.Startup, KeYSelectionListener, RuleAppListener,
+        implements KeYGuiExtension, KeYGuiExtension.Startup, KeYGuiExtension.ContextMenu,
+        KeYSelectionListener, RuleAppListener,
         ProofDisposedListener {
 
     private KeYMediator mediator;
@@ -84,6 +95,17 @@ public class CloseReferenceExtension
 
     }
 
+    @Nonnull
+    @Override
+    public List<Action> getContextActions(@Nonnull KeYMediator mediator,
+            @Nonnull ContextMenuKind kind, @Nonnull Object underlyingObject) {
+        if (kind.getType() == Node.class) {
+            return List.of(new CloseByReference(mediator, (Node) underlyingObject),
+                new CopyReferencedProof((Node) underlyingObject));
+        }
+        return new ArrayList<>();
+    }
+
     /**
      * Listener that ensures steps are copied before the referenced proof is disposed.
      */
@@ -113,6 +135,60 @@ public class CloseReferenceExtension
         @Override
         public void proofDisposed(ProofDisposedEvent e) {
 
+        }
+    }
+
+    static class CloseByReference extends KeyAction {
+        private final KeYMediator mediator;
+        private final Node node;
+
+        public CloseByReference(KeYMediator mediator, Node node) {
+            this.mediator = mediator;
+            this.node = node;
+            setName("Close by reference to other proof");
+            setEnabled(node.leaf() && !node.isClosed());
+            setMenuPath("Proof Caching");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // search other proofs for matching nodes
+            ClosedBy c = ReferenceSearcher.findPreviousProof(
+                mediator.getCurrentlyOpenedProofs(), node);
+            if (c != null) {
+                Node toClose = node;
+                Proof newProof = node.proof();
+                newProof.closeGoal(newProof.getGoal(toClose));
+                toClose.register(c, ClosedBy.class);
+            } else {
+                JOptionPane.showMessageDialog((JComponent) e.getSource(),
+                    "No matching branch found", "Proof Caching error", JOptionPane.WARNING_MESSAGE);
+            }
+        }
+    }
+
+    static class CopyReferencedProof extends KeyAction {
+        private final Node node;
+
+        public CopyReferencedProof(Node node) {
+            this.node = node;
+            setName("Copy referenced proof steps here");
+            setEnabled(node.leaf() && node.isClosed()
+                    && node.lookup(ClosedBy.class) != null);
+            setMenuPath("Proof Caching");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ClosedBy c = node.lookup(ClosedBy.class);
+            Goal current = node.proof().getClosedGoal(node);
+            node.proof().add(current);
+            node.proof().reOpenGoal(current);
+            try {
+                new CopyingProofReplayer(c.getProof(), node.proof()).copy(c.getNode(), current);
+            } catch (IntermediateProofReplayer.BuiltInConstructionException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 }
