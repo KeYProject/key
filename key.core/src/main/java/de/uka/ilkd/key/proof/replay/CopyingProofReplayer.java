@@ -30,6 +30,7 @@ public class CopyingProofReplayer extends AbstractProofReplayer {
      */
     public void copy(Node originalNode, Goal newNode)
             throws IntermediateProofReplayer.BuiltInConstructionException {
+        newNode.proof().register(this, CopyingProofReplayer.class);
         newNode.proof().setMutedProofCloseEvents(true);
         OneStepSimplifier.refreshOSS(newNode.proof());
         Deque<Node> nodeQueue = new ArrayDeque<>();
@@ -52,5 +53,6 @@ public class CopyingProofReplayer extends AbstractProofReplayer {
             }
         }
         newNode.proof().setMutedProofCloseEvents(false);
+        newNode.proof().deregister(this, CopyingProofReplayer.class);
     }
 }

@@ -40,6 +40,12 @@ public class CloseReferenceExtension
 
     private final Set<Proof> trackedProofs = new HashSet<>();
 
+    private static boolean ignoreRuleApplications = false;
+
+    public static void setIgnoreRuleApplications(boolean ignoreRuleApplications) {
+        CloseReferenceExtension.ignoreRuleApplications = ignoreRuleApplications;
+    }
+
     @Override
     public void selectedNodeChanged(KeYSelectionEvent e) {
     }
@@ -57,6 +63,9 @@ public class CloseReferenceExtension
 
     @Override
     public void ruleApplied(ProofEvent e) {
+        if (e.getSource().lookup(CopyingProofReplayer.class) != null) {
+            return; // copy in progress!
+        }
         if (!ProofIndependentSettings.DEFAULT_INSTANCE.getProofCachingSettings().getEnabled()) {
             return;
         }
@@ -74,7 +83,8 @@ public class CloseReferenceExtension
             if (c != null) {
                 p.closeGoal(goal);
                 goal.node().register(c, ClosedBy.class);
-                c.getProof().addProofDisposedListener(new CopyBeforeDispose(c.getProof(), p));
+                c.getProof()
+                        .addProofDisposedListener(new CopyBeforeDispose(mediator, c.getProof(), p));
             }
         }
     }
@@ -101,7 +111,7 @@ public class CloseReferenceExtension
             @Nonnull ContextMenuKind kind, @Nonnull Object underlyingObject) {
         if (kind.getType() == Node.class) {
             return List.of(new CloseByReference(mediator, (Node) underlyingObject),
-                new CopyReferencedProof((Node) underlyingObject));
+                new CopyReferencedProof(mediator, (Node) underlyingObject));
         }
         return new ArrayList<>();
     }
@@ -111,6 +121,7 @@ public class CloseReferenceExtension
      */
     private static class CopyBeforeDispose implements ProofDisposedListener {
 
+        private final KeYMediator mediator;
         private final Proof referencedProof;
         private final Proof newProof;
 
@@ -120,7 +131,8 @@ public class CloseReferenceExtension
          * @param referencedProof referenced proof
          * @param newProof new proof
          */
-        CopyBeforeDispose(Proof referencedProof, Proof newProof) {
+        CopyBeforeDispose(KeYMediator mediator, Proof referencedProof, Proof newProof) {
+            this.mediator = mediator;
             this.referencedProof = referencedProof;
             this.newProof = newProof;
         }
@@ -128,7 +140,9 @@ public class CloseReferenceExtension
         @Override
         public void proofDisposing(ProofDisposedEvent e) {
             if (!newProof.isDisposed()) {
+                mediator.stopInterface(true);
                 newProof.copyCachedGoals(referencedProof);
+                mediator.startInterface(true);
             }
         }
 
@@ -168,9 +182,11 @@ public class CloseReferenceExtension
     }
 
     static class CopyReferencedProof extends KeyAction {
+        private final KeYMediator mediator;
         private final Node node;
 
-        public CopyReferencedProof(Node node) {
+        public CopyReferencedProof(KeYMediator mediator, Node node) {
+            this.mediator = mediator;
             this.node = node;
             setName("Copy referenced proof steps here");
             setEnabled(node.leaf() && node.isClosed()
@@ -185,7 +201,9 @@ public class CloseReferenceExtension
             node.proof().add(current);
             node.proof().reOpenGoal(current);
             try {
+                // mediator.stopInterface(true);
                 new CopyingProofReplayer(c.getProof(), node.proof()).copy(c.getNode(), current);
+                // mediator.startInterface(true);
             } catch (IntermediateProofReplayer.BuiltInConstructionException ex) {
                 throw new RuntimeException(ex);
             }

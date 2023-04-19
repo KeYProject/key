@@ -1,6 +1,11 @@
 package de.uka.ilkd.key.proof.reference;
 
-import java.util.Optional;
+import java.util.ArrayDeque;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Queue;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.swing.*;
 
 import de.uka.ilkd.key.logic.Semisequent;
@@ -37,12 +42,16 @@ public class ReferenceSearcher {
         DefaultListModel<Proof> proofs = previousProofs;
         for (int i = 0; i < proofs.size(); i++) {
             Proof p = proofs.get(i);
+            if (p == newNode.proof()) {
+                continue; // doesn't make sense
+            }
             // only search in compatible proofs
             if (!p.getSettings().getChoiceSettings()
                     .equals(newNode.proof().getSettings().getChoiceSettings())) {
                 continue;
             }
-            Optional<Node> match = p.closedGoals().stream().map(goal -> {
+            Set<Node> checkedNodes = new HashSet<>();
+            Queue<Node> nodesToCheck = p.closedGoals().stream().map(goal -> {
                 // first, find the initial node in this branch
                 Node n = goal.node();
                 if (n.parent() != null
@@ -50,26 +59,29 @@ public class ReferenceSearcher {
                     // cannot reference this kind of branch
                     return null;
                 }
+                return n;
+            }).filter(Objects::nonNull).collect(Collectors.toCollection(ArrayDeque::new));
+            while (!nodesToCheck.isEmpty()) {
+                Node n = nodesToCheck.remove();
+                if (checkedNodes.contains(n)) {
+                    continue;
+                }
+                checkedNodes.add(n);
+
                 while (n.parent() != null && n.parent().childrenCount() == 1) {
                     n = n.parent();
                 }
-                return n;
-            }).filter(node -> {
-                if (node == null) {
-                    return false;
+                if (n.parent() != null) {
+                    nodesToCheck.add(n.parent());
                 }
-                // check that all formulas are also present in the new proof
-                Semisequent ante = node.sequent().antecedent();
-                Semisequent succ = node.sequent().succedent();
+                Semisequent ante = n.sequent().antecedent();
+                Semisequent succ = n.sequent().succedent();
                 Semisequent anteNew = newNode.sequent().antecedent();
                 Semisequent succNew = newNode.sequent().succedent();
                 if (!containedIn(anteNew, ante) || !containedIn(succNew, succ)) {
-                    return false;
+                    continue;
                 }
-                return true;
-            }).findAny();
-            if (match.isPresent()) {
-                return new ClosedBy(p, match.get());
+                return new ClosedBy(p, n);
             }
         }
         return null;
