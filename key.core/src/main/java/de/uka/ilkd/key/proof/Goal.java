@@ -126,8 +126,6 @@ public final class Goal {
 
     /**
      * creates a new goal referencing the given node
-     *
-     * @param namespaceSet
      */
     public Goal(Node node, RuleAppIndex ruleAppIndex) {
         this(node, ruleAppIndex, ImmutableSLList.nil(), null,
@@ -196,7 +194,7 @@ public final class Goal {
     /**
      * returns the namespaces for this goal.
      *
-     * @returns an up-to-date non-null namespaces-set.
+     * @return an up-to-date non-null namespaces-set.
      */
     public NamespaceSet getLocalNamespaces() {
         return localNamespaces;
