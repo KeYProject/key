@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.gui.proofdiff;
 
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -11,10 +15,6 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.Triple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
@@ -139,12 +139,14 @@ public class SequentDifference {
         }
 
         for (int i = 0; i < matchedLeft.length; i++) {
-            if (!matchedLeft[i])
+            if (!matchedLeft[i]) {
                 pairs.add(new Matching(left.get(i), null, left.get(i).length()));
+            }
         }
         for (int i = 0; i < matchedRight.length; i++) {
-            if (!matchedRight[i])
+            if (!matchedRight[i]) {
                 pairs.add(new Matching(null, right.get(i), right.get(i).length()));
+            }
         }
 
         return pairs;

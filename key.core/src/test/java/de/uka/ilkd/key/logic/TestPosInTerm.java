@@ -24,7 +24,7 @@ public class TestPosInTerm {
         assertEquals(20, pit.getIndex());
 
 
-        assertFalse(pit.equals(copy));
+        assertNotEquals(pit, copy);
         assertEquals(8, copy.getIndex());
         assertEquals(1, copy.depth());
 

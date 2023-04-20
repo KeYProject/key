@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.java;
 
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.java.JavaProgramFactory;
 import recoder.service.ConstantEvaluator;
 import recoder.service.DefaultConstantEvaluator;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 
 public class ConstantExpressionEvaluator {
 

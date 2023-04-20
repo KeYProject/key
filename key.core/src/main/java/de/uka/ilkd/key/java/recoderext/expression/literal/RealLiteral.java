@@ -2,6 +2,8 @@ package de.uka.ilkd.key.java.recoderext.expression.literal;
 
 import java.math.BigDecimal;
 
+import de.uka.ilkd.key.java.recoderext.KeYRecoderExtension;
+
 import org.key_project.util.ExtList;
 
 import org.slf4j.Logger;
@@ -9,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Literal;
-import de.uka.ilkd.key.java.recoderext.KeYRecoderExtension;
 
 /**
  * Literal for JML \real type;
@@ -24,7 +25,7 @@ public final class RealLiteral extends Literal implements KeYRecoderExtension {
     private final String value;
 
     public RealLiteral(int value) {
-        this("" + value + ".0");
+        this(value + ".0");
     }
 
     public RealLiteral(String value) {
@@ -68,10 +69,11 @@ public final class RealLiteral extends Literal implements KeYRecoderExtension {
     }
 
     public boolean equals(Object o) {
-        if (o instanceof RealLiteral)
+        if (o instanceof RealLiteral) {
             return value.equals(((RealLiteral) o).getValue());
-        else
+        } else {
             return false;
+        }
     }
 
     @Override

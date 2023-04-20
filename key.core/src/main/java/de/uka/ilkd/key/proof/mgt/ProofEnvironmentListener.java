@@ -4,9 +4,9 @@ import java.util.EventListener;
 
 public interface ProofEnvironmentListener extends EventListener {
 
-    public void proofRegistered(ProofEnvironmentEvent event);
+    void proofRegistered(ProofEnvironmentEvent event);
 
-    public void proofUnregistered(ProofEnvironmentEvent event);
+    void proofUnregistered(ProofEnvironmentEvent event);
 
 
 }

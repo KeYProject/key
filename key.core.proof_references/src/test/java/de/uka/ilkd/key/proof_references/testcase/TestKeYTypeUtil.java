@@ -6,6 +6,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.util.KeYTypeUtil;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

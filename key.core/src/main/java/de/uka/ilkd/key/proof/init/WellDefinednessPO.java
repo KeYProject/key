@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.proof.init;
 
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -13,15 +18,11 @@ import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.POTerms;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.TermAndFunc;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * <p>
@@ -101,7 +102,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     private static Map<LocationVariable, ProgramVariable> createAtPres(LocationVariable heap,
             TermServices services) {
         final Map<LocationVariable, ProgramVariable> res =
-            new LinkedHashMap<LocationVariable, ProgramVariable>();
+            new LinkedHashMap<>();
         final ProgramVariable atPre =
             services.getTermBuilder().atPreVar(heap.name().toString(), heap.sort(), true);
         res.put(heap, atPre);
@@ -112,10 +113,11 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     private static ImmutableList<ProgramVariable> addGhostParams(
             ImmutableList<ProgramVariable> paramVars, ImmutableList<ProgramVariable> origParams) {
         // make sure ghost parameters are present
-        ImmutableList<ProgramVariable> ghostParams = ImmutableSLList.<ProgramVariable>nil();
+        ImmutableList<ProgramVariable> ghostParams = ImmutableSLList.nil();
         for (ProgramVariable param : origParams) {
-            if (param.isGhost())
+            if (param.isGhost()) {
                 ghostParams = ghostParams.append(param);
+            }
         }
         paramVars = paramVars.append(ghostParams);
         return paramVars;
@@ -171,7 +173,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         if (vars.params != null && !vars.params.isEmpty()) {
             params = createParams(target, vars.params, services);
         } else {
-            params = ImmutableSLList.<ProgramVariable>nil();
+            params = ImmutableSLList.nil();
         }
         return new Variables(self, result, exception, atPres, params, heap, anonHeap, services);
     }
@@ -192,7 +194,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     @Override
     protected ImmutableSet<ClassAxiom> selectClassAxioms(KeYJavaType kjt) {
-        ImmutableSet<ClassAxiom> result = DefaultImmutableSet.<ClassAxiom>nil();
+        ImmutableSet<ClassAxiom> result = DefaultImmutableSet.nil();
         for (ClassAxiom axiom : specRepos.getClassAxioms(kjt)) {
             if (axiom instanceof ClassAxiom && check instanceof ClassWellDefinedness) {
                 final ClassAxiom classAxiom = axiom;

@@ -1,16 +1,16 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+
+import org.key_project.util.collection.DefaultImmutableMap;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableSet;
 
 class BasicMatching {
 
@@ -24,16 +24,19 @@ class BasicMatching {
      * @return all substitution found from this matching
      */
     static ImmutableSet<Substitution> getSubstitutions(Term trigger, Term targetTerm) {
-        ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
-        if (targetTerm.freeVars().size() > 0 || targetTerm.op() instanceof Quantifier)
+        ImmutableSet<Substitution> allsubs = DefaultImmutableSet.nil();
+        if (targetTerm.freeVars().size() > 0 || targetTerm.op() instanceof Quantifier) {
             return allsubs;
+        }
         final Substitution subst = match(trigger, targetTerm);
-        if (subst != null)
+        if (subst != null) {
             allsubs = allsubs.add(subst);
+        }
         final Operator op = targetTerm.op();
         if (!(op instanceof Modality || op instanceof UpdateApplication)) {
-            for (int i = 0; i < targetTerm.arity(); i++)
+            for (int i = 0; i < targetTerm.arity(); i++) {
                 allsubs = allsubs.union(getSubstitutions(trigger, targetTerm.sub(i)));
+            }
         }
         return allsubs;
     }
@@ -46,9 +49,10 @@ class BasicMatching {
      */
     private static Substitution match(Term pattern, Term instance) {
         final ImmutableMap<QuantifiableVariable, Term> map =
-            matchRec(DefaultImmutableMap.<QuantifiableVariable, Term>nilMap(), pattern, instance);
-        if (map == null)
+            matchRec(DefaultImmutableMap.nilMap(), pattern, instance);
+        if (map == null) {
             return null;
+        }
         return new Substitution(map);
     }
 
@@ -59,15 +63,18 @@ class BasicMatching {
             ImmutableMap<QuantifiableVariable, Term> varMap, Term pattern, Term instance) {
         final Operator patternOp = pattern.op();
 
-        if (patternOp instanceof QuantifiableVariable)
+        if (patternOp instanceof QuantifiableVariable) {
             return mapVarWithCheck(varMap, (QuantifiableVariable) patternOp, instance);
+        }
 
-        if (patternOp != instance.op())
+        if (patternOp != instance.op()) {
             return null;
+        }
         for (int i = 0; i < pattern.arity(); i++) {
             varMap = matchRec(varMap, pattern.sub(i), instance.sub(i));
-            if (varMap == null)
+            if (varMap == null) {
                 return null;
+            }
         }
         return varMap;
     }
@@ -82,11 +89,13 @@ class BasicMatching {
             ImmutableMap<QuantifiableVariable, Term> varMap, QuantifiableVariable var,
             Term instance) {
         final Term oldTerm = varMap.get(var);
-        if (oldTerm == null)
+        if (oldTerm == null) {
             return varMap.put(var, instance);
+        }
 
-        if (oldTerm.equals(instance))
+        if (oldTerm.equals(instance)) {
             return varMap;
+        }
         return null;
     }
 

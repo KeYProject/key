@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
-import javax.annotation.Nullable;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.ASSIGNABLE;
 
@@ -18,7 +19,7 @@ import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Cla
  */
 public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     private LabeledParserRuleContext variant = null;
-    private ArrayList<Entry> clauses = new ArrayList<>(16);
+    private final ArrayList<Entry> clauses = new ArrayList<>(16);
 
     /**
      * Heap-dependent clauses
@@ -164,10 +165,12 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
         TextualJMLLoopSpec that = (TextualJMLLoopSpec) o;
         return variant.equals(that.variant) && clauses.equals(that.clauses);
     }

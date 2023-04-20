@@ -1,16 +1,17 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
+import java.awt.*;
+import java.awt.dnd.*;
+import java.awt.event.MouseEvent;
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import org.key_project.util.collection.ImmutableList;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.dnd.*;
-import java.awt.event.MouseEvent;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Listener for a {@link CurrentGoalView}.
@@ -105,7 +106,7 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
     public void mouseEntered(MouseEvent me) {
     }
 
-    public final synchronized void setModalDragNDropEnabled(boolean allowDragNDrop) {
+    public synchronized void setModalDragNDropEnabled(boolean allowDragNDrop) {
         modalDragNDropEnabled = allowDragNDrop;
     }
 

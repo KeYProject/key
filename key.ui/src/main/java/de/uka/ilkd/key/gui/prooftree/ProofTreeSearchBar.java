@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.gui.prooftree;
 
-import de.uka.ilkd.key.gui.SearchBar;
-import de.uka.ilkd.key.util.Pair;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Nonnull;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.text.Position;
 import javax.swing.tree.TreePath;
-import java.util.Vector;
+
+import de.uka.ilkd.key.gui.SearchBar;
+import de.uka.ilkd.key.util.Pair;
 
 class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
 
@@ -84,7 +85,7 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
         reset();
     }
 
-    private Vector<Pair<GUIAbstractTreeNode, String>> cache;
+    private List<Pair<GUIAbstractTreeNode, String>> cache;
 
     public synchronized void reset() {
         cache = null;
@@ -96,7 +97,7 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
 
     private void fillCache() {
         if (cache == null) {
-            cache = new Vector<>();
+            cache = new ArrayList<>();
             if (this.proofTreeView.delegateModel.getRoot() != null) {
                 addNodeToCache((GUIAbstractTreeNode) this.proofTreeView.delegateModel.getRoot());
                 fillCacheHelp((GUIBranchNode) this.proofTreeView.delegateModel.getRoot());
@@ -105,14 +106,16 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
     }
 
     private void fillCacheHelp(GUIBranchNode branch) {
-        if (branch == null)
+        if (branch == null) {
             return;
+        }
         GUIAbstractTreeNode n;
         for (int i = 0; i < this.proofTreeView.delegateModel.getChildCount(branch); i++) {
             n = (GUIAbstractTreeNode) this.proofTreeView.delegateModel.getChild(branch, i);
             addNodeToCache(n);
-            if (n instanceof GUIBranchNode)
+            if (n instanceof GUIBranchNode) {
                 fillCacheHelp((GUIBranchNode) n);
+            }
         }
     }
 
@@ -120,26 +123,32 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
         String s = searchString.toLowerCase();
 
         if (bias == Position.Bias.Forward) {
-            if (startingRow < 0)
+            if (startingRow < 0) {
                 startingRow = 0;
+            }
             for (int i = startingRow; i < cache.size(); i++) {
-                if (nodeContainsString(i, s))
+                if (nodeContainsString(i, s)) {
                     return i;
+                }
             }
             for (int i = 0; i < startingRow && i < cache.size(); i++) {
-                if (nodeContainsString(i, s))
+                if (nodeContainsString(i, s)) {
                     return i;
+                }
             }
         } else {
-            if (startingRow > cache.size() - 1)
+            if (startingRow > cache.size() - 1) {
                 startingRow = cache.size() - 1;
+            }
             for (int i = startingRow; i >= 0; i--) {
-                if (nodeContainsString(i, s))
+                if (nodeContainsString(i, s)) {
                     return i;
+                }
             }
             for (int i = cache.size() - 1; i > startingRow && i > 0; i--) {
-                if (nodeContainsString(i, s))
+                if (nodeContainsString(i, s)) {
                     return i;
+                }
             }
         }
         return -1;

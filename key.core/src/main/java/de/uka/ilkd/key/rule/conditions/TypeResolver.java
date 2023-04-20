@@ -218,7 +218,7 @@ public abstract class TypeResolver {
                 Function func = (Function) op;
                 String funcName = func.name().toString();
                 String sortName = funcName.substring(0, funcName.indexOf("::"));
-                return (Sort) services.getNamespaces().sorts().lookup(new Name(sortName));
+                return services.getNamespaces().sorts().lookup(new Name(sortName));
             } else {
                 Debug.fail("Unknown member type", op);
             }

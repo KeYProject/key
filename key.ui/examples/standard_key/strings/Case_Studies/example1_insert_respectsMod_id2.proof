@@ -342,7 +342,7 @@ java.lang.String get_0(java.lang.String[],int);
       )
       (branch " Post"
          (builtin "Update Simplification" (formula "26"))
-         (rule "inInt" (formula "26") (term "1,1,0,0"))
+         (rule "expandInInt" (formula "26") (term "1,1,0,0"))
          (rule "concrete_and_3" (formula "26") (term "1,0,0"))
          (rule "impRight" (formula "26"))
          (rule "andLeft" (formula "1"))
@@ -521,7 +521,7 @@ java.lang.String get_0(java.lang.String[],int);
                )
                (branch " Post"
                   (builtin "Update Simplification" (formula "36"))
-                  (rule "inInt" (formula "36") (term "1,1,0,0"))
+                  (rule "expandInInt" (formula "36") (term "1,1,0,0"))
                   (rule "concrete_and_3" (formula "36") (term "1,0,0"))
                   (rule "impRight" (formula "36"))
                   (rule "andLeft" (formula "1"))
@@ -634,7 +634,7 @@ java.lang.String get_0(java.lang.String[],int);
                            )
                            (branch " Post"
                               (builtin "Update Simplification" (formula "40"))
-                              (rule "inInt" (formula "40") (term "1,1,0,0"))
+                              (rule "expandInInt" (formula "40") (term "1,1,0,0"))
                               (rule "concrete_and_3" (formula "40") (term "1,0,0"))
                               (rule "impRight" (formula "40"))
                               (rule "andLeft" (formula "1"))
@@ -709,7 +709,7 @@ java.lang.String get_0(java.lang.String[],int);
                                  )
                                  (branch " Post"
                                     (builtin "Update Simplification" (formula "39"))
-                                    (rule "inInt" (formula "39") (term "1,1,0,0"))
+                                    (rule "expandInInt" (formula "39") (term "1,1,0,0"))
                                     (rule "concrete_and_3" (formula "39") (term "1,0,0"))
                                     (rule "impRight" (formula "39"))
                                     (rule "andLeft" (formula "1"))
@@ -906,7 +906,7 @@ java.lang.String get_0(java.lang.String[],int);
                            )
                            (branch " Post"
                               (builtin "Update Simplification" (formula "41"))
-                              (rule "inInt" (formula "41") (term "1,1,0,0"))
+                              (rule "expandInInt" (formula "41") (term "1,1,0,0"))
                               (rule "concrete_and_3" (formula "41") (term "1,0,0"))
                               (rule "impRight" (formula "41"))
                               (rule "andLeft" (formula "1"))
@@ -1318,7 +1318,7 @@ java.lang.String get_0(java.lang.String[],int);
                         )
                         (branch " Post"
                            (builtin "Update Simplification" (formula "37"))
-                           (rule "inInt" (formula "37") (term "1,1,0,0"))
+                           (rule "expandInInt" (formula "37") (term "1,1,0,0"))
                            (rule "concrete_and_3" (formula "37") (term "1,0,0"))
                            (rule "impRight" (formula "37"))
                            (rule "andLeft" (formula "1"))

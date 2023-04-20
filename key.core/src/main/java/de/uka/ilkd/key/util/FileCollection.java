@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.NoSuchElementException;
 
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+
 import recoder.io.DataLocation;
 
 /**
@@ -39,7 +40,7 @@ public interface FileCollection {
      * @return a freshly created walker
      * @throws IOException during opening resources
      */
-    public Walker createWalker(String extension) throws IOException;
+    Walker createWalker(String extension) throws IOException;
 
     /**
      * create a {@link Walker} object that allows to iterate the file collection.
@@ -52,12 +53,12 @@ public interface FileCollection {
      * @return a freshly created walker
      * @throws IOException during opening resources
      */
-    public Walker createWalker(String[] extensions) throws IOException;
+    Walker createWalker(String[] extensions) throws IOException;
 
     /**
      * A Walker allows to iterate (once and one way) through a FileCollection.
      */
-    public interface Walker {
+    interface Walker {
 
         /**
          * step to next element in the collection if there is another one. The getCurrent...()
@@ -65,7 +66,7 @@ public interface FileCollection {
          *
          * @return true iff there is another element in the collection
          */
-        public boolean step();
+        boolean step();
 
         /**
          * get the name of the current file in the iteration. This is only the short name not
@@ -74,7 +75,7 @@ public interface FileCollection {
          * @return a short file name, not null
          * @throws NoSuchElementException if the previous call to step returned false.
          */
-        public String getCurrentName() throws NoSuchElementException;
+        String getCurrentName() throws NoSuchElementException;
 
         /**
          * get a {@link DataLocation} object describing the current file. The dynamic type of the
@@ -83,7 +84,7 @@ public interface FileCollection {
          * @return a {@link DataLocation}, not null
          * @throws NoSuchElementException if the previous call to step returned false.
          */
-        public DataLocation getCurrentDataLocation() throws NoSuchElementException;
+        DataLocation getCurrentDataLocation() throws NoSuchElementException;
 
         /**
          * return the type of the structure that is iterated. Must return the same value for any
@@ -92,7 +93,7 @@ public interface FileCollection {
          * @return a non-null String describing the type (e.g. "zip" or "file");
          * @throws NoSuchElementException if the previous call to step returned false.
          */
-        public String getType();
+        String getType();
 
         /**
          * create a new InputStream for the current element of the iteration. It is in the user's
@@ -102,7 +103,7 @@ public interface FileCollection {
          * @throws IOException if the resource cannot be opened
          * @throws NoSuchElementException if the previous call to step returned false.
          */
-        public InputStream openCurrent() throws IOException, NoSuchElementException;
+        InputStream openCurrent() throws IOException, NoSuchElementException;
 
         /**
          * Create a new InputStream for the current element of the iteration. A copy of the file the
@@ -115,6 +116,6 @@ public interface FileCollection {
          * @throws IOException if the resource cannot be opened
          * @throws NoSuchElementException if the previous call to step returned false.
          */
-        public InputStream openCurrent(FileRepo repo) throws IOException, NoSuchElementException;
+        InputStream openCurrent(FileRepo repo) throws IOException, NoSuchElementException;
     }
 }

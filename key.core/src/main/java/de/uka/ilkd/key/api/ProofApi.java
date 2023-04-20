@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.api;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -8,13 +14,8 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.util.MiscTools;
-import org.key_project.util.collection.ImmutableList;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * @author Alexander Weigl

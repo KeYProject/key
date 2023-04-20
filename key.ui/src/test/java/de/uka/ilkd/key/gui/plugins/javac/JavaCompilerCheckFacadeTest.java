@@ -1,13 +1,14 @@
 package de.uka.ilkd.key.gui.plugins.javac;
 
-import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
-import org.junit.jupiter.api.Test;
-
 import java.io.File;
 import java.util.Collections;
 import java.util.concurrent.ExecutionException;
+
+import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Alexander Weigl

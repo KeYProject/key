@@ -13,7 +13,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public abstract class GenericSortCondition {
 
-    private GenericSort gs;
+    private final GenericSort gs;
 
     /**
      * Create the condition that needs to be fulfilled for the given instantiation of a metavariable
@@ -45,8 +45,9 @@ public abstract class GenericSortCondition {
     public static GenericSortCondition createCondition(SortDependingFunction p0,
             SortDependingFunction p1) {
 
-        if (!p0.isSimilar(p1))
+        if (!p0.isSimilar(p1)) {
             return null;
+        }
 
         return createCondition(p0.getSortDependingOn(), p1.getSortDependingOn(), true);
     }
@@ -76,15 +77,17 @@ public abstract class GenericSortCondition {
             // collection sorts; therefore identity has to be ensured
             p_identity = true;
 
-            if (!s0.getClass().equals(s1.getClass()))
+            if (!s0.getClass().equals(s1.getClass())) {
                 return null;
+            }
 
             s0 = ((ArraySort) s0).elementSort();
             s1 = ((ArraySort) s1).elementSort();
         }
 
-        if (!(s0 instanceof GenericSort) || s1 == Sort.FORMULA || s1 == Sort.UPDATE)
+        if (!(s0 instanceof GenericSort) || s1 == Sort.FORMULA || s1 == Sort.UPDATE) {
             return null;
+        }
 
         final GenericSort gs = (GenericSort) s0;
 
@@ -105,10 +108,11 @@ public abstract class GenericSortCondition {
      */
     public static GenericSortCondition forceInstantiation(Sort p_s, boolean p_maximum) {
 
-        if (p_s instanceof GenericSort)
+        if (p_s instanceof GenericSort) {
             return createForceInstantiationCondition((GenericSort) p_s, p_maximum);
-        else if (p_s instanceof ArraySort)
+        } else if (p_s instanceof ArraySort) {
             return forceInstantiation(((ArraySort) p_s).elementSort(), p_maximum);
+        }
 
         return null;
     }
@@ -161,7 +165,7 @@ public abstract class GenericSortCondition {
 
 
     static class GSCSupersort extends GenericSortCondition {
-        Sort s;
+        final Sort s;
 
         protected GSCSupersort(GenericSort p_gs, Sort p_s) {
             super(p_gs);
@@ -189,7 +193,7 @@ public abstract class GenericSortCondition {
 
 
     static class GSCIdentity extends GenericSortCondition {
-        Sort s;
+        final Sort s;
 
         protected GSCIdentity(GenericSort p_gs, Sort p_s) {
             super(p_gs);
@@ -215,7 +219,7 @@ public abstract class GenericSortCondition {
 
 
     static class GSCForceInstantiation extends GenericSortCondition {
-        boolean maximum;
+        final boolean maximum;
 
         protected GSCForceInstantiation(GenericSort p_gs, boolean p_maximum) {
             super(p_gs);

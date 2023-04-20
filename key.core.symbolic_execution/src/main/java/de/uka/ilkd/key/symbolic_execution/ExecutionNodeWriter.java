@@ -8,12 +8,9 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.java.ArrayUtil;
-
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionAuxiliaryContract;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
@@ -36,6 +33,9 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.util.LinkedHashMap;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.ArrayUtil;
 
 /**
  * Allows to persistent selected properties of {@link IExecutionNode}s as XML file. Such files can

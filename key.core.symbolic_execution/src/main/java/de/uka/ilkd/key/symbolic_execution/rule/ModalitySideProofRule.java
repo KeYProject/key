@@ -4,9 +4,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -34,6 +31,9 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * <p>
@@ -175,7 +175,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             final TermBuilder tb = sideProofServices.getTermBuilder();
             Term newTerm = tb.func(newPredicate, varTerm);
             Term newModalityTerm = sideProofServices.getTermFactory().createTerm(modalityTerm.op(),
-                new ImmutableArray<Term>(newTerm), modalityTerm.boundVars(),
+                new ImmutableArray<>(newTerm), modalityTerm.boundVars(),
                 modalityTerm.javaBlock(), modalityTerm.getLabels());
             Term newModalityWithUpdatesTerm = tb.applySequential(updates, newModalityTerm);
             sequentToProve = sequentToProve
@@ -190,7 +190,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             Goal resultGoal = goals.head();
             resultGoal.removeFormula(pio);
             // Create results
-            Set<Term> resultTerms = new LinkedHashSet<Term>();
+            Set<Term> resultTerms = new LinkedHashSet<>();
             for (Triple<Term, Set<Term>, Node> conditionsAndResult : conditionsAndResultsMap) {
                 Term conditionTerm = tb.and(conditionsAndResult.second);
                 Term resultEqualityTerm = varFirst ? tb.equals(conditionsAndResult.first, otherTerm)

@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * A lattice for all predicates accepting the given sort. This lattice consists of n + 2 elements,
@@ -18,7 +19,7 @@ import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 public class SimplePredicateAbstractionLattice extends AbstractPredicateAbstractionLattice {
     public static final String PREDICATE_NAME_CONBINATION_STRING = "<<<<<<N/A>>>>>>";
 
-    private List<AbstractionPredicate> predicates = new ArrayList<AbstractionPredicate>();
+    private List<AbstractionPredicate> predicates = new ArrayList<>();
 
     /**
      * Constructs a new {@link SimplePredicateAbstractionLattice} for the given list of applicable
@@ -47,8 +48,8 @@ public class SimplePredicateAbstractionLattice extends AbstractPredicateAbstract
          * The join result is a PredicateAbstractionDomainElement constructed of the intersection of
          * the respective predicates.
          */
-        return super.join(a, b, (set1, set2) -> (set1.intersect(set2)),
-            set -> new SimplePredicateAbstractionDomainElement(set));
+        return super.join(a, b, ImmutableSet::intersect,
+            SimplePredicateAbstractionDomainElement::new);
     }
 
     /**
@@ -57,7 +58,7 @@ public class SimplePredicateAbstractionLattice extends AbstractPredicateAbstract
      */
     @Override
     public Iterator<AbstractDomainElement> iterator() {
-        return new Iterator<AbstractDomainElement>() {
+        return new Iterator<>() {
             int idx = 0;
 
             @Override

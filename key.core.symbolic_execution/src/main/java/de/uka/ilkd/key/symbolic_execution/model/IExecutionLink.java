@@ -11,12 +11,12 @@ public interface IExecutionLink {
      *
      * @return The source.
      */
-    public IExecutionNode<?> getSource();
+    IExecutionNode<?> getSource();
 
     /**
      * Returns the target.
      *
      * @return The target.
      */
-    public IExecutionNode<?> getTarget();
+    IExecutionNode<?> getTarget();
 }

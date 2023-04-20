@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.logic.op;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.util.collection.ImmutableArray;
 
 
 /**
@@ -45,14 +45,14 @@ public class Function extends AbstractSortedOperator {
     }
 
     public Function(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind, boolean unique) {
-        this(name, sort, new ImmutableArray<Sort>(argSorts),
-            whereToBind == null ? null : new ImmutableArray<Boolean>(whereToBind), unique);
+        this(name, sort, new ImmutableArray<>(argSorts),
+            whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique);
     }
 
     public Function(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind, boolean unique,
             boolean isSkolemConstant) {
-        this(name, sort, new ImmutableArray<Sort>(argSorts),
-            whereToBind == null ? null : new ImmutableArray<Boolean>(whereToBind), unique,
+        this(name, sort, new ImmutableArray<>(argSorts),
+            whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique,
             isSkolemConstant);
     }
 
@@ -73,11 +73,11 @@ public class Function extends AbstractSortedOperator {
     }
 
     public Function(Name name, Sort sort) {
-        this(name, sort, new ImmutableArray<Sort>(), null, false);
+        this(name, sort, new ImmutableArray<>(), null, false);
     }
 
     public Function(Name name, Sort sort, boolean isSkolemConstant) {
-        this(name, sort, new ImmutableArray<Sort>(), null, false, true, isSkolemConstant);
+        this(name, sort, new ImmutableArray<>(), null, false, true, isSkolemConstant);
     }
 
 
@@ -108,22 +108,23 @@ public class Function extends AbstractSortedOperator {
      * symbol.
      */
     public final String proofToString() {
-        String s = (sort() == Sort.FORMULA ? "" : sort().toString()) + " ";
-        s += name();
+        StringBuilder s =
+            new StringBuilder((sort() == Sort.FORMULA ? "" : sort().toString()) + " ");
+        s.append(name());
         if (arity() > 0) {
             int i = 0;
-            s += "(";
+            s.append("(");
             while (i < arity()) {
                 if (i > 0) {
-                    s += ",";
+                    s.append(",");
                 }
-                s += argSort(i);
+                s.append(argSort(i));
                 i++;
             }
-            s += ")";
+            s.append(")");
         }
-        s += ";\n";
-        return s;
+        s.append(";\n");
+        return s.toString();
     }
 
     public Function rename(Name newName) {

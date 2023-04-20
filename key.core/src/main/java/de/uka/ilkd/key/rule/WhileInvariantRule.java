@@ -4,11 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
@@ -65,6 +61,11 @@ import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 public final class WhileInvariantRule implements BuiltInRule {
     /**
@@ -150,7 +151,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         // generate information flow invariant application predicate
         // and associated taclet
-        final Pair<Term, Term> updates = new Pair<Term, Term>(inst.u, anonUpdate);
+        final Pair<Term, Term> updates = new Pair<>(inst.u, anonUpdate);
         final InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
             new InfFlowLoopInvariantTacletBuilder(services);
         ifInvariantBuilder.setInvariant(spec);
@@ -287,9 +288,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         final KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
         if (!suffix.equalsIgnoreCase("")) {
-            suffix = new String("_" + suffix);
+            suffix = "_" + suffix;
         }
-        final String name = tb.newName(varTerm.toString() + "_After" + suffix);
+        final String name = tb.newName(varTerm + "_After" + suffix);
         final LocationVariable varAtPostVar =
             new LocationVariable(new ProgramElementName(name), resultType);
         register(varAtPostVar, services);
@@ -305,7 +306,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         final TermBuilder tb = services.getTermBuilder();
         final KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
-        final String name = tb.newName(varTerm.toString() + "_Before");
+        final String name = tb.newName(varTerm + "_Before");
         final LocationVariable varAtPreVar =
             new LocationVariable(new ProgramElementName(name), resultType);
         register(varAtPreVar, services);
@@ -321,7 +322,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         final TermBuilder tb = services.getTermBuilder();
         final KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
-        final String name = tb.newName(varTerm.toString() + "_After");
+        final String name = tb.newName(varTerm + "_After");
         final LocationVariable varAtPostVar =
             new LocationVariable(new ProgramElementName(name), resultType);
         register(varAtPostVar, services);
@@ -335,13 +336,13 @@ public final class WhileInvariantRule implements BuiltInRule {
             return varTerms;
         }
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableList<Term> localOuts = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> localOuts = ImmutableSLList.nil();
         for (final Term varTerm : varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 
             final KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
 
-            final String name = tb.newName(varTerm.toString() + "_Before");
+            final String name = tb.newName(varTerm + "_Before");
             final LocationVariable varAtPostVar =
                 new LocationVariable(new ProgramElementName(name), resultType);
             register(varAtPostVar, services);
@@ -357,13 +358,13 @@ public final class WhileInvariantRule implements BuiltInRule {
             return varTerms;
         }
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableList<Term> localOuts = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> localOuts = ImmutableSLList.nil();
         for (final Term varTerm : varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 
             final KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
 
-            final String name = tb.newName(varTerm.toString() + "_After");
+            final String name = tb.newName(varTerm + "_After");
             final LocationVariable varAtPostVar =
                 new LocationVariable(new ProgramElementName(name), resultType);
             register(varAtPostVar, services);
@@ -516,7 +517,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final boolean dia = ((Modality) inst.progPost.op()).terminationSensitive();
         final Term variantUpdate = dia ? tb.elementary(variantPV, variant) : tb.skip();
         final Term variantPO = dia ? tb.prec(variant, tb.var(variantPV)) : tb.tt();
-        return new Pair<Term, Term>(variantUpdate, variantPO);
+        return new Pair<>(variantUpdate, variantPO);
     }
 
 
@@ -559,7 +560,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             JavaTools.removeActiveStatement(inst.progPost.javaBlock(), services);
         final ImmutableArray<TermLabel> instantiateLabels = TermLabelManager.instantiateLabels(
             termLabelState, services, ruleApp.posInOccurrence(), this, ruleApp, useGoal,
-            "UseModality", null, inst.progPost.op(), new ImmutableArray<Term>(inst.progPost.sub(0)),
+            "UseModality", null, inst.progPost.op(), new ImmutableArray<>(inst.progPost.sub(0)),
             null, useJavaBlock, inst.progPost.getLabels());
         Term restPsi = tb.prog((Modality) inst.progPost.op(), useJavaBlock, inst.progPost.sub(0),
             instantiateLabels);
@@ -586,7 +587,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             JavaBlock.createJavaBlock(new StatementBlock(guardVarMethodFrame));
         final Term guardTrueTerm = tb.equals(tb.var(guardVar), tb.TRUE());
         final Term guardFalseTerm = tb.equals(tb.var(guardVar), tb.FALSE());
-        return new Triple<JavaBlock, Term, Term>(guardJb, guardTrueTerm, guardFalseTerm);
+        return new Triple<>(guardJb, guardTrueTerm, guardFalseTerm);
     }
 
     private void prepareInvInitiallyValidBranch(TermLabelState termLabelState, Services services,
@@ -662,18 +663,15 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
         // active statement must be while loop
         final SourceElement activeStatement = JavaTools.getActiveStatement(progPost.javaBlock());
-        if (!(activeStatement instanceof While)) {
-            return false;
-        }
-        return true;
+        return activeStatement instanceof While;
     }
 
     static Pair<Term, Term> applyUpdates(Term focusTerm, TermServices services) {
         if (focusTerm.op() instanceof UpdateApplication) {
-            return new Pair<Term, Term>(UpdateApplication.getUpdate(focusTerm),
+            return new Pair<>(UpdateApplication.getUpdate(focusTerm),
                 UpdateApplication.getTarget(focusTerm));
         } else {
-            return new Pair<Term, Term>(services.getTermBuilder().skip(), focusTerm);
+            return new Pair<>(services.getTermBuilder().skip(), focusTerm);
         }
     }
 
@@ -699,6 +697,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
+    @Nonnull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
             throws RuleAbortException {
@@ -718,7 +717,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term invTerm = conjunctInv(services, inst, atPres, heapContext);
         final Term invFreeTerm = conjunctFreeInv(services, inst, atPres, heapContext);
 
-        final Map<LocationVariable, Term> mods = new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> mods = new LinkedHashMap<>();
         for (LocationVariable heap : heapContext) {
             final Term m = inst.inv.getModifies(heap, inst.selfTerm, atPres, services);
             mods.put(heap, m);
@@ -755,10 +754,10 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term beforeLoopUpdate = null;
 
         final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop =
-            new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+            new LinkedHashMap<>();
 
         for (LocationVariable heap : heapContext) {
-            heapToBeforeLoop.put(heap, new LinkedHashMap<Term, Term>());
+            heapToBeforeLoop.put(heap, new LinkedHashMap<>());
             final LocationVariable lv =
                 tb.locationVariable(heap + "Before_LOOP", heap.sort(), true);
             services.getNamespaces().programVariables().addSafely(lv);
@@ -802,7 +801,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term frameCondition = null;
         Term reachableState = null;
         Term anonHeap = null;
-        ImmutableList<AnonUpdateData> anonUpdateDatas = ImmutableSLList.<AnonUpdateData>nil();
+        ImmutableList<AnonUpdateData> anonUpdateDatas = ImmutableSLList.nil();
         for (LocationVariable heap : heapContext) {
             final AnonUpdateData tAnon = createAnonUpdate(heap, mods.get(heap), inst.inv, services);
             anonUpdateDatas = anonUpdateDatas.append(tAnon);

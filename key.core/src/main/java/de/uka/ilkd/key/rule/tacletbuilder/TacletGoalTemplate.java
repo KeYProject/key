@@ -13,6 +13,11 @@ import org.key_project.util.collection.ImmutableSet;
 
 import javax.annotation.Nullable;
 
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
 /**
  * this class contains the goals of the schematic theory specific rules (Taclet). There are new
  * sequents that have to be added, new rules and rule variables. The replacewith-goal is implemented
@@ -20,20 +25,14 @@ import javax.annotation.Nullable;
  */
 public class TacletGoalTemplate {
 
-    /**
-     * stores sequent that is one of the new goals
-     */
+    /** stores sequent that is one of the new goals */
     private Sequent addedSeq = Sequent.EMPTY_SEQUENT;
 
-    /**
-     * stores list of Taclet which are introduced
-     */
-    private ImmutableList<Taclet> addedRules = ImmutableSLList.<Taclet>nil();
+    /** stores list of Taclet which are introduced */
+    private ImmutableList<Taclet> addedRules = ImmutableSLList.nil();
 
-    /**
-     * program variables added by this taclet to the namespace
-     */
-    private ImmutableSet<SchemaVariable> addedProgVars = DefaultImmutableSet.<SchemaVariable>nil();
+    /** program variables added by this taclet to the namespace */
+    private ImmutableSet<SchemaVariable> addedProgVars = DefaultImmutableSet.nil();
 
     @Nullable
     private String name = null;
@@ -64,15 +63,15 @@ public class TacletGoalTemplate {
 
     /**
      * creates new Goaldescription same effect as <code>new TacletGoalTemplate(addedSeq,
-     * addedRules,
-     * SetAsListOf.<SchemaVariable>nil())
-     * </code>
+     *                                             addedRules,
+     *                                             SetAsListOf.<SchemaVariable>nil())
+     *                                             </code>
      *
      * @param addedSeq new Sequent to be added
      * @param addedRules IList<Taclet> contains the new allowed rules at this branch
      */
     public TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules) {
-        this(addedSeq, addedRules, DefaultImmutableSet.<SchemaVariable>nil());
+        this(addedSeq, addedRules, DefaultImmutableSet.nil());
     }
 
 
@@ -120,7 +119,7 @@ public class TacletGoalTemplate {
      * @return all variables that occur bound in this goal template
      */
     public ImmutableSet<QuantifiableVariable> getBoundVariables() {
-        ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet.<QuantifiableVariable>nil();
+        ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet.nil();
 
         for (Taclet taclet : rules()) {
             result = result.union(taclet.getBoundVariables());
@@ -159,10 +158,12 @@ public class TacletGoalTemplate {
     @Override
     public boolean equals(Object o) {
 
-        if (o == null)
+        if (o == null) {
             return false;
-        if (o == this)
+        }
+        if (o == this) {
             return true;
+        }
 
         if (getClass() != this.getClass()) {
             return false;
@@ -186,12 +187,15 @@ public class TacletGoalTemplate {
     @Override
     public String toString() {
         String result = "";
-        if (!sequent().isEmpty())
+        if (!sequent().isEmpty()) {
             result += "\\add " + sequent() + " ";
-        if (!rules().isEmpty())
+        }
+        if (!rules().isEmpty()) {
             result += "\\addrules " + rules() + " ";
-        if (!addedProgVars().isEmpty())
+        }
+        if (!addedProgVars().isEmpty()) {
             result += "\\addprogvars " + addedProgVars() + " ";
+        }
         return result;
     }
 }

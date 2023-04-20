@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.Iterator;
+import java.util.Set;
+
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
@@ -9,10 +12,8 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import org.key_project.util.collection.ImmutableList;
 
-import java.util.Iterator;
-import java.util.Set;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The command "focus" allows you to select formulas from the current sequent
@@ -111,7 +112,7 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
         Set<SchemaVariable> svs = tac.collectSchemaVars();
         assert svs.size() == 1;
         Iterator<SchemaVariable> iter = svs.iterator();
-        SchemaVariable sv = (SchemaVariable) iter.next();
+        SchemaVariable sv = iter.next();
 
         SVInstantiations inst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
@@ -123,4 +124,3 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
     }
 
 }
-

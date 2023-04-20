@@ -1,9 +1,8 @@
 package de.uka.ilkd.key.speclang.jml;
 
-import javax.annotation.Nonnull;
-
 import java.util.Set;
 import java.util.TreeSet;
+import javax.annotation.Nonnull;
 
 @Deprecated
 public abstract class JMLUtils {

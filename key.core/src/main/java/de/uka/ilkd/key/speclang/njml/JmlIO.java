@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.speclang.njml;
 
+import java.util.Map;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -18,12 +22,11 @@ import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.key_project.util.collection.ImmutableArray;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Map;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Stateful service for translating JML into KeY entities.
@@ -206,6 +209,7 @@ public class JmlIO {
         return term;
     }
 
+
     /**
      * Interpret the given parse tree as an JML expression in the current context. Attach both given
      * labels {@code type} and in labeled parse tree.
@@ -215,6 +219,7 @@ public class JmlIO {
         OriginTermLabel origin = new OriginTermLabel(new OriginTermLabel.Origin(type));
         final var termBuilder = services.getTermBuilder();
         return termBuilder.addLabel(term, origin);
+        }
     }
 
 

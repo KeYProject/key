@@ -37,9 +37,9 @@ public class IFProofObligationVars {
         this.symbExecVars = symbExecVars;
 
         assert symbExecVars != null;
-        infFlowToSymbExecVarsMaps = new HashMap<ProofObligationVars, Map<Term, Term>>();
-        infFlowToSymbExecVarsMaps.put(c1, new HashMap<Term, Term>());
-        infFlowToSymbExecVarsMaps.put(c2, new HashMap<Term, Term>());
+        infFlowToSymbExecVarsMaps = new HashMap<>();
+        infFlowToSymbExecVarsMaps.put(c1, new HashMap<>());
+        infFlowToSymbExecVarsMaps.put(c2, new HashMap<>());
         linkSymbExecVarsToCopies();
     }
 

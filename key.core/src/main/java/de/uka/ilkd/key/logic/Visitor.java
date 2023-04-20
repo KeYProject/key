@@ -7,14 +7,14 @@ public interface Visitor {
      * @param visited The currently visited {@link Term}.
      * @return {@code true} visit sub tree, {@code false} skip sub tree.
      */
-    public boolean visitSubtree(Term visited);
+    boolean visitSubtree(Term visited);
 
     /**
      * the entry method for the visitor pattern
      *
      * @param visited the Term to be visited
      */
-    public abstract void visit(Term visited);
+    void visit(Term visited);
 
     /**
      * this method is called in execPreOrder and execPostOrder in class Term when entering the
@@ -25,7 +25,7 @@ public interface Visitor {
      * @param subtreeRoot root of the subtree which the visitor enters.
      */
 
-    public void subtreeEntered(Term subtreeRoot);
+    void subtreeEntered(Term subtreeRoot);
 
     /**
      * this method is called in execPreOrder and execPostOrder in class Term when leaving the
@@ -36,5 +36,5 @@ public interface Visitor {
      * @param subtreeRoot root of the subtree which the visitor leaves.
      */
 
-    public void subtreeLeft(Term subtreeRoot);
+    void subtreeLeft(Term subtreeRoot);
 }

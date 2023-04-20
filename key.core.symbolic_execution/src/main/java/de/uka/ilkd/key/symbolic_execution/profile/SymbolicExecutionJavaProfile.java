@@ -1,9 +1,5 @@
 package de.uka.ilkd.key.symbolic_execution.profile;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabel;
 import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabelFactory;
@@ -12,7 +8,6 @@ import de.uka.ilkd.key.logic.label.FormulaTermLabelFactory;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabelFactory;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.Proof;
@@ -40,6 +35,10 @@ import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooserBuilder;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * An extended {@link JavaProfile} used by the symbolic execution API.
@@ -170,11 +169,11 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
             bcRefs, null));
         result =
             result.prepend(new TermLabelConfiguration(SymbolicExecutionUtil.LOOP_BODY_LABEL_NAME,
-                new SingletonLabelFactory<TermLabel>(SymbolicExecutionUtil.LOOP_BODY_LABEL), null,
+                new SingletonLabelFactory<>(SymbolicExecutionUtil.LOOP_BODY_LABEL), null,
                 symExcPolicies, null, null, lbUps, lbRefs, null));
         result = result.prepend(new TermLabelConfiguration(
             SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME,
-            new SingletonLabelFactory<TermLabel>(
+            new SingletonLabelFactory<>(
                 SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL),
             null, symExcPolicies, null, null, nbUps, nbRefs, null));
         result = result.prepend(new TermLabelConfiguration(SymbolicExecutionTermLabel.NAME,

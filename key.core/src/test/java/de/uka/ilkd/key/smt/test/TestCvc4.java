@@ -4,6 +4,7 @@ package de.uka.ilkd.key.smt.test;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

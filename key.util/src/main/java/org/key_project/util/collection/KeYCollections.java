@@ -25,8 +25,7 @@ public class KeYCollections {
      */
     public static <S, T extends S> S[] concat(S[] s1, T[] s2) {
         S[] res = Arrays.copyOf(s1, s1.length + s2.length);
-        for (int i = 0; i < s2.length; i++)
-            res[i + s1.length] = s2[i];
+        System.arraycopy(s2, 0, res, s1.length, s2.length);
         return res;
     }
 
@@ -41,23 +40,25 @@ public class KeYCollections {
      */
     public static <S, T, U> Map<S, U> apply(Map<S, ? extends T> m0, Map<T, U> m1) {
         Map<S, U> res = null;
-        final int size = m0.size() < m1.size() ? m0.size() : m1.size();
+        final int size = Math.min(m0.size(), m1.size());
         // try to use more specific implementation
-        if (m0 instanceof java.util.TreeMap)
-            res = new java.util.TreeMap<S, U>();
-        else if (m0 instanceof java.util.concurrent.ConcurrentHashMap)
-            res = new java.util.concurrent.ConcurrentHashMap<S, U>(size);
-        else if (m0 instanceof java.util.IdentityHashMap)
-            res = new java.util.IdentityHashMap<S, U>(size);
-        else if (m0 instanceof java.util.WeakHashMap)
-            res = new java.util.WeakHashMap<S, U>(size);
-        else
-            res = new HashMap<S, U>(size);
+        if (m0 instanceof java.util.TreeMap) {
+            res = new java.util.TreeMap<>();
+        } else if (m0 instanceof java.util.concurrent.ConcurrentHashMap) {
+            res = new java.util.concurrent.ConcurrentHashMap<>(size);
+        } else if (m0 instanceof java.util.IdentityHashMap) {
+            res = new java.util.IdentityHashMap<>(size);
+        } else if (m0 instanceof java.util.WeakHashMap) {
+            res = new java.util.WeakHashMap<>(size);
+        } else {
+            res = new HashMap<>(size);
+        }
 
         for (Map.Entry<S, ? extends T> e : m0.entrySet()) {
             final U value = m1.get(e.getValue());
-            if (value != null)
+            if (value != null) {
                 res.put(e.getKey(), value);
+            }
         }
         return res;
     }
@@ -108,7 +109,7 @@ public class KeYCollections {
         StringBuilder res = new StringBuilder();
         for (int i = 0; i < string.length(); i++) {
             char c = string.charAt(i);
-            if ((c >= 'A' && c <= 'Z') || (c >= 'A' && c <= 'Z')) {
+            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
                 res.append(c);
             }
         }

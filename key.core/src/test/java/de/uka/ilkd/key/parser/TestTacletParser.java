@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.parser;
 
+import java.io.IOException;
+import java.util.List;
+
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -15,12 +18,11 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
 import de.uka.ilkd.key.util.parsing.BuildingException;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.io.IOException;
-import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 

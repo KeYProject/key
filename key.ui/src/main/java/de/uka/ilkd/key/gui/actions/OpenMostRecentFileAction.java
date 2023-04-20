@@ -5,10 +5,10 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.nio.file.Path;
 
-import de.uka.ilkd.key.gui.ProofSelectionDialog;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.ProofSelectionDialog;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 /**
  * Loads the last opened file
@@ -41,7 +41,6 @@ public final class OpenMostRecentFileAction extends MainWindowAction {
                     Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
                     if (proofPath == null) {
                         // canceled by user
-                        return;
                     } else {
                         mainWindow.loadProofFromBundle(file, proofPath.toFile());
                     }

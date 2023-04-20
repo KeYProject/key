@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
 import org.key_project.util.ExtList;
 
 
@@ -47,10 +48,12 @@ public class TypeCast extends TypeOperator {
 
     public int getChildCount() {
         int result = 0;
-        if (typeReference != null)
+        if (typeReference != null) {
             result++;
-        if (children != null)
+        }
+        if (children != null) {
             result += children.size();
+        }
         return result;
     }
 
@@ -65,8 +68,9 @@ public class TypeCast extends TypeOperator {
     public ProgramElement getChildAt(int index) {
         int len;
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
             index--;
         }
         if (children != null) {

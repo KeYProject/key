@@ -1,10 +1,6 @@
 package de.uka.ilkd.key.macros;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -13,6 +9,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The abstract class AlternativeMacro can be used to create compound macros which apply the first
@@ -49,8 +47,8 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
         final List<ProofMacro> macros = getProofMacros();
-        for (int i = 0; i < macros.size(); i++) {
-            if (macros.get(i).canApplyTo(proof, goals, posInOcc)) {
+        for (ProofMacro macro : macros) {
+            if (macro.canApplyTo(proof, goals, posInOcc)) {
                 return true;
             }
         }
@@ -68,7 +66,7 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
-            throws InterruptedException, Exception {
+            throws Exception {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         for (final ProofMacro macro : getProofMacros()) {
             if (macro.canApplyTo(proof, goals, posInOcc)) {
@@ -98,6 +96,6 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
             assert proofMacros != null;
             assert proofMacros.length > 0;
         }
-        return Collections.unmodifiableList(Arrays.asList(proofMacros));
+        return List.of(proofMacros);
     }
 }

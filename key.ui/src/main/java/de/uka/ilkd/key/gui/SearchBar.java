@@ -1,8 +1,7 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-
+import java.awt.*;
+import java.awt.event.KeyEvent;
 import javax.annotation.Nonnull;
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -11,8 +10,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.*;
-import java.awt.event.KeyEvent;
+
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 /*
  * Abstract parent class of SequentSearchBar and ProofTreeSearchPanel. Might be used for additional
@@ -24,10 +24,10 @@ public abstract class SearchBar extends JPanel {
      *
      */
     private static final long serialVersionUID = -4821960226273983607L;
-    public JTextField searchField = new JTextField(20);
-    private JButton prev;
-    private JButton next;
-    private JButton close;
+    public final JTextField searchField = new JTextField(20);
+    private final JButton prev;
+    private final JButton next;
+    private final JButton close;
     private final ColorSettings.ColorProperty ALERT_COLOR =
         ColorSettings.define("[searchBar]alert", "", new Color(255, 178, 178));
 

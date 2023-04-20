@@ -20,7 +20,7 @@ public interface POExtension {
      * @param po The {@link ProofOblInput} to check.
      * @return {@code true} is supported, {@code false} is not supported.
      */
-    public boolean isPOSupported(ProofOblInput po);
+    boolean isPOSupported(ProofOblInput po);
 
     /**
      * Modifies the post condition.
@@ -31,5 +31,5 @@ public interface POExtension {
      * @return The modified post condition or the original post condition if no modifications were
      *         performed.
      */
-    public Term modifyPostTerm(InitConfig proofConfig, Services services, Term postTerm);
+    Term modifyPostTerm(InitConfig proofConfig, Services services, Term postTerm);
 }

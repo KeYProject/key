@@ -111,7 +111,7 @@ public class AutoMacro extends StrategyProofMacro {
 
     @Override
     public boolean hasParameter(String paramName) {
-        return Arrays.stream(PARAMS).anyMatch(param -> param.equals(paramName));
+        return Arrays.asList(PARAMS).contains(paramName);
     }
 
     @Override

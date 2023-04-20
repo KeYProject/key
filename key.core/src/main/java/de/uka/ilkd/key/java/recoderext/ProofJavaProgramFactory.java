@@ -11,6 +11,7 @@ import java.util.List;
 import de.uka.ilkd.key.java.recoderext.adt.MethodSignature;
 import de.uka.ilkd.key.parser.proofjava.ParseException;
 import de.uka.ilkd.key.parser.proofjava.ProofJavaParser;
+
 import recoder.ParserException;
 import recoder.ServiceConfiguration;
 import recoder.convenience.TreeWalker;
@@ -42,7 +43,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     /**
      * The singleton instance of the program factory.
      */
-    private static ProofJavaProgramFactory theFactory = new ProofJavaProgramFactory();
+    private static final ProofJavaProgramFactory theFactory = new ProofJavaProgramFactory();
 
     /**
      * Returns the single instance of this class.
@@ -109,7 +110,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         }
         ASTList<Comment> cml = dest.getComments();
         if (cml == null) {
-            dest.setComments(cml = new ASTArrayList<Comment>());
+            dest.setComments(cml = new ASTArrayList<>());
         }
         cml.add(c);
     }
@@ -158,7 +159,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
                     block.setBody(body);
 
                     // attach comment to empty statement
-                    ASTList<Comment> cml = new ASTArrayList<Comment>();
+                    ASTList<Comment> cml = new ASTArrayList<>();
                     newEmpty.setComments(cml);
                     current.setPrefixed(true);
                     cml.add(current);
@@ -265,7 +266,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
             }
             ASTList<Comment> cml = pe.getComments();
             if (cml == null) {
-                pe.setComments(cml = new ASTArrayList<Comment>());
+                pe.setComments(cml = new ASTArrayList<>());
             }
             do {
                 current = comments.get(commentIndex);
@@ -448,8 +449,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
             try {
                 ProofJavaParser.initialize(in);
                 ASTList<Statement> res = ProofJavaParser.GeneralizedStatements();
-                for (int i = 0; i < res.size(); i += 1) {
-                    postWork(res.get(i));
+                for (Statement re : res) {
+                    postWork(re);
                 }
                 return res;
             } catch (ParseException e) {

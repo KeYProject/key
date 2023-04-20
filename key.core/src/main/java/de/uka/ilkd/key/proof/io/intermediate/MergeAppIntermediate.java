@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.proof.io.intermediate;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Encapsulates intermediate information for constructing a {@link MergeRule} application.
@@ -16,12 +16,12 @@ import de.uka.ilkd.key.util.Pair;
 public class MergeAppIntermediate extends BuiltInAppIntermediate {
 
     private int id = 0;
-    private String mergeProc;
+    private final String mergeProc;
     private String distinguishingFormula = null;
     private int nrPartners = 0;
     private String abstractionPredicates = null;
     private String userChoices = null;
-    private Class<? extends AbstractPredicateAbstractionLattice> predAbstrLatticeType;
+    private final Class<? extends AbstractPredicateAbstractionLattice> predAbstrLatticeType;
 
     /**
      * Constructs a new join rule.

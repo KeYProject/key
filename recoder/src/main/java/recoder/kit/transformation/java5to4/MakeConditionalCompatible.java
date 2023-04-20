@@ -6,6 +6,9 @@
  */
 package recoder.kit.transformation.java5to4;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
 import recoder.abstraction.IntersectionType;
@@ -21,9 +24,6 @@ import recoder.java.reference.MethodReference;
 import recoder.kit.ProblemReport;
 import recoder.kit.TwoPassTransformation;
 import recoder.kit.TypeKit;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Deals with uses of the conditional(c-like trinary) operator which create intersection types.
@@ -49,7 +49,7 @@ public class MakeConditionalCompatible extends TwoPassTransformation {
 
     @Override
     public ProblemReport analyze() {
-        list = new ArrayList<Item>();
+        list = new ArrayList<>();
         setProblemReport(NO_PROBLEM);
         TreeWalker tw = new TreeWalker(root);
         while (tw.next()) {
@@ -78,8 +78,9 @@ public class MakeConditionalCompatible extends TwoPassTransformation {
                 }
             }
         }
-        if (list.isEmpty())
+        if (list.isEmpty()) {
             return IDENTITY;
+        }
         return NO_PROBLEM;
     }
 
@@ -96,8 +97,8 @@ public class MakeConditionalCompatible extends TwoPassTransformation {
     }
 
     private static class Item {
-        Conditional c;
-        Type t;
+        final Conditional c;
+        final Type t;
 
         Item(Conditional c, Type t) {
             this.c = c;

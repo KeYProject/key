@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -23,7 +24,7 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
     /**
      * The used {@link IBreakpoint}s.
      */
-    private final Set<IBreakpoint> breakpoints = new HashSet<IBreakpoint>();
+    private final Set<IBreakpoint> breakpoints = new HashSet<>();
 
     /**
      * Indicates that a breakpoint is hit.
@@ -37,9 +38,7 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
      */
     public BreakpointStopCondition(IBreakpoint... breakpoints) {
         if (breakpoints != null) {
-            for (IBreakpoint breakpoint : breakpoints) {
-                this.breakpoints.add(breakpoint);
-            }
+            Collections.addAll(this.breakpoints, breakpoints);
         }
     }
 

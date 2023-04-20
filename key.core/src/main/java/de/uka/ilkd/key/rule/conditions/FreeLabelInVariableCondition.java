@@ -45,7 +45,7 @@ public final class FreeLabelInVariableCondition extends VariableConditionAdapter
         }
 
         final boolean freeIn = freeLabelFinder.findLabel(prgLabel, program);
-        return negated ? !freeIn : freeIn;
+        return negated != freeIn;
     }
 
 

@@ -1,10 +1,9 @@
 package de.uka.ilkd.key.java;
 
+import de.uka.ilkd.key.rule.MatchConditions;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.util.Debug;
 
 /**
  * Top level implementation of a Java {@link NonTerminalProgramElement}. taken from COMPOST and
@@ -98,16 +97,11 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
 
-        LOGGER.debug("Program match start (template {}, source {})", this, src); // this.toString().equals("e")
-
         if (src == null) {
             return null;
         }
 
         if (src.getClass() != this.getClass()) {
-            LOGGER.debug("Incompatible AST nodes (template {}, source {})", this, src);
-            LOGGER.debug("Incompatible AST nodes (template {}, source {})", this.getClass(),
-                src.getClass());
             return null;
         }
 
@@ -161,7 +155,6 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
         final NonTerminalProgramElement ntSrc = (NonTerminalProgramElement) source.getElement();
 
         if (!compatibleBlockSize(source.getChildPos(), ntSrc.getChildCount())) {
-            LOGGER.debug("Source has unmatched elements.");
             return null;
         }
 

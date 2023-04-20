@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.gui.actions;
 
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.List;
+import javax.annotation.Nullable;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmaSelectionDialog;
@@ -15,13 +21,9 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.List;
 
 public abstract class LemmaGenerationAction extends MainWindowAction {
     public enum Mode {
@@ -94,7 +96,8 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
         }
 
         @Override
-        public final void stopped(final ProofAggregate p, final ImmutableSet<Taclet> taclets,
+        public final void stopped(final @Nullable ProofAggregate p,
+                final ImmutableSet<Taclet> taclets,
                 final boolean addAsAxioms) {
             SwingUtilities.invokeLater(() -> doStopped(p, taclets, addAsAxioms));
         }

@@ -1,9 +1,5 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -40,9 +36,13 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * Symbolically executes a method invocation
@@ -56,7 +56,7 @@ public class MethodCall extends ProgramTransformer {
     private IProgramMethod pm;
     protected ReferencePrefix newContext;
     protected ProgramVariable pvar;
-    private IExecutionContext execContextSV;
+    private final IExecutionContext execContextSV;
     private ExecutionContext execContext;
     protected ImmutableArray<Expression> arguments;
     protected KeYJavaType staticPrefixType;
@@ -107,7 +107,7 @@ public class MethodCall extends ProgramTransformer {
     /** gets an array of expression and returns a list of types */
     private ImmutableList<KeYJavaType> getTypes(ImmutableArray<Expression> args,
             Services services) {
-        ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
+        ImmutableList<KeYJavaType> result = ImmutableSLList.nil();
         for (int i = args.size() - 1; i >= 0; i--) {
             Expression argument = args.get(i);
             result =
@@ -190,7 +190,7 @@ public class MethodCall extends ProgramTransformer {
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
-        LOGGER.debug("method-call: called for {}", pe);
+        LOGGER.trace("method-call: called for {}", pe);
         if (resultVar != null) {
             pvar = (ProgramVariable) svInst.getInstantiation(resultVar);
         }
@@ -254,7 +254,7 @@ public class MethodCall extends ProgramTransformer {
 
     private Statement handleStatic(Services services) {
         Statement result;
-        LOGGER.debug("method-call: invocation of static method detected");
+        LOGGER.trace("method-call: invocation of static method detected");
         newContext = null;
         IProgramMethod staticMethod = getMethod(staticPrefixType, methRef, services);
         result = KeYJavaASTFactory.methodBody(pvar, newContext, staticMethod, arguments);
@@ -263,7 +263,7 @@ public class MethodCall extends ProgramTransformer {
 
     private Statement handleSuperReference(Services services) {
         Statement result;
-        LOGGER.debug(
+        LOGGER.trace(
             "method-call: super invocation of method detected." + "Requires static resolving.");
         IProgramMethod superMethod = getSuperMethod(execContext, methRef, services);
         result = KeYJavaASTFactory.methodBody(pvar, execContext.getRuntimeInstance(), superMethod,
@@ -276,11 +276,11 @@ public class MethodCall extends ProgramTransformer {
                 .equals(ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER))) {
             // private methods or constructor invocations are bound
             // statically
-            LOGGER.debug("method-call: invocation of private method detected."
+            LOGGER.trace("method-call: invocation of private method detected."
                 + "Requires static resolving.");
             result = makeMbs(staticPrefixType, services);
         } else {
-            LOGGER.debug("method-call: invocation of non-private" + " instance method detected."
+            LOGGER.trace("method-call: invocation of non-private" + " instance method detected."
                 + "Requires dynamic resolving.");
             ImmutableList<KeYJavaType> imps =
                 services.getJavaInfo().getKeYProgModelInfo().findImplementations(staticPrefixType,
@@ -471,7 +471,7 @@ public class MethodCall extends ProgramTransformer {
         for (int i = 0; i < varspecs.length; i++) {
             vars[i] = (Expression) varspecs[i].getProgramVariable();
         }
-        return new ImmutableArray<Expression>(vars);
+        return new ImmutableArray<>(vars);
     }
 
     /**

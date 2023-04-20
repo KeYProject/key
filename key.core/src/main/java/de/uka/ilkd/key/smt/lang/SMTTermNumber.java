@@ -83,10 +83,11 @@ public class SMTTermNumber extends SMTTerm {
             return sort;
         }
 
-        if (bitSize > 0)
+        if (bitSize > 0) {
             return SMTSort.mkBV(bitSize);
-        else
+        } else {
             return SMTSort.INT;
+        }
     }
 
     /** {@inheritDoc} */
@@ -143,11 +144,12 @@ public class SMTTermNumber extends SMTTerm {
 
         // Negative, bounded value
         if (bitSize > 0 && intValue < 0) {
-            return tab + "(bvneg (_ bv" + String.valueOf(-intValue) + " " + bitSize + "))";
+            return tab + "(bvneg (_ bv" + -intValue + " " + bitSize + "))";
         }
 
-        if (bitSize > 0)
-            return tab + "(_ bv" + String.valueOf(intValue) + " " + bitSize + ")";
+        if (bitSize > 0) {
+            return tab + "(_ bv" + intValue + " " + bitSize + ")";
+        }
 
         return tab + String.valueOf(intValue);
     }
@@ -155,14 +157,17 @@ public class SMTTermNumber extends SMTTerm {
     @Override
     public boolean equals(Object term) {
 
-        if (term == null)
+        if (term == null) {
             return false;
+        }
 
-        if (this == term)
+        if (this == term) {
             return true;
+        }
 
-        if (!(term instanceof SMTTermNumber))
+        if (!(term instanceof SMTTermNumber)) {
             return false;
+        }
         SMTTermNumber tn = (SMTTermNumber) term;
 
         return this.intValue == tn.intValue && this.bitSize == tn.bitSize;
@@ -170,14 +175,17 @@ public class SMTTermNumber extends SMTTerm {
 
     public boolean equals(SMTTerm term) {
 
-        if (term == null)
+        if (term == null) {
             return false;
+        }
 
-        if (this == term)
+        if (this == term) {
             return true;
+        }
 
-        if (!(term instanceof SMTTermNumber))
+        if (!(term instanceof SMTTermNumber)) {
             return false;
+        }
         SMTTermNumber tn = (SMTTermNumber) term;
 
         return this.intValue == tn.intValue && this.bitSize == tn.bitSize;
@@ -185,8 +193,9 @@ public class SMTTermNumber extends SMTTerm {
 
     public boolean equals(SMTTermNumber tn) {
 
-        if (this == tn)
+        if (this == tn) {
             return true;
+        }
 
         return this.intValue == tn.intValue && this.bitSize == tn.bitSize;
 

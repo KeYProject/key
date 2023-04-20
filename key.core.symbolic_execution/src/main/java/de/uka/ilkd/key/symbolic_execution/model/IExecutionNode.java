@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.Term;
@@ -9,6 +7,8 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * <p>
@@ -37,27 +37,27 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      * Prefix that is used in {@link IExecutionNode}s which represents an internal state in KeY
      * which is not part of the source code.
      */
-    public static final String INTERNAL_NODE_NAME_START = "<";
+    String INTERNAL_NODE_NAME_START = "<";
 
     /**
      * Suffix that is used in {@link IExecutionNode}s which represents an internal state in KeY
      * which is not part of the source code.
      */
-    public static final String INTERNAL_NODE_NAME_END = ">";
+    String INTERNAL_NODE_NAME_END = ">";
 
     /**
      * Returns the parent {@link IExecutionNode} or {@code null} if the current node is the root.
      *
      * @return The parent {@link IExecutionNode} or {@code null} on root.
      */
-    public IExecutionNode<?> getParent();
+    IExecutionNode<?> getParent();
 
     /**
      * Returns the available children.
      *
      * @return The available children.
      */
-    public IExecutionNode<?>[] getChildren();
+    IExecutionNode<?>[] getChildren();
 
     /**
      * Checks if this node has changed the path condition of the parent.
@@ -65,49 +65,49 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      * @return {@code true} has different path condition compared to its parent, {@code false} has
      *         same path condition as parent.
      */
-    public boolean isPathConditionChanged();
+    boolean isPathConditionChanged();
 
     /**
      * Returns the path condition to reach this node as {@link Term}.
      *
      * @return The path condition to reach this node as {@link Term}.
      */
-    public Term getPathCondition() throws ProofInputException;
+    Term getPathCondition() throws ProofInputException;
 
     /**
      * Returns the human readable path condition to reach this node as string.
      *
      * @return The human readable path condition as string.
      */
-    public String getFormatedPathCondition() throws ProofInputException;
+    String getFormatedPathCondition() throws ProofInputException;
 
     /**
      * Returns the method call stack.
      *
      * @return The method call stack.
      */
-    public IExecutionNode<?>[] getCallStack();
+    IExecutionNode<?>[] getCallStack();
 
     /**
      * Returns all available {@link IExecutionConstraint}s.
      *
      * @return The available {@link IExecutionConstraint}s.
      */
-    public IExecutionConstraint[] getConstraints();
+    IExecutionConstraint[] getConstraints();
 
     /**
      * Returns the active statement which is executed in the code.
      *
      * @return The active statement which is executed in the code.
      */
-    public S getActiveStatement();
+    S getActiveStatement();
 
     /**
      * Returns the {@link PositionInfo} of {@link #getActiveStatement()}.
      *
      * @return The {@link PositionInfo} of {@link #getActiveStatement()}.
      */
-    public PositionInfo getActivePositionInfo();
+    PositionInfo getActivePositionInfo();
 
     /**
      * Returns the variable value pairs of the current state.
@@ -115,7 +115,7 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      * @return The variable value pairs.
      * @throws ProofInputException Occurred Exception.
      */
-    public IExecutionVariable[] getVariables() throws ProofInputException;
+    IExecutionVariable[] getVariables() throws ProofInputException;
 
     /**
      * Returns the variable value pairs of the current state under the given condition.
@@ -123,7 +123,7 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      * @param condition A {@link Term} specifying some additional constraints to consider.
      * @return The variable value pairs.
      */
-    public IExecutionVariable[] getVariables(Term condition) throws ProofInputException;
+    IExecutionVariable[] getVariables(Term condition) throws ProofInputException;
 
     /**
      * Returns the number of memory layouts.
@@ -131,7 +131,7 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      * @return The number of memory layouts.
      * @throws ProofInputException Occurred Exception.
      */
-    public int getLayoutsCount() throws ProofInputException;
+    int getLayoutsCount() throws ProofInputException;
 
     /**
      * Returns the equivalence classes of the memory layout with the given index.
@@ -140,7 +140,7 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      * @return The equivalence classes of the memory layout at the given index.
      * @throws ProofInputException Occurred Exception.
      */
-    public ImmutableList<ISymbolicEquivalenceClass> getLayoutsEquivalenceClasses(int layoutIndex)
+    ImmutableList<ISymbolicEquivalenceClass> getLayoutsEquivalenceClasses(int layoutIndex)
             throws ProofInputException;
 
     /**
@@ -150,7 +150,7 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      * @return The initial memory layout at the given index.
      * @throws ProofInputException Occurred Exception.
      */
-    public ISymbolicLayout getInitialLayout(int layoutIndex) throws ProofInputException;
+    ISymbolicLayout getInitialLayout(int layoutIndex) throws ProofInputException;
 
     /**
      * Returns the current memory layout which shows the memory structure before the current node in
@@ -160,14 +160,14 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      * @return The current memory layout at the given index.
      * @throws ProofInputException Occurred Exception.
      */
-    public ISymbolicLayout getCurrentLayout(int layoutIndex) throws ProofInputException;
+    ISymbolicLayout getCurrentLayout(int layoutIndex) throws ProofInputException;
 
     /**
      * Returns all code blocks completed by this {@link IExecutionBlockStartNode}.
      *
      * @return All code blocks completed by this {@link IExecutionBlockStartNode}.
      */
-    public ImmutableList<IExecutionBlockStartNode<?>> getCompletedBlocks();
+    ImmutableList<IExecutionBlockStartNode<?>> getCompletedBlocks();
 
     /**
      * Returns the condition under which this node completes the code block of the given
@@ -178,7 +178,7 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      * @return The condition under which this node completes the code block of the given
      *         {@link IExecutionBlockStartNode}.
      */
-    public Term getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
+    Term getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
             throws ProofInputException;
 
     /**
@@ -190,7 +190,7 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      * @return The human readable condition under which this node completes the code block of the
      *         given {@link IExecutionBlockStartNode}.
      */
-    public String getFormatedBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
+    String getFormatedBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
             throws ProofInputException;
 
     /**
@@ -199,14 +199,14 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      * @param target The target {@link IExecutionNode}.
      * @return The found {@link IExecutionLink} or {@code null} if such a link is not available.
      */
-    public IExecutionLink getOutgoingLink(IExecutionNode<?> target);
+    IExecutionLink getOutgoingLink(IExecutionNode<?> target);
 
     /**
      * Returns all available outgoing links.
      *
      * @return The available outgoing links.
      */
-    public ImmutableList<IExecutionLink> getOutgoingLinks();
+    ImmutableList<IExecutionLink> getOutgoingLinks();
 
     /**
      * Returns the incoming {@link IExecutionLink}.
@@ -214,12 +214,12 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      * @param source The source {@link IExecutionNode}.
      * @return The found {@link IExecutionLink} or {@code null} if such a link is not available.
      */
-    public IExecutionLink getIncomingLink(IExecutionNode<?> source);
+    IExecutionLink getIncomingLink(IExecutionNode<?> source);
 
     /**
      * Returns all available incoming links.
      *
      * @return The available incoming links.
      */
-    public ImmutableList<IExecutionLink> getIncomingLinks();
+    ImmutableList<IExecutionLink> getIncomingLinks();
 }

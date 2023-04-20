@@ -1,14 +1,9 @@
 package de.uka.ilkd.key.gui.plugins.javac;
 
-import de.uka.ilkd.key.gui.PositionedIssueString;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.tools.*;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -17,7 +12,15 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import javax.annotation.Nonnull;
+import javax.tools.*;
+
+import de.uka.ilkd.key.gui.PositionedIssueString;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This facade checks whether the Java program to be verified is compilable using <code>javac</code>
@@ -87,19 +90,21 @@ public class JavaCompilerCheckFacade {
             paths.addAll(classPath);
         }
         paths.add(javaPath);
+        ArrayList<Path> files = new ArrayList<>();
+        for (File path : paths) {
+            if (!path.isDirectory()) {
+                continue;
+            }
+            try (var s = Files.walk(path.toPath())) {
+                s.filter(f -> !Files.isDirectory(f))
+                        .filter(f -> f.getFileName().toString().endsWith(".java"))
+                        .forEachOrdered(files::add);
+            } catch (IOException e) {
+                LOGGER.info("", e);
+            }
+        }
         Iterable<? extends JavaFileObject> compilationUnits =
-            fileManager.getJavaFileObjects(paths.stream()
-                    .filter(File::isDirectory)
-                    .flatMap(it -> {
-                        try {
-                            return Files.walk(it.toPath())
-                                    .filter(f -> !Files.isDirectory(f))
-                                    .filter(f -> f.getFileName().toString().endsWith(".java"));
-                        } catch (IOException e) {
-                            LOGGER.info("", e);
-                            return Stream.empty();
-                        }
-                    }).toArray(Path[]::new));
+            fileManager.getJavaFileObjects(files.toArray(new Path[0]));
 
         JavaCompiler.CompilationTask task = compiler.getTask(output, fileManager, diagnostics,
             new ArrayList<>(), classes, compilationUnits);
@@ -115,8 +120,8 @@ public class JavaCompilerCheckFacade {
                 it -> new PositionedIssueString(
                     it.getMessage(Locale.ENGLISH),
                     fileManager.asPath(it.getSource()).toFile().getAbsolutePath(),
-                    new Position((int) it.getLineNumber(), (int) it.getColumnNumber()),
-                    "" + it.getCode() + " " + it.getKind()))
+                    Position.newOneBased((int) it.getLineNumber(), (int) it.getColumnNumber()),
+                    it.getCode() + " " + it.getKind()))
                     .collect(Collectors.toList());
         });
     }

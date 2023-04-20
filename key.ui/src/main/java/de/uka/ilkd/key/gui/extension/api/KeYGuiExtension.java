@@ -4,13 +4,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Collection;
 import java.util.List;
-
+import javax.annotation.Nonnull;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JToolBar;
-
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.GoalList;

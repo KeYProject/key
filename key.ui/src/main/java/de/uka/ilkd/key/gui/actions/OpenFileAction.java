@@ -1,15 +1,15 @@
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.nio.file.Path;
-
 import javax.swing.*;
 
-import de.uka.ilkd.key.gui.ProofSelectionDialog;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.ProofSelectionDialog;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 public class OpenFileAction extends MainWindowAction {
@@ -41,11 +41,10 @@ public class OpenFileAction extends MainWindowAction {
                 Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
                 if (proofPath == null) {
                     // canceled by user!
-                    return;
                 } else {
                     mainWindow.loadProofFromBundle(file, proofPath.toFile());
-                    return;
                 }
+                return;
             }
 
             if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getNotifyLoadBehaviour()

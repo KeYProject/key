@@ -2,16 +2,20 @@ package de.uka.ilkd.key.rule;
 
 import java.util.List;
 import java.util.Objects;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import java.util.concurrent.atomic.AtomicLong;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
+    public static final AtomicLong PERF_EXECUTE = new AtomicLong();
+    public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();
 
     protected final BuiltInRule builtInRule;
 
@@ -22,7 +26,7 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
             ImmutableList<PosInOccurrence> ifInsts) {
         this.builtInRule = rule;
         this.pio = pio;
-        this.ifInsts = (ifInsts == null ? ImmutableSLList.<PosInOccurrence>nil() : ifInsts);
+        this.ifInsts = (ifInsts == null ? ImmutableSLList.nil() : ifInsts);
     }
 
     protected AbstractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio) {
@@ -64,18 +68,22 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
      * @return list of new created goals
      */
     @Override
-    public ImmutableList<Goal> execute(Goal goal, Services services) {
-        goal.addAppliedRuleApp(this);
-        ImmutableList<Goal> result = null;
+    public @Nullable ImmutableList<Goal> execute(Goal goal, Services services) {
+        var time = System.nanoTime();
+        var timeSetSequent = Goal.PERF_SET_SEQUENT.get();
         try {
-            result = builtInRule.apply(goal, services, this);
-        } catch (RuleAbortException rae) {
+            goal.addAppliedRuleApp(this);
+            try {
+                return Objects.requireNonNull(builtInRule.apply(goal, services, this));
+            } catch (RuleAbortException rae) {
+                goal.removeLastAppliedRuleApp();
+                goal.node().setAppliedRuleApp(null);
+                return null;
+            }
+        } finally {
+            PERF_EXECUTE.getAndAdd(System.nanoTime() - time);
+            PERF_SET_SEQUENT.getAndAdd(Goal.PERF_SET_SEQUENT.get() - timeSetSequent);
         }
-        if (result == null) {
-            goal.removeLastAppliedRuleApp();
-            goal.node().setAppliedRuleApp(null);
-        }
-        return result;
     }
 
     public abstract AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos);

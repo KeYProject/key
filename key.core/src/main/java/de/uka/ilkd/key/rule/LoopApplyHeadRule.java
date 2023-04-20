@@ -1,8 +1,6 @@
 package de.uka.ilkd.key.rule;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -21,6 +19,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.ForToWhileTransformation;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopContractImpl;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * <p>
@@ -57,6 +59,7 @@ public class LoopApplyHeadRule implements BuiltInRule {
      */
     public static final Name NAME = new Name("Loop Apply Head");
 
+    @Nonnull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp application)
             throws RuleAbortException {

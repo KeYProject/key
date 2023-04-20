@@ -4,9 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -27,6 +24,9 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * A contract for checking the well-definedness of a specification for a method or model field.
@@ -106,10 +106,10 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             ContractFactory.generateContractTypeName("JML model field", rep.getKJT(),
                 rep.getTarget(), rep.getTarget().getContainerType()),
             0, rep.getTarget(), rep.getOrigVars(), Type.OPERATION_CONTRACT, services);
-        Map<LocationVariable, Term> pres = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> pres = new LinkedHashMap<>();
         pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
             rep.getOrigVars().self == null ? TB.tt() : TB.inv(TB.var(rep.getOrigVars().self)));
-        Map<ProgramVariable, Term> deps = new LinkedHashMap<ProgramVariable, Term>();
+        Map<ProgramVariable, Term> deps = new LinkedHashMap<>();
         for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
             deps.put(heap, TB.allLocs());
         }
@@ -190,7 +190,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @return a list of schema variables
      */
     private ImmutableList<ParsableVariable> paramsSV() {
-        ImmutableList<ParsableVariable> paramsSV = ImmutableSLList.<ParsableVariable>nil();
+        ImmutableList<ParsableVariable> paramsSV = ImmutableSLList.nil();
         for (ProgramVariable pv : getOrigVars().params) {
             paramsSV = paramsSV.append(
                 SchemaVariableFactory.createTermSV(pv.name(), pv.getKeYJavaType().getSort()));
@@ -223,7 +223,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             assert params != null;
             final ProgramVariable selfVar =
                 self instanceof ProgramVariable ? (ProgramVariable) self : null;
-            ImmutableList<ProgramVariable> paramVars = ImmutableSLList.<ProgramVariable>nil();
+            ImmutableList<ProgramVariable> paramVars = ImmutableSLList.nil();
             for (ParsableVariable pv : params) {
                 assert pv instanceof ProgramVariable : pv.toString();
                 paramVars = paramVars.append((ProgramVariable) pv);
@@ -295,9 +295,9 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final SchemaVariable selfSV =
             SchemaVariableFactory.createTermSV(new Name("callee"), getKJT().getSort());
         final ImmutableList<ParsableVariable> paramsSV = paramsSV();
-        String ps = "";
+        StringBuilder ps = new StringBuilder();
         for (ProgramVariable pv : getOrigVars().params) {
-            ps = ps + " " + pv.getKeYJavaType().getFullName();
+            ps.append(" ").append(pv.getKeYJavaType().getFullName());
         }
         final Term[] args = getArgs(selfSV, heapSV, heapAtPreSV, isStatic, twoState, paramsSV);
         if (isNormal(services)) {
@@ -401,9 +401,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     public boolean isModel() {
         if (getMethodContract() instanceof FunctionalOperationContract) {
             final IProgramMethod pm = (IProgramMethod) getTarget();
-            if (pm.isModel()) {
-                return true;
-            }
+            return pm.isModel();
         }
         return false;
     }
@@ -417,9 +415,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     public MethodWellDefinedness combine(WellDefinednessCheck wdc, TermServices services) {
         assert wdc instanceof MethodWellDefinedness;
         final MethodWellDefinedness mwd = (MethodWellDefinedness) wdc;
-        assert getMethodContract() instanceof FunctionalOperationContract
-                ? getMethodContract().getName().equals(mwd.getMethodContract().getName())
-                : true;
+        assert !(getMethodContract() instanceof FunctionalOperationContract)
+                || getMethodContract().getName().equals(mwd.getMethodContract().getName());
         assert this.getMethodContract().id() == mwd.getMethodContract().id();
         assert this.getMethodContract().getTarget().equals(mwd.getMethodContract().getTarget());
         assert this.getMethodContract().getKJT().equals(mwd.getMethodContract().getKJT());

@@ -34,7 +34,7 @@ public class StaticFieldCondition extends VariableConditionAdapter {
     public boolean check(SchemaVariable var, SVSubstitute instCandidate, SVInstantiations instMap,
             Services services) {
         final Object o = instMap.getInstantiation(field);
-        if (o == null || !(o instanceof Term)) {
+        if (!(o instanceof Term)) {
             return false;
         }
         final Term f = (Term) o;
@@ -68,7 +68,7 @@ public class StaticFieldCondition extends VariableConditionAdapter {
                 return false;
             }
             final boolean result = attribute.isStatic();
-            return !negated ? result : !result;
+            return negated != result;
         }
         return false;
     }

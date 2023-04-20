@@ -1,5 +1,13 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
+import java.lang.ref.WeakReference;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.text.html.HTMLDocument;
+
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -7,13 +15,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
-import javax.swing.text.html.HTMLDocument;
-import java.lang.ref.WeakReference;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.util.UnicodeHelper.*;
 
@@ -32,6 +35,7 @@ import static de.uka.ilkd.key.util.UnicodeHelper.*;
  * @author Dominic Scheurer
  */
 public class HTMLSyntaxHighlighter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HTMLSyntaxHighlighter.class);
 
     // The below two constants are thresholds used to decide whether
     // syntax highlighting for program variables should be realized
@@ -194,7 +198,7 @@ public class HTMLSyntaxHighlighter {
             // Syntax highlighting should never break the system;
             // so we catch all throwables. However, a bug should
             // be filed with the stack trace printed here.
-            t.printStackTrace();
+            LOGGER.warn("Syntax highlighting failed", t);
             return toHTML(plainTextString);
         }
 
@@ -267,7 +271,7 @@ public class HTMLSyntaxHighlighter {
      * @return The concatenated array, elements separated by the given delimiter.
      */
     private static String concat(String delim, Iterable<?> strings) {
-        return concat(delim, strings, input -> input.toString());
+        return concat(delim, strings, Object::toString);
     }
 
     /**

@@ -2,6 +2,9 @@
 
 package recoder.kit;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.ProgramFactory;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Package;
@@ -10,9 +13,6 @@ import recoder.java.reference.PackageReference;
 import recoder.service.ChangeHistory;
 import recoder.service.CrossReferenceSourceInfo;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * this class implements basic functions for package handling.
@@ -37,8 +37,9 @@ public class PackageKit {
         PackageReference result = null;
         String name = p.getFullName();
         /* Fix by T.Gutzmann */
-        if (name.equals(""))
+        if (name.equals("")) {
             return null; // null is admissible as prefix
+        }
         int i, j = -1;
         do {
             i = j + 1;
@@ -57,7 +58,7 @@ public class PackageKit {
      *         {@link recoder.java.declaration.TypeDeclaration}s.
      */
     public static List<ClassType> getNonSourcePackageTypes(Package pkg) {
-        List<ClassType> result = new ArrayList<ClassType>();
+        List<ClassType> result = new ArrayList<>();
         List<? extends ClassType> classes = pkg.getTypes();
         for (int i = classes.size() - 1; i >= 0; i -= 1) {
             ClassType ct = classes.get(i);

@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.smt.hierarchy;
 
-import de.uka.ilkd.key.logic.sort.Sort;
-
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * Represents a node in the class hierarchy. Each SortNode contains a Sort and links to SortNodes

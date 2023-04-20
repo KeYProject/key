@@ -1,11 +1,5 @@
 package org.key_project.slicing.graph;
 
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.util.Pair;
-import org.key_project.slicing.analysis.AnalysisResults;
-import org.key_project.slicing.DependencyNodeData;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -13,6 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
+
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.slicing.DependencyNodeData;
+import org.key_project.slicing.analysis.AnalysisResults;
 
 /**
  * Exports a {@link DependencyGraph} in DOT format.

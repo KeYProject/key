@@ -34,7 +34,7 @@ public class Conditional extends Operator {
      */
 
     public Conditional(Expression guard, Expression thenExpr, Expression elseExpr) {
-        children = new ASTArrayList<Expression>(getArity());
+        children = new ASTArrayList<>(getArity());
         children.add(guard);
         children.add(thenExpr);
         children.add(elseExpr);

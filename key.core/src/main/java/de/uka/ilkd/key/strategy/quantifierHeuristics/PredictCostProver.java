@@ -4,15 +4,15 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * TODO: rewrite, this seems pretty inefficient ...
@@ -27,7 +27,7 @@ public class PredictCostProver {
     private ImmutableSet<Term> assertLiterals;
 
     /** clauses from <code>instance</code> of CNF */
-    private Set<Clause> clauses = new LinkedHashSet<Clause>();
+    private Set<Clause> clauses = new LinkedHashSet<>();
 
     private final Services services;
 
@@ -64,7 +64,7 @@ public class PredictCostProver {
     }
 
     private ImmutableSet<ImmutableSet<Term>> createClause(ImmutableSet<Term> set) {
-        final ImmutableSet<ImmutableSet<Term>> nil = DefaultImmutableSet.<ImmutableSet<Term>>nil();
+        final ImmutableSet<ImmutableSet<Term>> nil = DefaultImmutableSet.nil();
         ImmutableSet<ImmutableSet<Term>> res = nil.add(DefaultImmutableSet.<Term>nil());
         for (Term t : set) {
             ImmutableSet<ImmutableSet<Term>> tmp = nil;
@@ -196,7 +196,7 @@ public class PredictCostProver {
     private long firstRefine() {
         long cost = 1;
         boolean assertChanged = false;
-        Set<Clause> res = new LinkedHashSet<Clause>();
+        Set<Clause> res = new LinkedHashSet<>();
         for (final Clause c : clauses) {
             c.firstRefine();
             long cCost = c.cost();
@@ -243,7 +243,7 @@ public class PredictCostProver {
     private class Clause implements Iterable<Term> {
 
         /** all literals contains in this clause */
-        private ImmutableSet<Term> literals = DefaultImmutableSet.<Term>nil();
+        private ImmutableSet<Term> literals = DefaultImmutableSet.nil();
 
         public Clause(ImmutableSet<Term> lits) {
             literals = lits;
@@ -302,7 +302,7 @@ public class PredictCostProver {
          * that can't be removed by refining
          */
         public ImmutableSet<Term> refine(Iterable<? extends Term> assertLits) {
-            ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();
+            ImmutableSet<Term> res = DefaultImmutableSet.nil();
             for (final Term lit : this) {
                 final Operator op = proveLiteral(lit, assertLits).op();
                 if (op == Junctor.TRUE) {

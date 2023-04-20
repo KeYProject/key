@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -13,12 +18,14 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import javax.annotation.Nonnull;
 
 import org.antlr.v4.runtime.Token;
+
 import org.key_project.util.collection.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Objects of this type represent the various JML specification constructs in textual, unprocessed
@@ -120,11 +127,11 @@ public abstract class TextualJMLConstruct {
             item.put(HeapLDT.BASE_HEAP_NAME.toString(), l);
             return;
         }
-        List<String> hs = new ArrayList<String>();
+        List<String> hs = new ArrayList<>();
         while (t.startsWith("<") && !t.startsWith("<inv>")) {
             for (Name heapName : HeapLDT.VALID_HEAP_NAMES) {
                 for (String hName : new String[] { heapName.toString(),
-                    heapName.toString() + "AtPre" }) {
+                    heapName + "AtPre" }) {
                     String h = "<" + hName + ">";
                     if (t.startsWith(h)) {
                         hs.add(hName);

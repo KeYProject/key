@@ -44,7 +44,7 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
     public ConstructorDeclaration(VisibilityModifier modifier, Identifier name,
             ASTList<ParameterDeclaration> parameters, Throws exceptions, StatementBlock body) {
         super(null, null, name, parameters, exceptions, body);
-        ASTList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>(1);
+        ASTList<DeclarationSpecifier> mods = new ASTArrayList<>(1);
         if (mods != null) {
             mods.add(modifier);
             setDeclarationSpecifiers(mods);

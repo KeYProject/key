@@ -5,7 +5,6 @@ package de.uka.ilkd.key.gui.notification;
 
 import java.util.EnumMap;
 import java.util.Map;
-
 import javax.swing.JFrame;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -22,13 +21,13 @@ import de.uka.ilkd.key.proof.ProofEvent;
 public class NotificationManager {
 
     /** list of notification tasks */
-    private Map<NotificationEventID, NotificationTask> notificationTasks =
-        new EnumMap<NotificationEventID, NotificationTask>(NotificationEventID.class);
+    private final Map<NotificationEventID, NotificationTask> notificationTasks =
+        new EnumMap<>(NotificationEventID.class);
 
     /** true if we are currently in automode */
     private boolean autoMode = false;
 
-    private NotificationListener notificationListener;
+    private final NotificationListener notificationListener;
 
     public void setDefaultNotification(JFrame comp) {
         notificationTasks.clear();

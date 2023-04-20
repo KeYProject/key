@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.symbolic_execution.testcase.strategy;
 
+import java.io.IOException;
+import java.util.Map;
+import javax.xml.parsers.ParserConfigurationException;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -9,12 +13,9 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointSt
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.LineBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.util.HashMap;
 
 
 public class TestLineBreakpointStopConditionSimpleWithLoopInvariant
@@ -25,7 +26,7 @@ public class TestLineBreakpointStopConditionSimpleWithLoopInvariant
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> envMain = null;
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> envSomethingMain = null;
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> envSomethingLocalMain = null;
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
         try {
             // Define test settings

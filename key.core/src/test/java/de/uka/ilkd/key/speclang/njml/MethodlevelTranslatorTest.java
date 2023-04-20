@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.speclang.njml;
 
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.stream.Stream;
+
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -29,8 +29,9 @@ public class MethodlevelTranslatorTest {
         JmlParser parser = new JmlParser(new CommonTokenStream(lexer));
         try {
             JmlParser.Methodlevel_commentContext ctx = parser.methodlevel_comment();
-            if (parser.getNumberOfSyntaxErrors() != 0)
+            if (parser.getNumberOfSyntaxErrors() != 0) {
                 debugLexer(expr);
+            }
         } catch (Exception e) {
             debugLexer(expr);
         }

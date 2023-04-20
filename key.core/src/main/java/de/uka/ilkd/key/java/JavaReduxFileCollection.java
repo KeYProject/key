@@ -6,17 +6,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import recoder.io.DataLocation;
 import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.FileCollection;
 import de.uka.ilkd.key.util.KeYResourceManager;
+
+import recoder.io.DataLocation;
 
 /**
  * This is a special {@link FileCollection} which allows to retrieve the internally stored java boot
@@ -49,7 +51,7 @@ public class JavaReduxFileCollection implements FileCollection {
     /**
      * This list stores all resources to be retrieved. It is fed by the constructor.
      */
-    private List<String> resources = new ArrayList<String>();
+    private final List<String> resources = new ArrayList<>();
 
     /**
      * Instantiates a new file collection.
@@ -76,7 +78,7 @@ public class JavaReduxFileCollection implements FileCollection {
         }
 
         try (final BufferedReader r =
-            new BufferedReader(new InputStreamReader(jlURL.openStream()))) {
+            new BufferedReader(new InputStreamReader(jlURL.openStream(), StandardCharsets.UTF_8))) {
             for (String jl = r.readLine(); (jl != null); jl = r.readLine()) {
                 // ignore comments and empty lines
                 if ((jl.length() == 0) || (jl.charAt(0) == '#')) {
@@ -124,7 +126,7 @@ public class JavaReduxFileCollection implements FileCollection {
         /**
          * The iterator to wrap, it iterates the resources to open.
          */
-        private Iterator<String> iterator;
+        private final Iterator<String> iterator;
 
         /**
          * The currently open resource. null before the first step and after the last step.
@@ -142,8 +144,9 @@ public class JavaReduxFileCollection implements FileCollection {
         }
 
         public DataLocation getCurrentDataLocation() throws NoSuchElementException {
-            if (currentURL == null)
+            if (currentURL == null) {
                 throw new NoSuchElementException("Location of " + current + " not found.");
+            }
 
             return new URLDataLocation(currentURL);
         }
@@ -157,8 +160,9 @@ public class JavaReduxFileCollection implements FileCollection {
         }
 
         public InputStream openCurrent() throws IOException, NoSuchElementException {
-            if (current == null)
+            if (current == null) {
                 throw new NoSuchElementException();
+            }
 
             if (currentURL == null) {
                 throw new FileNotFoundException("cannot find " + resourceLocation + "/" + current);

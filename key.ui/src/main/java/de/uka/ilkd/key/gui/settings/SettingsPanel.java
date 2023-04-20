@@ -1,20 +1,21 @@
 package de.uka.ilkd.key.gui.settings;
 
 
-import de.uka.ilkd.key.gui.KeYFileChooser;
-import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
-import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
-import net.miginfocom.layout.AC;
-import net.miginfocom.layout.CC;
-import net.miginfocom.layout.LC;
-import net.miginfocom.swing.MigLayout;
-import javax.annotation.Nullable;
-
-import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import javax.annotation.Nullable;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.KeYFileChooser;
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
+import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+
+import net.miginfocom.layout.AC;
+import net.miginfocom.layout.CC;
+import net.miginfocom.layout.LC;
+import net.miginfocom.swing.MigLayout;
 
 /**
  * Extension of {@link SimpleSettingsPanel} which uses {@link MigLayout} to create a nice
@@ -54,8 +55,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      */
     protected void addRowWithHelp(String info, JComponent... components) {
         boolean hasInfo = info != null && !info.isEmpty();
-        for (int i = 0, length = components.length; i < length; i++) {
-            JComponent component = components[i];
+        for (JComponent component : components) {
             component.setAlignmentX(LEFT_ALIGNMENT);
             // last component, either line break or info
             pCenter.add(component);

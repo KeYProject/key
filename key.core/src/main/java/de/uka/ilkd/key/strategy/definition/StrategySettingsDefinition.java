@@ -1,13 +1,14 @@
 package de.uka.ilkd.key.strategy.definition;
 
+import java.util.ArrayList;
+
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Triple;
-import org.key_project.util.collection.ImmutableArray;
 
-import java.util.ArrayList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * <p>
@@ -74,10 +75,10 @@ public class StrategySettingsDefinition {
 
     static {
         STD_FURTHER_DEFAULTS =
-            new ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>>();
+            new ArrayList<>();
 
         // Java verification standard preset (tested in TimSort case study)
-        STD_FURTHER_DEFAULTS.add(new Triple<String, Integer, IDefaultStrategyPropertiesFactory>(
+        STD_FURTHER_DEFAULTS.add(new Triple<>(
             "Java verif. std.", 7000, () -> {
                 final StrategyProperties newProps =
                     IDefaultStrategyPropertiesFactory.DEFAULT_FACTORY
@@ -120,7 +121,7 @@ public class StrategySettingsDefinition {
             }));
 
         // Simplification preset
-        STD_FURTHER_DEFAULTS.add(new Triple<String, Integer, IDefaultStrategyPropertiesFactory>(
+        STD_FURTHER_DEFAULTS.add(new Triple<>(
             "Simplification", 5000, () -> {
                 final StrategyProperties newProps =
                     IDefaultStrategyPropertiesFactory.DEFAULT_FACTORY
@@ -202,7 +203,7 @@ public class StrategySettingsDefinition {
         this.propertiesTitle = propertiesTitle;
         this.defaultPropertiesFactory = defaultPropertiesFactory;
         this.furtherDefaults = furtherDefaults;
-        this.properties = new ImmutableArray<AbstractStrategyPropertyDefinition>(properties);
+        this.properties = new ImmutableArray<>(properties);
     }
 
     /**

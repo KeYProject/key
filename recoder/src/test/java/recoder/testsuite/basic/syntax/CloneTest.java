@@ -1,5 +1,7 @@
 package recoder.testsuite.basic.syntax;
 
+import java.util.List;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import recoder.ProgramFactory;
@@ -9,16 +11,13 @@ import recoder.java.CompilationUnit;
 import recoder.java.ProgramElement;
 import recoder.testsuite.basic.BasicTestsSuite;
 
-import java.util.List;
-
 public class CloneTest extends TestCase {
 
     public void testClone() {
         SourceFileRepository sfr = BasicTestsSuite.getConfig().getSourceFileRepository();
         ProgramFactory pf = BasicTestsSuite.getConfig().getProgramFactory();
         List<CompilationUnit> units = sfr.getCompilationUnits();
-        for (int i = 0; i < units.size(); i += 1) {
-            CompilationUnit cu = units.get(i);
+        for (CompilationUnit cu : units) {
             String buffer1 = cu.toSource();
             CompilationUnit cv = cu.deepClone();
             if (!ProgramElement.STRUCTURAL_EQUALITY.equals(cu, cv)) {

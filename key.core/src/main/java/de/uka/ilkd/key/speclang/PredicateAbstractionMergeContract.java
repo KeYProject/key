@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.speclang;
 
+import java.util.*;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -9,11 +13,8 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
-import org.key_project.util.java.MapUtil;
 
-import java.util.*;
-import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
+import org.key_project.util.java.MapUtil;
 
 /**
  * A {@link MergeContract} for the {@link MergeWithPredicateAbstraction} {@link MergeProcedure}.
@@ -95,7 +96,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
             final Term newPred = or.replace(pred.getPredicateFormWithPlaceholder().second);
             return AbstractionPredicate.create(newPred,
                 pred.getPredicateFormWithPlaceholder().first, services);
-        }).collect(Collectors.toCollection(() -> new ArrayList<>()));
+        }).collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override
@@ -125,7 +126,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
      * @return
      */
     private Map<Term, Term> getReplaceMap(Map<LocationVariable, Term> atPres, Services services) {
-        final Map<Term, Term> result = new LinkedHashMap<Term, Term>();
+        final Map<Term, Term> result = new LinkedHashMap<>();
 
         if (atPres != null) {
             for (Map.Entry<LocationVariable, Term> en : this.atPres.entrySet()) {

@@ -1,20 +1,20 @@
 
 package de.uka.ilkd.key.util.rifl;
 
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.Map.Entry;
 
+import de.uka.ilkd.key.util.LinkedHashMap;
+import de.uka.ilkd.key.util.Pair;
+
 import org.key_project.util.collection.KeYCollections;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import de.uka.ilkd.key.util.LinkedHashMap;
-import de.uka.ilkd.key.util.Pair;
 
 import static de.uka.ilkd.key.util.rifl.SpecificationEntity.*;
 

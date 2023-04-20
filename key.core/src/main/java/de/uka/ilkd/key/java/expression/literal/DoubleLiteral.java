@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.logic.Name;
+
 import org.key_project.util.ExtList;
 
 /**
@@ -40,7 +41,7 @@ public class DoubleLiteral extends Literal {
      */
 
     public DoubleLiteral(double value) {
-        this.value = "" + value;
+        this.value = String.valueOf(value);
     }
 
     /**

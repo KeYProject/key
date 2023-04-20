@@ -2,10 +2,6 @@ package de.uka.ilkd.key.util;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -15,6 +11,9 @@ import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * Provides utility methods which makes it easier to analyze the type hierarchy of
@@ -207,7 +206,7 @@ public final class KeYTypeUtil {
             return resolveType(((KeYJavaType) type).getJavaType());
         } else if (type instanceof ArrayType) {
             ArrayType arrayType = (ArrayType) type;
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append(resolveType(arrayType.getBaseType()));
             for (int i = 0; i < arrayType.getDimension(); i++) {
                 sb.append("[]");

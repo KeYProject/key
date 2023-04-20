@@ -1,8 +1,9 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import bibliothek.gui.dock.common.CLocation;
-import bibliothek.gui.dock.common.DefaultMultipleCDockable;
-import bibliothek.gui.dock.common.NullMultipleCDockableFactory;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYSelectionModel;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
@@ -12,9 +13,9 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
+import bibliothek.gui.dock.common.CLocation;
+import bibliothek.gui.dock.common.DefaultMultipleCDockable;
+import bibliothek.gui.dock.common.NullMultipleCDockableFactory;
 
 /**
  * @author Alexander Weigl

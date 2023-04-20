@@ -289,14 +289,18 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     public int getChildCount() {
         int result = 0;
-        if (accessPath != null)
+        if (accessPath != null) {
             result++;
-        if (typeReference != null)
+        }
+        if (typeReference != null) {
             result++;
-        if (children != null)
+        }
+        if (children != null) {
             result += children.size();
-        if (anonymousClass != null)
+        }
+        if (anonymousClass != null) {
             result++;
+        }
         return result;
     }
 
@@ -311,13 +315,15 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     public ProgramElement getChildAt(int index) {
         int len;
         if (accessPath != null) {
-            if (index == 0)
+            if (index == 0) {
                 return accessPath;
+            }
             index--;
         }
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
             index--;
         }
         if (children != null) {
@@ -328,8 +334,9 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
             index -= len;
         }
         if (anonymousClass != null) {
-            if (index == 0)
+            if (index == 0) {
                 return anonymousClass;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();

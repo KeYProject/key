@@ -1,17 +1,5 @@
 package org.key_project.slicing.ui;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import org.key_project.slicing.analysis.AnalysisResults;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.util.ArrayDeque;
@@ -25,6 +13,20 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.swing.*;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+
+import org.key_project.slicing.analysis.AnalysisResults;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dialog to monitor slicing progress.
@@ -177,10 +179,10 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
                         filename != null ? filename.getName() : results.proof.name().toString();
                     tableRows.add(List.of(
                         label,
-                        "" + results.totalSteps,
-                        "" + results.usefulStepsNr,
-                        "" + results.proof.countBranches(),
-                        "" + results.usefulBranchesNr));
+                        String.valueOf(results.totalSteps),
+                        String.valueOf(results.usefulStepsNr),
+                        String.valueOf(results.proof.countBranches()),
+                        String.valueOf(results.usefulBranchesNr)));
                     SwingUtilities.invokeLater(this::updateTable);
                 } catch (Exception e) {
                     LOGGER.error("failed to record statistics ", e);

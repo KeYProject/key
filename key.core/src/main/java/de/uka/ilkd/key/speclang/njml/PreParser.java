@@ -1,15 +1,17 @@
 package de.uka.ilkd.key.speclang.njml;
 
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import org.antlr.v4.runtime.ParserRuleContext;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 public class PreParser {
     /** warnings */

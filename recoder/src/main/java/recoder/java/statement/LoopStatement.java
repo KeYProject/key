@@ -118,14 +118,18 @@ public abstract class LoopStatement extends JavaStatement
 
     public int getChildCount() {
         int result = 0;
-        if (inits != null)
+        if (inits != null) {
             result += inits.size();
-        if (guard != null)
+        }
+        if (guard != null) {
             result++;
-        if (updates != null)
+        }
+        if (updates != null) {
             result += updates.size();
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -148,8 +152,9 @@ public abstract class LoopStatement extends JavaStatement
         }
         if (isCheckedBeforeIteration()) {
             if (guard != null) {
-                if (index == 0)
+                if (index == 0) {
                     return guard;
+                }
                 index--;
             }
         }
@@ -161,14 +166,16 @@ public abstract class LoopStatement extends JavaStatement
             index -= len;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         if (!isCheckedBeforeIteration()) {
             if (guard != null) {
-                if (index == 0)
+                if (index == 0) {
                     return guard;
+                }
                 index--;
             }
         }
@@ -275,8 +282,9 @@ public abstract class LoopStatement extends JavaStatement
 
     public int getExpressionCount() {
         int result = 0;
-        if (guard != null)
+        if (guard != null) {
             result += 1;
+        }
         if (inits != null) {
             for (int i = inits.size() - 1; i >= 0; i -= 1) {
                 if (inits.get(i) instanceof Expression) {
