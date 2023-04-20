@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.gui.proofdiff;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +30,12 @@ public class SequentDifferencesView extends JPanel {
 
     private Sequent left, right;
     private final KeyAction actionHideCommonFormulas = new HideCommandFormulaAction();
+    private final VisibleTermLabels termLabels;
 
-    public SequentDifferencesView(Services servicesLeft, Services servicesRight) {
+    public SequentDifferencesView(Services servicesLeft, Services servicesRight, VisibleTermLabels termLabels) {
         this.servicesLeft = servicesLeft;
         this.servicesRight = servicesRight;
+        this.termLabels = termLabels;
         var boxLayout = new BoxLayout(this, BoxLayout.Y_AXIS);
         setLayout(boxLayout);
 
@@ -70,7 +72,7 @@ public class SequentDifferencesView extends JPanel {
 
     private void updateView() {
         removeAll();
-        SequentDifference pd = SequentDifference.create(servicesLeft, servicesRight, left, right);
+        SequentDifference pd = SequentDifference.create(servicesLeft, servicesRight, left, right, termLabels);
         fill("Antecedent Differences", pd.getAntecPairs());
         fill("Succedent Differences", pd.getSuccPairs());
         invalidate();

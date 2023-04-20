@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.gui.proofdiff;
 
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -34,15 +33,13 @@ public class SequentDifference {
     private final Set<String> exclusiveSucc = new HashSet<>();
     private final Set<String> commonAntec = new HashSet<>();
 
-    public static SequentDifference create(Services servicesLeft, Services servicesRight, Sequent left, Sequent right) {
-        var termLabels = MainWindow.getInstance().getVisibleTermLabels();
+    public static SequentDifference create(Services servicesLeft, Services servicesRight, Sequent left, Sequent right, VisibleTermLabels termLabels) {
         Function<Term, String> printerLeft = createPrinter(servicesLeft, termLabels);
         Function<Term, String> printerRight = createPrinter(servicesRight, termLabels);
-
         return create(left, right, printerLeft, printerRight);
     }
 
-    private static Function<Term, String> createPrinter(Services services, VisibleTermLabels termLabels) {
+    public static Function<Term, String> createPrinter(Services services, VisibleTermLabels termLabels) {
         var settings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         final NotationInfo ni = new NotationInfo();
         ni.refresh(services, settings.isUsePretty(), settings.isUseUnicode());

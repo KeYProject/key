@@ -6,6 +6,7 @@ import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.SpecNameLabel;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.TacletApp;
 import org.slf4j.Logger;
@@ -44,16 +45,17 @@ public class NameLabelOf implements BranchNamingFunction {
             var name = term.getLabel(SpecNameLabel.NAME);
 
             if (name != null) {
-                return (String) name.getChild(0);
+                return LogicPrinter.quickPrintTerm(term, services);
             }
 
             var origin = (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
             if (origin != null) {
                 return origin.toString();
             }
+            return LogicPrinter.quickPrintTerm(term, services);
         } catch (ClassCastException e) {
             LOGGER.info("Unexpected non-term value.", e);
+            return value.toString();
         }
-        return value.toString();
     }
 }

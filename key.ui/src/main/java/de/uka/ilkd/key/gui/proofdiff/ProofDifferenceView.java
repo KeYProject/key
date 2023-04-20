@@ -8,6 +8,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.help.HelpFacade;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -41,11 +42,11 @@ public class ProofDifferenceView extends JPanel {
     private final JComboBox<Proof> listLeftProof = new JComboBox<>();
     private final JComboBox<Proof> listRightProof = new JComboBox<>();
 
-    public ProofDifferenceView(@Nonnull Node left, @Nonnull Node right, KeYMediator mediator) {
+    public ProofDifferenceView(@Nonnull Node left, @Nonnull Node right, KeYMediator mediator, VisibleTermLabels termLabels) {
         this.mediator = mediator;
         this.services = mediator.getServices();
 
-        contentPanel = new SequentDifferencesView(left.proof().getServices(), right.proof().getServices());
+        contentPanel = new SequentDifferencesView(left.proof().getServices(), right.proof().getServices(), termLabels);
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         setLayout(new BorderLayout());
         add(new JScrollPane(contentPanel));
@@ -147,7 +148,7 @@ public class ProofDifferenceView extends JPanel {
             if (proof == null)
                 return null;
             return proof.findAny(n -> n.serialNr() == serialNr);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
 
         }
         return null;
@@ -206,13 +207,6 @@ public class ProofDifferenceView extends JPanel {
         }
     }
 
-    /*
-     * private Component wrapScrollable(JComponent component, String title) { JPanel titlePanel =
-     * new JPanel(new BorderLayout()); titlePanel.add(component);
-     * titlePanel.setBorder(BorderFactory.createTitledBorder(title)); return new
-     * JScrollPane(titlePanel); }
-     */
-
     static class MyPanel extends JPanel implements Scrollable {
         private static final long serialVersionUID = -3046025680639399997L;
 
@@ -255,7 +249,7 @@ public class ProofDifferenceView extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             ProofDifferenceView pdv =
-                    new ProofDifferenceView(left, left.parent(), mainWindow.getMediator());
+                    new ProofDifferenceView(left, left.parent(), mainWindow.getMediator(), mainWindow.getVisibleTermLabels());
             var dockable = pdv.asDockable();
             mainWindow.getDockControl().addDockable(dockable);
             dockable.setLocation(CLocation.base());
