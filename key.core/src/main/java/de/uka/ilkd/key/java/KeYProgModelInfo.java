@@ -213,17 +213,6 @@ public class KeYProgModelInfo {
         return rt.getFullName();
     }
 
-    private recoder.abstraction.Type getType(TypeReference tr) {
-        recoder.abstraction.Type result;
-        if (tr instanceof TypeRef) {
-            result = (recoder.abstraction.Type) rec2key().toRecoder(tr.getKeYJavaType());
-            return result;
-        }
-        result = getServConf().getSourceInfo()
-                .getType((recoder.java.reference.TypeReference) rec2key().toRecoder(tr));
-        return result;
-    }
-
 
     public boolean isFinal(KeYJavaType kjt) {
         final recoder.abstraction.Type recoderType =
@@ -362,30 +351,6 @@ public class KeYProgModelInfo {
 
 
     /**
-     * Returns the list of most specific methods with the given name that are defined in the given
-     * type or in a supertype where they are visible for the given type, and have a signature that
-     * is compatible to the given one. If used to resolve a method call, the result should be
-     * defined and unambiguous.
-     *
-     * @param ct the class type to get methods from.
-     * @param m the name of the methods in question.
-     * @param signature the statical type signature of a callee.
-     */
-
-    private ImmutableList<Method> getMethods(KeYJavaType ct, String m, ImmutableList<Type> signature,
-            KeYJavaType context) {
-        List<recoder.abstraction.Method> rml = getRecoderMethods(ct, m, signature, context);
-        ImmutableList<Method> result = ImmutableSLList.nil();
-        for (int i = rml.size() - 1; i >= 0; i--) {
-            recoder.abstraction.Method rm = rml.get(i);
-            Method method = (Method) rec2key().toKeY(rm);
-            result = result.prepend(method);
-        }
-        return result;
-    }
-
-
-    /**
      * Returns the methods locally defined within the given class type. If the type is represented
      * in source code, the returned list matches the syntactic order.
      *
@@ -485,7 +450,7 @@ public class KeYProgModelInfo {
         for (int i = 0; i < members.size(); i++) {
             final MemberDeclaration member = members.get(i);
             if (member instanceof IProgramMethod
-                    && ((IProgramMethod) member).getMethodDeclaration().getName().equals(name)) {
+                    && Objects.equals(((IProgramMethod) member).getMethodDeclaration().getName(), name)) {
                 return (IProgramMethod) member;
             }
         }
@@ -822,11 +787,6 @@ public class KeYProgModelInfo {
             }
         }
         return false;
-    }
-
-    private void putImplicitMethod(IProgramMethod m, KeYJavaType t) {
-        Map<String, IProgramMethod> map = implicits.computeIfAbsent(t, k -> new LinkedHashMap<>());
-        map.put(m.name().toString(), m);
     }
 
 
