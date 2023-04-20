@@ -93,7 +93,8 @@ public class JPKeYProgModelInfo {
      */
     public ImmutableList<Method> getAllMethods(KeYJavaType kjt) {
         var rmethods = getAllRecoderMethods(kjt);
-        return rmethods.stream().map(it -> ((IProgramMethod) rec2key().toKeY(it.getDeclaration().toAst().get())).getMethodDeclaration()).collect(ImmutableList.collector());
+        return rmethods.stream().map(it -> ((IProgramMethod) rec2key().toKeY(it.getDeclaration().toAst().get()))
+                .getMethodDeclaration()).collect(ImmutableList.collector());
     }
 
 
@@ -170,7 +171,7 @@ public class JPKeYProgModelInfo {
 
     public boolean isFinal(KeYJavaType kjt) {
         var recoderType = (com.github.javaparser.ast.type.Type) rec2key().toRecoder(kjt);
-        if (recoderType.isClassOrInterfaceType()) { //TODO enum declarations and records!
+        if (recoderType.isClassOrInterfaceType()) { //TODO weigl enum declarations and records!
             var rt = recoderType.asClassOrInterfaceType().resolve();
             var td = rt.asReferenceType().getTypeDeclaration().get();
             var node = (NodeWithModifiers<?>) td.asClass().toAst().get();

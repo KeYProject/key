@@ -40,6 +40,7 @@ import de.uka.ilkd.key.util.parsing.BuildingIssue;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.net.URI;
 import java.time.chrono.IsoChronology;
@@ -300,10 +301,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }*/
 
 
-    private <T extends Object> T accept(Node check) {
+    @Nonnull
+    private <T extends Object> T accept(@Nonnull Node check) {
         var a = check.accept(this, null);
         mapping.put(check, a);
-        return (T) a;
+        return Objects.requireNonNull((T) a);
     }
 
     private PositionInfo createPositionInfo(Node node) {
