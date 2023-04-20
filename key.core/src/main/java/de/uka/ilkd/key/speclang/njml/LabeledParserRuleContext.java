@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.speclang.njml;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -7,12 +10,6 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * This class maps a {@link ParserRuleContext} to a {@link TermLabel}.

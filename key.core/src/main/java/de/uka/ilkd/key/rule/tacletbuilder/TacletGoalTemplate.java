@@ -1,17 +1,13 @@
 package de.uka.ilkd.key.rule.tacletbuilder;
 
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.branchlabel.BranchNamingFunction;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
-import javax.annotation.Nullable;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;

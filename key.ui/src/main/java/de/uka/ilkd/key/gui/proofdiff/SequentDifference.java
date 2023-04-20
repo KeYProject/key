@@ -13,6 +13,7 @@ import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.Triple;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,13 +34,15 @@ public class SequentDifference {
     private final Set<String> exclusiveSucc = new HashSet<>();
     private final Set<String> commonAntec = new HashSet<>();
 
-    public static SequentDifference create(Services servicesLeft, Services servicesRight, Sequent left, Sequent right, VisibleTermLabels termLabels) {
+    public static SequentDifference create(Services servicesLeft, Services servicesRight,
+            Sequent left, Sequent right, VisibleTermLabels termLabels) {
         Function<Term, String> printerLeft = createPrinter(servicesLeft, termLabels);
         Function<Term, String> printerRight = createPrinter(servicesRight, termLabels);
         return create(left, right, printerLeft, printerRight);
     }
 
-    public static Function<Term, String> createPrinter(Services services, VisibleTermLabels termLabels) {
+    public static Function<Term, String> createPrinter(Services services,
+            VisibleTermLabels termLabels) {
         var settings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         final NotationInfo ni = new NotationInfo();
         ni.refresh(services, settings.isUsePretty(), settings.isUseUnicode());
@@ -57,8 +60,8 @@ public class SequentDifference {
     }
 
     public static SequentDifference create(Sequent left, Sequent right,
-                                           Function<Term, String> printerLeft,
-                                           Function<Term, String> printerRight) {
+            Function<Term, String> printerLeft,
+            Function<Term, String> printerRight) {
         SequentDifference pd = new SequentDifference();
         assert left != null && right != null;
         pd.leftAntec = initialise(printerLeft, left.antecedent());
@@ -70,7 +73,7 @@ public class SequentDifference {
     }
 
     private static List<String> initialise(Function<Term, String> printer,
-                                           Semisequent semisequent) {
+            Semisequent semisequent) {
         return semisequent.asList().stream().map(it -> printer.apply(it.formula()))
                 .collect(Collectors.toList());
     }
@@ -82,12 +85,12 @@ public class SequentDifference {
     }
 
     private static void computeDiff(List<String> left, List<String> right, Set<String> common,
-                                    Set<String> exclusive) {
+            Set<String> exclusive) {
         computeDiff(new HashSet<>(left), new HashSet<>(right), common, exclusive);
     }
 
     private static void computeDiff(Set<String> left, Set<String> right, Set<String> common,
-                                    Set<String> exclusive) {
+            Set<String> exclusive) {
         common.addAll(intersect(left, right));
         exclusive.addAll(left);
         exclusive.addAll(right);
@@ -113,9 +116,9 @@ public class SequentDifference {
     static List<Matching> findPairs(List<String> left, List<String> right) {
         List<Matching> pairs = new ArrayList<>(left.size() + right.size());
         int initCap =
-                Math.max(8, Math.max(left.size() * right.size(), Math.max(left.size(), right.size())));
+            Math.max(8, Math.max(left.size() * right.size(), Math.max(left.size(), right.size())));
         PriorityQueue<Triple<Integer, Integer, Integer>> queue =
-                new PriorityQueue<>(initCap, Comparator.comparingInt((t) -> t.third));
+            new PriorityQueue<>(initCap, Comparator.comparingInt((t) -> t.third));
         for (int i = 0; i < left.size(); i++) {
             for (int j = 0; j < right.size(); j++) {
                 queue.add(new Triple<>(i, j, Levensthein.calculate(left.get(i), right.get(j))));
@@ -211,8 +214,8 @@ public class SequentDifference {
                         dp[i][j] = i;
                     } else {
                         dp[i][j] = min(
-                                dp[i - 1][j - 1] + costOfSubstitution(x.charAt(i - 1), y.charAt(j - 1)),
-                                dp[i - 1][j] + 1, dp[i][j - 1] + 1);
+                            dp[i - 1][j - 1] + costOfSubstitution(x.charAt(i - 1), y.charAt(j - 1)),
+                            dp[i - 1][j] + 1, dp[i][j - 1] + 1);
                     }
                 }
             }

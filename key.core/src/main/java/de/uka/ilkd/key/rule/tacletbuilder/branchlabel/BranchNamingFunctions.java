@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.rule.tacletbuilder.branchlabel;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import javax.annotation.Nonnull;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Common definitions of {@link BranchNamingFunction}s including a register of known functions.

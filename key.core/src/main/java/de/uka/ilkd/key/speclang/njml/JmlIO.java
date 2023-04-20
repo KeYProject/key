@@ -20,9 +20,8 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.key_project.util.collection.ImmutableArray;
 
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -162,7 +161,6 @@ public class JmlIO {
     }
 
 
-
     /**
      * Parse and interpret the given string as an JML expression in the current context.
      */
@@ -219,7 +217,6 @@ public class JmlIO {
         OriginTermLabel origin = new OriginTermLabel(new OriginTermLabel.Origin(type));
         final var termBuilder = services.getTermBuilder();
         return termBuilder.addLabel(term, origin);
-        }
     }
 
 
@@ -414,7 +411,4 @@ public class JmlIO {
     public void clearWarnings() {
         warnings = ImmutableSLList.nil();
     }
-
-    // region
-    // endregion
 }

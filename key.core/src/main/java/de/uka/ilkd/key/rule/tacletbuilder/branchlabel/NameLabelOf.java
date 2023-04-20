@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.rule.tacletbuilder.branchlabel;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
@@ -9,10 +11,9 @@ import de.uka.ilkd.key.logic.label.SpecNameLabel;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.TacletApp;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * {@code NameLabelOf} tries to find a the {@link de.uka.ilkd.key.logic.label.TermLabel}

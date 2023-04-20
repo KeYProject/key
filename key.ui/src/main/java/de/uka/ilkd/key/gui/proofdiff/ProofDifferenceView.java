@@ -1,8 +1,16 @@
 package de.uka.ilkd.key.gui.proofdiff;
 
-import bibliothek.gui.dock.common.CLocation;
-import bibliothek.gui.dock.common.DefaultMultipleCDockable;
-import bibliothek.gui.dock.common.NullMultipleCDockableFactory;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.util.Enumeration;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.swing.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
@@ -12,16 +20,9 @@ import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.swing.*;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.util.Enumeration;
+import bibliothek.gui.dock.common.CLocation;
+import bibliothek.gui.dock.common.DefaultMultipleCDockable;
+import bibliothek.gui.dock.common.NullMultipleCDockableFactory;
 
 /**
  * @author Alexander Weigl
@@ -42,11 +43,13 @@ public class ProofDifferenceView extends JPanel {
     private final JComboBox<Proof> listLeftProof = new JComboBox<>();
     private final JComboBox<Proof> listRightProof = new JComboBox<>();
 
-    public ProofDifferenceView(@Nonnull Node left, @Nonnull Node right, KeYMediator mediator, VisibleTermLabels termLabels) {
+    public ProofDifferenceView(@Nonnull Node left, @Nonnull Node right, KeYMediator mediator,
+            VisibleTermLabels termLabels) {
         this.mediator = mediator;
         this.services = mediator.getServices();
 
-        contentPanel = new SequentDifferencesView(left.proof().getServices(), right.proof().getServices(), termLabels);
+        contentPanel = new SequentDifferencesView(left.proof().getServices(),
+            right.proof().getServices(), termLabels);
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         setLayout(new BorderLayout());
         add(new JScrollPane(contentPanel));
@@ -99,9 +102,9 @@ public class ProofDifferenceView extends JPanel {
         ListCellRenderer<? super Proof> renderer = new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                                                          boolean isSelected, boolean cellHasFocus) {
+                    boolean isSelected, boolean cellHasFocus) {
                 return super.getListCellRendererComponent(list, ((Proof) value).name(), index,
-                        isSelected, cellHasFocus);
+                    isSelected, cellHasFocus);
             }
         };
         listRightProof.setRenderer(renderer);
@@ -128,14 +131,15 @@ public class ProofDifferenceView extends JPanel {
 
     public DefaultMultipleCDockable asDockable() {
         var dockable = new DefaultMultipleCDockable(NullMultipleCDockableFactory.NULL,
-                "Proof Differences", this);
+            "Proof Differences", this);
         dockable.setCloseable(true);
         dockable.setRemoveOnClose(true);
         dockable.addAction(HelpFacade.createHelpButton("user/NodeDiff/"));
         dockable.setLayout(new BorderLayout());
         addPropertyChangeListener(evt -> {
             if (this.left != null && this.right != null) {
-                dockable.setTitleText("Difference between: " + left.serialNr() + " and " + right.serialNr());
+                dockable.setTitleText(
+                    "Difference between: " + left.serialNr() + " and " + right.serialNr());
             }
         });
         return dockable;
@@ -219,7 +223,7 @@ public class ProofDifferenceView extends JPanel {
         }
 
         public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation,
-                                               int direction) {
+                int direction) {
             return 0;
         }
 
@@ -231,7 +235,8 @@ public class ProofDifferenceView extends JPanel {
             return true;
         }
 
-        public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+        public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation,
+                int direction) {
             return 0;
         }
     }
@@ -249,7 +254,8 @@ public class ProofDifferenceView extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             ProofDifferenceView pdv =
-                    new ProofDifferenceView(left, left.parent(), mainWindow.getMediator(), mainWindow.getVisibleTermLabels());
+                new ProofDifferenceView(left, left.parent(), mainWindow.getMediator(),
+                    mainWindow.getVisibleTermLabels());
             var dockable = pdv.asDockable();
             mainWindow.getDockControl().addDockable(dockable);
             dockable.setLocation(CLocation.base());

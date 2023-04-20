@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.rule.tacletbuilder.branchlabel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.uka.ilkd.key.nparser.KeYLexer;
 import de.uka.ilkd.key.nparser.ParsingFacade;
+
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Token;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Parser for branch labels.

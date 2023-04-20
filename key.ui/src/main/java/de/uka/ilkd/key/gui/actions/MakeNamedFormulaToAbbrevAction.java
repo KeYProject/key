@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.gui.actions;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.util.Iterator;
+import java.util.Objects;
+
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -7,11 +12,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.SpecNameLabel;
 import de.uka.ilkd.key.pp.AbbrevException;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.util.Iterator;
-import java.util.Objects;
 
 /**
  * @author Alexander Weigl

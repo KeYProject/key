@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nonnull;
@@ -14,18 +15,11 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
-import org.antlr.v4.runtime.ParserRuleContext;
-import javax.annotation.Nonnull;
-
-import org.antlr.v4.runtime.Token;
 
 import org.key_project.util.collection.ImmutableList;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 
 /**
  * Objects of this type represent the various JML specification constructs in textual, unprocessed

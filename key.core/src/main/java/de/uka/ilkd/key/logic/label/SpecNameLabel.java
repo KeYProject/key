@@ -1,9 +1,7 @@
 package de.uka.ilkd.key.logic.label;
 
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.TermServices;
 
-import java.util.List;
 
 /**
  * A label that is associated with the name of a term.

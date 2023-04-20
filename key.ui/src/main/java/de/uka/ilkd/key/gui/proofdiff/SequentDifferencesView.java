@@ -1,20 +1,21 @@
 package de.uka.ilkd.key.gui.proofdiff;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.List;
+import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.List;
 
 /**
  * @author Alexander Weigl
@@ -32,7 +33,8 @@ public class SequentDifferencesView extends JPanel {
     private final KeyAction actionHideCommonFormulas = new HideCommandFormulaAction();
     private final VisibleTermLabels termLabels;
 
-    public SequentDifferencesView(Services servicesLeft, Services servicesRight, VisibleTermLabels termLabels) {
+    public SequentDifferencesView(Services servicesLeft, Services servicesRight,
+            VisibleTermLabels termLabels) {
         this.servicesLeft = servicesLeft;
         this.servicesRight = servicesRight;
         this.termLabels = termLabels;
@@ -45,7 +47,8 @@ public class SequentDifferencesView extends JPanel {
             }
         });
 
-        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().addSettingsListener(e -> updateView());
+        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .addPropertyChangeListener(e -> updateView());
     }
 
     public Sequent getLeft() {
@@ -53,7 +56,8 @@ public class SequentDifferencesView extends JPanel {
     }
 
     public void setLeft(Sequent left) {
-        if (left == null) return;
+        if (left == null)
+            return;
         var oldValue = this.left;
         this.left = left;
         firePropertyChange(PROPERTY_LEFT, oldValue, left);
@@ -64,7 +68,8 @@ public class SequentDifferencesView extends JPanel {
     }
 
     public void setRight(Sequent right) {
-        if (right == null) return;
+        if (right == null)
+            return;
         var oldValue = this.right;
         this.right = right;
         firePropertyChange(PROPERTY_RIGHT, oldValue, right);
@@ -72,7 +77,8 @@ public class SequentDifferencesView extends JPanel {
 
     private void updateView() {
         removeAll();
-        SequentDifference pd = SequentDifference.create(servicesLeft, servicesRight, left, right, termLabels);
+        SequentDifference pd =
+            SequentDifference.create(servicesLeft, servicesRight, left, right, termLabels);
         fill("Antecedent Differences", pd.getAntecPairs());
         fill("Succedent Differences", pd.getSuccPairs());
         invalidate();
@@ -85,7 +91,8 @@ public class SequentDifferencesView extends JPanel {
     private void fill(String title, List<SequentDifference.Matching> pairs) {
         Box pane = new Box(BoxLayout.Y_AXIS);
         pane.setBorder(BorderFactory.createTitledBorder(title));
-        if (!pairs.isEmpty()) add(pane);
+        if (!pairs.isEmpty())
+            add(pane);
         for (SequentDifference.Matching pair : pairs) {
             // hideCommonFormulas --> distance != 0
             if (!isHideCommonFormulas() || pair.distance > 0) { // skip formulas that have no
@@ -112,7 +119,7 @@ public class SequentDifferencesView extends JPanel {
 
     private static void equaliseSize(JComponent txtL, JComponent txtR) {
         Dimension max = new Dimension(Math.max(txtL.getWidth(), txtR.getWidth()),
-                Math.max(txtL.getHeight(), txtR.getHeight()));
+            Math.max(txtL.getHeight(), txtR.getHeight()));
         txtR.setSize(max);
         txtL.setSize(max);
         txtR.setPreferredSize(max);
@@ -140,10 +147,12 @@ public class SequentDifferencesView extends JPanel {
         try {
             for (int i = 0; i < Math.min(l.length, r.length); i++) {
                 int start = i;
-                for (; i < Math.min(l.length, r.length); i++) ;
+                for (; i < Math.min(l.length, r.length); i++);
                 if (start != i) {
-                    df1.addHighlight(start, i, new DefaultHighlighter.DefaultHighlightPainter(Color.RED));
-                    df2.addHighlight(start, i, new DefaultHighlighter.DefaultHighlightPainter(Color.RED));
+                    df1.addHighlight(start, i,
+                        new DefaultHighlighter.DefaultHighlightPainter(Color.RED));
+                    df2.addHighlight(start, i,
+                        new DefaultHighlighter.DefaultHighlightPainter(Color.RED));
                 }
             }
         } catch (BadLocationException | NullPointerException e) {
