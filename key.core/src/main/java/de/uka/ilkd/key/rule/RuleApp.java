@@ -3,6 +3,9 @@
  */
 package de.uka.ilkd.key.rule;
 
+
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -31,6 +34,7 @@ public interface RuleApp extends EqualsModProofIrrelevancy {
      * @param services the Services encapsulating all java information
      * @return list of new created goals
      */
+    @Nullable
     ImmutableList<Goal> execute(Goal goal, Services services);
 
     /**

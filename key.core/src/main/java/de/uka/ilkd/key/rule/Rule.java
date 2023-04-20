@@ -3,6 +3,8 @@
  */
 package de.uka.ilkd.key.rule;
 
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
@@ -20,8 +22,9 @@ public interface Rule extends HasOrigin {
      * @param ruleApp the rule application to be executed
      * @return all open goals below \old(goal.node()), i.e. the goals resulting from the rule
      *         application
-     * @throws Exception
+     * @throws RuleAbortException when this rule was aborted
      */
+    @Nonnull
     ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException;
 

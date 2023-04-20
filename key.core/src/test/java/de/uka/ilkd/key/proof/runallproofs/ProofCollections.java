@@ -81,9 +81,10 @@ public class ProofCollections {
         // forkDebugPort = "wait:1234"
 
         /*
-         * By default runAllProofs does not print a lot of information.
+         * By default, runAllProofs does not print a lot of information.
          * Set this to true to get more output.
          */
+        settings.setVerboseOutput(true);
         // verboseOutput = true
 
         /*
@@ -597,7 +598,7 @@ public class ProofCollections {
         g.provable("standard_key/java_dl/methodCall.key");
         g.provable("standard_key/java_dl/methodCall1.key");
         g.provable("standard_key/java_dl/methodCall1box.key");
-        //// Commented out as this can not be proved modularly sound (See !183 which is related)
+        // Commented out as this can not be proved modularly sound (See !183 which is related)
         // g.provable("standard_key/java_dl/methodCall2.key");
         g.provable("standard_key/java_dl/methodCall3.key");
         g.provable("standard_key/java_dl/polishFlagSort.key");

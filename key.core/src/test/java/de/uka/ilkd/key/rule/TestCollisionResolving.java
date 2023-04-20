@@ -44,9 +44,7 @@ public class TestCollisionResolving {
         Node node = new Node(proof, seq);
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         BuiltInRuleAppIndex builtInRuleAppIndex = new BuiltInRuleAppIndex(null);
-        RuleAppIndex ruleAppIndex =
-            new RuleAppIndex(tacletIndex, builtInRuleAppIndex, proof.getServices());
-        goal = new Goal(node, ruleAppIndex);
+        goal = new Goal(node, tacletIndex, builtInRuleAppIndex, proof.getServices());
     }
 
     @AfterEach

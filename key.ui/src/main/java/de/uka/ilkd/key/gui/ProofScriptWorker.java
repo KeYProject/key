@@ -157,7 +157,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
         try {
             get();
         } catch (CancellationException ex) {
-            LOGGER.info("Scripting was cancelled.", ex);
+            LOGGER.info("Scripting was cancelled.");
         } catch (Throwable ex) {
             IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
         }

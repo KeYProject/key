@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -127,6 +128,7 @@ public class MergeRule implements BuiltInRule {
         return displayName();
     }
 
+    @Nonnull
     @Override
     public final ImmutableList<Goal> apply(Goal goal, final Services services, RuleApp ruleApp)
             throws RuleAbortException {
@@ -134,7 +136,7 @@ public class MergeRule implements BuiltInRule {
         final MergeRuleBuiltInRuleApp mergeRuleApp = (MergeRuleBuiltInRuleApp) ruleApp;
 
         if (!mergeRuleApp.complete()) {
-            return null;
+            throw new RuleAbortException("Merge rule not complete");
         }
 
         // The number of goals needed for side conditions related to

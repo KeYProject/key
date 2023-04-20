@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -41,6 +43,12 @@ import org.key_project.util.collection.ImmutableSLList;
  * Goal.
  */
 public final class Goal {
+
+    public static final AtomicLong PERF_APP_EXECUTE = new AtomicLong();
+    public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();
+    public static final AtomicLong PERF_UPDATE_TAG_MANAGER = new AtomicLong();
+    public static final AtomicLong PERF_UPDATE_RULE_APP_INDEX = new AtomicLong();
+    public static final AtomicLong PERF_UPDATE_LISTENERS = new AtomicLong();
 
     /**
      * If an application of a rule added some information for the strategy, then this information is
@@ -85,47 +93,36 @@ public final class Goal {
      */
     private NamespaceSet localNamespaces;
 
-    /*
-     * creates a new goal referencing the given node.
+    /**
+     * copy constructor
      */
     private Goal(Node node, RuleAppIndex ruleAppIndex, ImmutableList<RuleApp> appliedRuleApps,
             FormulaTagManager tagManager, AutomatedRuleApplicationManager ruleAppManager,
             Properties strategyInfos, NamespaceSet localNamespace) {
         this.node = node;
-        this.ruleAppIndex = ruleAppIndex;
+        this.ruleAppIndex = ruleAppIndex.copy(this);
         this.appliedRuleApps = appliedRuleApps;
-        this.tagManager = tagManager;
+        this.tagManager = tagManager == null ? new FormulaTagManager(this) : tagManager;
         this.goalStrategy = null;
-        this.ruleAppIndex.setup(this);
         this.strategyInfos = strategyInfos;
         setRuleAppManager(ruleAppManager);
-        this.localNamespaces = localNamespace;
-    }
-
-    private Goal(Node node, RuleAppIndex ruleAppIndex, ImmutableList<RuleApp> appliedRuleApps,
-            AutomatedRuleApplicationManager ruleAppManager, Properties strategyInfos,
-            NamespaceSet localNamespace) {
-        this.node = node;
-        this.ruleAppIndex = ruleAppIndex;
-        this.appliedRuleApps = appliedRuleApps;
-        this.goalStrategy = null;
-        this.ruleAppIndex.setup(this);
-        this.strategyInfos = strategyInfos;
-        setRuleAppManager(ruleAppManager);
-        this.tagManager = new FormulaTagManager(this);
         this.localNamespaces = localNamespace;
     }
 
     /**
      * creates a new goal referencing the given node
-     *
-     * @param namespaceSet
      */
-    public Goal(Node node, RuleAppIndex ruleAppIndex) {
-        this(node, ruleAppIndex, ImmutableSLList.nil(), null,
-            new QueueRuleApplicationManager(), new MapProperties(),
-            node.proof().getServices().getNamespaces().copyWithParent().copyWithParent());
-        tagManager = new FormulaTagManager(this);
+    public Goal(Node node, TacletIndex tacletIndex, BuiltInRuleAppIndex builtInRuleAppIndex,
+            Services services) {
+        this.node = node;
+        this.ruleAppIndex = new RuleAppIndex(tacletIndex, builtInRuleAppIndex, this, services);
+        this.appliedRuleApps = ImmutableSLList.nil();
+        this.goalStrategy = null;
+        this.strategyInfos = new MapProperties();
+        this.tagManager = new FormulaTagManager(this);
+        setRuleAppManager(new QueueRuleApplicationManager());
+        this.localNamespaces =
+            node.proof().getServices().getNamespaces().copyWithParent().copyWithParent();
     }
 
     /**
@@ -166,14 +163,14 @@ public final class Goal {
 
     public void setRuleAppManager(AutomatedRuleApplicationManager manager) {
         if (ruleAppManager != null) {
-            ruleAppIndex().removeNewRuleListener(ruleAppManager);
+            ruleAppIndex.setNewRuleListener(null);
             ruleAppManager.setGoal(null);
         }
 
         ruleAppManager = manager;
 
         if (ruleAppManager != null) {
-            ruleAppIndex().addNewRuleListener(ruleAppManager);
+            ruleAppIndex.setNewRuleListener(ruleAppManager);
             ruleAppManager.setGoal(this);
         }
     }
@@ -188,7 +185,7 @@ public final class Goal {
     /**
      * returns the namespaces for this goal.
      *
-     * @returns an up-to-date non-null namespaces-set.
+     * @return an up-to-date non-null namespaces-set.
      */
     public NamespaceSet getLocalNamespaces() {
         return localNamespaces;
@@ -221,11 +218,17 @@ public final class Goal {
      * event object.
      */
     private void fireSequentChanged(SequentChangeInfo sci) {
+        var time = System.nanoTime();
         getFormulaTagManager().sequentChanged(this, sci);
-        ruleAppIndex().sequentChanged(this, sci);
+        var time1 = System.nanoTime();
+        PERF_UPDATE_TAG_MANAGER.getAndAdd(time1 - time);
+        ruleAppIndex.sequentChanged(sci);
+        var time2 = System.nanoTime();
+        PERF_UPDATE_RULE_APP_INDEX.getAndAdd(time2 - time1);
         for (GoalListener listener : listeners) {
             listener.sequentChanged(this, sci);
         }
+        PERF_UPDATE_LISTENERS.getAndAdd(System.nanoTime() - time2);
     }
 
     private void fireGoalReplaced(Goal goal, Node parent, ImmutableList<Goal> newGoals) {
@@ -234,7 +237,7 @@ public final class Goal {
         }
     }
 
-    private void fireAautomaticStateChanged(boolean oldAutomatic, boolean newAutomatic) {
+    private void fireAutomaticStateChanged(boolean oldAutomatic, boolean newAutomatic) {
         for (GoalListener listener : listeners) {
             listener.automaticStateChanged(this, oldAutomatic, newAutomatic);
         }
@@ -252,7 +255,6 @@ public final class Goal {
         } else {
             node = p_node;
         }
-        ruleAppIndex.setup(this);
     }
 
     /**
@@ -324,7 +326,7 @@ public final class Goal {
         boolean oldAutomatic = automatic;
         automatic = t;
         node().clearNameCache();
-        fireAautomaticStateChanged(oldAutomatic, automatic);
+        fireAutomaticStateChanged(oldAutomatic, automatic);
     }
 
     /**
@@ -334,15 +336,6 @@ public final class Goal {
      */
     public boolean isLinked() {
         return this.linkedGoal != null;
-    }
-
-    /**
-     * Returns the goal that this goal is linked to.
-     *
-     * @return The goal that this goal is linked to (or null if there is no such one).
-     */
-    public Goal getLinkedGoal() {
-        return this.linkedGoal;
     }
 
     /**
@@ -360,14 +353,21 @@ public final class Goal {
     /**
      * sets the sequent of the node
      *
-     * @param sci SequentChangeInfo containing the sequent to be set and desribing the applied
-     *        changes to the sequent of the parent node
+     * @param sci SequentChangeInfo containing the sequent to be set and describing the applied
+     *        changes to the sequent of the node currently pointed to by this goal
      */
     public void setSequent(SequentChangeInfo sci) {
+        assert sci.getOriginalSequent() == node().sequent();
+        if (!sci.hasChanged()) {
+            assert sci.sequent().equals(sci.getOriginalSequent());
+            return;
+        }
         node().setSequent(sci.sequent());
         node().getNodeInfo().setSequentChangeInfo(sci);
-        // VK reminder: now update the index
+        var time = System.nanoTime();
+        // updates the index
         fireSequentChanged(sci);
+        PERF_SET_SEQUENT.getAndAdd(System.nanoTime() - time);
     }
 
     /**
@@ -449,14 +449,6 @@ public final class Goal {
     /**
      * Rebuild all rule caches
      */
-    public void updateRuleAppIndex() {
-        getRuleAppManager().clearCache();
-        ruleAppIndex.clearIndexes();
-    }
-
-    /**
-     * Rebuild all rule caches
-     */
     public void clearAndDetachRuleAppIndex() {
         getRuleAppManager().clearCache();
         ruleAppIndex.clearAndDetachCache();
@@ -490,11 +482,11 @@ public final class Goal {
     public Goal clone(Node node) {
         Goal clone;
         if (node.sequent() != this.node.sequent()) {
-            clone = new Goal(node, ruleAppIndex.copy(), appliedRuleApps, ruleAppManager.copy(),
+            clone = new Goal(node, ruleAppIndex, appliedRuleApps, null, ruleAppManager.copy(),
                 strategyInfos.clone(), localNamespaces);
         } else {
             clone =
-                new Goal(node, ruleAppIndex.copy(), appliedRuleApps, getFormulaTagManager().copy(),
+                new Goal(node, ruleAppIndex, appliedRuleApps, getFormulaTagManager().copy(),
                     ruleAppManager.copy(), strategyInfos.clone(), localNamespaces);
         }
         clone.listeners = (List<GoalListener>) ((ArrayList<GoalListener>) listeners).clone();
@@ -538,6 +530,7 @@ public final class Goal {
      *
      * @return the list of new created goals.
      */
+    @Nonnull
     public ImmutableList<Goal> split(int n) {
         ImmutableList<Goal> goalList = ImmutableSLList.nil();
 
@@ -619,29 +612,33 @@ public final class Goal {
          */
         NamespaceSet originalNamespaces = getLocalNamespaces();
         Services overlayServices = proof.getServices().getOverlay(originalNamespaces);
-        final ImmutableList<Goal> goalList = ruleApp.execute(this, overlayServices);
+        final ImmutableList<Goal> goalList;
+        var time = System.nanoTime();
+        try {
+            goalList = ruleApp.execute(this, overlayServices);
+        } finally {
+            PERF_APP_EXECUTE.getAndAdd(System.nanoTime() - time);
+        }
+        // can be null when the taclet failed to apply (RuleAbortException)
+        if (goalList == null) {
+            return null;
+        }
 
         proof.getServices().saveNameRecorder(n);
 
-        if (goalList != null) { // TODO: can goalList be null?
-            if (goalList.isEmpty()) {
-                proof.closeGoal(this);
-            } else {
-                proof.replace(this, goalList);
-                if (ruleApp instanceof TacletApp && ((TacletApp) ruleApp).taclet().closeGoal()) {
-                    // the first new goal is the one to be closed
-                    proof.closeGoal(goalList.head());
-                }
+        if (goalList.isEmpty()) {
+            proof.closeGoal(this);
+        } else {
+            proof.replace(this, goalList);
+            if (ruleApp instanceof TacletApp && ((TacletApp) ruleApp).taclet().closeGoal()) {
+                // the first new goal is the one to be closed
+                proof.closeGoal(goalList.head());
             }
         }
 
         adaptNamespacesNewGoals(goalList);
-
         final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(ruleApp);
-
-        if (goalList != null) {
-            proof.fireRuleApplied(new ProofEvent(proof, ruleAppInfo, goalList));
-        }
+        proof.fireRuleApplied(new ProofEvent(proof, ruleAppInfo, goalList));
         return goalList;
     }
 

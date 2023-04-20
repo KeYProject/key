@@ -261,9 +261,7 @@ public class TestSchemaModalOperators {
 
     private Goal createGoal(Node n, TacletIndex tacletIndex) {
         final BuiltInRuleAppIndex birIndex = new BuiltInRuleAppIndex(new BuiltInRuleIndex());
-        final RuleAppIndex ruleAppIndex =
-            new RuleAppIndex(tacletIndex, birIndex, n.proof().getServices());
-        return new Goal(n, ruleAppIndex);
+        return new Goal(n, tacletIndex, birIndex, n.proof().getServices());
     }
 
 }
