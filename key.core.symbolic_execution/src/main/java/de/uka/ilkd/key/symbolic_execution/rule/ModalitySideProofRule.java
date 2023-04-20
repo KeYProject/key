@@ -3,6 +3,7 @@ package de.uka.ilkd.key.symbolic_execution.rule;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -34,8 +35,6 @@ import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-
-import javax.annotation.Nonnull;
 
 /**
  * <p>
