@@ -234,7 +234,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
                     if (line.isEmpty() || line.charAt(0) == '#') {
                         continue;
                     }
-                    String[] fields = line.split("[|]");
+                    String[] fields = line.split("[|]", STYLES.length);
                     boolean skipByMsgFilter = msgFilterApply && !fields[5].contains(msgFilter);
                     boolean skipByPkgFilter = pkgFilterApply && !fields[4].startsWith(pkgFilter);
                     boolean skipErrorLevel = !levelError && "ERROR".equals(fields[1]);

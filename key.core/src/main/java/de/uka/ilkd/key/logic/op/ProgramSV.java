@@ -292,9 +292,6 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
 
         while (src != null) {
             if (!check(src, ec, services)) {
-                LOGGER.debug(
-                    "taclet: Stopped list matching because of " + "incompatible elements {} {}",
-                    this, src);
                 break;
             }
             matchedElements.add(src);

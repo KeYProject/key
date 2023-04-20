@@ -126,9 +126,8 @@ public abstract class AbstractProofControl implements ProofControl {
         if (pos != null && focusedGoal != null) {
             LOGGER.debug("NoPosTacletApp: Looking for applicables rule at node {}",
                 focusedGoal.node().serialNr());
-            return filterTaclet(focusedGoal, focusedGoal.ruleAppIndex()
-                    .getFindTaclet(TacletFilter.TRUE, pos, focusedGoal.proof().getServices()),
-                pos);
+            return filterTaclet(focusedGoal,
+                focusedGoal.ruleAppIndex().getFindTaclet(TacletFilter.TRUE, pos), pos);
         }
         return ImmutableSLList.nil();
     }
@@ -136,8 +135,8 @@ public abstract class AbstractProofControl implements ProofControl {
     @Override
     public ImmutableList<TacletApp> getRewriteTaclet(Goal focusedGoal, PosInOccurrence pos) {
         if (pos != null) {
-            return filterTaclet(focusedGoal, focusedGoal.ruleAppIndex().getRewriteTaclet(
-                TacletFilter.TRUE, pos, focusedGoal.proof().getServices()), pos);
+            return filterTaclet(focusedGoal,
+                focusedGoal.ruleAppIndex().getRewriteTaclet(TacletFilter.TRUE, pos), pos);
         }
 
         return ImmutableSLList.nil();

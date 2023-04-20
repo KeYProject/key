@@ -509,20 +509,20 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnForUpdates(ForUpdates x) {
-        // handled by loop methods
-        throw new UnsupportedOperationException();
+        writeCommaList(x.getUpdates());
     }
 
     @Override
     public void performActionOnGuard(Guard x) {
-        // handled by loop methods
-        throw new UnsupportedOperationException();
+        var child = x.getChildAt(0);
+        if (child != null) {
+            child.visit(this);
+        }
     }
 
     @Override
     public void performActionOnLoopInit(LoopInit x) {
-        // handled by loop methods
-        throw new UnsupportedOperationException();
+        writeCommaList(x.getInits());
     }
 
     @Override
@@ -947,8 +947,8 @@ public class PrettyPrinter implements Visitor {
         l.keyWord("while");
         l.print(" ");
         beginMultilineBracket();
-        if (x.getGuardExpression() != null) {
-            x.getGuardExpression().visit(this);
+        if (x.getGuard() != null) {
+            x.getGuard().visit(this);
         }
         endMultilineBracket();
         l.print(";");
@@ -993,13 +993,10 @@ public class PrettyPrinter implements Visitor {
 
         // there is no "getLoopInit" method
         // so get the first child of the for loop
+
         ILoopInit init = x.getILoopInit();
         if (init != null) {
-            if (init instanceof ProgramSV) {
-                init.visit(this);
-            } else {
-                writeCommaList(x.getInitializers());
-            }
+            init.visit(this);
         }
         l.print(";").brk();
         if (x.getGuardExpression() != null) {
@@ -1009,10 +1006,10 @@ public class PrettyPrinter implements Visitor {
 
         IForUpdates upd = x.getIForUpdates();
         if (upd != null) {
+            upd.visit(this);
             if (upd instanceof ProgramSV) {
-                upd.visit(this);
+
             } else {
-                writeCommaList(x.getUpdates());
             }
         }
         endMultilineBracket();
@@ -1668,8 +1665,7 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnThen(Then x) {
-        // Handled by if
-        throw new UnsupportedOperationException();
+        handleBlockOrSingleStatement(x.getBody());
     }
 
     @Override

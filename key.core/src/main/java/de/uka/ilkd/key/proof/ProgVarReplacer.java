@@ -49,31 +49,6 @@ public final class ProgVarReplacer {
         this.services = services;
     }
 
-
-    /**
-     * merges "next" into "base" precondition: "next" is the result of replacing in "base" the
-     * formula at position "idx" by calling Semisequent.replace() (this implies that "next" contains
-     * exactly one removed and one added formula)
-     */
-    public static void mergeSemiCIs(SemisequentChangeInfo base, SemisequentChangeInfo next,
-            int idx) {
-        assert next.modifiedFormulas().isEmpty();
-
-        Iterator<SequentFormula> remIt = next.removedFormulas().iterator();
-        assert remIt.hasNext();
-        SequentFormula remCf = remIt.next();
-        assert !remIt.hasNext();
-        base.removedFormula(idx, remCf);
-
-        Iterator<SequentFormula> addIt = next.addedFormulas().iterator();
-        assert addIt.hasNext();
-        SequentFormula addCf = addIt.next();
-        assert !addIt.hasNext();
-        base.addedFormula(idx, addCf);
-
-        base.setFormulaList(next.getFormulaList());
-    }
-
     /**
      * replaces in a set
      */

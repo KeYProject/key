@@ -158,6 +158,7 @@ public class KeYFile implements EnvInput {
     protected KeyAst.File getParseContext() {
         if (fileCtx == null) {
             try {
+                LOGGER.trace("Reading KeY file {}", file);
                 fileCtx = ParsingFacade.parseFile(file.getCharStream());
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -304,7 +305,6 @@ public class KeYFile implements EnvInput {
             throw new IllegalStateException("KeYFile: InitConfig not set.");
         }
         // read .key file
-        LOGGER.debug("Reading KeY file {}", file);
         ChoiceInformation ci = getParseContext().getChoices();
         initConfig.addCategory2DefaultChoices(ci.getDefaultOptions());
 
@@ -320,9 +320,6 @@ public class KeYFile implements EnvInput {
      * @return list of parser warnings
      */
     public ImmutableSet<PositionedString> readContracts() {
-        LOGGER.debug("Read specifications obtained when parsing the Java files " +
-            "(usually JML and Strings.key) from {}", file);
-
         SpecificationRepository specRepos = initConfig.getServices().getSpecificationRepository();
         ContractsAndInvariantsFinder cinvs =
             new ContractsAndInvariantsFinder(initConfig.getServices(), initConfig.namespaces());
