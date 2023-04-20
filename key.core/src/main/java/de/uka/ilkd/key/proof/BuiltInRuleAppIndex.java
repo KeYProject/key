@@ -122,7 +122,7 @@ public class BuiltInRuleAppIndex {
         }
     }
 
-    public void reportRuleApps(NewRuleListener l, Goal goal) {
+    public void reportRuleApps(Goal goal, NewRuleListener l) {
         var time = System.nanoTime();
         scanSimplificationRule(goal, l);
         sequentChangeInfo = null;
