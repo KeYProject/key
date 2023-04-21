@@ -170,7 +170,7 @@ public final class SMTFocusResults {
      * @param lastLine unsat core line
      * @return list of labels referenced in the unsat core
      */
-    private static Integer[] parseZ3Format(String lastLine) {
+    static Integer[] parseZ3Format(String lastLine) {
         lastLine = lastLine.substring(1, lastLine.length() - 1);
 
         String[] labels = lastLine.trim().split(" +");
@@ -194,7 +194,7 @@ public final class SMTFocusResults {
      * @param lines CVC5 output
      * @return list of labels referenced in unsat core
      */
-    private static Integer[] parseCVC5Format(String[] lines) {
+    static Integer[] parseCVC5Format(String[] lines) {
         for (int i = 0; i < lines.length; i++) {
             if (lines[i].equals("(")) {
                 Integer[] numbers = new Integer[lines.length - 2 - i];

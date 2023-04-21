@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
  * Tests for the unsat core saving infrastructure.
  */
 class TestUnsatCore {
-    public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
+    private static final File testCaseDirectory = FindResources.getTestCasesDirectory();
 
     @Test
     void testUnsatCore() throws ProblemLoaderException {
