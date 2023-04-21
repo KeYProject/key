@@ -142,7 +142,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         clutterRuleSets = vs.getClutterRuleSets();
         clutterRules = vs.getClutterRules();
-        vs.addSettingsListener(e -> {
+        vs.addPropertyChangeListener(e -> {
             clutterRuleSets = vs.getClutterRuleSets();
             clutterRules = vs.getClutterRules();
         });

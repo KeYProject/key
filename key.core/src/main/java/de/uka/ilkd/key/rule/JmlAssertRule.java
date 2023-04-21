@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.Optional;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
@@ -101,6 +102,7 @@ public final class JmlAssertRule implements BuiltInRule {
         return new JmlAssertBuiltInRuleApp(this, occurrence);
     }
 
+    @Nonnull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException {

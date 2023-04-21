@@ -300,7 +300,7 @@ public class Recoder2KeY implements JavaReader {
         de.uka.ilkd.key.java.CompilationUnit[] result =
             new de.uka.ilkd.key.java.CompilationUnit[cUnits.size()];
         for (int i = 0, sz = cUnits.size(); i < sz; i++) {
-            LOGGER.debug("converting now {}", cUnitStrings[i]);
+            LOGGER.trace("Converting {}", cUnitStrings[i]);
             try {
                 recoder.java.CompilationUnit cu = cUnits.get(i);
                 result[i] = getConverter().processCompilationUnit(cu, cu.getDataLocation());
@@ -1202,10 +1202,22 @@ public class Recoder2KeY implements JavaReader {
     /**
      * tries to parse recoders exception position information
      */
-    private static Position extractPositionInfo(String errorMessage) {
+    private static Pair<String, Position> extractPositionInfo(String errorMessage) {
         if (errorMessage == null || errorMessage.indexOf('@') == -1) {
-            return Position.UNDEFINED;
+            return null;
         }
+        String url = null;
+        int fileStart = errorMessage.indexOf("\"FILE:");
+        fileStart = fileStart == -1 ? errorMessage.indexOf("\"URL:") : fileStart;
+        fileStart = fileStart == -1 ? errorMessage.indexOf("\"ARCHIVE:") : fileStart;
+        if (fileStart != -1) {
+            fileStart += 1;
+            int fileEnd = errorMessage.indexOf("\"", fileStart);
+
+            url =
+                errorMessage.substring(fileStart, fileEnd == -1 ? errorMessage.length() : fileEnd);
+        }
+
         int line = -1;
         int column = -1;
         try {
@@ -1220,7 +1232,7 @@ public class Recoder2KeY implements JavaReader {
         } catch (StringIndexOutOfBoundsException siexc) {
             return null;
         }
-        return Position.newOneBased(line, column);
+        return new Pair<>(url, Position.newOneBased(line, column));
     }
 
     /**
@@ -1242,8 +1254,8 @@ public class Recoder2KeY implements JavaReader {
             throw (PosConvertException) cause;
         }
 
-        Position pos = extractPositionInfo(cause.toString());
-        reportErrorWithPositionInFile(message, cause, pos, null);
+        var pos = extractPositionInfo(cause.toString());
+        reportErrorWithPositionInFile(message, cause, pos.second, pos.first);
     }
 
     public static void reportErrorWithPositionInFile(String message, Throwable cause,

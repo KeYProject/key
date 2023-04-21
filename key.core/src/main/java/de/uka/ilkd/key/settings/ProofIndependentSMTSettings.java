@@ -8,45 +8,42 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
 public final class ProofIndependentSMTSettings
-        implements de.uka.ilkd.key.settings.Settings, Cloneable {
+        extends AbstractSettings {
 
-    private static final String ACTIVE_SOLVER = "[SMTSettings]ActiveSolver";
-
-    private static final String KEY_TIMEOUT = "[SMTSettings]SolverTimeout";
-
-
-    private static final String PATH_FOR_SMT_TRANSLATION = "[SMTSettings]pathForSMTTranslation";
-
-    private static final String PATH_FOR_TACLET_TRANSLATION =
+    public static final String ACTIVE_SOLVER = "[SMTSettings]ActiveSolver";
+    public static final String KEY_TIMEOUT = "[SMTSettings]SolverTimeout";
+    public static final String PATH_FOR_SMT_TRANSLATION = "[SMTSettings]pathForSMTTranslation";
+    public static final String PATH_FOR_TACLET_TRANSLATION =
         "[SMTSettings]pathForTacletTranslation";
-
-    private static final String SHOW_SMT_RES_DIA = "[SMTSettings]showSMTResDialog";
-
-
-    private static final String PROGRESS_DIALOG_MODE = "[SMTSettings]modeOfProgressDialog";
-
-
-    private static final String MAX_CONCURRENT_PROCESSES = "[SMTSettings]maxConcurrentProcesses";
+    public static final String SHOW_SMT_RES_DIA = "[SMTSettings]showSMTResDialog";
+    public static final String PROGRESS_DIALOG_MODE = "[SMTSettings]modeOfProgressDialog";
+    public static final String MAX_CONCURRENT_PROCESSES = "[SMTSettings]maxConcurrentProcesses";
 
     /*
      * The following properties are used to set the bit sizes for bounded counter example
      * generation.
      */
-    private static final String INT_BOUND = "[SMTSettings]intBound";
-    private static final String HEAP_BOUND = "[SMTSettings]heapBound";
-    private static final String FIELD_BOUND = "[SMTSettings]fieldBound";
-    private static final String OBJECT_BOUND = "[SMTSettings]objectBound";
-    private static final String LOCSET_BOUND = "[SMTSettings]locsetBound";
+    public static final String INT_BOUND = "[SMTSettings]intBound";
+    public static final String HEAP_BOUND = "[SMTSettings]heapBound";
+    public static final String FIELD_BOUND = "[SMTSettings]fieldBound";
+    public static final String OBJECT_BOUND = "[SMTSettings]objectBound";
+    public static final String LOCSET_BOUND = "[SMTSettings]locsetBound";
 
-    private static final String SOLVER_PARAMETERS = "[SMTSettings]solverParametersV1";
-    private static final String SOLVER_COMMAND = "[SMTSettings]solverCommand";
-    private static final String PROP_TIMEOUT = "[SMTSettings]timeout";
-    private static final String SOLVER_CHECK_FOR_SUPPORT = "[SMTSettings]checkForSupport";
+    public static final String SOLVER_PARAMETERS = "[SMTSettings]solverParametersV1";
+    public static final String SOLVER_COMMAND = "[SMTSettings]solverCommand";
+    public static final String PROP_TIMEOUT = "[SMTSettings]timeout";
+    public static final String SOLVER_CHECK_FOR_SUPPORT = "[SMTSettings]checkForSupport";
 
     private static final ProofIndependentSMTSettings DEFAULT_DATA =
         new ProofIndependentSMTSettings();
 
     private static final int DEFAULT_BIT_LENGTH_FOR_CE_GENERATION = 3;
+    public static final String PROP_SOLVER_UNION = "activeSolverUnion";
+    public static final String PROP_SHOW_RESULT_AFTER_EXECUTION =
+        "PROP_SHOW_RESULT_AFTER_EXECUTION";
+    public static final String PROP_STORE_SMT_TRANSLATION_FILE = "PROP_STORE_SMT_TRANSLATION_FILE";
+    public static final String PROP_STORE_TACLET_TRANSLATION_FILE =
+        "PROP_STORE_TACLET_TRANSLATION_FILE";
 
     private final Collection<SolverType> solverTypes = new LinkedList<>();
     private boolean showResultsAfterExecution = false;
@@ -68,8 +65,6 @@ public final class ProofIndependentSMTSettings
     private long seqBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
     private long objectBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
     private long locsetBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
-
-    private final Collection<SettingsListener> listeners = new LinkedHashSet<>();
 
     private SolverTypeCollection activeSolverUnion = SolverTypeCollection.EMPTY_COLLECTION;
     private LinkedList<SolverTypeCollection> solverUnions = new LinkedList<>();
@@ -109,7 +104,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setShowResultsAfterExecution(boolean showResultsAfterExecution) {
+        var old = this.showResultsAfterExecution;
         this.showResultsAfterExecution = showResultsAfterExecution;
+        firePropertyChange(PROP_SHOW_RESULT_AFTER_EXECUTION, old, this.showResultsAfterExecution);
+
     }
 
     public boolean isStoreSMTTranslationToFile() {
@@ -117,7 +115,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setStoreSMTTranslationToFile(boolean storeSMTTranslationToFile) {
+        var old = this.storeSMTTranslationToFile;
         this.storeSMTTranslationToFile = storeSMTTranslationToFile;
+        firePropertyChange(PROP_STORE_SMT_TRANSLATION_FILE, old, this.storeSMTTranslationToFile);
+
     }
 
     public boolean isStoreTacletTranslationToFile() {
@@ -125,7 +126,11 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setStoreTacletTranslationToFile(boolean storeTacletTranslationToFile) {
+        var old = this.storeTacletTranslationToFile;
         this.storeTacletTranslationToFile = storeTacletTranslationToFile;
+        firePropertyChange(PROP_STORE_TACLET_TRANSLATION_FILE, old,
+            this.storeTacletTranslationToFile);
+
     }
 
     public long getTimeout() {
@@ -133,7 +138,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setTimeout(long timeout) {
+        var old = this.timeout;
         this.timeout = timeout;
+        firePropertyChange(PROP_TIMEOUT, old, this.timeout);
+
     }
 
     public ProgressMode getModeOfProgressDialog() {
@@ -141,7 +149,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setModeOfProgressDialog(ProgressMode modeOfProgressDialog) {
+        var old = this.modeOfProgressDialog;
         this.modeOfProgressDialog = modeOfProgressDialog;
+        firePropertyChange(PROGRESS_DIALOG_MODE, old, this.modeOfProgressDialog);
+
     }
 
     public String getPathForSMTTranslation() {
@@ -149,7 +160,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setPathForSMTTranslation(String pathForSMTTranslation) {
+        var old = this.pathForSMTTranslation;
         this.pathForSMTTranslation = pathForSMTTranslation;
+        firePropertyChange(PATH_FOR_SMT_TRANSLATION, old, this.pathForSMTTranslation);
+
     }
 
     public String getPathForTacletTranslation() {
@@ -157,7 +171,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setPathForTacletTranslation(String pathForTacletTranslation) {
+        var old = this.pathForTacletTranslation;
         this.pathForTacletTranslation = pathForTacletTranslation;
+        firePropertyChange(PATH_FOR_TACLET_TRANSLATION, old, this.pathForTacletTranslation);
+
     }
 
     public String getActiveSolver() {
@@ -165,7 +182,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setActiveSolver(String activeSolver) {
+        var old = this.activeSolver;
         this.activeSolver = activeSolver;
+        firePropertyChange(ACTIVE_SOLVER, old, this.activeSolver);
+
     }
 
     public long getIntBound() {
@@ -173,7 +193,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setIntBound(long intBound) {
+        var old = this.intBound;
         this.intBound = intBound;
+        firePropertyChange(INT_BOUND, old, this.intBound);
+
     }
 
     public long getHeapBound() {
@@ -181,7 +204,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setHeapBound(long heapBound) {
+        var old = this.heapBound;
         this.heapBound = heapBound;
+        firePropertyChange(HEAP_BOUND, old, this.heapBound);
+
     }
 
     public long getSeqBound() {
@@ -189,7 +215,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setSeqBound(long seqBound) {
+        var old = this.seqBound;
         this.seqBound = seqBound;
+        firePropertyChange(FIELD_BOUND, old, this.seqBound);
+
     }
 
     public long getObjectBound() {
@@ -197,7 +226,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setObjectBound(long objectBound) {
+        var old = this.objectBound;
         this.objectBound = objectBound;
+        firePropertyChange(OBJECT_BOUND, old, this.objectBound);
+
     }
 
     public long getLocsetBound() {
@@ -205,7 +237,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setLocsetBound(long locsetBound) {
+        var old = this.locsetBound;
         this.locsetBound = locsetBound;
+        firePropertyChange(LOCSET_BOUND, old, this.locsetBound);
+
     }
 
     public boolean isCheckForSupport() {
@@ -213,12 +248,16 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setCheckForSupport(boolean checkForSupport) {
+        var old = this.checkForSupport;
         this.checkForSupport = checkForSupport;
+        firePropertyChange(SOLVER_CHECK_FOR_SUPPORT, old, this.checkForSupport);
     }
 
     public enum ProgressMode {
         USER, CLOSE, CLOSE_FIRST
     }
+
+    private final Map<SolverType, SolverData> dataOfSolvers = new LinkedHashMap<>();
 
     public int getMaxConcurrentProcesses() {
         return maxConcurrentProcesses;
@@ -226,25 +265,28 @@ public final class ProofIndependentSMTSettings
 
 
     public void setMaxConcurrentProcesses(int maxConcurrentProcesses) {
+        var old = this.maxConcurrentProcesses;
         this.maxConcurrentProcesses = maxConcurrentProcesses;
+        firePropertyChange(MAX_CONCURRENT_PROCESSES, old, this.maxConcurrentProcesses);
+
     }
 
 
     public void copy(ProofIndependentSMTSettings data) {
-        this.showResultsAfterExecution = data.showResultsAfterExecution;
-        this.storeSMTTranslationToFile = data.storeSMTTranslationToFile;
-        this.storeTacletTranslationToFile = data.storeTacletTranslationToFile;
-        this.timeout = data.timeout;
-        this.maxConcurrentProcesses = data.maxConcurrentProcesses;
-        this.pathForSMTTranslation = data.pathForSMTTranslation;
-        this.pathForTacletTranslation = data.pathForTacletTranslation;
-        this.modeOfProgressDialog = data.modeOfProgressDialog;
-        this.checkForSupport = data.checkForSupport;
-        this.intBound = data.intBound;
-        this.heapBound = data.heapBound;
-        this.seqBound = data.seqBound;
-        this.locsetBound = data.locsetBound;
-        this.objectBound = data.objectBound;
+        setShowResultsAfterExecution(data.showResultsAfterExecution);
+        setStoreSMTTranslationToFile(data.storeSMTTranslationToFile);
+        setStoreTacletTranslationToFile(data.storeTacletTranslationToFile);
+        setTimeout(data.timeout);
+        setMaxConcurrentProcesses(data.maxConcurrentProcesses);
+        setPathForSMTTranslation(data.pathForSMTTranslation);
+        setPathForTacletTranslation(data.pathForTacletTranslation);
+        setModeOfProgressDialog(data.modeOfProgressDialog);
+        setCheckForSupport(data.checkForSupport);
+        setIntBound(data.intBound);
+        setHeapBound(data.heapBound);
+        setSeqBound(data.seqBound);
+        setLocsetBound(data.locsetBound);
+        setObjectBound(data.objectBound);
 
 
         solverTypes.addAll(data.solverTypes);
@@ -342,11 +384,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setActiveSolverUnion(SolverTypeCollection solverUnion) {
-        if (activeSolverUnion != solverUnion) {
-            activeSolverUnion = solverUnion;
-            activeSolver = activeSolverUnion.name();
-            fireSettingsChanged();
-        }
+        var oldActiveSolverUnion = activeSolverUnion;
+        activeSolverUnion = solverUnion;
+        firePropertyChange(PROP_SOLVER_UNION, oldActiveSolverUnion, activeSolver);
+        setActiveSolver(activeSolverUnion.name());
     }
 
     public SolverTypeCollection computeActiveSolverUnion() {
@@ -391,21 +432,95 @@ public final class ProofIndependentSMTSettings
         return res;
     }
 
-    public void fireSettingsChanged() {
-        for (SettingsListener aListenerList : listeners) {
-            aListenerList.settingsChanged(new EventObject(this));
+    public static class SolverData extends AbstractSettings {
+        private String solverParameters = "";
+        private String solverCommand = "";
+        private long timeout = -1;
+        private final SolverType type;
+
+        public SolverData(SolverType type) {
+            this(type, type.getDefaultSolverCommand(), type.getDefaultSolverParameters());
         }
 
-    }
+        private SolverData(SolverType type, String command, String parameters) {
+            this(type, command, parameters, -1);
+        }
 
-    @Override
-    public void addSettingsListener(SettingsListener l) {
-        listeners.add(l);
-    }
+        public SolverData(SolverType type, String command, String parameters, long timeout) {
+            this.type = type;
+            setSolverCommand(command);
+            setSolverParameters(parameters);
+            setTimeout(timeout);
+        }
 
-    @Override
-    public void removeSettingsListener(SettingsListener l) {
-        listeners.remove(l);
-    }
+        @Override
+        public void readSettings(Properties props) {
+            setSolverParameters(SettingsConverter.read(props,
+                SOLVER_PARAMETERS + getType().getName(), getSolverParameters()));
+            setTimeout(
+                SettingsConverter.read(props, PROP_TIMEOUT + getType().getName(), getTimeout()));
+            setSolverCommand(SettingsConverter.read(props,
+                SOLVER_COMMAND + getType().getName(), getSolverCommand()));
+            getType().setSolverParameters(getSolverParameters());
+            getType().setSolverCommand(getSolverCommand());
 
+        }
+
+        @Override
+        public void writeSettings(Properties props) {
+            SettingsConverter.store(props, SOLVER_PARAMETERS + getType().getName(),
+                getSolverParameters());
+            SettingsConverter.store(props, SOLVER_COMMAND + getType().getName(),
+                getSolverCommand());
+            SettingsConverter.store(props, PROP_TIMEOUT + getType().getName(), getTimeout());
+            getType().setSolverParameters(getSolverParameters());
+            getType().setSolverCommand(getSolverCommand());
+        }
+
+
+        public SolverData clone() {
+            return new SolverData(getType(), getSolverCommand(), getSolverParameters(),
+                getTimeout());
+        }
+
+        public String toString() {
+            return getType().getName();
+        }
+
+        public String getSolverParameters() {
+            return solverParameters;
+        }
+
+        public void setSolverParameters(String solverParameters) {
+            var old = this.solverParameters;
+            this.solverParameters = solverParameters;
+            firePropertyChange(SOLVER_PARAMETERS, old, this.solverParameters);
+
+        }
+
+        public String getSolverCommand() {
+            return solverCommand;
+        }
+
+        public void setSolverCommand(String solverCommand) {
+            var old = this.solverCommand;
+            this.solverCommand = solverCommand;
+            firePropertyChange(SOLVER_COMMAND, old, this.solverCommand);
+
+        }
+
+        public SolverType getType() {
+            return type;
+        }
+
+        public long getTimeout() {
+            return timeout;
+        }
+
+        public void setTimeout(long timeout) {
+            var old = this.timeout;
+            this.timeout = timeout;
+            firePropertyChange(KEY_TIMEOUT, old, this.timeout);
+        }
+    }
 }

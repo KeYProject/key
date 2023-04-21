@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.proof_references.testcase;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -63,7 +63,8 @@ public abstract class AbstractProofReferenceTestCase {
             IProofReferencesAnalyst analyst, ExpectedProofReferences... expectedReferences)
             throws Exception {
         doReferenceFunctionTest(baseDir, javaPathInBaseDir, containerTypeName, targetName,
-            useContracts, analyst, null, expectedReferences);
+            useContracts, analyst,
+            null, expectedReferences);
     }
 
     /**
@@ -306,7 +307,7 @@ public abstract class AbstractProofReferenceTestCase {
         assertNotNull(tester);
         KeYEnvironment<?> environment = null;
         Proof proof = null;
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         boolean usePrettyPrinting = ProofIndependentSettings.isUsePrettyPrinting();
         try {
             // Disable pretty printing to make tests more robust against different term
@@ -379,7 +380,7 @@ public abstract class AbstractProofReferenceTestCase {
         assertNotNull(tester);
         KeYEnvironment<?> environment = null;
         Proof proof = null;
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         boolean usePrettyPrinting = ProofIndependentSettings.isUsePrettyPrinting();
         try {
             // Disable pretty printing to make tests more robust against different term

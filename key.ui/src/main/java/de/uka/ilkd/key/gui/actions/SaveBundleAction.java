@@ -34,7 +34,7 @@ public final class SaveBundleAction extends MainWindowAction {
 
         // react to setting changes
         GeneralSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-        settings.addSettingsListener(e -> updateStatus());
+        settings.addPropertyChangeListener(e -> updateStatus());
 
         // react to changes of proof selection
         mainWindow.getMediator().addKeYSelectionListener(new KeYSelectionListener() {

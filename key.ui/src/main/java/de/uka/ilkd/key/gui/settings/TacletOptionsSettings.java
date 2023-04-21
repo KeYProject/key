@@ -264,7 +264,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         }
         if (c.unsound) {
             JLabel lbl = new JLabel(IconFactory.WARNING_UNSOUND.get());
-            lbl.setToolTipText("Unsound " + button.getToolTipText());
+            lbl.setToolTipText("Unsound");
             b.add(lbl);
         }
         if (c.information != null) {
@@ -295,8 +295,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
 
     private void setChoiceSettings(ChoiceSettings choiceSettings) {
         this.settings = choiceSettings;
-        category2Choice = settings.getDefaultChoices();
-        category2Choices = settings.getChoices();
+        category2Choice = new HashMap<>(settings.getDefaultChoices());
+        category2Choices = new HashMap<>(settings.getChoices());
         layoutChoiceSelector();
     }
 

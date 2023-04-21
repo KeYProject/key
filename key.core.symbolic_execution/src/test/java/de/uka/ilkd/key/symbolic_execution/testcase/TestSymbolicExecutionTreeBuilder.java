@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -19,6 +19,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 
 /**
  * Tests for {@link SymbolicExecutionTreeBuilder},
@@ -536,7 +537,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     @Test
     public void testSymbolicExecutionCompletionsTest() throws Exception {
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
         try {
             String javaPathInBaseDir =

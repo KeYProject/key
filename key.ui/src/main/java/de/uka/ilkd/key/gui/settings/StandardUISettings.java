@@ -149,7 +149,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         chkRightClickMacros.setSelected(generalSettings.isRightClickMacro());
         chkConfirmExit.setSelected(vs.confirmExit());
         spAutoSaveProof.setValue(generalSettings.autoSavePeriod());
-        chkMinimizeInteraction.setSelected(generalSettings.tacletFilter());
+        chkMinimizeInteraction.setSelected(generalSettings.getTacletFilter());
         spFontSizeTreeSequent.setSelectedIndex(vs.sizeIndex());
 
         return this;

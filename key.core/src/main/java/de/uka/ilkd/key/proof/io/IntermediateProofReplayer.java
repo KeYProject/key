@@ -30,6 +30,7 @@ import de.uka.ilkd.key.proof.io.intermediate.MergeAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.MergePartnerAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
+import de.uka.ilkd.key.prover.impl.PerfScope;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
@@ -163,6 +164,7 @@ public class IntermediateProofReplayer {
         int stepIndex = 0;
         int reportInterval = 1;
         int max = 0;
+        var time = System.nanoTime();
         if (listener != null && progressMonitor != null) {
             max = !queue.isEmpty() && queue.peekFirst().second != null
                     ? queue.peekFirst().second.countAllChildren()
@@ -354,6 +356,7 @@ public class IntermediateProofReplayer {
         if (listener != null && progressMonitor != null) {
             progressMonitor.setProgress(max);
         }
+        LOGGER.debug("Proof replay took " + PerfScope.formatTime(System.nanoTime() - time));
         return new Result(status, errors, currGoal);
     }
 

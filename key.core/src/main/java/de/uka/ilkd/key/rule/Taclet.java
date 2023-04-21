@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.*;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
@@ -928,6 +929,7 @@ public abstract class Taclet implements Rule, Named {
      *         close-goal-taclet ( this.closeGoal () ), the first goal of the return list is the
      *         goal that should be closed (with the constraint this taclet is applied under).
      */
+    @Nonnull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp tacletApp) {
         return getExecutor().apply(goal, services, tacletApp);

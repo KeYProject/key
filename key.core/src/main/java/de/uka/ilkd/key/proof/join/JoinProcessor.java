@@ -156,7 +156,7 @@ public class JoinProcessor implements Runnable {
 
         };
         ImmutableList<NoPosTacletApp> apps =
-            goal.ruleAppIndex().getFindTaclet(filter, pio, services);
+            goal.ruleAppIndex().getFindTaclet(filter, pio);
 
         if (apps.isEmpty()) {
             return null;

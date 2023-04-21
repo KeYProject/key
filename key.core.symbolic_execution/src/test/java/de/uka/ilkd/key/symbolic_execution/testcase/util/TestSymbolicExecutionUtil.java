@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.testcase.util;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.Map;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
@@ -121,7 +121,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
             // weigl: disable, no clue why the choice settings should be initialised
             // assertTrue(SymbolicExecutionUtil.isChoiceSettingInitialised());
             // Store default choice settings
-            HashMap<String, String> defaultSettings =
+            Map<String, String> defaultSettings =
                 ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
             // weigl: disable, no clue why the choice settings should be initialised
             // assertFalse(defaultSettings.isEmpty());
@@ -142,7 +142,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
             Assertions.assertEquals(newValue, SymbolicExecutionUtil
                     .getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
             // Make sure that all other settings are unchanged.
-            HashMap<String, String> changedSettings =
+            Map<String, String> changedSettings =
                 ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
             defaultSettings.put(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, newValue);
             Assertions.assertEquals(defaultSettings, changedSettings);

@@ -336,10 +336,18 @@ public final class MiscTools {
     }
 
     public static String toValidFileName(String s) {
-        s = s.replace("\\", "_").replace("$", "_").replace("?", "_").replace("|", "_")
-                .replace("<", "_").replace(">", "_").replace(":", "_").replace("*", "+")
-                .replace("\"", "'").replace("/", "-").replace("[", "(").replace("]", ")");
-        return s;
+        return s.replace("\\", "_")
+                .replace("$", "_")
+                .replace("?", "_")
+                .replace("|", "_")
+                .replace("<", "_")
+                .replace(">", "_")
+                .replace(":", "_")
+                .replace("*", "+")
+                .replace("\"", "'")
+                .replace("/", "-")
+                .replace("[", "(")
+                .replace("]", ")");
     }
 
     public static Name toValidVariableName(String s) {

@@ -36,7 +36,7 @@ public class ShowOriginAction extends MainWindowAction {
 
         setName("Show origin");
         setEnabled(settings.getUseOriginLabels());
-        settings.addSettingsListener(event -> setEnabled(settings.getUseOriginLabels()));
+        settings.addPropertyChangeListener(event -> setEnabled(settings.getUseOriginLabels()));
         setMenuPath("View");
         lookupAcceleratorKey();
     }

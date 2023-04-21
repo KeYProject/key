@@ -131,10 +131,11 @@ public class ColorSettings extends AbstractPropertiesSettings {
 
         @Override
         public void parseFrom(String v) {
-            if (!Objects.equals(value(), v)) {
+            final var old = value();
+            if (!Objects.equals(old, v)) {
                 currentValue = fromHex(v);
                 properties.setProperty(getKey(), v);
-                fireSettingsChange();
+                firePropertyChange(getKey(), old, currentValue);
             }
         }
 
@@ -146,9 +147,10 @@ public class ColorSettings extends AbstractPropertiesSettings {
         @Override
         public void set(Color value) {
             if (currentValue != value) {
+                var old = currentValue;
                 currentValue = value;
                 properties.setProperty(getKey(), toHex(value));
-                fireSettingsChange();
+                firePropertyChange(getKey(), old, value);
             }
         }
 

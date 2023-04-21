@@ -84,10 +84,7 @@ public class TestVariableNamer {
 
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         BuiltInRuleAppIndex builtInRuleAppIndex = new BuiltInRuleAppIndex(new BuiltInRuleIndex());
-        RuleAppIndex ruleAppIndex =
-            new RuleAppIndex(tacletIndex, builtInRuleAppIndex, proof.getServices());
-
-        return new Goal(node, ruleAppIndex);
+        return new Goal(node, tacletIndex, builtInRuleAppIndex, proof.getServices());
     }
 
 

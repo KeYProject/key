@@ -124,6 +124,7 @@ public abstract class ProgramSVSort extends AbstractSort {
     public static final ProgramSVSort TYPE = new TypeReferenceSort();
 
     public static final ProgramSVSort TYPENOTPRIMITIVE = new TypeReferenceNotPrimitiveSort();
+    public static final ProgramSVSort TYPE_PRIMITIVE = new TypeReferencePrimitiveSort();
 
     public static final ProgramSVSort CLASSREFERENCE = new MetaClassReferenceSort();
 
@@ -889,6 +890,30 @@ public abstract class ProgramSVSort extends AbstractSort {
         @Override
         protected boolean canStandFor(ProgramElement check, Services services) {
             return (check instanceof TypeReference);
+        }
+    }
+
+    /**
+     * This sort represents a type of program schema variables that matches byte,
+     * char, short, int, and long.
+     */
+    private static final class TypeReferencePrimitiveSort extends ProgramSVSort {
+        public TypeReferencePrimitiveSort() {
+            super(new Name("PrimitiveType"));
+        }
+
+        @Override
+        protected boolean canStandFor(ProgramElement check, Services services) {
+            if (!(check instanceof TypeReference)) {
+                return false;
+            }
+            return ((TypeReference) (check)).getKeYJavaType()
+                    .getJavaType() instanceof PrimitiveType;
+        }
+
+        @Override
+        public ProgramSVSort createInstance(String parameter) {
+            return TYPE_PRIMITIVE;
         }
     }
 

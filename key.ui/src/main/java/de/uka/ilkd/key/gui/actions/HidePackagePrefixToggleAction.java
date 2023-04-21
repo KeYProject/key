@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
 import java.util.EventObject;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
 
 public final class HidePackagePrefixToggleAction extends MainWindowAction {
     public static final String NAME = "Hide Package Prefix";
@@ -23,16 +23,17 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
      * Such changes can occur in the Eclipse context when settings are changed in for instance the
      * KeYIDE.
      */
-    private final SettingsListener viewSettingsListener = this::handleViewSettingsChanged;
+    private final PropertyChangeListener viewSettingsListener = this::handleViewSettingsChanged;
 
     public HidePackagePrefixToggleAction(MainWindow mainWindow) {
         super(mainWindow);
         setName(NAME);
         setTooltip(TOOL_TIP);
+        // Attention: The listener is never
+        // removed, because there is only one
+        // MainWindow!
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                .addSettingsListener(viewSettingsListener); // Attention: The listener is never
-                                                            // removed, because there is only one
-                                                            // MainWindow!
+                .addPropertyChangeListener(viewSettingsListener);
         updateSelectedState();
     }
 

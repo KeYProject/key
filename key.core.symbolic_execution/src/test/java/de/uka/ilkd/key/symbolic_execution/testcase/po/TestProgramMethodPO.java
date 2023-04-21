@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.testcase.po;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -108,7 +108,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
             String methodFullName, String oraclePathInBaseDirFile, String precondition,
             String expectedTryContent) throws ProofInputException, IOException,
             ParserConfigurationException, SAXException, ProblemLoaderException {
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
         try {

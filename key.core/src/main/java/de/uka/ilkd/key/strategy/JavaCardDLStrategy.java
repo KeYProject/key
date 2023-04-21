@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.strategy;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.CharListLDT;
@@ -59,6 +61,9 @@ import de.uka.ilkd.key.util.MiscTools;
  * Strategy tailored to be used as long as a java program can be found in the sequent.
  */
 public class JavaCardDLStrategy extends AbstractFeatureStrategy {
+    public static final AtomicLong PERF_COMPUTE = new AtomicLong();
+    public static final AtomicLong PERF_APPROVE = new AtomicLong();
+    public static final AtomicLong PERF_INSTANTIATE = new AtomicLong();
 
     public static final String JAVA_CARD_DL_STRATEGY = "JavaCardDLStrategy";
 
@@ -2036,7 +2041,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      */
     @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
-        return costComputationF.computeCost(app, pio, goal);
+        var time = System.nanoTime();
+        try {
+            return costComputationF.computeCost(app, pio, goal);
+        } finally {
+            PERF_COMPUTE.addAndGet(System.nanoTime() - time);
+        }
     }
 
     /**
@@ -2050,12 +2060,22 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      */
     @Override
     public final boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-        return !(approvalF.computeCost(app, pio, goal) instanceof TopRuleAppCost);
+        var time = System.nanoTime();
+        try {
+            return !(approvalF.computeCost(app, pio, goal) == TopRuleAppCost.INSTANCE);
+        } finally {
+            PERF_APPROVE.addAndGet(System.nanoTime() - time);
+        }
     }
 
     @Override
     protected RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-        return instantiationF.computeCost(app, pio, goal);
+        var time = System.nanoTime();
+        try {
+            return instantiationF.computeCost(app, pio, goal);
+        } finally {
+            PERF_INSTANTIATE.addAndGet(System.nanoTime() - time);
+        }
     }
 
     // //////////////////////////////////////////////////////////////////////////

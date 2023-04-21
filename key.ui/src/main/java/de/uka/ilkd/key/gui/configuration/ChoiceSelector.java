@@ -1,11 +1,24 @@
 package de.uka.ilkd.key.gui.configuration;
 
 import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
@@ -23,8 +36,8 @@ public class ChoiceSelector extends JDialog {
     private static final String EXPLANATIONS_RESOURCE =
         "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
     private final ChoiceSettings settings;
-    private final HashMap<String, String> category2DefaultChoice;
-    private HashMap<String, Set<String>> category2Choices;
+    private final Map<String, String> category2DefaultChoice;
+    private Map<String, Set<String>> category2Choices;
     private boolean changed = false;
 
 
