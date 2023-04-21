@@ -5,6 +5,9 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -53,8 +56,10 @@ public class ProofSMTApplyUserAction extends UserAction {
     protected void apply() {
         for (SMTProblem problem : smtProblems) {
             if (problem.getFinalResult().isValid() == SMTSolverResult.ThreeValuedTruth.VALID) {
-                IBuiltInRuleApp app =
-                    SMTRuleApp.rule.createApp(null).setTitle(getTitle(problem));
+                SequentFormula formula = problem.getSequent().getFormulabyNr(1);
+                IBuiltInRuleApp app = SMTRuleApp.rule.createApp(null)
+                    .tryToInstantiate(problem.getGoal())
+                    .setTitle(getTitle(problem));
                 goalsClosed.add(problem.getGoal().node());
                 problem.getGoal().apply(app);
             }

@@ -1,15 +1,16 @@
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 
 import org.key_project.util.collection.ImmutableList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The rule application that is used when a goal is closed by means of an external solver. So far it
@@ -20,7 +21,11 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
     public final static SMTRule rule = new SMTRule();
     private final String title;
 
-
+    /**
+     * Create a new rule app without ifInsts (will be null).
+     * @param rule the SMTRule to apply
+     * @param pio the pos in term to apply the rule on
+     */
     SMTRuleApp(SMTRule rule, PosInOccurrence pio) {
         this(rule, pio, null, "SMT Rule App");
     }
@@ -31,14 +36,13 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
         this.title = title;
     }
 
-
     private SMTRuleApp(SMTRule rule, String title) {
         super(rule, null);
         this.title = title;
     }
 
     public SMTRuleApp replacePos(PosInOccurrence newPos) {
-        return this;
+        return new SMTRuleApp(rule, newPos, ifInsts, title);
     }
 
     @Override
@@ -52,12 +56,11 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public PosInOccurrence posInOccurrence() {
-        return null;
+        return pio;
     }
 
     @Override
     public BuiltInRule rule() {
-
         return rule;
     }
 
@@ -80,6 +83,14 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
         }
 
 
+        /**
+         * Create a new goal (to be closed in {@link Goal#apply(RuleApp)} directly afterwards)
+         * with the same sequent as the given one.
+         * @param goal the Goal on which to apply <tt>ruleApp</tt>
+         * @param services the Services with the necessary information about the java programs
+         * @param ruleApp the rule application to be executed
+         * @return a list with an identical goal as the given <tt>goal</tt>
+         */
         @Override
         public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
             if (goal.proof().getInitConfig().getJustifInfo().getJustification(rule) == null) {
@@ -118,7 +129,7 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public SMTRuleApp setTitle(String title) {
-        return new SMTRuleApp(rule, title);
+        return new SMTRuleApp(rule, pio, ifInsts, title);
     }
 
     @Override
@@ -127,9 +138,26 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
         return this;
     }
 
+    /**
+     * Create a new RuleApp with the same pio (in this case, that will probably be null as the
+     * SMT rule is applied to the complete sequent) as this one.
+     * Add all top level formulas of the goal
+     * to the RuleApp's ifInsts.
+     * @param goal the goal to instantiate the current RuleApp on
+     * @return a new RuleApp with the same pio and all top level formulas of the goal as ifInsts
+     */
     @Override
     public SMTRuleApp tryToInstantiate(Goal goal) {
-        return this;
+        SMTRuleApp app = rule.createApp(pio);
+        Sequent seq = goal.sequent();
+        List<PosInOccurrence> ifInsts = new ArrayList<>();
+        for (SequentFormula ante : seq.antecedent()) {
+            ifInsts.add(new PosInOccurrence(ante, PosInTerm.getTopLevel(), true));
+        }
+        for (SequentFormula succ : seq.succedent()) {
+            ifInsts.add(new PosInOccurrence(succ, PosInTerm.getTopLevel(), false));
+        }
+        return app.setIfInsts(ImmutableList.fromList(ifInsts));
     }
 
 }
