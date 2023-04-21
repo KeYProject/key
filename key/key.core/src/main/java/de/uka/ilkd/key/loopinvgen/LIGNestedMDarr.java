@@ -44,7 +44,7 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 		outerCompPreds.add(tb.geq(indexInner, lowInner));
 //		outerCompPreds.add(tb.geq(indexInner, tb.add(lowInner, tb.one())));
 //		outerCompPreds.add(tb.geq(indexInner, tb.sub(lowInner, tb.one())));
-		outerCompPreds.add(tb.leq(indexInner, tb.add(highInner, tb.one())));
+		outerCompPreds.add(tb.leq(indexInner, highInner));
 //		outerCompPreds.add(tb.leq(indexInner, highInner));
 //		outerCompPreds.add(tb.leq(indexInner, tb.sub(highInner, tb.one())));
 
@@ -83,27 +83,32 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 
 		int outerItrNumber = -1;
 		PredicateRefiner prInner = null;
-		if(arrays.length==1)
-			prInner = new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
-					innerDepPreds, innerCompPreds, arrays[0], arrays[0],
-					indexOuter, indexInner, outerItrNumber, services);
-		if(arrays.length==2)
-				prInner = new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
-						innerDepPreds, innerCompPreds, arrays[0], arrays[1],
-						indexOuter, indexInner, outerItrNumber, services);
+		prInner = new LoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
+					innerDepPreds, innerCompPreds, indexOuter, indexInner, outerItrNumber, services);
+//		if(arrays.length==1)
+//			prInner = new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
+//					innerDepPreds, innerCompPreds, arrays[0], arrays[0],
+//					indexOuter, indexInner, outerItrNumber, services);
+//		if(arrays.length==2)
+//				prInner = new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
+//						innerDepPreds, innerCompPreds, arrays[0], arrays[1],
+//						indexOuter, indexInner, outerItrNumber, services);
 		Pair<Set<Term>, Set<Term>> refinedInnerPreds = prInner.refine();
 		innerDepPreds = refinedInnerPreds.first;
 		innerCompPreds = refinedInnerPreds.second;
 
 		PredicateRefiner prOuter = null;
-		if(arrays.length==1)
-			prOuter = new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
-					outerDepPreds, outerCompPreds, arrays[0], arrays[0],
-					indexOuter, indexInner, outerItrNumber, services);
-		if(arrays.length==2)
-			prOuter = new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
-					outerDepPreds, outerCompPreds, arrays[0], arrays[1],
-					indexOuter, indexInner, outerItrNumber, services);
+		prOuter = new LoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
+				outerDepPreds, outerCompPreds, indexOuter, indexInner, outerItrNumber, services);
+
+//		if(arrays.length==1)
+//			prOuter = new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
+//					outerDepPreds, outerCompPreds, arrays[0], arrays[0],
+//					indexOuter, indexInner, outerItrNumber, services);
+//		if(arrays.length==2)
+//			prOuter = new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
+//					outerDepPreds, outerCompPreds, arrays[0], arrays[1],
+//					indexOuter, indexInner, outerItrNumber, services);
 		Pair<Set<Term>, Set<Term>> refinedOuterPreds = prOuter.refine();
 		outerDepPreds = refinedOuterPreds.first;
 		outerCompPreds = refinedOuterPreds.second;

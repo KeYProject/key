@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -106,6 +107,10 @@ public class PredicateSetCompressor {
 										depPred2.sub(0).sub(2))));
 							}
 						}
+						else if (depPred1.sub(0).op() == locSetLDT.getMatrixRange()
+								&& depPred2.sub(0).op() == locSetLDT.getMatrixRange()) {
+
+						}
 					}
 				}
 			}
@@ -134,6 +139,11 @@ public class PredicateSetCompressor {
 
 	private Set<Term> depPredListCompressionByPredicate(Set<Term> fDepPredList) {
 		Set<Term> toDelete = new HashSet<>();
+//		HashMap<Term, Boolean> depPreds= new HashMap<Term, Boolean>();
+//
+//		for(Term d :  fDepPredList){
+//			depPreds.put(d, false);
+//		}
 		for (Term depPred1 : fDepPredList) {
 			for (Term depPred2 : fDepPredList) {
 				if (toDelete.contains(depPred2)) { // CHECK method for more efficient optimisations, e.g. exclude
@@ -154,9 +164,15 @@ public class PredicateSetCompressor {
 						}
 					}
 				}
+				if(depPred1.op()==depPred2.op() && !sProof.proofEquality(depPred2.sub(0), depPred1.sub(0))){
+					if (sProof.proofSubSet(depPred2.sub(0), depPred1.sub(0))) {
+						toDelete.add(depPred2);
+					}
+				}
 			}
 		}
 		fDepPredList.removeAll(toDelete);
+		System.out.println("Deleted: "+toDelete);
 		return fDepPredList;
 	}
 

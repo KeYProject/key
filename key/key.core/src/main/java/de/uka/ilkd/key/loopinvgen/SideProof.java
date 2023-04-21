@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -18,10 +19,12 @@ import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Provides means to perform side proofs required by the loop invariant generator.
@@ -70,9 +73,9 @@ public class SideProof {
 	}
 
 	public static ApplyStrategyInfo isProvableHelper(Sequent seq2prove,
-																									 int maxRuleApp, boolean simplifyOnly,
-																									 boolean stopAtFirstUncloseableGoal,
-																									 Services services) throws ProofInputException {
+													 int maxRuleApp, boolean simplifyOnly,
+													 boolean stopAtFirstUncloseableGoal,
+													 Services services) throws ProofInputException {
 		return isProvableHelper(seq2prove,maxRuleApp,-1, simplifyOnly,stopAtFirstUncloseableGoal,services);
 	}
 		public static ApplyStrategyInfo isProvableHelper(Sequent seq2prove,
@@ -86,6 +89,7 @@ public class SideProof {
 
 		StrategyProperties sp = null;
 		final StrategySettingsDefinition strategyDefinition = ps.getProof().getActiveStrategyFactory().getSettingsDefinition();
+
 
 		if (simplifyOnly) {
 			//Simplification
@@ -103,7 +107,7 @@ public class SideProof {
 
 		sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_OFF);
 
-		if (stopAtFirstUncloseableGoal) {
+		if (false && stopAtFirstUncloseableGoal) {
 			sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_NONCLOSE);
 		} else {
 			sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
@@ -184,10 +188,11 @@ public class SideProof {
 		if(left!=null && right!=null){
 			Term fml = tb.equals(left, right);
 			Sequent sideSeq = prepareSideProof(left, right,
-					sf->true);//services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()));
+					sf->false);//services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op())
 			sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
 			boolean closed = isProvable(sideSeq, services);
 			// true: Holds, false: Unknown
+//			System.out.println("Proving fml "+ fml + " is "+ closed);
 			return closed;
 		}
 		return false;
@@ -204,21 +209,59 @@ public class SideProof {
 	}
 
 	public boolean proofSubSet(Term left, Term right) {
-		Function pred = services.getTypeConverter().getLocSetLDT().getSubset();
-		return prove(pred, left, right, sf-> true);
+		if(left!=null && right!=null){
+			Term fml = tb.subset(left, right);
+			Sequent sideSeq = prepareSideProof(left, right,
+					sf->false);//services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op())
+			sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
+			boolean closed = isProvable(sideSeq, services);
+			// true: Holds, false: Unknown
+//			System.out.println("Proving fml "+ fml + " is "+ closed);
+			return closed;
+		}
+		return false;
 	}
+//	public boolean proofSubSet(Term left, Term right) {
+//		Function pred = services.getTypeConverter().getLocSetLDT().getSubset();
+//		return prove(pred, left, right, sf-> true);
+//	}
 
 	public boolean proofLT(Term left, Term right) {
-		Function pred = services.getTypeConverter().getIntegerLDT().getLessThan();
-		return prove(pred, left, right,
-				sf-> services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()));
+		if(left!=null && right!=null){
+			Term fml = tb.lt(left, right);
+			Sequent sideSeq = prepareSideProof(left, right,
+					sf->services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()));
+			sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
+			boolean closed = isProvable(sideSeq, services);
+			// true: Holds, false: Unknown
+//			System.out.println("Proving fml "+ fml + " is "+ closed);
+			return closed;
+		}
+		return false;
 	}
-
+//	public boolean proofLT(Term left, Term right) {
+//		Function pred = services.getTypeConverter().getIntegerLDT().getLessThan();
+//		return prove(pred, left, right,
+//				sf-> services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()));
+//	}
 	public boolean proofLEQ(Term left, Term right) {
-		Function pred = services.getTypeConverter().getIntegerLDT().getLessOrEquals();
-		return prove(pred, left, right,
-				sf-> services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()));
+		if(left!=null && right!=null){
+			Term fml = tb.leq(left, right);
+			Sequent sideSeq = prepareSideProof(left, right,
+					sf->services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()));//services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()));
+			sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
+			boolean closed = isProvable(sideSeq, services);
+			// true: Holds, false: Unknown
+//			System.out.println("Proving fml "+ fml + " is "+ closed);
+			return closed;
+		}
+		return false;
 	}
+//	public boolean proofLEQ(Term left, Term right) {
+//		Function pred = services.getTypeConverter().getIntegerLDT().getLessOrEquals();
+//		return prove(pred, left, right,
+//				sf-> services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()));
+//	}
 
 	public ImmutableList<Goal> retGoal(){
 		return this.services.getProof().openGoals();
@@ -269,6 +312,7 @@ public class SideProof {
 		cache.put(key, new CacheValue(sideSeq));
 		return sideSeq;
 	}
+
 
 	/**
 	 * determines relevant formulas of the given semisequent to add. Relevant formulas are those that have

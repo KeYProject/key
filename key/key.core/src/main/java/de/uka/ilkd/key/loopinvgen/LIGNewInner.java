@@ -87,9 +87,11 @@ public class LIGNewInner extends AbstractLoopInvariantGenerator {
 
 		allDepPreds.addAll(allCompPreds);
 
-//		final PredicateSetCompressor compressor =
-//				new PredicateSetCompressor(allDepPreds, currentGoal.sequent(), false, services);
-//		allDepPreds = compressor.compress();
+		final PredicateSetCompressor compressor =
+				new PredicateSetCompressor(allDepPreds, currentGoal.sequent(), false, services);
+		allDepPreds = compressor.compress();
+		System.out.println("Compressd!");
+
 
 		final LoopInvariantGenerationResult loopInv = new LoopInvariantGenerationResult(allDepPreds, itrNumber);
 		System.out.println("Inner loop inv is: " + loopInv);

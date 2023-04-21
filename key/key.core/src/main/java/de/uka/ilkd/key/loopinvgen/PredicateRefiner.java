@@ -16,8 +16,10 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.util.Pair;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class PredicateRefiner {
     protected final Services services;
@@ -157,13 +159,23 @@ public abstract class PredicateRefiner {
 
 
 
-        final Sequent sideSeq =
+        Sequent sideSeq =
                 filter(sequent).addFormula(new SequentFormula(pred), false, true).sequent();
 
 
+//        final TermBuilder tb = services.getTermBuilder();
+//        final Term antecedent =
+//                tb.and(Arrays.stream(sideSeq.antecedent().asList().toArray(new SequentFormula[0])).
+//                        map(SequentFormula::formula).collect(Collectors.toList()));
+//        final Term succedent =
+//                tb.or(Arrays.stream(sideSeq.succedent().asList().toArray(new SequentFormula[0])).
+//                        map(SequentFormula::formula).collect(Collectors.toList()));
+//        sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(tb.imp(antecedent,succedent)),
+//                false, true).sequent();
 
-        final boolean provable = sProof.isProvable(sideSeq, 120000,services);
-            //SideProof.isProvable(sideSeq, 100000, 3000, true, services);
+
+        final boolean provable = sProof.isProvable(sideSeq, 60000,services);
+           // SideProof.isProvable(sideSeq, 100000, 60000, true, services);
 
 
 //        if(!provable)
@@ -173,17 +185,18 @@ public abstract class PredicateRefiner {
     }
 
     protected Sequent simplify(Sequent sequent) {
-        System.out.println("sequent " + sequent);
-        try {
-            ApplyStrategyInfo info =
-                    SideProof.isProvableHelper(sequent, 1000, true, false, services);
-            if (info.getProof().openGoals().size() != 1) {
-                throw new ProofInputException("Illegal number of goals. Open goals: " + info.getProof().openGoals().size());
-            }
-            sequent = info.getProof().openGoals().head().sequent();
-        } catch (ProofInputException e) {
-            e.printStackTrace();
-        }
         return sequent;
+//        System.out.println("sequent " + sequent);
+//        try {
+//            ApplyStrategyInfo info =
+//                    SideProof.isProvableHelper(sequent, 1000, true, false, services);
+//            if (info.getProof().openGoals().size() != 1) {
+//                throw new ProofInputException("Illegal number of goals. Open goals: " + info.getProof().openGoals().size());
+//            }
+//            sequent = info.getProof().openGoals().head().sequent();
+//        } catch (ProofInputException e) {
+//            e.printStackTrace();
+//        }
+//        return sequent;
     }
 }

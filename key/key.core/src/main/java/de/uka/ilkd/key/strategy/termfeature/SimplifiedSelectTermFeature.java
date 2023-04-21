@@ -31,7 +31,7 @@ public final class SimplifiedSelectTermFeature extends BinaryTermFeature {
                     primitiveHeapTermFeature.filter(t.sub(0), services) ||
                     // or the heap term of the select operator is an anon heap symbol
                     // (for instance an anonHeap function)
-                    (   t.sub(0).op() instanceof Function &&
+                    ( false &&  t.sub(0).op() instanceof Function &&
                         t.sub(0).op().arity() == 0 &&
                         t.sub(0).hasLabels() &&
                         t.sub(0).containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL));

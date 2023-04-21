@@ -22,9 +22,9 @@ public final class IsSelectSkolemConstantTermFeature extends BinaryTermFeature {
 
     @Override
     protected boolean filter(Term t, Services services) {
-        return t.hasLabels() &&
+        return false; /*t.hasLabels() &&
                t.containsLabel(ParameterlessTermLabel.SELECT_SKOLEM_LABEL) &&
                t.op().arity() == 0 &&
-               t.op() instanceof Function;
+               t.op() instanceof Function;*/
     }
 }

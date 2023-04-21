@@ -66,8 +66,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private final ValueTermFeature vf;
 
 
-    protected JavaCardDLStrategy(Proof proof,
-                                 StrategyProperties strategyProperties) {
+    public JavaCardDLStrategy(Proof proof,
+                              StrategyProperties strategyProperties) {
 
         super(proof);
         heapLDT = getServices().getTypeConverter().getHeapLDT();
@@ -267,7 +267,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "semantics_blasting", inftyConst());
 
-        bindRuleSet(d, "simplify_heap_high_costs", inftyConst());
+        bindRuleSet(d, "simplify_heap_high_costs", longConst(30000));//inftyConst());
 
         bindRuleSet(d, "closure", -15000);
         bindRuleSet(d, "alpha", -7000);

@@ -42,6 +42,15 @@ public class NestedLoopUsecaseRuleImp{
         constructUsecase(loopInvariant, anonUpdate, loopGuard);
     }
 
+    private Term findWPRed(Term innerLI, Term mod){
+
+        final Term arr = tb.var((LocationVariable) services.getNamespaces().programVariables().lookup("a"));
+        return tb.matrixRange(tb.getBaseHeap(),
+                arr,
+                tb.zero(), tb.dotLength(arr),
+                tb.zero(), tb.dotLength(tb.dotArr(arr, tb.zero()))
+        );
+    }
     private Term findNoW(Term innerLI, Term mod){
         if (innerLI.op()==depLDT.getNoW()){
             mod = tb.setMinus(mod, innerLI.sub(0));
@@ -53,7 +62,7 @@ public class NestedLoopUsecaseRuleImp{
         return mod;
     }
     private Term creatUpdates(Term innerLI, PosInOccurrence pos) {
-        Term mod = findNoW(innerLI, tb.allLocs());
+        Term mod = findWPRed(innerLI, tb.allLocs());//findNoW
 
         //anonymizes the heap
         final Name heapPrimeName = new Name(tb.newName(tb.getBaseHeap()+"_Prime"));
