@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.*;
@@ -33,6 +34,9 @@ import org.key_project.util.collection.*;
  * complete, so that is can be applied.
  */
 public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
+    public static final AtomicLong PERF_EXECUTE = new AtomicLong();
+    public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();
+    public static final AtomicLong PERF_PRE = new AtomicLong();
 
     /** the taclet for which the application information is collected */
     private final Taclet taclet;
@@ -321,19 +325,32 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @return list of new created goals
      */
     @Override
-    public ImmutableList<Goal> execute(Goal goal, Services services) {
-        if (!complete()) {
-            throw new IllegalStateException(
-                "Tried to apply rule \n" + taclet + "\nthat is not complete." + this);
-        }
+    public @Nullable ImmutableList<Goal> execute(Goal goal, Services services) {
+        var time = System.nanoTime();
+        var timeSetSequent = Goal.PERF_SET_SEQUENT.get();
+        try {
+            var timePre = System.nanoTime();
+            try {
+                if (!complete()) {
+                    throw new IllegalStateException(
+                        "Tried to apply rule \n" + taclet + "\nthat is not complete." + this);
+                }
 
-        if (!isExecutable(services)) {
-            throw new RuntimeException(
-                "taclet application with unsatisfied 'checkPrefix': " + this);
+                if (!isExecutable(services)) {
+                    throw new RuntimeException(
+                        "taclet application with unsatisfied 'checkPrefix': " + this);
+                }
+                registerSkolemConstants(goal.getLocalNamespaces());
+                goal.addAppliedRuleApp(this);
+            } finally {
+                PERF_PRE.getAndAdd(System.nanoTime() - timePre);
+            }
+
+            return taclet().apply(goal, services, this);
+        } finally {
+            PERF_EXECUTE.getAndAdd(System.nanoTime() - time);
+            PERF_SET_SEQUENT.getAndAdd(Goal.PERF_SET_SEQUENT.get() - timeSetSequent);
         }
-        registerSkolemConstants(goal.getLocalNamespaces());
-        goal.addAppliedRuleApp(this);
-        return taclet().apply(goal, services, this);
     }
 
     /*

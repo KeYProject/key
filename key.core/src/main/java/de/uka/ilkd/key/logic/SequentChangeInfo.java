@@ -103,14 +103,22 @@ public class SequentChangeInfo {
         this.originalSequent = originalSequent;
     }
 
+    public SequentChangeInfo copy() {
+        return new SequentChangeInfo(
+            antecedent == null ? null : antecedent.copy(),
+            succedent == null ? null : succedent.copy(),
+            resultingSequent,
+            originalSequent);
+    }
+
     /**
      * returns true iff the sequent has been changed by the operation
      *
      * @return true iff the sequent has been changed by the operation
      */
     public boolean hasChanged() {
-        return (antecedent == null || antecedent.hasChanged())
-                || (succedent == null || succedent.hasChanged());
+        return (antecedent != null && antecedent.hasChanged())
+                || (succedent != null && succedent.hasChanged());
     }
 
     /**
@@ -331,6 +339,4 @@ public class SequentChangeInfo {
 
         return result;
     }
-
-
 }

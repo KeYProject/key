@@ -1,13 +1,10 @@
 package de.uka.ilkd.key.proof;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.rulefilter.AnyRuleSetTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.NotRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
@@ -24,7 +21,7 @@ import org.key_project.util.collection.ImmutableSLList;
  */
 public final class RuleAppIndex {
 
-    private Goal goal;
+    private final Goal goal;
 
     private final TacletIndex tacletIndex;
 
@@ -39,8 +36,7 @@ public final class RuleAppIndex {
 
     private final BuiltInRuleAppIndex builtInRuleAppIndex;
 
-    private final List<NewRuleListener> listenerList =
-        Collections.synchronizedList(new ArrayList<>(10));
+    private NewRuleListener ruleListener = null;
 
     /**
      * The current mode of the index: For <code>autoMode==true</code>, the index
@@ -48,17 +44,24 @@ public final class RuleAppIndex {
      */
     private boolean autoMode;
 
+    private final NewRuleListener newRuleListener = new NewRuleListener() {
+        public void ruleAdded(RuleApp taclet, PosInOccurrence pos) {
+            informNewRuleListener(taclet, pos);
+        }
 
-    public RuleAppIndex(TacletAppIndex p_tacletAppIndex, BuiltInRuleAppIndex p_builtInRuleAppIndex,
-            Services services) {
-        this(p_tacletAppIndex.tacletIndex(), p_builtInRuleAppIndex, services);
-    }
+        @Override
+        public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
+            informNewRuleListener(rules, pos);
+        }
+    };
 
     public RuleAppIndex(TacletIndex p_tacletIndex, BuiltInRuleAppIndex p_builtInRuleAppIndex,
+            Goal goal,
             Services services) {
         tacletIndex = p_tacletIndex;
-        automatedTacletAppIndex = new TacletAppIndex(tacletIndex, services);
-        interactiveTacletAppIndex = new TacletAppIndex(tacletIndex, services);
+        automatedTacletAppIndex = new TacletAppIndex(tacletIndex, goal, services);
+        interactiveTacletAppIndex = new TacletAppIndex(tacletIndex, goal, services);
+        this.goal = goal;
         builtInRuleAppIndex = p_builtInRuleAppIndex;
         // default to false to keep compatibility with old code
         autoMode = false;
@@ -71,36 +74,21 @@ public final class RuleAppIndex {
 
     private RuleAppIndex(TacletIndex tacletIndex, TacletAppIndex interactiveTacletAppIndex,
             TacletAppIndex automatedTacletAppIndex, BuiltInRuleAppIndex builtInRuleAppIndex,
-            boolean autoMode) {
+            Goal goal, boolean autoMode) {
         this.tacletIndex = tacletIndex;
         this.interactiveTacletAppIndex = interactiveTacletAppIndex;
         this.automatedTacletAppIndex = automatedTacletAppIndex;
         this.builtInRuleAppIndex = builtInRuleAppIndex;
         this.autoMode = autoMode;
+        this.goal = goal;
 
         setNewRuleListeners();
     }
 
     private void setNewRuleListeners() {
-        NewRuleListener newRuleListener = new NewRuleListener() {
-            public void ruleAdded(RuleApp taclet, PosInOccurrence pos) {
-                informNewRuleListener(taclet, pos);
-            }
-
-            @Override
-            public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
-                informNewRuleListener(rules, pos);
-            }
-        };
         interactiveTacletAppIndex.setNewRuleListener(newRuleListener);
         automatedTacletAppIndex.setNewRuleListener(newRuleListener);
         builtInRuleAppIndex.setNewRuleListener(newRuleListener);
-    }
-
-    public void setup(Goal p_goal) {
-        goal = p_goal;
-        interactiveTacletAppIndex.setup(p_goal);
-        automatedTacletAppIndex.setup(p_goal);
     }
 
     /**
@@ -137,17 +125,8 @@ public final class RuleAppIndex {
      *
      * @param l the AppIndexListener to add
      */
-    public void addNewRuleListener(NewRuleListener l) {
-        listenerList.add(l);
-    }
-
-    /**
-     * removes a change listener to the index
-     *
-     * @param l the AppIndexListener to remove
-     */
-    public void removeNewRuleListener(NewRuleListener l) {
-        listenerList.remove(l);
+    public void setNewRuleListener(@Nullable NewRuleListener l) {
+        ruleListener = l;
     }
 
     /**
@@ -199,17 +178,14 @@ public final class RuleAppIndex {
      *
      * @param filter the TacletFiler filtering the taclets of interest
      * @param pos the PosInOccurrence to focus
-     * @param services the Services object encapsulating information about the java datastructures
-     *        like (static)types etc.
      * @return list of all possible instantiations
      */
-    public ImmutableList<NoPosTacletApp> getFindTaclet(TacletFilter filter, PosInOccurrence pos,
-            TermServices services) {
+    public ImmutableList<NoPosTacletApp> getFindTaclet(TacletFilter filter, PosInOccurrence pos) {
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
         if (!autoMode) {
-            result = result.prepend(interactiveTacletAppIndex.getFindTaclet(pos, filter, services));
+            result = result.prepend(interactiveTacletAppIndex.getFindTaclet(pos, filter));
         }
-        result = result.prepend(automatedTacletAppIndex.getFindTaclet(pos, filter, services));
+        result = result.prepend(automatedTacletAppIndex.getFindTaclet(pos, filter));
         return result;
     }
 
@@ -237,18 +213,16 @@ public final class RuleAppIndex {
      *
      * @param filter the TacletFiler filtering the taclets of interest
      * @param pos the PosInOccurrence to focus
-     * @param services the Services object encapsulating information about the java datastructures
-     *        like (static)types etc.
      * @return list of all possible instantiations
      */
-    public ImmutableList<NoPosTacletApp> getRewriteTaclet(TacletFilter filter, PosInOccurrence pos,
-            TermServices services) {
+    public ImmutableList<NoPosTacletApp> getRewriteTaclet(TacletFilter filter,
+            PosInOccurrence pos) {
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
         if (!autoMode) {
             result =
-                result.prepend(interactiveTacletAppIndex.getRewriteTaclet(pos, filter, services));
+                result.prepend(interactiveTacletAppIndex.getRewriteTaclet(pos, filter));
         }
-        result = result.prepend(automatedTacletAppIndex.getRewriteTaclet(pos, filter, services));
+        result = result.prepend(automatedTacletAppIndex.getRewriteTaclet(pos, filter));
 
         return result;
     }
@@ -267,7 +241,7 @@ public final class RuleAppIndex {
     /**
      * adds a new Taclet with instantiation information to the Taclet Index of this TacletAppIndex.
      *
-     * @param tacletApp the NoPosTacletApp describing a partial instantiated Taclet to add
+     * @param tacletApps the NoPosTacletApp describing a partial instantiated Taclet to add
      */
     public void addNoPosTacletApp(Iterable<NoPosTacletApp> tacletApps) {
         tacletIndex.addTaclets(tacletApps);
@@ -315,18 +289,14 @@ public final class RuleAppIndex {
     /**
      * called if a formula has been replaced
      *
-     * @param g the Goal which sequent has been changed
      * @param sci SequentChangeInfo describing the change of the sequent
      */
-    public void sequentChanged(Goal g, SequentChangeInfo sci) {
-        if (!autoMode)
-        // the TacletAppIndex is able to detect modification of the
-        // sequent itself, it is not necessary to clear the index
-        {
-            interactiveTacletAppIndex.sequentChanged(g, sci);
+    public void sequentChanged(SequentChangeInfo sci) {
+        if (!autoMode) {
+            interactiveTacletAppIndex.sequentChanged(sci);
         }
-        automatedTacletAppIndex.sequentChanged(g, sci);
-        builtInRuleAppIndex().sequentChanged(g, sci);
+        automatedTacletAppIndex.sequentChanged(sci);
+        builtInRuleAppIndex.sequentChanged(goal, sci, newRuleListener);
     }
 
     /**
@@ -366,7 +336,7 @@ public final class RuleAppIndex {
      */
     public void reportAutomatedRuleApps(NewRuleListener l, Services services) {
         automatedTacletAppIndex.reportRuleApps(l, services);
-        builtInRuleAppIndex().reportRuleApps(l, goal);
+        builtInRuleAppIndex.reportRuleApps(l, goal);
     }
 
     /**
@@ -375,15 +345,15 @@ public final class RuleAppIndex {
      * @param p_goal the Goal which to scan
      */
     public void scanBuiltInRules(Goal p_goal) {
-        builtInRuleAppIndex().scanApplicableRules(p_goal);
+        builtInRuleAppIndex().scanApplicableRules(p_goal, newRuleListener);
     }
 
     /**
      * informs all observers, if a formula has been added, changed or removed
      */
     private void informNewRuleListener(RuleApp p_app, PosInOccurrence p_pos) {
-        for (final NewRuleListener listener : listenerList) {
-            listener.ruleAdded(p_app, p_pos);
+        if (ruleListener != null) {
+            ruleListener.ruleAdded(p_app, p_pos);
         }
     }
 
@@ -392,8 +362,8 @@ public final class RuleAppIndex {
      */
     private void informNewRuleListener(ImmutableList<? extends RuleApp> p_apps,
             PosInOccurrence p_pos) {
-        for (final NewRuleListener listener : listenerList) {
-            listener.rulesAdded(p_apps, p_pos);
+        if (ruleListener != null) {
+            ruleListener.rulesAdded(p_apps, p_pos);
         }
     }
 
@@ -402,14 +372,14 @@ public final class RuleAppIndex {
      * returns a new RuleAppIndex with a copied TacletIndex. Attention: the listener lists are not
      * copied
      */
-    public RuleAppIndex copy() {
+    public RuleAppIndex copy(Goal goal) {
         TacletIndex copiedTacletIndex = tacletIndex.copy();
         TacletAppIndex copiedInteractiveTacletAppIndex =
-            interactiveTacletAppIndex.copyWithTacletIndex(copiedTacletIndex);
+            interactiveTacletAppIndex.copyWith(copiedTacletIndex, goal);
         TacletAppIndex copiedAutomatedTacletAppIndex =
-            automatedTacletAppIndex.copyWithTacletIndex(copiedTacletIndex);
+            automatedTacletAppIndex.copyWith(copiedTacletIndex, goal);
         return new RuleAppIndex(copiedTacletIndex, copiedInteractiveTacletAppIndex,
-            copiedAutomatedTacletAppIndex, builtInRuleAppIndex().copy(), autoMode);
+            copiedAutomatedTacletAppIndex, builtInRuleAppIndex().copy(), goal, autoMode);
     }
 
 

@@ -1,14 +1,10 @@
 package de.uka.ilkd.key.rule.executor.javadl;
 
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.FormulaChangeInfo;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
@@ -22,7 +18,9 @@ import org.key_project.util.collection.ImmutableList;
 
 public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
         extends TacletExecutor<TacletKind> {
-
+    public static final AtomicLong PERF_APPLY = new AtomicLong();
+    public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();
+    public static final AtomicLong PERF_TERM_LABELS = new AtomicLong();
 
     public FindTacletExecutor(TacletKind taclet) {
         super(taclet);
@@ -102,6 +100,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
             final Goal currentGoal = goalIt.next();
             final SequentChangeInfo currentSequent = newSequentsIt.next();
 
+            var timeApply = System.nanoTime();
             applyReplacewith(gt, termLabelState, currentSequent, tacletApp.posInOccurrence(), mc,
                 currentGoal, ruleApp, services);
 
@@ -122,15 +121,22 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
             // in the new sequent
             applyAddProgVars(gt.addedProgVars(), currentSequent, currentGoal,
                 tacletApp.posInOccurrence(), services, mc);
+            PERF_APPLY.getAndAdd(System.nanoTime() - timeApply);
 
+            var timeTermLabels = System.nanoTime();
             TermLabelManager.mergeLabels(currentSequent, services);
+            timeTermLabels = System.nanoTime() - timeTermLabels;
 
+            var timeSetSequent = System.nanoTime();
             currentGoal.setSequent(currentSequent);
+            PERF_SET_SEQUENT.getAndAdd(System.nanoTime() - timeSetSequent);
 
             currentGoal.setBranchLabel(gt.name());
 
+            timeTermLabels = System.nanoTime() + timeTermLabels;
             TermLabelManager.refactorSequent(termLabelState, services, ruleApp.posInOccurrence(),
                 ruleApp.rule(), currentGoal, null, null);
+            PERF_TERM_LABELS.getAndAdd(System.nanoTime() - timeTermLabels);
         }
 
         // in case the assumes sequent of the taclet did not

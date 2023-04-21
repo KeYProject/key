@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.strategy;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicLong;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -21,6 +24,9 @@ import org.key_project.util.collection.ImmutableSLList;
  * {@link Strategy#computeCost(RuleApp, PosInOccurrence, Goal)}).
  */
 public class QueueRuleApplicationManager implements AutomatedRuleApplicationManager {
+    public static final AtomicLong PERF_QUEUE_OPS = new AtomicLong();
+    public static final AtomicLong PERF_PEEK = new AtomicLong();
+    public static final AtomicLong PERF_CREATE_CONTAINER = new AtomicLong();
 
     /**
      * The goal this manager belongs to.
@@ -106,9 +112,12 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             return;
         }
 
+        var time = System.nanoTime();
         RuleAppContainer c = RuleAppContainer.createAppContainer(rule, pos, goal);
+        PERF_CREATE_CONTAINER.addAndGet(System.nanoTime() - time);
+
         ensureQueueExists();
-        queue = push(c, queue);
+        addRuleApp(c);
     }
 
     /**
@@ -123,18 +132,29 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             return;
         }
 
+        var time = System.nanoTime();
         final ImmutableList<RuleAppContainer> containers =
             RuleAppContainer.createAppContainers(rules, pos, goal);
+        PERF_CREATE_CONTAINER.addAndGet(System.nanoTime() - time);
         ensureQueueExists();
         for (RuleAppContainer rac : containers) {
+            addRuleApp(rac);
+        }
+    }
+
+    private void addRuleApp(RuleAppContainer rac) {
+        var time = System.nanoTime();
+        try {
             queue = push(rac, queue);
+        } finally {
+            PERF_QUEUE_OPS.addAndGet(System.nanoTime() - time);
         }
     }
 
     /**
      * Add a number of new rule apps to the heap
      */
-    private ImmutableHeap<RuleAppContainer> push(Iterator<RuleAppContainer> it,
+    private static ImmutableHeap<RuleAppContainer> push(Iterator<RuleAppContainer> it,
             ImmutableHeap<RuleAppContainer> sourceQueue) {
         while (it.hasNext()) {
             sourceQueue = push(it.next(), sourceQueue);
@@ -145,12 +165,37 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     /**
      * Add a new rule app to the heap, provided that the rule app is not infinitely expensive
      */
-    private ImmutableHeap<RuleAppContainer> push(RuleAppContainer c,
+    private static ImmutableHeap<RuleAppContainer> push(RuleAppContainer c,
             ImmutableHeap<RuleAppContainer> sourceQueue) {
-        if (c.getCost() instanceof TopRuleAppCost) {
+        if (c.getCost() == TopRuleAppCost.INSTANCE) {
             return sourceQueue;
         } else {
             return sourceQueue.insert(c);
+        }
+    }
+
+    private static ImmutableHeap<RuleAppContainer> createFurtherApps(
+            @Nullable RuleAppContainer from, Goal goal) {
+        if (from == null) {
+            return ImmutableLeftistHeap.nilHeap();
+        }
+        var apps = from.createFurtherApps(goal);
+        if (apps.isEmpty()) {
+            return ImmutableLeftistHeap.nilHeap();
+        }
+
+        var actualApps = new ArrayList<RuleAppContainer>(apps.size());
+        for (RuleAppContainer app : apps) {
+            if (app.getCost() == TopRuleAppCost.INSTANCE) {
+                continue;
+            }
+            actualApps.add(app);
+        }
+        var time = System.nanoTime();
+        try {
+            return ImmutableLeftistHeap.<RuleAppContainer>nilHeap().insert(actualApps.iterator());
+        } finally {
+            PERF_QUEUE_OPS.addAndGet(System.nanoTime() - time);
         }
     }
 
@@ -162,34 +207,35 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      */
     @Override
     public RuleApp peekNext() {
-        ensureQueueExists();
+        var otime = System.nanoTime();
+        try {
+            ensureQueueExists();
 
-        final long currentTime = goal.getTime();
-        if (currentTime != nextRuleTime) {
-            clearNextRuleApp();
-            nextRuleTime = currentTime;
-        }
+            final long currentTime = goal.getTime();
+            if (currentTime != nextRuleTime) {
+                clearNextRuleApp();
+                nextRuleTime = currentTime;
+            }
 
-        if (nextRuleApp != null) {
-            return nextRuleApp;
-        }
+            if (nextRuleApp != null) {
+                return nextRuleApp;
+            }
 
-        goal.ruleAppIndex().fillCache();
+            goal.ruleAppIndex().fillCache();
 
-        /*
-         * Create further appcontainers from previous minimum, which was removed from queue in a
-         * previous round.
-         */
-        ImmutableHeap<RuleAppContainer> furtherAppsQueue = ImmutableLeftistHeap.nilHeap();
-        if (previousMinimum != null) {
-            furtherAppsQueue =
-                push(previousMinimum.createFurtherApps(goal).iterator(), furtherAppsQueue);
+            /*
+             * Create further appcontainers from previous minimum, which was removed from queue in a
+             * previous round.
+             */
+            ImmutableHeap<RuleAppContainer> furtherAppsQueue =
+                createFurtherApps(previousMinimum, goal);
             previousMinimum = null;
-        }
 
-        clearNextRuleApp();
-        computeNextRuleApp(furtherAppsQueue);
-        return nextRuleApp;
+            computeNextRuleApp(furtherAppsQueue);
+            return nextRuleApp;
+        } finally {
+            PERF_PEEK.addAndGet(System.nanoTime() - otime);
+        }
     }
 
     /**
@@ -219,7 +265,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
          */
         ImmutableList<RuleAppContainer> workingList = ImmutableSLList.nil();
 
-        /**
+        /*
          * Try to find a rule app that can be completed until both queues are exhausted.
          */
         while (nextRuleApp == null && !(queue.isEmpty() && furtherAppsQueue.isEmpty())) {
@@ -234,36 +280,52 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             if (queue.isEmpty()) {
                 // Use furtherAppsQueue in case queue is empty.
                 furtherAppsQueueUsed = true;
-                minRuleAppContainer = furtherAppsQueue.findMin();
-                furtherAppsQueue = furtherAppsQueue.deleteMin();
+                var time = System.nanoTime();
+                try {
+                    minRuleAppContainer = furtherAppsQueue.findMin();
+                    furtherAppsQueue = furtherAppsQueue.deleteMin();
+                } finally {
+                    PERF_QUEUE_OPS.addAndGet(System.nanoTime() - time);
+                }
             } else if (furtherAppsQueue.isEmpty()) {
                 // Use queue in case furtherAppsQueueUsed is empty.
                 furtherAppsQueueUsed = false;
-                minRuleAppContainer = queue.findMin();
-                queue = queue.deleteMin();
+                var time = System.nanoTime();
+                try {
+                    minRuleAppContainer = queue.findMin();
+                    queue = queue.deleteMin();
+                } finally {
+                    PERF_QUEUE_OPS.addAndGet(System.nanoTime() - time);
+                }
             } else {
                 // Neither queue is empty. Find a minimum that ranges over both
                 // queues.
-                RuleAppContainer queueMin = queue.findMin();
-                RuleAppContainer furtherAppsQueueMin = furtherAppsQueue.findMin();
-                furtherAppsQueueUsed = queueMin.compareTo(furtherAppsQueueMin) > 0;
-                if (furtherAppsQueueUsed) {
-                    furtherAppsQueue = furtherAppsQueue.deleteMin();
-                    minRuleAppContainer = furtherAppsQueueMin;
-                } else {
-                    queue = queue.deleteMin();
-                    minRuleAppContainer = queueMin;
+                var time = System.nanoTime();
+                try {
+                    RuleAppContainer queueMin = queue.findMin();
+                    RuleAppContainer furtherAppsQueueMin = furtherAppsQueue.findMin();
+                    assert (queueMin != null && furtherAppsQueueMin != null);
+                    furtherAppsQueueUsed = queueMin.compareTo(furtherAppsQueueMin) > 0;
+                    if (furtherAppsQueueUsed) {
+                        furtherAppsQueue = furtherAppsQueue.deleteMin();
+                        minRuleAppContainer = furtherAppsQueueMin;
+                    } else {
+                        queue = queue.deleteMin();
+                        minRuleAppContainer = queueMin;
+                    }
+                } finally {
+                    PERF_QUEUE_OPS.addAndGet(System.nanoTime() - time);
                 }
             }
 
             nextRuleApp = minRuleAppContainer.completeRuleApp(goal);
-            /**
+            /*
              * The obtained minimum rule app container was removed from the queue it came from. The
              * following if-then-else block makes sure that {@link TacletAppContainer}s do not go
              * missing so that further apps can be created from it in future rounds.
              */
             if (nextRuleApp == null && minRuleAppContainer instanceof TacletAppContainer) {
-                /**
+                /*
                  * Cannot complete given {@link TacletAppContainer}, attempt resulted in null.
                  */
                 if (furtherAppsQueueUsed) {
@@ -277,8 +339,14 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
                      * Create further apps if found in main queue. Rule apps obtained this way will
                      * be considered during the current round.
                      */
-                    furtherAppsQueue = push(minRuleAppContainer.createFurtherApps(goal).iterator(),
-                        furtherAppsQueue);
+                    var time = System.nanoTime();
+                    try {
+                        furtherAppsQueue =
+                            push(minRuleAppContainer.createFurtherApps(goal).iterator(),
+                                furtherAppsQueue);
+                    } finally {
+                        PERF_QUEUE_OPS.addAndGet(System.nanoTime() - time);
+                    }
                 }
             } else {
                 /*
@@ -291,8 +359,13 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         /*
          * Put remaining elements into main queue, so they can be considered in the upcoming rounds.
          */
-        queue = queue.insert(workingList.iterator());
-        queue = queue.insert(furtherAppsQueue);
+        var time = System.nanoTime();
+        try {
+            queue = queue.insert(workingList.iterator());
+            queue = queue.insert(furtherAppsQueue);
+        } finally {
+            PERF_QUEUE_OPS.addAndGet(System.nanoTime() - time);
+        }
     }
 
     @Override

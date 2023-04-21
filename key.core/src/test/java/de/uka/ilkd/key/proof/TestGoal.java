@@ -86,11 +86,8 @@ public class TestGoal {
                 .insert(0, new SequentFormula(TacletForTests.parseTerm("A"))).semisequent());
         Node root = new Node(proof, seq);
         proof.setRoot(root);
-        Goal g = new Goal(root,
-            new RuleAppIndex(
-                new TacletAppIndex(TacletIndexKit.getKit().createTacletIndex(),
-                    proof.getServices()),
-                new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices()));
+        Goal g = new Goal(root, TacletIndexKit.getKit().createTacletIndex(),
+            new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices());
         ImmutableList<Goal> lg = g.split(3);
         lg.head().addNoPosTacletApp(TacletForTests.getRules().lookup("imp_right"));
         lg.tail().head().addNoPosTacletApp(TacletForTests.getRules().lookup("imp_left"));

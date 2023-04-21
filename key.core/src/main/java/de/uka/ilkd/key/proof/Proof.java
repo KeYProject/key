@@ -215,8 +215,7 @@ public class Proof implements Named {
         });
 
         var firstGoal =
-            new Goal(rootNode, new RuleAppIndex(new TacletAppIndex(rules, getServices()),
-                new BuiltInRuleAppIndex(builtInRules), getServices()));
+            new Goal(rootNode, rules, new BuiltInRuleAppIndex(builtInRules), getServices());
         openGoals = openGoals.prepend(firstGoal);
         setRoot(rootNode);
 

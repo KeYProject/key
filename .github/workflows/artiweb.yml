@@ -62,7 +62,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             let fs = require('fs');
-            let issue_number_text = fs.readFileSync('./pr_number', 'uft8');
+            let issue_number_text = fs.readFileSync('./pr_number', 'utf8');
             core.info("Found pr number \"" + issue_number_text + "\"");
             core.setOutput("pr-number", issue_number_text === "" ? "" : Number(issue_number_text));
       - name: Find Comment
