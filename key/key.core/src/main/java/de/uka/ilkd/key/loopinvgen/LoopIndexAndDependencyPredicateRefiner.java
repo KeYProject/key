@@ -501,55 +501,58 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 			Term lowToInner, innerToHigh;
 			Term lowToOuter, outerToHigh;
 
-			if (sProof.proofLEQ(inLow, index)) {
-				lowToInner = tb.matrixRange(heap, arr, outLow, outHigh, inLow, index);
-				if (sProof.proofLEQ(index, inHigh)) {
-					innerToHigh = tb.matrixRange(heap, arr, outLow, outHigh, index, inHigh);
-				} else {
+			if(!sProof.proofEquality(inLow, inHigh)) {
+				if (sProof.proofLEQ(inLow, index)) {
+					lowToInner = tb.matrixRange(heap, arr, outLow, outHigh, inLow, index);
+					if (sProof.proofLEQ(index, inHigh)) {
+						innerToHigh = tb.matrixRange(heap, arr, outLow, outHigh, index, inHigh);
+					} else {
 						innerToHigh = tb.empty();
 					}
-			} else {
-				lowToInner = tb.empty();
-				if (sProof.proofLEQ(index, inHigh)) {
-					innerToHigh = tb.matrixRange(heap, arr, outLow, outHigh, index, inHigh);
 				} else {
-					innerToHigh = tb.empty();
+					lowToInner = tb.empty();
+					if (sProof.proofLEQ(index, inHigh)) {
+						innerToHigh = tb.matrixRange(heap, arr, outLow, outHigh, index, inHigh);
+					} else {
+						innerToHigh = tb.empty();
+					}
+				}
+
+				if (depLDT.isDependencePredicate(pred.op())) {
+					final Function dependencyOp = (Function) pred.op();
+					if (lowToInner != null && lowToInner != tb.empty()) {
+						result.add(tb.func(dependencyOp, lowToInner));
+					}
+					if (innerToHigh != null && innerToHigh != tb.empty()) {
+						result.add(tb.func(dependencyOp, innerToHigh));
+					}
 				}
 			}
-
-			if (depLDT.isDependencePredicate(pred.op())) {
-				final Function dependencyOp = (Function) pred.op();
-				if (lowToInner != null && lowToInner != tb.empty()) {
-					result.add(tb.func(dependencyOp, lowToInner));
-				}
-				if(innerToHigh != null && innerToHigh!=tb.empty()){
-					result.add(tb.func(dependencyOp, innerToHigh));
-				}
-			}
-
-			if (sProof.proofLEQ(outLow, indexOuter)) {
-				lowToOuter = tb.matrixRange(heap, arr, outLow, indexOuter, inLow, inHigh);
-				if (sProof.proofLEQ(indexOuter, outHigh)) {
-					outerToHigh = tb.matrixRange(heap, arr, indexOuter, outHigh, inLow, inHigh);
+			if(!sProof.proofEquality(outLow, outHigh)) {
+				if (sProof.proofLEQ(outLow, indexOuter)) {
+					lowToOuter = tb.matrixRange(heap, arr, outLow, indexOuter, inLow, inHigh);
+					if (sProof.proofLEQ(indexOuter, outHigh)) {
+						outerToHigh = tb.matrixRange(heap, arr, indexOuter, outHigh, inLow, inHigh);
+					} else {
+						outerToHigh = tb.empty();
+					}
 				} else {
-					outerToHigh = tb.empty();
+					lowToOuter = tb.empty();
+					if (sProof.proofLEQ(indexOuter, outHigh)) {
+						outerToHigh = tb.matrixRange(heap, arr, indexOuter, outHigh, inLow, inHigh);
+					} else {
+						outerToHigh = tb.empty();
+					}
 				}
-			} else {
-				lowToOuter = tb.empty();
-				if (sProof.proofLEQ(indexOuter, outHigh)) {
-					outerToHigh = tb.matrixRange(heap, arr, indexOuter, outHigh, inLow, inHigh);
-				} else {
-					outerToHigh = tb.empty();
-				}
-			}
 
-			if (depLDT.isDependencePredicate(pred.op())) {
-				final Function dependencyOp = (Function) pred.op();
-				if (lowToOuter != null && lowToOuter != tb.empty()) {
-					result.add(tb.func(dependencyOp, lowToOuter));
-				}
-				if (outerToHigh != null && outerToHigh != tb.empty()) {
-					result.add(tb.func(dependencyOp, outerToHigh));
+				if (depLDT.isDependencePredicate(pred.op())) {
+					final Function dependencyOp = (Function) pred.op();
+					if (lowToOuter != null && lowToOuter != tb.empty()) {
+						result.add(tb.func(dependencyOp, lowToOuter));
+					}
+					if (outerToHigh != null && outerToHigh != tb.empty()) {
+						result.add(tb.func(dependencyOp, outerToHigh));
+					}
 				}
 			}
 		}

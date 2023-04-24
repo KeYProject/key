@@ -136,7 +136,7 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 			// Second approach calculates th inner LI for each outer iteration.
 			// I should compare their speed and precision.
 			ImmutableList<Goal> goalsAfterShiftUpdate = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
-			System.out.println("Goal after Shifting Outer Loop's Updates: " + goalsAfterShiftUpdate.head());
+//			System.out.println("Goal after Shifting Outer Loop's Updates: " + goalsAfterShiftUpdate.head());
 			for (Goal g : goalsAfterShiftUpdate) {
 				for (final SequentFormula sf : g.sequent().succedent()) {
 					final Term formula = tb.goBelowUpdates(sf.formula());
@@ -156,7 +156,7 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 								innerLoop = (LoopStatement) activePE;
 								SideProof innerLoopProof = new  SideProof(services, modifySeqAnte(g));
 								innerLI = innerLIComputation(innerLoopProof.retGoal().head(), activePE);//For now only taking the head goal
-								System.out.println("Inner Loop Inv:   " + innerLI);
+//								System.out.println("Inner Loop Inv:   " + innerLI);
 								once=true;
 							} else if (!firstApproach) {
 								innerLoop = (LoopStatement) activePE;
@@ -173,27 +173,27 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 				if (nested) {
 					LoopSpecification loopSpec = new LoopSpecificationImpl(innerLoop, tb.and(innerLI.getConjuncts()));
 					services.getSpecificationRepository().addLoopInvariant(loopSpec);
-					System.out.println("Goals before Usecase: " + goalsAfterShiftUpdate.head());
+//					System.out.println("Goals before Usecase: " + goalsAfterShiftUpdate.head());
 					ImmutableList<Goal> goalsAfterNestedLoopUsecase = ruleApp.applyNestedLoopUsecaseRule(goalsAfterShiftUpdate);
-					System.out.println("Goals after nested Loop Usecase: "+ goalsAfterNestedLoopUsecase);
+//					System.out.println("Goals after nested Loop Usecase: "+ goalsAfterNestedLoopUsecase);
 					goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterNestedLoopUsecase);
-					System.out.println("Goals After Shifting the inner LI : " + goalsAfterShift);
+//					System.out.println("Goals After Shifting the inner LI : " + goalsAfterShift);
 				}
 				if (firstApproach) {
 					nested = false;
 				}
 			}
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
-			System.out.println("goal for refinement: " + currentGoal + " ------------------------------");
+			System.out.println("Refinement for outer loop: " + " ------------------------------");
 			PredicateRefiner prOuter1 = null;
-			if(arrays.length==1)
-				prOuter1 = new NestedLoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(),
-						outerDepPreds, outerCompPreds, arrays[0], arrays[0],
+//			if(arrays.length==1)
+				prOuter1 = new LoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(),
+						outerDepPreds, outerCompPreds,
 						indexOuter, indexInner, outerItrNumber, services);
-			if(arrays.length==2)
-				prOuter1 = new NestedLoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(),
-						outerDepPreds, outerCompPreds, arrays[0], arrays[1],
-						indexOuter, indexInner, outerItrNumber, services);
+//			if(arrays.length==2)
+//				prOuter1 = new NestedLoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(),
+//						outerDepPreds, outerCompPreds, arrays[0], arrays[1],
+//						indexOuter, indexInner, outerItrNumber, services);
 			Pair<Set<Term>, Set<Term>> refinedOuterPreds1 = prOuter1.refine();
 
 			outerDepPreds = refinedOuterPreds1.first;

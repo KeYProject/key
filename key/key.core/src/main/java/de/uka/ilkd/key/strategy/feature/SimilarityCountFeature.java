@@ -38,9 +38,11 @@ public class SimilarityCountFeature implements Feature {
 
         LocSetLDT locsetLDT = goal.proof().getServices().getTypeConverter().getLocSetLDT();
 
+
         Term subFst = null;
         Term subSnd = null;
         int penalty = 0;
+
         while ( fst.op() == locsetLDT.getSetMinus() || snd.op()==locsetLDT.getSetMinus()) {
             if (fst.op() == locsetLDT.getSetMinus()) {
                 subFst = fst.sub(1);
@@ -67,12 +69,17 @@ public class SimilarityCountFeature implements Feature {
             return NumberRuleAppCost.getZeroCost();
         }
 
+
+
         int count = 0;
         for (int i = 0; i<fst.arity();i++) {
             if (fst.sub(i).equalsModRenaming(snd.sub(i))) {
                 count += 10;
             }
         }
+
+
+
         return NumberRuleAppCost.create(count - penalty > 0 ? count - penalty : 0);
     }
 

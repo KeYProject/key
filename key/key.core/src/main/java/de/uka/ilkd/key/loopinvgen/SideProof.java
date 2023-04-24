@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
@@ -85,6 +86,7 @@ public class SideProof {
 
 		final ProofStarter ps = new ProofStarter(false);
 		final ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(services.getProof());
+
 		ps.init(seq2prove, env, "IsInRange Proof");
 
 		StrategyProperties sp = null;
@@ -116,6 +118,7 @@ public class SideProof {
 		if (simplifyOnly) {
 			sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_OFF);
 		}
+
 
 		ps.setStrategyProperties(sp);
 		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
