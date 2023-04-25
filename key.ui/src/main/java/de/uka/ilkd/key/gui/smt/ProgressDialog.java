@@ -106,6 +106,7 @@ public class ProgressDialog extends JDialog {
         buttonBox.add(Box.createHorizontalStrut(5));
         if (!counterexample) {
             buttonBox.add(getFocusButton());
+            buttonBox.add(Box.createHorizontalStrut(5));
             buttonBox.add(getApplyButton());
             buttonBox.add(Box.createHorizontalStrut(5));
         }
