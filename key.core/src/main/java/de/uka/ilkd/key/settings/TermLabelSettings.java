@@ -33,8 +33,6 @@ public class TermLabelSettings extends AbstractSettings {
         if (str != null && (str.equals("true") || str.equals("false"))) {
             setUseOriginLabels(Boolean.parseBoolean(str));
         } else {
-            LOGGER.debug("TermLabelSettings: Failure while reading the setting \"UseOriginLabels\"."
-                + "Using the default value: true." + "The string read was: {}", str);
             setUseOriginLabels(true);
         }
     }

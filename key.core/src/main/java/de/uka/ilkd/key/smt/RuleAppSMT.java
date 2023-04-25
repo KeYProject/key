@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.smt;
 
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -80,6 +82,7 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
         }
 
 
+        @Nonnull
         @Override
         public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
             if (goal.proof().getInitConfig().getJustifInfo().getJustification(rule) == null) {
@@ -88,9 +91,8 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
 
             // RuleAppSMT app = (RuleAppSMT) ruleApp;
             // goal.node().getNodeInfo().setBranchLabel(app.getTitle());
-            ImmutableList<Goal> newGoals = goal.split(0);
 
-            return newGoals;
+            return goal.split(0);
         }
 
         /**

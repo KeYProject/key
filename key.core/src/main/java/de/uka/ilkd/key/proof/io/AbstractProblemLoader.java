@@ -29,6 +29,7 @@ import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.io.consistency.SimpleFileRepo;
+import de.uka.ilkd.key.prover.impl.PerfScope;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.Contract;
@@ -306,10 +307,18 @@ public abstract class AbstractProblemLoader {
     protected void loadEnvironment() throws ProofInputException, IOException {
         FileRepo fileRepo = createFileRepo();
 
+        var timeBeforeEnv = System.nanoTime();
+        LOGGER.info("Loading environment from " + file);
         envInput = createEnvInput(fileRepo);
+        LOGGER.debug(
+            "Environment load took " + PerfScope.formatTime(System.nanoTime() - timeBeforeEnv));
         problemInitializer = createProblemInitializer(fileRepo);
+        var beforeInitConfig = System.nanoTime();
+        LOGGER.info("Creating init config");
         initConfig = createInitConfig();
         initConfig.setFileRepo(fileRepo);
+        LOGGER.debug(
+            "Init config took " + PerfScope.formatTime(System.nanoTime() - beforeInitConfig));
         if (!problemInitializer.getWarnings().isEmpty() && !ignoreWarnings) {
             control.reportWarnings(problemInitializer.getWarnings());
         }
@@ -704,6 +713,7 @@ public abstract class AbstractProblemLoader {
 
     private ReplayResult replayProof(Proof proof)
             throws ProofInputException, ProblemLoaderException {
+        LOGGER.info("Replaying proof " + proof.name());
         String status = "";
         List<Throwable> errors = new LinkedList<>();
         Node lastTouchedNode = proof.root();

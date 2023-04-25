@@ -931,6 +931,7 @@ public final class SourceView extends JComponent {
 
             // add Line numbers to each Scrollview
             TextLineNumber tln = new TextLineNumber(textPane, 1);
+            tln.setUpdateFont(true);
             setRowHeaderView(tln);
         }
 

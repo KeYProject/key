@@ -307,8 +307,8 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
                 }
             };
             try {
-                ImmutableList<NoPosTacletApp> t = lastGoal.ruleAppIndex().getFindTaclet(filter,
-                    pos.getPosInOccurrence(), services);
+                ImmutableList<NoPosTacletApp> t =
+                    lastGoal.ruleAppIndex().getFindTaclet(filter, pos.getPosInOccurrence());
                 t.forEach(taclets::add);
             } catch (NullPointerException e) {
                 LOGGER.debug("NPE", e);
