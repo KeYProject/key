@@ -560,6 +560,10 @@ public class IntermediateProofReplayer {
         }
 
         if (RuleAppSMT.RULE.name().toString().equals(ruleName)) {
+            if (!ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().isEnableOnLoad()) {
+                status = SMT_NOT_RUN;
+                throw new SkipSMTRuleException();
+            }
             boolean error = false;
             final SMTProblem smtProblem = new SMTProblem(currGoal);
             try {
