@@ -714,6 +714,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 //				forEach(arg2, SubtermGenerator.leftTraverse(findLocSet, op(setMinus)),
 //						not(eq(instOfNonStrict("loc1"), arg2))), longConst(0));
 //
+
+        bindRuleSet(d, "simplify_dependency_predicates", longConst(-4000) );
         bindRuleSet(d, "dep_setMinus", noDoubleMinus);
 
         bindRuleSet(d, "dep_replace_known", add(longConst(8000), NonDuplicateAppFeature.INSTANCE));//EqNonDuplicateAppFeature
@@ -729,8 +731,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             ifZero(MatchedIfFeature.INSTANCE,
                 ScaleFeature.createAffine(
                     SimilarityCountFeature.create(instOf("loc1"), instOf("loc2")),
-                    -100, 1000),
-                longConst(0)));
+                    -10, 250),
+                longConst(-500)));
 
 
         Feature accessAtEarlierTime = gt("label1", "label2");
@@ -740,7 +742,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "accessAtSameOrLaterTime",
             ifZero(MatchedIfFeature.INSTANCE,
-                ifZero(leq("label1", "label2"), longConst(-100)), longConst(0)));
+               /* ifZero(eq(instOf("label1"), instOf("label2")),
+                        longConst(-200),*/
+                    ifZero(leq("label1", "label2"), longConst(-100), longConst(0))));
 
 
         bindRuleSet(d, "rewriteDependenciesAfterArgumentSimplification", add(noDoubleMinus, longConst(-100)));

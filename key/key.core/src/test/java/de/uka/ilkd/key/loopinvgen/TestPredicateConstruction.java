@@ -1072,7 +1072,9 @@ public LoopInvariantGenerationResult correlation_init_array() {//Change length o
 	}
 	Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 
-	String[] arrLeft = { "wellFormedMatrix(a, heap)", "noW(arrayRange(a,0,a.length-1))", "noW(matrixRange(heap,a,0,N-1,0,M-1))","noR(matrixRange(heap,a,0,N-1,0,M-1))", "a.length > N", "a[0].length > M", "N >10","M >10"};
+	String[] arrLeft = { "wellFormed(heap)", "a.<created>=TRUE", "wellFormedMatrix(a, heap)", "noW(arrayRange(a,0,a.length-1))",
+			"noW(matrixRange(heap,a,0,N-1,0,M-1))","noR(matrixRange(heap,a,0,N-1,0,M-1))",
+			"a.length > N", "a[0].length > M", "N >10","M >10"};
 	String[] arrRight = { "a=null" };
 	try {
 		for (String fml : arrLeft) {

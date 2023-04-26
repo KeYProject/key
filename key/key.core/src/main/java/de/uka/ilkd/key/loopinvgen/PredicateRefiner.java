@@ -174,7 +174,7 @@ public abstract class PredicateRefiner {
 //                false, true).sequent();
 
 
-        final boolean provable = sProof.isProvable(sideSeq, 60000,services);
+        final boolean provable = sProof.isProvable(sideSeq, 70000, services);
            // SideProof.isProvable(sideSeq, 100000, 60000, true, services);
 
 

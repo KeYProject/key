@@ -1872,8 +1872,8 @@ public class TermBuilder {
         for (int i = 0; i < subs.length; i++) {
             subs[i] = unlabelRecursive(term.sub(i));
         }
-        return tf.createTerm(term.op(), subs, term.boundVars(),
-                term.javaBlock());
+        return term.hasLabels() ? tf.createTerm(term.op(), subs, term.boundVars(),
+                term.javaBlock()) : term;
     }
 
     public Term dotArr(Term ref, Term idx) {

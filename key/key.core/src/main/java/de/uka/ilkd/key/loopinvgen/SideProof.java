@@ -107,6 +107,8 @@ public class SideProof {
 			sp = strategyDefinition.getDefaultPropertiesFactory().createDefaultStrategyProperties();
 		}
 
+
+
 		sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_OFF);
 
 		if (false && stopAtFirstUncloseableGoal) {
@@ -124,6 +126,7 @@ public class SideProof {
 		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
 		ps.setMaxRuleApplications(maxRuleApp);
 		ps.setTimeout(timeout);
+
 
 //		try {
 //			new ProofSaver(ps.getProof(), new java.io.File("C:\\Users\\Asma\\AAAAA.key")).save();

@@ -219,6 +219,7 @@ public class ProofStarter {
               StrategyFactory factory = profile.getDefaultStrategyFactory();
               StrategyProperties sp = factory.getSettingsDefinition().getDefaultPropertiesFactory().createDefaultStrategyProperties();;
               strategy = factory.create(proof, sp);
+              System.out.println("STRANGE");
            }
 
            proof.setActiveStrategy(strategy);
@@ -240,21 +241,22 @@ public class ProofStarter {
            ApplyStrategyInfo result;
            proof.setRuleAppIndexToAutoMode();
            
-           result = prover.start(proof, goals, maxSteps, timeout, strategy.isStopAtFirstNonCloseableGoal());          
-           
-           if (result.isError()) {
-               throw new RuntimeException("Proof attempt failed due to exception:"
-                                           + result.getException(),
-                                          result.getException());
-           }
+           result = prover.start(proof, goals, maxSteps, timeout, strategy.isStopAtFirstNonCloseableGoal());
 
            if (ptl != null) {
               prover.removeProverTaskObserver(ptl);
            }
+
            if (autoSaver != null) {
               prover.removeProverTaskObserver(autoSaver);
               autoSaver.setProof(null);
            }
+
+            if (result.isError()) {
+                throw new RuntimeException("Proof attempt failed due to exception:"
+                        + result.getException(),
+                        result.getException());
+            }
 
            return result;
         } 

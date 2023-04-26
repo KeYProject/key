@@ -177,6 +177,29 @@ public class OutputStreamProofSaver {
             header = makePathsRelative(header);
             ps.print(header);
 
+            // save function symbols
+            StringBuffer functions=new StringBuffer("\\functions {");
+            for (var fs : proof.getServices().getNamespaces().functions().allElements()) {
+                if (
+                        /* !proof.getEnv().getInitConfigForEnvironment().namespaces().functions().contains(fs) && */ fs.arity() == 0) {
+                    functions.append(fs.sort() + " " + fs.name() + "; //" + fs.isSkolemConstant() +  "\n");
+                }
+            }
+            functions.append("}\n");
+
+            ps.println(functions);
+
+            // save program variables
+            StringBuffer progVars=new StringBuffer("\\programVariables {");
+            for (var pv : proof.getServices().getNamespaces().programVariables().allElements()) {
+                if (true || proof.getEnv().getInitConfigForEnvironment().namespaces().programVariables().contains(pv)) {
+                    progVars.append(pv.sort() + " " + pv.name() + ";\n");
+                }
+            }
+            progVars.append("}\n");
+
+            ps.println(progVars);
+
             // \problem or \proofObligation
             if (po instanceof IPersistablePO
                     && (!(po instanceof AbstractInfFlowPO)
