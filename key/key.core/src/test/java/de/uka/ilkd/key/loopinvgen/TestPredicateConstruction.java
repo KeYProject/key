@@ -1105,10 +1105,70 @@ public LoopInvariantGenerationResult correlation_init_array() {//Change length o
 	final LIGNestedMDarr loopInvGenerator = new LIGNestedMDarr(seq, services);
 	return loopInvGenerator.generate();
 }
+//======================================================================================================================================
+
+	public LoopInvariantGenerationResult correlation_print_array() {//Change length of arrays in AbstractLoopInvariantGenerator to 1
+
+		Term succFormula;
+
+		try {
+			succFormula = parse("{i:=0 || j:=0}\\<{" + "		while (i<=N-1) {"
+														+ "			while (j<=M-1) {"
+														//+ "			if(((i * M) + j) / 20 == 0){"
+														+ "					x = a[i][j];"
+//														+ "				}"
+														+ "				j++;"
+														+ "				}"
+														+ "				j = 0;"
+														+ "				i++;}"
+														+ "		}\\>true");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return null;
+		}
+		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
+
+		String[] arrLeft = { "wellFormed(heap)", "a.<created>=TRUE", "wellFormedMatrix(a, heap)", "noW(arrayRange(a,0,a.length-1))",
+				"noW(matrixRange(heap,a,0,N-1,0,M-1))","noR(matrixRange(heap,a,0,N-1,0,M-1))",
+				"a.length > N", "a[0].length > M", "N >10","M >10", "N = M"};
+		String[] arrRight = { "a=null" };
+		try {
+			for (String fml : arrLeft) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return null;
+		}
+
+		try {
+			for (String fml : arrRight) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), false, false).sequent();
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return null;
+		}
+
+		final LIGNestedMDarr loopInvGenerator = new LIGNestedMDarr(seq, services);
+		return loopInvGenerator.generate();
+	}
 
 
 
-
+	//======================================================================================================================================
 	public static void main(String[] args) {
 		TestPredicateConstruction tpc = new TestPredicateConstruction();
 		LoopInvariantGenerationResult result;
@@ -1126,7 +1186,8 @@ public LoopInvariantGenerationResult correlation_init_array() {//Change length o
 //		result = tpc.basicMltpArrDiffIndex();
 //		System.out.println(result);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		result = tpc.correlation_init_array();
+//		result = tpc.correlation_init_array();
+		result = tpc.correlation_print_array();
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation took " + (end - start) + " ms");
 	}
