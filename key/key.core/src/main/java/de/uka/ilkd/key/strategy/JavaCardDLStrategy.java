@@ -735,10 +735,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 longConst(-500)));
 
 
-        Feature accessAtEarlierTime = gt("label1", "label2");
+        final Feature accessAtEarlierTime = gt("label1", "label2");
+        final Feature accessAtLaterTime = lt("label1", "label2");
 
         bindRuleSet(d, "accessAtEarlierTime",
             ifZero(MatchedIfFeature.INSTANCE, accessAtEarlierTime, longConst(0)));
+
+        bindRuleSet(d, "accessAtLaterTime",
+            ifZero(MatchedIfFeature.INSTANCE, accessAtLaterTime, longConst(0)));
+
 
         bindRuleSet(d, "accessAtSameOrLaterTime",
             ifZero(MatchedIfFeature.INSTANCE,
@@ -799,6 +804,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             applyTF(left, tf.polynomial),
             applyTF(right, tf.polynomial),
             not(PolynomialValuesCmpFeature.lt(instOf(right), instOf(left))));
+    }
+
+    private Feature lt(String left, String right) {
+        return add(
+            applyTF(left, tf.polynomial),
+            applyTF(right, tf.polynomial),
+            PolynomialValuesCmpFeature.lt(instOf(left), instOf(right)));
     }
 
     private void setupSelectSimplification(final RuleSetDispatchFeature d) {
