@@ -1,17 +1,21 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
 package de.uka.ilkd.key.java.transformations.pipeline;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
@@ -28,10 +32,6 @@ import com.github.javaparser.ast.type.VoidType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-
 /**
  * Each class is prepared before it is initialised. The preparation of
  * a class consists of pre-initialising the class fields with their
@@ -40,7 +40,8 @@ import java.util.List;
  * preparation.
  */
 public class ClassPreparationMethodBuilder extends JavaTransformer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClassPreparationMethodBuilder.class);
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(ClassPreparationMethodBuilder.class);
 
     public static final String CLASS_PREPARE_IDENTIFIER = "$clprepare";
 
@@ -57,7 +58,7 @@ public class ClassPreparationMethodBuilder extends JavaTransformer {
      * which are declared in one of the given compilation units.
      *
      * @param services the CrossReferenceServiceConfiguration with the
-     *                 information about the recoder model
+     *        information about the recoder model
      */
     public ClassPreparationMethodBuilder(TransformationPipelineServices services) {
         super(services);
@@ -83,23 +84,24 @@ public class ClassPreparationMethodBuilder extends JavaTransformer {
                     if (services.isConstant(variable.getInitializer())) {
                         SimpleName ident = variable.getName();
                         result.add(
-                                new ExpressionStmt(
-                                        new AssignExpr(
-                                                new KeyPassiveExpression(
-                                                        new NameExpr(ident.clone())),
-                                                services.getDefaultValue(variable.getType()),
-                                                AssignExpr.Operator.ASSIGN)));
+                            new ExpressionStmt(
+                                new AssignExpr(
+                                    new KeyPassiveExpression(
+                                        new NameExpr(ident.clone())),
+                                    services.getDefaultValue(variable.getType()),
+                                    AssignExpr.Operator.ASSIGN)));
                     }
                 }
             }
         }
 
         result.add(
-                new ExpressionStmt(
-                        new AssignExpr(
-                                new KeyPassiveExpression(new NameExpr(PipelineConstants.IMPLICIT_CLASS_PREPARED)),
-                                new BooleanLiteralExpr(true),
-                                AssignExpr.Operator.ASSIGN)));
+            new ExpressionStmt(
+                new AssignExpr(
+                    new KeyPassiveExpression(
+                        new NameExpr(PipelineConstants.IMPLICIT_CLASS_PREPARED)),
+                    new BooleanLiteralExpr(true),
+                    AssignExpr.Operator.ASSIGN)));
         return result;
     }
 
@@ -110,7 +112,8 @@ public class ClassPreparationMethodBuilder extends JavaTransformer {
                         .anyMatch(BodyDeclaration::isClassOrInterfaceDeclaration);
 
                 if (b) {
-                    LOGGER.debug("Inner Class detected. Reject building class initialisation methods.");
+                    LOGGER.debug(
+                        "Inner Class detected. Reject building class initialisation methods.");
                 }
 
                 // collect initializers for transformation phase
@@ -124,16 +127,16 @@ public class ClassPreparationMethodBuilder extends JavaTransformer {
      * given type declaration
      *
      * @param td the TypeDeclaration to which the new created method
-     *           will be attached
+     *        will be attached
      * @return the created class preparation method
      */
     private MethodDeclaration createPrepareMethod(TypeDeclaration<?> td) {
         NodeList<Modifier> modifiers = new NodeList<>(
-                new Modifier(Modifier.Keyword.STATIC),
-                new Modifier(Modifier.Keyword.PRIVATE));
+            new Modifier(Modifier.Keyword.STATIC),
+            new Modifier(Modifier.Keyword.PRIVATE));
         MethodDeclaration method = new MethodDeclaration(modifiers,
-                new VoidType(),  // return type is void
-                CLASS_PREPARE_IDENTIFIER);
+            new VoidType(), // return type is void
+            CLASS_PREPARE_IDENTIFIER);
         final var statements = class2staticFields.get(td);
         if (statements != null) {
             method.setBody(new BlockStmt(statements));

@@ -1,11 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
@@ -50,8 +50,8 @@ public class CreateBuilder extends JavaTransformer {
     private BlockStmt createBody() {
         var block = new BlockStmt();
         block.addStatement(
-                assign(attribute(new ThisExpr(), PipelineConstants.IMPLICIT_INITIALIZED),
-                        new BooleanLiteralExpr(false)));
+            assign(attribute(new ThisExpr(), PipelineConstants.IMPLICIT_INITIALIZED),
+                new BooleanLiteralExpr(false)));
         block.addStatement(call(PipelineConstants.IMPLICIT_OBJECT_PREPARE_ENTER));
         block.addStatement(new ReturnStmt(new ThisExpr()));
         return block;
@@ -63,7 +63,7 @@ public class CreateBuilder extends JavaTransformer {
      * method that takes the object to be created out of the pool
      *
      * @param type the TypeDeclaration for which the
-     *             <code>&lt;prepare&gt;</code> is created
+     *        <code>&lt;prepare&gt;</code> is created
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
     public MethodDeclaration createMethod(TypeDeclaration<?> type) {
@@ -71,8 +71,8 @@ public class CreateBuilder extends JavaTransformer {
         modifiers.add(new Modifier(Modifier.Keyword.PUBLIC));
 
         MethodDeclaration md = new MethodDeclaration(
-                modifiers, new ClassOrInterfaceType(null, services.getId(type)),
-                IMPLICIT_CREATE);
+            modifiers, new ClassOrInterfaceType(null, services.getId(type)),
+            IMPLICIT_CREATE);
         md.setBody(createBody());
         return md;
     }

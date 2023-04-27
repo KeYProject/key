@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.java.transformations;
 
+import java.util.List;
+
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.expr.Expression;
 import jdk.jshell.JShell;
 import jdk.jshell.SnippetEvent;
-
-import java.util.List;
 
 /**
  * An evaluator for constant expression based on {@link JShell}.
@@ -13,7 +13,8 @@ import java.util.List;
  * @author Alexander Weigl
  * @version 1 (11/2/21)
  */
-// TODO weigl: We want to rewrite this into a more isolated non-JShell version. JShell performance is not tested.
+// TODO weigl: We want to rewrite this into a more isolated non-JShell version. JShell performance
+// is not tested.
 public class ConstantExpressionEvaluator {
     private final JavaParser javaParser;
     private final JShell jShell = JShell.create();
@@ -26,9 +27,9 @@ public class ConstantExpressionEvaluator {
         List<SnippetEvent> value = jShell.eval(expr.toString());
         assert value.size() == 1;
         SnippetEvent evt = value.get(0);
-        //throw new EvaluationException("Could not evaluate " + expr, evt.exception());
+        // throw new EvaluationException("Could not evaluate " + expr, evt.exception());
         return evt.exception() == null;
-        //String result = evt.value();
+        // String result = evt.value();
     }
 
     public Expression evaluate(Expression expression) throws EvaluationException {
@@ -43,6 +44,6 @@ public class ConstantExpressionEvaluator {
             throw new EvaluationException("Could not evaluate " + expression, evt.exception());
         }
         return javaParser.parseExpression(evt.value()).getResult().orElseThrow(
-                () -> new EvaluationException("Could not evaluate " + expression, evt.exception()));
+            () -> new EvaluationException("Could not evaluate " + expression, evt.exception()));
     }
 }

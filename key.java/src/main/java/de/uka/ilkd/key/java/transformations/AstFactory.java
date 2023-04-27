@@ -8,7 +8,6 @@ import com.github.javaparser.ast.key.KeyPassiveExpression;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
-import java.util.Arrays;
 
 /**
  * This class provides static function for constructing AST more efficiently.
@@ -134,9 +133,7 @@ public class AstFactory {
                 break;
         }
         node.setLineComment(
-                String.format("Created by %s:%d", next.getFileName(), next.getLineNumber())
-        );
+            String.format("Created by %s:%d", next.getFileName(), next.getLineNumber()));
         return node;
     }
 }
-

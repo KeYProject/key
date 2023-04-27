@@ -1,17 +1,20 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
 package de.uka.ilkd.key.java.transformations.pipeline;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
@@ -22,9 +25,6 @@ import com.github.javaparser.ast.key.KeyMethodBodyStatement;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
-
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 import static de.uka.ilkd.key.java.transformations.AstFactory.*;
 
@@ -64,19 +64,22 @@ public class CreateObjectBuilder extends JavaTransformer {
         var arguments = new NodeList<Expression>();
 
         result.addStatement(
-                assign(name(NEW_OBJECT_VAR_NAME),
-                        call(new TypeExpr(thisType), PipelineConstants.IMPLICIT_INSTANCE_ALLOCATE, arguments)));
+            assign(name(NEW_OBJECT_VAR_NAME),
+                call(new TypeExpr(thisType), PipelineConstants.IMPLICIT_INSTANCE_ALLOCATE,
+                    arguments)));
 
-        MethodCallExpr createRef = new MethodCallExpr(new NameExpr(NEW_OBJECT_VAR_NAME), CreateBuilder.IMPLICIT_CREATE);
+        MethodCallExpr createRef =
+            new MethodCallExpr(new NameExpr(NEW_OBJECT_VAR_NAME), CreateBuilder.IMPLICIT_CREATE);
 
         // July 08 - mulbrich: wraps createRef into a method body statement to
         // avoid unnecessary dynamic dispatch.
         // Method body statement are not possible for anonymous classes, however.
         // Use a method call there
-        if (recoderClass.getName() == null) {//TODO weigl recheck
+        if (recoderClass.getName() == null) {// TODO weigl recheck
             // anonymous
             result.addStatement(
-                    new MethodCallExpr(new NameExpr(new SimpleName(NEW_OBJECT_VAR_NAME)), CreateBuilder.IMPLICIT_CREATE));
+                new MethodCallExpr(new NameExpr(new SimpleName(NEW_OBJECT_VAR_NAME)),
+                    CreateBuilder.IMPLICIT_CREATE));
         } else {
             result.addStatement(new KeyMethodBodyStatement(null, createRef, thisType));
         }
@@ -94,8 +97,8 @@ public class CreateObjectBuilder extends JavaTransformer {
      */
     public void createMethod(ClassOrInterfaceDeclaration type) {
         var md = type.addMethod(
-                IMPLICIT_OBJECT_CREATE,
-                Modifier.Keyword.PUBLIC, Modifier.Keyword.STATIC);
+            IMPLICIT_OBJECT_CREATE,
+            Modifier.Keyword.PUBLIC, Modifier.Keyword.STATIC);
         md.setType(new ClassOrInterfaceType(null, type.getName(), null));
         md.setBody(createBody(type));
     }

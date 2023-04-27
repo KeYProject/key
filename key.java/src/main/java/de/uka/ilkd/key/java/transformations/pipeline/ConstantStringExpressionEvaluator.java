@@ -1,11 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
@@ -13,14 +13,15 @@
 
 package de.uka.ilkd.key.java.transformations.pipeline;
 
+import java.util.Objects;
+
+import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
+import de.uka.ilkd.key.java.transformations.EvaluationException;
+
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.visitor.VoidVisitorWithDefaults;
-import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
-import de.uka.ilkd.key.java.transformations.EvaluationException;
-
-import java.util.Objects;
 
 public class ConstantStringExpressionEvaluator extends JavaTransformer {
 
@@ -40,7 +41,7 @@ public class ConstantStringExpressionEvaluator extends JavaTransformer {
                     if (!e.isNullLiteralExpr() && expType != null
                             && expType.isReferenceType()
                             && Objects.equals(expType.asReferenceType().getQualifiedName(),
-                            "java.lang.String")) {
+                                "java.lang.String")) {
                         try {
                             var expression = cee.evaluate(e);
                             e.replace(expression);

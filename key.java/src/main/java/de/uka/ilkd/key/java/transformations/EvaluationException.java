@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.java.transformations;
 
-import jdk.jshell.JShellException;
 
 /**
  * @author Alexander Weigl

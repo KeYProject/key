@@ -1,16 +1,15 @@
 package de.uka.ilkd.key.java;
 
-import com.github.javaparser.ast.Node;
-import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
+import java.util.*;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.util.Debug;
+
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
+import com.github.javaparser.resolution.types.ResolvedType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Alexander Weigl
@@ -31,6 +30,12 @@ public class KeYJPMapping {
     private final HashMap<Node, Object> map;
 
     /**
+     * maps a recoder programelement (or something similar, e.g. Type)
+     * to the KeY-equivalent
+     */
+    private final HashMap<ResolvedType, KeYJavaType> typeMap;
+
+    /**
      * maps a KeY programelement to the Recoder-equivalent
      */
     private final Map<Object, Node> revMap;
@@ -43,6 +48,7 @@ public class KeYJPMapping {
 
     public KeYJPMapping() {
         this.map = new LinkedHashMap<>(4096);
+        this.typeMap = new LinkedHashMap<>(4096);
         this.revMap = new LinkedHashMap<>(4096);
     }
 
@@ -51,15 +57,17 @@ public class KeYJPMapping {
      * creates a KeYRecoderMapping object.
      * Used for cloning and testing.
      *
-     * @param map           a HashMap mapping ProgramElements in Recoder to
-     *                      ProgramElements in KeY
-     * @param revMap        the reverse map (KeY->Recoder)
+     * @param map a HashMap mapping ProgramElements in Recoder to
+     *        ProgramElements in KeY
+     * @param revMap the reverse map (KeY->Recoder)
      * @param parsedSpecial boolean indicating if the special classes have been parsed in
      */
-    KeYJPMapping(HashMap<Node, Object> map, Map<Object, Node> revMap,
-                 KeYJavaType superArrayType,
-                 boolean parsedSpecial) {
+    KeYJPMapping(HashMap<Node, Object> map, HashMap<ResolvedType, KeYJavaType> typeMap,
+            Map<Object, Node> revMap,
+            KeYJavaType superArrayType,
+            boolean parsedSpecial) {
         this.map = map;
+        this.typeMap = typeMap;
         this.revMap = revMap;
         this.superArrayType = superArrayType;
         this.parsedSpecial = parsedSpecial;
@@ -72,6 +80,15 @@ public class KeYJPMapping {
      */
     public Object toKeY(Node pe) {
         return map.get(pe);
+    }
+
+    /**
+     * returns a matching ModelElement (KeY) to a given recoder.ModelElement
+     *
+     * @param pe a recoder.ModelElement
+     */
+    public KeYJavaType toKeY(ResolvedType pe) {
+        return typeMap.get(pe);
     }
 
 
@@ -108,17 +125,29 @@ public class KeYJPMapping {
         if (formerValue != null)
             LOGGER.error("Duplicate registration of type: {}, formerValue: {}", key, formerValue);
         revMap.put(key, rec);
+        // TODO remove
         LOGGER.warn("Size of rec2key: {} entries", map.size());
     }
 
-    public boolean mapped(Object rec) {
+    public void put(ResolvedType rec, KeYJavaType key) {
+        var formerValue = typeMap.put(rec, key);
+        if (formerValue != null)
+            LOGGER.error("Duplicate registration of resolved type: {}, formerValue: {}", key,
+                formerValue);
+    }
+
+    public boolean mapped(Node rec) {
         return map.containsKey(rec);
     }
 
-
     public Set<Object> elemsKeY() {
+        // TODO remove
         LOGGER.error("Size of rec2key: {} entries", map.size());
         return revMap.keySet();
+    }
+
+    public Collection<KeYJavaType> keYTypes() {
+        return this.typeMap.values();
     }
 
     public Set<Node> elemsRec() {
@@ -134,7 +163,8 @@ public class KeYJPMapping {
     }
 
     public KeYJPMapping copy() {
-        return new KeYJPMapping(new HashMap<>(map), new HashMap<>(revMap), superArrayType, parsedSpecial);
+        return new KeYJPMapping(new LinkedHashMap<>(map), new LinkedHashMap<>(typeMap),
+            new LinkedHashMap<>(revMap), superArrayType, parsedSpecial);
     }
 
     /**
@@ -163,14 +193,14 @@ public class KeYJPMapping {
      * not
      *
      * @param b boolean indicating if the special classes have been
-     *          parsed in
+     *        parsed in
      */
     public void parsedSpecial(boolean b) {
         parsedSpecial = b;
     }
 
     public Object toKeY(ResolvedDeclaration rm) {
-        //TODO weigl
+        // TODO weigl
         return toKeY(rm.toAst().get());
     }
 }

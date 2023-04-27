@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.java.transformations;
 
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.body.TypeDeclaration;
-import de.uka.ilkd.key.java.transformations.pipeline.*;
-
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
+import de.uka.ilkd.key.java.transformations.pipeline.*;
+
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.TypeDeclaration;
 
 /**
  * @author Alexander Weigl
@@ -30,7 +31,7 @@ public class KeYJavaPipeline {
 
     public static KeYJavaPipeline createDefault(TransformationPipelineServices pipelineServices) {
         KeYJavaPipeline p = new KeYJavaPipeline(pipelineServices);
-        //new EnumClassBuilder(pipelineServices),
+        // new EnumClassBuilder(pipelineServices),
         p.add(new JMLTransformer(pipelineServices));
         p.add(new ImplicitFieldAdder(pipelineServices));
         p.add(new InstanceAllocationMethodBuilder(pipelineServices));

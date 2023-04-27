@@ -1,17 +1,23 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
 package de.uka.ilkd.key.java.transformations.pipeline;
+
+import java.util.Optional;
+import javax.annotation.Nonnull;
+
+import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
+import de.uka.ilkd.key.java.transformations.EvaluationException;
 
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
@@ -21,11 +27,6 @@ import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.key.KeyPassiveExpression;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.VoidType;
-import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
-import de.uka.ilkd.key.java.transformations.EvaluationException;
-
-import javax.annotation.Nonnull;
-import java.util.Optional;
 
 import static de.uka.ilkd.key.java.transformations.AstFactory.*;
 import static de.uka.ilkd.key.java.transformations.pipeline.ClassPreparationMethodBuilder.CLASS_PREPARE_IDENTIFIER;
@@ -48,7 +49,7 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
      * which are declared in one of the given compilation units.
      *
      * @param services the CrossReferenceServiceConfiguration with the
-     *                 information about the recoder model
+     *        information about the recoder model
      */
     public ClassInitializeMethodBuilder(TransformationPipelineServices services) {
         super(services);
@@ -58,7 +59,7 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
      * returns true if the given fieldspecification denotes a constant
      * field. A constant field is declared as final and static and
      * initialised with a time constant, which is not prepared or
-     * initialised here.  ATTENTION: this is a derivation from the JLS
+     * initialised here. ATTENTION: this is a derivation from the JLS
      * but the obtained behaviour is equivalent as we only consider
      * completely compiled programs and not partial compilations. The
      * reason for preparation and initialisation of comnpile time
@@ -93,13 +94,13 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
         for (VariableDeclarator fs : specs) {
             if (fd.isStatic() && fs.getInitializer().isPresent() && !isConstantField(fd, fs)) {
                 result.add(
-                        new ExpressionStmt(
-                                new AssignExpr(
-                                        new KeyPassiveExpression(new NameExpr(fs.getName())),
-                                        fs.getInitializer().get().clone(),
-                                        AssignExpr.Operator.ASSIGN
+                    new ExpressionStmt(
+                        new AssignExpr(
+                            new KeyPassiveExpression(new NameExpr(fs.getName())),
+                            fs.getInitializer().get().clone(),
+                            AssignExpr.Operator.ASSIGN
 
-                                )));
+                        )));
             }
         }
         return result;
@@ -142,12 +143,12 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
     private CatchClause createCatchClause(String caughtType, String caughtParam, ThrowStmt t) {
         NodeList<Statement> catcher = new NodeList<>();
         var resetInitInProgress =
-                assignToPassive(PipelineConstants.IMPLICIT_CLASS_INIT_IN_PROGRESS, mkTrue());
+            assignToPassive(PipelineConstants.IMPLICIT_CLASS_INIT_IN_PROGRESS, mkTrue());
         var markErroneous = assignToPassive(PipelineConstants.IMPLICIT_CLASS_ERRONEOUS, mkTrue());
 
         Parameter param = new Parameter(
-                services.getType("java", "lang", caughtType),
-                caughtParam);
+            services.getType("java", "lang", caughtType),
+            caughtParam);
 
         catcher.add(resetInitInProgress);
         catcher.add(markErroneous);
@@ -173,21 +174,21 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
             final var superType = type.getAncestors().get(0);
             final var scope = new NameExpr(superType.getQualifiedName());
             initializerExecutionBody.add(0,
-                    callPassively(scope, CLASS_INITIALIZE_IDENTIFIER));
+                callPassively(scope, CLASS_INITIALIZE_IDENTIFIER));
         }
 
         // catch clauses
         var catchClauses = new NodeList<CatchClause>();
         catchClauses.add(
-                mark(createCatchClause("Error", "err", throwName("err"))));
+            mark(createCatchClause("Error", "err", throwName("err"))));
 
         var exceptionInInitializerArguments = new NodeList<Expression>();
         exceptionInInitializerArguments.add(new NameExpr(new SimpleName("twa")));
 
         ThrowStmt t = new ThrowStmt(
-                new ObjectCreationExpr(null,
-                        services.getType("java", "lang", "ExceptionInInitializerError"),
-                        exceptionInInitializerArguments));
+            new ObjectCreationExpr(null,
+                services.getType("java", "lang", "ExceptionInInitializerError"),
+                exceptionInInitializerArguments));
 
         catchClauses.add(createCatchClause("Throwable", "twa", t));
 
@@ -209,40 +210,43 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
 
         var s = PipelineConstants.IMPLICIT_CLASS_PREPARED;
         clInitNotInProgressBody.add(
-                ifthen(negate(fieldAccessPassively(mkThis(), s)),
-                        block(clNotPreparedBody))
-        );
+            ifthen(negate(fieldAccessPassively(mkThis(), s)),
+                block(clNotPreparedBody)));
 
 
         var clErroneousBody = new NodeList<Statement>();
         clErroneousBody.add(
-                new ThrowStmt(
-                        new ObjectCreationExpr(null,
-                                services.getType("java", "lang", "NoClassDefFoundError"),
-                                new NodeList<>())));
+            new ThrowStmt(
+                new ObjectCreationExpr(null,
+                    services.getType("java", "lang", "NoClassDefFoundError"),
+                    new NodeList<>())));
 
         // IF <classErroneous> : clErroneousBody : null
         clInitNotInProgressBody.add(
-                ifthen(namePassively(PipelineConstants.IMPLICIT_CLASS_ERRONEOUS), block(clErroneousBody)));
+            ifthen(namePassively(PipelineConstants.IMPLICIT_CLASS_ERRONEOUS),
+                block(clErroneousBody)));
 
 
         // @(CLASS_INIT_IN_PROGRESS) = true
         clInitNotInProgressBody.add(
-                assignToPassive(PipelineConstants.IMPLICIT_CLASS_INIT_IN_PROGRESS, mkTrue()));
+            assignToPassive(PipelineConstants.IMPLICIT_CLASS_INIT_IN_PROGRESS, mkTrue()));
 
 
         // create try block in initialized method
         clInitNotInProgressBody.add(createInitializerExecutionTryBlock(td));
-        clInitNotInProgressBody.add(assignToPassive(PipelineConstants.IMPLICIT_CLASS_INIT_IN_PROGRESS, mkFalse()));
-        clInitNotInProgressBody.add(assignToPassive(PipelineConstants.IMPLICIT_CLASS_ERRONEOUS, mkFalse()));
-        clInitNotInProgressBody.add(assignToPassive(PipelineConstants.IMPLICIT_CLASS_INITIALIZED, mkTrue()));
+        clInitNotInProgressBody
+                .add(assignToPassive(PipelineConstants.IMPLICIT_CLASS_INIT_IN_PROGRESS, mkFalse()));
+        clInitNotInProgressBody
+                .add(assignToPassive(PipelineConstants.IMPLICIT_CLASS_ERRONEOUS, mkFalse()));
+        clInitNotInProgressBody
+                .add(assignToPassive(PipelineConstants.IMPLICIT_CLASS_INITIALIZED, mkTrue()));
 
         clInitializeBody.add(ifthen(
-                negate(namePassively(PipelineConstants.IMPLICIT_CLASS_INIT_IN_PROGRESS)),
-                block(clInitNotInProgressBody)));
+            negate(namePassively(PipelineConstants.IMPLICIT_CLASS_INIT_IN_PROGRESS)),
+            block(clInitNotInProgressBody)));
 
         methodBody.add(ifthen(negate(namePassively(PipelineConstants.IMPLICIT_CLASS_INITIALIZED)),
-                block(clInitializeBody)));
+            block(clInitializeBody)));
 
         return block(methodBody);
     }
@@ -257,14 +261,14 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
      * </pre></code>
      *
      * @param td the TypeDeclaration to which the new created method
-     *           will be attached
+     *        will be attached
      * @return the created class preparation method
      * @see #createInitializeMethod(TypeDeclaration)
      */
     private MethodDeclaration createInitializeMethod(TypeDeclaration<?> td) {
         MethodDeclaration md = new MethodDeclaration(new NodeList<>(),
-                new VoidType(),
-                CLASS_INITIALIZE_IDENTIFIER);
+            new VoidType(),
+            CLASS_INITIALIZE_IDENTIFIER);
         md.addModifier(Modifier.Keyword.STATIC, Modifier.Keyword.PUBLIC);
         md.setBody(createInitializeMethodBody(td));
         return md;

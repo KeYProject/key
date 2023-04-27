@@ -1,11 +1,12 @@
 package de.uka.ilkd.key.java;
 
 
-import com.github.javaparser.ast.Node;
+import java.net.URI;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.speclang.PositionedString;
 
-import javax.annotation.Nullable;
-import java.net.URI;
+import com.github.javaparser.ast.Node;
 
 /**
  * @author Alexander Weigl

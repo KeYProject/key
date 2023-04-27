@@ -1,5 +1,13 @@
 package de.uka.ilkd.key.java.transformations.pipeline;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+
+import de.uka.ilkd.key.java.JavaService;
+import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
+import de.uka.ilkd.key.java.transformations.EvaluationException;
+
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
@@ -12,27 +20,20 @@ import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.*;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
-import com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import com.github.javaparser.resolution.model.SymbolReference;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
-import de.uka.ilkd.key.java.JavaService;
-import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
-import de.uka.ilkd.key.java.transformations.EvaluationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
  * @version 1 (11/2/21)
  */
 public class TransformationPipelineServices {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TransformationPipelineServices.class);
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(TransformationPipelineServices.class);
 
     @Nonnull
     private final TransformerCache cache;
@@ -41,7 +42,8 @@ public class TransformationPipelineServices {
     private final JavaService javaService;
 
 
-    public TransformationPipelineServices(@Nonnull JavaService javaService, @Nonnull TransformerCache cache) {
+    public TransformationPipelineServices(@Nonnull JavaService javaService,
+            @Nonnull TransformerCache cache) {
         this.cache = cache;
         this.javaService = javaService;
     }
@@ -56,16 +58,18 @@ public class TransformationPipelineServices {
     }
 
 
-    /*protected TypeDeclaration<?> containingClass(TypeDeclaration<?> td) {
-        Node container = td.getContainingReferenceType();
-        if (container == null) {
-            container = td.getParentNode().get();
-        }
-        while (!(container instanceof TypeDeclaration<?>)) {
-            container = container.getParentNode().get();
-        }
-        return (TypeDeclaration<?>) container;
-    }*/
+    /*
+     * protected TypeDeclaration<?> containingClass(TypeDeclaration<?> td) {
+     * Node container = td.getContainingReferenceType();
+     * if (container == null) {
+     * container = td.getParentNode().get();
+     * }
+     * while (!(container instanceof TypeDeclaration<?>)) {
+     * container = container.getParentNode().get();
+     * }
+     * return (TypeDeclaration<?>) container;
+     * }
+     */
 
 
     public String getId(TypeDeclaration<?> td) {
@@ -85,7 +89,7 @@ public class TransformationPipelineServices {
      * according to JLS Sect. 4.5.5
      *
      * @return the default value of the given type
-     * according to JLS Sect. 4.5.5
+     *         according to JLS Sect. 4.5.5
      */
     public Expression getDefaultValue(Type type) {
         if (type instanceof ReferenceType) {
@@ -93,29 +97,29 @@ public class TransformationPipelineServices {
         } else if (type instanceof PrimitiveType) {
             PrimitiveType ptype = (PrimitiveType) type;
             switch (ptype.getType()) {
-                case BOOLEAN:
-                    return new BooleanLiteralExpr(false);
-                case KEY_BIGINT:
-                case BYTE:
-                case SHORT:
-                case INT:
-                    return new IntegerLiteralExpr("0");
-                case LONG:
-                    return new LongLiteralExpr("0");
+            case BOOLEAN:
+                return new BooleanLiteralExpr(false);
+            case KEY_BIGINT:
+            case BYTE:
+            case SHORT:
+            case INT:
+                return new IntegerLiteralExpr("0");
+            case LONG:
+                return new LongLiteralExpr("0");
 
-                case CHAR:
-                    return new CharLiteralExpr((char) 0);
-                case FLOAT:
-                case DOUBLE:
-                case KEY_REAL:
-                    return new DoubleLiteralExpr("0.0");
+            case CHAR:
+                return new CharLiteralExpr((char) 0);
+            case FLOAT:
+            case DOUBLE:
+            case KEY_REAL:
+                return new DoubleLiteralExpr("0.0");
 
-                case KEY_LOCSET:
-                case KEY_SEQ:
-                case KEY_FREE:
-                case KEY_MAP:
-                    throw new IllegalArgumentException("TODO");
-                    //return new KeyEscapeExpression(null, new NodeList<>());
+            case KEY_LOCSET:
+            case KEY_SEQ:
+            case KEY_FREE:
+            case KEY_MAP:
+                throw new IllegalArgumentException("TODO");
+            // return new KeyEscapeExpression(null, new NodeList<>());
             }
         }
         LOGGER.error("makeImplicitMembersExplicit: unknown primitive type: {}", type);
@@ -146,7 +150,7 @@ public class TransformationPipelineServices {
      * returns true if the given FieldDeclaration denotes a constant
      * field. A constant field is declared as final and static and
      * initialised with a time constant, which is not prepared or
-     * initialised here.  ATTENTION: this is a derivation from the JLS
+     * initialised here. ATTENTION: this is a derivation from the JLS
      * but the obtained behaviour is equivalent as we only consider
      * completely compiled programs and not partial compilations. The
      * reason for preparation and initialisation of comnpile time
@@ -170,13 +174,15 @@ public class TransformationPipelineServices {
         return new ClassOrInterfaceType(null, decl.getName(), null);
     }
 
-    /*public ResolvedTypeDeclaration getJavaLangObject() {
-        return javaService.getTypeSolver().getSolvedJavaLangObject();
-    }*/
+    /*
+     * public ResolvedTypeDeclaration getJavaLangObject() {
+     * return javaService.getTypeSolver().getSolvedJavaLangObject();
+     * }
+     */
 
     public Type getType(ResolvedType type) {
         if (type.isArray()) {
-            //TODO weigl type.arrayLevel()
+            // TODO weigl type.arrayLevel()
             return new ArrayType(getType(type.asArrayType().getComponentType()));
         }
 
@@ -191,9 +197,10 @@ public class TransformationPipelineServices {
         return null;
     }
 
-    public List<SymbolReference<? extends ResolvedValueDeclaration>> getUsages(ResolvedFieldDeclaration v, Node node) {
-        //TODO
-        return Collections.emptyList();//;resolver.solveSymbol(v.getName(), node);
+    public List<SymbolReference<? extends ResolvedValueDeclaration>> getUsages(
+            ResolvedFieldDeclaration v, Node node) {
+        // TODO
+        return Collections.emptyList();// ;resolver.solveSymbol(v.getName(), node);
     }
 
     /**
@@ -226,20 +233,20 @@ public class TransformationPipelineServices {
      * </code>
      *
      * @param cd the TypeDeclaration<?> of which the initilizers have to
-     *           be collected
+     *        be collected
      * @return the list of copy assignments and method references
-     * realising the initializers.
+     *         realising the initializers.
      */
     public NodeList<Statement> getInitializers(ClassOrInterfaceDeclaration cd) {
         NodeList<Statement> result = new NodeList<>();
         NodeList<MethodDeclaration> mdl = new NodeList<>();
 
         var initializers =
-                cd.getMembers().stream()
-                        .filter(BodyDeclaration::isInitializerDeclaration)
-                        .map(it -> (InitializerDeclaration) it)
-                        .filter(it -> !it.isStatic())
-                        .collect(Collectors.toList());
+            cd.getMembers().stream()
+                    .filter(BodyDeclaration::isInitializerDeclaration)
+                    .map(it -> (InitializerDeclaration) it)
+                    .filter(it -> !it.isStatic())
+                    .collect(Collectors.toList());
 
 
         for (InitializerDeclaration initializer : initializers) {
@@ -252,19 +259,20 @@ public class TransformationPipelineServices {
         }
 
         var memberFields =
-                cd.getMembers().stream()
-                        .filter(BodyDeclaration::isFieldDeclaration)
-                        .map(it -> (FieldDeclaration) it)
-                        .filter(it -> !it.isStatic())
-                        .collect(Collectors.toList());
+            cd.getMembers().stream()
+                    .filter(BodyDeclaration::isFieldDeclaration)
+                    .map(it -> (FieldDeclaration) it)
+                    .filter(it -> !it.isStatic())
+                    .collect(Collectors.toList());
 
         for (FieldDeclaration field : memberFields) {
             for (VariableDeclarator variable : field.getVariables()) {
                 if (variable.getInitializer().isPresent()) {
                     Expression fieldInit = variable.getInitializer().get();
                     final var access = new FieldAccessExpr(
-                            new ThisExpr(), new NodeList<>(), variable.getName());
-                    var fieldCopy = new AssignExpr(access, fieldInit.clone(), AssignExpr.Operator.ASSIGN);
+                        new ThisExpr(), new NodeList<>(), variable.getName());
+                    var fieldCopy =
+                        new AssignExpr(access, fieldInit.clone(), AssignExpr.Operator.ASSIGN);
                     result.add(new ExpressionStmt(fieldCopy));
                 }
             }
@@ -291,15 +299,15 @@ public class TransformationPipelineServices {
             }
 
             switch (p.name()) {
-                case "int":
-                case "byte":
-                case "short":
-                    return new IntegerLiteralExpr("0");
-                case "char":
-                    return new CharLiteralExpr("0");
-                case "float":
-                case "double":
-                    return new DoubleLiteralExpr("0.0");
+            case "int":
+            case "byte":
+            case "short":
+                return new IntegerLiteralExpr("0");
+            case "char":
+                return new CharLiteralExpr("0");
+            case "float":
+            case "double":
+                return new DoubleLiteralExpr("0.0");
             }
         }
 
@@ -334,8 +342,8 @@ public class TransformationPipelineServices {
     public static class TransformerCache {
         private final NodeList<CompilationUnit> cUnits = new NodeList<>();
         private Set<TypeDeclaration<?>> classDeclarations;
-        //private HashMap<ReferenceType, List<Name>> localClass2FinalVar;
-        //private HashMap<TypeDeclaration, List<ReferenceType>> typeDeclaration2allSupertypes;
+        // private HashMap<ReferenceType, List<Name>> localClass2FinalVar;
+        // private HashMap<TypeDeclaration, List<ReferenceType>> typeDeclaration2allSupertypes;
 
         public TransformerCache(List<CompilationUnit> cUnits) {
             this.cUnits.addAll(cUnits);
@@ -402,21 +410,22 @@ public class TransformationPipelineServices {
         public List<ResolvedReferenceType> getAllSupertypes(TypeDeclaration<?> td) {
             return td.resolve().getAncestors();
             /*
-            if (td.isEnumDeclaration()) {
-                return Collections.singletonList(getType("java", "lang", "Enum"));
-            }
-
-            if (td.isRecordDeclaration()) {
-                return Collections.singletonList(getType("java", "lang", "Record"));
-            }
-
-            if (td.isAnnotationDeclaration()) {
-                return Collections.emptyList();
-            }
-
-            ClassOrInterfaceDeclaration cd = (ClassOrInterfaceDeclaration) td;
-            var a = cd.resolve();
-            return typeDeclaration2allSupertypes.get(td);*/
+             * if (td.isEnumDeclaration()) {
+             * return Collections.singletonList(getType("java", "lang", "Enum"));
+             * }
+             *
+             * if (td.isRecordDeclaration()) {
+             * return Collections.singletonList(getType("java", "lang", "Record"));
+             * }
+             *
+             * if (td.isAnnotationDeclaration()) {
+             * return Collections.emptyList();
+             * }
+             *
+             * ClassOrInterfaceDeclaration cd = (ClassOrInterfaceDeclaration) td;
+             * var a = cd.resolve();
+             * return typeDeclaration2allSupertypes.get(td);
+             */
         }
 
         public List<CompilationUnit> getUnits() {

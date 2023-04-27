@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.java;
 
+import java.io.Reader;
+
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.stmt.BlockStmt;
-
-import java.io.Reader;
 
 /**
  * @author Alexander Weigl

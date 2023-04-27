@@ -1,17 +1,20 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
 package de.uka.ilkd.key.java.transformations.pipeline;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
@@ -24,11 +27,6 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.VoidType;
-import de.uka.ilkd.key.java.transformations.pipeline.JavaTransformer;
-import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static de.uka.ilkd.key.java.transformations.AstFactory.assign;
 import static de.uka.ilkd.key.java.transformations.AstFactory.attribute;
@@ -52,8 +50,7 @@ public class PrepareObjectBuilder extends JavaTransformer {
      */
     private List<VariableDeclarator> getFields(TypeDeclaration<?> cd) {
         List<VariableDeclarator> result = new ArrayList<>();
-        outer:
-        for (FieldDeclaration fd : cd.getFields()) {
+        outer: for (FieldDeclaration fd : cd.getFields()) {
             for (Modifier mod : fd.getModifiers()) {
                 if (mod.getKeyword() == Modifier.Keyword.MODEL)
                     continue outer;
@@ -81,7 +78,7 @@ public class PrepareObjectBuilder extends JavaTransformer {
                     SimpleName fieldId = variable.getName();
                     if (!fieldId.getIdentifier().startsWith("<")) {
                         result.add(assign((attribute(new ThisExpr(), fieldId.getIdentifier())),
-                                services.getDefaultValue(field.resolve().getType())));
+                            services.getDefaultValue(field.resolve().getType())));
 
                     }
                 }
@@ -98,7 +95,8 @@ public class PrepareObjectBuilder extends JavaTransformer {
         var body = new NodeList<Statement>();
         if (type.resolve().isJavaLangObject()) {
             // we can access the implementation
-            body.add(new ExpressionStmt(new MethodCallExpr(new SuperExpr(), IMPLICIT_OBJECT_PREPARE)));
+            body.add(
+                new ExpressionStmt(new MethodCallExpr(new SuperExpr(), IMPLICIT_OBJECT_PREPARE)));
             body.addAll(defaultSettings(type.getFields()));
         }
         return new BlockStmt(body);
@@ -109,14 +107,15 @@ public class PrepareObjectBuilder extends JavaTransformer {
      * sets the fields of the given type to its default values
      *
      * @param type the TypeDeclaration for which the
-     *             <code>&lt;prepare&gt;</code> is created
+     *        <code>&lt;prepare&gt;</code> is created
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
     public MethodDeclaration createMethod(TypeDeclaration type) {
-        NodeList<Modifier> modifiers = new NodeList<Modifier>(new Modifier(Modifier.Keyword.PROTECTED));
+        NodeList<Modifier> modifiers =
+            new NodeList<Modifier>(new Modifier(Modifier.Keyword.PROTECTED));
         MethodDeclaration md = new MethodDeclaration(modifiers,
-                new VoidType(),
-                IMPLICIT_OBJECT_PREPARE);
+            new VoidType(),
+            IMPLICIT_OBJECT_PREPARE);
         md.setBody(createPrepareBody(type));
         return md;
     }
@@ -126,14 +125,14 @@ public class PrepareObjectBuilder extends JavaTransformer {
      * sets the fields of the given type to its default values
      *
      * @param type the TypeDeclaration for which the
-     *             <code>&lt;prepare&gt;</code> is created
+     *        <code>&lt;prepare&gt;</code> is created
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
     public MethodDeclaration createMethodPrepareEnter(TypeDeclaration<?> type) {
         NodeList<Modifier> modifiers = new NodeList<>(new Modifier(Modifier.Keyword.PRIVATE));
         MethodDeclaration md = new MethodDeclaration(modifiers,
-                new VoidType(),
-                IMPLICIT_OBJECT_PREPARE_ENTER);
+            new VoidType(),
+            IMPLICIT_OBJECT_PREPARE_ENTER);
         md.setBody(createPrepareBody(type));
         return md;
     }
