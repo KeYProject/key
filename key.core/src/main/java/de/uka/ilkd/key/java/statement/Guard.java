@@ -4,11 +4,12 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import org.key_project.util.ExtList;
 
-import java.util.List;
+import org.key_project.util.ExtList;
 
 public class Guard extends JavaNonTerminalProgramElement implements IGuard {
 

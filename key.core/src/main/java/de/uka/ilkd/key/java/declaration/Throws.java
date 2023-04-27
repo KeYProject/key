@@ -1,13 +1,14 @@
 package de.uka.ilkd.key.java.declaration;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.List;
 
 /**
  * Throws.
@@ -53,7 +54,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
      * @param children the children of this AST element as KeY classes. May contain: several of
-     *                 TypeReference (as references to thrown exceptions), Comments
+     *        TypeReference (as references to thrown exceptions), Comments
      */
     public Throws(ExtList children) {
         super(children);

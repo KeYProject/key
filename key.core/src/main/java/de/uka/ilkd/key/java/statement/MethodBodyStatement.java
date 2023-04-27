@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.statement;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.*;
@@ -11,8 +13,6 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.List;
 
 
 /**
@@ -118,10 +118,11 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
             new MethodReference(args, method.getProgramElementName(), newContext);
     }
 
-    public MethodBodyStatement(PositionInfo pi, List<Comment> c, IProgramVariable resultVar, TypeReference bodySource,
-                               MethodReference methodReference, IProgramMethod method) {
+    public MethodBodyStatement(PositionInfo pi, List<Comment> c, IProgramVariable resultVar,
+            TypeReference bodySource,
+            MethodReference methodReference, IProgramMethod method) {
         super(pi, c);
-        this.resultVar=resultVar;
+        this.resultVar = resultVar;
         this.bodySource = bodySource;
         this.method = method;
         this.methodReference = methodReference;

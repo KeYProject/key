@@ -1,11 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
@@ -13,16 +13,17 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import java.util.List;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Declaration;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.declaration.modifier.*;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import javax.annotation.Nonnull;
-import java.util.List;
 
 /**
  * Java declaration.
@@ -41,7 +42,8 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
     @Nonnull
     protected final ImmutableArray<Modifier> modArray;
 
-    public JavaDeclaration(PositionInfo pi, List<Comment> comments, @Nonnull ImmutableArray<Modifier> modArray) {
+    public JavaDeclaration(PositionInfo pi, List<Comment> comments,
+            @Nonnull ImmutableArray<Modifier> modArray) {
         super(pi, comments);
         this.modArray = modArray;
     }
@@ -68,8 +70,8 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
      * @param children the children of this AST element as KeY classes. May
-     *                 include: several Modifier (taken as modifiers of the declaration),
-     *                 a Comment
+     *        include: several Modifier (taken as modifiers of the declaration),
+     *        a Comment
      */
     public JavaDeclaration(ExtList children) {
         super(children);

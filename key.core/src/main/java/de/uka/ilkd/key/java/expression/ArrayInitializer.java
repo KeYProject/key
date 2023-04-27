@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.expression;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -7,8 +9,6 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.List;
 
 
 /**
@@ -51,8 +51,9 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
         this.children = new ImmutableArray<>(expressions);
     }
 
-    public ArrayInitializer(PositionInfo pi, List<Comment> c, ImmutableArray<Expression> children, KeYJavaType keyJavaType) {
-        super(pi,c);
+    public ArrayInitializer(PositionInfo pi, List<Comment> c, ImmutableArray<Expression> children,
+            KeYJavaType keyJavaType) {
+        super(pi, c);
         this.kjt = keyJavaType;
         this.children = children;
     }

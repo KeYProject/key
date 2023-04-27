@@ -123,7 +123,7 @@ public class JavaReduxFileCollection implements FileCollection {
     public Stream<URL> getResources() {
         return resources.stream()
                 .map(it -> KeYResourceManager.getManager().getResourceFile(
-                        Recoder2KeY.class, resourceLocation + "/" + it));
+                    Recoder2KeY.class, resourceLocation + "/" + it));
     }
 
     /*

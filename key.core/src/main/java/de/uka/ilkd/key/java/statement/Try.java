@@ -1,17 +1,15 @@
 package de.uka.ilkd.key.java.statement;
 
+import java.util.List;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import javax.annotation.Nonnull;
-import java.util.List;
 
 /**
  * Try.
@@ -25,14 +23,16 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
     private final MethodFrame innerMostMethodFrame;
     private final int prefixLength;
 
-    public Try(PositionInfo pi, List<Comment> comments, StatementBlock body, ImmutableArray<Branch> branches,
-               MethodFrame innerMostMethodFrame, int prefixLength) {
+    public Try(PositionInfo pi, List<Comment> comments, StatementBlock body,
+            ImmutableArray<Branch> branches,
+            MethodFrame innerMostMethodFrame, int prefixLength) {
         super(pi, comments);
         this.body = body;
         this.branches = branches;
         this.innerMostMethodFrame = innerMostMethodFrame;
         this.prefixLength = prefixLength;
     }
+
     /**
      * Try.
      *
@@ -51,7 +51,7 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
     /**
      * Try.
      *
-     * @param body     a statement block.
+     * @param body a statement block.
      * @param branches a branch array.
      */
 
@@ -68,7 +68,7 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
     /**
      * Try.
      *
-     * @param body     a statement block.
+     * @param body a statement block.
      * @param branches a branch array.
      */
 
@@ -162,17 +162,18 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
 
     /**
      * Returns the child at the specified index in this node's "virtual"
-      child array
+     * child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
      * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-                                             of bounds
+     *         of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (body != null) {
-            if (index == 0) return body;
+            if (index == 0)
+                return body;
             index--;
         }
         if (branches != null) {
@@ -233,7 +234,7 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
      *
      * @param index an index for a branch.
      * @return the branch with the given index.
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out*                                        of bounds.
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out* of bounds.
      */
 
     public Branch getBranchAt(int index) {

@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.expression.literal;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
@@ -7,8 +9,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Name;
-
-import java.util.List;
 
 /**
  * Null literal. Is used as singleton.

@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.statement;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -10,8 +12,6 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.List;
 
 /**
  * The statement inserted by KeY if a method call is executed.
@@ -89,13 +89,15 @@ public class MethodFrame extends JavaStatement
 
     }
 
-    public MethodFrame(PositionInfo pi, List<Comment> c, IProgramVariable resultVar, StatementBlock body,
-                       IExecutionContext execContext, PosInProgram firstActiveChildPos, int prefixLength, MethodFrame o) {
+    public MethodFrame(PositionInfo pi, List<Comment> c, IProgramVariable resultVar,
+            StatementBlock body,
+            IExecutionContext execContext, PosInProgram firstActiveChildPos, int prefixLength,
+            MethodFrame o) {
         super(pi, c);
         this.resultVar = resultVar;
         this.body = body;
         this.execContext = execContext;
-        this.firstActiveChildPos=firstActiveChildPos;
+        this.firstActiveChildPos = firstActiveChildPos;
         this.prefixLength = prefixLength;
         this.innerMostMethodFrame = o;
     }

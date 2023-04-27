@@ -1,11 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
@@ -13,16 +13,17 @@
 
 package de.uka.ilkd.key.java.reference;
 
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import org.key_project.util.ExtList;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.List;
+import org.key_project.util.ExtList;
 
 
 public class VariableReference extends JavaNonTerminalProgramElement
@@ -69,7 +70,7 @@ public class VariableReference extends JavaNonTerminalProgramElement
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
      * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                                        of bounds
+     *         of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (variable != null) {
@@ -127,11 +128,11 @@ public class VariableReference extends JavaNonTerminalProgramElement
      * Gets the KeY java type.
      *
      * @param javaServ the java services
-     * @param ec       the execution context
+     * @param ec the execution context
      * @return the KeY java type
      */
     public KeYJavaType getKeYJavaType(Services javaServ,
-                                      ExecutionContext ec) {
+            ExecutionContext ec) {
         return getKeYJavaType();
     }
 

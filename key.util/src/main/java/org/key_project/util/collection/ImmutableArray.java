@@ -1,10 +1,10 @@
 package org.key_project.util.collection;
 
-import javax.annotation.Nonnull;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import javax.annotation.Nonnull;
 
 public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Serializable {
 
@@ -24,15 +24,15 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     }
 
     public ImmutableArray(S s1) {
-        content = (S[]) new Object[]{s1};
+        content = (S[]) new Object[] { s1 };
     }
 
     public ImmutableArray(S s1, S s2) {
-        content = (S[]) new Object[]{s1, s2};
+        content = (S[]) new Object[] { s1, s2 };
     }
 
     public ImmutableArray(S s1, S s2, S s3) {
-        content = (S[]) new Object[]{s1, s2, s3};
+        content = (S[]) new Object[] { s1, s2, s3 };
     }
 
     /**
@@ -191,7 +191,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
         @Override
         public void remove() {
             throw new UnsupportedOperationException(
-                    "Illegal modification access on unmodifiable array.");
+                "Illegal modification access on unmodifiable array.");
         }
     }
 

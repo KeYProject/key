@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.declaration;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -12,8 +14,6 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.List;
 
 /**
  * There are several types of class declarations:
@@ -114,10 +114,10 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     }
 
     public ClassDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> modArray,
-                            ProgramElementName name, ProgramElementName fullName,
-                            ImmutableArray<MemberDeclaration> members, boolean parentIsInterface,
-                            boolean isLibrary, Extends extending, Implements implementing, boolean innerClass,
-                            boolean localClassDeclaration, boolean isAnonymousClass) {
+            ProgramElementName name, ProgramElementName fullName,
+            ImmutableArray<MemberDeclaration> members, boolean parentIsInterface,
+            boolean isLibrary, Extends extending, Implements implementing, boolean innerClass,
+            boolean localClassDeclaration, boolean isAnonymousClass) {
         super(pi, c, modArray, name, fullName, members, parentIsInterface, isLibrary);
         this.extending = extending;
         this.implementing = implementing;

@@ -1,16 +1,14 @@
 package de.uka.ilkd.key.java.statement;
 
-import de.uka.ilkd.key.java.*;
-import java.util.Optional;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import org.key_project.util.ExtList;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.List;
+import org.key_project.util.ExtList;
 
 public final class Ccatch extends BranchImp implements ParameterContainer, VariableScope {
     @Nullable
@@ -22,7 +20,7 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
     private final StatementBlock body;
 
     public Ccatch(PositionInfo pi, List<Comment> comments, @Nullable ParameterDeclaration parameter,
-                  @Nullable CcatchNonstandardParameterDeclaration nonStdParameter, StatementBlock body) {
+            @Nullable CcatchNonstandardParameterDeclaration nonStdParameter, StatementBlock body) {
         super(pi, comments);
         this.parameter = parameter;
         this.nonStdParameter = nonStdParameter;
@@ -32,7 +30,7 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
     /**
      * Ccatch.
      *
-     * @param e    a parameter declaration.
+     * @param e a parameter declaration.
      * @param body a statement.
      */
     public Ccatch(ParameterDeclaration e, StatementBlock body) {
@@ -42,7 +40,7 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
     /**
      * Ccatch.
      *
-     * @param e    a parameter declaration.
+     * @param e a parameter declaration.
      * @param body a statement.
      */
     public Ccatch(CcatchNonstandardParameterDeclaration e, StatementBlock body) {
@@ -53,7 +51,8 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
      * @param children the children of this AST element as KeY classes. May contain:
-                      Comments, a*        ParameterDeclaration (declaring the catched                 exceptions) a StatementBlock (as the*        action to do when                 catching)
+     *        Comments, a* ParameterDeclaration (declaring the catched exceptions) a StatementBlock
+     *        (as the* action to do when catching)
      */
     public Ccatch(ExtList children) {
         super(children);

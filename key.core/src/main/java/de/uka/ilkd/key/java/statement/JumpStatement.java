@@ -1,10 +1,11 @@
 package de.uka.ilkd.key.java.statement;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.PositionInfo;
-import org.key_project.util.ExtList;
 
-import java.util.List;
+import org.key_project.util.ExtList;
 
 /**
  * Jump statement.

@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.statement;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
@@ -7,8 +9,6 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.List;
 
 /**
  * For.
@@ -56,7 +56,8 @@ public class For extends LoopStatement implements VariableScope {
             children.get(IForUpdates.class), children.get(Statement.class), children);
     }
 
-    public For(PositionInfo pi, List<Comment> c, LoopInit loopInit, ForUpdates forUpdates, Guard guard, PositionInfo accept) {
+    public For(PositionInfo pi, List<Comment> c, LoopInit loopInit, ForUpdates forUpdates,
+            Guard guard, PositionInfo accept) {
     }
 
     public SourceElement getLastElement() {

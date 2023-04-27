@@ -1,3 +1,16 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
+
+import de.uka.ilkd.key.java.JP2KeYConverter;
+import de.uka.ilkd.key.java.JP2KeYTypeConverter;
+import de.uka.ilkd.key.java.KeYJPMapping;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
@@ -5,36 +18,28 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
-import de.uka.ilkd.key.java.JP2KeYConverter;
-import de.uka.ilkd.key.java.KeYJPMapping;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.proof.init.JavaProfile;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.stream.Stream;
 
 /**
  * @author Alexander Weigl
  * @version 1 (17.04.23)
  */
 public class ReduxTest {
-    public static final String PATHTOREDUX = "../key.core/src/main/resources/de/uka/ilkd/key/java/JavaRedux";
+    public static final String PATHTOREDUX =
+        "../key.core/src/main/resources/de/uka/ilkd/key/java/JavaRedux";
 
-    private final JP2KeYConverter converter = new JP2KeYConverter(
-            new Services(JavaProfile.getDefaultProfile()),
-            new KeYJPMapping(), new Namespace<>());
+    private final Services services = new Services(JavaProfile.getDefaultProfile());
+    private final KeYJPMapping mapping = new KeYJPMapping();
     private final TypeSolver typeSolver = new JavaParserTypeSolver(Paths.get(PATHTOREDUX));
+    private final JP2KeYConverter converter = new JP2KeYConverter(services, mapping,
+        new Namespace<>(), new JP2KeYTypeConverter(services, typeSolver, mapping));
     private final JavaSymbolSolver javaSymbolSolver = new JavaSymbolSolver(typeSolver);
 
-    private final JavaParser parser = new JavaParser(new ParserConfiguration().setSymbolResolver(javaSymbolSolver));
+    private final JavaParser parser =
+        new JavaParser(new ParserConfiguration().setSymbolResolver(javaSymbolSolver));
 
     @Test
     void testJavaLangObject() {

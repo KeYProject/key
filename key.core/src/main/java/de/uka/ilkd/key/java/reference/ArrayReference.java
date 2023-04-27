@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.reference;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
@@ -7,8 +9,6 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.List;
 
 /**
  * Array reference.
@@ -102,7 +102,8 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
         }
     }
 
-    public ArrayReference(PositionInfo pi, List<Comment> c, ReferencePrefix prefix, ImmutableArray<Expression> inits) {
+    public ArrayReference(PositionInfo pi, List<Comment> c, ReferencePrefix prefix,
+            ImmutableArray<Expression> inits) {
         super(pi, c);
         this.prefix = prefix;
         this.inits = inits;

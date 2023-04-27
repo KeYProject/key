@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.expression.operator;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -9,10 +11,9 @@ import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.List;
 
 /**
  * Type operator.
@@ -32,8 +33,8 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
      * @param children the children of this AST element as KeY classes. May contain: a TypeReference
-     *                 (the referred type) 2 of Expression (the first Expression as left hand side, the
-     *                 second as right hand side), Comments
+     *        (the referred type) 2 of Expression (the first Expression as left hand side, the
+     *        second as right hand side), Comments
      */
     public TypeOperator(ExtList children) {
         super(children);
@@ -44,8 +45,8 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
      * @param children the children of this AST element as KeY classes. May contain: a TypeReference
-     *                 (the referred type) 2 of Expression (the first Expression as left hand side, the
-     *                 second as right hand side), Comments
+     *        (the referred type) 2 of Expression (the first Expression as left hand side, the
+     *        second as right hand side), Comments
      */
     public TypeOperator(ExtList children, PositionInfo pi) {
         super(children);
@@ -66,7 +67,8 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
         typeReference = null;
     }
 
-    public TypeOperator(PositionInfo pi, List<Comment> c, ImmutableArray<Expression> arguments, TypeReference type) {
+    public TypeOperator(PositionInfo pi, List<Comment> c, ImmutableArray<Expression> arguments,
+            TypeReference type) {
         super(pi, c, arguments);
         typeReference = type;
     }

@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.java;
 
+import java.util.List;
+
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.List;
 
 /**
  * Top level implementation of a Java {@link NonTerminalProgramElement}. taken from COMPOST and

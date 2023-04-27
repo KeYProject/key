@@ -1,11 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
@@ -13,12 +13,13 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import java.util.List;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import org.key_project.util.ExtList;
 
-import javax.annotation.Nonnull;
-import java.util.List;
+import org.key_project.util.ExtList;
 
 /**
  * Then.
@@ -87,12 +88,13 @@ public final class Then extends BranchImp {
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
      * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                                        of bounds
+     *         of bounds
      */
 
     public ProgramElement getChildAt(int index) {
         if (body != null) {
-            if (index == 0) return body;
+            if (index == 0)
+                return body;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -108,13 +110,16 @@ public final class Then extends BranchImp {
     }
 
     /*
-      Return the statement at the specified index in this node's
-      "virtual" statement array.
-      @param index an index for a statement.
-      @return the statement with the given index.
-      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-      of bounds.
-    */
+     * Return the statement at the specified index in this node's
+     * "virtual" statement array.
+     *
+     * @param index an index for a statement.
+     *
+     * @return the statement with the given index.
+     *
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     * of bounds.
+     */
 
     public Statement getStatementAt(int index) {
         if (body != null && index == 0) {

@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.java.expression.operator;
 
+import java.util.List;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -12,19 +15,15 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import javax.annotation.Nonnull;
-import java.util.List;
-
-import org.key_project.util.ExtList;
 
 public class DLEmbeddedExpression extends Operator {
     private final Function functionSymbol;
 
     public DLEmbeddedExpression(PositionInfo pi, List<Comment> comments, Function functionSymbol,
-                                @Nonnull ImmutableArray<Expression> children) {
+            @Nonnull ImmutableArray<Expression> children) {
         super(pi, comments, children);
         this.functionSymbol = functionSymbol;
     }
@@ -40,7 +39,7 @@ public class DLEmbeddedExpression extends Operator {
 
     /**
      * Arity of an embedded JavaDL Expression depends upon the number of arguments.
-     *<p>
+     * <p>
      * Since the first argument may be implicitly given, we cannot use the arity of
      * {@link #functionSymbol}.
      */

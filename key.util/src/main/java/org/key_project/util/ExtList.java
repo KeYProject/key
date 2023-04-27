@@ -11,8 +11,9 @@ import java.util.List;
  * extends java.util.LinkedList in order to collect elements
  * according to their type.
  *
- * @deprecated This class provides a bad coding style of exploiting reflection in the construction of KeY-Java-AST.
- * Will be removed.
+ * @deprecated This class provides a bad coding style of exploiting reflection in the construction
+ *             of KeY-Java-AST.
+ *             Will be removed.
  */
 @Deprecated
 public class ExtList extends ArrayList<Object> {
@@ -62,7 +63,7 @@ public class ExtList extends ArrayList<Object> {
             if (cl.isInstance(next) && (next != null)) {
                 colls.add((T) next);
             }
-    }
+        }
         return colls;
     }
 
@@ -112,7 +113,7 @@ public class ExtList extends ArrayList<Object> {
 
     public void addFirst(Object o) {
         add(0, o);
-}
+    }
 
     public Object removeFirst() {
         return remove(0);

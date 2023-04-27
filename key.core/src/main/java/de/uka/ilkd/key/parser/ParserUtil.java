@@ -22,7 +22,7 @@ public final class ParserUtil {
     public static void checkValidSingletonReference(Expression expr, Token tok) {
         // weigl: I hope I catch them all.
         if (expr instanceof VariableReference || expr instanceof ThisReference
-                //|| expr instanceof ArrayReference || expr instanceof ArrayLengthReference
+        // || expr instanceof ArrayReference || expr instanceof ArrayLengthReference
                 || expr instanceof UncollatedReferenceQualifier || expr instanceof SuperReference) {
             return;
         }

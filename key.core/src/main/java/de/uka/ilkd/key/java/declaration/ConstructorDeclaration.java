@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.declaration;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -10,8 +12,6 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.List;
 
 
 /**
@@ -55,8 +55,9 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
     }
 
     public ConstructorDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> map,
-                                  TypeReference o, Comment[] comments, ProgramElementName name, ImmutableArray<ParameterDeclaration> map1,
-                                  Throws exceptions, StatementBlock body, boolean parentIsInterfaceDeclaration) {
+            TypeReference o, Comment[] comments, ProgramElementName name,
+            ImmutableArray<ParameterDeclaration> map1,
+            Throws exceptions, StatementBlock body, boolean parentIsInterfaceDeclaration) {
         super(pi, c, map, o, comments, name, map1, exceptions, body, parentIsInterfaceDeclaration);
     }
 

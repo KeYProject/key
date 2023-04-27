@@ -1,11 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
@@ -13,18 +13,19 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.List;
 
 /**
  * Loop scope block. TODO
@@ -42,7 +43,7 @@ public final class LoopScopeBlock extends JavaStatement
     private final int prefixLength;
 
     public LoopScopeBlock(PositionInfo pi, List<Comment> comments, IProgramVariable indexPV,
-                          StatementBlock body, MethodFrame innerMostMethodFrame, int prefixLength) {
+            StatementBlock body, MethodFrame innerMostMethodFrame, int prefixLength) {
         super(pi, comments);
         this.indexPV = indexPV;
         this.body = body;
@@ -104,14 +105,15 @@ public final class LoopScopeBlock extends JavaStatement
             return (ProgramPrefix) body.getStatementAt(0);
         } else {
             throw new IndexOutOfBoundsException(
-                    "No next prefix element " + this);
+                "No next prefix element " + this);
         }
     }
 
     @Override
     public ProgramPrefix getLastPrefixElement() {
         return hasNextPrefixElement()
-                ? getNextPrefixElement().getLastPrefixElement() : this;
+                ? getNextPrefixElement().getLastPrefixElement()
+                : this;
     }
 
     @Override
@@ -156,7 +158,7 @@ public final class LoopScopeBlock extends JavaStatement
     @Override
     public Expression getExpressionAt(int index) {
         if (indexPV != null && index == 0) {
-            return (ProgramVariable) indexPV; //XXX This cast may fail...
+            return (ProgramVariable) indexPV; // XXX This cast may fail...
         }
         throw new ArrayIndexOutOfBoundsException();
     }

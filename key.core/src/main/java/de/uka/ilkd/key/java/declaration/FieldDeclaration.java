@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.declaration;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -8,8 +10,6 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.List;
 
 /**
  * Field declaration. taken from COMPOST and changed to achieve an immutable structure
@@ -53,8 +53,9 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
             new ImmutableArray<>(children.collect(FieldSpecification.class));
     }
 
-    public FieldDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> modArray, TypeReference type,
-                            boolean parentIsInferface, ImmutableArray<FieldSpecification> fieldSpecs) {
+    public FieldDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> modArray,
+            TypeReference type,
+            boolean parentIsInferface, ImmutableArray<FieldSpecification> fieldSpecs) {
         super(pi, c, modArray, type, parentIsInferface);
         this.fieldSpecs = fieldSpecs;
     }

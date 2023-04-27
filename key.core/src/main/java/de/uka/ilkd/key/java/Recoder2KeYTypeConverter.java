@@ -139,7 +139,6 @@ public class Recoder2KeYTypeConverter {
      * @return null iff t == null, otherwise a keytype.
      */
     public KeYJavaType getKeYJavaType(recoder.abstraction.Type t) {
-
         // change from 2012-02-07: there must be a definite KJT
         if (t == null) {
             throw new NullPointerException("null cannot be converted into a KJT");

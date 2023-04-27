@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.statement;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MetaClassReference;
@@ -10,8 +12,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.List;
 
 /**
  * Synchronized block.
@@ -85,12 +85,13 @@ public class SynchronizedBlock extends JavaStatement
 
     }
 
-    public SynchronizedBlock(PositionInfo pi, List<Comment> c, Expression expr, StatementBlock body, MethodFrame innerMostMethodFrame, int prefixLength) {
+    public SynchronizedBlock(PositionInfo pi, List<Comment> c, Expression expr, StatementBlock body,
+            MethodFrame innerMostMethodFrame, int prefixLength) {
         super(pi, c);
-        this.expression=expr;
+        this.expression = expr;
         this.body = body;
         this.innerMostMethodFrame = innerMostMethodFrame;
-        this.prefixLength= prefixLength;
+        this.prefixLength = prefixLength;
     }
 
     @Override

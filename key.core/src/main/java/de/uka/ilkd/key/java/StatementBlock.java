@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.java;
 
 import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclarationContainer;
@@ -10,13 +13,6 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.util.Debug;
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -40,8 +36,8 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     private final MethodFrame innerMostMethodFrame;
 
     public StatementBlock(PositionInfo pi, List<Comment> comments,
-                          @Nonnull ImmutableArray<? extends Statement> body,
-                          int prefixLength, MethodFrame innerMostMethodFrame) {
+            @Nonnull ImmutableArray<? extends Statement> body,
+            int prefixLength, MethodFrame innerMostMethodFrame) {
         super(pi, comments);
         this.body = body;
         this.prefixLength = prefixLength;
@@ -92,17 +88,18 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
         return super.equalsModRenaming(se, nat)
                 // why do we care here// about position info and
-                                                                          // nowhere else?
+                // nowhere else?
                 && (this.getStartPosition().equals(Position.UNDEFINED) ||
-                se.getStartPosition().equals(Position.UNDEFINED)
-                || this.getStartPosition().line() == se.getStartPosition().line());
+                        se.getStartPosition().equals(Position.UNDEFINED)
+                        || this.getStartPosition().line() == se.getStartPosition().line());
     }
 
     /**
      * computes the prefix elements for the given array of statment block
      */
-    public static ImmutableArray<ProgramPrefix> computePrefixElements(ImmutableArray<? extends Statement> b,
-                                                                      ProgramPrefix current) {
+    public static ImmutableArray<ProgramPrefix> computePrefixElements(
+            ImmutableArray<? extends Statement> b,
+            ProgramPrefix current) {
         final ArrayList<ProgramPrefix> prefix = new ArrayList<>();
         prefix.add(current);
 
@@ -142,11 +139,11 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     /**
      * Returns the child at the specified index in this node's "virtual"
-      child array
+     * child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out                                        of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {

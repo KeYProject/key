@@ -1,11 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
@@ -13,15 +13,16 @@
 
 package de.uka.ilkd.key.java.expression;
 
+import java.util.List;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.rule.MatchConditions;
-import org.key_project.util.ExtList;
 
-import javax.annotation.Nullable;
-import java.util.List;
+import org.key_project.util.ExtList;
 
 /**
  * Literal.
@@ -29,7 +30,8 @@ import java.util.List;
  * @author <TT>AutoDoc</TT>
  */
 
-public abstract class Literal extends JavaProgramElement implements Expression, TerminalProgramElement {
+public abstract class Literal extends JavaProgramElement
+        implements Expression, TerminalProgramElement {
     public Literal(@Nullable PositionInfo pi, @Nullable List<Comment> comments) {
         super(pi, comments);
     }
@@ -38,7 +40,7 @@ public abstract class Literal extends JavaProgramElement implements Expression, 
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
      * @param children the children of this AST element as KeY classes.
-     *                 May contain: Comments
+     *        May contain: Comments
      */
     public Literal(ExtList children) {
         super(children);
@@ -48,7 +50,7 @@ public abstract class Literal extends JavaProgramElement implements Expression, 
      * Literal with specific source code position.
      *
      * @param children the children of this AST element as KeY classes. May contain: Comments
-     * @param pos      The specific source code position.
+     * @param pos The specific source code position.
      */
     public Literal(ExtList children, PositionInfo pos) {
         super(children, pos);
@@ -72,12 +74,12 @@ public abstract class Literal extends JavaProgramElement implements Expression, 
      * execution context, it is same as using {@link #getKeYJavaType(Services)})
      *
      * @param javaServ the Services offering access to the Java model
-     * @param ec       the ExecutionContext in which the expression is evaluated
+     * @param ec the ExecutionContext in which the expression is evaluated
      * @return the literal's type
      */
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ,
-                                      ExecutionContext ec) {
+            ExecutionContext ec) {
         return getKeYJavaType(javaServ);
     }
 

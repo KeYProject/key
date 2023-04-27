@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.java;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-
-import java.util.List;
 
 /**
  * A "\Break label" parameter declaration of a ccatch clause.

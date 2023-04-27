@@ -1,17 +1,20 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
 package de.uka.ilkd.key.java.declaration;
+
+import java.util.List;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.*;
@@ -20,15 +23,14 @@ import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import java.util.List;
 
 /**
  * Type declaration.
@@ -59,7 +61,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
 
         /** constructor */
         public JMLModifiers(boolean strictlyPure, boolean pure, boolean nullableByDefault,
-                            SpecMathMode specMathMode) {
+                SpecMathMode specMathMode) {
             this.strictlyPure = strictlyPure;
             this.pure = pure;
             this.nullableByDefault = nullableByDefault;
@@ -71,10 +73,11 @@ public abstract class TypeDeclaration extends JavaDeclaration
 
 
 
-    public TypeDeclaration(PositionInfo pi, List<Comment> comments, @Nonnull ImmutableArray<Modifier> modArray,
-                           ProgramElementName name, ProgramElementName fullName,
-                           ImmutableArray<MemberDeclaration> members, boolean parentIsInterfaceDeclaration,
-                           boolean isLibrary) {
+    public TypeDeclaration(PositionInfo pi, List<Comment> comments,
+            @Nonnull ImmutableArray<Modifier> modArray,
+            ProgramElementName name, ProgramElementName fullName,
+            ImmutableArray<MemberDeclaration> members, boolean parentIsInterfaceDeclaration,
+            boolean isLibrary) {
         super(pi, comments, modArray);
         this.name = name;
         this.fullName = fullName;
@@ -97,17 +100,17 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * Type declaration.
      *
-     * @param mods    a modifier array.
-     * @param name    ProgramElementName of the type
+     * @param mods a modifier array.
+     * @param name ProgramElementName of the type
      * @param members an array containing the memberdeclarations of
-     *                this type
+     *        this type
      */
     public TypeDeclaration(Modifier[] mods,
-                           ProgramElementName name,
-                           ProgramElementName fullName,
-                           MemberDeclaration[] members,
-                           boolean parentIsInterfaceDeclaration,
-                           boolean isLibrary) {
+            ProgramElementName name,
+            ProgramElementName fullName,
+            MemberDeclaration[] members,
+            boolean parentIsInterfaceDeclaration,
+            boolean isLibrary) {
         super(mods);
         this.name = name;
         this.fullName = fullName;
@@ -119,17 +122,17 @@ public abstract class TypeDeclaration extends JavaDeclaration
 
     /**
      * @param children an ExtList of children.
-     * @param name     the ProgramElementName of the type
-     *                 May contain:
-     *                 several MemberDeclaration (as members of the type),
-     *                 a parentIsInterfaceDeclaration (indicating if parent is interface),
-     *                 several Modifier (as modifiers of the type decl),
-     *                 Comments
+     * @param name the ProgramElementName of the type
+     *        May contain:
+     *        several MemberDeclaration (as members of the type),
+     *        a parentIsInterfaceDeclaration (indicating if parent is interface),
+     *        several Modifier (as modifiers of the type decl),
+     *        Comments
      */
     public TypeDeclaration(ExtList children,
-                           ProgramElementName name,
-                           ProgramElementName fullName,
-                           boolean isLibrary) {
+            ProgramElementName name,
+            ProgramElementName fullName,
+            boolean isLibrary) {
         super(children);
         this.name = name;
         this.fullName = fullName;
@@ -146,19 +149,19 @@ public abstract class TypeDeclaration extends JavaDeclaration
 
     /**
      * @param children an ExtList of children.
-     *                 May contain:
-     *                 a ProgramElementName (as name),
-     *                 several MemberDeclaration (as members of the type),
-     *                 a parentIsInterfaceDeclaration (indicating if parent is interface),
-     *                 several Modifier (as modifiers of the type decl),
-     *                 Comments
+     *        May contain:
+     *        a ProgramElementName (as name),
+     *        several MemberDeclaration (as members of the type),
+     *        a parentIsInterfaceDeclaration (indicating if parent is interface),
+     *        several Modifier (as modifiers of the type decl),
+     *        Comments
      */
     public TypeDeclaration(ExtList children,
-                           ProgramElementName fullName,
-                           boolean isLibrary) {
+            ProgramElementName fullName,
+            boolean isLibrary) {
         this(children,
-                children.get(ProgramElementName.class),
-                fullName, isLibrary);
+            children.get(ProgramElementName.class),
+            fullName, isLibrary);
     }
 
     @Nonnull
@@ -195,7 +198,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
      * according to JLS 4.5.5
      *
      * @return the default value of the given type
-     * according to JLS 4.5.5
+     *         according to JLS 4.5.5
      */
     public Literal getDefaultValue() {
         return NullLiteral.NULL;
@@ -265,7 +268,8 @@ public abstract class TypeDeclaration extends JavaDeclaration
 
         for (MemberDeclaration member : members) {
             if (member instanceof FieldDeclaration) {
-                for (FieldSpecification field : ((FieldDeclaration) member).getFieldSpecifications()) {
+                for (FieldSpecification field : ((FieldDeclaration) member)
+                        .getFieldSpecifications()) {
                     result = result.append(field);
                 }
             }
@@ -334,13 +338,16 @@ public abstract class TypeDeclaration extends JavaDeclaration
     }
 
     /*
-      Return the type declaration at the specified index in this node's
-      "virtual" type declaration array.
-      @param index an index for a type declaration.
-      @return the type declaration with the given index.
-      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-      of bounds.
-    */
+     * Return the type declaration at the specified index in this node's
+     * "virtual" type declaration array.
+     *
+     * @param index an index for a type declaration.
+     *
+     * @return the type declaration with the given index.
+     *
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     * of bounds.
+     */
 
     public TypeDeclaration getTypeDeclarationAt(int index) {
         if (members != null) {
@@ -410,7 +417,8 @@ public abstract class TypeDeclaration extends JavaDeclaration
     public boolean equals(Object o) {
         if (o instanceof TypeDeclaration) {
             return ((TypeDeclaration) o).fullName.equals(fullName);
-        } else return false;
+        } else
+            return false;
     }
 
     public JMLModifiers getJmlModifiers() {

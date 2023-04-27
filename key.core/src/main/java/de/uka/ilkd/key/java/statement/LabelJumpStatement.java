@@ -1,15 +1,16 @@
 package de.uka.ilkd.key.java.statement;
 
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.NameReference;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import org.key_project.util.ExtList;
 
-import java.util.List;
+import org.key_project.util.ExtList;
 
 /**
  * Label jump statement.

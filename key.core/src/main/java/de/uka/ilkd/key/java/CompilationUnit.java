@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.java;
 
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclarationContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -11,8 +13,6 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * A node representing a single source file containing {@link TypeDeclaration}s and an optional
@@ -71,7 +71,8 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     }
 
     public CompilationUnit(PositionInfo pi, List<Comment> c,
-                           PackageSpecification accepto, ImmutableArray<Import> map, ImmutableArray<TypeDeclaration> map1) {
+            PackageSpecification accepto, ImmutableArray<Import> map,
+            ImmutableArray<TypeDeclaration> map1) {
         super(pi, c);
         this.packageSpec = accepto;
         this.imports = map;

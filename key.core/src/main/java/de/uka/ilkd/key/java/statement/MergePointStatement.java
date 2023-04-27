@@ -1,11 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
@@ -13,14 +13,15 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import java.util.List;
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import org.key_project.util.ExtList;
 
-import java.util.List;
-import java.util.Objects;
+import org.key_project.util.ExtList;
 
 /**
  * A statement indicating a merge point.
@@ -33,10 +34,11 @@ public class MergePointStatement extends JavaStatement
     // Those are used for JML to JavaDL conversions
     protected final IProgramVariable identifier;
 
-    //TODO weigl revise extra comments
-    //protected final Comment[] comments;
+    // TODO weigl revise extra comments
+    // protected final Comment[] comments;
 
-    public MergePointStatement(PositionInfo pi, List<Comment> comments, IProgramVariable identifier) {
+    public MergePointStatement(PositionInfo pi, List<Comment> comments,
+            IProgramVariable identifier) {
         super(pi, comments);
         this.identifier = identifier;
     }
@@ -52,14 +54,15 @@ public class MergePointStatement extends JavaStatement
     public MergePointStatement(ExtList children) {
         super(children);
         identifier = Objects.requireNonNull(children.get(IProgramVariable.class));
-        //comments = children.get(Comment[].class);
+        // comments = children.get(Comment[].class);
     }
 
-/*    @Override
-    public Comment[] getComments() {
-        return comments;
-    }
-*/
+    /*
+     * @Override
+     * public Comment[] getComments() {
+     * return comments;
+     * }
+     */
 
     /**
      * Get the number of expressions in this container.

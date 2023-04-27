@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.java;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-
-import java.util.List;
 
 /**
  * A "\Return" parameter declaration of a ccatch clause.
@@ -17,7 +17,7 @@ public class CcatchReturnParameterDeclaration extends CcatchNonstandardParameter
     }
 
     public CcatchReturnParameterDeclaration(PositionInfo pi, List<Comment> c) {
-        super(pi,c);
+        super(pi, c);
     }
 
     @Override

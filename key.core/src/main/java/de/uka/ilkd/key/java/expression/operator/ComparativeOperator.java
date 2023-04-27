@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.expression.operator;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -7,10 +9,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.List;
 
 /**
  * Comparative operator.
@@ -25,7 +26,7 @@ public abstract class ComparativeOperator extends Operator {
      * Comparative operator.
      *
      * @param children an ExtList with all children of this node the first children in list will be
-     *                 the one on the left side, the second the one on the right side.
+     *        the one on the left side, the second the one on the right side.
      */
 
     public ComparativeOperator(ExtList children) {

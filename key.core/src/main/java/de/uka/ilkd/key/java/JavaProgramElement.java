@@ -1,14 +1,16 @@
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.rule.MatchConditions;
-import org.key_project.util.ExtList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
+
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.rule.MatchConditions;
+
+import org.key_project.util.ExtList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Top level implementation of a Java {@link ProgramElement}. taken from COMPOST and changed to
@@ -146,7 +148,7 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
 
 
         public static final NameAbstractionTableDisabled INSTANCE =
-                new NameAbstractionTableDisabled();
+            new NameAbstractionTableDisabled();
 
         public void add(SourceElement pe1, SourceElement pe2) {
         }

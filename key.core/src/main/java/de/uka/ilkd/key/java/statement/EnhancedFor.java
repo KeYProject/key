@@ -1,13 +1,12 @@
 package de.uka.ilkd.key.java.statement;
 
+import java.util.List;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import org.key_project.util.ExtList;
-
-import javax.annotation.Nonnull;
-import java.util.List;
 
 import org.key_project.util.ExtList;
 
@@ -15,7 +14,7 @@ import org.key_project.util.ExtList;
  * The new enhanced form of a for-loop.
  * <p>
  * for(Type var : exp) Statement
- *<p>
+ * <p>
  * LoopStatement.inits is initialized with "Type var" LoopStatement.guard is initialized with "exp"
  * LoopStatement.body with "statement"
  *
@@ -23,12 +22,12 @@ import org.key_project.util.ExtList;
  */
 public class EnhancedFor extends LoopStatement implements VariableScope {
     private EnhancedFor(PositionInfo pi, List<Comment> comments, ILoopInit inits,
-                        IForUpdates updates, IGuard guard, Statement body) {
+            IForUpdates updates, IGuard guard, Statement body) {
         super(pi, comments, inits, updates, guard, body);
     }
 
     public EnhancedFor(PositionInfo pi, List<Comment> comments, ILoopInit inits,
-                       IGuard guard, Statement body) {
+            IGuard guard, Statement body) {
         super(pi, comments, inits, null, guard, body);
     }
 
@@ -36,14 +35,14 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
     /**
      * Used for the Recoder2KeY transformation.
      *
-     * @param init      the initializers - here a single VariableDeclaration. may not be null.
-     * @param guard     a guard - here an expression of type Iterable. may not be null.
+     * @param init the initializers - here a single VariableDeclaration. may not be null.
+     * @param guard a guard - here an expression of type Iterable. may not be null.
      * @param statement the statement of the loop
-     * @param comments  collected comments
-     * @param info      position
+     * @param comments collected comments
+     * @param info position
      */
     public EnhancedFor(@Nonnull LoopInit init, @Nonnull Guard guard, @Nonnull Statement statement,
-                       ExtList comments, PositionInfo info) {
+            ExtList comments, PositionInfo info) {
         this(info, null, init, null, guard, statement);
     }
 

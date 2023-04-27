@@ -1,16 +1,17 @@
 package de.uka.ilkd.key.java.expression.operator;
 
+import java.util.List;
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.List;
-import java.util.Objects;
 
 /**
  * The array allocation operator. There are two variants for NewArray:
@@ -51,14 +52,14 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
     /**
      * New array.
      *
-     * @param children   an ExtList with the children of this node (remove the ArrayInitializer out of
-     *                   the list).
-     * @param init       the arrayInitializer
+     * @param children an ExtList with the children of this node (remove the ArrayInitializer out of
+     *        the list).
+     * @param init the arrayInitializer
      * @param dimensions an int value.
      */
 
     public NewArray(ExtList children, KeYJavaType keyJavaType, ArrayInitializer init,
-                    int dimensions) {
+            int dimensions) {
         super(children);
         this.arrayInitializer = init;
         this.dimensions = dimensions;
@@ -70,13 +71,13 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
     /**
      * New array.
      *
-     * @param arguments  an array of expressions describing the dimensions
-     * @param typeRef    a reference to the arraytype
-     * @param init       the arrayInitializer
+     * @param arguments an array of expressions describing the dimensions
+     * @param typeRef a reference to the arraytype
+     * @param init the arrayInitializer
      * @param dimensions an int value.
      */
     public NewArray(Expression[] arguments, TypeReference typeRef, KeYJavaType keyJavaType,
-                    ArrayInitializer init, int dimensions) {
+            ArrayInitializer init, int dimensions) {
         super(arguments, typeRef);
         this.arrayInitializer = init;
         this.dimensions = dimensions;
@@ -84,7 +85,8 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
         assert dimensions > 0;
     }
 
-    public NewArray(PositionInfo pi, List<Comment> c, ImmutableArray<Expression> children, TypeReference type, KeYJavaType keyJavaType, int i, ArrayInitializer ai) {
+    public NewArray(PositionInfo pi, List<Comment> c, ImmutableArray<Expression> children,
+            TypeReference type, KeYJavaType keyJavaType, int i, ArrayInitializer ai) {
         super(pi, c, children, type);
         this.keyJavaType = keyJavaType;
         this.dimensions = i;

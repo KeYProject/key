@@ -1,17 +1,20 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
 package de.uka.ilkd.key.java.expression.literal;
+
+import java.util.List;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -20,16 +23,15 @@ import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.logic.Name;
-import org.key_project.util.ExtList;
 
-import javax.annotation.Nullable;
-import java.util.List;
+import org.key_project.util.ExtList;
 
 
 public final class StringLiteral extends Literal implements ReferencePrefix {
     private final String value;
 
-    public StringLiteral(@Nullable PositionInfo pi, @Nullable List<Comment> comments, String value) {
+    public StringLiteral(@Nullable PositionInfo pi, @Nullable List<Comment> comments,
+            String value) {
         super(pi, comments);
         this.value = value;
     }
@@ -47,7 +49,7 @@ public final class StringLiteral extends Literal implements ReferencePrefix {
      * String literal.
      *
      * @param children an ExtList with children(here:comments)
-     * @param value    a string.
+     * @param value a string.
      */
     public StringLiteral(ExtList children, String value) {
         super(children);

@@ -1,17 +1,20 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
 package de.uka.ilkd.key.java.declaration;
+
+import java.util.List;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -22,18 +25,17 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import javax.annotation.Nonnull;
-import java.util.List;
 
 /**
  * Method declaration.
  * taken from COMPOST and changed to achieve an immutable structure
  */
 public class MethodDeclaration extends JavaDeclaration
-        implements MemberDeclaration, TypeReferenceContainer, NamedProgramElement, ParameterContainer, Method,
+        implements MemberDeclaration, TypeReferenceContainer, NamedProgramElement,
+        ParameterContainer, Method,
         VariableScope {
 
     protected final TypeReference returnType;
@@ -59,7 +61,7 @@ public class MethodDeclaration extends JavaDeclaration
 
         /** constructor */
         public JMLModifiers(boolean pure, boolean strictlyPure, boolean helper,
-                            SpecMathMode specMathMode) {
+                SpecMathMode specMathMode) {
             this.pure = pure;
             this.strictlyPure = strictlyPure;
             this.helper = helper;
@@ -74,11 +76,12 @@ public class MethodDeclaration extends JavaDeclaration
     protected final boolean parentIsInterfaceDeclaration;
 
 
-    public MethodDeclaration(PositionInfo pi, List<Comment> comments, @Nonnull ImmutableArray<Modifier> modArray,
-                             TypeReference returnType,
-                             Comment[] voidComments, ProgramElementName name,
-                             ImmutableArray<ParameterDeclaration> parameters, Throws exceptions,
-                             StatementBlock body, boolean parentIsInterfaceDeclaration) {
+    public MethodDeclaration(PositionInfo pi, List<Comment> comments,
+            @Nonnull ImmutableArray<Modifier> modArray,
+            TypeReference returnType,
+            Comment[] voidComments, ProgramElementName name,
+            ImmutableArray<ParameterDeclaration> parameters, Throws exceptions,
+            StatementBlock body, boolean parentIsInterfaceDeclaration) {
         super(pi, comments, modArray);
         this.returnType = returnType;
         this.voidComments = voidComments;
@@ -93,18 +96,18 @@ public class MethodDeclaration extends JavaDeclaration
     /**
      * Method declaration.
      *
-     * @param children                     an ExtList of children.  May
-     *                                     include: a TypeReference (as a reference to the return type), a
-     *                                     de.uka.ilkd.key.logic.ProgramElementName (as Name of the method),
-     *                                     several ParameterDeclaration (as parameters of the declared method), a
-     *                                     StatementBlock (as body of the declared method), several Modifier
-     *                                     (taken as modifiers of the declaration), a Comment
+     * @param children an ExtList of children. May
+     *        include: a TypeReference (as a reference to the return type), a
+     *        de.uka.ilkd.key.logic.ProgramElementName (as Name of the method),
+     *        several ParameterDeclaration (as parameters of the declared method), a
+     *        StatementBlock (as body of the declared method), several Modifier
+     *        (taken as modifiers of the declaration), a Comment
      * @param parentIsInterfaceDeclaration a boolean set true iff
-     *                                     parent is an InterfaceDeclaration
+     *        parent is an InterfaceDeclaration
      */
     public MethodDeclaration(ExtList children,
-                             boolean parentIsInterfaceDeclaration,
-                             Comment[] voidComments) {
+            boolean parentIsInterfaceDeclaration,
+            Comment[] voidComments) {
         super(children);
         returnType = children.get(TypeReference.class);
         this.voidComments = voidComments;
@@ -121,51 +124,51 @@ public class MethodDeclaration extends JavaDeclaration
     /**
      * Method declaration.
      *
-     * @param modifiers                    a modifier array
-     * @param returnType                   a type reference.
-     * @param name                         an identifier.
-     * @param parameters                   a parameter declaration mutable list.
-     * @param exceptions                   a throws.
-     * @param body                         a statement block.
+     * @param modifiers a modifier array
+     * @param returnType a type reference.
+     * @param name an identifier.
+     * @param parameters a parameter declaration mutable list.
+     * @param exceptions a throws.
+     * @param body a statement block.
      * @param parentIsInterfaceDeclaration a boolean set true iff
-     *                                     parent is an InterfaceDeclaration
+     *        parent is an InterfaceDeclaration
      */
     public MethodDeclaration(Modifier[] modifiers,
-                             TypeReference returnType,
-                             ProgramElementName name,
-                             ParameterDeclaration[] parameters,
-                             Throws exceptions,
-                             StatementBlock body,
-                             boolean parentIsInterfaceDeclaration) {
+            TypeReference returnType,
+            ProgramElementName name,
+            ParameterDeclaration[] parameters,
+            Throws exceptions,
+            StatementBlock body,
+            boolean parentIsInterfaceDeclaration) {
         this(modifiers,
-                returnType,
-                name,
-                new ImmutableArray<>(parameters),
-                exceptions,
-                body,
-                parentIsInterfaceDeclaration);
+            returnType,
+            name,
+            new ImmutableArray<>(parameters),
+            exceptions,
+            body,
+            parentIsInterfaceDeclaration);
     }
 
 
     /**
      * Method declaration.
      *
-     * @param modifiers                    a modifier array
-     * @param returnType                   a type reference.
-     * @param name                         an identifier.
-     * @param parameters                   a parameter declaration mutable list.
-     * @param exceptions                   a throws.
-     * @param body                         a statement block.
+     * @param modifiers a modifier array
+     * @param returnType a type reference.
+     * @param name an identifier.
+     * @param parameters a parameter declaration mutable list.
+     * @param exceptions a throws.
+     * @param body a statement block.
      * @param parentIsInterfaceDeclaration a boolean set true iff
-     *                                     parent is an InterfaceDeclaration
+     *        parent is an InterfaceDeclaration
      */
     public MethodDeclaration(Modifier[] modifiers,
-                             TypeReference returnType,
-                             ProgramElementName name,
-                             ImmutableArray<ParameterDeclaration> parameters,
-                             Throws exceptions,
-                             StatementBlock body,
-                             boolean parentIsInterfaceDeclaration) {
+            TypeReference returnType,
+            ProgramElementName name,
+            ImmutableArray<ParameterDeclaration> parameters,
+            Throws exceptions,
+            StatementBlock body,
+            boolean parentIsInterfaceDeclaration) {
         super(modifiers);
         this.returnType = returnType;
         this.voidComments = null;
@@ -201,12 +204,18 @@ public class MethodDeclaration extends JavaDeclaration
     @Override
     public int getChildCount() {
         int result = 0;
-        if (modArray != null) result += modArray.size();
-        if (returnType != null) result++;
-        if (name != null) result++;
-        if (parameters != null) result += parameters.size();
-        if (exceptions != null) result++;
-        if (body != null) result++;
+        if (modArray != null)
+            result += modArray.size();
+        if (returnType != null)
+            result++;
+        if (name != null)
+            result++;
+        if (parameters != null)
+            result += parameters.size();
+        if (exceptions != null)
+            result++;
+        if (body != null)
+            result++;
         return result;
     }
 
@@ -222,11 +231,13 @@ public class MethodDeclaration extends JavaDeclaration
             index -= len;
         }
         if (returnType != null) {
-            if (index == 0) return returnType;
+            if (index == 0)
+                return returnType;
             index--;
         }
         if (name != null) {
-            if (index == 0) return name;
+            if (index == 0)
+                return name;
             index--;
         }
         if (parameters != null) {
@@ -237,11 +248,13 @@ public class MethodDeclaration extends JavaDeclaration
             index -= len;
         }
         if (exceptions != null) {
-            if (index == 0) return exceptions;
+            if (index == 0)
+                return exceptions;
             index--;
         }
         if (body != null) {
-            if (index == 0) return body;
+            if (index == 0)
+                return body;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -383,7 +396,8 @@ public class MethodDeclaration extends JavaDeclaration
     }
 
     /**
-     * test whether the declaration is a method with a variable number of arguments (i.e. the ellipsis ...)
+     * test whether the declaration is a method with a variable number of arguments (i.e. the
+     * ellipsis ...)
      *
      * @return true iff so
      */

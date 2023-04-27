@@ -1,11 +1,12 @@
 package de.uka.ilkd.key.java.reference;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import org.key_project.util.ExtList;
 
-import java.util.List;
+import org.key_project.util.ExtList;
 
 /**
  * A reference to the current object. "this" can be prefixed by a type reference (to resolve
@@ -41,7 +42,7 @@ public class ThisReference extends JavaNonTerminalProgramElement
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
      * @param children the children of this AST element as KeY classes. May contain: a TypeReference
-     *                 (as reference for the ThisReference) Comments
+     *        (as reference for the ThisReference) Comments
      */
     public ThisReference(ExtList children) {
         super(children);

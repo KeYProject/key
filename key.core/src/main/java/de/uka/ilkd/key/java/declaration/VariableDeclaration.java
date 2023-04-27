@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.declaration;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
@@ -9,8 +11,6 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.List;
 
 /**
  * Variable declaration. taken from COMPOST and changed to achieve an immutable structure
@@ -86,9 +86,10 @@ public abstract class VariableDeclaration extends JavaDeclaration
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
     }
 
-    public VariableDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> modArray, TypeReference type, boolean parentIsInferface) {
+    public VariableDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> modArray,
+            TypeReference type, boolean parentIsInferface) {
         super(pi, c, modArray);
-        this.typeReference=type;
+        this.typeReference = type;
         this.parentIsInterfaceDeclaration = parentIsInferface;
     }
 

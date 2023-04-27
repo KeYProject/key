@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.expression.operator;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
@@ -11,8 +13,6 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-
-import java.util.List;
 
 /** The most weird ternary C operator ?: */
 
@@ -30,7 +30,8 @@ public class Conditional extends Operator {
         super(children);
     }
 
-    public Conditional(PositionInfo pi, List<Comment> c, Object accept, Object accept1, Object accept2) {
+    public Conditional(PositionInfo pi, List<Comment> c, Object accept, Object accept1,
+            Object accept2) {
     }
 
 

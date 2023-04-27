@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.java.statement;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
-
-import java.util.List;
 
 public class TransactionStatement extends JavaStatement {
 

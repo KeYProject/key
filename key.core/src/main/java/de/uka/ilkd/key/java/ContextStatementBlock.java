@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -12,8 +14,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.List;
 
 /**
  * In the DL-formulae description of Taclets the program part can have the following form < pi
@@ -71,8 +71,9 @@ public class ContextStatementBlock extends StatementBlock {
         patternPrefixLength = this.getPrefixLength();
     }
 
-    public ContextStatementBlock(PositionInfo pi, List<Comment> c, ImmutableArray<? extends Statement> body,
-                                 int i, MethodFrame o, IExecutionContext execContext, int i1) {
+    public ContextStatementBlock(PositionInfo pi, List<Comment> c,
+            ImmutableArray<? extends Statement> body,
+            int i, MethodFrame o, IExecutionContext execContext, int i1) {
         super(pi, c, body, i, o);
         this.executionContext = execContext;
         this.patternPrefixLength = i1;

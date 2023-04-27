@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -7,8 +9,6 @@ import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.List;
 
 /**
  * A "\Return int v" parameter declaration of a ccatch clause.
@@ -24,7 +24,8 @@ public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParame
         delegate = children.get(ParameterDeclaration.class);
     }
 
-    public CcatchReturnValParameterDeclaration(PositionInfo pi, List<Comment> c, ParameterDeclaration delegate) {
+    public CcatchReturnValParameterDeclaration(PositionInfo pi, List<Comment> c,
+            ParameterDeclaration delegate) {
         super(pi, c);
         this.delegate = delegate;
     }

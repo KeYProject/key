@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.java.statement;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-
-import java.util.List;
 
 /**
  * Catch.
@@ -60,7 +60,8 @@ public class Catch extends BranchImp implements ParameterContainer, VariableScop
         body = children.get(StatementBlock.class);
     }
 
-    public Catch(PositionInfo pi, List<Comment> c, ParameterDeclaration param, StatementBlock body) {
+    public Catch(PositionInfo pi, List<Comment> c, ParameterDeclaration param,
+            StatementBlock body) {
         super(pi, c);
         this.parameter = param;
         this.body = body;

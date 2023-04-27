@@ -1,12 +1,11 @@
 package de.uka.ilkd.key.java;
 
 import java.util.*;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -23,8 +22,6 @@ import org.slf4j.LoggerFactory;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Constructor;
 import recoder.java.CompilationUnit;
-
-import javax.annotation.Nonnull;
 
 public class KeYProgModelInfo {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeYProgModelInfo.class);
@@ -450,7 +447,8 @@ public class KeYProgModelInfo {
         for (int i = 0; i < members.size(); i++) {
             final MemberDeclaration member = members.get(i);
             if (member instanceof IProgramMethod
-                    && Objects.equals(((IProgramMethod) member).getMethodDeclaration().getName(), name)) {
+                    && Objects.equals(((IProgramMethod) member).getMethodDeclaration().getName(),
+                        name)) {
                 return (IProgramMethod) member;
             }
         }

@@ -1,11 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
@@ -13,16 +13,17 @@
 
 package de.uka.ilkd.key.java.expression.literal;
 
+import java.util.List;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import org.key_project.util.ExtList;
 
-import javax.annotation.Nullable;
-import java.util.List;
+import org.key_project.util.ExtList;
 
 /**
  * Char literal.
@@ -120,9 +121,9 @@ public class CharLiteral extends AbstractIntegerLiteral {
      * @param sourceStr the String containing the literal surrounded by single-quotes
      * @return the parsed value as a char
      * @throws NumberFormatException if the given String does not represent a syntactically valid
-     *                               character literal or the literal is not surrounded by single-quotes
+     *         character literal or the literal is not surrounded by single-quotes
      * @see <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.4">
-     * https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.4</a>
+     *      https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.4</a>
      */
     protected static char parseFromString(final String sourceStr) {
         if (sourceStr.charAt(0) != '\'' || sourceStr.charAt(sourceStr.length() - 1) != '\'') {
@@ -133,41 +134,41 @@ public class CharLiteral extends AbstractIntegerLiteral {
 
         /*
          * There are three possible cases:
-         *   1. the char is written directly
-         *   2. Java escape like '\n'
-         *   3. octal Unicode escape like '\040'
+         * 1. the char is written directly
+         * 2. Java escape like '\n'
+         * 3. octal Unicode escape like '\040'
          */
         if (valStr.charAt(0) == '\\') {
             switch (valStr.charAt(1)) {
-                case 'b':
-                    return '\b';
-                case 't':
-                    return '\t';
-                case 'n':
-                    return '\n';
-                case 'f':
-                    return '\f';
-                case 'r':
-                    return '\r';
-                case '\"':
-                    return '\"';
-                case '\'':
-                    return '\'';
-                case '\\':
-                    return '\\';
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                    return (char) Integer.parseInt(valStr.substring(1), 8);
-                case 'u':
-                    return (char) Integer.parseInt(valStr.substring(2), 16);
-                default:
-                    throw new NumberFormatException("Invalid char: " + sourceStr);
+            case 'b':
+                return '\b';
+            case 't':
+                return '\t';
+            case 'n':
+                return '\n';
+            case 'f':
+                return '\f';
+            case 'r':
+                return '\r';
+            case '\"':
+                return '\"';
+            case '\'':
+                return '\'';
+            case '\\':
+                return '\\';
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+                return (char) Integer.parseInt(valStr.substring(1), 8);
+            case 'u':
+                return (char) Integer.parseInt(valStr.substring(2), 16);
+            default:
+                throw new NumberFormatException("Invalid char: " + sourceStr);
             }
         } else {
             return valStr.charAt(0);

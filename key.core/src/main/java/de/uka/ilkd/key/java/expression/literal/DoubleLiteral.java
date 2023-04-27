@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.expression.literal;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -9,8 +11,6 @@ import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.logic.Name;
 
 import org.key_project.util.ExtList;
-
-import java.util.List;
 
 /**
  * Double literal.

@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.reference;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
@@ -11,12 +13,11 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.util.Debug;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.List;
 
 /**
  * Method reference.
@@ -51,7 +52,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
     }
 
     public MethodReference(ImmutableArray<? extends Expression> args, MethodName n,
-                           ReferencePrefix p) {
+            ReferencePrefix p) {
         this.prefix = p;
         name = n;
         Debug.assertTrue(name != null, "Tried to reference unnamed method.");
@@ -60,7 +61,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
     }
 
     public MethodReference(ImmutableArray<Expression> args, MethodName n, ReferencePrefix p,
-                           PositionInfo pos) {
+            PositionInfo pos) {
         super(pos);
         this.prefix = p;
         name = n;
@@ -71,16 +72,16 @@ public class MethodReference extends JavaNonTerminalProgramElement
 
     public MethodReference(ExtList children, MethodName n, ReferencePrefix p) {
         this(new ImmutableArray<>(children.collect(Expression.class)), n, p,
-                children.get(PositionInfo.class));
+            children.get(PositionInfo.class));
     }
 
     public MethodReference(ExtList children, MethodName n, ReferencePrefix p, PositionInfo pos,
-                           String scope) {
+            String scope) {
         this(new ImmutableArray<>(children.collect(Expression.class)), n, p, pos);
     }
 
     public MethodReference(PositionInfo pi, List<Comment> c, ReferencePrefix prefix,
-                           MethodName name, ImmutableArray<Expression> args) {
+            MethodName name, ImmutableArray<Expression> args) {
         super(pi, c);
         this.arguments = args;
         this.name = name;
@@ -307,11 +308,11 @@ public class MethodReference extends JavaNonTerminalProgramElement
     }
 
     public IProgramMethod method(Services services, KeYJavaType refPrefixType,
-                                 ExecutionContext ec) {
+            ExecutionContext ec) {
         ProgramVariable inst = services.getJavaInfo().getAttribute(
-                ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, ec.getTypeReference().getKeYJavaType());
+            ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, ec.getTypeReference().getKeYJavaType());
         IProgramMethod pm = method(services, refPrefixType, getMethodSignature(services, ec),
-                ec.getTypeReference().getKeYJavaType());
+            ec.getTypeReference().getKeYJavaType());
         while (inst != null && pm == null) {
             KeYJavaType classType = inst.getKeYJavaType();
             pm = method(services, classType, getMethodSignature(services, ec), classType);
@@ -319,23 +320,23 @@ public class MethodReference extends JavaNonTerminalProgramElement
                 return pm;
             }
             inst = services.getJavaInfo().getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS,
-                    classType);
+                classType);
         }
         return pm;
     }
 
     /**
-     * @param services  the Services class offering access to metamodel information
+     * @param services the Services class offering access to metamodel information
      * @param classType the KeYJavaType where to start looking for the declared method
      * @param signature the IList<KeYJavaType> of the arguments types
-     * @param context   the KeYJavaType from where the method is called
+     * @param context the KeYJavaType from where the method is called
      * @return the found program method
      */
     public IProgramMethod method(Services services, KeYJavaType classType,
-                                 ImmutableList<KeYJavaType> signature, KeYJavaType context) {
+            ImmutableList<KeYJavaType> signature, KeYJavaType context) {
         final String methodName = name.toString();
         IProgramMethod pm =
-                services.getJavaInfo().getProgramMethod(classType, methodName, signature, context);
+            services.getJavaInfo().getProgramMethod(classType, methodName, signature, context);
         return pm;
     }
 

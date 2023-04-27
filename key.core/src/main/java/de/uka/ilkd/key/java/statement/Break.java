@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.java.statement;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-
-import java.util.List;
 
 /**
  * Break.
@@ -45,7 +45,7 @@ public class Break extends LabelJumpStatement {
     }
 
     public Break(PositionInfo pi, List<Comment> c, Label name) {
-        super(pi, c,name);
+        super(pi, c, name);
     }
 
     /**

@@ -1,9 +1,8 @@
 package de.uka.ilkd.key.java;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.net.URI;
 import java.nio.file.Paths;
+import javax.annotation.Nonnull;
 
 import recoder.java.SourceElement;
 
@@ -63,9 +62,9 @@ public class PositionInfo {
     /**
      * Creates a new PositionInfo without resource information but only with positions.
      *
-     * @param relPos   the relative position
+     * @param relPos the relative position
      * @param startPos the start position
-     * @param endPos   the end position
+     * @param endPos the end position
      */
     public PositionInfo(SourceElement.Position relPos, Position startPos, Position endPos) {
         this.relPos = relPos;
@@ -77,10 +76,10 @@ public class PositionInfo {
     /**
      * Creates a new PositionInfo without the given resource information.
      *
-     * @param relPos   the relative position
+     * @param relPos the relative position
      * @param startPos the start position
-     * @param endPos   the end position
-     * @param fileURI  the resource the PositionInfo refers to
+     * @param endPos the end position
+     * @param fileURI the resource the PositionInfo refers to
      */
     public PositionInfo(SourceElement.Position relPos, Position startPos, Position endPos,
             URI fileURI) {
@@ -109,7 +108,7 @@ public class PositionInfo {
      * originates from).
      *
      * @deprecated This method should no longer be used, as PositionInfo can now be used with
-     * resources other than files. Use {@link #getParentClassURI()} instead.
+     *             resources other than files. Use {@link #getParentClassURI()} instead.
      */
     @Deprecated // only kept for compatibility reasons
     public String getParentClass() {
@@ -213,7 +212,7 @@ public class PositionInfo {
             return "UNDEFINED";
         } else {
             return ((fileURI == UNKNOWN_URI ? "" : fileURI) + " rel. Pos: " + relPos
-                    + " start Pos: " + startPos + " end Pos: " + endPos);
+                + " start Pos: " + startPos + " end Pos: " + endPos);
         }
     }
 

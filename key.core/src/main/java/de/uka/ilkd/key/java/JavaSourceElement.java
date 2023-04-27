@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.java;
 
 import java.net.URI;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.pp.PrettyPrinter;
 
@@ -8,9 +10,6 @@ import org.key_project.util.ExtList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 
 /**
