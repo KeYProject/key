@@ -101,7 +101,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     protected Feature setupGlobalF(Feature dispatcher) {
         final Feature ifMatchedF =
-                ifZero(MatchedIfFeature.INSTANCE, longConst(+1));
+                ifZero(MatchedIfFeature.INSTANCE, longConst(1));
 
         final Feature methodSpecF;
         final String methProp =
@@ -714,7 +714,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 //				forEach(arg2, SubtermGenerator.leftTraverse(findLocSet, op(setMinus)),
 //						not(eq(instOfNonStrict("loc1"), arg2))), longConst(0));
 //
-
+        bindRuleSet(d, "rewriteDependenciesAfterArgumentSimplification",
+            add(noDoubleMinus, longConst(-100)));
         bindRuleSet(d, "simplify_dependency_predicates", longConst(-4000) );
         bindRuleSet(d, "dep_setMinus", noDoubleMinus);
 
@@ -749,12 +750,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             ifZero(MatchedIfFeature.INSTANCE,
                /* ifZero(eq(instOf("label1"), instOf("label2")),
                         longConst(-200),*/
-                    ifZero(leq("label1", "label2"), longConst(-100), longConst(0))));
+                    ifZero(leq("label1", "label2"), longConst(-100), longConst(0)),
+                    longConst(-110))); // costs slightly lower than -100 to ensure that first unmatched assumes apps
+                                          // get their cost computed
 
 
-        bindRuleSet(d, "rewriteDependenciesAfterArgumentSimplification", add(noDoubleMinus, longConst(-100)));
 
-        bindRuleSet(d, "dep_pred_known", add(ScaleFeature.createScaled(FocusTermDepthFeature.INSTANCE, 3000), longConst(5000)));//+100
+        bindRuleSet(d, "dep_pred_known",
+            add(ScaleFeature.createScaled(FocusTermDepthFeature.INSTANCE, 3000),
+            longConst(5000)));//+100
         bindRuleSet(d, "dep_pred_known_2", add(noDoubleMinus,longConst(100)));//+100
         bindRuleSet(d, "dep_pred_known_2b", add(noDoubleMinus,longConst(10)));
         bindRuleSet(d, "dep_pred_known_2c", add(noDoubleMinus,longConst(-2500)));
@@ -1171,7 +1175,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
 
         bindRuleSet(d, "locsetExpandSetMinusMatrix", add(ifZero(MatchedIfFeature.INSTANCE,
-                or(rowIndexInBetween, colNotInInterval)), longConst(100)));
+                or(rowIndexInBetween, colNotInInterval), longConst(-1)), longConst(100)));
 
 
 
