@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.java;
 
 import java.io.*;
+import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.*;
@@ -20,6 +21,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.*;
 import de.uka.ilkd.key.util.LinkedHashMap;
+import de.uka.ilkd.key.util.parsing.HasLocation;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -1202,6 +1204,7 @@ public class Recoder2KeY implements JavaReader {
     /**
      * tries to parse recoders exception position information
      */
+    @Nullable
     private static Pair<String, Position> extractPositionInfo(String errorMessage) {
         if (errorMessage == null || errorMessage.indexOf('@') == -1) {
             return null;
@@ -1254,17 +1257,31 @@ public class Recoder2KeY implements JavaReader {
             throw (PosConvertException) cause;
         }
 
-        Pair<String, Position> pos = extractPositionInfo(cause.toString());
-        if (pos != null) {
-            reportErrorWithPositionInFile(message, cause, pos.second, pos.first);
-        } else {
-            reportErrorWithPositionInFile(message, cause, null, null);
+        Position pos = null;
+        String file = null;
+        if (cause instanceof HasLocation) {
+            try {
+                var location = ((HasLocation) cause).getLocation();
+                if (location != null) {
+                    pos = location.getPosition();
+                    file = location.getFileURL().toString();
+                }
+            } catch (MalformedURLException ignored) {
+            }
         }
+        if (pos == null) {
+            Pair<String, Position> info = extractPositionInfo(cause.toString());
+            if (info != null) {
+                pos = info.second;
+                file = info.first;
+            }
+        }
+        reportErrorWithPositionInFile(message, cause, pos, file);
     }
 
     public static void reportErrorWithPositionInFile(String message, Throwable cause,
             @Nullable Position pos,
-            String file) {
+            @Nullable String file) {
         final RuntimeException rte;
         if (pos != null) {
             rte = new PosConvertException(message, pos, file);
