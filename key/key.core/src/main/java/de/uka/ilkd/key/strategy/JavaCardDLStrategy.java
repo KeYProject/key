@@ -724,7 +724,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         Feature depth = applyTF(FocusFormulaProjection.INSTANCE, rec(any(), longTermConst(1)));
 
         bindRuleSet(d, "noEqApp", EqNonDuplicateAppFeature.INSTANCE);
-        bindRuleSet(d, "strictNoEqApp", StrictEqNonDuplicateAppFeature.INSTANCE);
+        bindRuleSet(d, "strictNoEqApp", EqNonDuplicateAppFeature.INSTANCE);
+                //StrictEqNonDuplicateAppFeature.INSTANCE);
 
         bindRuleSet(d, "dep_pred_unroll_fixed_bounds", longConst(0));
 
@@ -747,7 +748,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
 
         bindRuleSet(d, "accessAtSameOrLaterTime",
-            ifZero(MatchedIfFeature.INSTANCE,
+             ifZero(MatchedIfFeature.INSTANCE,
                /* ifZero(eq(instOf("label1"), instOf("label2")),
                         longConst(-200),*/
                     ifZero(leq("label1", "label2"), longConst(-100), longConst(0)),
@@ -2890,7 +2891,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "apply_equations", EqNonDuplicateAppFeature.INSTANCE);
 
         bindRuleSet(d, "noEqApp", EqNonDuplicateAppFeature.INSTANCE);
-        bindRuleSet(d, "strictNoEqApp", StrictEqNonDuplicateAppFeature.INSTANCE);
+        bindRuleSet(d, "strictNoEqApp", EqNonDuplicateAppFeature.INSTANCE);//StrictEqNonDuplicateAppFeature.INSTANCE);
         return d;
     }
 

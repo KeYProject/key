@@ -31,7 +31,7 @@ public class PrintFeature implements Feature {
       RuleAppCost cost = f.computeCost(app, pos, goal);
       LOGGER.debug("{}:{}:{}{}",
               prefix, cost.toString(), pos != null ? pos.subTerm() + ":" : "", app.rule().name());
-      System.out.println("Cost: " + cost + " for " + app + " at goal " + goal.node().serialNr());
+      System.out.println("Cost ("+f.getClass().getName()+"): " + cost + " for " + app + " at goal " + goal.node().serialNr());
       return cost;
    }
     

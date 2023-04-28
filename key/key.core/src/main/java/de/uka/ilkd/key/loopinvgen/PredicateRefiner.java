@@ -153,7 +153,7 @@ public abstract class PredicateRefiner {
     }
 
     protected boolean sequentImpliesPredicate(Term pred) {
-//        System.out.println("sequentImpliesPredicate is called for: "+ProofSaver.printAnything(pred, null));
+        System.out.println("sequentImpliesPredicate is called for: "+ProofSaver.printAnything(pred, null));
 
 //        Sequent sequent = Sequent.EMPTY_SEQUENT;
 
@@ -174,7 +174,7 @@ public abstract class PredicateRefiner {
 //                false, true).sequent();
 
 
-        final boolean provable = sProof.isProvable(sideSeq, 70000, services);
+        final boolean provable = sProof.isProvable(sideSeq, 60000, services);
            // SideProof.isProvable(sideSeq, 100000, 60000, true, services);
 
 

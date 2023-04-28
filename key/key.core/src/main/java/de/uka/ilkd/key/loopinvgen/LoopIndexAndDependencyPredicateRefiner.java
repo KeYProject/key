@@ -557,7 +557,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 			}
 		}
 
-//		System.out.println("weakening by dividing over index for: "+ pred + " is:"+ result);
+		System.out.println("weakening by dividing over index for: "+ pred + " is:"+ result);
 //		System.out.println("size: " + result.size());
 		return result;
 	}

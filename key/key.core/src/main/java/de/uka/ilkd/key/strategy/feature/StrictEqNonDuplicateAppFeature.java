@@ -55,7 +55,7 @@ public class StrictEqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeatu
 
 
         // compare the if-sequent instantiations
-/*      final ImmutableList<IfFormulaInstantiation> newAppIfFmlInstantiations = newApp.ifFormulaInstantiations ();
+      final ImmutableList<IfFormulaInstantiation> newAppIfFmlInstantiations = newApp.ifFormulaInstantiations ();
         final ImmutableList<IfFormulaInstantiation> cmpIfFmlInstantiations = cmp.ifFormulaInstantiations ();
         if ( newAppIfFmlInstantiations == null
             || cmpIfFmlInstantiations == null ) {
@@ -77,7 +77,7 @@ public class StrictEqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeatu
                     return false;
             }
         }
-*/
+
         return equalInterestingInsts ( newApp.instantiations (), cmp.instantiations () );
     }
 
