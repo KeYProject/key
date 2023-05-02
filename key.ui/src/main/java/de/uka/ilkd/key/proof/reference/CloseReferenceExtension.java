@@ -33,6 +33,7 @@ import org.key_project.util.collection.ImmutableList;
     experimental = false)
 public class CloseReferenceExtension
         implements KeYGuiExtension, KeYGuiExtension.Startup, KeYGuiExtension.ContextMenu,
+        KeYGuiExtension.Toolbar,
         KeYSelectionListener, RuleAppListener,
         ProofDisposedListener {
 
@@ -116,6 +117,14 @@ public class CloseReferenceExtension
                 new CopyReferencedProof(mediator, (Node) underlyingObject));
         }
         return new ArrayList<>();
+    }
+
+    @Nonnull
+    @Override
+    public JToolBar getToolbar(MainWindow mainWindow) {
+        JToolBar bar = new JToolBar();
+        bar.add(new CopyStepsAction(mainWindow));
+        return bar;
     }
 
     /**
