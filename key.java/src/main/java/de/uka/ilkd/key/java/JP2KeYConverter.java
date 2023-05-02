@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -315,6 +316,16 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return Objects.requireNonNull((T) a);
     }
 
+    private boolean parentIsInterface(@Nonnull Node n) {
+        if (n.getParentNode().isPresent()) {
+            var parent = n.getParentNode().get();
+            if (parent instanceof ClassOrInterfaceDeclaration) {
+                return ((ClassOrInterfaceDeclaration) parent).isInterface();
+            }
+        }
+        return false;
+    }
+
     private PositionInfo createPositionInfo(Node node) {
         if (node.getRange().isEmpty()) {
             return null;
@@ -386,7 +397,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(ConstructorDeclaration n, Void arg) {
-        boolean parentIsInterface = false;
+        var isInInterface = parentIsInterface(n);
         var pi = createPositionInfo(n);
         var c = createComments(n);
         ImmutableArray<TypeReference> exc = map(n.getThrownExceptions());
@@ -398,7 +409,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             new ProgramElementName(n.getNameAsString()),
             map(n.getParameters()),
             thr,
-            accept(n.getBody()), false);
+            accept(n.getBody()), isInInterface);
     }
 
     @Override
@@ -481,12 +492,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(FieldDeclaration n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        boolean parentIsInferface = false;
+        var isInInterface = parentIsInterface(n);
         ImmutableArray<de.uka.ilkd.key.java.declaration.Modifier> modArray = map(n.getModifiers());
         TypeReference type = accept(n.getVariables().get(0).getType());
         ImmutableArray<FieldSpecification> fieldSpecs = map(n.getVariables());
         return new de.uka.ilkd.key.java.declaration.FieldDeclaration(pi, c, modArray, type,
-            parentIsInferface, fieldSpecs);
+            isInInterface, fieldSpecs);
     }
 
     @Override
@@ -577,7 +588,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
         ImmutableArray<TypeReference> t = map(n.getThrownExceptions());
         var thr = t.isEmpty() ? null : new Throws(null, null, t);
-        boolean parentIsInterface = false;
+        var isInInterface = parentIsInterface(n);
         return new de.uka.ilkd.key.java.declaration.MethodDeclaration(
             pi, c, map(n.getModifiers()),
             accept(n.getType()),
@@ -586,7 +597,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             map(n.getParameters()),
             thr,
             accepto(n.getBody()),
-            parentIsInterface);
+                isInInterface);
     }
 
     @Override
@@ -635,20 +646,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(Parameter n, Void arg) {
         ImmutableArray<de.uka.ilkd.key.java.declaration.Modifier> modifiers = map(n.getModifiers());
         var va = n.isVarArgs();
-        var type = getKeyJavaType(n.getType().resolve());
-        // TODO dimension? source position? comments?
-        var typeRef = new TypeRef(type);
+        TypeReference type = accept(n.getType());
         var spec = new VariableSpecification();
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        boolean isInInterface = false;
-        if (n.getParentNode().isPresent()) {
-            var parent = n.getParentNode().get();
-            if (parent instanceof ClassOrInterfaceDeclaration) {
-                isInInterface = ((ClassOrInterfaceDeclaration) parent).isInterface();
-            }
-        }
-        return new ParameterDeclaration(new ImmutableArray<>(spec), pi, c, modifiers, typeRef, isInInterface, va);
+        var isInInterface = parentIsInterface(n);
+        return new ParameterDeclaration(new ImmutableArray<>(spec), pi, c, modifiers, type, isInInterface, va);
     }
 
     @Override
@@ -813,12 +816,30 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(VariableDeclarationExpr n, Void arg) {
-        return super.visit(n, arg);
+        var varsList = new ArrayList<VariableSpecification>(n.getVariables().size());
+        for (VariableDeclarator v : n.getVariables()) {
+            var pi = createPositionInfo(v);
+            var c = createComments(v);
+            Expression init = accepto(v.getInitializer());
+            var type = getKeyJavaType(v.getType().resolve());
+            var name = VariableNamer.parseName(v.getName().asString());
+            var pv = new LocationVariable(name, type, n.isFinal());
+            varsList.add(new VariableSpecification(pi, c, init, pv, 0, type));
+        }
+        var vars = new ImmutableArray<>(varsList);
+        ImmutableArray<de.uka.ilkd.key.java.declaration.Modifier> modifiers = map(n.getModifiers());
+        TypeReference type = accept(n.getVariables().get(0).getType());
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        var isInInterface = parentIsInterface(n);
+        return new LocalVariableDeclaration(pi, c, modifiers, type, isInInterface, vars);
     }
 
     @Override
     public Object visit(VariableDeclarator n, Void arg) {
-        return super.visit(n, arg);
+        // Only allowed inside VariableDeclarationExpr which is handled above
+        reportUnsupportedElement(n);
+        return null;
     }
 
     @Override

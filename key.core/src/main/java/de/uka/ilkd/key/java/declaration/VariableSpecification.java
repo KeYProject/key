@@ -15,6 +15,8 @@ import org.key_project.util.ExtList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 
 /**
  * Variable specification that defines a variable name. This is a part of a
@@ -93,6 +95,13 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
         this.type = type;
     }
 
+    public VariableSpecification(PositionInfo pi, List<Comment> comments, Expression init, IProgramVariable var, int dim, Type type) {
+        super(pi, comments);
+        this.var = var;
+        initializer = init;
+        dimensions = dim;
+        this.type = type;
+    }
 
     /**
      * Returns the number of children of this node.
