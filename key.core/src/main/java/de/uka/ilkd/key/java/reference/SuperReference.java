@@ -6,6 +6,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import java.util.List;
+
 /**
  * Super reference.
  *
@@ -33,6 +35,11 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
      * @param accessPath a reference expression.
      */
     public SuperReference(ReferencePrefix accessPath) {
+        this.prefix = accessPath;
+    }
+
+    public SuperReference(ReferencePrefix accessPath, PositionInfo pi, List<Comment> c) {
+        super(pi, c);
         this.prefix = accessPath;
     }
 

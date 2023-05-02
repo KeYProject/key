@@ -6,6 +6,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import java.util.List;
 
 
 public class ClassInitializer extends JavaDeclaration
@@ -24,6 +25,11 @@ public class ClassInitializer extends JavaDeclaration
 
     public ClassInitializer(Static modifier, StatementBlock body) {
         super(new Modifier[] { modifier });
+        this.body = body;
+    }
+
+    public ClassInitializer(Modifier[] modifier, StatementBlock body, PositionInfo pi, List<Comment> comments) {
+        super(modifier);
         this.body = body;
     }
 

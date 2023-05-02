@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.java.statement;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ExpressionContainer;
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.*;
 
 import org.key_project.util.ExtList;
+
+import java.util.List;
 
 /**
  * Expression jump statement.
@@ -43,6 +43,11 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
      */
     public ExpressionJumpStatement(Expression expr) {
         expression = expr;
+    }
+
+    public ExpressionJumpStatement(Expression expression, PositionInfo pi, List<Comment> comments) {
+        super(pi, comments);
+        this.expression = expression;
     }
 
     /**

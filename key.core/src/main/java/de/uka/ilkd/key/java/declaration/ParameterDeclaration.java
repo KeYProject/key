@@ -1,11 +1,15 @@
 package de.uka.ilkd.key.java.declaration;
 
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 /**
  * Formal parameters require a VariableSpecificationList of size() <= 1 (size() == 0 for abstract
@@ -86,6 +90,15 @@ public class ParameterDeclaration extends VariableDeclaration {
         super(children, parentIsInterfaceDeclaration);
         this.varSpec =
             new ImmutableArray<>(children.get(VariableSpecification.class));
+        this.varArgParameter = parameterIsVarArg;
+    }
+    public ParameterDeclaration(
+            ImmutableArray<VariableSpecification> specs,
+            PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> modArray,
+            TypeReference type, boolean parentIsInterfaceDeclaration,
+            boolean parameterIsVarArg) {
+        super(pi, c, modArray, type, parentIsInterfaceDeclaration);
+        this.varSpec = specs;
         this.varArgParameter = parameterIsVarArg;
     }
 

@@ -1,9 +1,13 @@
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
+
+import java.util.List;
 
 /**
  * Throw.
@@ -38,6 +42,15 @@ public class Throw extends ExpressionJumpStatement {
 
     public Throw(ExtList children) {
         super(children);
+    }
+
+    /**
+     * Throw.
+     *
+     */
+
+    public Throw(Expression expression, PositionInfo pi, List<Comment> comments) {
+        super(expression, pi, comments);
     }
 
     /**

@@ -5,6 +5,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import java.util.List;
+
 /**
  * Import.
  *
@@ -50,7 +52,8 @@ public class Import extends JavaNonTerminalProgramElement
      * @param t a type reference.
      * @param multi indicates the wildcard.
      */
-    public Import(TypeReference t, boolean multi) {
+    public Import(TypeReference t, boolean multi, PositionInfo pi, List<Comment> comments) {
+        super(pi, comments);
         reference = t;
         isMultiImport = multi;
     }
@@ -61,7 +64,8 @@ public class Import extends JavaNonTerminalProgramElement
      * @param t a package reference.
      */
 
-    public Import(PackageReference t) {
+    public Import(PackageReference t, PositionInfo pi, List<Comment> comments) {
+        super(pi, comments);
         reference = t;
         isMultiImport = true;
     }

@@ -1,14 +1,12 @@
 package de.uka.ilkd.key.java;
 
 import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.github.javaparser.resolution.types.ResolvedVoidType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.*;
@@ -268,7 +266,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new CharLiteral(pi, c, n.getValue().charAt(0));
     }
 
-
     @Override
     public Object visit(ClassOrInterfaceDeclaration n, Void arg) {
         var pi = createPositionInfo(n);
@@ -364,6 +361,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new ImmutableArray<>(seq);
     }
 
+    private <T> ImmutableArray<T> flatMap(NodeList<? extends Visitable> nodes) {
+        var seq = nodes.stream().flatMap(it -> ((List<T>) Objects.requireNonNull(it.accept(this, null))).stream())
+                .collect(Collectors.toList());
+        return new ImmutableArray<>(seq);
+    }
+
     @Nullable
     private <R> R accepto(Optional<? extends Node> node) {
         if (node.isEmpty())
@@ -454,8 +457,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(ExpressionStmt n, Void arg) {
-        var pi = createPositionInfo(n);
-        var c = createComments(n);
         return accept(n.getExpression());
     }
 
@@ -521,7 +522,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(InitializerDeclaration n, Void arg) {
-        return super.visit(n, arg);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        StatementBlock body = accept(n.getBody());
+        var mods = n.isStatic() ? new de.uka.ilkd.key.java.declaration.Modifier[] { new Static() } :
+                new de.uka.ilkd.key.java.declaration.Modifier[0];
+        return new ClassInitializer(mods, body, pi, c);
     }
 
     @Override
@@ -585,16 +591,15 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(NameExpr n, Void arg) {
-        var pi = createPositionInfo(n);
-        var c = createComments(n);
         ResolvedType rtype = n.calculateResolvedType();
+        var type = getKeyJavaType(rtype);
         // TODO weigl find declaraton with n.resolve()
-        return new LocationVariable(new ProgramElementName(n.getNameAsString()),
-            getKeyJavaType(rtype));
+        return new LocationVariable(new ProgramElementName(n.getNameAsString()), type);
     }
 
     @Override
     public Object visit(NormalAnnotationExpr n, Void arg) {
+        // TODO
         return super.visit(n, arg);
     }
 
@@ -607,6 +612,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(ObjectCreationExpr n, Void arg) {
+        // TODO
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
@@ -626,81 +633,115 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(Parameter n, Void arg) {
-        new ParameterDeclaration();
-        // TODO
-        return super.visit(n, arg);
+        ImmutableArray<de.uka.ilkd.key.java.declaration.Modifier> modifiers = map(n.getModifiers());
+        var va = n.isVarArgs();
+        var type = getKeyJavaType(n.getType().resolve());
+        // TODO dimension? source position? comments?
+        var typeRef = new TypeRef(type);
+        var spec = new VariableSpecification();
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        boolean isInInterface = false;
+        if (n.getParentNode().isPresent()) {
+            var parent = n.getParentNode().get();
+            if (parent instanceof ClassOrInterfaceDeclaration) {
+                isInInterface = ((ClassOrInterfaceDeclaration) parent).isInterface();
+            }
+        }
+        return new ParameterDeclaration(new ImmutableArray<>(spec), pi, c, modifiers, typeRef, isInInterface, va);
     }
 
     @Override
     public Object visit(PrimitiveType n, Void arg) {
-        return super.visit(n, arg);
+        return getKeyJavaType(n.resolve());
     }
 
     @Override
     public Object visit(Name n, Void arg) {
+        // TODO
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
     public Object visit(SimpleName n, Void arg) {
+        // TODO
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
     public Object visit(ArrayType n, Void arg) {
-        return super.visit(n, arg);
+        return getKeyJavaType(n.resolve());
     }
 
     @Override
     public Object visit(ArrayCreationLevel n, Void arg) {
-        return super.visit(n, arg);
+        return this.<Expression>accepto(n.getDimension());
     }
 
     @Override
     public Object visit(IntersectionType n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
     public Object visit(UnionType n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
     public Object visit(ReturnStmt n, Void arg) {
-        return super.visit(n, arg);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        Expression expr = accepto(n.getExpression());
+        return new Return(expr, pi, c);
     }
 
     @Override
     public Object visit(SingleMemberAnnotationExpr n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
     @Override
     public Object visit(StringLiteralExpr n, Void arg) {
-        return super.visit(n, arg);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        return new StringLiteral(pi, c, n.getValue());
     }
 
     @Override
     public Object visit(SuperExpr n, Void arg) {
-        return super.visit(n, arg);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        // TODO
+        ReferencePrefix path = null;
+        return new SuperReference(path, pi, c);
     }
 
     @Override
     public Object visit(SwitchEntry n, Void arg) {
-        n.getLabels();
-        n.getStatements();
-        n.getType();
-        // TODO return new Case(e, body);
-        return null;
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        ImmutableArray<Statement> body = map(n.getStatements());
+        // TODO we currently multiply the branches
+        var result = new ArrayList<Case>(n.getLabels().size());
+        for (var label : n.getLabels()) {
+            Expression expr = accept(label);
+            result.add(new Case(expr, body, pi, c));
+        }
+        return result;
     }
 
     @Override
     public Object visit(SwitchStmt n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        Expression expr = null; // TODO
-        ImmutableArray<Branch> branches = map(n.getEntries());
+        Expression expr = accept(n.getSelector());
+        ImmutableArray<Branch> branches = flatMap(n.getEntries());
         return new Switch(pi, c, expr, branches);
     }
 
@@ -714,13 +755,17 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(ThisExpr n, Void arg) {
-        n.getTypeName();// TODO
-        return new ThisReference(createPositionInfo(n), createComments(n), null);
+        // TODO
+        ReferencePrefix prefix = null;
+        return new ThisReference(createPositionInfo(n), createComments(n), prefix);
     }
 
     @Override
     public Object visit(ThrowStmt n, Void arg) {
-        return super.visit(n, arg);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        Expression expr = accept(n.getExpression());
+        return new Throw(expr, pi, c);
     }
 
     @Override
@@ -762,6 +807,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(UnknownType n, Void arg) {
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
@@ -777,9 +823,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(VoidType n, Void arg) {
-        var pi = createPositionInfo(n);
-        var c = createComments(n);
-        return null; /* TODO */
+        return getKeyJavaType(ResolvedVoidType.INSTANCE);
     }
 
     @Override
@@ -801,11 +845,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         }
 
         if (n.isAsterisk()) {
+            // TODO Class.* works as well
             var name = translateName(n.getName());
-            return new Import(new PackageReference(name, null));
+            return new Import(new PackageReference(name, null), pi, c);
         } else {
             TypeReference type = null; // TODO weigl
-            return new Import(type, n.isAsterisk());
+            return new Import(type, n.isAsterisk(), pi, c);
         }
     }
 
@@ -889,7 +934,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(KeyCcatchParameter n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        // TODO
+        reportUnsupportedElement(n);
         return null;
     }
 
@@ -907,6 +952,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     @Override
     public Object visit(KeyCatchAllStatement n, Void arg) {
         // TODO
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
     // endregion
@@ -1040,6 +1086,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         // TODO weigl unclear
+        reportUnsupportedElement(n);
         return null;
     }
 
@@ -1065,14 +1112,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(KeyExpressionSV n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
+        // TODO what is this
+        reportUnsupportedElement(n);
         return super.visit(n, arg);
     }
 
 
     @Override
     public Object visit(KeyMetaConstructExpression n, Void arg) {
-        var pi = createPositionInfo(n);
-        var c = createComments(n);
         String mcName = n.getText();
         Expression child = accept(n.getChild());
         switch (mcName) {
@@ -1091,8 +1138,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(KeyMetaConstruct n, Void arg) {
-        var pi = createPositionInfo(n);
-        var c = createComments(n);
         String mcName = n.getKind();
         final ImmutableArray<SchemaVariable> labels = map(n.getSchemas());
         switch (mcName) {
@@ -1166,8 +1211,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(KeyMetaConstructType n, Void arg) {
-        var pi = createPositionInfo(n);
-        var c = createComments(n);
         Expression child = accept(n.getExpr());
         if ("#typeof".equals(n.getKind())) {
             return new TypeOf(child);
