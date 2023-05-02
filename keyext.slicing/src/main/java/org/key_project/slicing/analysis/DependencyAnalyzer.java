@@ -180,7 +180,8 @@ public final class DependencyAnalyzer {
                 + "try disabling GeneralSettings.noPruningClosed");
         }
         // first check that all goals are closed without proof caching references
-        if (!proof.closedGoals().stream().allMatch(goal -> goal.node().lookup(ClosedBy.class) == null)) {
+        if (!proof.closedGoals().stream()
+                .allMatch(goal -> goal.node().lookup(ClosedBy.class) == null)) {
             throw new IllegalStateException("cannot analyze proof with cached references");
         }
 

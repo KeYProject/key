@@ -81,7 +81,9 @@ public class CloseReferenceExtension
             ClosedBy c = ReferenceSearcher.findPreviousProof(mediator.getCurrentlyOpenedProofs(),
                 goal.node());
             if (c != null) {
-                p.closeGoal(goal);
+                // p.closeGoal(goal);
+                goal.setEnabled(false);
+
                 goal.node().register(c, ClosedBy.class);
                 c.getProof()
                         .addProofDisposedListener(new CopyBeforeDispose(mediator, c.getProof(), p));
@@ -172,7 +174,7 @@ public class CloseReferenceExtension
             if (c != null) {
                 Node toClose = node;
                 Proof newProof = node.proof();
-                newProof.closeGoal(newProof.getGoal(toClose));
+                // newProof.closeGoal(newProof.getGoal(toClose));
                 toClose.register(c, ClosedBy.class);
             } else {
                 JOptionPane.showMessageDialog((JComponent) e.getSource(),
@@ -189,7 +191,7 @@ public class CloseReferenceExtension
             this.mediator = mediator;
             this.node = node;
             setName("Copy referenced proof steps here");
-            setEnabled(node.leaf() && node.isClosed()
+            setEnabled(node.leaf() && !node.isClosed()
                     && node.lookup(ClosedBy.class) != null);
             setMenuPath("Proof Caching");
         }
@@ -197,9 +199,9 @@ public class CloseReferenceExtension
         @Override
         public void actionPerformed(ActionEvent e) {
             ClosedBy c = node.lookup(ClosedBy.class);
-            Goal current = node.proof().getClosedGoal(node);
-            node.proof().add(current);
-            node.proof().reOpenGoal(current);
+            Goal current = node.proof().getGoal(node);
+            // node.proof().add(current);
+            // node.proof().reOpenGoal(current);
             try {
                 // mediator.stopInterface(true);
                 new CopyingProofReplayer(c.getProof(), node.proof()).copy(c.getNode(), current);

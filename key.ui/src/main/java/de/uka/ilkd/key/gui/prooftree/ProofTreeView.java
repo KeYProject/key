@@ -53,6 +53,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
         ColorSettings.define("[proofTree]gray", "", Color.DARK_GRAY);
     public static final ColorSettings.ColorProperty LIGHT_BLUE_COLOR =
         ColorSettings.define("[proofTree]lightBlue", "", new Color(230, 254, 255));
+    public static final ColorSettings.ColorProperty OTHER_GREEN_COLOR =
+        ColorSettings.define("[proofTree]otherGreen", "", new Color(0, 100, 0));
     public static final ColorSettings.ColorProperty DARK_GREEN_COLOR =
         ColorSettings.define("[proofTree]darkGreen", "", new Color(0, 128, 51));
     public static final ColorSettings.ColorProperty DARK_RED_COLOR =
@@ -989,6 +991,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 style.foreground = PINK_COLOR.get();
                 style.icon = IconFactory.keyHoleLinked(20, 20);
                 toolTipText = "Linked goal - no automatic rule application";
+            } else if (leaf.lookup(ClosedBy.class) != null) {
+                style.foreground = OTHER_GREEN_COLOR.get();
+                style.icon = IconFactory.BACKREFERENCE.get(16);
+                toolTipText = "Cached goal - reference to another proof";
             } else if (!goal.isAutomatic()) {
                 style.foreground = ORANGE_COLOR.get();
                 style.icon = IconFactory.keyHoleInteractive(20, 20);

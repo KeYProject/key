@@ -1441,7 +1441,7 @@ public class Proof implements Named {
      */
     public void copyCachedGoals(Proof referencedFrom) {
         // first, ensure that all cached goals are copied over
-        List<Goal> goals = closedGoals().toList();
+        List<Goal> goals = openGoals().toList();
         for (Goal g : goals) {
             Node node = g.node();
             ClosedBy c = node.lookup(ClosedBy.class);
@@ -1451,8 +1451,8 @@ public class Proof implements Named {
             if (referencedFrom != null && referencedFrom != c.getProof()) {
                 continue;
             }
-            add(g);
-            reOpenGoal(g);
+            // add(g);
+            // reOpenGoal(g);
             node.deregister(c, ClosedBy.class);
             try {
                 new CopyingProofReplayer(c.getProof(), this).copy(c.getNode(), g);
