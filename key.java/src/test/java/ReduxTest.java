@@ -8,8 +8,12 @@ import de.uka.ilkd.key.java.JP2KeYConverter;
 import de.uka.ilkd.key.java.JP2KeYTypeConverter;
 import de.uka.ilkd.key.java.KeYJPMapping;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+
+import org.key_project.util.collection.ImmutableSet;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
@@ -40,6 +44,15 @@ public class ReduxTest {
 
     private final JavaParser parser =
         new JavaParser(new ParserConfiguration().setSymbolResolver(javaSymbolSolver));
+
+    public ReduxTest() {
+        var sorts = services.getNamespaces().sorts();
+        sorts.add(new SortImpl(new Name("int"), ImmutableSet.empty(), false));
+        sorts.add(new SortImpl(new Name("boolean"), ImmutableSet.empty(), false));
+        sorts.add(new SortImpl(new Name("long"), ImmutableSet.empty(), false));
+        sorts.add(new SortImpl(new Name("double"), ImmutableSet.empty(), false));
+        sorts.add(new SortImpl(new Name("float"), ImmutableSet.empty(), false));
+    }
 
     @Test
     void testJavaLangObject() {
