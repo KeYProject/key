@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.java.declaration;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.modifier.Static;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-
-import java.util.List;
 
 
 public class ClassInitializer extends JavaDeclaration
@@ -28,7 +28,8 @@ public class ClassInitializer extends JavaDeclaration
         this.body = body;
     }
 
-    public ClassInitializer(Modifier[] modifier, StatementBlock body, PositionInfo pi, List<Comment> comments) {
+    public ClassInitializer(Modifier[] modifier, StatementBlock body, PositionInfo pi,
+            List<Comment> comments) {
         super(modifier);
         this.body = body;
     }

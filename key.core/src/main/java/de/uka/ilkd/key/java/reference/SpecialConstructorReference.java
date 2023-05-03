@@ -1,9 +1,8 @@
 package de.uka.ilkd.key.java.reference;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
+import java.util.List;
+
+import de.uka.ilkd.key.java.*;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -66,6 +65,12 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
     public SpecialConstructorReference(ExtList children, PositionInfo pi) {
         super(children, pi);
         this.arguments = new ImmutableArray<>(children.collect(Expression.class));
+    }
+
+    public SpecialConstructorReference(ImmutableArray<Expression> arguments, PositionInfo pi,
+            List<Comment> c) {
+        super(pi, c);
+        this.arguments = arguments;
     }
 
 

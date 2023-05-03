@@ -313,7 +313,7 @@ public final class JavaInfo {
 
         if (sort == null) {
             throw new IllegalStateException(
-                "Could not find sort " + ldtName + " for type: " + type);
+                "Could not find ldt sort \"" + ldtName + "\" for type " + type);
         }
 
         KeYJavaType result = new KeYJavaType(type, sort);

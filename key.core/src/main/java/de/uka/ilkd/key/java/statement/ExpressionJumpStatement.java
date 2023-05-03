@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.java.statement;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.*;
 
 import org.key_project.util.ExtList;
-
-import java.util.List;
 
 /**
  * Expression jump statement.

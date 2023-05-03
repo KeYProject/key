@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.java.statement;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.List;
 
 /**
  * Case.
@@ -70,7 +70,8 @@ public class Case extends BranchImp implements ExpressionContainer {
         this.body = new ImmutableArray<>(children.collect(Statement.class));
     }
 
-    public Case(Expression expr, ImmutableArray<Statement> body, PositionInfo pi, List<Comment> comments) {
+    public Case(Expression expr, ImmutableArray<Statement> body, PositionInfo pi,
+            List<Comment> comments) {
         super(pi, comments);
         this.expression = expr;
         this.body = body;

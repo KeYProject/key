@@ -1,9 +1,14 @@
 package de.uka.ilkd.key.java.declaration;
 
+import java.util.List;
+
+import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.ExtList;
@@ -72,6 +77,11 @@ public class FieldSpecification extends VariableSpecification implements Field {
 
     public FieldSpecification(ExtList children, ProgramVariable var, int dimensions, Type type) {
         super(children, var, dimensions, type);
+    }
+
+    public FieldSpecification(PositionInfo pi, List<Comment> comments, Expression init,
+            IProgramVariable var, int dim, Type type) {
+        super(pi, comments, init, var, dim, type);
     }
 
     /**

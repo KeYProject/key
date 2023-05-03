@@ -46,4 +46,13 @@ public class JavaBuildingIssue {
     public int getColumn() {
         return node.getRange().map(it -> it.begin).map(it -> it.column).orElse(-1);
     }
+
+    @Override
+    public String toString() {
+        return "JavaBuildingIssue{" +
+            "node=" + node +
+            "range=" + node.getRange() +
+            ", message='" + message + '\'' +
+            '}';
+    }
 }

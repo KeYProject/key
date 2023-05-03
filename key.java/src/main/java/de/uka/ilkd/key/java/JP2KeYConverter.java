@@ -2,15 +2,16 @@ package de.uka.ilkd.key.java;
 
 import java.net.URI;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.github.javaparser.resolution.types.ResolvedVoidType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.*;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
@@ -25,6 +26,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.metaconstruct.*;
+import de.uka.ilkd.key.util.AssertionFailure;
 
 import org.key_project.util.collection.ImmutableArray;
 
@@ -43,7 +45,9 @@ import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.*;
 import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 import com.github.javaparser.ast.visitor.Visitable;
+import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedType;
+import com.github.javaparser.resolution.types.ResolvedVoidType;
 
 import static java.lang.String.format;
 
@@ -82,6 +86,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     private final KeYJPMapping mapping;
     private final JP2KeYTypeConverter typeConverter;
     private final Namespace<SchemaVariable> svns;
+    /**
+     * Hashmap from variable spec to
+     * <code>ProgramVariable</code>; this is necessary to avoid cycles when converting initializers.
+     * Access to this map is performed via the method
+     * <code>getProgramVariableForFieldSpecification</code>
+     */
+    private final HashMap<FullVariableDeclarator, ProgramVariable> fieldSpecificationMapping =
+        new LinkedHashMap<>();
 
     JP2KeYVisitor(Services services, KeYJPMapping mapping, JP2KeYTypeConverter typeConverter,
             Namespace<SchemaVariable> schemaVariables) {
@@ -373,7 +385,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     private <T> ImmutableArray<T> flatMap(NodeList<? extends Visitable> nodes) {
-        var seq = nodes.stream().flatMap(it -> ((List<T>) Objects.requireNonNull(it.accept(this, null))).stream())
+        var seq = nodes.stream()
+                .flatMap(it -> ((List<T>) Objects.requireNonNull(it.accept(this, null))).stream())
                 .collect(Collectors.toList());
         return new ImmutableArray<>(seq);
     }
@@ -462,8 +475,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(ExplicitConstructorInvocationStmt n, Void arg) {
-        // TODO
-        return super.visit(n, arg);
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        ImmutableArray<Expression> args = map(n.getArguments());
+        return new SuperConstructorReference(args, pi, c);
     }
 
     @Override
@@ -495,7 +510,13 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var isInInterface = parentIsInterface(n);
         ImmutableArray<de.uka.ilkd.key.java.declaration.Modifier> modArray = map(n.getModifiers());
         TypeReference type = accept(n.getVariables().get(0).getType());
-        ImmutableArray<FieldSpecification> fieldSpecs = map(n.getVariables());
+        var varsList = new ArrayList<FieldSpecification>(n.getVariables().size());
+        for (VariableDeclarator v : n.getVariables()) {
+            // TODO always model = false?
+            varsList.add(visitFieldSpecification(
+                new FullVariableDeclarator(v, n.isFinal(), n.isStatic(), false)));
+        }
+        var fieldSpecs = new ImmutableArray<>(varsList);
         return new de.uka.ilkd.key.java.declaration.FieldDeclaration(pi, c, modArray, type,
             isInInterface, fieldSpecs);
     }
@@ -536,8 +557,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         StatementBlock body = accept(n.getBody());
-        var mods = n.isStatic() ? new de.uka.ilkd.key.java.declaration.Modifier[] { new Static() } :
-                new de.uka.ilkd.key.java.declaration.Modifier[0];
+        var mods = n.isStatic() ? new de.uka.ilkd.key.java.declaration.Modifier[] { new Static() }
+                : new de.uka.ilkd.key.java.declaration.Modifier[0];
         return new ClassInitializer(mods, body, pi, c);
     }
 
@@ -597,7 +618,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             map(n.getParameters()),
             thr,
             accepto(n.getBody()),
-                isInInterface);
+            isInInterface);
     }
 
     @Override
@@ -633,25 +654,31 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         if (n.getAnnotations().isNonEmpty())
             reportUnsupportedElement(n);
 
-        ProgramElementName name = translateName(n.getName());
-        ReferencePrefix prefix = null;// TODO
-        return new PackageSpecification(new PackageReference(name, prefix));
+        var ref = translatePackageReference(n.getName());
+        return new PackageSpecification(ref);
     }
 
-    private ProgramElementName translateName(Name name) {
-        return new ProgramElementName(name.asString());
+    @Nonnull
+    private PackageReference translatePackageReference(Name name) {
+        // Translate recursively since PackageReference and Name are ordered differently
+        var pen = new ProgramElementName(name.getIdentifier());
+        var inner = name.getQualifier().map(this::translatePackageReference).orElse(null);
+        return new PackageReference(pen, inner);
     }
 
     @Override
     public Object visit(Parameter n, Void arg) {
         ImmutableArray<de.uka.ilkd.key.java.declaration.Modifier> modifiers = map(n.getModifiers());
         var va = n.isVarArgs();
-        TypeReference type = accept(n.getType());
-        var spec = new VariableSpecification();
+        var type = getKeyJavaType(n.getType().resolve());
         var pi = createPositionInfo(n);
         var c = createComments(n);
+        var name = VariableNamer.parseName(n.getName().asString());
+        var pv = new LocationVariable(name, type, n.isFinal());
+        var spec = new VariableSpecification(pi, c, null, pv, 0, type);
         var isInInterface = parentIsInterface(n);
-        return new ParameterDeclaration(new ImmutableArray<>(spec), pi, c, modifiers, type, isInInterface, va);
+        return new ParameterDeclaration(new ImmutableArray<>(spec), pi, c, modifiers,
+            new TypeRef(type), isInInterface, va);
     }
 
     @Override
@@ -818,13 +845,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(VariableDeclarationExpr n, Void arg) {
         var varsList = new ArrayList<VariableSpecification>(n.getVariables().size());
         for (VariableDeclarator v : n.getVariables()) {
-            var pi = createPositionInfo(v);
-            var c = createComments(v);
-            Expression init = accepto(v.getInitializer());
-            var type = getKeyJavaType(v.getType().resolve());
-            var name = VariableNamer.parseName(v.getName().asString());
-            var pv = new LocationVariable(name, type, n.isFinal());
-            varsList.add(new VariableSpecification(pi, c, init, pv, 0, type));
+            var full = new FullVariableDeclarator(v,
+                n.isFinal(),
+                n.hasModifier(Modifier.Keyword.STATIC),
+                n.hasModifier(Modifier.Keyword.MODEL));
+            varsList.add(visitVariableSpecification(full));
         }
         var vars = new ImmutableArray<>(varsList);
         ImmutableArray<de.uka.ilkd.key.java.declaration.Modifier> modifiers = map(n.getModifiers());
@@ -833,6 +858,134 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var c = createComments(n);
         var isInInterface = parentIsInterface(n);
         return new LocalVariableDeclaration(pi, c, modifiers, type, isInInterface, vars);
+    }
+
+    private VariableSpecification visitVariableSpecification(FullVariableDeclarator v) {
+        var pi = createPositionInfo(v.decl);
+        var c = createComments(v.decl);
+        Expression init = accepto(v.decl.getInitializer());
+        var type = getKeyJavaType(v.decl.getType().resolve());
+        var name = VariableNamer.parseName(v.decl.getName().asString());
+        var pv = new LocationVariable(name, type, v.isFinal);
+        return new VariableSpecification(pi, c, init, pv, 0, type);
+    }
+
+    /**
+     * @return a literal constant representing the value of <code>p_er</code>
+     */
+    private Literal getLiteralFor(LiteralExpr lit) {
+        if (lit.isBooleanLiteralExpr()) {
+            return BooleanLiteral.getBooleanLiteral(lit.asBooleanLiteralExpr().getValue());
+        } else if (lit.isCharLiteralExpr()) {
+            return new CharLiteral(lit.asCharLiteralExpr().getValue());
+        } else if (lit.isDoubleLiteralExpr()) {
+            // TODO there are only double or float literals in jp
+            return new DoubleLiteral(lit.asDoubleLiteralExpr().getValue());
+        } else if (lit.isIntegerLiteralExpr()) {
+            // TODO there are only int literals in jp, not byte short int
+            return new IntLiteral(lit.asIntegerLiteralExpr().getValue());
+        } else if (lit.isLongLiteralExpr()) {
+            return new LongLiteral(lit.asLongLiteralExpr().getValue());
+        } else if (lit.isNullLiteralExpr()) {
+            return new NullLiteral();
+        } else if (lit.isStringLiteralExpr()) {
+            assert lit.asStringLiteralExpr().getValue() != null;
+            return new StringLiteral(lit.asStringLiteralExpr().getValue());
+        } else if (lit.isTextBlockLiteralExpr()) {
+            return new StringLiteral(lit.asTextBlockLiteralExpr().getValue());
+        } else {
+            reportUnsupportedElement(lit);
+            throw new AssertionFailure();
+        }
+    }
+
+    /**
+     * @return a literal constant representing the value of the initializer of
+     *         <code>recoderVarSpec</code>, if the variable is a compile-time constant, and
+     *         <code>null</code> otherwise
+     */
+    private Literal getCompileTimeConstantInitializer(FullVariableDeclarator spec) {
+        // Necessary condition: the field is static and final
+        if (!spec.isFinal || !spec.isStatic) {
+            return null;
+        }
+
+        var init = spec.decl.getInitializer();
+
+        if (init.isPresent()) {
+            // TODO needs java parser
+            // var ce = new ConstantExpressionEvaluator(javaParser);
+            // try {
+            // var expr = ce.evaluate(init.get());
+            // if (expr.isLiteralExpr()) {
+            // return getLiteralFor(expr.asLiteralExpr());
+            // }
+            // } catch (EvaluationException ignored) {
+            // }
+        }
+
+        return null;
+    }
+
+    /**
+     * this is needed by #convert(FieldSpecification).
+     */
+    private ProgramVariable getProgramVariableForFieldSpecification(FullVariableDeclarator decl) {
+        ProgramVariable pv = fieldSpecificationMapping.get(decl);
+
+        if (pv != null) {
+            return pv;
+        }
+        var spec = decl.decl;
+        VariableSpecification varSpec = (VariableSpecification) mapping.toKeY(spec);
+        if (varSpec == null) {
+            var t = spec.getType().resolve();
+            var classNode = findContainingClass(spec).orElseThrow();
+            var classType = new ReferenceTypeImpl(classNode.resolve());
+            final ProgramElementName pen =
+                new ProgramElementName(spec.getName().asString(),
+                    classNode.getFullyQualifiedName().orElseThrow());
+
+            final Literal compileTimeConstant = getCompileTimeConstantInitializer(decl);
+
+            if (compileTimeConstant == null) {
+                pv = new LocationVariable(pen, getKeyJavaType(t),
+                    getKeyJavaType(classType), decl.isStatic, decl.isModel,
+                    false, decl.isFinal);
+            } else {
+                pv = new ProgramConstant(pen, getKeyJavaType(t),
+                    getKeyJavaType(classType), decl.isStatic,
+                    compileTimeConstant);
+            }
+        } else {
+            pv = (ProgramVariable) varSpec.getProgramVariable();
+        }
+        fieldSpecificationMapping.put(decl, pv);
+
+        assert pv != null;
+        return pv;
+    }
+
+    private static Optional<ClassOrInterfaceDeclaration> findContainingClass(Node node) {
+        return findParent(node, n -> n instanceof ClassOrInterfaceDeclaration)
+                .map(c -> (ClassOrInterfaceDeclaration) c);
+    }
+
+    private static Optional<Node> findParent(Node node, Predicate<Node> filter) {
+        Optional<Node> n = Optional.of(node);
+        while (n.isPresent() && !filter.test(n.get())) {
+            n = n.get().getParentNode();
+        }
+        return n;
+    }
+
+    private FieldSpecification visitFieldSpecification(FullVariableDeclarator v) {
+        var pi = createPositionInfo(v.decl);
+        var c = createComments(v.decl);
+        Expression init = accepto(v.decl.getInitializer());
+        var type = getKeyJavaType(v.decl.getType().resolve());
+        var pv = getProgramVariableForFieldSpecification(v);
+        return new FieldSpecification(pi, c, init, pv, 0, type);
     }
 
     @Override
@@ -867,8 +1020,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
         if (n.isAsterisk()) {
             // TODO Class.* works as well
-            var name = translateName(n.getName());
-            return new Import(new PackageReference(name, null), pi, c);
+            var ref = translatePackageReference(n.getName());
+            return new Import(ref, pi, c);
         } else {
             TypeReference type = null; // TODO weigl
             return new Import(type, n.isAsterisk(), pi, c);
@@ -1485,6 +1638,37 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             return n;
         } else {
             throw new IllegalArgumentException("Schema variable not declared: " + name);
+        }
+    }
+
+    private static final class FullVariableDeclarator {
+        public final VariableDeclarator decl;
+        public final boolean isFinal;
+        public final boolean isStatic;
+        public final boolean isModel;
+
+        public FullVariableDeclarator(VariableDeclarator decl, boolean isFinal, boolean isStatic,
+                boolean isModel) {
+            this.decl = decl;
+            this.isFinal = isFinal;
+            this.isStatic = isStatic;
+            this.isModel = isModel;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            FullVariableDeclarator that = (FullVariableDeclarator) o;
+            return isFinal == that.isFinal && isStatic == that.isStatic && isModel == that.isModel
+                    && decl.equals(that.decl);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(decl, isFinal, isStatic, isModel);
         }
     }
 }

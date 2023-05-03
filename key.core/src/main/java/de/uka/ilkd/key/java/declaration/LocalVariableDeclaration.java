@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.declaration;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.LoopInitializer;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -9,8 +11,6 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import java.util.List;
 
 /**
  * Local variable declaration. taken from COMPOST and changed to achieve an immutable structure
@@ -85,8 +85,10 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
         this.varSpecs = new ImmutableArray<>(vars);
     }
 
-    public LocalVariableDeclaration(PositionInfo pi, List<Comment> comments, ImmutableArray<Modifier> mods,
-            TypeReference type, boolean parentIsInterface, ImmutableArray<VariableSpecification> vars) {
+    public LocalVariableDeclaration(PositionInfo pi, List<Comment> comments,
+            ImmutableArray<Modifier> mods,
+            TypeReference type, boolean parentIsInterface,
+            ImmutableArray<VariableSpecification> vars) {
         super(pi, comments, mods, type, parentIsInterface);
         this.varSpecs = vars;
     }

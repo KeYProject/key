@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.java.declaration;
 
+import java.util.List;
 import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.*;
@@ -14,8 +15,6 @@ import org.key_project.util.ExtList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 
 /**
@@ -95,7 +94,8 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
         this.type = type;
     }
 
-    public VariableSpecification(PositionInfo pi, List<Comment> comments, Expression init, IProgramVariable var, int dim, Type type) {
+    public VariableSpecification(PositionInfo pi, List<Comment> comments, Expression init,
+            IProgramVariable var, int dim, Type type) {
         super(pi, comments);
         this.var = var;
         initializer = init;

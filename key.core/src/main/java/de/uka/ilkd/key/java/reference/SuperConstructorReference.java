@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.java.reference;
 
+import java.util.List;
+
+import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
@@ -92,6 +95,12 @@ public class SuperConstructorReference extends SpecialConstructorReference
     public SuperConstructorReference(ExtList children, ReferencePrefix accessPath) {
         super(children);
         this.prefix = accessPath;
+    }
+
+    public SuperConstructorReference(ImmutableArray<Expression> arguments, PositionInfo pi,
+            List<Comment> c) {
+        super(arguments, pi, c);
+        this.prefix = null;
     }
 
 

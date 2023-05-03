@@ -170,7 +170,8 @@ public class JP2KeYTypeConverter {
 
     private void addPrimitiveType(ResolvedType type) {
         var description = type.describe();
-        // TODO why does this use typeConverter? this seems like a loop since it gets initialized by this step
+        // TODO why does this use typeConverter? this seems like a loop since it gets initialized by
+        // this step
         var primitiveType = PrimitiveType.getPrimitiveType(type.describe());
         var result = typeConverter.getKeYJavaType(primitiveType);
         var sort = result.getSort();
