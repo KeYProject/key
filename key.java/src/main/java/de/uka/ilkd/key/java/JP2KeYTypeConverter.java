@@ -27,10 +27,7 @@ import com.github.javaparser.resolution.TypeSolver;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration;
 import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
-import com.github.javaparser.resolution.types.ResolvedArrayType;
-import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
-import com.github.javaparser.resolution.types.ResolvedReferenceType;
-import com.github.javaparser.resolution.types.ResolvedType;
+import com.github.javaparser.resolution.types.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,8 +83,8 @@ public class JP2KeYTypeConverter {
         this.typeSolver = typeSolver;
         this.typeConverter = services.getTypeConverter();
         this.namespaces = services.getNamespaces();
-        this.objectSort = namespaces.sorts().lookup(new Name("java.lang.Object"));
         this.objectType = getKeYJavaType("java.lang.Object");
+        this.objectSort = namespaces.sorts().lookup(new Name("java.lang.Object"));
         this.cloneableType = getKeYJavaType("java.lang.Cloneable");
         this.serializableType = getKeYJavaType("java.io.Serializable");
         // I may not use JavaInfo here because the classes may not yet be cached!
@@ -154,6 +151,8 @@ public class JP2KeYTypeConverter {
             addReferenceType(type.asReferenceType());
         } else if (type.isArray()) {
             addArrayType(type.asArrayType());
+        } else if (type.isVoid()) {
+            addVoidType(type);
         } else {
             LOGGER.error("Unexpected type to convert: " + type);
             throw new AssertionFailure("Unexpected type to convert");
@@ -190,6 +189,10 @@ public class JP2KeYTypeConverter {
             namespaces.sorts().add(sort);
         }
         storeInCache(type, new KeYJavaType(NullType.JAVA_NULL, sort));
+    }
+
+    private void addVoidType(ResolvedType type) {
+        storeInCache(type, KeYJavaType.VOID_TYPE);
     }
 
     private void addArrayType(ResolvedArrayType type) {
@@ -410,7 +413,6 @@ public class JP2KeYTypeConverter {
 
     private void initArrayMethodBuilder() {
         final KeYJavaType integerType = getKeYJavaType(ResolvedPrimitiveType.INT);
-        final KeYJavaType objectType = getKeYJavaType("java");
         final HeapLDT heapLDT = typeConverter.getHeapLDT();
         Sort heapSort = heapLDT == null ? Sort.ANY : heapLDT.targetSort();
         int heapCount = (heapLDT == null) ? 1 : (heapLDT.getAllHeaps().size() - 1);
