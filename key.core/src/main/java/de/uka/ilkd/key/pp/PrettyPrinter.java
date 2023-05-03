@@ -574,8 +574,9 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnArrayDeclaration(ArrayDeclaration type) {
         Type baseType = type.getBaseType().getKeYJavaType().getJavaType();
-        assert baseType != null;
-        if (baseType instanceof ArrayDeclaration) {
+        if (baseType == null) {
+            l.print("unknown");
+        } else if (baseType instanceof ArrayDeclaration) {
             performActionOnArrayDeclaration((ArrayDeclaration) baseType);
         } else {
             l.print(baseType.getFullName());
