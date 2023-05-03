@@ -644,9 +644,16 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(ObjectCreationExpr n, Void arg) {
-        // TODO
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        if (n.getAnonymousClassBody().isPresent()) {
+            // TODO
+            reportUnsupportedElement(n);
+            return null;
+        }
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
+        ImmutableArray<Expression> args = map(n.getArguments());
+        TypeRef type = accept(n.getType());
+        return new New(pi, c, args, type);
     }
 
     @Override
@@ -683,7 +690,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(PrimitiveType n, Void arg) {
-        return getKeyJavaType(n.resolve());
+        return new TypeRef(getKeyJavaType(n.resolve()));
     }
 
     @Override
@@ -702,7 +709,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(ArrayType n, Void arg) {
-        return getKeyJavaType(n.resolve());
+        return new TypeRef(getKeyJavaType(n.resolve()));
     }
 
     @Override
@@ -997,7 +1004,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(VoidType n, Void arg) {
-        return getKeyJavaType(ResolvedVoidType.INSTANCE);
+        return new TypeRef(getKeyJavaType(ResolvedVoidType.INSTANCE));
     }
 
     @Override

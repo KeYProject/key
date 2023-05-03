@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.expression.operator;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
@@ -12,6 +14,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * The object allocation operator. There are two variants for New:
@@ -80,6 +83,13 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
         super(arguments, type);
         anonymousClass = null;
         accessPath = rp;
+    }
+
+    public New(PositionInfo pi, List<Comment> c, ImmutableArray<Expression> arguments,
+            TypeReference type) {
+        super(pi, c, arguments, type);
+        anonymousClass = null;
+        accessPath = null;
     }
 
 
