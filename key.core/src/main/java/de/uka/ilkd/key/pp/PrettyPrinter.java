@@ -433,7 +433,6 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnPackageSpecification(PackageSpecification x) {
-        l.nl();
         l.keyWord("package");
         l.print(" ");
         performActionOnPackageReference(x.getPackageReference());
@@ -666,9 +665,12 @@ public class PrettyPrinter implements Visitor {
             if (hasImports || hasPackageSpec) {
                 l.nl();
             }
-            for (TypeDeclaration td : x.getDeclarations()) {
+            for (int i = 0; i < x.getDeclarations().size(); i++) {
+                if (i != 0) {
+                    l.nl();
+                }
                 l.nl();
-                td.visit(this);
+                x.getDeclarations().get(i).visit(this);
             }
         }
     }
@@ -676,6 +678,7 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnClassDeclaration(ClassDeclaration x) {
         l.beginC();
+        l.beginC(0);
         ImmutableArray<Modifier> mods = x.getModifiers();
         boolean hasMods = mods != null && !mods.isEmpty();
         if (hasMods) {
@@ -688,23 +691,34 @@ public class PrettyPrinter implements Visitor {
             l.keyWord("class").print(" ");
             performActionOnProgramElementName(x.getProgramElementName());
         }
-        if (x.getExtendedTypes() != null) {
-            l.print(" ");
+        l.end();
+        if (x.getExtendedTypes() != null && x.getExtendedTypes().getChildCount() != 0) {
+            l.brk().beginC(0);
             performActionOnExtends(x.getExtendedTypes());
+            l.end();
         }
-        if (x.getImplementedTypes() != null) {
-            l.print(" ");
+        if (x.getImplementedTypes() != null && x.getImplementedTypes().getChildCount() != 0) {
+            l.brk();
             performActionOnImplements(x.getImplementedTypes());
         }
         // not an anonymous class
         if (x.getProgramElementName() != null) {
             l.print(" ");
         }
-        if (x.getMembers() != null) {
+        l.end();
+
+        performActionOnMemberDeclarations(x.getMembers());
+    }
+
+    private void performActionOnMemberDeclarations(ImmutableArray<MemberDeclaration> members) {
+        if (members != null && !members.isEmpty()) {
             beginBlock();
-            for (MemberDeclaration m : x.getMembers()) {
+            for (int i = 0; i < members.size(); ++i) {
+                if (i != 0) {
+                    l.nl();
+                }
                 l.nl();
-                m.visit(this);
+                members.get(i).visit(this);
             }
             endBlock();
         } else {
@@ -727,22 +741,14 @@ public class PrettyPrinter implements Visitor {
             l.keyWord("interface").print(" ");
             performActionOnProgramElementName(x.getProgramElementName());
         }
-        if (x.getExtendedTypes() != null) {
+        if (x.getExtendedTypes() != null && x.getExtendedTypes().getChildCount() != 0) {
             l.print(" ");
             performActionOnExtends(x.getExtendedTypes());
         }
         l.print(" ");
+        l.end();
 
-        if (x.getMembers() != null) {
-            beginBlock();
-            for (MemberDeclaration m : x.getMembers()) {
-                l.nl();
-                m.visit(this);
-            }
-            endBlock();
-        } else {
-            l.print("{}");
-        }
+        performActionOnMemberDeclarations(x.getMembers());
     }
 
     @Override
@@ -774,7 +780,7 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnMethodDeclaration(MethodDeclaration x) {
-        l.beginC();
+        l.beginC(0);
         ImmutableArray<Modifier> mods = x.getModifiers();
         boolean hasMods = mods != null && !mods.isEmpty();
         if (hasMods) {
@@ -789,7 +795,6 @@ public class PrettyPrinter implements Visitor {
             l.print(" ");
         }
         performActionOnProgramElementName(x.getProgramElementName());
-        l.print(" ");
 
         beginMultilineBracket();
         if (x.getParameters() != null) {
@@ -800,9 +805,10 @@ public class PrettyPrinter implements Visitor {
             performActionOnThrows(x.getThrown());
         }
         if (x.getBody() != null) {
+            l.print(" ").end();
             printStatementBlock(x.getBody());
         } else {
-            l.print(";");
+            l.print(";").end();
         }
     }
 
@@ -821,7 +827,8 @@ public class PrettyPrinter implements Visitor {
 
     protected void performActionOnStatement(SourceElement s) {
         l.beginRelativeC(0);
-        boolean validStatement = !(s instanceof CatchAllStatement || s instanceof ProgramPrefix);
+        boolean validStatement = !(s instanceof CatchAllStatement || s instanceof ProgramPrefix
+                || s instanceof TypeDeclarationContainer);
         if (validStatement) {
             markStart(s);
         }
@@ -829,7 +836,8 @@ public class PrettyPrinter implements Visitor {
         if (validStatement) {
             markEnd(s);
         }
-        if (!(s instanceof BranchStatement) && !(s instanceof StatementContainer)) {
+        if (!(s instanceof BranchStatement) && !(s instanceof StatementContainer)
+                && !(s instanceof TypeDeclarationContainer)) {
             l.print(";");
         }
         l.end();
@@ -1225,16 +1233,20 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnExtends(Extends x) {
         if (x.getSupertypes() != null) {
-            l.keyWord("extends").print(" ");
+            l.beginC();
+            l.keyWord("extends").brk();
             writeCommaList(x.getSupertypes());
+            l.end();
         }
     }
 
     @Override
     public void performActionOnImplements(Implements x) {
         if (x.getSupertypes() != null) {
-            l.keyWord("implements").print(" ");
+            l.beginC();
+            l.keyWord("implements").brk();
             writeCommaList(x.getSupertypes());
+            l.end();
         }
     }
 
