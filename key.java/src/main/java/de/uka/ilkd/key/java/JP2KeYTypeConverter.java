@@ -94,6 +94,10 @@ public class JP2KeYTypeConverter {
         }
     }
 
+    public TypeConverter getTypeConverter() {
+        return typeConverter;
+    }
+
     private KeYJavaType lookupInCache(ResolvedType t) {
         return jp2KeY.toKeY(t);
     }
