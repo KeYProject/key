@@ -15,7 +15,7 @@ import de.uka.ilkd.key.proof.Proof;
  * @author Arne Keller
  */
 public class CopyStepsAction extends MainWindowAction implements KeYSelectionListener {
-    CopyStepsAction(MainWindow mainWindow) {
+    public CopyStepsAction(MainWindow mainWindow) {
         super(mainWindow);
         putValue(SMALL_ICON, IconFactory.BACKREFERENCE.get(MainWindow.TOOLBAR_ICON_SIZE));
         putValue(SHORT_DESCRIPTION, "Copy all referenced proof steps.");

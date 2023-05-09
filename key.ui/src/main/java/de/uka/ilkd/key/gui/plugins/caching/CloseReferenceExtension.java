@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.proof.reference;
+package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -23,6 +23,9 @@ import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
+import de.uka.ilkd.key.proof.reference.CopyStepsAction;
+import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
@@ -33,7 +36,7 @@ import org.key_project.util.collection.ImmutableList;
     experimental = false)
 public class CloseReferenceExtension
         implements KeYGuiExtension, KeYGuiExtension.Startup, KeYGuiExtension.ContextMenu,
-        KeYGuiExtension.Toolbar,
+        KeYGuiExtension.Toolbar, KeYGuiExtension.StatusLine,
         KeYSelectionListener, RuleAppListener,
         ProofDisposedListener {
 
@@ -93,9 +96,14 @@ public class CloseReferenceExtension
     }
 
     @Override
-    public void init(MainWindow window, KeYMediator mediator) {
+    public void preInit(MainWindow window, KeYMediator mediator) {
         this.mediator = mediator;
         mediator.addKeYSelectionListener(this);
+    }
+
+    @Override
+    public void init(MainWindow window, KeYMediator mediator) {
+
     }
 
     @Override
@@ -127,10 +135,15 @@ public class CloseReferenceExtension
         return bar;
     }
 
+    @Override
+    public List<JComponent> getStatusLineComponents() {
+        return List.of(new ReferenceSearchButton(mediator));
+    }
+
     /**
      * Listener that ensures steps are copied before the referenced proof is disposed.
      */
-    private static class CopyBeforeDispose implements ProofDisposedListener {
+    public static class CopyBeforeDispose implements ProofDisposedListener {
 
         private final KeYMediator mediator;
         private final Proof referencedProof;
@@ -142,7 +155,7 @@ public class CloseReferenceExtension
          * @param referencedProof referenced proof
          * @param newProof new proof
          */
-        CopyBeforeDispose(KeYMediator mediator, Proof referencedProof, Proof newProof) {
+        public CopyBeforeDispose(KeYMediator mediator, Proof referencedProof, Proof newProof) {
             this.mediator = mediator;
             this.referencedProof = referencedProof;
             this.newProof = newProof;
