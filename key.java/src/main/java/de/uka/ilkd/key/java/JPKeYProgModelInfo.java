@@ -30,6 +30,7 @@ import com.github.javaparser.resolution.logic.MethodResolutionCapability;
 import com.github.javaparser.resolution.types.ResolvedArrayType;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
+import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserMethodDeclaration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,28 +89,13 @@ public class JPKeYProgModelInfo {
     @Nonnull
     private Set<MethodUsage> getAllRecoderMethods(KeYJavaType kjt) {
         if (kjt.getJavaType() instanceof TypeDeclaration) {
+            // TODO this does not work, type map
             com.github.javaparser.ast.body.TypeDeclaration<?> o =
                 (com.github.javaparser.ast.body.TypeDeclaration<?>) rec2key().toRecoder(kjt);
             var rtype = o.resolve();
             return rtype.getAllMethods();
         }
         return Collections.emptySet();
-    }
-
-
-    /**
-     * Returns all visible methods that are defined in this
-     * class type or any of its supertypes. The methods are
-     * in topological order with respect to the inheritance hierarchy.
-     *
-     * @return the list of visible methods of this type and its supertypes.
-     */
-    public ImmutableList<Method> getAllMethods(KeYJavaType kjt) {
-        var rmethods = getAllRecoderMethods(kjt);
-        return rmethods.stream()
-                .map(it -> ((IProgramMethod) rec2key().toKeY(it.getDeclaration().toAst().get()))
-                        .getMethodDeclaration())
-                .collect(ImmutableList.collector());
     }
 
 
@@ -290,7 +276,7 @@ public class JPKeYProgModelInfo {
          */
     }
 
-    private List<ResolvedMethodDeclaration> getRecoderMethods(KeYJavaType kjt) {
+    private List<ResolvedMethodDeclaration> getMethods(KeYJavaType kjt) {
         com.github.javaparser.ast.type.Type type =
             (com.github.javaparser.ast.type.Type) rec2key().toRecoder(kjt.getJavaType());
         var rtype = type.resolve();
@@ -312,7 +298,7 @@ public class JPKeYProgModelInfo {
         return (com.github.javaparser.ast.type.Type) rec2key().toRecoder(ct);
     }
 
-    private List<ResolvedMethodDeclaration> getRecoderMethods(KeYJavaType ct, String name,
+    private List<ResolvedMethodDeclaration> getMethods(KeYJavaType ct, String name,
             ImmutableList<? extends Type> signature, KeYJavaType context) {
         var rct = getJPType(ct).resolve();
         var rcontext = getJPType(context);
@@ -332,53 +318,6 @@ public class JPKeYProgModelInfo {
         return null;
     }
 
-
-    /**
-     * Returns the list of most specific methods with the given
-     * name that are defined in the given type or in a supertype
-     * where they are visible for the given type, and have a signature
-     * that is compatible to the given one. If used to resolve a
-     * method call, the result should be defined and unambiguous.
-     *
-     * @param ct the class type to get methods from.
-     * @param m the name of the methods in question.
-     * @param signature the statical type signature of a callee.
-     */
-
-    private ImmutableList<Method> getMethods(KeYJavaType ct, String m,
-            ImmutableList<Type> signature, KeYJavaType context) {
-        var rml = getRecoderMethods(ct, m, signature, context);
-        ImmutableList<Method> result = ImmutableSLList.nil();
-        for (int i = rml.size() - 1; i >= 0; i--) {
-            var rm = rml.get(i);
-            Method method = (Method) rec2key().toKeY(rm);
-            result = result.prepend(method);
-        }
-        return result;
-    }
-
-
-    /**
-     * Returns the methods locally defined within the given
-     * class type. If the type is represented in source code,
-     * the returned list matches the syntactic order.
-     *
-     * @param ct a class type.
-     */
-
-    public ImmutableList<Method> getMethods(KeYJavaType ct) {
-        var rml = getRecoderMethods(ct);
-        ImmutableList<Method> result = ImmutableSLList.nil();
-        for (int i = rml.size() - 1; i >= 0; i--) {
-            var rm = rml.get(i);
-            if (!(rm instanceof recoder.bytecode.MethodInfo)) {
-                Method m = ((IProgramMethod) rec2key().toKeY(rm)).getMethodDeclaration();
-                result = result.prepend(m);
-            }
-        }
-        return result;
-    }
-
     /**
      * Returns the ProgramMethods locally defined within the given
      * class type. If the type is represented in source code,
@@ -387,16 +326,15 @@ public class JPKeYProgModelInfo {
      * @param ct a class type.
      */
     public ImmutableList<ProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType ct) {
-        var rml = getRecoderMethods(ct);
+        var rml = getMethods(ct);
         ImmutableList<ProgramMethod> result = ImmutableSLList.nil();
         for (int i = rml.size() - 1; i >= 0; i--) {
             var rm = rml.get(i);
-            if (!(rm instanceof recoder.bytecode.MethodInfo)) {
-                final var element = (ProgramMethod) rec2key().toKeY(rm);
+            if (rm instanceof JavaParserMethodDeclaration) {
+                var element = (ProgramMethod) rec2key().toKeY(rm);
                 if (element != null) {
                     result = result.prepend(element);
                 }
-
             }
         }
         return result;
@@ -487,7 +425,7 @@ public class JPKeYProgModelInfo {
             return getImplicitMethod(ct, m);
         }
 
-        var methodlist = getRecoderMethods(ct, m, signature, context);
+        var methodlist = getMethods(ct, m, signature, context);
 
         if (methodlist.size() == 1) {
             return (IProgramMethod) rec2key().toKeY(methodlist.get(0));
@@ -684,23 +622,6 @@ public class JPKeYProgModelInfo {
     private JP2KeYConverter createRecoder2KeY(Namespace<SchemaVariable> nss) {
         return new JP2KeYConverter(services, rec2key(), nss, typeConverter);
     }
-
-    /**
-     * Parses a given JavaBlock using cd as context to determine the right
-     * references.
-     *
-     * @param block a String describing a java block
-     * @param cd ClassDeclaration representing the context in which the
-     *        block has to be interpreted.
-     * @return the parsed and resolved JavaBlock
-     *         public JavaBlock readBlock(String block, ClassDeclaration cd,
-     *         Namespace<SchemaVariable> nss) {
-     *         return javaService.readBlock()
-     *         return createRecoder2KeY(nss)
-     *         .readBlock(block, new JPContext(sc, (ClassOrInterfaceDeclaration)
-     *         rec2key().toRecoder(cd)));
-     *         }
-     */
 
 
     /**

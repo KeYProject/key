@@ -89,25 +89,6 @@ public class KeYProgModelInfo {
      * @return the list of visible methods of this type and its supertypes.
      */
 
-    public ImmutableList<Method> getAllMethods(KeYJavaType kjt) {
-        List<recoder.abstraction.Method> rmethods = getAllRecoderMethods(kjt);
-        ImmutableList<Method> result = ImmutableSLList.nil();
-        for (int i = rmethods.size() - 1; i >= 0; i--) {
-            recoder.abstraction.Method rm = rmethods.get(i);
-            Method m = ((IProgramMethod) rec2key().toKeY(rm)).getMethodDeclaration();
-            result = result.prepend(m);
-        }
-        return result;
-    }
-
-
-    /**
-     * Returns all visible methods that are defined in this class type or any of its supertypes. The
-     * methods are in topological order with respect to the inheritance hierarchy.
-     *
-     * @return the list of visible methods of this type and its supertypes.
-     */
-
     public ImmutableList<IProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
         List<recoder.abstraction.Method> rmethods = getAllRecoderMethods(kjt);
         ImmutableList<IProgramMethod> result = ImmutableSLList.nil();
@@ -344,27 +325,6 @@ public class KeYProgModelInfo {
             ImmutableList<KeYJavaType> signature) {
         recoder.abstraction.ClassType rct = (recoder.abstraction.ClassType) rec2key().toRecoder(ct);
         return rct.getProgramModelInfo().getConstructors(rct, getRecoderTypes(signature));
-    }
-
-
-    /**
-     * Returns the methods locally defined within the given class type. If the type is represented
-     * in source code, the returned list matches the syntactic order.
-     *
-     * @param ct a class type.
-     */
-
-    public ImmutableList<Method> getMethods(KeYJavaType ct) {
-        List<recoder.abstraction.Method> rml = getRecoderMethods(ct);
-        ImmutableList<Method> result = ImmutableSLList.nil();
-        for (int i = rml.size() - 1; i >= 0; i--) {
-            recoder.abstraction.Method rm = rml.get(i);
-            if (!(rm instanceof recoder.bytecode.MethodInfo)) {
-                Method m = ((IProgramMethod) rec2key().toKeY(rm)).getMethodDeclaration();
-                result = result.prepend(m);
-            }
-        }
-        return result;
     }
 
     /**
@@ -645,19 +605,6 @@ public class KeYProgModelInfo {
     private Recoder2KeY createRecoder2KeY(NamespaceSet nss) {
         return new Recoder2KeY(services, sc, rec2key(), nss, typeConverter);
     }
-
-    /**
-     * Parses a given JavaBlock using cd as context to determine the right references.
-     *
-     * @param block a String describing a java block
-     * @param cd ClassDeclaration representing the context in which the block has to be interpreted.
-     * @return the parsed and resolved JavaBlock
-     */
-    public JavaBlock readBlock(String block, ClassDeclaration cd, NamespaceSet nss) {
-        return createRecoder2KeY(nss).readBlock(block,
-            new Context(sc, (recoder.java.declaration.ClassDeclaration) rec2key().toRecoder(cd)));
-    }
-
 
     /**
      * Parses a given JavaBlock using an empty context.
