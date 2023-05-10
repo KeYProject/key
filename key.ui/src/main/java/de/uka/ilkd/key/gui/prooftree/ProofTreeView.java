@@ -92,6 +92,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * Stores for each loaded proof the GUI tree model.
      */
     private final WeakHashMap<Proof, GUIProofTreeModel> models = new WeakHashMap<>(20);
+    /**
+     * Stores for each loaded proof the position of the scroll view.
+     */
+    private final WeakHashMap<Proof, Integer> scrollState = new WeakHashMap<>();
 
     /**
      * The (currently selected) proof this view shows.
@@ -377,10 +381,17 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * @param p the Proof that has been loaded
      */
     private void setProof(Proof p) {
+        if (proof != null) {
+            // save old scroll height
+            JScrollPane scroller = (JScrollPane) delegateView.getParent().getParent();
+            scrollState.put(proof, scroller.getVerticalScrollBar().getValue());
+        }
         if (proof == p) {
             return; // proof is already loaded
         }
+        ProofTreeViewFilter.NodeFilter filter = null;
         if (delegateModel != null) {
+            filter = delegateModel.getActiveNodeFilter();
             expansionState.disconnect();
             delegateModel.setExpansionState(expansionState.copyState());
             delegateModel.storeSelection(delegateView.getSelectionPath());
@@ -392,7 +403,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
             proof.removeRuleAppListener(proofListener);
         }
 
-        Proof oldProof = proof;
         proof = p;
 
         if (proof != null) {
@@ -409,14 +419,38 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 new ProofTreeExpansionState(delegateView, delegateModel.getExpansionState());
             delegateView.expandRow(0);
 
+            // Save expansion state to restore:
+            // since TreePaths are not valid after refreshing the filter, we need to store the
+            // row indices
+            List<Integer> rowsToExpand = new ArrayList<>();
+            for (TreePath tp : expansionState) {
+                rowsToExpand.add(delegateView.getUI().getRowForPath(delegateView, tp));
+            }
+            Collections.sort(rowsToExpand);
+
             // Redraw the tree in case the ProofTreeViewFilters have changed
             // since the last time the proof was loaded.
-            if (oldProof == null || !oldProof.equals(proof)) {
-                delegateModel.updateTree(null);
+            delegateModel.setFilterImmediately(filter, filter != null && filter.isActive());
+
+            // Expand previously visible rows.
+            for (int i : rowsToExpand) {
+                delegateView.expandRow(i);
             }
 
-            delegateView.setSelectionPath(delegateModel.getSelection());
-            delegateView.scrollPathToVisible(delegateModel.getSelection());
+            if (delegateModel.getSelection() != null) {
+                delegateView.setSelectionPath(delegateModel.getSelection());
+                delegateView.scrollPathToVisible(delegateModel.getSelection());
+            } else {
+                // new proof, select initial node
+                delegateView.setSelectionRow(1);
+            }
+
+            // Restore previous scroll position.
+            JScrollPane scroller = (JScrollPane) delegateView.getParent().getParent();
+            Integer i = scrollState.get(proof);
+            if (i != null) {
+                scroller.getVerticalScrollBar().setValue(i);
+            }
         } else {
             delegateModel = null;
             delegateView
@@ -429,6 +463,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     public void removeProofs(Proof[] ps) {
         for (final Proof p : ps) {
             models.remove(p);
+            scrollState.remove(p);
             mediator.getCurrentlyOpenedProofs().removeElement(p);
         }
     }
