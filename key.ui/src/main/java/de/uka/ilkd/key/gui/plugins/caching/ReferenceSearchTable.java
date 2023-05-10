@@ -1,13 +1,9 @@
 package de.uka.ilkd.key.gui.plugins.caching;
 
-import java.awt.*;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -80,43 +76,6 @@ class ReferenceSearchTable extends JTable implements TableModel {
         this.openGoals = proof.openGoals().toList();
         getColumnModel().getColumn(1).setMinWidth(200);
     }
-
-    // @Override
-    // public Dimension getPreferredSize() {
-    // Dimension dim = new Dimension(super.getPreferredSize());
-    // dim.height = Math.min(NUMBER_OF_VISIBLE_ROWS *
-    // (progressPanelRenderer.getPreferredSize().height+5), dim.height);
-    // return dim;
-    // }
-
-    public static void packColumn(JTable table, int vColIndex, int margin) {
-
-        TableColumnModel colModel = table.getColumnModel();
-        TableColumn col = colModel.getColumn(vColIndex);
-        int width = 0;
-
-
-        TableCellRenderer renderer = col.getHeaderRenderer();
-        if (renderer == null) {
-            renderer = table.getTableHeader().getDefaultRenderer();
-        }
-        Component comp =
-            renderer.getTableCellRendererComponent(table, col.getHeaderValue(), false, false, 0, 0);
-        width = comp.getPreferredSize().width;
-
-
-        for (int r = 0; r < table.getRowCount(); r++) {
-            renderer = table.getCellRenderer(r, vColIndex);
-            comp = renderer.getTableCellRendererComponent(table, table.getValueAt(r, vColIndex),
-                false, false, r, vColIndex);
-            width = Math.max(width, comp.getPreferredSize().width);
-        }
-
-        width += 10 * margin;
-
-        col.setPreferredWidth(width);
-    }
-
 
     @Override
     public void tableChanged(TableModelEvent e) {

@@ -8,7 +8,6 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.settings.GeneralSettings;
-import de.uka.ilkd.key.settings.ProofCachingSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
@@ -42,7 +41,6 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     private final JCheckBox chkShowWholeTacletCB;
     private final JCheckBox chkShowUninstantiatedTaclet;
     private final JCheckBox chkRightClickMacros;
-    private final JCheckBox chkEnableProofCaching;
     private final JCheckBox chkPrettyPrint;
     private final JCheckBox chkUseUnicode;
     private final JCheckBox chkSyntaxHighlightning;
@@ -114,8 +112,6 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
             addCheckBox("Ensure source consistency", "", true, emptyValidator());
         chkRightClickMacros =
             addCheckBox("Right click for proof macros", "", false, emptyValidator());
-        chkEnableProofCaching =
-            addCheckBox("Enable Proof Caching in Auto Mode", "", true, emptyValidator());
     }
 
 
@@ -151,8 +147,6 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         chkSyntaxHighlightning.setSelected(vs.isUseSyntaxHighlighting());
         chkEnsureSourceConsistency.setSelected(generalSettings.isEnsureSourceConsistency());
         chkRightClickMacros.setSelected(generalSettings.isRightClickMacro());
-        chkEnableProofCaching.setSelected(
-            ProofIndependentSettings.DEFAULT_INSTANCE.getProofCachingSettings().getEnabled());
         chkConfirmExit.setSelected(vs.confirmExit());
         spAutoSaveProof.setValue(generalSettings.autoSavePeriod());
         chkMinimizeInteraction.setSelected(generalSettings.getTacletFilter());
@@ -170,8 +164,6 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     public void applySettings(MainWindow window) throws InvalidSettingsInputException {
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-        ProofCachingSettings cs =
-            ProofIndependentSettings.DEFAULT_INSTANCE.getProofCachingSettings();
 
         vs.setLookAndFeel(LAF_CLASSES.get(lookAndFeel.getSelectedIndex()));
         vs.setUIFontSizeFactor((Double) spFontSizeGlobal.getValue());
@@ -189,7 +181,6 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         vs.setUseSyntaxHighlighting(chkSyntaxHighlightning.isSelected());
         gs.setEnsureSourceConsistency(chkEnsureSourceConsistency.isSelected());
         gs.setRightClickMacros(chkRightClickMacros.isSelected());
-        cs.setEnabled(chkEnableProofCaching.isSelected());
         vs.setConfirmExit(chkConfirmExit.isSelected());
         gs.setAutoSave((Integer) spAutoSaveProof.getValue());
         gs.setTacletFilter(chkMinimizeInteraction.isSelected());

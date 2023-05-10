@@ -5,20 +5,24 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 
 public class ReferenceSearchButton extends JButton
-        implements ActionListener, ReferenceSearchDialogListener {
+        implements ActionListener, ReferenceSearchDialogListener, KeYSelectionListener {
     private final KeYMediator mediator;
     private ReferenceSearchDialog dialog = null;
 
     public ReferenceSearchButton(KeYMediator mediator) {
         super("Proof Caching");
         this.mediator = mediator;
+        mediator.addKeYSelectionListener(this);
         addActionListener(this);
+        setEnabled(false);
     }
 
 
@@ -56,6 +60,25 @@ public class ReferenceSearchButton extends JButton
             mediator.getSelectedProof().copyCachedGoals(null);
             dialog.dispose();
             dialog = null;
+        }
+    }
+
+    @Override
+    public void selectedNodeChanged(KeYSelectionEvent e) {
+        Proof p = e.getSource().getSelectedProof();
+        if (p == null) {
+            setText("Proof Caching");
+            setEnabled(false);
+            return;
+        }
+        long foundRefs =
+            p.openGoals().stream().filter(g -> g.node().lookup(ClosedBy.class) != null).count();
+        if (foundRefs > 0) {
+            setText(String.format("Proof Caching (%d references found!)", foundRefs));
+            setEnabled(true);
+        } else {
+            setText("Proof Caching");
+            setEnabled(false);
         }
     }
 }

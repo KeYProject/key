@@ -37,7 +37,6 @@ public class ProofIndependentSettings {
     private final ViewSettings viewSettings = new ViewSettings();
     private final TermLabelSettings termLabelSettings = new TermLabelSettings();
 
-    private final ProofCachingSettings proofCachingSettings = new ProofCachingSettings();
     private final String filename;
 
 
@@ -51,7 +50,6 @@ public class ProofIndependentSettings {
         addSettings(lemmaGeneratorSettings);
         addSettings(generalSettings);
         addSettings(viewSettings);
-        addSettings(proofCachingSettings);
         this.filename = filename;
         loadSettings();
     }
@@ -149,9 +147,5 @@ public class ProofIndependentSettings {
     public static void setUsePrettyPrinting(boolean usePrettyPrinting) {
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(usePrettyPrinting);
         NotationInfo.DEFAULT_PRETTY_SYNTAX = usePrettyPrinting;
-    }
-
-    public ProofCachingSettings getProofCachingSettings() {
-        return proofCachingSettings;
     }
 }

@@ -15,6 +15,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -27,7 +28,6 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.CopyStepsAction;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -36,7 +36,7 @@ import org.key_project.util.collection.ImmutableList;
     experimental = false)
 public class CloseReferenceExtension
         implements KeYGuiExtension, KeYGuiExtension.Startup, KeYGuiExtension.ContextMenu,
-        KeYGuiExtension.Toolbar, KeYGuiExtension.StatusLine,
+        KeYGuiExtension.Toolbar, KeYGuiExtension.StatusLine, KeYGuiExtension.Settings,
         KeYSelectionListener, RuleAppListener,
         ProofDisposedListener {
 
@@ -70,7 +70,7 @@ public class CloseReferenceExtension
         if (e.getSource().lookup(CopyingProofReplayer.class) != null) {
             return; // copy in progress!
         }
-        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getProofCachingSettings().getEnabled()) {
+        if (!CachingSettingsProvider.getCachingSettings().getEnabled()) {
             return;
         }
         Proof p = e.getSource();
@@ -122,7 +122,8 @@ public class CloseReferenceExtension
             @Nonnull ContextMenuKind kind, @Nonnull Object underlyingObject) {
         if (kind.getType() == Node.class) {
             return List.of(new CloseByReference(mediator, (Node) underlyingObject),
-                new CopyReferencedProof(mediator, (Node) underlyingObject));
+                new CopyReferencedProof(mediator, (Node) underlyingObject),
+                new GotoReferencedProof(mediator, (Node) underlyingObject));
         }
         return new ArrayList<>();
     }
@@ -206,11 +207,9 @@ public class CloseReferenceExtension
     }
 
     static class CopyReferencedProof extends KeyAction {
-        private final KeYMediator mediator;
         private final Node node;
 
         public CopyReferencedProof(KeYMediator mediator, Node node) {
-            this.mediator = mediator;
             this.node = node;
             setName("Copy referenced proof steps here");
             setEnabled(node.leaf() && !node.isClosed()
@@ -222,15 +221,36 @@ public class CloseReferenceExtension
         public void actionPerformed(ActionEvent e) {
             ClosedBy c = node.lookup(ClosedBy.class);
             Goal current = node.proof().getGoal(node);
-            // node.proof().add(current);
-            // node.proof().reOpenGoal(current);
             try {
-                // mediator.stopInterface(true);
                 new CopyingProofReplayer(c.getProof(), node.proof()).copy(c.getNode(), current);
-                // mediator.startInterface(true);
             } catch (IntermediateProofReplayer.BuiltInConstructionException ex) {
                 throw new RuntimeException(ex);
             }
         }
+    }
+
+    static class GotoReferencedProof extends KeyAction {
+        private final KeYMediator mediator;
+        private final Node node;
+
+        public GotoReferencedProof(KeYMediator mediator, Node node) {
+            this.mediator = mediator;
+            this.node = node;
+            setName("Go to referenced proof");
+            setEnabled(node.leaf() && !node.isClosed()
+                    && node.lookup(ClosedBy.class) != null);
+            setMenuPath("Proof Caching");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ClosedBy c = node.lookup(ClosedBy.class);
+            mediator.getSelectionModel().setSelectedNode(c.getNode());
+        }
+    }
+
+    @Override
+    public SettingsProvider getSettings() {
+        return new CachingSettingsProvider();
     }
 }
