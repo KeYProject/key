@@ -113,9 +113,6 @@ public class JavaService {
      */
     private Collection<? extends CompilationUnit> dynamicallyCreatedCompilationUnits;
 
-
-    private final CompilationUnit compilationUnitOfVirtualClasses;
-
     private final Services services;
     private final JavaParserFactory programFactory;
 
@@ -1001,7 +998,6 @@ public class JavaService {
         converter = new JP2KeYConverter(services, mapping, schemaVariables, getTypeConverter());
         typeConverter = new JP2KeYTypeConverter(services, getTypeSolver(), mapping);
         programFactory = new JavaParserFactory(this);
-        compilationUnitOfVirtualClasses = null;
     }
 
     public JavaParser createJavaParser() {

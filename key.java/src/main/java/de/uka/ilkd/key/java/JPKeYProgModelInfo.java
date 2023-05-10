@@ -44,6 +44,7 @@ public class JPKeYProgModelInfo {
     private final JP2KeYTypeConverter typeConverter;
     private final Map<KeYJavaType, Map<String, IProgramMethod>> implicits = new LinkedHashMap<>();
     private KeYRecoderExcHandler exceptionHandler = null;
+    // TODO what is this
     private JavaService javaService;
 
     public JPKeYProgModelInfo(Services services, KeYJPMapping mapping,
@@ -52,7 +53,6 @@ public class JPKeYProgModelInfo {
         this.services = services;
         this.typeConverter = typeConverter;
         this.mapping = mapping;
-
     }
 
 

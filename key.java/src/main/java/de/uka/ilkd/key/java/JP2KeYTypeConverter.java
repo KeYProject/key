@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java;
 
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.Final;
@@ -283,16 +285,12 @@ public class JP2KeYTypeConverter {
         return new SortImpl(name, supers, isAbstract || ct.isInterface());
     }
 
-    /**
-     * create
-     *
-     * @param baseType
-     * @param arrayType
-     * @return the ArrayDeclaration of the given type
-     */
-    public ArrayDeclaration createArrayType(KeYJavaType baseType, KeYJavaType arrayType) {
-        if (jp2KeY.getSuperArrayType() == null) {
-            createSuperArrayType(); // we want to have exactly one
+    @Nonnull
+    private KeYJavaType getSuperArrayType() {
+        var res = jp2KeY.getSuperArrayType();
+        if (res == null) {
+            res = createSuperArrayType();
+            // we want to have exactly one
             // length attribute for this R2K
             // instance (resolving
             // a.length=a.length might get
@@ -300,10 +298,21 @@ public class JP2KeYTypeConverter {
             // therefore we introduce a 'super
             // array class' which contains the
             // length attribute
-            assert jp2KeY.getSuperArrayType() != null;
+            jp2KeY.setSuperArrayType(res);
         }
 
-        var sat = jp2KeY.getSuperArrayType();
+        return res;
+    }
+
+    /**
+     * create
+     *
+     * @param baseType
+     * @param arrayType
+     * @return the ArrayDeclaration of the given type
+     */
+    private ArrayDeclaration createArrayType(KeYJavaType baseType, KeYJavaType arrayType) {
+        var sat = getSuperArrayType();
         final FieldDeclaration length = ((SuperArrayDeclaration) sat.getJavaType()).length();
         final TypeReference baseTypeRef;
 
@@ -327,19 +336,18 @@ public class JP2KeYTypeConverter {
      * <p>
      * creates the field declaration for the public final integer field <code>length</code>
      */
-    private FieldDeclaration createSuperArrayType() {
+    @Nonnull
+    private KeYJavaType createSuperArrayType() {
         KeYJavaType integerType = getKeYJavaType(ResolvedPrimitiveType.INT);
 
-        final KeYJavaType superArrayType = new KeYJavaType();
-        jp2KeY.setSuperArrayType(superArrayType);
-
-        FieldSpecification specLength =
+        var superArrayType = new KeYJavaType();
+        var specLength =
             new FieldSpecification(new LocationVariable(new ProgramElementName("length"),
                 integerType, superArrayType, false, false, false, true));
-        FieldDeclaration f = new FieldDeclaration(new Modifier[] { new Public(), new Final() },
+        var f = new FieldDeclaration(new Modifier[] { new Public(), new Final() },
             new TypeRef(integerType), new FieldSpecification[] { specLength }, false);
         superArrayType.setJavaType(new SuperArrayDeclaration(f));
-        return f;
+        return superArrayType;
     }
 
     /**
