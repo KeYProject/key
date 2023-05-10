@@ -46,6 +46,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      * Once <a href="https://github.com/cvc5/cvc5/pull/9353">the fix</a> is included in a release,
      * add this handler option to the .props file.
      * </p>
+     * Make sure to also send (get-unsat-core) in the respective socket class when adding this
+     * option.
      */
     private static final String GET_UNSAT_CORE = "getUnsatCore";
 
@@ -136,7 +138,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         boolean getUnsatCore = Arrays.asList(handlerOptions).contains(GET_UNSAT_CORE);
         sb.append("\n; --- Sequent\n");
-        int i = 0;
+        int i = 1;
         for (SExpr ass : sequentSMTAsserts) {
             if (getUnsatCore) {
                 String label = "L_" + i;
@@ -149,9 +151,6 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
 
         sb.append("\n(check-sat)");
-        if (getUnsatCore) {
-            sb.append("\n(get-unsat-core)");
-        }
 
         if (!master.getUnknownValues().isEmpty()) {
             sb.append("\n\n; --- Translation of unknown values\n");
