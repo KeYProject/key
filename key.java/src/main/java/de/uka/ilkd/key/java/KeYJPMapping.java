@@ -125,7 +125,7 @@ public class KeYJPMapping {
         if (formerValue != null)
             LOGGER.error("Duplicate registration of type: {}, formerValue: {}", key, formerValue);
         revMap.put(key, rec);
-        // TODO remove
+        // TODO javaparser remove
         LOGGER.warn("Size of rec2key: {} entries", map.size());
     }
 
@@ -141,7 +141,7 @@ public class KeYJPMapping {
     }
 
     public Set<Object> elemsKeY() {
-        // TODO remove
+        // TODO javaparser remove
         LOGGER.error("Size of rec2key: {} entries", map.size());
         return revMap.keySet();
     }

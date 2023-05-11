@@ -532,7 +532,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         TypeReference type = accept(n.getVariables().get(0).getType());
         var varsList = new ArrayList<FieldSpecification>(n.getVariables().size());
         for (VariableDeclarator v : n.getVariables()) {
-            // TODO always model = false?
+            // TODO javaparser always model = false?
             varsList.add(visitFieldSpecification(
                 new FullVariableDeclarator(v, n.isFinal(), n.isStatic(), false)));
         }
@@ -794,7 +794,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         ImmutableArray<Statement> body = map(n.getStatements());
-        // TODO we currently multiply the branches
+        // TODO javaparser we currently multiply the branches
         var result = new ArrayList<Case>(n.getLabels().size());
         for (var label : n.getLabels()) {
             Expression expr = accept(label);
@@ -916,10 +916,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         } else if (lit.isCharLiteralExpr()) {
             return new CharLiteral(lit.asCharLiteralExpr().getValue());
         } else if (lit.isDoubleLiteralExpr()) {
-            // TODO there are only double or float literals in jp
+            // TODO javaparser there are only double or float literals in jp
             return new DoubleLiteral(lit.asDoubleLiteralExpr().getValue());
         } else if (lit.isIntegerLiteralExpr()) {
-            // TODO there are only int literals in jp, not byte short int
+            // TODO javaparser there are only int literals in jp, not byte short int
             return new IntLiteral(lit.asIntegerLiteralExpr().getValue());
         } else if (lit.isLongLiteralExpr()) {
             return new LongLiteral(lit.asLongLiteralExpr().getValue());
@@ -950,7 +950,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var init = spec.decl.getInitializer();
 
         if (init.isPresent()) {
-            // TODO needs java parser
+            // TODO javaparser needs java parser
             // var ce = new ConstantExpressionEvaluator(javaParser);
             // try {
             // var expr = ce.evaluate(init.get());
@@ -1056,7 +1056,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         }
 
         if (n.isAsterisk()) {
-            // TODO Class.* works as well
+            // TODO javaparser Class.* works as well
             var ref = translatePackageReference(n.getName());
             return new Import(ref, pi, c);
         } else {
@@ -1274,7 +1274,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var c = createComments(n);
         IProgramVariable resultVar = accept(n.getExpr());
         TypeReference bodySource = accept(n.getSource());
-        MethodReference methodReference = null;// TODO missing?
+        MethodReference methodReference = null;// TODO javaparser missing?
         IProgramMethod method = null;
         return new MethodBodyStatement(pi, c, resultVar, bodySource, methodReference, method);
     }
@@ -1323,7 +1323,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(KeyExpressionSV n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        // TODO what is this
+        // TODO javaparser what is this
         reportUnsupportedElement(n);
         return super.visit(n, arg);
     }

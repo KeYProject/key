@@ -43,7 +43,7 @@ public class InstanceAllocationMethodBuilder extends JavaTransformer {
 
     @Override
     public void apply(TypeDeclaration<?> td) {
-        // TODO only for classes?
+        // TODO javaparser only for classes?
         if (td.isRecordDeclaration() && td.isClassOrInterfaceDeclaration()) {
             addAllocateMethod(td);
         }

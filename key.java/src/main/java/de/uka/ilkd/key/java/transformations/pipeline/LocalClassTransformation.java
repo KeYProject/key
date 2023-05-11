@@ -43,7 +43,7 @@ public class LocalClassTransformation extends JavaTransformer {
                 for (final var vr : services.getUsages(v, td)) {
                     FieldAccessExpr fr = new FieldAccessExpr(new ThisExpr(),
                         PipelineConstants.FINAL_VAR_PREFIX + v.getName());
-                    // TODO td.replace(vr, fr);
+                    // TODO javaparser td.replace(vr, fr);
                 }
             }
         }

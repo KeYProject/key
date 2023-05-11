@@ -44,7 +44,7 @@ public class JPKeYProgModelInfo {
     private final JP2KeYTypeConverter typeConverter;
     private final Map<KeYJavaType, Map<String, IProgramMethod>> implicits = new LinkedHashMap<>();
     private KeYRecoderExcHandler exceptionHandler = null;
-    // TODO what is this
+    // TODO javaparser what is this
     private JavaService javaService;
 
     public JPKeYProgModelInfo(Services services, KeYJPMapping mapping,
@@ -70,7 +70,7 @@ public class JPKeYProgModelInfo {
      *
      * @return a Set object containing the KeY-elements.
      */
-    // TODO Check usages: Does not contain KeYJavaType
+    // TODO javaparser Check usages: Does not contain KeYJavaType
     public Set<Object> allElements() {
         return rec2key().elemsKeY();
     }
@@ -89,7 +89,7 @@ public class JPKeYProgModelInfo {
     @Nonnull
     private Set<MethodUsage> getAllRecoderMethods(KeYJavaType kjt) {
         if (kjt.getJavaType() instanceof TypeDeclaration) {
-            // TODO this does not work, type map
+            // TODO javaparser this does not work, type map
             com.github.javaparser.ast.body.TypeDeclaration<?> o =
                 (com.github.javaparser.ast.body.TypeDeclaration<?>) rec2key().toRecoder(kjt);
             var rtype = o.resolve();
@@ -549,7 +549,7 @@ public class JPKeYProgModelInfo {
      */
     private List<ResolvedReferenceTypeDeclaration> getAllRecoderSubtypes(KeYJavaType ct) {
         var rt = getJPType(ct).resolve();
-        // TODO get all known java types in classpath
+        // TODO javaparser get all known java types in classpath
         // best approximation is to use the recoder2key mapping
 
         var types = rec2key().elemsRec().stream()

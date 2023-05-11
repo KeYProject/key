@@ -1039,7 +1039,7 @@ public class JavaService {
                          * final Matcher matcher = IOUtil.URL_JAR_FILE.matcher();
                          * if (matcher.matches()) {
                          */
-                        // TODO add support for java files inside
+                        // TODO javaparser add support for java files inside
                     }
                 } else if (Files.isDirectory(sourcePath)) {
                     ct.add(new JavaParserTypeSolver(sourcePath, config));

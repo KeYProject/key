@@ -84,7 +84,7 @@ public class CreateObjectBuilder extends JavaTransformer {
             result.addStatement(new KeyMethodBodyStatement(null, createRef, thisType));
         }
 
-        // TODO why does the method return a value? Is the result ever used??
+        // TODO javaparser why does the method return a value? Is the result ever used??
         result.addStatement(new ReturnStmt(new NameExpr(NEW_OBJECT_VAR_NAME)));
         return result;
     }
