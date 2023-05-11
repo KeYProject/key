@@ -69,22 +69,33 @@ public abstract class PredicateRefiner {
                     if (label == null) {
                         loc2label.put(loc, sf.formula().sub(1));
                     } else if (label.op() == numberSymbol) {
-                        Term currentLabel = sf.formula().sub(1);
+                        final Term currentLabel = sf.formula().sub(1);
                         Term minimalLabel = currentLabel;
+                        Integer inMap = Integer.parseInt(integerLDT.toNumberString(label.sub(0)));
                         if (currentLabel.op() == numberSymbol) {
                             Integer current = Integer.parseInt(integerLDT.toNumberString(currentLabel.sub(0)));
-                            Integer inMap = Integer.parseInt(integerLDT.toNumberString(label.sub(0)));
                             if (inMap.compareTo(current) < 0) {
                                 minimalLabel = label;
                             }
+                            loc2label.put(loc, minimalLabel);
+                        } else if (inMap.intValue() != 0) {
+                            loc2label.put(loc, currentLabel);
                         }
-                        loc2label.put(loc, minimalLabel);
+                    } else {
+                        final Term currentLabel = sf.formula().sub(1);
+                        if (currentLabel.op() == numberSymbol) {
+                            Integer current = Integer.parseInt(integerLDT.toNumberString(currentLabel.sub(0)));
+                            if (current == 0) {
+                                loc2label.put(loc, currentLabel);
+                            }
+                        }
                     }
                 }
             }
         }
 
         for (SequentFormula sequentFormula : originalSequent.antecedent()) {
+
             boolean doNotAdd = false;
             Operator sfOp = sequentFormula.formula().op();
             if (depLDT.isHistoryPredicate(sfOp)) {
@@ -111,8 +122,6 @@ public abstract class PredicateRefiner {
                         } else {
                             doNotAdd = false;
                         }
-
-
 //                    if (minLabel == null ||
 //                            (minLabel.op() != numberSymbol || minLabel.equalsModRenaming(sequentFormula.formula().sub(1)))) {
 //                        //sequent = sequent.addFormula(sequentFormula, true, false).sequent();
@@ -126,6 +135,7 @@ public abstract class PredicateRefiner {
             }
             if (!doNotAdd) {
                 sequent = sequent.addFormula(sequentFormula, true, false).sequent();
+
             } else {
 //                System.out.println("Discarding " + ProofSaver.printAnything(sequentFormula.formula(), null));
             }

@@ -691,7 +691,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "pull_out_dep_locations",
                 add(applyTF(FocusProjection.create(1), isDepPredicate),
-                        applyTF(FocusProjection.create(2), ff.update), applyTF("t", IsNonRigidTermFeature.INSTANCE),
+                        applyTF(FocusProjection.create(2), ff.update),
+                        applyTF("t", IsNonRigidTermFeature.INSTANCE),
                         longConst(100)));
 
         final Operator setMinus = getServices().getTypeConverter().getLocSetLDT().getSetMinus();
@@ -827,6 +828,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                         "h",
                         not(or(PrimitiveHeapTermFeature.create(heapLDT),
                                 AnonHeapTermFeature.INSTANCE))),
+                        //delete
+                        ifZero(applyTF(FocusProjection.create(1), tf.eqF), inftyConst(), longConst(0)),
                         ifZero(applyTF(FocusFormulaProjection.INSTANCE,
                                 ff.update), longConst(-4200), longConst(-1900)),
                         NonDuplicateAppModPositionFeature.INSTANCE));

@@ -71,12 +71,10 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
 
 		for (Term w : weakenedDepPreds) {
-			if (locSetToPredicate.hasVertex(w.sub(0))) {
-				if(locSetToPredicate.hasEdge(w.sub(0),w)) {
+			if (locSetToPredicate.hasVertex(w.sub(0)) && locSetToPredicate.hasEdge(w.sub(0),w)) {
 					depPredicates.add(w);
-//					System.out.println("In lattice: " + w);
+					System.out.println("In lattice: " + w);
 					inlattice++;
-				}
 			}
 			else{
 				if (sequentImpliesPredicate(w)) {
@@ -222,7 +220,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 //				System.out.println("added 1");
 			}
 		}
-//		System.out.println("weaken by predicate symb for " + unProven + " is "+result);
+		System.out.println("weaken by predicate symb for " + unProven + " is "+result);
 //		System.out.println("size: " + result.size());
 		return result;
 	}

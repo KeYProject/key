@@ -133,11 +133,12 @@ public class SideProof {
 //		} catch (IOException e) {
 //			e.printStackTrace();
 //		}
+
 		return ps.start();
 	}
 
 		static long COUNTER=0; // only used for saving - unique filenames
-	private static void printDebugAndSaveProof(ApplyStrategyInfo info) {
+	private static void printDebugAndSaveProof(ApplyStrategyInfo info, long time) {
 		if (DEBUG_VERBOSITY == 0) return;
 //		System.out.println("Proof Status: " + (info.getProof().closed() ? "closed" : "open"));
 
@@ -152,8 +153,10 @@ public class SideProof {
 
 
 		try {
+
 			new ProofSaver(info.getProof(), new java.io.File("C:\\Users\\Asma\\Unprovable"+COUNTER+".key")).save();
-			System.out.println(COUNTER + "   " +info.getProof().closed());
+
+			System.out.println(COUNTER + "   " +info.getProof().closed() + " in " + time + " ms");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -170,6 +173,7 @@ public class SideProof {
 																		 boolean stopAtFirstUncloseableGoal,
 									 									 Services services) {
 		ApplyStrategyInfo info;
+		long start = System.currentTimeMillis();
 		try {
 			info = isProvableHelper(seq2prove, maxRuleApp, timeout,false, stopAtFirstUncloseableGoal, services);
 
@@ -184,8 +188,9 @@ public class SideProof {
 		}
 
 		boolean closed = info.getProof().closed();
+		long end = System.currentTimeMillis();
 
-		if (DEBUG_VERBOSITY > 0) printDebugAndSaveProof(info);
+		if (DEBUG_VERBOSITY > 0) printDebugAndSaveProof(info, end - start);
 
 		return closed;
 	}
@@ -398,12 +403,12 @@ public class SideProof {
 	}
  */
 	protected boolean isProvable(Sequent seq2prove, Services services) {
-//		System.out.println(seq2prove);
+		System.out.println(seq2prove.succedent());
 		return isProvable(seq2prove, maxRuleApp, true, services);
 	}
 
 	protected boolean isProvable(Sequent seq2prove, int timeout, Services services) {
-//		System.out.println(seq2prove);
+		System.out.println(seq2prove.succedent());
 		return isProvable(seq2prove, maxRuleApp, timeout, true, services);
 	}
 
