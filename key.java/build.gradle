@@ -2,7 +2,6 @@ plugins {}
 
 dependencies {
     api project(':key.util')
-    api project(':key.core')
 
     def JP_VERSION = "3.25.2-K3-SNAPSHOT"
     api "com.github.javaparser:javaparser-core:$JP_VERSION"

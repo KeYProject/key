@@ -17,7 +17,8 @@ import de.uka.ilkd.key.speclang.translation.*;
  */
 public final class JMLResolverManager extends SLResolverManager {
 
-    public JMLResolverManager(JavaInfo javaInfo, KeYJavaType specInClass, ParsableVariable selfVar,
+    public JMLResolverManager(
+            JavaInfo javaInfo, KeYJavaType specInClass, ParsableVariable selfVar,
             SLExceptionFactory eManager) {
         super(eManager, specInClass, selfVar, false, javaInfo.getServices().getTermBuilder());
         addResolver(new JMLBuiltInPropertyResolver(javaInfo, this, specInClass));

@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
+import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -102,7 +103,7 @@ public class Services implements TermServices {
     }
 
     private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc,
-            KeYRecoderMapping rec2key, HashMap<String, Counter> counters, ServiceCaches caches) {
+            KeYJPMapping rec2key, HashMap<String, Counter> counters, ServiceCaches caches) {
         assert profile != null;
         assert counters != null;
         assert caches != null;

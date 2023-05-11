@@ -260,7 +260,7 @@ public final class ProblemInitializer {
         }
 
         // create Recoder2KeY, set classpath
-        final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(), initConfig.namespaces());
+        final JP2KeY r2k = new JP2KeY(initConfig.getServices(), initConfig.namespaces());
         r2k.setClassPath(bootClassPath, classPath);
 
         // read Java (at least the library classes)

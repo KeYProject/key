@@ -75,7 +75,7 @@ public class RecoderExample {
     public static void main(String[] args) {
         System.out.println("Starting...");
         RecoderExample ex = new RecoderExample();
-        Recoder2KeY c2k = new Recoder2KeY(TacletForTests.services(), new NamespaceSet());
+        JP2KeY c2k = new JP2KeY(TacletForTests.services(), new NamespaceSet());
         String prg = "{ int i=0; while (i<5) { i++;} }";
         JavaBlock block = c2k.readBlock(prg, c2k.createEmptyContext());
         System.out.println("Read Original:\n" + block);

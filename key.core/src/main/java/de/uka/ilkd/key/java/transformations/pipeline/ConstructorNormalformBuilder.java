@@ -30,9 +30,6 @@ import com.github.javaparser.ast.type.ReferenceType;
 import com.github.javaparser.ast.type.VoidType;
 import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
 
-import static de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
-import static de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices.cloneList;
-
 /**
  * Transforms the constructors of the given class to their
  * normalform. The constructor normalform can then be accessed via a
@@ -53,14 +50,16 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
 
     private void attachDefaultConstructor(ClassOrInterfaceDeclaration cd) {
         var body = new BlockStmt();
-        body.addStatement(new MethodCallExpr(new SuperExpr(), CONSTRUCTOR_NORMALFORM_IDENTIFIER));
+        body.addStatement(new MethodCallExpr(new SuperExpr(),
+            PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER));
         var initializers = services.getInitializers(cd);
         int i = 0;
         for (Statement initializer : initializers) {
             body.addStatement(i++, initializer.clone());
         }
         MethodDeclaration def =
-            cd.addMethod(CONSTRUCTOR_NORMALFORM_IDENTIFIER, Modifier.Keyword.PUBLIC);
+            cd.addMethod(PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER,
+                Modifier.Keyword.PUBLIC);
         def.setBody(body);
     }
 
@@ -102,9 +101,9 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
             recThrows = null;
             body = new BlockStmt();
         } else {
-            mods = cloneList(cons.getModifiers());
-            parameters = cloneList(cons.getParameters());
-            recThrows = cloneList(cons.getThrownExceptions());
+            mods = TransformationPipelineServices.cloneList(cons.getModifiers());
+            parameters = TransformationPipelineServices.cloneList(cons.getParameters());
+            recThrows = TransformationPipelineServices.cloneList(cons.getThrownExceptions());
 
             BlockStmt origBody = cons.getBody();
             if (origBody == null) // may happen if a stub is defined with an empty constructor
@@ -137,14 +136,15 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
             // first statement has to be a this or super constructor call
             if (!(first instanceof ExplicitConstructorInvocationStmt)) {
                 body.addStatement(0,
-                    new MethodCallExpr(new SuperExpr(), CONSTRUCTOR_NORMALFORM_IDENTIFIER));
+                    new MethodCallExpr(new SuperExpr(),
+                        PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER));
             } else {
                 body.getStatements().remove(0);
                 var constructorCall = (ExplicitConstructorInvocationStmt) first;
                 if (constructorCall.isThis()) {
                     var methodCall = new MethodCallExpr(new ThisExpr(),
                         constructorCall.getTypeArguments().orElse(null), // copy?
-                        CONSTRUCTOR_NORMALFORM_IDENTIFIER,
+                        PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER,
                         constructorCall.getArguments() /* copy? */);
                     body.addStatement(0, methodCall);
                 } else {
@@ -160,7 +160,7 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
                     }
                     var expr = new MethodCallExpr(new SuperExpr(),
                         null,
-                        CONSTRUCTOR_NORMALFORM_IDENTIFIER,
+                        PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER,
                         args);
                     body.addStatement(0, expr);
                 }
@@ -193,7 +193,7 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
         MethodDeclaration nf = new MethodDeclaration(
             mods,
             new VoidType(),
-            CONSTRUCTOR_NORMALFORM_IDENTIFIER);
+            PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER);
         nf.setParameters(parameters);
         nf.setThrownExceptions(recThrows);
         nf.setBody(body);

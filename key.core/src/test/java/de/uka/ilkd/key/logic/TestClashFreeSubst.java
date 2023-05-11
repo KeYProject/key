@@ -3,7 +3,7 @@ package de.uka.ilkd.key.logic;
 import java.io.IOException;
 import java.util.Stack;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.JP2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -47,7 +47,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         parseDecls(sorts);
         assertNotNull(nss.sorts().lookup("boolean"));
 
-        Recoder2KeY r2k = new Recoder2KeY(services, nss);
+        JP2KeY r2k = new JP2KeY(services, nss);
         r2k.parseSpecialClasses();
 
         parseDecls(

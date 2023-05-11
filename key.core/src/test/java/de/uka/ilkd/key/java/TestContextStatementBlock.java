@@ -25,7 +25,7 @@ public class TestContextStatementBlock {
     public void setUp() {
         JavaInfo ji = TacletForTests.javaInfo();
         Services services = TacletForTests.services();
-        Recoder2KeY c2k = new Recoder2KeY(services, ji.getKeYProgModelInfo().getServConf(),
+        JP2KeY c2k = new JP2KeY(services, ji.getKeYProgModelInfo().getServConf(),
             ji.rec2key(), new NamespaceSet(), services.getTypeConverter());
         blockOne = c2k.readBlock("{int a=1; {int b=3; b++;} a++;}", c2k.createEmptyContext());
 

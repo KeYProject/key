@@ -3,15 +3,10 @@ package de.uka.ilkd.key.speclang;
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.JavaReduxFileCollection;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Recoder2KeY;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
@@ -88,7 +83,8 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
 
-    private ImmutableSet<PositionedString> createDLLibrarySpecsHelper(Set<KeYJavaType> allKJTs,
+    private ImmutableSet<PositionedString> createDLLibrarySpecsHelper(
+            Collection<KeYJavaType> allKJTs,
             String path) throws ProofInputException {
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
         for (KeYJavaType kjt : allKJTs) {
@@ -103,7 +99,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                 if (file.isFile()) {
                     rs = RuleSourceFactory.initRuleFile(file);
                 } else {
-                    URL url = KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class,
+                    URL url = KeYResourceManager.getManager().getResourceFile(JP2KeY.class,
                         filePath);
                     if (url != null) {
                         rs = RuleSourceFactory.initRuleFile(url);
@@ -127,7 +123,7 @@ public final class SLEnvInput extends AbstractEnvInput {
      * specifications from this file.
      */
     private ImmutableSet<PositionedString> createDLLibrarySpecs() throws ProofInputException {
-        final Set<KeYJavaType> allKJTs =
+        final var allKJTs =
             initConfig.getServices().getJavaInfo().getAllKeYJavaTypes();
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
         // either boot class path or JavaRedux
@@ -278,7 +274,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         ImmutableSet<PositionedString> warnings = createDLLibrarySpecs();
 
         // sort types alphabetically (necessary for deterministic names)
-        final Set<KeYJavaType> allKeYJavaTypes = javaInfo.getAllKeYJavaTypes();
+        final var allKeYJavaTypes = javaInfo.getAllKeYJavaTypes();
         final KeYJavaType[] kjts =
             sortKJTs(allKeYJavaTypes.toArray(new KeYJavaType[0]));
 

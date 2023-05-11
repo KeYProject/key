@@ -13,6 +13,8 @@ import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
+import de.uka.ilkd.key.java.transformations.EvaluationException;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramInLogic;
@@ -25,6 +27,7 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.service.ConstantEvaluator;
@@ -729,7 +732,6 @@ public final class TypeConverter {
 
 
     public boolean isImplicitNarrowing(Expression expr, PrimitiveType to) {
-
         int minValue, maxValue;
         if (to == PrimitiveType.JAVA_BYTE) {
             minValue = Byte.MIN_VALUE;
@@ -748,12 +750,17 @@ public final class TypeConverter {
 
         ConstantEvaluator.EvaluationResult res = new ConstantEvaluator.EvaluationResult();
 
-        if (!cee.isCompileTimeConstant(expr, res)
-                || res.getTypeCode() != ConstantEvaluator.INT_TYPE) {
-            return false;
+        try {
+            var e = cee.evaluate(expr.toString());
+            if (!cee.isCompileTimeConstant(e)
+                    || e.calculateResolvedType() != ResolvedPrimitiveType.INT) {
+                return false;
+            }
+            int value = res.getInt();
+            return (minValue <= value) && (value <= maxValue);
+        } catch (EvaluationException e) {
+            throw new RuntimeException(e);
         }
-        int value = res.getInt();
-        return (minValue <= value) && (value <= maxValue);
     }
 
 

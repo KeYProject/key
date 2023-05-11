@@ -10,7 +10,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -26,7 +25,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.*;
-import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
@@ -50,7 +48,6 @@ import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -322,10 +319,8 @@ public class JavaService {
     // ----- parsing libraries
 
     public void setClassPath(File bootClassPath, List<Path> classPath) {
-        this.sourcePaths.clear();
-        this.sourcePaths.addAll(classPath);
         this.bootClassPath = bootClassPath;
-        typeSolver = null;
+        this.programFactory.setSourcePaths(classPath);
     }
 
     /**
@@ -433,7 +428,7 @@ public class JavaService {
         List<FileCollection> sources = new ArrayList<>();
         List<CompilationUnit> rcuList = new ArrayList<>(internal);
 
-        for (var cp : sourcePaths) {
+        for (var cp : programFactory.getSourcePaths()) {
             if (Files.isDirectory(cp)) {
                 sources.add(new DirectoryFileCollection(cp.toFile()));
             } else {
@@ -662,7 +657,8 @@ public class JavaService {
      *        has to be embedded
      * @return the enclosing declaration.ClassDeclaration
      */
-    protected ClassOrInterfaceDeclaration embedMethod(MethodDeclaration mdecl, JPContext context) {
+    protected ClassOrInterfaceDeclaration embedMethod(MethodDeclaration mdecl,
+            TypeScope.JPContext context) {
         ClassOrInterfaceDeclaration classContext = context.getClassDeclaration();
         classContext.addMember(mdecl);
         /*
@@ -684,11 +680,11 @@ public class JavaService {
      *
      * @return the new CompilationUnit
      */
-    public JPContext createEmptyContext() {
+    public TypeScope.JPContext createEmptyContext() {
         var classContext = interactClassDecl();
         var cu = new CompilationUnit(null, new NodeList<>(), new NodeList<>(classContext), null);
         getSymbolResolver().inject(cu);
-        return new JPContext(cu, classContext);
+        return new TypeScope.JPContext(cu, classContext);
     }
 
     /**
@@ -698,12 +694,12 @@ public class JavaService {
      * @param vars a list of variables
      * @return a newly created context.
      */
-    protected JPContext createContext(ImmutableList<ProgramVariable> vars) {
+    protected TypeScope.JPContext createContext(ImmutableList<ProgramVariable> vars) {
         var classContext = interactClassDecl();
         addProgramVariablesToClassContext(classContext, vars);
         var cu = new CompilationUnit(null, new NodeList<>(), new NodeList<>(classContext), null);
         getSymbolResolver().inject(cu);
-        return new JPContext(cu, classContext);
+        return new TypeScope.JPContext(cu, classContext);
     }
 
     /**
@@ -809,7 +805,7 @@ public class JavaService {
      *        interpreted
      * @return the parsed and resolved recoder statement block
      */
-    BlockStmt recoderBlock(String block, JPContext context) {
+    BlockStmt recoderBlock(String block, TypeScope.JPContext context) {
         parseSpecialClasses();
         var bl = getProgramFactory().parseStatementBlock(block);
         if (!bl.isSuccessful()) {
@@ -832,7 +828,7 @@ public class JavaService {
     private TransformationPipelineServices createPipelineServices(List<CompilationUnit> cUnits) {
         TransformationPipelineServices.TransformerCache cache =
             new TransformationPipelineServices.TransformerCache(cUnits);
-        return new TransformationPipelineServices(this, cache);
+        return new TransformationPipelineServices(programFactory, cache);
     }
 
 
@@ -845,7 +841,7 @@ public class JavaService {
      *        interprested
      * @return the parsed and resolved JavaBlock
      */
-    public JavaBlock readBlock(String block, JPContext context) {
+    public JavaBlock readBlock(String block, TypeScope.JPContext context) {
         var sb = recoderBlock(block, context);
         return JavaBlock.createJavaBlock((StatementBlock) getConverter().process(sb));
     }
@@ -970,108 +966,24 @@ public class JavaService {
         throw rte;
     }
 
-
-    /**
-     * A list of {@link File} objects that describes the classpath to be searched
-     * for classes or Java files.
-     */
-    @Nonnull
-    private final List<Path> sourcePaths;
-
-    @Nullable
-    private ParserConfiguration config;
-
-    @Nullable
-    private TypeSolver typeSolver;
-
-    @Nullable
-    private JavaSymbolSolver symbolResolver;
-
-    private boolean useSystemClassLoaderInResolution;
-
     public JavaService(Services services, Collection<Path> sourcePaths) {
         this.services = services;
-        this.sourcePaths = new ArrayList<>(sourcePaths);
         converter = new JP2KeYConverter(services, mapping, schemaVariables, getTypeConverter());
-        typeConverter = new JP2KeYTypeConverter(services, getTypeSolver(), mapping);
-        programFactory = new JavaParserFactory(this);
-    }
-
-    public JavaParser createJavaParser() {
-        return new JavaParser(getConfiguration());
-    }
-
-    @Nonnull
-    private ParserConfiguration getConfiguration() {
-        if (config == null) {
-            config = new ParserConfiguration();
-        }
-        config.setSymbolResolver(getSymbolResolver());
-        return config;
-    }
-
-    @Nonnull
-    private JavaSymbolSolver getSymbolResolver() {
-        if (symbolResolver == null) {
-            symbolResolver = new JavaSymbolSolver(getTypeSolver());
-        }
-        return symbolResolver;
-    }
-
-
-    public TypeSolver getTypeSolver() {
-        if (typeSolver == null) {
-            var ct = new CombinedTypeSolver();
-            for (var sourcePath : sourcePaths) {
-                if (Files.isRegularFile(sourcePath)) {
-                    if (sourcePath.getFileName().endsWith(".jar")) {
-                        try {
-                            ct.add(new JarTypeSolver(sourcePath));
-                        } catch (IOException e) {
-                            LOGGER.error(e.getMessage(), e);
-                        }
-                    } else {
-                        /*
-                         * sourcePath.getRoot();
-                         * final Matcher matcher = IOUtil.URL_JAR_FILE.matcher();
-                         * if (matcher.matches()) {
-                         */
-                        // TODO javaparser add support for java files inside
-                    }
-                } else if (Files.isDirectory(sourcePath)) {
-                    ct.add(new JavaParserTypeSolver(sourcePath, config));
-                }
-            }
-
-            if (useSystemClassLoaderInResolution) {
-                ct.add(new ReflectionTypeSolver(true));
-            }
-            typeSolver = ct;
-        }
-        return typeSolver;
-    }
-
-    /**
-     * If set to true the symbol solver do not use the {@link ClassLoaderTypeSolver} with the system
-     * class class loader.
-     * This means, that classes defined by the JRE are not found, if they are not given in the class
-     * path.
-     * In particular, only JavaRedux and Red classes (if added) are
-     * <p>
-     * the next parser runs
-     *
-     * @param useSystemClassLoaderInResolution
-     */
-    public void setUseSystemClassLoaderInResolution(boolean useSystemClassLoaderInResolution) {
-        this.useSystemClassLoaderInResolution = useSystemClassLoaderInResolution;
-        typeSolver = null;
+        programFactory = new JavaParserFactory(sourcePaths);
+        // TODO javaparser the typesolver is not updated when changing
+        // useSystemClassLoaderInResolution
+        typeConverter = new JP2KeYTypeConverter(services, programFactory.getTypeSolver(), mapping);
     }
 
     public JavaParserFactory getProgramFactory() {
         return programFactory;
     }
 
-    public JavaSymbolSolver getSymbolSolver() {
-        return symbolResolver;
+    public JavaSymbolSolver getSymbolResolver() {
+        return programFactory.getSymbolSolver();
+    }
+
+    public TypeSolver getTypeSolver() {
+        return programFactory.getTypeSolver();
     }
 }

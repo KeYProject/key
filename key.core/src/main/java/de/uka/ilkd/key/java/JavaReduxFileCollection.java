@@ -74,7 +74,7 @@ public class JavaReduxFileCollection implements FileCollection {
         String resourceString = resourceLocation + "/" + profile.getInternalClasslistFilename();
 
         URL jlURL =
-            KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, resourceString);
+            KeYResourceManager.getManager().getResourceFile(JP2KeY.class, resourceString);
 
         if (jlURL == null) {
             throw new FileNotFoundException("Resource " + resourceString + " cannot be opened.");
@@ -123,7 +123,7 @@ public class JavaReduxFileCollection implements FileCollection {
     public Stream<URL> getResources() {
         return resources.stream()
                 .map(it -> KeYResourceManager.getManager().getResourceFile(
-                    Recoder2KeY.class, resourceLocation + "/" + it));
+                    JP2KeY.class, resourceLocation + "/" + it));
     }
 
     /*
@@ -211,7 +211,7 @@ public class JavaReduxFileCollection implements FileCollection {
             final String currentFileName = current.replace('.', '/').concat(".java");
 
             // may be null!
-            currentURL = KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class,
+            currentURL = KeYResourceManager.getManager().getResourceFile(JP2KeY.class,
                 resourceLocation + "/" + currentFileName);
 
             return true;

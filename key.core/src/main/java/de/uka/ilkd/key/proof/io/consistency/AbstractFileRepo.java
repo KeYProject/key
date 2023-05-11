@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.JP2KeY;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.io.RuleSource;
@@ -38,7 +38,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * The URL to KeY's built-in Java classes (used to prevent these classes from getting copied).
      */
     protected static final URL REDUX_URL =
-        KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, "JavaRedux/");
+        KeYResourceManager.getManager().getResourceFile(JP2KeY.class, "JavaRedux/");
 
     /**
      * This matcher matches *.java files.

@@ -120,7 +120,7 @@ public final class JavaInfo {
      * convenience method that returns the Recoder-to-KeY mapping underlying the KeYProgModelInfo of
      * this JavaInfo
      */
-    public KeYRecoderMapping rec2key() {
+    public KeYJPMapping rec2key() {
         return getKeYProgModelInfo().rec2key();
     }
 
@@ -197,18 +197,16 @@ public final class JavaInfo {
      * caches all known types using their qualified name as retrieval key
      */
     private void buildNameCache() {
-        nameCachedSize = kpmi.rec2key().size();
+        var types = kpmi.rec2key().keYTypes();
+        nameCachedSize = types.size();
         name2KJTCache = new LinkedHashMap<>();
-        for (final Object o : kpmi.allElements()) {
-            if (o instanceof KeYJavaType) {
-                final KeYJavaType oKJT = (KeYJavaType) o;
-                if (oKJT.getJavaType() instanceof ArrayType) {
-                    final ArrayType at = (ArrayType) oKJT.getJavaType();
-                    name2KJTCache.put(at.getFullName(), oKJT);
-                    name2KJTCache.put(at.getAlternativeNameRepresentation(), oKJT);
-                } else {
-                    name2KJTCache.put(getFullName(oKJT), oKJT);
-                }
+        for (final KeYJavaType type : types) {
+            if (type.getJavaType() instanceof ArrayType) {
+                final ArrayType at = (ArrayType) type.getJavaType();
+                name2KJTCache.put(at.getFullName(), type);
+                name2KJTCache.put(at.getAlternativeNameRepresentation(), type);
+            } else {
+                name2KJTCache.put(getFullName(type), type);
             }
         }
     }
@@ -276,14 +274,8 @@ public final class JavaInfo {
      *
      * @return all known KeYJavaTypes of the current program type model
      */
-    public Set<KeYJavaType> getAllKeYJavaTypes() {
-        final Set<KeYJavaType> result = new LinkedHashSet<>();
-        for (final Object o : kpmi.allElements()) {
-            if (o instanceof KeYJavaType) {
-                result.add((KeYJavaType) o);
-            }
-        }
-        return result;
+    public Collection<KeYJavaType> getAllKeYJavaTypes() {
+        return kpmi.allTypes();
     }
 
 
@@ -313,7 +305,7 @@ public final class JavaInfo {
 
         if (sort == null) {
             throw new IllegalStateException(
-                "Could not find ldt sort \"" + ldtName + "\" for type " + type);
+                "Could not find sort " + ldtName + " for type: " + type);
         }
 
         KeYJavaType result = new KeYJavaType(type, sort);
@@ -434,14 +426,11 @@ public final class JavaInfo {
         if (sort2KJTCache == null || kpmi.rec2key().size() > sortCachedSize) {
             sortCachedSize = kpmi.rec2key().size();
             sort2KJTCache = new HashMap<>();
-            for (final Object o : kpmi.allElements()) {
-                if (o instanceof KeYJavaType) {
-                    final KeYJavaType oKJT = (KeYJavaType) o;
-                    Sort s = oKJT.getSort();
-                    List<KeYJavaType> l = sort2KJTCache.computeIfAbsent(s, k -> new LinkedList<>());
-                    if (!l.contains(oKJT)) {
-                        l.add(oKJT);
-                    }
+            for (final KeYJavaType oKJT : kpmi.allTypes()) {
+                Sort s = oKJT.getSort();
+                List<KeYJavaType> l = sort2KJTCache.computeIfAbsent(s, k -> new LinkedList<>());
+                if (!l.contains(oKJT)) {
+                    l.add(oKJT);
                 }
             }
         }
@@ -458,11 +447,8 @@ public final class JavaInfo {
     public KeYJavaType getKeYJavaType(Type t) {
         if (type2KJTCache == null) {
             type2KJTCache = new LinkedHashMap<>();
-            for (final Object o : kpmi.allElements()) {
-                if (o instanceof KeYJavaType) {
-                    final KeYJavaType oKJT = (KeYJavaType) o;
-                    type2KJTCache.put(oKJT.getJavaType(), oKJT);
-                }
+            for (final KeYJavaType type : kpmi.allTypes()) {
+                type2KJTCache.put(type.getJavaType(), type);
             }
         }
         if (t instanceof PrimitiveType) {
@@ -796,7 +782,9 @@ public final class JavaInfo {
      */
     public JavaBlock readJavaBlock(String java) {
         NamespaceSet nss = services.getNamespaces().copy();
-        final JavaBlock block = kpmi.readJavaBlock(java, nss);
+        // TODO
+        // final JavaBlock block = kpmi.readJavaBlock(java, nss);
+        final JavaBlock block = null;
         // if we are here everything is fine and we can add the
         // changes (may be new array types)
         // Until end 2016, a protocol mode for namespaces was used here

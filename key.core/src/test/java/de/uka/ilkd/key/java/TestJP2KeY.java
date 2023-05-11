@@ -26,12 +26,12 @@ import org.slf4j.LoggerFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-public class TestRecoder2KeY {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestRecoder2KeY.class);
+public class TestJP2KeY {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestJP2KeY.class);
 
 
 
-    private static Recoder2KeY c2k;
+    private static JP2KeY c2k;
 
     // some non sense java blocks with lots of statements and expressions
     private static final String[] jblocks = new String[] {
@@ -98,7 +98,7 @@ public class TestRecoder2KeY {
     @BeforeEach
     public void setUp() {
         if (c2k == null) {
-            c2k = new Recoder2KeY(TacletForTests.services(),
+            c2k = new JP2KeY(TacletForTests.services(),
                 TacletForTests.services().getNamespaces());
         }
 

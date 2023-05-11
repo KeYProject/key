@@ -16,7 +16,7 @@ public class TestKeYRecoderMapping {
     private ProgramElement kp;
     private recoder.ModelElement rm, rm2;
     private ModelElement km;
-    private KeYRecoderMapping mapping;
+    private KeYJPMapping mapping;
 
 
     @BeforeEach
@@ -33,7 +33,7 @@ public class TestKeYRecoderMapping {
         revmap.put(kp, rp);
         map.put(rm, km);
         revmap.put(km, rm);
-        mapping = new KeYRecoderMapping(map, revmap, null, false);
+        mapping = new KeYJPMapping(map, revmap, null, false);
     }
 
 

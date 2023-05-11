@@ -43,7 +43,7 @@ public class ProofJavaProgramFactoryTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofJavaProgramFactoryTest.class);
 
     final Services services = HelperClassForTests.createServices();
-    final Recoder2KeY r2k = new Recoder2KeY(services, services.getNamespaces());
+    final JP2KeY r2k = new JP2KeY(services, services.getNamespaces());
 
     @Test
     public void testAttachCommentsCompilationUnit_AssertsFalse() throws IOException {

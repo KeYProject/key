@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
-import de.uka.ilkd.key.java.JavaService;
+import de.uka.ilkd.key.java.JavaParserFactory;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
 
@@ -39,13 +39,13 @@ public class TransformationPipelineServices {
     private final TransformerCache cache;
 
     @Nonnull
-    private final JavaService javaService;
+    private final JavaParserFactory javaParserFactory;
 
 
-    public TransformationPipelineServices(@Nonnull JavaService javaService,
+    public TransformationPipelineServices(@Nonnull JavaParserFactory javaParserFactory,
             @Nonnull TransformerCache cache) {
         this.cache = cache;
-        this.javaService = javaService;
+        this.javaParserFactory = javaParserFactory;
     }
 
     @Nonnull
@@ -54,7 +54,7 @@ public class TransformationPipelineServices {
     }
 
     public ConstantExpressionEvaluator getConstantEvaluator() {
-        return new ConstantExpressionEvaluator(javaService.createJavaParser());
+        return new ConstantExpressionEvaluator(getParser());
     }
 
 
@@ -325,7 +325,7 @@ public class TransformationPipelineServices {
     }
 
     public JavaParser getParser() {
-        return javaService.createJavaParser();
+        return javaParserFactory.createJavaParser();
     }
 
     /**

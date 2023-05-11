@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.JP2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
@@ -48,7 +48,7 @@ public class TestDeclParser {
         assertNotNull(nss.sorts().lookup("boolean"));
         assertNotNull(nss.sorts().lookup("int"));
         assertNotNull(nss.sorts().lookup("boolean"));
-        Recoder2KeY r2k = new Recoder2KeY(serv, nss);
+        JP2KeY r2k = new JP2KeY(serv, nss);
         r2k.parseSpecialClasses();
     }
 

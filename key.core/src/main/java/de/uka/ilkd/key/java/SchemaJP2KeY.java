@@ -21,8 +21,8 @@ import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
-public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SchemaRecoder2KeY.class);
+public class SchemaJP2KeY extends JP2KeY implements SchemaJavaReader {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchemaJP2KeY.class);
 
     /** the namespace containing the program schema variables allowed here */
     protected Namespace<SchemaVariable> svns;
@@ -38,12 +38,12 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
     private static final SchemaCrossReferenceServiceConfiguration schemaServConf =
         new SchemaCrossReferenceServiceConfiguration(new KeYRecoderExcHandler());
 
-    public SchemaRecoder2KeY(Services services, NamespaceSet nss) {
+    public SchemaJP2KeY(Services services, NamespaceSet nss) {
         super(services, nss);
     }
 
     @Override
-    protected Recoder2KeYConverter makeConverter(Services services, NamespaceSet nss) {
+    protected JP2KeYConverter makeConverter(Services services, NamespaceSet nss) {
         return new SchemaRecoder2KeYConverter(this, services, nss);
     }
 
@@ -148,7 +148,7 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
     /**
      * there is no need to parse special classes in this case, so this is empty
      *
-     * @see de.uka.ilkd.key.java.Recoder2KeY#parseSpecialClasses()
+     * @see JP2KeY#parseSpecialClasses()
      */
     public void parseSpecialClasses() {
     }

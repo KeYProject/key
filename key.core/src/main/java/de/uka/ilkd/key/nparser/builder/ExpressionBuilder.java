@@ -561,7 +561,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         try {
             try {
                 if (javaSchemaModeAllowed) {// TEST
-                    SchemaJavaReader jr = new SchemaRecoder2KeY(services, nss);
+                    SchemaJavaReader jr = new SchemaJP2KeY(services, nss);
                     jr.setSVNamespace(schemaVariables());
                     try {
                         sjb.javaBlock =
@@ -577,7 +577,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
 
             if (sjb.javaBlock == null) {
-                JavaReader jr = new Recoder2KeY(services, nss);
+                JavaReader jr = new JP2KeY(services, nss);
                 try {
                     sjb.javaBlock = jr.readBlockWithProgramVariables(programVariables(), cleanJava);
                 } catch (Exception e1) {

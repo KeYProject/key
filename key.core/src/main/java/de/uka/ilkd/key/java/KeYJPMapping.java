@@ -170,7 +170,7 @@ public class KeYJPMapping {
     /**
      * As long as we do not support lemmata we need the source code of
      * some 'java.lang' classes. These are parsed in using method
-     * parseSpecial of {@link Recoder2KeY}. To avoid multiple readings
+     * parseSpecial of {@link JP2KeY}. To avoid multiple readings
      * this method indicates whether the special have been parsed in or
      * not.
      *
@@ -188,7 +188,7 @@ public class KeYJPMapping {
     /**
      * As long as we do not support lemmata we need the source code of
      * some 'java.lang' classes. These are parsed in using method
-     * parseSpecial of {@link Recoder2KeY}. To avoid multiple readings
+     * parseSpecial of {@link JP2KeY}. To avoid multiple readings
      * this method sets a flag whether the special have been parsed in or
      * not
      *

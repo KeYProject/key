@@ -63,12 +63,12 @@ import recoder.service.UnresolvedReferenceException;
  * It used to be monolithic but now uses separate classes for doing the actual conversion and type
  * conversion.
  *
- * @see Recoder2KeYConverter
- * @see Recoder2KeYTypeConverter
+ * @see JP2KeYConverter
+ * @see JP2KeYTypeConverter
  */
 
-public class Recoder2KeY implements JavaReader {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Recoder2KeY.class);
+public class JP2KeY implements JavaReader {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JP2KeY.class);
 
     /**
      * the set of File objects that describes the classpath to be searched for classes. it may
@@ -88,7 +88,7 @@ public class Recoder2KeY implements JavaReader {
      *
      * It is used for syntactical structures and types.
      */
-    private final KeYRecoderMapping mapping;
+    private final KeYJPMapping mapping;
 
     /**
      * Recoder's serviceConfiguration that is used throughout this process.
@@ -109,12 +109,12 @@ public class Recoder2KeY implements JavaReader {
     /**
      * the object that handles the transformation from recoder AST to KeY AST
      */
-    private final Recoder2KeYConverter converter;
+    private final JP2KeYConverter converter;
 
     /**
      * the object that handles the transformation from recoder types to KeY types
      */
-    private final Recoder2KeYTypeConverter typeConverter;
+    private final JP2KeYTypeConverter typeConverter;
 
     /**
      * the list of classnames that contain the classes that are referenced but not defined. For
@@ -138,8 +138,8 @@ public class Recoder2KeY implements JavaReader {
      * @param nss the namespaces to work upon, not null
      * @param tc the type converter, not null
      */
-    public Recoder2KeY(Services services, KeYCrossReferenceServiceConfiguration servConf,
-            KeYRecoderMapping rec2key, NamespaceSet nss, TypeConverter tc) {
+    public JP2KeY(Services services, KeYCrossReferenceServiceConfiguration servConf,
+            KeYJPMapping rec2key, NamespaceSet nss, TypeConverter tc) {
         this(services, servConf, null, rec2key, nss, tc);
     }
 
@@ -155,7 +155,7 @@ public class Recoder2KeY implements JavaReader {
      * @param services services to retrieve objects from, not null
      * @param nss the namespaces to work upon, not null
      */
-    public Recoder2KeY(Services services, NamespaceSet nss) {
+    public JP2KeY(Services services, NamespaceSet nss) {
         this(services, services.getJavaInfo().getKeYProgModelInfo().getServConf(), null,
             services.getJavaInfo().rec2key(), nss, services.getTypeConverter());
     }
@@ -174,8 +174,8 @@ public class Recoder2KeY implements JavaReader {
      *
      * @throws IllegalArgumentException if arguments are not valid (null e.g.)
      */
-    private Recoder2KeY(Services services, KeYCrossReferenceServiceConfiguration servConf,
-            String classPath, KeYRecoderMapping rec2key, NamespaceSet nss, TypeConverter tc) {
+    private JP2KeY(Services services, KeYCrossReferenceServiceConfiguration servConf,
+            String classPath, KeYJPMapping rec2key, NamespaceSet nss, TypeConverter tc) {
 
         if (servConf == null) {
             throw new IllegalArgumentException("service configuration is null");
@@ -198,7 +198,7 @@ public class Recoder2KeY implements JavaReader {
         this.servConf = servConf;
         this.mapping = rec2key;
         this.converter = makeConverter(services, nss);
-        this.typeConverter = new Recoder2KeYTypeConverter(services, tc, nss, this);
+        this.typeConverter = new JP2KeYTypeConverter(services, tc, mapping);
 
         // set up recoder:
         recoder.util.Debug.setLevel(500);
@@ -221,8 +221,8 @@ public class Recoder2KeY implements JavaReader {
      *
      * @return a newley created converter
      */
-    protected Recoder2KeYConverter makeConverter(Services services, NamespaceSet nss) {
-        return new Recoder2KeYConverter(this, services, nss);
+    protected JP2KeYConverter makeConverter(Services services, NamespaceSet nss) {
+        return new JP2KeYConverter(this, services, nss);
     }
 
     /**
@@ -230,7 +230,7 @@ public class Recoder2KeY implements JavaReader {
      *
      * @return not null
      */
-    public Recoder2KeYConverter getConverter() {
+    public JP2KeYConverter getConverter() {
         return converter;
     }
 
@@ -239,7 +239,7 @@ public class Recoder2KeY implements JavaReader {
      *
      * @return not null
      */
-    public Recoder2KeYTypeConverter getTypeConverter() {
+    public JP2KeYTypeConverter getTypeConverter() {
         return typeConverter;
     }
 
@@ -265,7 +265,7 @@ public class Recoder2KeY implements JavaReader {
         return servConf;
     }
 
-    public KeYRecoderMapping rec2key() {
+    public KeYJPMapping rec2key() {
         return mapping;
     }
 

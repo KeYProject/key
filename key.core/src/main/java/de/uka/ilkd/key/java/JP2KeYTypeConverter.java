@@ -175,7 +175,8 @@ public class JP2KeYTypeConverter {
 
     private void addPrimitiveType(ResolvedType type) {
         var description = type.describe();
-        // TODO javaparser why does this use typeConverter? this seems like a loop since it gets initialized by
+        // TODO javaparser why does this use typeConverter? this seems like a loop since it gets
+        // initialized by
         // this step
         var primitiveType = PrimitiveType.getPrimitiveType(type.describe());
         var result = typeConverter.getKeYJavaType(primitiveType);
@@ -281,7 +282,7 @@ public class JP2KeYTypeConverter {
                 isAbstract = td.hasModifier(com.github.javaparser.ast.Modifier.Keyword.ABSTRACT);
             }
         }
-        final Name name = new Name(Recoder2KeYConverter.makeAdmissibleName(ct.getQualifiedName()));
+        final Name name = new Name(ct.getQualifiedName());
         return new SortImpl(name, supers, isAbstract || ct.isInterface());
     }
 

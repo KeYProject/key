@@ -27,7 +27,7 @@ import org.key_project.util.collection.ImmutableArray;
 import recoder.list.generic.ASTList;
 
 /**
- * This is an extension of the usual {@link Recoder2KeYConverter} that supports schema variables.
+ * This is an extension of the usual {@link JP2KeYConverter} that supports schema variables.
  *
  * Some entities have to be treated differently, but most conversions are handled identically (via
  * the superclass).
@@ -35,7 +35,7 @@ import recoder.list.generic.ASTList;
  * @author MU
  *
  */
-public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
+public class SchemaRecoder2KeYConverter extends JP2KeYConverter {
 
     /**
      * the type that is used for schema variables types.
@@ -51,7 +51,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
      * @param namespaceSet namespaces to resolve entity names
      * @param services services to be used
      */
-    public SchemaRecoder2KeYConverter(SchemaRecoder2KeY rec2key, Services services,
+    public SchemaRecoder2KeYConverter(
+            SchemaJP2KeY rec2key, Services services,
             NamespaceSet namespaceSet) {
         super(rec2key, services, namespaceSet);
     }

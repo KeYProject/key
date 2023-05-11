@@ -53,7 +53,7 @@ public class ProofManagementApi {
      */
     private void buildContracts() {
         proofContracts.clear();
-        Set<KeYJavaType> kjts = currentEnv.getJavaInfo().getAllKeYJavaTypes();
+        var kjts = currentEnv.getJavaInfo().getAllKeYJavaTypes();
         for (KeYJavaType type : kjts) {
             if (!KeYTypeUtil.isLibraryClass(type)) {
                 ImmutableSet<IObserverFunction> targets =

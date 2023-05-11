@@ -2,6 +2,7 @@ package de.uka.ilkd.key.rule.match.legacy;
 
 import java.io.File;
 
+import de.uka.ilkd.key.java.JP2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -200,8 +201,8 @@ public class TestLegacyTacletMatch {
     @Test
     public void testProgramMatch1() {
         Services services = TacletForTests.services();
-        de.uka.ilkd.key.java.Recoder2KeY c2k =
-            new de.uka.ilkd.key.java.Recoder2KeY(services, new NamespaceSet());
+        JP2KeY c2k =
+            new JP2KeY(services, new NamespaceSet());
         JavaBlock jb = c2k.readBlock("{ int i; int j; i=++j;" + " while(true) {break;}}",
             c2k.createEmptyContext());
 

@@ -2,9 +2,8 @@ package de.uka.ilkd.key.rule;
 
 import java.io.File;
 
-import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.JP2KeY;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
@@ -210,7 +209,7 @@ public class TacletForTests {
     }
 
     public static ProgramElement parsePrg(String prgString) {
-        Recoder2KeY r2k = new Recoder2KeY(services(), new NamespaceSet());
+        JP2KeY r2k = new JP2KeY(services(), new NamespaceSet());
         return r2k.readBlockWithEmptyContext(prgString).program();
     }
 }
