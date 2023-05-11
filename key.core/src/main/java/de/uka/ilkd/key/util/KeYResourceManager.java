@@ -23,7 +23,7 @@ public class KeYResourceManager {
 
     private static final String DEFAULT_VERSION = "x.z.y";
     private static final Set<String> INVISIBLE_BRANCHES =
-        Set.of(new String[] { "master", "main" });
+        Set.of("master", "main");
 
     /**
      * the unique instance
