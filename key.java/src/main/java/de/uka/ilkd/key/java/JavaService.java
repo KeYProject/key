@@ -529,7 +529,7 @@ public class JavaService {
         VoidVisitor<Void> removeBodies = new VoidVisitorAdapter<>() {
             @Override
             public void visit(MethodDeclaration n, Void arg) {
-                if (!allowed && n.getBody() != null) {
+                if (!allowed && n.getBody().isPresent()) {
                     LOGGER.warn("Method body ({}) should not be allowed: {}", n.getNameAsString(),
                         rcu.getStorage());
                 }
@@ -714,7 +714,6 @@ public class JavaService {
      */
     private void addProgramVariablesToClassContext(ClassOrInterfaceDeclaration classContext,
             ImmutableList<ProgramVariable> vars) {
-        Map<String, VariableDeclarator> names2var = new LinkedHashMap<>();
         Set<String> names = new HashSet<>();
 
         for (ProgramVariable var : vars) {
@@ -747,8 +746,6 @@ public class JavaService {
                 new VariableDeclarator(name2typeReference(typeName), keyVarSpec.getName()));
 
             classContext.addMember(recVar);
-            var rvarspec = recVar.getVariables().get(0);
-            names2var.put(var.name().toString(), rvarspec);
             insertToMap(recVar.getVariables().get(0), keyVarSpec);
         }
     }
