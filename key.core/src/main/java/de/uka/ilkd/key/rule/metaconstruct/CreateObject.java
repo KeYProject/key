@@ -5,8 +5,8 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.recoderext.CreateObjectBuilder;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.transformations.pipeline.CreateObjectBuilder;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**

@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -293,7 +293,7 @@ public class TriggersSet {
             if (term.op() == services.getTypeConverter().getHeapLDT().getSelect(term.sort(),
                 services)) {
                 if (term.sub(2).op().name().toString()
-                        .endsWith(ImplicitFieldAdder.IMPLICIT_CREATED)) {
+                        .endsWith(PipelineConstants.IMPLICIT_CREATED)) {
                     return false;
                 }
             }

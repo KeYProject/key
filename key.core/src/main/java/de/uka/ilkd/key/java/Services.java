@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
-import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.*;
@@ -102,8 +100,7 @@ public class Services implements TermServices {
         nameRecorder = new NameRecorder();
     }
 
-    private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc,
-            KeYJPMapping rec2key, HashMap<String, Counter> counters, ServiceCaches caches) {
+    private Services(Profile profile, KeYJPMapping rec2key, HashMap<String, Counter> counters, ServiceCaches caches) {
         assert profile != null;
         assert counters != null;
         assert caches != null;
@@ -116,7 +113,7 @@ public class Services implements TermServices {
         this.specRepos = new SpecificationRepository(this);
         cee = new ConstantExpressionEvaluator(this);
         typeconverter = new TypeConverter(this);
-        javainfo = new JavaInfo(new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
+        javainfo = new JavaInfo(new KeYProgModelInfo(this, rec2key, typeconverter), this);
         nameRecorder = new NameRecorder();
     }
 
@@ -226,13 +223,8 @@ public class Services implements TermServices {
      * @return The created copy.
      */
     public Services copy(Profile profile, boolean shareCaches) {
-        Debug.assertTrue(
-            !(getJavaInfo().getKeYProgModelInfo()
-                    .getServConf() instanceof SchemaCrossReferenceServiceConfiguration),
-            "services: tried to copy schema cross reference service config.");
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-        Services s = new Services(profile, getJavaInfo().getKeYProgModelInfo().getServConf(),
-            getJavaInfo().getKeYProgModelInfo().rec2key().copy(), copyCounters(), newCaches);
+        Services s = new Services(profile, getJavaInfo().getKeYProgModelInfo().rec2key().copy(), copyCounters(), newCaches);
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
@@ -268,10 +260,6 @@ public class Services implements TermServices {
      * creates a new service object with the same ldt information as the actual one
      */
     public Services copyPreservesLDTInformation() {
-        Debug.assertTrue(
-            !(javainfo.getKeYProgModelInfo()
-                    .getServConf() instanceof SchemaCrossReferenceServiceConfiguration),
-            "services: tried to copy schema cross reference service config.");
         Services s = new Services(getProfile());
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
@@ -302,7 +290,7 @@ public class Services implements TermServices {
     public Services copyProofSpecific(Proof p_proof, boolean shareCaches) {
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
         final Services s =
-            new Services(getProfile(), getJavaInfo().getKeYProgModelInfo().getServConf(),
+            new Services(getProfile(),
                 getJavaInfo().getKeYProgModelInfo().rec2key(), copyCounters(), newCaches);
         s.proof = p_proof;
         s.specRepos = specRepos;
@@ -394,7 +382,7 @@ public class Services implements TermServices {
 
     /**
      * Returns the {@link TermBuilder} used to create {@link Term}s. Same as
-     * {@link #getTermBuilder(true).
+     * {@link #getTermBuilder(boolean)} .
      *
      * @return The {@link TermBuilder} used to create {@link Term}s.
      */

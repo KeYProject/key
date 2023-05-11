@@ -27,9 +27,6 @@ import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.expression.operator.PostIncrement;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.recoderext.InstanceAllocationMethodBuilder;
-import de.uka.ilkd.key.java.recoderext.PrepareObjectBuilder;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.MethodReference;
@@ -38,6 +35,7 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.Return;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -100,10 +98,10 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         ImmutableList<Field> implicitFields = filterImplicitFields(fields);
 
         // declared only in Object so we have to look there
-        ProgramVariable initialized = findInObjectFields(ImplicitFieldAdder.IMPLICIT_INITIALIZED);
+        ProgramVariable initialized = findInObjectFields(PipelineConstants.IMPLICIT_INITIALIZED);
         if (initialized == null) {
             // only if createObject for Object is called
-            initialized = find(ImplicitFieldAdder.IMPLICIT_INITIALIZED, implicitFields);
+            initialized = find(PipelineConstants.IMPLICIT_INITIALIZED, implicitFields);
         }
 
         result.addLast(assign(attribute(new ThisReference(), initialized), BooleanLiteral.FALSE));
@@ -214,7 +212,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
             new TypeRef(integerType), new VariableSpecification(paramLength), false);
 
         final MethodDeclaration md = new MethodDeclaration(modifiers, arrayTypeReference,
-            new ProgramElementName(InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
+            new ProgramElementName(PipelineConstants.IMPLICIT_INSTANCE_ALLOCATE),
             new ParameterDeclaration[] { param }, null, null, false);
 
         return new ProgramMethod(md, arrayType, arrayType, PositionInfo.UNDEFINED, heapSort,
@@ -236,7 +234,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         body.addLast(local);
         body.addLast(assign(newObject,
             new MethodReference(new ImmutableArray<Expression>(paramLength),
-                new ProgramElementName(InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
+                new ProgramElementName(PipelineConstants.IMPLICIT_INSTANCE_ALLOCATE),
                 arrayRef)));
 
         body.add(new MethodReference(new ImmutableArray<>(),
@@ -282,10 +280,10 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         final List<Statement> body = createArray(fields);
 
         body.add(new MethodReference(new ImmutableArray<>(),
-            new ProgramElementName(PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE), null));
+            new ProgramElementName(PipelineConstants.IMPLICIT_OBJECT_PREPARE), null));
 
         body.add(
-            assign(attribute(thisRef, findInObjectFields(ImplicitFieldAdder.IMPLICIT_INITIALIZED)),
+            assign(attribute(thisRef, findInObjectFields(PipelineConstants.IMPLICIT_INITIALIZED)),
                 BooleanLiteral.TRUE));
 
         body.add(new Return(thisRef));
@@ -373,7 +371,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         final StatementBlock body = new StatementBlock(new Statement[] { forLoop });
 
         final MethodDeclaration md = new MethodDeclaration(new Modifier[] { new Private() },
-            arrayRef, new ProgramElementName(PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE),
+            arrayRef, new ProgramElementName(PipelineConstants.IMPLICIT_OBJECT_PREPARE),
             new ParameterDeclaration[0], null, body, false);
 
         return new ProgramMethod(md, arrayType, KeYJavaType.VOID_TYPE, PositionInfo.UNDEFINED,

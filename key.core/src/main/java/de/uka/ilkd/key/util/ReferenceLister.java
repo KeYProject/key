@@ -7,8 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 
-import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.CrossReferenceServiceConfiguration;

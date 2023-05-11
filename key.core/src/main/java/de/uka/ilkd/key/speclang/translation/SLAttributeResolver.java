@@ -6,7 +6,7 @@ import de.uka.ilkd.key.java.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.MemberDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
@@ -93,11 +93,11 @@ public final class SLAttributeResolver extends SLExpressionResolver {
             while (attribute == null) {
                 attribute = lookupVisibleAttribute(name, containingType);
                 if (attribute == null) {
-                    attribute = lookupVisibleAttribute(ImplicitFieldAdder.FINAL_VAR_PREFIX + name,
+                    attribute = lookupVisibleAttribute(PipelineConstants.FINAL_VAR_PREFIX + name,
                         containingType);
                 }
                 final LocationVariable et = (LocationVariable) javaInfo
-                        .getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
+                        .getAttribute(PipelineConstants.IMPLICIT_ENCLOSING_THIS, containingType);
                 if (et != null && attribute == null) {
                     containingType = et.getKeYJavaType();
                     if (recTerm != null) {

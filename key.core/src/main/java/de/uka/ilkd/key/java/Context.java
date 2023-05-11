@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
-import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.util.SpecDataLocation;
 
 import recoder.java.declaration.ClassDeclaration;
@@ -27,8 +25,7 @@ class Context {
      * @param compilationUnitContext a recoder.java.CompilationUnit
      * @param classContext a recoder.java.declaration.ClassDeclaration
      */
-    public Context(KeYCrossReferenceServiceConfiguration servConf,
-            recoder.java.CompilationUnit compilationUnitContext, ClassDeclaration classContext) {
+    public Context(recoder.java.CompilationUnit compilationUnitContext, ClassDeclaration classContext) {
         this.compilationUnitContext = compilationUnitContext;
         this.classContext = classContext;
     }

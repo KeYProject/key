@@ -11,9 +11,9 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -32,13 +32,6 @@ import org.key_project.util.collection.ImmutableArray;
 public class ConstructorCall extends ProgramTransformer {
 
     private static final String CONSTRUCTOR_CALL = "constructor-call";
-
-    /**
-     * The normal form identifier.
-     */
-    private static final String NORMALFORM_IDENTIFIER = //
-        de.uka.ilkd.key.java.recoderext. //
-                ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
 
     // @ invariant (newObjectSV == null) != (newObjectVar == null);
     private final SchemaVariable newObjectSV;
@@ -142,7 +135,7 @@ public class ConstructorCall extends ProgramTransformer {
         // (deliberately using classType itself as the "context type", in order
         // to allow public calls to private init methods)
         final MethodBodyStatement mbs = KeYJavaASTFactory.methodBody(services.getJavaInfo(), null,
-            newObject, classType, NORMALFORM_IDENTIFIER, argumentVariables);
+            newObject, classType, PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER, argumentVariables);
 
         Debug.assertTrue(mbs != null, "Call to non-existent constructor.");
 

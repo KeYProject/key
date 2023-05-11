@@ -62,7 +62,7 @@ import static java.lang.String.format;
  * need to change the other as well.
  */
 public final class JMLTransformer extends JavaTransformer {
-    public static final EnumSet<JMLModifier> javaMods =
+    public static final EnumSet<JMLModifier> JAVA_MODS =
         EnumSet.of(JMLModifier.ABSTRACT, JMLModifier.FINAL, JMLModifier.PRIVATE,
             JMLModifier.PROTECTED,
             JMLModifier.PUBLIC, JMLModifier.STATIC);
@@ -135,7 +135,7 @@ public final class JMLTransformer extends JavaTransformer {
             ParserRuleContext ctx) {
         StringBuilder sb = new StringBuilder();
         for (var mod : mods) {
-            if (javaMods.contains(mod)) {
+            if (JAVA_MODS.contains(mod)) {
                 sb.append(mod);
             } else {
                 sb.append(StringUtil.repeat(" ", mod.name().length()));
@@ -160,7 +160,7 @@ public final class JMLTransformer extends JavaTransformer {
     private String getJMLModString(ImmutableList<JMLModifier> mods) {
         StringBuilder sb = new StringBuilder(JML);
         for (var mod : mods) {
-            if (!javaMods.contains(mod)) {
+            if (!JAVA_MODS.contains(mod)) {
                 sb.append(mod.name()).append(" ");
             }
         }

@@ -5,7 +5,7 @@ import java.util.List;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -310,7 +310,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
     public IProgramMethod method(Services services, KeYJavaType refPrefixType,
             ExecutionContext ec) {
         ProgramVariable inst = services.getJavaInfo().getAttribute(
-            ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, ec.getTypeReference().getKeYJavaType());
+                PipelineConstants.IMPLICIT_ENCLOSING_THIS, ec.getTypeReference().getKeYJavaType());
         IProgramMethod pm = method(services, refPrefixType, getMethodSignature(services, ec),
             ec.getTypeReference().getKeYJavaType());
         while (inst != null && pm == null) {
@@ -319,7 +319,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
             if (pm != null) {
                 return pm;
             }
-            inst = services.getJavaInfo().getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS,
+            inst = services.getJavaInfo().getAttribute(PipelineConstants.IMPLICIT_ENCLOSING_THIS,
                 classType);
         }
         return pm;

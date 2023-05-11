@@ -17,7 +17,6 @@ import java.util.zip.ZipFile;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.Assignment;
-import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
@@ -72,7 +71,6 @@ public final class MiscTools {
      * otherwise results in undefined behavior in that case.
      *
      * @param loopTerm The term for which to return the {@link LoopSpecification}.
-     * @param localSpecRepo TODO
      * @return The {@link LoopSpecification} for the loop statement in the given term or an empty
      *         optional if there is no specified invariant for the loop.
      */

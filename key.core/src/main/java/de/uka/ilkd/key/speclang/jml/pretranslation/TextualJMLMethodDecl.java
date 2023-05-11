@@ -3,7 +3,7 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.java.recoderext.JMLTransformer;
+import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 
 import org.key_project.util.collection.ImmutableList;
@@ -27,7 +27,7 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
 
     public String getParsableDeclaration() {
         String m = mods.stream().map(it -> {
-            if (JMLTransformer.javaMods.contains(it)) {
+            if (JMLTransformer.JAVA_MODS.contains(it)) {
                 return it.toString();
             } else {
                 return StringUtil.repeat(" ", it.toString().length());
