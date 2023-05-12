@@ -28,6 +28,7 @@ import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.MergeAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.MergePartnerAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
+import de.uka.ilkd.key.proof.io.intermediate.SMTAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
 import de.uka.ilkd.key.prover.impl.PerfScope;
 import de.uka.ilkd.key.rule.*;
@@ -37,8 +38,10 @@ import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.smt.SMTFocusResults;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.SolverLauncher;
@@ -558,21 +561,42 @@ public class IntermediateProofReplayer {
             }
         }
 
-        if (RuleAppSMT.rule.name().toString().equals(ruleName)) {
+        if (RuleAppSMT.RULE.name().toString().equals(ruleName)) {
+            if (!ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().isEnableOnLoad()) {
+                status = SMT_NOT_RUN;
+                throw new SkipSMTRuleException();
+            }
             boolean error = false;
             final SMTProblem smtProblem = new SMTProblem(currGoal);
             try {
-                DefaultSMTSettings settings =
-                    new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
-                        ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                        proof.getSettings().getNewSMTSettings(), proof);
-                SolverLauncher launcher = new SolverLauncher(settings);
-                // launcher.addListener(new SolverListener(settings, proof));
-                SolverTypeCollection active = ProofIndependentSettings.DEFAULT_INSTANCE
-                        .getSMTSettings().computeActiveSolverUnion();
+                DefaultSMTSettings settings = new DefaultSMTSettings(
+                    proof.getSettings().getSMTSettings(),
+                    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                    proof.getSettings().getNewSMTSettings(),
+                    proof);
+
+                ProofIndependentSMTSettings smtSettings = ProofIndependentSettings.DEFAULT_INSTANCE
+                        .getSMTSettings();
+                SolverTypeCollection active = smtSettings.computeActiveSolverUnion();
+                SMTAppIntermediate smtAppIntermediate = (SMTAppIntermediate) currInterm;
+                String smtSolver = smtAppIntermediate.getSolver();
+                if (smtSolver == null || smtSolver.isEmpty()) {
+                    // default to Z3 because this one most likely was used when saving the proof
+                    smtSolver = "Z3";
+                }
+                // try to find the solver that closed the proof
+                for (SolverTypeCollection su : smtSettings.getSolverUnions(true)) {
+                    if (su.name().equals(smtSolver)) {
+                        active = su;
+                        break;
+                    }
+                }
                 ArrayList<SMTProblem> problems = new ArrayList<>();
                 problems.add(smtProblem);
-                launcher.launch(active.getTypes(), problems, proof.getServices());
+
+                SolverLauncher launcher = new SolverLauncher(settings);
+                launcher.launch(active.getTypes(), problems,
+                    proof.getServices());
             } catch (Exception e) {
                 error = true;
             }
@@ -580,7 +604,14 @@ public class IntermediateProofReplayer {
                 status = SMT_NOT_RUN;
                 throw new SkipSMTRuleException();
             } else {
-                return RuleAppSMT.rule.createApp(null, proof.getServices());
+                String name = smtProblem.getSuccessfulSolver().name();
+                Optional<ImmutableList<PosInOccurrence>> unsatCore =
+                    SMTFocusResults.getUnsatCore(smtProblem);
+                if (unsatCore.isPresent()) {
+                    return RuleAppSMT.RULE.createApp(name, unsatCore.get());
+                } else {
+                    return RuleAppSMT.RULE.createApp(name);
+                }
             }
         }
 

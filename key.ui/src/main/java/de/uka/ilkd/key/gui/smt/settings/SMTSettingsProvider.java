@@ -50,6 +50,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     private final JSpinner objectBoundField;
     private final JSpinner locsetBoundField;
     private final JCheckBox solverSupportCheck;
+    private final JCheckBox enableOnLoad;
 
     private transient ProofIndependentSMTSettings settings;
     private final transient List<SettingsProvider> children = new ArrayList<>();
@@ -65,6 +66,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         locsetBoundField = createLocSetBoundField();
         seqBoundField = createSeqBoundField();
         solverSupportCheck = createSolverSupportCheck();
+        enableOnLoad = createEnableOnLoad();
 
         // Load all available solver types in the system according to SolverTypes.
         // Note that this should happen before creating the NewTranslationOptions, otherwise
@@ -168,6 +170,12 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
             e -> settings.setCheckForSupport(solverSupportCheck.isSelected()));
     }
 
+    private JCheckBox createEnableOnLoad() {
+        return addCheckBox("Enable SMT solvers when loading proofs",
+            "", true,
+            e -> settings.setEnableOnLoad(enableOnLoad.isSelected()));
+    }
+
     private JTextField getSaveToFilePanel() {
         return addFileChooserPanel("Store translation to file:", "",
             BUNDLE.getString(INFO_SAVE_TO_FILE_PANEL), true,
@@ -198,5 +206,6 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         // Timeout can have up to 3 decimal places in seconds to still be an integer in ms.
         timeoutField.setValue(((double) this.settings.getTimeout()) / 1000);
         maxProcesses.setValue(this.settings.getMaxConcurrentProcesses());
+        enableOnLoad.setEnabled(this.settings.isEnableOnLoad());
     }
 }

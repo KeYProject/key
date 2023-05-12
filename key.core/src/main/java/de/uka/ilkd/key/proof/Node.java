@@ -621,7 +621,7 @@ public class Node implements Iterable<Node> {
                 return nodeInfo.getFirstStatementString();
             }
 
-            cachedName = rap.rule().displayName();
+            cachedName = rap.displayName();
             if (cachedName == null) {
                 cachedName = RULE_WITHOUT_NAME;
             }
