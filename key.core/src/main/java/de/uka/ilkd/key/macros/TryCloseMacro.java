@@ -143,6 +143,8 @@ public class TryCloseMacro extends AbstractProofMacro {
             return null;
         }
 
+        proof.register(this, TryCloseMacro.class);
+
         //
         // create the rule application engine
         final ProverCore applyStrategy = new ApplyStrategy(
@@ -203,6 +205,7 @@ public class TryCloseMacro extends AbstractProofMacro {
             final ImmutableList<Goal> resultingGoals =
                 setDifference(proof.openGoals(), ignoredOpenGoals);
             info = new ProofMacroFinishedInfo(this, info, resultingGoals);
+            proof.deregister(this, TryCloseMacro.class);
         }
         return info;
     }

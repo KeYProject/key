@@ -16,6 +16,7 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
+import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -44,12 +45,6 @@ public class CloseReferenceExtension
 
     private final Set<Proof> trackedProofs = new HashSet<>();
 
-    private static boolean ignoreRuleApplications = false;
-
-    public static void setIgnoreRuleApplications(boolean ignoreRuleApplications) {
-        CloseReferenceExtension.ignoreRuleApplications = ignoreRuleApplications;
-    }
-
     @Override
     public void selectedNodeChanged(KeYSelectionEvent e) {
     }
@@ -67,7 +62,8 @@ public class CloseReferenceExtension
 
     @Override
     public void ruleApplied(ProofEvent e) {
-        if (e.getSource().lookup(CopyingProofReplayer.class) != null) {
+        if (e.getSource().lookup(CopyingProofReplayer.class) != null
+                || e.getSource().lookup(TryCloseMacro.class) != null) {
             return; // copy in progress!
         }
         if (!CachingSettingsProvider.getCachingSettings().getEnabled()) {
@@ -166,7 +162,7 @@ public class CloseReferenceExtension
         public void proofDisposing(ProofDisposedEvent e) {
             if (!newProof.isDisposed()) {
                 mediator.stopInterface(true);
-                newProof.copyCachedGoals(referencedProof);
+                newProof.copyCachedGoals(referencedProof, null, null);
                 mediator.startInterface(true);
             }
         }

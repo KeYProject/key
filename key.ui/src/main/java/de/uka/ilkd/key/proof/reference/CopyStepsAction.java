@@ -46,6 +46,6 @@ public class CopyStepsAction extends MainWindowAction implements KeYSelectionLis
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        getMediator().getSelectedProof().copyCachedGoals(null);
+        getMediator().getSelectedProof().copyCachedGoals(null, null, null);
     }
 }

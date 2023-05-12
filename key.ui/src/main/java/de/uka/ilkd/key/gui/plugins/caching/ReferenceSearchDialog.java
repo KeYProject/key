@@ -28,6 +28,10 @@ public class ReferenceSearchDialog extends JDialog {
      * Scroll pane listing the open goals and the results of running each SMT solver on them.
      */
     private JScrollPane scrollPane;
+    /**
+     * Overall progress of the search / copy.
+     */
+    private final JProgressBar progressBar;
     private final ReferenceSearchDialogListener listener;
 
     public ReferenceSearchDialog(Proof proof, ReferenceSearchDialogListener listener) {
@@ -40,8 +44,15 @@ public class ReferenceSearchDialog extends JDialog {
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setModal(true);
+
         Container contentPane = this.getContentPane();
         contentPane.setLayout(new GridBagLayout());
+
+        progressBar = new JProgressBar();
+        progressBar.setString("Finished.");
+        progressBar.setStringPainted(true);
+        progressBar.setMaximum(1);
+        progressBar.setValue(1);
         Box buttonBox = Box.createHorizontalBox();
         buttonBox.add(Box.createHorizontalGlue());
         buttonBox.add(getStopButton());
@@ -52,6 +63,7 @@ public class ReferenceSearchDialog extends JDialog {
         GridBagConstraints constraints = new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
             GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 0, 5), 0, 0);
 
+        contentPane.add(progressBar, constraints);
         constraints.gridy++;
         constraints.weighty = 2.0;
         contentPane.add(getScrollPane(), constraints);
@@ -107,5 +119,20 @@ public class ReferenceSearchDialog extends JDialog {
             });
         }
         return stopButton;
+    }
+
+    public void setMaximum(int total) {
+        progressBar.setMaximum(total);
+        progressBar.setValue(0);
+        progressBar.setString("Working...");
+    }
+
+    public boolean incrementProgress() {
+        progressBar.setValue(progressBar.getValue() + 1);
+        if (progressBar.getValue() == progressBar.getMaximum()) {
+            progressBar.setString("Finished.");
+            return true;
+        }
+        return false;
     }
 }

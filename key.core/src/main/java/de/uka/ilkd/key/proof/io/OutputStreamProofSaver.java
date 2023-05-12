@@ -148,7 +148,7 @@ public class OutputStreamProofSaver {
     }
 
     public void save(OutputStream out) throws IOException {
-        proof.copyCachedGoals(null);
+        proof.copyCachedGoals(null, null, null);
         try (var ps = new PrintWriter(out, true, StandardCharsets.UTF_8)) {
             final ProofOblInput po =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);

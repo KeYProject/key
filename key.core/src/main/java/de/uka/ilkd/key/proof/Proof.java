@@ -4,6 +4,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -1437,10 +1438,14 @@ public class Proof implements Named {
      * copy the relevant proof steps into this proof.
      *
      * @param referencedFrom filter, if not null copy only from that proof
+     * @param callbackTotal callback that gets the total number of branches to complete
+     * @param callbackBranch callback notified every time a branch has been copied
      */
-    public void copyCachedGoals(Proof referencedFrom) {
+    public void copyCachedGoals(Proof referencedFrom, Consumer<Integer> callbackTotal,
+            Runnable callbackBranch) {
         // first, ensure that all cached goals are copied over
         List<Goal> goals = openGoals().toList();
+        List<Goal> todo = new ArrayList<>();
         for (Goal g : goals) {
             Node node = g.node();
             ClosedBy c = node.lookup(ClosedBy.class);
@@ -1450,13 +1455,21 @@ public class Proof implements Named {
             if (referencedFrom != null && referencedFrom != c.getProof()) {
                 continue;
             }
-            // add(g);
-            // reOpenGoal(g);
-            node.deregister(c, ClosedBy.class);
+            todo.add(g);
+        }
+        if (callbackTotal != null) {
+            callbackTotal.accept(todo.size());
+        }
+        for (Goal g : todo) {
+            ClosedBy c = g.node().lookup(ClosedBy.class);
+            g.node().deregister(c, ClosedBy.class);
             try {
                 new CopyingProofReplayer(c.getProof(), this).copy(c.getNode(), g);
             } catch (IntermediateProofReplayer.BuiltInConstructionException e) {
                 throw new RuntimeException(e);
+            }
+            if (callbackBranch != null) {
+                callbackBranch.run();
             }
         }
     }
