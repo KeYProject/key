@@ -6,6 +6,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
@@ -14,8 +15,17 @@ class ReferenceSearchTable extends JTable implements TableModel {
 
     private static final long serialVersionUID = 1L;
 
+    private final KeYMediator mediator;
     private final Proof proof;
     private final List<Goal> openGoals;
+
+    public ReferenceSearchTable(Proof proof, KeYMediator mediator) {
+        this.setModel(this);
+        this.proof = proof;
+        this.openGoals = proof.openGoals().toList();
+        this.mediator = mediator;
+        getColumnModel().getColumn(1).setMinWidth(200);
+    }
 
     @Override
     public void addTableModelListener(TableModelListener l) {
@@ -64,17 +74,15 @@ class ReferenceSearchTable extends JTable implements TableModel {
             if (c == null) {
                 return "no reference found";
             } else {
-                return "reference available";
+                int i = mediator.getCurrentlyOpenedProofs().indexOf(c.getProof()) + 1;
+                return String.format("reference available (proof %d)", i);
             }
         }
     }
 
-
-    public ReferenceSearchTable(Proof proof) {
-        this.setModel(this);
-        this.proof = proof;
-        this.openGoals = proof.openGoals().toList();
-        getColumnModel().getColumn(1).setMinWidth(200);
+    @Override
+    public boolean isCellEditable(int row, int column) {
+        return false;
     }
 
     @Override

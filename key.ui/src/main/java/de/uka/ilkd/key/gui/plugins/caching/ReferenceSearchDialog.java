@@ -9,21 +9,22 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 
 /**
- * Dialog showing launched SMT processes and results.
+ * Dialog showing reference search information.
+ *
+ * @author Arne Keller
  */
 public class ReferenceSearchDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
     private final ReferenceSearchTable table;
     /**
-     * Button to apply the results of running the SMT solver.
-     * May close some open goals if the solver returned unsat.
+     * Button to copy the relevant proof steps.
      */
     private JButton applyButton;
     /**
-     * Button to stop the launched SMT solvers.
+     * Button to close the dialog.
      */
-    private JButton stopButton;
+    private JButton closeDialog;
     /**
      * Scroll pane listing the open goals and the results of running each SMT solver on them.
      */
@@ -36,7 +37,7 @@ public class ReferenceSearchDialog extends JDialog {
 
     public ReferenceSearchDialog(Proof proof, ReferenceSearchDialogListener listener) {
         super(MainWindow.getInstance());
-        table = new ReferenceSearchTable(proof);
+        table = new ReferenceSearchTable(proof, MainWindow.getInstance().getMediator());
         table.getTableHeader().setReorderingAllowed(false);
         this.setLocationByPlatform(true);
         this.setTitle("Proof Caching");
@@ -55,7 +56,7 @@ public class ReferenceSearchDialog extends JDialog {
         progressBar.setValue(1);
         Box buttonBox = Box.createHorizontalBox();
         buttonBox.add(Box.createHorizontalGlue());
-        buttonBox.add(getStopButton());
+        buttonBox.add(getCloseDialog());
         buttonBox.add(Box.createHorizontalStrut(5));
         buttonBox.add(getApplyButton());
 
@@ -111,22 +112,31 @@ public class ReferenceSearchDialog extends JDialog {
         return scrollPane;
     }
 
-    private JButton getStopButton() {
-        if (stopButton == null) {
-            stopButton = new JButton("Close");
-            stopButton.addActionListener(e -> {
-                listener.discardButtonClicked();
-            });
+    private JButton getCloseDialog() {
+        if (closeDialog == null) {
+            closeDialog = new JButton("Close");
+            closeDialog.addActionListener(e -> listener.discardButtonClicked());
         }
-        return stopButton;
+        return closeDialog;
     }
 
+    /**
+     * Set the maximum value of the progress bar.
+     * Also resets progress to zero.
+     *
+     * @param total total value
+     */
     public void setMaximum(int total) {
         progressBar.setMaximum(total);
         progressBar.setValue(0);
         progressBar.setString("Working...");
     }
 
+    /**
+     * Increment progress by one.
+     *
+     * @return whether progress is full
+     */
     public boolean incrementProgress() {
         progressBar.setValue(progressBar.getValue() + 1);
         if (progressBar.getValue() == progressBar.getMaximum()) {

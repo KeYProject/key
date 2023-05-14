@@ -19,6 +19,7 @@ public enum FontAwesomeSolid implements IconFont {
     ARROW_ALT_CIRCLE_RIGHT('\uf35a'), ARROW_ALT_CIRCLE_UP('\uf35b'), ARROW_CIRCLE_DOWN('\uf0ab'),
     ARROW_CIRCLE_LEFT('\uf0a8'), ARROW_CIRCLE_RIGHT('\uf0a9'), ARROW_CIRCLE_UP('\uf0aa'),
     ARROW_DOWN('\uf063'), ARROW_LEFT('\uf060'), ARROW_RIGHT('\uf061'), ARROW_UP('\uf062'),
+    ARROW_UP_LEFT_FROM_CIRCLE('\ue09e'),
     ARROWS_ALT('\uf0b2'), ARROWS_ALT_H('\uf337'), ARROWS_ALT_V('\uf338'),
     ASSISTIVE_LISTENING_SYSTEMS('\uf2a2'), ASTERISK('\uf069'), AT('\uf1fa'), ATLAS('\uf558'),
     ATOM('\uf5d2'), AUDIO_DESCRIPTION('\uf29e'), AWARD('\uf559'), BABY('\uf77c'),

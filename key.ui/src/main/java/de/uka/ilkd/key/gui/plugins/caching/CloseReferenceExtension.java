@@ -118,8 +118,7 @@ public class CloseReferenceExtension
             @Nonnull ContextMenuKind kind, @Nonnull Object underlyingObject) {
         if (kind.getType() == Node.class) {
             return List.of(new CloseByReference(mediator, (Node) underlyingObject),
-                new CopyReferencedProof(mediator, (Node) underlyingObject),
-                new GotoReferencedProof(mediator, (Node) underlyingObject));
+                new CopyReferencedProof(mediator, (Node) underlyingObject));
         }
         return new ArrayList<>();
     }
@@ -129,6 +128,7 @@ public class CloseReferenceExtension
     public JToolBar getToolbar(MainWindow mainWindow) {
         JToolBar bar = new JToolBar();
         bar.add(new CopyStepsAction(mainWindow));
+        bar.add(new GotoReferenceAction(mainWindow));
         return bar;
     }
 
@@ -222,26 +222,6 @@ public class CloseReferenceExtension
             } catch (IntermediateProofReplayer.BuiltInConstructionException ex) {
                 throw new RuntimeException(ex);
             }
-        }
-    }
-
-    static class GotoReferencedProof extends KeyAction {
-        private final KeYMediator mediator;
-        private final Node node;
-
-        public GotoReferencedProof(KeYMediator mediator, Node node) {
-            this.mediator = mediator;
-            this.node = node;
-            setName("Go to referenced proof");
-            setEnabled(node.leaf() && !node.isClosed()
-                    && node.lookup(ClosedBy.class) != null);
-            setMenuPath("Proof Caching");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            ClosedBy c = node.lookup(ClosedBy.class);
-            mediator.getSelectionModel().setSelectedNode(c.getNode());
         }
     }
 
