@@ -395,6 +395,10 @@ public class Node implements Iterable<Node> {
         }
     }
 
+    public void removeChildren() {
+        children.clear();
+    }
+
     /**
      * Removes child/parent relationship between the given node and this node; if the given node is
      * not child of this node, nothing happens and then and only then false is returned.
