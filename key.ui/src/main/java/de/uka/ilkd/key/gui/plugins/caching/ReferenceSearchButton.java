@@ -14,6 +14,11 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 
+/**
+ * Status line button to indicate whether cached goals are present.
+ *
+ * @author Arne Keller
+ */
 public class ReferenceSearchButton extends JButton
         implements ActionListener, ReferenceSearchDialogListener, KeYSelectionListener {
     /**
@@ -23,9 +28,20 @@ public class ReferenceSearchButton extends JButton
         ColorSettings.define("caching.reference_found", "",
             new Color(80, 120, 0));
 
+    /**
+     * The mediator.
+     */
     private final KeYMediator mediator;
+    /**
+     * The opened dialog, once the user clicks on the button.
+     */
     private ReferenceSearchDialog dialog = null;
 
+    /**
+     * Construct a new button.
+     *
+     * @param mediator the mediator
+     */
     public ReferenceSearchButton(KeYMediator mediator) {
         super("Proof Caching");
         this.mediator = mediator;
@@ -56,7 +72,7 @@ public class ReferenceSearchButton extends JButton
     }
 
     @Override
-    public void discardButtonClicked() {
+    public void closeButtonClicked() {
         if (dialog != null) {
             dialog.dispose();
             dialog = null;

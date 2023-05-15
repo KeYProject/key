@@ -4,8 +4,16 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 
+/**
+ * Simple visitor to find instances of non-model {@link ProgramMethod} in terms.
+ *
+ * @author Arne Keller
+ */
 public class ProgramMethodFinder implements Visitor {
 
+    /**
+     * Whether a program method has been found.
+     */
     private boolean foundProgramMethod = false;
 
     @Override
@@ -16,7 +24,10 @@ public class ProgramMethodFinder implements Visitor {
     @Override
     public void visit(Term visited) {
         if (visited.op() instanceof ProgramMethod) {
-            foundProgramMethod = true;
+            ProgramMethod pm = (ProgramMethod) visited.op();
+            if (!pm.isModel()) {
+                foundProgramMethod = true;
+            }
         }
     }
 

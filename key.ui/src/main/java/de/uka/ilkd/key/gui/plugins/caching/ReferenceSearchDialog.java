@@ -16,6 +16,9 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
 public class ReferenceSearchDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
+    /**
+     * The table of reference search results.
+     */
     private final ReferenceSearchTable table;
     /**
      * Button to copy the relevant proof steps.
@@ -33,8 +36,17 @@ public class ReferenceSearchDialog extends JDialog {
      * Overall progress of the search / copy.
      */
     private final JProgressBar progressBar;
+    /**
+     * Listener used to react to user inputs.
+     */
     private final ReferenceSearchDialogListener listener;
 
+    /**
+     * Construct a new dialog. Use {@link #setVisible(boolean)} afterwards to show it.
+     *
+     * @param proof the proof
+     * @param listener control listener
+     */
     public ReferenceSearchDialog(Proof proof, ReferenceSearchDialogListener listener) {
         super(MainWindow.getInstance());
         table = new ReferenceSearchTable(proof, MainWindow.getInstance().getMediator());
@@ -115,7 +127,7 @@ public class ReferenceSearchDialog extends JDialog {
     private JButton getCloseDialog() {
         if (closeDialog == null) {
             closeDialog = new JButton("Close");
-            closeDialog.addActionListener(e -> listener.discardButtonClicked());
+            closeDialog.addActionListener(e -> listener.closeButtonClicked());
         }
         return closeDialog;
     }

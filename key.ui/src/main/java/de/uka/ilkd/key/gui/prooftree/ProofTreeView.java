@@ -53,12 +53,21 @@ public class ProofTreeView extends JPanel implements TabPanel {
         ColorSettings.define("[proofTree]gray", "", Color.DARK_GRAY);
     public static final ColorSettings.ColorProperty LIGHT_BLUE_COLOR =
         ColorSettings.define("[proofTree]lightBlue", "", new Color(230, 254, 255));
+    /**
+     * Other green color, currently used for cached goals.
+     */
     public static final ColorSettings.ColorProperty OTHER_GREEN_COLOR =
         ColorSettings.define("[proofTree]otherGreen", "", new Color(0, 100, 0));
+    /**
+     * Color used for closed goals.
+     */
     public static final ColorSettings.ColorProperty DARK_GREEN_COLOR =
         ColorSettings.define("[proofTree]darkGreen", "", new Color(0, 128, 51));
     public static final ColorSettings.ColorProperty DARK_RED_COLOR =
         ColorSettings.define("[proofTree]darkRed", "", new Color(191, 0, 0));
+    /**
+     * Color used for linked goals.
+     */
     public static final ColorSettings.ColorProperty PINK_COLOR =
         ColorSettings.define("[proofTree]pink", "", new Color(255, 0, 240));
     public static final ColorSettings.ColorProperty ORANGE_COLOR =

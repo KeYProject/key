@@ -15,6 +15,11 @@ import de.uka.ilkd.key.proof.Proof;
  * @author Arne Keller
  */
 public class CopyStepsAction extends MainWindowAction implements KeYSelectionListener {
+    /**
+     * Construct a new action.
+     *
+     * @param mainWindow main window
+     */
     public CopyStepsAction(MainWindow mainWindow) {
         super(mainWindow);
         putValue(SMALL_ICON, IconFactory.BACKREFERENCE.get(MainWindow.TOOLBAR_ICON_SIZE));

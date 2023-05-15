@@ -11,17 +11,32 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 
+/**
+ * Table showing the results of searching for proof references.
+ *
+ * @author Arne Keller
+ */
 class ReferenceSearchTable extends JTable implements TableModel {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The mediator.
+     */
     private final KeYMediator mediator;
-    private final Proof proof;
+    /**
+     * List of open goals in the selected proof.
+     */
     private final List<Goal> openGoals;
 
+    /**
+     * Construct a new table.
+     *
+     * @param proof proof to analyze
+     * @param mediator the mediator
+     */
     public ReferenceSearchTable(Proof proof, KeYMediator mediator) {
         this.setModel(this);
-        this.proof = proof;
         this.openGoals = proof.openGoals().toList();
         this.mediator = mediator;
         getColumnModel().getColumn(1).setMinWidth(200);

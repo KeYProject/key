@@ -6,6 +6,9 @@ package de.uka.ilkd.key.settings;
  * @author Arne Keller
  */
 public class ProofCachingSettings extends AbstractPropertiesSettings {
+    /**
+     * Key ID for {@link #enabled}.
+     */
     private static final String ENABLED_KEY = "[ProofCaching]Enabled";
 
     /**

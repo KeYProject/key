@@ -21,7 +21,7 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
  *
  * @author Arne Keller
  */
-public class ReferenceSearcher {
+public final class ReferenceSearcher {
     private ReferenceSearcher() {
 
     }

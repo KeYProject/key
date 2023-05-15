@@ -1,11 +1,9 @@
 package de.uka.ilkd.key.settings;
 
-import java.beans.PropertyChangeListener;
 import java.util.*;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -26,9 +24,8 @@ import org.key_project.util.collection.ImmutableSet;
  *
  */
 public class ChoiceSettings extends AbstractSettings {
-
     private static final String KEY_DEFAULT_CHOICES = "[Choice]DefaultChoices";
-    private final LinkedList<PropertyChangeListener> listenerList = new LinkedList<>();
+
     private static final String PROP_CHOICE_DEFAULT = "category2Default";
     private static final String PROP_CHOICE_CATEGORIES = "category2Choices";
     private HashMap<String, String> category2Default;

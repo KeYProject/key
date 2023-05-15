@@ -10,8 +10,18 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 
+/**
+ * Action to go the referenced proof.
+ *
+ * @author Arne Keller
+ */
 public class GotoReferenceAction extends MainWindowAction implements KeYSelectionListener {
 
+    /**
+     * Construct a new action.
+     *
+     * @param mainWindow main window
+     */
     public GotoReferenceAction(MainWindow mainWindow) {
         super(mainWindow);
         putValue(SMALL_ICON, IconFactory.BACKREFERENCE_ARROW.get(MainWindow.TOOLBAR_ICON_SIZE));

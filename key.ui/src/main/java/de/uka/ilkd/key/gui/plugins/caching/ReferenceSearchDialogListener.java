@@ -1,7 +1,18 @@
 package de.uka.ilkd.key.gui.plugins.caching;
 
+/**
+ * Interface to receive callbacks from the {@link ReferenceSearchDialog}.
+ *
+ * @author Arne Keller
+ */
 public interface ReferenceSearchDialogListener {
-    void discardButtonClicked();
+    /**
+     * Button to close the dialog has been activated.
+     */
+    void closeButtonClicked();
 
+    /**
+     * Button to copy proof steps has been activated.
+     */
     void copyButtonClicked();
 }

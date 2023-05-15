@@ -32,6 +32,11 @@ import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 
 import org.key_project.util.collection.ImmutableList;
 
+/**
+ * Extension for proof caching.
+ *
+ * @author Arne Keller
+ */
 @KeYGuiExtension.Info(name = "Proof Caching", optional = true,
     description = "Functionality related to reusing previous proof results in similar proofs",
     experimental = false)
@@ -41,8 +46,14 @@ public class CloseReferenceExtension
         KeYSelectionListener, RuleAppListener,
         ProofDisposedListener {
 
+    /**
+     * The mediator.
+     */
     private KeYMediator mediator;
 
+    /**
+     * Proofs tracked for automatic reference search.
+     */
     private final Set<Proof> trackedProofs = new HashSet<>();
 
     @Override
@@ -139,16 +150,28 @@ public class CloseReferenceExtension
 
     /**
      * Listener that ensures steps are copied before the referenced proof is disposed.
+     *
+     * @author Arne Keller
      */
     public static class CopyBeforeDispose implements ProofDisposedListener {
 
+        /**
+         * The mediator.
+         */
         private final KeYMediator mediator;
+        /**
+         * The referenced proof.
+         */
         private final Proof referencedProof;
+        /**
+         * The new proof.
+         */
         private final Proof newProof;
 
         /**
          * Construct new listener.
          *
+         * @param mediator the mediator
          * @param referencedProof referenced proof
          * @param newProof new proof
          */
@@ -173,10 +196,27 @@ public class CloseReferenceExtension
         }
     }
 
+    /**
+     * Action to search for suitable references on a single node.
+     *
+     * @author Arne Keller
+     */
     static class CloseByReference extends KeyAction {
+        /**
+         * The mediator.
+         */
         private final KeYMediator mediator;
+        /**
+         * The node to try to close by reference.
+         */
         private final Node node;
 
+        /**
+         * Construct new action.
+         *
+         * @param mediator the mediator
+         * @param node the node
+         */
         public CloseByReference(KeYMediator mediator, Node node) {
             this.mediator = mediator;
             this.node = node;
@@ -191,10 +231,7 @@ public class CloseReferenceExtension
             ClosedBy c = ReferenceSearcher.findPreviousProof(
                 mediator.getCurrentlyOpenedProofs(), node);
             if (c != null) {
-                Node toClose = node;
-                Proof newProof = node.proof();
-                // newProof.closeGoal(newProof.getGoal(toClose));
-                toClose.register(c, ClosedBy.class);
+                node.register(c, ClosedBy.class);
             } else {
                 JOptionPane.showMessageDialog((JComponent) e.getSource(),
                     "No matching branch found", "Proof Caching error", JOptionPane.WARNING_MESSAGE);
@@ -202,10 +239,29 @@ public class CloseReferenceExtension
         }
     }
 
-    static class CopyReferencedProof extends KeyAction {
+    /**
+     * Action to copy referenced proof steps to the new proof.
+     *
+     * @author Arne Keller
+     */
+    private static class CopyReferencedProof extends KeyAction {
+        /**
+         * The mediator.
+         */
+        private final KeYMediator mediator;
+        /**
+         * The node to copy the steps to.
+         */
         private final Node node;
 
+        /**
+         * Construct a new action.
+         *
+         * @param mediator the mediator
+         * @param node the node
+         */
         public CopyReferencedProof(KeYMediator mediator, Node node) {
+            this.mediator = mediator;
             this.node = node;
             setName("Copy referenced proof steps here");
             setEnabled(node.leaf() && !node.isClosed()
@@ -218,7 +274,9 @@ public class CloseReferenceExtension
             ClosedBy c = node.lookup(ClosedBy.class);
             Goal current = node.proof().getGoal(node);
             try {
+                mediator.stopInterface(true);
                 new CopyingProofReplayer(c.getProof(), node.proof()).copy(c.getNode(), current);
+                mediator.startInterface(true);
             } catch (IntermediateProofReplayer.BuiltInConstructionException ex) {
                 throw new RuntimeException(ex);
             }

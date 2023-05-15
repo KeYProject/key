@@ -17,6 +17,12 @@ import org.key_project.util.collection.ImmutableList;
  * @author Arne Keller
  */
 public class CopyingProofReplayer extends AbstractProofReplayer {
+    /**
+     * Construct a new replayer.
+     *
+     * @param originalProof proof to copy from
+     * @param proof proof to add steps to
+     */
     public CopyingProofReplayer(Proof originalProof, Proof proof) {
         super(originalProof, proof);
     }

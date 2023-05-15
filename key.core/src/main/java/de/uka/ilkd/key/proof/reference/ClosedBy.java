@@ -12,12 +12,18 @@ public class ClosedBy {
     /**
      * The proof referenced.
      */
-    private Proof proof;
+    private final Proof proof;
     /**
      * The node referenced.
      */
-    private Node node;
+    private final Node node;
 
+    /**
+     * Construct a new instance.
+     *
+     * @param proof the proof
+     * @param node the node
+     */
     public ClosedBy(Proof proof, Node node) {
         this.proof = proof;
         this.node = node;
