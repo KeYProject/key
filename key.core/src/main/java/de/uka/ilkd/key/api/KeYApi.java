@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.api;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -57,7 +58,7 @@ public abstract class KeYApi {
      * @return
      * @throws ProblemLoaderException
      */
-    public static ProofManagementApi loadFromKeyFile(File keyFile) throws ProblemLoaderException {
+    public static ProofManagementApi loadFromKeyFile(Path keyFile) throws ProblemLoaderException {
         return new ProofManagementApi(KeYEnvironment.load(keyFile));
     }
 
@@ -69,8 +70,8 @@ public abstract class KeYApi {
      * @return
      * @throws ProblemLoaderException
      */
-    public static ProofManagementApi loadProof(File location, List<File> classPath,
-            File bootClassPath, List<File> includes) throws ProblemLoaderException {
+    public static ProofManagementApi loadProof(Path location, List<Path> classPath,
+            Path bootClassPath, List<Path> includes) throws ProblemLoaderException {
         return new ProofManagementApi(
             KeYEnvironment.load(location, classPath, bootClassPath, includes));
     }
@@ -80,7 +81,7 @@ public abstract class KeYApi {
      * @return
      * @throws ProblemLoaderException
      */
-    public static ProofManagementApi loadProof(File javaSourceCode) throws ProblemLoaderException {
+    public static ProofManagementApi loadProof(Path javaSourceCode) throws ProblemLoaderException {
         return loadProof(javaSourceCode, null, null, null);
     }
 

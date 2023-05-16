@@ -31,6 +31,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import com.github.javaparser.ast.key.KeyTransactionStatement;
+
 /**
  * <p>
  * This abstract implementation of {@link ProofOblInput} extends the functionality of
@@ -896,19 +898,19 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 sb2 = new StatementBlock(transaction
                         ? new Statement[] {
                             new TransactionStatement(
-                                de.uka.ilkd.key.java.recoderext.TransactionStatement.BEGIN),
+                                KeyTransactionStatement.TransactionType.BEGIN.ordinal()),
                             nullStat, tryStat,
                             new TransactionStatement(
-                                de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH) }
+                                KeyTransactionStatement.TransactionType.FINISH.ordinal()) }
                         : new Statement[] { nullStat, tryStat });
             } else {
                 sb2 = new StatementBlock(transaction
                         ? new Statement[] {
                             new TransactionStatement(
-                                de.uka.ilkd.key.java.recoderext.TransactionStatement.BEGIN),
+                                KeyTransactionStatement.TransactionType.BEGIN.ordinal()),
                             nullStat, beforeTry, tryStat,
                             new TransactionStatement(
-                                de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH) }
+                                KeyTransactionStatement.TransactionType.FINISH.ordinal()) }
                         : new Statement[] { nullStat, beforeTry, tryStat });
             }
         }

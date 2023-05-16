@@ -71,7 +71,7 @@ public class JavaService {
      * second category. A null value indicates that the boot classes are to
      * be read from an internal repository.
      */
-    private File bootClassPath;
+    private Path bootClassPath;
 
     /**
      * this mapping stores the relation between recoder and KeY entities in a
@@ -180,7 +180,7 @@ public class JavaService {
      */
 
     public List<de.uka.ilkd.key.java.CompilationUnit> readCompilationUnitsAsFiles(
-            List<String> cUnitStrings, FileRepo fileRepo)
+            Collection<String> cUnitStrings, FileRepo fileRepo)
             throws ParseExceptionInFile {
 
         List<CompilationUnit> cUnits = recoderCompilationUnitsAsFiles(cUnitStrings, fileRepo);
@@ -207,7 +207,7 @@ public class JavaService {
      * @return a new list containing the recoder compilation units corresponding
      *         to the given files.
      */
-    private List<CompilationUnit> recoderCompilationUnitsAsFiles(List<String> filenames,
+    private List<CompilationUnit> recoderCompilationUnitsAsFiles(Collection<String> filenames,
             FileRepo fileRepo)
             throws BuildingExceptions {
         List<CompilationUnit> cUnits = new ArrayList<>();
@@ -318,7 +318,7 @@ public class JavaService {
 
     // ----- parsing libraries
 
-    public void setClassPath(File bootClassPath, List<Path> classPath) {
+    public void setClassPath(Path bootClassPath, List<Path> classPath) {
         this.bootClassPath = bootClassPath;
         this.programFactory.setSourcePaths(classPath);
     }
@@ -368,7 +368,7 @@ public class JavaService {
             var bootCollection = new JavaReduxFileCollection(services.getProfile());
             paths = bootCollection.getResources();
         } else {
-            paths = Files.walk(bootClassPath.toPath())
+            paths = Files.walk(bootClassPath)
                     .filter(it -> it.getFileName().endsWith(".java")
                             || it.getFileName().endsWith(".jml"))
                     .map(it -> {

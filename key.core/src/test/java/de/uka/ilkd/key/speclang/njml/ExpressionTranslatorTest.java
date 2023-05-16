@@ -2,7 +2,6 @@ package de.uka.ilkd.key.speclang.njml;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.java.JP2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;

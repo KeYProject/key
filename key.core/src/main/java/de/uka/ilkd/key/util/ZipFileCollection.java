@@ -12,17 +12,16 @@ import java.util.NoSuchElementException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
+import javax.annotation.Nonnull;
 
-import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.io.DataLocation;
 
 
 /**
- * Allows to iterate a zip file to return all matching entries as InpuStreams.
+ * Allows to iterate a zip file to return all matching entries as InputStreams.
  *
  * @author MU
  */
@@ -44,9 +43,7 @@ public class ZipFileCollection implements FileCollection {
             try {
                 zipFile = new ZipFile(file);
             } catch (ZipException ex) {
-                IOException iox =
-                    new IOException("can't open " + file + ": " + ex.getMessage(), ex);
-                throw iox;
+                throw new IOException("can't open " + file + ": " + ex.getMessage(), ex);
             }
         }
         return new Walker(extensions);
@@ -124,16 +121,16 @@ public class ZipFileCollection implements FileCollection {
             return "zip";
         }
 
-        public DataLocation getCurrentDataLocation() {
-            // dont use ArchiveDataLocation this keeps the zip open and keeps reference to it!
+        @Nonnull
+        public URI getCurrentDataLocation() {
+            // don't use ArchiveDataLocation this keeps the zip open and keeps reference to it!
             try {
                 // since we actually return a zip/jar, we use URLDataLocation
-                URI uri = MiscTools.getZipEntryURI(zipFile, currentEntry.getName());
-                return new URLDataLocation(uri.toURL());
+                return MiscTools.getZipEntryURI(zipFile, currentEntry.getName());
             } catch (IOException e) {
                 LOGGER.warn("Failed to get zip entry uri", e);
+                throw new RuntimeException(e);
             }
-            return SpecDataLocation.UNKNOWN_LOCATION; // fallback
         }
     }
 

@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.java.JP2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;

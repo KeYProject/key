@@ -1,7 +1,6 @@
 package org.key_project.slicing.ui;
 
 import java.awt.*;
-import java.io.File;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -174,9 +173,10 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
                             name,
                             (k, v) -> v == null ? 1 : v + 1);
                     }
-                    File filename = results.proof.getProofFile();
+                    var filename = results.proof.getProofFile();
                     String label =
-                        filename != null ? filename.getName() : results.proof.name().toString();
+                        filename != null ? filename.getFileName().toString()
+                                : results.proof.name().toString();
                     tableRows.add(List.of(
                         label,
                         String.valueOf(results.totalSteps),

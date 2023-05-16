@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.init.Includes;
@@ -17,8 +17,8 @@ public abstract class AbstractEnvInput implements EnvInput {
 
     protected final String name;
     protected final String javaPath;
-    protected final List<File> classPath;
-    protected final File bootClassPath;
+    protected final List<Path> classPath;
+    protected final Path bootClassPath;
     protected final Includes includes;
     protected final Profile profile;
 
@@ -31,8 +31,8 @@ public abstract class AbstractEnvInput implements EnvInput {
     // constructors
     // -------------------------------------------------------------------------
 
-    public AbstractEnvInput(String name, String javaPath, List<File> classPath, File bootClassPath,
-            Profile profile, List<File> includes) {
+    public AbstractEnvInput(String name, String javaPath, List<Path> classPath, Path bootClassPath,
+            Profile profile, List<Path> includes) {
         assert profile != null;
         this.name = name;
         this.javaPath = javaPath;
@@ -41,7 +41,7 @@ public abstract class AbstractEnvInput implements EnvInput {
         this.profile = profile;
         this.includes = new Includes();
         if (includes != null) {
-            for (File path : includes) {
+            for (Path path : includes) {
                 this.includes.put(path.toString(), RuleSourceFactory.initRuleFile(path));
             }
         }
@@ -84,13 +84,13 @@ public abstract class AbstractEnvInput implements EnvInput {
 
 
     @Override
-    public final List<File> readClassPath() throws ProofInputException {
+    public final List<Path> readClassPath() throws ProofInputException {
         return classPath;
     }
 
 
     @Override
-    public File readBootClassPath() {
+    public Path readBootClassPath() {
         return bootClassPath;
     }
 

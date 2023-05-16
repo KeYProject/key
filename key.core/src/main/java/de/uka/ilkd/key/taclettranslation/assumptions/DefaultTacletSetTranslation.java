@@ -164,9 +164,9 @@ public final class DefaultTacletSetTranslation
         StringBuilder toStore = new StringBuilder();
         toStore = new StringBuilder("//" + Calendar.getInstance().getTime() + "\n");
 
-        String modelDir = services.getJavaModel().getModelDir();
+        var modelDir = services.getJavaModel().getModelDir();
 
-        if (modelDir != null && !modelDir.isEmpty()) {
+        if (modelDir != null && !modelDir.toString().isEmpty()) {
             toStore.append("\\javaSource \"").append(modelDir).append("\";\n\n");
         }
 

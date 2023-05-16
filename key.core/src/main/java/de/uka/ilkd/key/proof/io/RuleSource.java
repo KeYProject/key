@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Path;
 
 import org.antlr.v4.runtime.CharStream;
 
@@ -12,7 +12,7 @@ public abstract class RuleSource {
     // key-file containing ldt declarations
     public static final String ldtFile = "ldt.key";
 
-    public abstract File file();
+    public abstract Path file();
 
     /**
      * Provides an URL to the location the RuleSource is read from. This is more general than
@@ -25,7 +25,7 @@ public abstract class RuleSource {
     public abstract URL url() throws IOException;
 
     public boolean isDirectory() {
-        return file().isDirectory();
+        return file().toFile().isDirectory();
     }
 
     public abstract int getNumberOfBytes();

@@ -3,6 +3,7 @@ package de.uka.ilkd.key.proof;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Predicate;
 import javax.annotation.Nonnull;
@@ -127,10 +128,10 @@ public class Proof implements Named {
     private final List<ProofDisposedListener> proofDisposedListener = new LinkedList<>();
 
     /**
-     * The {@link File} under which this {@link Proof} was saved the last time if available or
+     * The {@link Path} under which this {@link Proof} was saved the last time if available or
      * {@code null} otherwise.
      */
-    private File proofFile;
+    private Path proofFile;
 
     @Nullable
     private Lookup userData;
@@ -1309,21 +1310,21 @@ public class Proof implements Named {
     }
 
     /**
-     * Returns the {@link File} under which the {@link Proof} was saved the last time if available.
+     * Returns the {@link Path} under which the {@link Proof} was saved the last time if available.
      *
-     * @return The {@link File} under which the {@link Proof} was saved the last time or
+     * @return The {@link Path} under which the {@link Proof} was saved the last time or
      *         {@code null} if not available.
      */
-    public File getProofFile() {
+    public Path getProofFile() {
         return proofFile;
     }
 
     /**
-     * Sets the {@link File} under which the {@link Proof} was saved the last time.
+     * Sets the {@link Path} under which the {@link Proof} was saved the last time.
      *
-     * @param proofFile The {@link File} under which the {@link Proof} was saved the last time.
+     * @param proofFile The {@link Path} under which the {@link Proof} was saved the last time.
      */
-    public void setProofFile(File proofFile) {
+    public void setProofFile(Path proofFile) {
         this.proofFile = proofFile;
     }
 

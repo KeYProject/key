@@ -25,7 +25,8 @@ class Context {
      * @param compilationUnitContext a recoder.java.CompilationUnit
      * @param classContext a recoder.java.declaration.ClassDeclaration
      */
-    public Context(recoder.java.CompilationUnit compilationUnitContext, ClassDeclaration classContext) {
+    public Context(recoder.java.CompilationUnit compilationUnitContext,
+            ClassDeclaration classContext) {
         this.compilationUnitContext = compilationUnitContext;
         this.classContext = classContext;
     }
@@ -35,9 +36,8 @@ class Context {
      *
      * @param compilationUnitContext a recoder.java.declaration.CompilationUnit
      */
-    public Context(KeYCrossReferenceServiceConfiguration servConf,
-            recoder.java.CompilationUnit compilationUnitContext) {
-        this(servConf, compilationUnitContext, createClassDecl(servConf));
+    public Context(recoder.java.CompilationUnit compilationUnitContext) {
+        this(compilationUnitContext, createClassDecl(servConf));
     }
 
 

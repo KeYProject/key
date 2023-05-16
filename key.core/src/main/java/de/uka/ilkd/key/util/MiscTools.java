@@ -43,9 +43,6 @@ import org.key_project.util.Filenames;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.*;
 
-import recoder.io.ArchiveDataLocation;
-import recoder.io.DataFileLocation;
-import recoder.io.DataLocation;
 
 /**
  * Collection of some common, stateless functionality. Stolen from the weissInvariants side branch.
@@ -735,46 +732,6 @@ public final class MiscTools {
             result = result.substring("FILE:".length());
         }
         return result;
-    }
-
-    /**
-     * Tries to extract a valid URI from the given DataLocation.
-     *
-     * @param loc the given DataLocation
-     * @return an URI identifying the resource of the DataLocation
-     */
-    public static URI extractURI(DataLocation loc) {
-        if (loc == null) {
-            throw new IllegalArgumentException("The given DataLocation is null!");
-        }
-
-        try {
-            switch (loc.getType()) {
-            case "URL": // URLDataLocation
-                return ((URLDataLocation) loc).getUrl().toURI();
-            case "ARCHIVE": // ArchiveDataLocation
-                // format: "ARCHIVE:<filename>?<itemname>"
-                ArchiveDataLocation adl = (ArchiveDataLocation) loc;
-
-                // extract item name and zip file
-                int qmindex = adl.toString().lastIndexOf('?');
-                String itemName = adl.toString().substring(qmindex + 1);
-                ZipFile zip = adl.getFile();
-
-                // use special method to ensure that path separators are correct
-                return getZipEntryURI(zip, itemName);
-            case "FILE": // DataFileLocation
-                // format: "FILE:<path>"
-                return ((DataFileLocation) loc).getFile().toURI();
-            default: // SpecDataLocation
-                // format "<type>://<location>"
-                // wrap into URN to ensure URI encoding is correct (no spaces!)
-                return new URI("urn", loc.toString(), null);
-            }
-        } catch (URISyntaxException | IOException e) {
-            throw new IllegalArgumentException(
-                "The given DataLocation can not be converted into a valid URI: " + loc, e);
-        }
     }
 
     /**

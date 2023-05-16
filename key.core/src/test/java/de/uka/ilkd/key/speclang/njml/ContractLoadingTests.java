@@ -22,7 +22,7 @@ public class ContractLoadingTests {
     public void sumAndMax() throws ProblemLoaderException {
         final File javaFile =
             new File(EXAMPLES_DIR, "heap/vstte10_01_SumAndMax/src/SumAndMax.java");
-        ProofManagementApi file = KeYApi.loadProof(javaFile);
+        ProofManagementApi file = KeYApi.loadProof(javaFile.toPath());
         Services services = file.getServices();
         Logger LOGGER = LoggerFactory.getLogger(ContractLoadingTests.class);
         for (Contract proofContract : file.getProofContracts()) {
@@ -35,7 +35,7 @@ public class ContractLoadingTests {
         final File javaFile =
             new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/1658/Test.java");
         Assumptions.assumeTrue(javaFile.exists());
-        ProofManagementApi file = KeYApi.loadProof(javaFile);
+        ProofManagementApi file = KeYApi.loadProof(javaFile.toPath());
         Assertions.assertTrue(file.getProofContracts().size() > 0);
     }
 
@@ -44,7 +44,7 @@ public class ContractLoadingTests {
         final File javaFile =
             new File(HelperClassForTests.TESTCASE_DIRECTORY, "specMath/java/Test.java");
         Assumptions.assumeTrue(javaFile.exists());
-        ProofManagementApi file = KeYApi.loadProof(javaFile);
+        ProofManagementApi file = KeYApi.loadProof(javaFile.toPath());
         Assertions.assertTrue(file.getProofContracts().size() > 0);
     }
 
@@ -53,7 +53,7 @@ public class ContractLoadingTests {
         final File javaFile =
             new File(HelperClassForTests.TESTCASE_DIRECTORY, "specMath/bigint/Test.java");
         Assumptions.assumeTrue(javaFile.exists());
-        ProofManagementApi file = KeYApi.loadProof(javaFile);
+        ProofManagementApi file = KeYApi.loadProof(javaFile.toPath());
         Assertions.assertTrue(file.getProofContracts().size() > 0);
     }
 }

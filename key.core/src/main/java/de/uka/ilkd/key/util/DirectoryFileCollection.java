@@ -4,16 +4,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
-
-import recoder.io.DataFileLocation;
-import recoder.io.DataLocation;
 
 /**
  * This class is used to describe a directory structure as a repository for files to read in. A
@@ -167,6 +166,7 @@ public class DirectoryFileCollection implements FileCollection {
             return currentFile.toPath();
         }
 
+        @Override
         public boolean step() {
             try {
                 currentFile = iterator.next();
@@ -177,12 +177,15 @@ public class DirectoryFileCollection implements FileCollection {
             }
         }
 
+        @Override
         public String getType() {
             return "file";
         }
 
-        public DataLocation getCurrentDataLocation() {
-            return new DataFileLocation(currentFile);
+        @Nonnull
+        @Override
+        public URI getCurrentDataLocation() {
+            return currentFile.toURI();
         }
     }
 

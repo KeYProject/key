@@ -2,7 +2,6 @@ package de.uka.ilkd.key.rule;
 
 import java.io.File;
 
-import de.uka.ilkd.key.java.JP2KeY;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;

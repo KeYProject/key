@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.control;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -179,8 +180,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
      * @throws ProblemLoaderException Occurred Exception
      */
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(File location,
-            List<File> classPaths, File bootClassPath, List<File> includes)
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(Path location,
+            List<Path> classPaths, Path bootClassPath, List<Path> includes)
             throws ProblemLoaderException {
         return load(null, location, classPaths, bootClassPath, includes, false);
     }
@@ -197,8 +198,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
      * @throws ProblemLoaderException Occurred Exception
      */
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(File location,
-            List<File> classPaths, File bootClassPath, List<File> includes,
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(Path location,
+            List<Path> classPaths, Path bootClassPath, List<Path> includes,
             RuleCompletionHandler ruleCompletionHandler) throws ProblemLoaderException {
         return load(null, location, classPaths, bootClassPath, includes, null,
             ruleCompletionHandler, false);
@@ -219,8 +220,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
      * @throws ProblemLoaderException Occurred Exception
      */
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, File location,
-            List<File> classPaths, File bootClassPath, List<File> includes,
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, Path location,
+            List<Path> classPaths, Path bootClassPath, List<Path> includes,
             boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
         return load(profile, location, classPaths, bootClassPath, includes, null, null,
             forceNewProfileOfNewProofs);
@@ -244,8 +245,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
      * @throws ProblemLoaderException Occurred Exception
      */
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, File location,
-            List<File> classPaths, File bootClassPath, List<File> includes,
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, Path location,
+            List<Path> classPaths, Path bootClassPath, List<Path> includes,
             Properties poPropertiesToForce, RuleCompletionHandler ruleCompletionHandler,
             boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
         return load(profile, location, classPaths, bootClassPath, includes, poPropertiesToForce,
@@ -273,8 +274,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
      * @throws ProblemLoaderException Occurred Exception
      */
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, File location,
-            List<File> classPaths, File bootClassPath, List<File> includes,
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, Path location,
+            List<Path> classPaths, Path bootClassPath, List<Path> includes,
             Properties poPropertiesToForce, RuleCompletionHandler ruleCompletionHandler,
             Consumer<Proof> callbackProofLoaded,
             boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
@@ -287,7 +288,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
             loader.getProofScript(), loader.getResult());
     }
 
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(File keyFile)
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(Path keyFile)
             throws ProblemLoaderException {
         return load(keyFile, null, null, null);
     }

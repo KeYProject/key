@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -14,13 +15,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.FileCollection;
 import de.uka.ilkd.key.util.KeYResourceManager;
-
-import recoder.io.DataLocation;
 
 /**
  * This is a special {@link FileCollection} which allows to retrieve the internally stored java boot
@@ -73,7 +73,7 @@ public class JavaReduxFileCollection implements FileCollection {
         String resourceString = resourceLocation + "/" + profile.getInternalClasslistFilename();
 
         URL jlURL =
-            KeYResourceManager.getManager().getResourceFile(JP2KeY.class, resourceString);
+            KeYResourceManager.getManager().getResourceFile(JavaService.class, resourceString);
 
         if (jlURL == null) {
             throw new FileNotFoundException("Resource " + resourceString + " cannot be opened.");
@@ -122,7 +122,7 @@ public class JavaReduxFileCollection implements FileCollection {
     public Stream<URL> getResources() {
         return resources.stream()
                 .map(it -> KeYResourceManager.getManager().getResourceFile(
-                    JP2KeY.class, resourceLocation + "/" + it));
+                    JavaService.class, resourceLocation + "/" + it));
     }
 
     /*
@@ -151,12 +151,17 @@ public class JavaReduxFileCollection implements FileCollection {
             this.iterator = iterator;
         }
 
-        public DataLocation getCurrentDataLocation() throws NoSuchElementException {
+        @Nonnull
+        public URI getCurrentDataLocation() throws NoSuchElementException {
             if (currentURL == null) {
                 throw new NoSuchElementException("Location of " + current + " not found.");
             }
 
-            return new URLDataLocation(currentURL);
+            try {
+                return currentURL.toURI();
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         public String getCurrentName() throws NoSuchElementException {
@@ -210,7 +215,7 @@ public class JavaReduxFileCollection implements FileCollection {
             final String currentFileName = current.replace('.', '/').concat(".java");
 
             // may be null!
-            currentURL = KeYResourceManager.getManager().getResourceFile(JP2KeY.class,
+            currentURL = KeYResourceManager.getManager().getResourceFile(JavaService.class,
                 resourceLocation + "/" + currentFileName);
 
             return true;

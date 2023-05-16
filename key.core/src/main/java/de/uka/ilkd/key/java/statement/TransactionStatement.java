@@ -6,6 +6,8 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
 
+import com.github.javaparser.ast.key.KeyTransactionStatement;
+
 public class TransactionStatement extends JavaStatement {
 
     public static final String[] names = { "#beginJavaCardTransaction",
@@ -15,10 +17,10 @@ public class TransactionStatement extends JavaStatement {
 
     public TransactionStatement(int type) {
         super();
-        if (type != de.uka.ilkd.key.java.recoderext.TransactionStatement.BEGIN
-                && type != de.uka.ilkd.key.java.recoderext.TransactionStatement.COMMIT
-                && type != de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH
-                && type != de.uka.ilkd.key.java.recoderext.TransactionStatement.ABORT) {
+        if (type != KeyTransactionStatement.TransactionType.BEGIN.ordinal()
+                && type != KeyTransactionStatement.TransactionType.COMMIT.ordinal()
+                && type != KeyTransactionStatement.TransactionType.FINISH.ordinal()
+                && type != KeyTransactionStatement.TransactionType.ABORT.ordinal()) {
             throw new IllegalArgumentException("Wrong transaction statement type " + type);
         }
         this.type = type;

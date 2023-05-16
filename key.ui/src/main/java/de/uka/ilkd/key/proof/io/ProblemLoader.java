@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 import javax.swing.SwingWorker;
@@ -32,7 +32,8 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
 
     private final KeYMediator mediator;
 
-    public ProblemLoader(File file, List<File> classPath, File bootClassPath, List<File> includes,
+    public ProblemLoader(
+            Path file, List<Path> classPath, Path bootClassPath, List<Path> includes,
             Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs, KeYMediator mediator,
             boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
             Properties poPropertiesToForce, ProverTaskListener ptl) {

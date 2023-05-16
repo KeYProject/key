@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -18,18 +16,11 @@ import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
-public class SchemaJP2KeY extends JP2KeY implements SchemaJavaReader {
+public class SchemaJP2KeY extends JavaService implements SchemaJavaReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(SchemaJP2KeY.class);
 
     /** the namespace containing the program schema variables allowed here */
     protected Namespace<SchemaVariable> svns;
-
-    /** caches access to methods for reflection */
-    private final static HashMap<?, ?> schemaCt2meth = new LinkedHashMap<>(400);
-
-    /** caches constructor access for reflection */
-    private final static HashMap<?, ?> recClass2schemakeyClassCons =
-        new LinkedHashMap<>(400);
 
     // could this be the servConf of the super class?
     private static final SchemaCrossReferenceServiceConfiguration schemaServConf =
@@ -42,18 +33,6 @@ public class SchemaJP2KeY extends JP2KeY implements SchemaJavaReader {
     @Override
     protected JP2KeYConverter makeConverter(Services services, NamespaceSet nss) {
         return new SchemaRecoder2KeYConverter(this, services, nss);
-    }
-
-    /**
-     * returns the hashmap of a concrete RecodeR class to the constructor of its corresponding KeY
-     * class. Speeds up reflection. Attention must be overwritten by subclasses!
-     */
-    protected HashMap<?, ?> getKeYClassConstructorCache() {
-        return recClass2schemakeyClassCons;
-    }
-
-    protected HashMap<?, ?> getMethodCache() {
-        return schemaCt2meth;
     }
 
     public void setSVNamespace(Namespace<SchemaVariable> svns) {
@@ -145,7 +124,7 @@ public class SchemaJP2KeY extends JP2KeY implements SchemaJavaReader {
     /**
      * there is no need to parse special classes in this case, so this is empty
      *
-     * @see JP2KeY#parseSpecialClasses()
+     * @see JavaService#parseSpecialClasses()
      */
     public void parseSpecialClasses() {
     }

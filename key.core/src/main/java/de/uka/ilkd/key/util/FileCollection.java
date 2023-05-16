@@ -2,12 +2,12 @@ package de.uka.ilkd.key.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
-
-import recoder.io.DataLocation;
 
 /**
  * This class encapsulates a collection of files which is arbitrarily organised. It is iterable and
@@ -80,13 +80,14 @@ public interface FileCollection {
         String getCurrentName() throws NoSuchElementException;
 
         /**
-         * get a {@link DataLocation} object describing the current file. The dynamic type of the
+         * get a {@link URI} object describing the current file. The dynamic type of the
          * result depends on the implementation in use.
          *
-         * @return a {@link DataLocation}, not null
+         * @return a {@link URI}, not null
          * @throws NoSuchElementException if the previous call to step returned false.
          */
-        DataLocation getCurrentDataLocation() throws NoSuchElementException;
+        @Nonnull
+        URI getCurrentDataLocation() throws NoSuchElementException;
 
         /**
          * return the type of the structure that is iterated. Must return the same value for any

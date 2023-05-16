@@ -2,7 +2,6 @@ package de.uka.ilkd.key.parser;
 
 import java.io.IOException;
 
-import de.uka.ilkd.key.java.JP2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;

@@ -31,7 +31,7 @@ public class TestJP2KeY {
 
 
 
-    private static JP2KeY c2k;
+    private static JavaService c2k;
 
     // some non sense java blocks with lots of statements and expressions
     private static final String[] jblocks = new String[] {
@@ -98,7 +98,7 @@ public class TestJP2KeY {
     @BeforeEach
     public void setUp() {
         if (c2k == null) {
-            c2k = new JP2KeY(TacletForTests.services(),
+            c2k = new JavaService(TacletForTests.services(),
                 TacletForTests.services().getNamespaces());
         }
 

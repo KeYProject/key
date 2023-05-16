@@ -3,7 +3,6 @@ package de.uka.ilkd.key.logic;
 import java.io.IOException;
 import java.util.Stack;
 
-import de.uka.ilkd.key.java.JP2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;

@@ -2,6 +2,7 @@ package de.uka.ilkd.key.proof.init;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.*;
 
 import de.uka.ilkd.key.java.*;
@@ -234,8 +235,8 @@ public final class ProblemInitializer {
         // read Java source and classpath settings
         envInput.setInitConfig(initConfig);
         final String javaPath = envInput.readJavaPath();
-        final List<File> classPath = envInput.readClassPath();
-        final File bootClassPath;
+        final List<Path> classPath = envInput.readClassPath();
+        final Path bootClassPath;
         try {
             bootClassPath = envInput.readBootClassPath();
         } catch (IOException ioe) {
@@ -254,13 +255,17 @@ public final class ProblemInitializer {
         // weigl: 2021-01, Early including the includes of the KeYUserProblemFile,
         // this allows to use included symbols inside JML.
         for (var fileName : includes.getRuleSets()) {
-            KeYFile keyFile = new KeYFile(fileName.file().getName(), fileName, progMon,
-                envInput.getProfile(), fileRepo);
+            KeYFile keyFile =
+                new KeYFile(fileName.file().getFileName().toString(), fileName, progMon,
+                    envInput.getProfile(), fileRepo);
             readEnvInput(keyFile, initConfig);
         }
 
         // create Recoder2KeY, set classpath
-        final JP2KeY r2k = new JP2KeY(initConfig.getServices(), initConfig.namespaces());
+        final JavaService r2k = new JavaService(initConfig.getServices(), classPath/*
+                                                                                    * , initConfig.
+                                                                                    * namespaces()
+                                                                                    */);
         r2k.setClassPath(bootClassPath, classPath);
 
         // read Java (at least the library classes)
@@ -280,9 +285,8 @@ public final class ProblemInitializer {
                 }
             }
             // support for single file loading
-            final String[] cus = var.toArray(new String[0]);
             try {
-                r2k.readCompilationUnitsAsFiles(cus, fileRepo);
+                r2k.readCompilationUnitsAsFiles(var, fileRepo);
             } catch (ParseExceptionInFile e) {
                 throw new ProofInputException(e);
             }
@@ -290,7 +294,7 @@ public final class ProblemInitializer {
             reportStatus("Reading Java libraries");
             r2k.parseSpecialClasses(fileRepo);
         }
-        File initialFile = envInput.getInitialFile();
+        Path initialFile = envInput.getInitialFile();
         initConfig.getServices().setJavaModel(
             JavaModel.createJavaModel(javaPath, classPath, bootClassPath, includes, initialFile));
     }

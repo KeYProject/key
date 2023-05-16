@@ -466,8 +466,9 @@ public abstract class AbstractPO implements IPersistablePO {
             proofConfig = environmentConfig.deepCopy();
         }
         final JavaModel javaModel = proofConfig.getServices().getJavaModel();
-        createProofHeader(javaModel.getModelDir(), javaModel.getClassPath(),
-            javaModel.getBootClassPath(), javaModel.getIncludedFiles(), proofConfig.getServices());
+        createProofHeader(javaModel.getModelDir().toString(), javaModel.getClassPath(),
+            javaModel.getBootClassPath().toString(), javaModel.getIncludedFiles(),
+            proofConfig.getServices());
 
         final Proof proof = createProofObject(proofName, header, poTerm, proofConfig);
 

@@ -71,7 +71,8 @@ public class HelperClassForTests {
         ProofAggregate result = null;
 
         try {
-            KeYUserProblemFile po = new KeYUserProblemFile("UpdatetermTest", file, null, profile);
+            KeYUserProblemFile po =
+                new KeYUserProblemFile("UpdatetermTest", file.toPath(), null, profile);
             pi = new ProblemInitializer(profile);
 
             result = pi.startProver(po, po);
@@ -89,7 +90,8 @@ public class HelperClassForTests {
 
     public ProofAggregate parseThrowException(File file, Profile profile)
             throws ProofInputException {
-        KeYUserProblemFile po = new KeYUserProblemFile("UpdatetermTest", file, null, profile);
+        KeYUserProblemFile po =
+            new KeYUserProblemFile("UpdatetermTest", file.toPath(), null, profile);
         ProblemInitializer pi = new ProblemInitializer(profile);
         return pi.startProver(po, po);
     }
@@ -163,7 +165,7 @@ public class HelperClassForTests {
             // Assert.assertTrue(javaFile.exists());
             // Load java file
             KeYEnvironment<DefaultUserInterfaceControl> environment =
-                KeYEnvironment.load(javaFile, null, null, null);
+                KeYEnvironment.load(javaFile.toPath(), null, null, null);
             try {
                 // Start proof
                 ImmutableSet<Contract> contracts =
@@ -199,7 +201,7 @@ public class HelperClassForTests {
             Proof proof = null;
             try {
                 // Load java file
-                environment = KeYEnvironment.load(javaFile, null, null, null);
+                environment = KeYEnvironment.load(javaFile.toPath(), null, null, null);
                 // Search type
                 KeYJavaType containerKJT =
                     environment.getJavaInfo().getTypeByClassName(containerTypeName);
@@ -308,7 +310,7 @@ public class HelperClassForTests {
 
     public static KeYEnvironment<DefaultUserInterfaceControl> createKeYEnvironment()
             throws ProblemLoaderException {
-        return KeYEnvironment.load(DUMMY_KEY_FILE);
+        return KeYEnvironment.load(DUMMY_KEY_FILE.toPath());
     }
 
 }

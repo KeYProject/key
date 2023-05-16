@@ -411,7 +411,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
         File selectedFile = null;
         if (proof != null) {
-            selectedFile = proof.getProofFile();
+            selectedFile = proof.getProofFile().toFile();
         }
         // Suggest default file name if required
         final String defaultName;

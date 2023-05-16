@@ -10,7 +10,6 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 import org.key_project.util.lookup.Lookup;
@@ -100,7 +99,8 @@ public class Services implements TermServices {
         nameRecorder = new NameRecorder();
     }
 
-    private Services(Profile profile, KeYJPMapping rec2key, HashMap<String, Counter> counters, ServiceCaches caches) {
+    private Services(Profile profile, KeYJPMapping rec2key, HashMap<String, Counter> counters,
+            ServiceCaches caches) {
         assert profile != null;
         assert counters != null;
         assert caches != null;
@@ -224,7 +224,8 @@ public class Services implements TermServices {
      */
     public Services copy(Profile profile, boolean shareCaches) {
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-        Services s = new Services(profile, getJavaInfo().getKeYProgModelInfo().rec2key().copy(), copyCounters(), newCaches);
+        Services s = new Services(profile, getJavaInfo().getKeYProgModelInfo().rec2key().copy(),
+            copyCounters(), newCaches);
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());

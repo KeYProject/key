@@ -41,7 +41,7 @@ public final class SLTypeResolver extends SLExpressionResolver {
                             return new SLExpression(containingType);
                         }
                         ProgramVariable et = javaInfo.getAttribute(
-                                PipelineConstants.IMPLICIT_ENCLOSING_THIS, containingType);
+                            PipelineConstants.IMPLICIT_ENCLOSING_THIS, containingType);
                         if (et != null) {
                             containingType = et.getKeYJavaType();
                         } else {

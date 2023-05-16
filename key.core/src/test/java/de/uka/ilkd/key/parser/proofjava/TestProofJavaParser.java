@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.parser.proofjava;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 import org.junit.jupiter.api.BeforeEach;

@@ -42,9 +42,9 @@ public class ProofScriptFromFileAction extends AbstractAction {
         } else {
             Proof currentProof = mediator.getSelectedProof();
             if (currentProof != null) {
-                File currentFile = currentProof.getProofFile();
+                var currentFile = currentProof.getProofFile();
                 if (currentFile != null) {
-                    dir = currentFile.getParentFile();
+                    dir = currentFile.getParent().toFile();
                 }
             } else {
                 dir = new File(".");

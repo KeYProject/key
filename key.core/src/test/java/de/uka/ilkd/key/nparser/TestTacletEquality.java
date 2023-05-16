@@ -93,8 +93,9 @@ public class TestTacletEquality {
         File file = new File(HelperClassForTests.TESTCASE_DIRECTORY, "merge/gcd.closed.proof");
         if (initConfig == null) {
             ProblemLoaderControl control = new DefaultUserInterfaceControl(null);
-            SingleThreadProblemLoader loader = new SingleThreadProblemLoader(file, null, null, null,
-                JavaProfile.getDefaultInstance(), true, control, false, null);
+            SingleThreadProblemLoader loader =
+                new SingleThreadProblemLoader(file.toPath(), null, null, null,
+                    JavaProfile.getDefaultInstance(), true, control, false, null);
             loader.load();
             initConfig = loader.getInitConfig();
             // uncomment the line, if you want to generate a new oracle file

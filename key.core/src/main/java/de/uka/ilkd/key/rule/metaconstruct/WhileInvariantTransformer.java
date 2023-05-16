@@ -26,6 +26,8 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import com.github.javaparser.ast.key.KeyTransactionStatement;
+
 public final class WhileInvariantTransformer {
     /** the outer label that is used to leave the while loop ('l1') */
     private final SchemaVariable outerLabel = SchemaVariableFactory
@@ -206,7 +208,7 @@ public final class WhileInvariantTransformer {
         JavaBlock mainJavaBlock = JavaBlock.createJavaBlock(transaction
                 ? new StatementBlock(resSta,
                     new TransactionStatement(
-                        de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH))
+                        KeyTransactionStatement.TransactionType.FINISH.ordinal()))
                 : new StatementBlock(resSta));
         return services.getTermBuilder().prog(loopBodyModality, mainJavaBlock, result,
             computeLoopBodyModalityLabels(termLabelState, services, applicationPos, rule, ruleApp,

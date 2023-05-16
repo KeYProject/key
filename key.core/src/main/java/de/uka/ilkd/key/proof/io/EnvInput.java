@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -61,14 +61,14 @@ public interface EnvInput {
      * gets the classpath elements to be considered here.
      */
     @Nonnull
-    List<File> readClassPath() throws ProofInputException;
+    List<Path> readClassPath() throws ProofInputException;
 
     /**
      * gets the boot classpath element, null if none set.
      *
      * @throws
      */
-    File readBootClassPath() throws IOException;
+    Path readBootClassPath() throws IOException;
 
     /**
      * Reads the input using the given modification strategy, i.e., parts of the input do not modify
@@ -86,11 +86,11 @@ public interface EnvInput {
     Profile getProfile();
 
     /**
-     * Returns the initial {@link File} which is loaded if available.
+     * Returns the initial {@link Path} which is loaded if available.
      *
-     * @return The initial {@link File} which is loaded or {@code null} otherwise.
+     * @return The initial {@link Path} which is loaded or {@code null} otherwise.
      */
-    File getInitialFile();
+    Path getInitialFile();
 
     /**
      * This flag determines whether the given path to the Java source should be considered as a

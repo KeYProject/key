@@ -577,7 +577,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
 
             if (sjb.javaBlock == null) {
-                JavaReader jr = new JP2KeY(services, nss);
+                JavaReader jr = new JavaService(services, nss);
                 try {
                     sjb.javaBlock = jr.readBlockWithProgramVariables(programVariables(), cleanJava);
                 } catch (Exception e1) {

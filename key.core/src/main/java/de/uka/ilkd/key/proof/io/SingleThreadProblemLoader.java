@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 
@@ -33,8 +33,9 @@ public class SingleThreadProblemLoader extends AbstractProblemLoader {
      *        defined by the loaded proof or {@code false} otherwise which still allows to work with
      *        the loaded {@link InitConfig}.
      */
-    public SingleThreadProblemLoader(File file, List<File> classPath, File bootClassPath,
-            List<File> includes, Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs,
+    public SingleThreadProblemLoader(
+            Path file, List<Path> classPath, Path bootClassPath,
+            List<Path> includes, Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs,
             ProblemLoaderControl control,
             boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
             Properties poPropertiesToForce) {

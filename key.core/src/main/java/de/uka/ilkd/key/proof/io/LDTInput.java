@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.init.Includes;
@@ -36,7 +36,6 @@ public class LDTInput implements EnvInput {
      * creates a representation of the LDT files to be used as input to the KeY prover.
      *
      * @param keyFiles an array containing the LDT .key files
-     * @param main the main class used to report the progress of reading
      */
     public LDTInput(KeYFile[] keyFiles, LDTInputListener listener, Profile profile) {
         assert profile != null;
@@ -82,21 +81,21 @@ public class LDTInput implements EnvInput {
 
 
     @Override
-    public String readJavaPath() throws ProofInputException {
+    public String readJavaPath() {
         return "";
     }
 
 
     // no class path elements here
     @Override
-    public List<File> readClassPath() throws ProofInputException {
+    public List<Path> readClassPath() {
         return null;
     }
 
 
     // no class path elements here
     @Override
-    public File readBootClassPath() {
+    public Path readBootClassPath() {
         return null;
     }
 
@@ -181,7 +180,7 @@ public class LDTInput implements EnvInput {
     }
 
     @Override
-    public File getInitialFile() {
+    public Path getInitialFile() {
         return null;
     }
 }

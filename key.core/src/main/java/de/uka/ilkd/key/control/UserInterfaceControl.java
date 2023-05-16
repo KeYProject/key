@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.control;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -19,7 +19,7 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 /**
  * Provides the user interface independent logic to manage multiple proofs. This includes:
  * <ul>
- * <li>Functionality to load files via {@link #load(Profile, File, List<File>, File, List<File>,
+ * <li>Functionality to load files via {@link #load(Profile, Path, List<Path>, Path, List<Path>,
  * Properties, boolean, Consumer<Proof>)}.</li>
  * <li>Functionality to instantiate new {@link Proof}s via
  * {@link #createProof(InitConfig, ProofOblInput)}.</li>
@@ -70,8 +70,8 @@ public interface UserInterfaceControl {
      * @return The opened {@link AbstractProblemLoader}.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    AbstractProblemLoader load(Profile profile, File file, List<File> classPaths,
-            File bootClassPath, List<File> includes, Properties poPropertiesToForce,
+    AbstractProblemLoader load(Profile profile, Path file, List<Path> classPaths,
+            Path bootClassPath, List<Path> includes, Properties poPropertiesToForce,
             boolean forceNewProfileOfNewProofs,
             Consumer<Proof> callbackProofLoaded) throws ProblemLoaderException;
 

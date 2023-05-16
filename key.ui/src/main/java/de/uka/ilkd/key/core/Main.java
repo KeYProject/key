@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -597,16 +598,16 @@ public final class Main {
      *
      * @return {@link File} object representing working directory.
      */
-    public static File getWorkingDir() {
+    public static Path getWorkingDir() {
         if (fileArguments != null && !fileArguments.isEmpty()) {
             File f = fileArguments.get(0);
             if (f.isDirectory()) {
-                return f;
+                return f.toPath();
             } else {
-                return f.getParentFile();
+                return f.toPath().getParent();
             }
         } else {
-            return IOUtil.getCurrentDirectory();
+            return IOUtil.getCurrentDirectory().toPath();
         }
     }
 

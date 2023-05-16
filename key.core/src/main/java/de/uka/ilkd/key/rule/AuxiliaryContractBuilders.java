@@ -43,6 +43,8 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import com.github.javaparser.ast.key.KeyTransactionStatement;
+
 /**
  * This contains various builders used in building formulae and terms for block and loop contracts.
  *
@@ -1564,7 +1566,7 @@ public final class AuxiliaryContractBuilders {
                 final Statement statement) {
             if (instantiation.isTransactional()) {
                 return new StatementBlock(statement, new TransactionStatement(
-                    de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH));
+                    KeyTransactionStatement.TransactionType.FINISH.ordinal()));
             } else {
                 if (statement instanceof StatementBlock) {
                     return (StatementBlock) statement;
