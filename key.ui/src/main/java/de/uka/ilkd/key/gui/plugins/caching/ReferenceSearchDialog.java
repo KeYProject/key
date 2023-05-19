@@ -94,7 +94,7 @@ public class ReferenceSearchDialog extends JDialog {
 
     private JButton getApplyButton() {
         if (applyButton == null) {
-            applyButton = new JButton("Copy");
+            applyButton = new JButton("Apply");
             applyButton.setToolTipText(
                 "Apply the results (i.e. copy steps into current proof)");
             applyButton.setEnabled(false);

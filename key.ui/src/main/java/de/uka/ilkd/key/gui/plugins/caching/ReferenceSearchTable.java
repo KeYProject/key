@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.gui.plugins.caching;
 
+import java.awt.*;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
@@ -38,8 +40,15 @@ class ReferenceSearchTable extends JTable implements TableModel {
     public ReferenceSearchTable(Proof proof, KeYMediator mediator) {
         this.setModel(this);
         this.openGoals = proof.openGoals().toList();
+        Collections.reverse(this.openGoals);
         this.mediator = mediator;
         getColumnModel().getColumn(1).setMinWidth(200);
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        Dimension d = super.getPreferredSize();
+        return new Dimension(d.width + 100, d.height);
     }
 
     @Override
@@ -90,7 +99,8 @@ class ReferenceSearchTable extends JTable implements TableModel {
                 return "no reference found";
             } else {
                 int i = mediator.getCurrentlyOpenedProofs().indexOf(c.getProof()) + 1;
-                return String.format("reference available (proof %d)", i);
+                return String.format("reference available (proof %d, node %d)", i,
+                    c.getNode().serialNr());
             }
         }
     }
