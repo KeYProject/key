@@ -8,10 +8,8 @@ import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -612,10 +610,6 @@ public class KeYProgModelInfo {
      */
     public ImmutableList<KeYJavaType> getAllSubtypes(KeYJavaType ct) {
         return asKeYJavaTypes(getAllRecoderSubtypes(ct));
-    }
-
-    private JP2KeYConverter createRecoder2KeY(Namespace<SchemaVariable> nss) {
-        return new JP2KeYConverter(services, rec2key(), nss, typeConverter);
     }
 
     public ImmutableList<KeYJavaType> findImplementations(Type ct, String name,

@@ -12,6 +12,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
+
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
@@ -142,5 +144,9 @@ public class JavaParserFactory {
 
     public ParseResult<BlockStmt> parseStatementBlock(String sr) {
         return createJavaParser().parseBlock(sr);
+    }
+
+    public ConstantExpressionEvaluator createConstantExpressionEvaluator() {
+        return new ConstantExpressionEvaluator(createJavaParser());
     }
 }

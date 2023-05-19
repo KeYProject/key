@@ -968,11 +968,12 @@ public class JavaService {
 
     public JavaService(Services services, Collection<Path> sourcePaths) {
         this.services = services;
-        converter = new JP2KeYConverter(services, mapping, schemaVariables, getTypeConverter());
         programFactory = new JavaParserFactory(sourcePaths);
+        typeConverter = new JP2KeYTypeConverter(services, programFactory.getTypeSolver(), mapping);
         // TODO javaparser the typesolver is not updated when changing
         // useSystemClassLoaderInResolution
-        typeConverter = new JP2KeYTypeConverter(services, programFactory.getTypeSolver(), mapping);
+        converter = new JP2KeYConverter(services, mapping, schemaVariables, typeConverter,
+            programFactory.createConstantExpressionEvaluator());
     }
 
     public JavaParserFactory getProgramFactory() {

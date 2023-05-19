@@ -18,6 +18,8 @@ import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
+import de.uka.ilkd.key.java.transformations.EvaluationException;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInProgram;
@@ -61,14 +63,17 @@ public class JP2KeYConverter {
     private final KeYJPMapping mapping;
     private final Namespace<SchemaVariable> schemaVariables;
     private final JP2KeYTypeConverter typeConverter;
+    private final ConstantExpressionEvaluator evaluator;
 
     public JP2KeYConverter(Services services, KeYJPMapping mapping,
             Namespace<SchemaVariable> schemaVariables,
-            JP2KeYTypeConverter typeConverter) {
+            JP2KeYTypeConverter typeConverter,
+            ConstantExpressionEvaluator evaluator) {
         this.services = services;
         this.mapping = mapping;
         this.schemaVariables = schemaVariables;
         this.typeConverter = typeConverter;
+        this.evaluator = evaluator;
     }
 
     public CompilationUnit processCompilationUnit(com.github.javaparser.ast.CompilationUnit cu) {
@@ -76,7 +81,8 @@ public class JP2KeYConverter {
     }
 
     public Object process(Node block) {
-        return block.accept(new JP2KeYVisitor(services, mapping, typeConverter, schemaVariables),
+        return block.accept(
+            new JP2KeYVisitor(services, mapping, typeConverter, schemaVariables, evaluator),
             null);
     }
 }
@@ -87,6 +93,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     private final KeYJPMapping mapping;
     private final JP2KeYTypeConverter typeConverter;
     private final Namespace<SchemaVariable> svns;
+    private final ConstantExpressionEvaluator evaluator;
     /**
      * Hashmap from variable spec to
      * <code>ProgramVariable</code>; this is necessary to avoid cycles when converting initializers.
@@ -97,11 +104,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         new LinkedHashMap<>();
 
     JP2KeYVisitor(Services services, KeYJPMapping mapping, JP2KeYTypeConverter typeConverter,
-            Namespace<SchemaVariable> schemaVariables) {
+            Namespace<SchemaVariable> schemaVariables, ConstantExpressionEvaluator evaluator) {
         this.services = services;
         this.mapping = mapping;
         this.typeConverter = typeConverter;
         svns = schemaVariables;
+        this.evaluator = evaluator;
     }
 
     private void reportError(Node n, String message) {
@@ -854,7 +862,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 var lit = (IntegerLiteralExpr) expr;
                 var num = lit.asNumber();
                 if (num instanceof Long) {
-                    if (-num.longValue() != (long)Integer.MIN_VALUE) {
+                    if (-num.longValue() != (long) Integer.MIN_VALUE) {
                         reportUnsupportedElement(n);
                     }
                     return new IntLiteral(pi, c, Integer.MIN_VALUE);
@@ -963,15 +971,13 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var init = spec.decl.getInitializer();
 
         if (init.isPresent()) {
-            // TODO javaparser needs java parser
-            // var ce = new ConstantExpressionEvaluator(javaParser);
-            // try {
-            // var expr = ce.evaluate(init.get());
-            // if (expr.isLiteralExpr()) {
-            // return getLiteralFor(expr.asLiteralExpr());
-            // }
-            // } catch (EvaluationException ignored) {
-            // }
+            try {
+                var expr = evaluator.evaluate(init.get());
+                if (expr.isLiteralExpr()) {
+                    return getLiteralFor(expr.asLiteralExpr());
+                }
+            } catch (EvaluationException ignored) {
+            }
         }
 
         return null;
