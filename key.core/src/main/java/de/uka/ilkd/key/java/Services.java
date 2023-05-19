@@ -10,7 +10,6 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 import org.key_project.util.lookup.Lookup;
 
@@ -95,7 +94,7 @@ public class Services implements TermServices {
         cee = new ConstantExpressionEvaluator(this);
         typeconverter = new TypeConverter(this);
         javainfo = new JavaInfo(
-            new KeYProgModelInfo(this, typeconverter, new KeYRecoderExcHandler()), this);
+            new KeYProgModelInfo(this, typeconverter), this);
         nameRecorder = new NameRecorder();
     }
 

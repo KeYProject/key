@@ -10,7 +10,6 @@ import javax.xml.parsers.SAXParserFactory;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.DirectoryFileCollection;
 import de.uka.ilkd.key.util.FileCollection.Walker;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

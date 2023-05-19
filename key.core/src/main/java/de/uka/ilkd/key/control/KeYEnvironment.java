@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.control;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;

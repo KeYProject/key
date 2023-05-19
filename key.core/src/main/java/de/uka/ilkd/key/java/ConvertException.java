@@ -27,20 +27,4 @@ public class ConvertException extends RuntimeException {
     public ConvertException(String errmsg, Throwable cause) {
         super(errmsg, cause);
     }
-
-    public recoder.parser.ParseException parseException() {
-        if (getCause() instanceof recoder.parser.ParseException) {
-            return (recoder.parser.ParseException) getCause();
-        } else {
-            return null;
-        }
-    }
-
-    public de.uka.ilkd.key.parser.proofjava.ParseException proofJavaException() {
-        if (getCause() instanceof de.uka.ilkd.key.parser.proofjava.ParseException) {
-            return (de.uka.ilkd.key.parser.proofjava.ParseException) getCause();
-        } else {
-            return null;
-        }
-    }
 }

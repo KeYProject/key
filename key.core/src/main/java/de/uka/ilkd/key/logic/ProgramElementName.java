@@ -128,17 +128,6 @@ public class ProgramElementName extends Name
         return Position.UNDEFINED;
     }
 
-    /**
-     * Returns the relative position (number of blank heading lines and columns) of the primary
-     * token of this element. To get the relative position of the syntactical first token, call the
-     * corresponding method of <CODE>getFirstElement()</CODE>.
-     *
-     * @return the relative position of the primary token.
-     */
-    public recoder.java.SourceElement.Position getRelativePosition() {
-        return recoder.java.SourceElement.Position.UNDEFINED;
-    }
-
 
     public PositionInfo getPositionInfo() {
         return PositionInfo.UNDEFINED;

@@ -13,7 +13,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -43,13 +42,11 @@ public class KeYProgModelInfo {
     private final KeYJPMapping mapping;
     private final JP2KeYTypeConverter typeConverter;
     private final Map<KeYJavaType, Map<String, IProgramMethod>> implicits = new LinkedHashMap<>();
-    private KeYRecoderExcHandler exceptionHandler = null;
     // TODO javaparser what is this
     private JavaService javaService;
 
     public KeYProgModelInfo(Services services, KeYJPMapping mapping,
-            JP2KeYTypeConverter typeConverter, KeYRecoderExcHandler keh) {
-        exceptionHandler = keh;
+            JP2KeYTypeConverter typeConverter) {
         this.services = services;
         this.typeConverter = typeConverter;
         this.mapping = mapping;
@@ -58,10 +55,6 @@ public class KeYProgModelInfo {
 
     public KeYJPMapping rec2key() {
         return mapping;
-    }
-
-    public KeYRecoderExcHandler getExceptionHandler() {
-        return exceptionHandler;
     }
 
     /**
@@ -536,8 +529,10 @@ public class KeYProgModelInfo {
                 .toKeY(javaService.getTypeSolver().getSolvedJavaLangObject()));
 
         for (Field aJavaLangObjectField : javaLangObjectField) {
-            if (!((recoder.abstraction.Field) rec2key().toRecoder(aJavaLangObjectField))
-                    .isPrivate()) {
+            // TODO javaparser FieldDeclaration? was recoder.Field
+            if (!((com.github.javaparser.ast.body.FieldDeclaration) rec2key()
+                    .toRecoder(aJavaLangObjectField))
+                            .isPrivate()) {
                 result = result.append(aJavaLangObjectField);
             }
         }
@@ -623,17 +618,6 @@ public class KeYProgModelInfo {
         return new JP2KeYConverter(services, rec2key(), nss, typeConverter);
     }
 
-
-    /**
-     * Parses a given JavaBlock using an empty context.
-     *
-     * @param block a String describing a java block
-     * @return the parsed and resolved JavaBlock
-     *         public JavaBlock readJavaBlock(String block, NamespaceSet nss) {
-     *         return createRecoder2KeY(nss).readBlockWithEmptyContext(block);
-     *         }
-     */
-
     public ImmutableList<KeYJavaType> findImplementations(Type ct, String name,
             ImmutableList<KeYJavaType> signature) {
         // set up recoder inputs
@@ -709,8 +693,10 @@ public class KeYProgModelInfo {
         return method.isSolved();
     }
 
-    private boolean isDeclaringInterface(recoder.abstraction.ClassType ct, String name,
-            List<recoder.abstraction.Type> signature) {
+    private boolean isDeclaringInterface(/*
+                                          * recoder.abstraction.ClassType ct, String name,
+                                          * List<recoder.abstraction.Type> signature
+                                          */) {
         // TODO Weigl does not compile
         // Debug.assertTrue(ct.isInterface());
         // List<recoder.abstraction.Method> list = si.getMethods(ct);
@@ -733,6 +719,6 @@ public class KeYProgModelInfo {
 
 
     public KeYProgModelInfo copy() {
-        return new KeYProgModelInfo(services, rec2key().copy(), typeConverter, exceptionHandler);
+        return new KeYProgModelInfo(services, rec2key().copy(), typeConverter);
     }
 }

@@ -30,7 +30,6 @@ import org.key_project.util.collection.ImmutableArray;
 import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.ConstantEvaluator;
 
 public final class TypeConverter {
     public static final Logger LOGGER = LoggerFactory.getLogger(TypeConverter.class);
@@ -326,9 +325,6 @@ public final class TypeConverter {
             return convertToInstanceofTerm((Instanceof) pe, ec);
         } else if (pe instanceof de.uka.ilkd.key.java.expression.Operator) {
             return translateOperator((de.uka.ilkd.key.java.expression.Operator) pe, ec);
-        } else if (pe instanceof recoder.abstraction.PrimitiveType) {
-            throw new IllegalArgumentException(
-                "TypeConverter could not handle" + " this primitive type");
         } else {
             assert !(pe instanceof MetaClassReference) : "not supported";
         }
@@ -748,6 +744,7 @@ public final class TypeConverter {
 
         ConstantExpressionEvaluator cee = services.getConstantExpressionEvaluator();
 
+        // TODO javaparser
         ConstantEvaluator.EvaluationResult res = new ConstantEvaluator.EvaluationResult();
 
         try {

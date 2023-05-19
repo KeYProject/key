@@ -11,8 +11,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.ExtList;
 
-import recoder.java.declaration.EnumConstantDeclaration;
-
 /**
  * This class is used for wrapping an enum into a standard class type.
  *
@@ -38,17 +36,17 @@ public class EnumClassDeclaration extends ClassDeclaration {
      * @param children children in the ast (members)
      * @param fullName of the class/enum
      * @param isLibrary see class constructor
-     * @param enumConstantDeclarations the declarations for the enum constants
      */
-    public EnumClassDeclaration(ExtList children, ProgramElementName fullName, boolean isLibrary,
-            List<EnumConstantDeclaration> enumConstantDeclarations) {
-
+    // TODO javaparser
+    public EnumClassDeclaration(
+            ExtList children, ProgramElementName fullName, boolean isLibrary
+    /* , List<EnumConstantDeclaration> enumConstantDeclarations */) {
         super(children, fullName, isLibrary);
 
-        for (EnumConstantDeclaration ecd : enumConstantDeclarations) {
-            String constName = ecd.getEnumConstantSpecification().getName();
-            constants.add(findAttr(constName));
-        }
+        // for (EnumConstantDeclaration ecd : enumConstantDeclarations) {
+        // String constName = ecd.getEnumConstantSpecification().getName();
+        // constants.add(findAttr(constName));
+        // }
     }
 
     /*

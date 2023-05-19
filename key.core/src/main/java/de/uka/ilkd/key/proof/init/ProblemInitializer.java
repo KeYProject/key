@@ -20,7 +20,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
@@ -43,9 +42,6 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.io.PathList;
-import recoder.io.ProjectSettings;
-
 
 public final class ProblemInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProblemInitializer.class);
@@ -438,33 +434,34 @@ public final class ProblemInitializer {
         // methods and
         // the synchronized statement can not be avoided for this reason.
 
-        synchronized (SchemaJavaParser.class) {
-            // It is required to work with a copy to make this method thread save required by the
-            // Eclipse plug-ins.
-            InitConfig currentBaseConfig = baseConfig != null ? baseConfig.copy() : null;
-            progressStarted(this);
-            alreadyParsed.clear();
+        // TODO javaparser
+        // synchronized (SchemaJavaParser.class) {
+        // It is required to work with a copy to make this method thread save required by the
+        // Eclipse plug-ins.
+        InitConfig currentBaseConfig = baseConfig != null ? baseConfig.copy() : null;
+        progressStarted(this);
+        alreadyParsed.clear();
 
-            // the first time, read in standard rules
-            Profile profile = services.getProfile();
-            if (currentBaseConfig == null || profile != currentBaseConfig.getProfile()) {
-                currentBaseConfig = new InitConfig(services);
-                RuleSource tacletBase = profile.getStandardRules().getTacletBase();
-                if (tacletBase != null) {
-                    KeYFile tacletBaseFile = new KeYFile("taclet base",
-                        profile.getStandardRules().getTacletBase(), progMon, profile);
-                    readEnvInput(tacletBaseFile, currentBaseConfig);
-                }
-                // remove traces of the generic sorts within the base configuration
-                cleanupNamespaces(currentBaseConfig);
-                baseConfig = currentBaseConfig;
+        // the first time, read in standard rules
+        Profile profile = services.getProfile();
+        if (currentBaseConfig == null || profile != currentBaseConfig.getProfile()) {
+            currentBaseConfig = new InitConfig(services);
+            RuleSource tacletBase = profile.getStandardRules().getTacletBase();
+            if (tacletBase != null) {
+                KeYFile tacletBaseFile = new KeYFile("taclet base",
+                    profile.getStandardRules().getTacletBase(), progMon, profile);
+                readEnvInput(tacletBaseFile, currentBaseConfig);
             }
-            InitConfig ic = prepare(envInput, currentBaseConfig);
-            if (Debug.ENABLE_DEBUG) {
-                print(ic);
-            }
-            return ic;
+            // remove traces of the generic sorts within the base configuration
+            cleanupNamespaces(currentBaseConfig);
+            baseConfig = currentBaseConfig;
         }
+        InitConfig ic = prepare(envInput, currentBaseConfig);
+        if (Debug.ENABLE_DEBUG) {
+            print(ic);
+        }
+        return ic;
+        // }
     }
 
     private void print(Proof firstProof) {

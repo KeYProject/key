@@ -161,18 +161,6 @@ public final class ProgramMethod extends ObserverFunction
         return pi.getEndPosition();
     }
 
-    /**
-     * Returns the relative position (number of blank heading lines and columns) of the primary
-     * token of this element. To get the relative position of the syntactical first token, call the
-     * corresponding method of <CODE>getFirstElement()</CODE>.
-     *
-     * @return the relative position of the primary token.
-     */
-    @Override
-    public recoder.java.SourceElement.Position getRelativePosition() {
-        return pi.getRelativePosition();
-    }
-
     @Override
     public PositionInfo getPositionInfo() {
         return pi;

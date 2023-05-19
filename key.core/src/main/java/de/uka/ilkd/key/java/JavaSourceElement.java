@@ -130,23 +130,10 @@ public abstract class JavaSourceElement implements SourceElement {
         return posInfo.getEndPosition();
     }
 
-    /**
-     * Returns the relative position (number of blank heading lines and columns) of the primary
-     * token of this element. To get the relative position of the syntactical first token, call the
-     * corresponding method of <CODE>getFirstElement()</CODE>.
-     *
-     * @return the relative position of the primary token.
-     */
-    public recoder.java.SourceElement.Position getRelativePosition() {
-        return posInfo.getRelativePosition();
-    }
-
 
     public PositionInfo getPositionInfo() {
         return posInfo;
     }
-
-
 
     /** toString */
     public String toString() {

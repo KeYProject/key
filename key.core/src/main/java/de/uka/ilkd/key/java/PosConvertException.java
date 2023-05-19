@@ -2,14 +2,11 @@ package de.uka.ilkd.key.java;
 
 
 import java.net.MalformedURLException;
+import java.net.URL;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
-
-import recoder.java.CompilationUnit;
-import recoder.kit.UnitKit;
-import recoder.service.UnresolvedReferenceException;
 
 /**
  * A convert exception enriched with a location within a file/source.
@@ -23,7 +20,7 @@ public class PosConvertException extends ConvertException implements HasLocation
     /**
      * The file this error references. May be null.
      */
-    private String file;
+    private URL file;
 
     /**
      * The position
@@ -49,7 +46,7 @@ public class PosConvertException extends ConvertException implements HasLocation
      * @param position the position
      * @param file the file that contains the error
      */
-    public PosConvertException(String message, Position position, String file) {
+    public PosConvertException(String message, Position position, URL file) {
         super(message);
         this.position = position;
         this.file = file;
@@ -67,15 +64,6 @@ public class PosConvertException extends ConvertException implements HasLocation
     @Nullable
     @Override
     public Location getLocation() throws MalformedURLException {
-        Throwable cause = getCause();
-        if (this.file == null) {
-            if (cause instanceof UnresolvedReferenceException) {
-                UnresolvedReferenceException ure = (UnresolvedReferenceException) cause;
-                CompilationUnit cu = UnitKit.getCompilationUnit(ure.getUnresolvedReference());
-                String dataloc = cu.getDataLocation().toString();
-                this.file = dataloc.substring(dataloc.indexOf(':') + 1);
-            }
-        }
         return new Location(file, position);
     }
 }

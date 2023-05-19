@@ -201,10 +201,6 @@ public class TestMiscTools {
             assertEquals("jar:" + tmpZipURI + "!/" + "entry%20with%20!bang!.txt", read.toString());
         }
 
-        // test for SpecDataLocation
-        DataLocation specDataLoc = new SpecDataLocation("UNKNOWN", "unknown");
-        assertEquals("urn:UNKNOWN:unknown", MiscTools.extractURI(specDataLoc).toString());
-
         // test for DataFileLocation
         DataLocation fileDataLoc = new DataFileLocation(tmp.toFile());
         assertEquals(tmpURI, MiscTools.extractURI(fileDataLoc));

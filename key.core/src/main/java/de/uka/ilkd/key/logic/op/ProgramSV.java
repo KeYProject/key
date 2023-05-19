@@ -94,11 +94,6 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
     }
 
     @Override
-    public recoder.java.SourceElement.Position getRelativePosition() {
-        return recoder.java.SourceElement.Position.UNDEFINED;
-    }
-
-    @Override
     public PositionInfo getPositionInfo() {
         return PositionInfo.UNDEFINED;
     }

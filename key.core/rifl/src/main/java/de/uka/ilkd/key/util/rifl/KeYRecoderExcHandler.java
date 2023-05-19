@@ -1,9 +1,11 @@
-package de.uka.ilkd.key.util;
+package de.uka.ilkd.key.util.rifl;
 
 
 import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.List;
+
+import de.uka.ilkd.key.util.ExceptionHandlerException;
 
 
 public class KeYRecoderExcHandler implements recoder.service.ErrorHandler {

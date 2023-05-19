@@ -163,12 +163,6 @@ public abstract class ProgramVariable extends AbstractSortedOperator
 
 
     @Override
-    public recoder.java.SourceElement.Position getRelativePosition() {
-        return recoder.java.SourceElement.Position.UNDEFINED;
-    }
-
-
-    @Override
     public PositionInfo getPositionInfo() {
         return PositionInfo.UNDEFINED;
     }

@@ -350,9 +350,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 .map(it -> it.getPath().toUri()).orElse(null);
         Position startPos = Position.newOneBased(r.begin.line, r.begin.column);
         Position endPos = Position.newOneBased(r.end.line, r.end.column);
-        // TODO weigl what to do with a relative position? what is this thing?
-        recoder.java.SourceElement.Position relPos = recoder.java.SourceElement.Position.UNDEFINED;
-        return new PositionInfo(relPos, startPos, endPos, uri);
+        return new PositionInfo(startPos, endPos, uri);
     }
 
     @Override

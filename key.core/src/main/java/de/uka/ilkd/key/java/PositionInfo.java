@@ -4,8 +4,6 @@ import java.net.URI;
 import java.nio.file.Paths;
 import javax.annotation.Nonnull;
 
-import recoder.java.SourceElement;
-
 /**
  * represents a group of three Positions: relativePosition, startPosition, endPosition
  *
@@ -21,12 +19,6 @@ public class PositionInfo {
      * PositionInfo with undefined positions.
      */
     public static final PositionInfo UNDEFINED = new PositionInfo();
-
-    /**
-     * TODO: What is the purpose of this? To which position is this one relative?
-     */
-    @Nonnull
-    private final SourceElement.Position relPos;
 
     /**
      * The start position.
@@ -53,7 +45,6 @@ public class PositionInfo {
     private URI parentClassURI;
 
     private PositionInfo() {
-        this.relPos = SourceElement.Position.UNDEFINED;
         this.startPos = Position.UNDEFINED;
         this.endPos = Position.UNDEFINED;
         fileURI = UNKNOWN_URI;
@@ -62,12 +53,10 @@ public class PositionInfo {
     /**
      * Creates a new PositionInfo without resource information but only with positions.
      *
-     * @param relPos the relative position
      * @param startPos the start position
      * @param endPos the end position
      */
-    public PositionInfo(SourceElement.Position relPos, Position startPos, Position endPos) {
-        this.relPos = relPos;
+    public PositionInfo(Position startPos, Position endPos) {
         this.startPos = startPos;
         this.endPos = endPos;
         fileURI = UNKNOWN_URI;
@@ -76,14 +65,11 @@ public class PositionInfo {
     /**
      * Creates a new PositionInfo without the given resource information.
      *
-     * @param relPos the relative position
      * @param startPos the start position
      * @param endPos the end position
      * @param fileURI the resource the PositionInfo refers to
      */
-    public PositionInfo(SourceElement.Position relPos, Position startPos, Position endPos,
-            URI fileURI) {
-        this.relPos = relPos;
+    public PositionInfo(Position startPos, Position endPos, URI fileURI) {
         this.startPos = startPos;
         this.endPos = endPos;
         if (fileURI == null) {
@@ -140,10 +126,6 @@ public class PositionInfo {
         return fileURI;
     }
 
-    public SourceElement.Position getRelativePosition() {
-        return relPos;
-    }
-
     public Position getStartPosition() {
         return startPos;
     }
@@ -192,8 +174,7 @@ public class PositionInfo {
         } else {
             end = p2.endPos;
         }
-        // TODO: join relative position as well
-        return new PositionInfo(SourceElement.Position.UNDEFINED, start, end, p1.getURI());
+        return new PositionInfo(start, end, p1.getURI());
     }
 
     /**
@@ -211,8 +192,8 @@ public class PositionInfo {
         if (this == PositionInfo.UNDEFINED) {
             return "UNDEFINED";
         } else {
-            return ((fileURI == UNKNOWN_URI ? "" : fileURI) + " rel. Pos: " + relPos
-                + " start Pos: " + startPos + " end Pos: " + endPos);
+            return ((fileURI == UNKNOWN_URI ? "" : fileURI) + " start Pos: " + startPos
+                + " end Pos: " + endPos);
         }
     }
 

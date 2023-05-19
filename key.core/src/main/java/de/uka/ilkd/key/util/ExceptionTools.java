@@ -2,16 +2,12 @@ package de.uka.ilkd.key.util;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.parser.proofjava.ParseException;
-import de.uka.ilkd.key.parser.proofjava.Token;
-import de.uka.ilkd.key.parser.proofjava.TokenMgrError;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
 import org.antlr.runtime.RecognitionException;
@@ -50,10 +46,6 @@ public final class ExceptionTools {
         Location location = null;
         if (exc instanceof HasLocation) {
             return ((HasLocation) exc).getLocation();
-        } else if (exc instanceof ParseException) {
-            location = getLocation((ParseException) exc);
-        } else if (exc instanceof TokenMgrError) {
-            location = getLocation((TokenMgrError) exc);
         }
 
         if (location == null && exc.getCause() != null) {
@@ -63,18 +55,11 @@ public final class ExceptionTools {
         return location;
     }
 
-    @Nullable
-    private static Location getLocation(ParseException exc) {
-        // JavaCC has 1-based column numbers
-        Token token = exc.currentToken;
-        return token == null ? null
-                : new Location((URL) null, Position.fromToken(token.next));
-    }
-
     private static URL parseFileName(String filename) throws MalformedURLException {
         return filename == null ? null : MiscTools.parseURL(filename);
     }
 
+    // TODO javaparser this was not unused
     @Nullable
     private static Location getLocation(RecognitionException exc) throws MalformedURLException {
         // ANTLR 3 - Recognition Exception.
@@ -85,15 +70,4 @@ public final class ExceptionTools {
         }
         return null;
     }
-
-    private static Location getLocation(TokenMgrError exc) {
-        Matcher m = TOKEN_MGR_ERR_PATTERN.matcher(exc.getMessage());
-        if (m.find()) {
-            int line = Integer.parseInt(m.group(1));
-            int col = Integer.parseInt(m.group(2));
-            return new Location((URL) null, Position.newOneBased(line, col));
-        }
-        return null;
-    }
-
 }

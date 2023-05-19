@@ -19,6 +19,4 @@ public interface Label extends TerminalProgramElement {
 
     Position getEndPosition();
 
-    recoder.java.SourceElement.Position getRelativePosition();
-
 }
