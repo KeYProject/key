@@ -171,26 +171,21 @@ public class JavaService {
      * Each element of the array is treated as a filename to read in.
      *
      * @param cUnitStrings a list of strings, each element is interpreted as a file to be
-     *        read. not null.
-     * @param fileRepo the fileRepo which will store the files
+     *                     read. not null.
+     * @param fileRepo     the fileRepo which will store the files
      * @return a new list containing the recoder compilation units corresponding
-     *         to the given files.
+     * to the given files.
      * @throws ParseExceptionInFile any exception occurring while treating the file is wrapped
-     *         into a parse exception that contains the filename.
+     *                              into a parse exception that contains the filename.
      */
-
     public List<de.uka.ilkd.key.java.CompilationUnit> readCompilationUnitsAsFiles(
             Collection<String> cUnitStrings, FileRepo fileRepo)
-            throws ParseExceptionInFile {
+            throws JavaBuildingExceptions {
 
         List<CompilationUnit> cUnits = recoderCompilationUnitsAsFiles(cUnitStrings, fileRepo);
         var result = new ArrayList<de.uka.ilkd.key.java.CompilationUnit>(cUnits.size());
         for (CompilationUnit cu : cUnits) {
-            try {
-                result.add(getConverter().processCompilationUnit(cu));
-            } catch (Exception e) {
-                throw new ParseExceptionInFile("", e); // Find a better solution
-            }
+            result.add(getConverter().processCompilationUnit(cu));
         }
         return result;
     }
@@ -202,13 +197,13 @@ public class JavaService {
      * Each element of the array is treated as a filename to read in.
      *
      * @param filenames a list of strings, each element is interpreted as a file to be
-     *        read. not null.
-     * @param fileRepo the fileRepo which will store the files
+     *                  read. not null.
+     * @param fileRepo  the fileRepo which will store the files
      * @return a new list containing the recoder compilation units corresponding
-     *         to the given files.
+     * to the given files.
      */
     private List<CompilationUnit> recoderCompilationUnitsAsFiles(Collection<String> filenames,
-            FileRepo fileRepo)
+                                                                 FileRepo fileRepo)
             throws BuildingExceptions {
         List<CompilationUnit> cUnits = new ArrayList<>();
         parseSpecialClasses(fileRepo);
@@ -244,14 +239,14 @@ public class JavaService {
                     .map(b -> b.begin)
                     .orElse(new Position(-1, -1));
             return new BuildingIssue(it.getVerboseMessage(),
-                null, false,
-                de.uka.ilkd.key.java.Position.newOneBased(loc.line, loc.column));
+                    null, false,
+                    de.uka.ilkd.key.java.Position.newOneBased(loc.line, loc.column));
         }).collect(Collectors.toList());
         throw new BuildingExceptions(be);
     }
 
     private ParseResult<CompilationUnit> parseCompilationUnit(String filename,
-            @Nullable FileRepo fileRepo) {
+                                                              @Nullable FileRepo fileRepo) {
         try {
             Reader is;
             if (fileRepo != null)
@@ -268,12 +263,12 @@ public class JavaService {
 
         } catch (FileNotFoundException e) {
             return new ParseResult<>(null,
-                Collections.singletonList(new Problem("Could not find " + filename, null, e)),
-                new CommentsCollection());
+                    Collections.singletonList(new Problem("Could not find " + filename, null, e)),
+                    new CommentsCollection());
         } catch (IOException e) {
             return new ParseResult<>(null,
-                Collections.singletonList(new Problem("I/O error reading: " + filename, null, e)),
-                new CommentsCollection());
+                    Collections.singletonList(new Problem("I/O error reading: " + filename, null, e)),
+                    new CommentsCollection());
         }
     }
 
@@ -293,7 +288,7 @@ public class JavaService {
      * read a number of compilation units, each given as a string.
      *
      * @param cUnitStrings an array of strings, each element represents a compilation
-     *        unit
+     *                     unit
      * @return a list of KeY structured compilation units.
      */
     List<CompilationUnit> recoderCompilationUnits(List<String> cUnitStrings) {
@@ -311,7 +306,7 @@ public class JavaService {
 
         // transform program
         final var collect =
-            cUnits.stream().map(it -> it.getResult().get()).collect(Collectors.toList());
+                cUnits.stream().map(it -> it.getResult().get()).collect(Collectors.toList());
         transformModel(collect);
         return collect;
     }
@@ -384,7 +379,7 @@ public class JavaService {
         var seq = paths.parallel().map(it -> {
             try {
                 final var inputStream =
-                    fileRepo == null ? it.openStream() : fileRepo.getInputStream(it);
+                        fileRepo == null ? it.openStream() : fileRepo.getInputStream(it);
                 try (Reader f = new BufferedReader(new InputStreamReader(inputStream))) {
                     return getProgramFactory().parseCompilationUnit(f);
                 }
@@ -448,8 +443,8 @@ public class JavaService {
             while (walker.step()) {
                 currentDataLocation = walker.getCurrentLocation();
                 try (InputStream is = walker.openCurrent(fileRepo);
-                        Reader isr = new InputStreamReader(is);
-                        Reader f = new BufferedReader(isr)) {
+                     Reader isr = new InputStreamReader(is);
+                     Reader f = new BufferedReader(isr)) {
                     var rcu = getProgramFactory().parseCompilationUnit(f);
                     reportErrors(rcu);
                     var cu = rcu.getResult().get();
@@ -466,8 +461,8 @@ public class JavaService {
             while (walker.step()) {
                 currentDataLocation = walker.getCurrentLocation();
                 try (InputStream is = walker.openCurrent(fileRepo);
-                        Reader isr = new InputStreamReader(is);
-                        Reader f = new BufferedReader(isr)) {
+                     Reader isr = new InputStreamReader(is);
+                     Reader f = new BufferedReader(isr)) {
                     var rcu = getProgramFactory().parseCompilationUnit(f);
                     reportErrors(rcu);
                     var cu = rcu.getResult().get();
@@ -499,8 +494,8 @@ public class JavaService {
          */
 
         var rcu = getProgramFactory().parseCompilationUnit(
-            new StringReader("public class " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS +
-                " { public static void " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_METHOD + "() {}  }"));
+                new StringReader("public class " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS +
+                        " { public static void " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_METHOD + "() {}  }"));
         reportErrors(rcu);
         rcuList.add(rcu.getResult().get());
         return rcuList;
@@ -526,7 +521,7 @@ public class JavaService {
             public void visit(MethodDeclaration n, Void arg) {
                 if (!allowed && n.getBody().isPresent()) {
                     LOGGER.warn("Method body ({}) should not be allowed: {}", n.getNameAsString(),
-                        rcu.getStorage());
+                            rcu.getStorage());
                 }
                 n.setBody(null);
             }
@@ -644,7 +639,7 @@ public class JavaService {
      */
     protected MethodDeclaration embedBlock(BlockStmt block) {
         MethodDeclaration mdecl = new MethodDeclaration(new NodeList<>(), new VoidType(),
-            "$virtual_method_for_parsing");
+                "$virtual_method_for_parsing");
         mdecl.setBody(block);
         return mdecl;
     }
@@ -652,13 +647,13 @@ public class JavaService {
     /**
      * wraps a RECODER MethodDeclaration in a class
      *
-     * @param mdecl the declaration.MethodDeclaration to wrap
+     * @param mdecl   the declaration.MethodDeclaration to wrap
      * @param context the declaration.ClassDeclaration where the method
-     *        has to be embedded
+     *                has to be embedded
      * @return the enclosing declaration.ClassDeclaration
      */
     protected ClassOrInterfaceDeclaration embedMethod(MethodDeclaration mdecl,
-            TypeScope.JPContext context) {
+                                                      TypeScope.JPContext context) {
         ClassOrInterfaceDeclaration classContext = context.getClassDeclaration();
         classContext.addMember(mdecl);
         /*
@@ -706,10 +701,10 @@ public class JavaService {
      * add a list of variables to a context
      *
      * @param classContext context to add to
-     * @param vars vars to add
+     * @param vars         vars to add
      */
     private void addProgramVariablesToClassContext(ClassOrInterfaceDeclaration classContext,
-            ImmutableList<ProgramVariable> vars) {
+                                                   ImmutableList<ProgramVariable> vars) {
         Set<String> names = new HashSet<>();
 
         for (ProgramVariable var : vars) {
@@ -739,7 +734,7 @@ public class JavaService {
 
 
             FieldDeclaration recVar = new FieldDeclaration(new NodeList<>(),
-                new VariableDeclarator(name2typeReference(typeName), keyVarSpec.getName()));
+                    new VariableDeclarator(name2typeReference(typeName), keyVarSpec.getName()));
 
             classContext.addMember(recVar);
             insertToMap(recVar.getVariables().get(0), keyVarSpec);
@@ -800,9 +795,9 @@ public class JavaService {
      * parses a given JavaBlock using the context to determine the right
      * references and returns a statement block of recoder.
      *
-     * @param block a String describing a java block
+     * @param block   a String describing a java block
      * @param context CompilationUnit in which the block has to be
-     *        interpreted
+     *                interpreted
      * @return the parsed and resolved recoder statement block
      */
     BlockStmt recoderBlock(String block, TypeScope.JPContext context) {
@@ -827,7 +822,7 @@ public class JavaService {
 
     private TransformationPipelineServices createPipelineServices(List<CompilationUnit> cUnits) {
         TransformationPipelineServices.TransformerCache cache =
-            new TransformationPipelineServices.TransformerCache(cUnits);
+                new TransformationPipelineServices.TransformerCache(cUnits);
         return new TransformationPipelineServices(programFactory, cache);
     }
 
@@ -836,9 +831,9 @@ public class JavaService {
      * parses a given JavaBlock using the context to determine the right
      * references
      *
-     * @param block a String describing a java block
+     * @param block   a String describing a java block
      * @param context CompilationUnit in which the block has to be
-     *        interprested
+     *                interprested
      * @return the parsed and resolved JavaBlock
      */
     public JavaBlock readBlock(String block, TypeScope.JPContext context) {
@@ -866,7 +861,7 @@ public class JavaService {
      * @return the parsed and resolved JavaBlock
      */
     public JavaBlock readBlockWithProgramVariables(Namespace<IProgramVariable> variables,
-            String s) {
+                                                   String s) {
         ImmutableList<ProgramVariable> pvs = ImmutableSLList.nil();
         for (IProgramVariable n : variables.allElements()) {
             if (n instanceof ProgramVariable) {
@@ -885,7 +880,7 @@ public class JavaService {
      */
     private ClassOrInterfaceDeclaration interactClassDecl() {
         var classContext = new ClassOrInterfaceDeclaration(new NodeList<>(), false,
-            "$virtual_class_for_parsing" + interactCounter.incrementAndGet());
+                "$virtual_class_for_parsing" + interactCounter.incrementAndGet());
         return classContext;
     }
 
@@ -926,12 +921,12 @@ public class JavaService {
             column = Integer.parseInt(pos.substring(pos.indexOf('/') + 1));
         } catch (NumberFormatException nfe) {
             LOGGER.debug(
-                "recoder2key:unresolved reference at " + "line:" + line + " column:" + column);
+                    "recoder2key:unresolved reference at " + "line:" + line + " column:" + column);
             return new int[0];
         } catch (StringIndexOutOfBoundsException siexc) {
             return new int[0];
         }
-        return new int[] { line, column };
+        return new int[]{line, column};
     }
 
     /**
@@ -939,7 +934,7 @@ public class JavaService {
      * attached to the resulting exception.
      *
      * @param message message to be used.
-     * @param t the cause of the exceptional case
+     * @param t       the cause of the exceptional case
      * @throws ConvertException always
      */
     public static void reportError(String message, Throwable t) {
@@ -957,7 +952,7 @@ public class JavaService {
         final RuntimeException rte;
         if (pos.length > 0) {
             rte = new PosConvertException(message,
-                de.uka.ilkd.key.java.Position.newOneBased(pos[0], pos[1]));
+                    de.uka.ilkd.key.java.Position.newOneBased(pos[0], pos[1]));
             rte.initCause(cause);
         } else {
             rte = new ConvertException(message, cause);
@@ -973,7 +968,7 @@ public class JavaService {
         // TODO javaparser the typesolver is not updated when changing
         // useSystemClassLoaderInResolution
         converter = new JP2KeYConverter(services, mapping, schemaVariables, typeConverter,
-            programFactory.createConstantExpressionEvaluator());
+                programFactory.createConstantExpressionEvaluator());
     }
 
     public JavaParserFactory getProgramFactory() {
