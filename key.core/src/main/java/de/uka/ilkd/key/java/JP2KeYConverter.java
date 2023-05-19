@@ -848,12 +848,26 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(UnaryExpr n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
+        if (n.getOperator() == UnaryExpr.Operator.MINUS) {
+            var expr = n.getExpression();
+            if (expr instanceof IntegerLiteralExpr) {
+                var lit = (IntegerLiteralExpr) expr;
+                var num = lit.asNumber();
+                if (num instanceof Long) {
+                    if (-num.longValue() != (long)Integer.MIN_VALUE) {
+                        reportUnsupportedElement(n);
+                    }
+                    return new IntLiteral(pi, c, Integer.MIN_VALUE);
+                }
+            }
+            return new Negative(pi, c, accept(expr));
+        }
         Expression child = accept(n.getExpression());
         switch (n.getOperator()) {
         case PLUS:
             return new Positive(pi, c, child);
         case MINUS:
-            return new Negative(pi, c, child);
+            throw new IllegalStateException();
         case PREFIX_INCREMENT:
             return new PreIncrement(pi, c, child);
         case PREFIX_DECREMENT:
@@ -867,6 +881,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         case POSTFIX_DECREMENT:
             return new PostDecrement(pi, c, child);
         }
+        reportUnsupportedElement(n);
         return null;
     }
 
