@@ -399,6 +399,12 @@ public class Node implements Iterable<Node> {
         children.clear();
     }
 
+    public void replaceChild(int i, Node newChild) {
+        children.set(i, newChild);
+        newChild.parent = this;
+        newChild.siblingNr = i;
+    }
+
     /**
      * Removes child/parent relationship between the given node and this node; if the given node is
      * not child of this node, nothing happens and then and only then false is returned.
@@ -825,5 +831,14 @@ public class Node implements Iterable<Node> {
 
     void setStepIndex(int stepIndex) {
         this.stepIndex = stepIndex;
+    }
+
+    public Node getFirstInBranch() {
+        Node candidate = this;
+        while (candidate.parent != null
+                && candidate.parent.getBranchLocation().equals(candidate.getBranchLocation())) {
+            candidate = candidate.parent;
+        }
+        return candidate;
     }
 }
