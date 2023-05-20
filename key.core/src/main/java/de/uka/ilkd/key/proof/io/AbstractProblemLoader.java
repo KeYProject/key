@@ -437,8 +437,7 @@ public abstract class AbstractProblemLoader {
      * @throws IOException Occurred Exception.
      */
     protected EnvInput createEnvInput(FileRepo fileRepo) throws IOException {
-
-        final Path filename = file.getFileName();
+        final var filename = file.getFileName().toString();
 
         // set the root directory of the FileRepo (used for resolving paths)
         fileRepo.setBaseDir(file);

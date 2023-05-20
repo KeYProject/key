@@ -34,26 +34,22 @@ public class OpenFileAction extends MainWindowAction {
         int result = fc.showOpenDialog(mainWindow);
 
         if (result == JFileChooser.APPROVE_OPTION) {
-            File file = fc.getSelectedFile();
+            var file = fc.getSelectedFile().toPath();
 
             // special case proof bundles -> allow to select the proof to load
-            if (ProofSelectionDialog.isProofBundle(file.toPath())) {
-                Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
-                if (proofPath == null) {
-                    // canceled by user!
-                } else {
-                    mainWindow.loadProofFromBundle(file, proofPath.toFile());
-                }
+            if (ProofSelectionDialog.isProofBundle(file)) {
+                Path proofPath = ProofSelectionDialog.chooseProofToLoad(file);
+                mainWindow.loadProofFromBundle(file, proofPath);
                 return;
             }
 
             if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getNotifyLoadBehaviour()
                     && file.toString().endsWith(".java")) {
                 JCheckBox checkbox = new JCheckBox("Don't show this warning again");
-                Object[] message = { "When you load a Java file, all java files in the current",
-                    "directory and all subdirectories will be loaded as well.", checkbox };
+                Object[] message = {"When you load a Java file, all java files in the current",
+                        "directory and all subdirectories will be loaded as well.", checkbox};
                 JOptionPane.showMessageDialog(mainWindow, message, "Please note",
-                    JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.WARNING_MESSAGE);
                 ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                         .setNotifyLoadBehaviour(!checkbox.isSelected());
                 ProofIndependentSettings.DEFAULT_INSTANCE.saveSettings();

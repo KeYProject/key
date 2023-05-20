@@ -6,8 +6,6 @@ import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.util.Debug;
@@ -21,7 +19,6 @@ import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
-import com.github.javaparser.resolution.MethodUsage;
 import com.github.javaparser.resolution.declarations.*;
 import com.github.javaparser.resolution.logic.MethodResolutionCapability;
 import com.github.javaparser.resolution.types.ResolvedArrayType;
@@ -78,15 +75,13 @@ public class KeYProgModelInfo {
     }
 
     @Nonnull
-    private Set<MethodUsage> getAllRecoderMethods(KeYJavaType kjt) {
+    private List<ResolvedMethodDeclaration> getAllRecoderMethods(KeYJavaType kjt) {
         if (kjt.getJavaType() instanceof TypeDeclaration) {
             // TODO javaparser this does not work, type map
-            com.github.javaparser.ast.body.TypeDeclaration<?> o =
-                (com.github.javaparser.ast.body.TypeDeclaration<?>) rec2key().toRecoder(kjt);
-            var rtype = o.resolve();
+            var rtype = rec2key().toRecoder(kjt).asReferenceType();
             return rtype.getAllMethods();
         }
-        return Collections.emptySet();
+        return Collections.emptyList();
     }
 
 
@@ -100,8 +95,9 @@ public class KeYProgModelInfo {
     public ImmutableList<IProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
         var rmethods = getAllRecoderMethods(kjt);
         ImmutableList<IProgramMethod> result = ImmutableSLList.nil();
-        for (MethodUsage rm : rmethods) {
-            IProgramMethod m = (IProgramMethod) rec2key().toKeY(rm.getDeclaration().toAst().get());
+        for (var rm : rmethods) {
+            var declaration = rm.toAst();
+            IProgramMethod m = (IProgramMethod) rec2key().toKeY(declaration.get());
             if (m != null) {
                 result = result.prepend(m);
             }
@@ -128,8 +124,8 @@ public class KeYProgModelInfo {
 
     private Optional<CompilationUnit> getCompilationUnit(KeYJavaType kjt) {
         var type = getJPType(kjt);
-        var rt = type.asClassOrInterfaceType().resolve();
-        var td = rt.asReferenceType().getTypeDeclaration().get();
+        var rt = type.asReferenceType();
+        var td = rt.getTypeDeclaration().get();
         var node = td.asClass().toAst().get();
         return node.findCompilationUnit();
     }
@@ -150,25 +146,18 @@ public class KeYProgModelInfo {
      * @return the full name of t as a String.
      */
     public String getFullName(KeYJavaType t) {
-        var rt = (com.github.javaparser.ast.type.Type) rec2key().toRecoder(t);
-        if (rt.isClassOrInterfaceType())
-            return rt.asClassOrInterfaceType().getNameWithScope();
+        var rt = rec2key().toRecoder(t);
+        if (rt.isReferenceType())
+            return rt.asReferenceType().getQualifiedName();
         return rt.toDescriptor();
-    }
-
-    private com.github.javaparser.ast.type.Type getType(TypeReference tr) {
-        if (tr instanceof TypeRef) {
-            return (com.github.javaparser.ast.type.Type) rec2key().toRecoder(tr.getKeYJavaType());
-        }
-        return null;
     }
 
 
     public boolean isFinal(KeYJavaType kjt) {
-        var recoderType = (com.github.javaparser.ast.type.Type) rec2key().toRecoder(kjt);
-        if (recoderType.isClassOrInterfaceType()) { // TODO weigl enum declarations and records!
-            var rt = recoderType.asClassOrInterfaceType().resolve();
-            var td = rt.asReferenceType().getTypeDeclaration().get();
+        var recoderType = rec2key().toRecoder(kjt);
+        if (recoderType.isReferenceType()) { // TODO weigl enum declarations and records!
+            var rt = recoderType.asReferenceType();
+            var td = rt.getTypeDeclaration().get();
             var node = (NodeWithModifiers<?>) td.asClass().toAst().get();
             return node.hasModifier(Modifier.Keyword.FINAL);
         } else { // array or primitive type
@@ -184,15 +173,11 @@ public class KeYProgModelInfo {
      *         false in the other case.
      */
     public boolean isSubtype(KeYJavaType subType, KeYJavaType superType) {
-        return isSubtype((com.github.javaparser.ast.type.Type) rec2key().toRecoder(subType),
-            (com.github.javaparser.ast.type.Type) rec2key().toRecoder(superType));
+        return isSubtype(rec2key().toRecoder(subType), rec2key().toRecoder(superType));
     }
 
-    private boolean isSubtype(com.github.javaparser.ast.type.Type subType,
-            com.github.javaparser.ast.type.Type superType) {
-        var a = subType.resolve();
-        var b = superType.resolve();
-        return b.isAssignableBy(a); // TODO weigl check if it is the right method and order.
+    private boolean isSubtype(ResolvedType subType, ResolvedType superType) {
+        return superType.isAssignableBy(subType); // TODO weigl check if it is the right method and order.
 
         /*
          * if (subType instanceof ClassOrInterfaceType && superType instanceof ClassOrInterfaceType)
@@ -280,18 +265,18 @@ public class KeYProgModelInfo {
     private List<com.github.javaparser.ast.body.ConstructorDeclaration> getRecoderConstructors(
             KeYJavaType ct) {
         var type = getJPType(ct);
-        var rtype = type.resolve();
+        var rtype = type;
         // TODO weigl return rtype.asReferenceType().;
         return null;
     }
 
-    private com.github.javaparser.ast.type.Type getJPType(KeYJavaType ct) {
-        return (com.github.javaparser.ast.type.Type) rec2key().toRecoder(ct);
+    private ResolvedType getJPType(KeYJavaType ct) {
+        return rec2key().toRecoder(ct);
     }
 
     private List<ResolvedMethodDeclaration> getMethods(KeYJavaType ct, String name,
             ImmutableList<? extends Type> signature, KeYJavaType context) {
-        var rct = getJPType(ct).resolve();
+        var rct = getJPType(ct);
         var rcontext = getJPType(context);
 
         var methods = rct.asReferenceType().getAllMethods();
@@ -476,7 +461,7 @@ public class KeYProgModelInfo {
         if (ct.getJavaType() instanceof ArrayType) {
             return getVisibleArrayFields(ct);
         }
-        return asKeYFieldsR(getJPType(ct).resolve().asReferenceType().getDeclaredFields());
+        return asKeYFieldsR(getJPType(ct).asReferenceType().getDeclaredFields());
     }
 
 
@@ -495,7 +480,7 @@ public class KeYProgModelInfo {
         if (ct.getJavaType() instanceof ArrayDeclaration) {
             return getVisibleArrayFields(ct);
         }
-        var t = getJPType(ct).resolve().asReferenceType();
+        var t = getJPType(ct).asReferenceType();
         return asKeYFieldsR(t.getAllFieldsVisibleToInheritors());
     }
 
@@ -541,7 +526,7 @@ public class KeYProgModelInfo {
      * returns all proper subtypes of class <code>ct</code> (i.e. without <code>ct</code> itself)
      */
     private List<ResolvedReferenceTypeDeclaration> getAllRecoderSubtypes(KeYJavaType ct) {
-        var rt = getJPType(ct).resolve();
+        var rt = getJPType(ct);
         // TODO javaparser get all known java types in classpath
         // best approximation is to use the recoder2key mapping
 
@@ -569,7 +554,7 @@ public class KeYProgModelInfo {
      * @return
      */
     private List<ResolvedReferenceType> getAllRecoderSupertypes(KeYJavaType ct) {
-        return getJPType(ct).resolve().asReferenceType().getAllAncestors();
+        return getJPType(ct).asReferenceType().getAllAncestors();
     }
 
 

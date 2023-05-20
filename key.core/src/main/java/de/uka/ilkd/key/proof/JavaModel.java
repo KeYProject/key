@@ -70,10 +70,10 @@ public final class JavaModel {
         this.bootClassPath = bootClassPath == null ? null : bootClassPath.toAbsolutePath();
         StringBuilder sb2 = new StringBuilder();
         if (includes != null) {
-            List<Path> includeList = includes.getFiles();
+            var includeList = includes.getIncludes();
             if (!includeList.isEmpty()) {
-                for (Path f : includeList) {
-                    sb2.append("\"").append(f.toAbsolutePath()).append("\", ");
+                for (var f : includeList) {
+                    sb2.append("\"").append(f).append("\", ");
                 }
                 sb2.setLength(sb2.length() - 2);
             }

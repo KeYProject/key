@@ -10,8 +10,10 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.github.javaparser.ast.key.sv.*;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
@@ -23,6 +25,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.*;
 import de.uka.ilkd.key.util.parsing.BuildingExceptions;
@@ -63,15 +66,6 @@ import org.slf4j.LoggerFactory;
  */
 public class JavaService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaService.class);
-    private Namespace<SchemaVariable> schemaVariables;
-
-    /**
-     * the File object that describes the directory from which the internal
-     * classes are to be read. They are read in differently - therefore the
-     * second category. A null value indicates that the boot classes are to
-     * be read from an internal repository.
-     */
-    private Path bootClassPath;
 
     /**
      * this mapping stores the relation between recoder and KeY entities in a
@@ -79,7 +73,7 @@ public class JavaService {
      * <p>
      * It is used for syntactical structures and types.
      */
-    private final KeYJPMapping mapping = new KeYJPMapping();
+    private final KeYJPMapping mapping;
 
     /**
      * Counter used to enumerate the anonymous implicit classes used in parsing of Java Fragments
@@ -114,13 +108,18 @@ public class JavaService {
     private final JavaParserFactory programFactory;
 
 
+    public JP2KeYConverter getConverter() {
+        return converter;
+    }
+
     /**
      * return the associated converter object
      *
      * @return not null
      */
-    public JP2KeYConverter getConverter() {
-        return converter;
+    public JP2KeYConverter getConverter(Namespace<SchemaVariable> schemaVariables) {
+        return new JP2KeYConverter(services, mapping, schemaVariables, typeConverter,
+                programFactory.createConstantExpressionEvaluator());
     }
 
     /**
@@ -221,6 +220,7 @@ public class JavaService {
 
     private <T> void reportErrors(ParseResult<T> result) {
         if (!result.isSuccessful()) {
+            result.getProblems().forEach(it -> LOGGER.error("Error in {}.", it, it.getCause().orElse(null)));
             reportErrors(result.getProblems().stream());
         }
     }
@@ -314,8 +314,10 @@ public class JavaService {
     // ----- parsing libraries
 
     public void setClassPath(Path bootClassPath, List<Path> classPath) {
-        this.bootClassPath = bootClassPath;
-        this.programFactory.setSourcePaths(classPath);
+        programFactory.setBootClassPath(bootClassPath);
+        for (Path path : classPath) {
+            addSourcePath(path);
+        }
     }
 
     /**
@@ -359,36 +361,38 @@ public class JavaService {
     private List<CompilationUnit> parseInternalClasses(FileRepo fileRepo) throws IOException {
         Stream<URL> paths;
 
-        if (bootClassPath == null) {
+        if (programFactory.getBootClassPath() == null) {
             var bootCollection = new JavaReduxFileCollection(services.getProfile());
             paths = bootCollection.getResources();
         } else {
-            paths = Files.walk(bootClassPath)
+            paths = Files.walk(programFactory.getBootClassPath())
                     .filter(it -> it.getFileName().endsWith(".java")
                             || it.getFileName().endsWith(".jml"))
                     .map(it -> {
                         try {
                             return it.toUri().toURL();
                         } catch (MalformedURLException e) {
-                            e.printStackTrace();
+                            LOGGER.error("Could not get URL for {}", it, e);
                         }
                         return null;
                     });
         }
 
-        var seq = paths.parallel().map(it -> {
-            try {
-                final var inputStream =
-                        fileRepo == null ? it.openStream() : fileRepo.getInputStream(it);
-                try (Reader f = new BufferedReader(new InputStreamReader(inputStream))) {
-                    return getProgramFactory().parseCompilationUnit(f);
-                }
-                // Set storage location?
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }).collect(Collectors.toList());
+        var seq = paths.parallel()
+                .filter(Objects::nonNull)
+                .map(it -> {
+                    try {
+                        final var inputStream =
+                                fileRepo == null ? it.openStream() : fileRepo.getInputStream(it);
+                        try (Reader f = new BufferedReader(new InputStreamReader(inputStream))) {
+                            return getProgramFactory().parseCompilationUnit(f);
+                        }
+                        // Set storage location?
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }).collect(Collectors.toList());
 
         if (seq.stream().anyMatch(it -> !it.isSuccessful())) {
             reportErrors(seq.stream().flatMap(it -> it.getProblems().stream()));
@@ -577,8 +581,9 @@ public class JavaService {
             // make them available to the rec2key mapping
             for (CompilationUnit cu : specialClasses) {
                 var dl = cu.getStorage();
-                if (dl.isEmpty())
-                    throw new AssertionError("DataLocation not set on compilation unit");
+                // weigl: allowed for fragments
+                // if (dl.isEmpty())
+                //    throw new AssertionError("DataLocation not set on compilation unit");
                 getConverter().processCompilationUnit(cu);
             }
 
@@ -619,8 +624,12 @@ public class JavaService {
      *
      * @param cUnits a list of compilation units, not null.
      */
-
     protected void transformModel(List<CompilationUnit> cUnits) {
+        // weigl: Exclude java fragments for speed-up:
+        // These fragments are boring: No JML, no constructors, no initializer. And therefore
+        // no need for pre-transformation.
+        cUnits = cUnits.stream().filter(it -> !it.getType(0).getNameAsString().equals(JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS))
+                .collect(Collectors.toList());
         KeYJavaPipeline pipeline = KeYJavaPipeline.createDefault(createPipelineServices(cUnits));
         pipeline.apply();
     }
@@ -802,18 +811,20 @@ public class JavaService {
      */
     BlockStmt recoderBlock(String block, TypeScope.JPContext context) {
         parseSpecialClasses();
-        var bl = getProgramFactory().parseStatementBlock(block);
+        var bl = getProgramFactory().parseContextBlock(block);
         if (!bl.isSuccessful()) {
             reportErrors(bl);
         }
-        final var blockStmt = bl.getResult().get();
-        embedMethod(embedBlock(blockStmt), context);
+        // TODO weigl further eloborate the situation, how to work with contexts provided?
+        final KeyContextStatementBlock blockStmt = bl.getResult().get();
+        BlockStmt block1 = new BlockStmt(blockStmt.getStatements());
+        embedMethod(embedBlock(block1), context);
         // normalise constant string expressions
         List<CompilationUnit> cunits = new ArrayList<>();
         cunits.add(context.getCompilationUnitContext());
         new ConstantStringExpressionEvaluator(createPipelineServices())
                 .apply(context.getClassDeclaration());
-        return blockStmt;
+        return block1;
     }
 
     private TransformationPipelineServices createPipelineServices() {
@@ -831,25 +842,46 @@ public class JavaService {
      * parses a given JavaBlock using the context to determine the right
      * references
      *
-     * @param block   a String describing a java block
-     * @param context CompilationUnit in which the block has to be
-     *                interprested
+     * @param block           a String describing a java block
+     * @param context         CompilationUnit in which the block has to be
+     *                        interprested
+     * @param allowSchemaJava if parameter is non-null SchemaJava is allowed and the namespace is used to resolve symbols
      * @return the parsed and resolved JavaBlock
      */
-    public JavaBlock readBlock(String block, TypeScope.JPContext context) {
+    public JavaBlock readBlock(String block, TypeScope.JPContext context, Namespace<SchemaVariable> allowSchemaJava) {
         var sb = recoderBlock(block, context);
-        return JavaBlock.createJavaBlock((StatementBlock) getConverter().process(sb));
+        if (allowSchemaJava == null && containsSchemaJava(sb)) {
+            throw new RuntimeException("SchemaJava unexpected in the given block");
+        }
+        return JavaBlock.createJavaBlock((StatementBlock) getConverter(allowSchemaJava).process(sb));
+    }
+
+    private boolean containsSchemaJava(Node node) {
+        return node.stream().anyMatch(it -> isSchemaJavaNode(node));
+    }
+
+    /**
+     * A SchemaJava node is a node that represents a schema variable,e.g., {@code #s}.
+     * We exploit the naming convention inside key-javaparser.
+     *
+     * @param node
+     * @return true if type name of the node matches "Key*SV".
+     */
+    private boolean isSchemaJavaNode(@Nonnull Node node) {
+        String typeName = node.getMetaModel().getTypeName();
+        return typeName.startsWith("Key") && typeName.endsWith("SV");
     }
 
     /**
      * parses a given JavaBlock using the context to determine the right
      * references using an empty context
      *
-     * @param block a String describing a java block
+     * @param block           a String describing a java block
+     * @param allowSchemaJava if parameter is non-null SchemaJava is allowed and the namespace is used to resolve symbols
      * @return the parsed and resolved JavaBlock
      */
-    public JavaBlock readBlockWithEmptyContext(String block) {
-        return readBlock(block, createEmptyContext());
+    public JavaBlock readBlockWithEmptyContext(String block, @Nullable Namespace<SchemaVariable> allowSchemaJava) {
+        return readBlock(block, createEmptyContext(), allowSchemaJava);
     }
 
     /**
@@ -857,18 +889,19 @@ public class JavaService {
      * references using an empty context. The variables of the namespace are
      * used to create a new class context
      *
-     * @param s a String describing a java block
+     * @param allowSchemaJava if parameter is non-null SchemaJava is allowed and the namespace is used to resolve symbols
+     * @param s               a String describing a java block
      * @return the parsed and resolved JavaBlock
      */
-    public JavaBlock readBlockWithProgramVariables(Namespace<IProgramVariable> variables,
-                                                   String s) {
+    public JavaBlock readBlockWithProgramVariables(Namespace<IProgramVariable> variables, String s,
+                                                   Namespace<SchemaVariable> allowSchemaJava) {
         ImmutableList<ProgramVariable> pvs = ImmutableSLList.nil();
         for (IProgramVariable n : variables.allElements()) {
             if (n instanceof ProgramVariable) {
                 pvs = pvs.append((ProgramVariable) n); // preserve the order (nested namespaces!)
             }
         }
-        return readBlock(s, createContext(pvs));
+        return readBlock(s, createContext(pvs), allowSchemaJava);
     }
 
     /**
@@ -962,24 +995,54 @@ public class JavaService {
     }
 
     public JavaService(Services services, Collection<Path> sourcePaths) {
+        this(services, new KeYJPMapping(),
+                Paths.get(JavaProfile.getDefaultProfile().getInternalClassDirectory()), sourcePaths);
+    }
+
+    public JavaService(Services services, KeYJPMapping mapping, Path bootClassPath, Collection<Path> sourcePaths) {
         this.services = services;
-        programFactory = new JavaParserFactory(sourcePaths);
+        this.mapping = mapping;
+        programFactory = new JavaParserFactory(bootClassPath, sourcePaths);
         typeConverter = new JP2KeYTypeConverter(services, programFactory.getTypeSolver(), mapping);
-        // TODO javaparser the typesolver is not updated when changing
-        // useSystemClassLoaderInResolution
-        converter = new JP2KeYConverter(services, mapping, schemaVariables, typeConverter,
+        converter = new JP2KeYConverter(services, mapping, new Namespace<>(), typeConverter,
                 programFactory.createConstantExpressionEvaluator());
     }
+
 
     public JavaParserFactory getProgramFactory() {
         return programFactory;
     }
 
+    @Nonnull
     public JavaSymbolSolver getSymbolResolver() {
         return programFactory.getSymbolSolver();
     }
 
     public TypeSolver getTypeSolver() {
         return programFactory.getTypeSolver();
+    }
+
+
+    public void addSourcePath(Path javaPath) {
+        var classpath = programFactory.getSourcePaths();
+
+        if (classpath.contains(javaPath)) {
+            return; // ignore that path is already set
+        }
+
+        for (Path path : classpath) {
+            if (javaPath.startsWith(path)) {
+                throw new IllegalStateException("A parent of this path is already given in the classpath");
+            }
+
+            if (path.startsWith(javaPath)) {
+                throw new IllegalStateException("A child folder of this path is already given in the classpath");
+            }
+        }
+        classpath.add(javaPath);
+    }
+
+    public void addSourcePath(String javaPath) {
+        addSourcePath(Paths.get(javaPath).toAbsolutePath());
     }
 }

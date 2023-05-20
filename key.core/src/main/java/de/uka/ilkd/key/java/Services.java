@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java;
 
+import java.nio.file.Path;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
@@ -13,12 +15,17 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 
 import org.key_project.util.lookup.Lookup;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * this is a collection of common services to the KeY prover. Services include information on the
  * underlying Java model and a converter to transform Java program elements to logic (where
  * possible) and back.
  */
 public class Services implements TermServices {
+    @Nullable
+    private KeYJPMapping mapping;
     /**
      * the proof
      */
@@ -44,7 +51,8 @@ public class Services implements TermServices {
     /**
      * the information object on the Java model
      */
-    private final JavaInfo javainfo;
+    @Nullable
+    private JavaInfo javainfo;
 
     /**
      * variable namer for inner renaming
@@ -69,7 +77,7 @@ public class Services implements TermServices {
     private NameRecorder nameRecorder;
 
     private ITermProgramVariableCollectorFactory factory =
-        TermProgramVariableCollector::new;
+            TermProgramVariableCollector::new;
 
     private final Profile profile;
 
@@ -79,27 +87,22 @@ public class Services implements TermServices {
 
     private final TermBuilder termBuilderWithoutCache;
 
+    @Nullable
+    private JavaService javaService;
+
     /**
      * creates a new Services object with a new TypeConverter and a new JavaInfo object with no
      * information stored at none of these.
      */
     public Services(Profile profile) {
-        assert profile != null;
-        this.profile = profile;
-        this.counters = new LinkedHashMap<>();
-        this.caches = new ServiceCaches();
-        this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
-        this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
-        this.specRepos = new SpecificationRepository(this);
-        cee = new ConstantExpressionEvaluator(this);
-        typeconverter = new TypeConverter(this);
-        javainfo = new JavaInfo(
-            new KeYProgModelInfo(this, typeconverter), this);
-        nameRecorder = new NameRecorder();
+        this(profile, new LinkedHashMap<>(), new ServiceCaches());
     }
 
-    private Services(Profile profile, KeYJPMapping rec2key, HashMap<String, Counter> counters,
-            ServiceCaches caches) {
+    private Services(Profile profile, HashMap<String, Counter> counters, ServiceCaches caches) {
+        this(profile, new KeYJPMapping(), counters, caches);
+    }
+
+    private Services(Profile profile, KeYJPMapping mapping, HashMap<String, Counter> counters, ServiceCaches caches) {
         assert profile != null;
         assert counters != null;
         assert caches != null;
@@ -110,9 +113,11 @@ public class Services implements TermServices {
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
         this.specRepos = new SpecificationRepository(this);
-        cee = new ConstantExpressionEvaluator(this);
+        this.cee = new ConstantExpressionEvaluator();
+
         typeconverter = new TypeConverter(this);
-        javainfo = new JavaInfo(new KeYProgModelInfo(this, rec2key, typeconverter), this);
+        this.mapping = mapping;
+        nameRecorder = new NameRecorder();
         nameRecorder = new NameRecorder();
     }
 
@@ -129,6 +134,7 @@ public class Services implements TermServices {
         this.nameRecorder = s.nameRecorder;
         this.factory = s.factory;
         this.caches = s.caches;
+        this.javaService = s.javaService;
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
     }
@@ -164,6 +170,7 @@ public class Services implements TermServices {
     /**
      * Returns the JavaInfo associated with this Services object.
      */
+    @Nonnull
     public JavaInfo getJavaInfo() {
         return javainfo;
     }
@@ -203,8 +210,8 @@ public class Services implements TermServices {
      * be used for a new proof.
      *
      * @param shareCaches {@code true} The created {@link Services} will use the same
-     *        {@link ServiceCaches} like this instance; {@code false} the created {@link Services}
-     *        will use a new empty {@link ServiceCaches} instance.
+     *                    {@link ServiceCaches} like this instance; {@code false} the created {@link Services}
+     *                    will use a new empty {@link ServiceCaches} instance.
      * @return the copy
      */
     public Services copy(boolean shareCaches) {
@@ -215,16 +222,17 @@ public class Services implements TermServices {
      * Creates a copy of this {@link Services} in which the {@link Profile} is replaced. The copy
      * does not belong to a {@link Proof} object and can hence be used for a new proof.
      *
-     * @param profile The new {@link Profile} to use in the copy of this {@link Services}.
+     * @param profile     The new {@link Profile} to use in the copy of this {@link Services}.
      * @param shareCaches {@code true} The created {@link Services} will use the same
-     *        {@link ServiceCaches} like this instance; {@code false} the created {@link Services}
-     *        will use a new empty {@link ServiceCaches} instance.
+     *                    {@link ServiceCaches} like this instance; {@code false} the created {@link Services}
+     *                    will use a new empty {@link ServiceCaches} instance.
      * @return The created copy.
      */
     public Services copy(Profile profile, boolean shareCaches) {
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-        Services s = new Services(profile, getJavaInfo().getKeYProgModelInfo().rec2key().copy(),
-            copyCounters(), newCaches);
+        Services s = new Services(profile,
+                getJavaInfo().getKeYProgModelInfo().rec2key().copy(),
+                copyCounters(), newCaches);
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
@@ -281,25 +289,9 @@ public class Services implements TermServices {
     public void setProof(Proof p_proof) {
         if (this.proof != null) {
             throw new IllegalStateException(
-                "Services are already owned by another proof:" + proof.name());
+                    "Services are already owned by another proof:" + proof.name());
         }
         proof = p_proof;
-    }
-
-
-    public Services copyProofSpecific(Proof p_proof, boolean shareCaches) {
-        ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-        final Services s =
-            new Services(getProfile(),
-                getJavaInfo().getKeYProgModelInfo().rec2key(), copyCounters(), newCaches);
-        s.proof = p_proof;
-        s.specRepos = specRepos;
-        s.setTypeConverter(getTypeConverter().copy(s));
-        s.setNamespaces(namespaces.copy());
-        nameRecorder = nameRecorder.copy();
-        s.setJavaModel(getJavaModel());
-
-        return s;
     }
 
 
@@ -367,7 +359,6 @@ public class Services implements TermServices {
     }
 
     /**
-     *
      * Returns either the cache backed or raw {@link TermBuilder} used to create {@link Term}s.
      * Usually the cache backed version is the intended one. The non-cached version is for use cases
      * where a lot of intermediate terms are created of which most exist only for a very short time.
@@ -426,6 +417,19 @@ public class Services implements TermServices {
         this.javaModel = javaModel;
     }
 
+    @Nonnull
+    public JavaService getJavaService() {
+        return javaService;
+    }
+
+    public void activateJava(Path bootClassPath) {
+        var m = mapping == null ? new KeYJPMapping() : mapping;
+        javaService = new JavaService(this, m, bootClassPath, Collections.emptyList());
+        var jpTypoConv = javaService.getTypeConverter();
+        var kpmi = new KeYProgModelInfo(this, mapping, jpTypoConv);
+        javainfo = new JavaInfo(kpmi, this);
+    }
+
     public Lookup createLookup() {
         Lookup lookup = new Lookup();
         lookup.register(getJavaInfo());
@@ -436,6 +440,7 @@ public class Services implements TermServices {
         lookup.register(getTermBuilder());
         lookup.register(getNameRecorder());
         lookup.register(getVariableNamer());
+        lookup.register(getJavaInfo());
         return lookup;
     }
 }

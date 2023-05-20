@@ -244,7 +244,7 @@ public class ClassTree extends JTree {
     private static DefaultMutableTreeNode createTree(boolean addContractTargets,
             boolean skipLibraryClasses, Services services) {
         // get all classes
-        final Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
+        var kjts = services.getJavaInfo().getAllKeYJavaTypes();
         kjts.removeIf(kjt -> !(kjt.getJavaType() instanceof ClassDeclaration
                 || kjt.getJavaType() instanceof InterfaceDeclaration)
                 || (((TypeDeclaration) kjt.getJavaType()).isLibraryClass()

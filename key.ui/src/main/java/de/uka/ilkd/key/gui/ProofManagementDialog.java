@@ -552,7 +552,7 @@ public final class ProofManagementDialog extends JDialog {
         SpecificationRepository specRepos = services.getSpecificationRepository();
 
 
-        Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
+        var kjts = services.getJavaInfo().getAllKeYJavaTypes();
         for (KeYJavaType kjt : kjts) {
             // skip library classes, the user isn't shown contracts for them
             if (kjt.getJavaType() instanceof TypeDeclaration

@@ -89,11 +89,10 @@ public final class JavaInfo {
     /**
      * the name of the class used as default execution context
      */
-    static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
-    static final String DEFAULT_EXECUTION_CONTEXT_METHOD = "<defaultMethod>";
+    static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "__Default__";
+    static final String DEFAULT_EXECUTION_CONTEXT_METHOD = "__defaultMethod__";
 
     private final HashMap<KeYJavaType, ObserverFunction> staticInvs = new LinkedHashMap<>();
-
 
     /**
      * creates a new JavaInfo object by giving a KeYProgModelInfo to access the Recoder SourceInfo

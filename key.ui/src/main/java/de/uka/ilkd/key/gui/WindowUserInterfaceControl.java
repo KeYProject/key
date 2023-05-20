@@ -2,6 +2,7 @@ package de.uka.ilkd.key.gui;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -94,22 +95,22 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @param classPath the class path entries to use.
      * @param bootClassPath the boot class path to use.
      */
-    public void loadProblem(File file, List<File> classPath, File bootClassPath,
-            List<File> includes) {
-        mainWindow.addRecentFile(file.getAbsolutePath());
+    public void loadProblem(Path file, List<Path> classPath, Path bootClassPath,
+            List<Path> includes) {
+        mainWindow.addRecentFile(file.toAbsolutePath().toString());
         ProblemLoader problemLoader =
             getProblemLoader(file, classPath, bootClassPath, includes, getMediator());
         problemLoader.runAsynchronously();
     }
 
     @Override
-    public void loadProblem(File file) {
+    public void loadProblem(Path file) {
         loadProblem(file, null, null, null);
     }
 
     @Override
-    public void loadProofFromBundle(File proofBundle, File proofFilename) {
-        mainWindow.addRecentFile(proofBundle.getAbsolutePath());
+    public void loadProofFromBundle(Path proofBundle, Path proofFilename) {
+        mainWindow.addRecentFile(proofBundle.toAbsolutePath().toString());
         ProblemLoader problemLoader =
             getProblemLoader(proofBundle, null, null, null, getMediator());
         problemLoader.setProofPath(proofFilename);
@@ -312,17 +313,17 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * {@inheritDoc}
      */
     @Override
-    public AbstractProblemLoader load(Profile profile, File file, List<File> classPath,
-            File bootClassPath, List<File> includes, Properties poPropertiesToForce,
-            boolean forceNewProfileOfNewProofs, Consumer<Proof> callback)
+    public AbstractProblemLoader load(Profile profile, Path file, List<Path> classPath,
+                                      Path bootClassPath, List<Path> includes, Properties poPropertiesToForce,
+                                      boolean forceNewProfileOfNewProofs, Consumer<Proof> callback)
             throws ProblemLoaderException {
         if (file != null) {
-            mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
+            mainWindow.getRecentFiles().addRecentFile(file.toAbsolutePath().toString());
         }
         try {
             getMediator().stopInterface(true);
             return super.load(profile, file, classPath, bootClassPath, includes,
-                poPropertiesToForce, forceNewProfileOfNewProofs, callback);
+                    poPropertiesToForce, forceNewProfileOfNewProofs, callback);
         } finally {
             getMediator().startInterface(true);
         }
@@ -345,10 +346,10 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
         Pair<File, String> f = fileName(proof, fileExtension);
         final int result = fc.showSaveDialog(mainWindow, f.first, f.second);
-        File file = null;
+        Path file = null;
         if (result == JFileChooser.APPROVE_OPTION) { // saved
-            file = fc.getSelectedFile();
-            final String filename = file.getAbsolutePath();
+            file = fc.getSelectedFile().toPath();
+            final String filename = file.toAbsolutePath().toString();
             ProofSaver saver;
             if (fc.useCompression()) {
                 saver = new GZipProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
@@ -368,7 +369,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 proof.setProofFile(file);
             }
         }
-        return file;
+        return file.toFile();
     }
 
     /**
@@ -400,7 +401,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 mainWindow.notify(
                     new GeneralFailureEvent("Saving Proof failed.\n Error: " + errorMsg));
             } else {
-                proof.setProofFile(file);
+                proof.setProofFile(file.toPath());
             }
         }
     }
@@ -542,7 +543,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @throws ProblemLoaderException Occurred Exception
      */
     public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(Profile profile,
-            File location, List<File> classPaths, File bootClassPath, List<File> includes,
+            Path location, List<Path> classPaths, Path bootClassPath, List<Path> includes,
             boolean forceNewProfileOfNewProofs, boolean makeMainWindowVisible)
             throws ProblemLoaderException {
         MainWindow main = MainWindow.getInstance();

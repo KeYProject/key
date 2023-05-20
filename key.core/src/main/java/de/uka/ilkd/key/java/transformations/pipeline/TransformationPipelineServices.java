@@ -54,7 +54,7 @@ public class TransformationPipelineServices {
     }
 
     public ConstantExpressionEvaluator getConstantEvaluator() {
-        return new ConstantExpressionEvaluator(getParser());
+        return new ConstantExpressionEvaluator();
     }
 
 

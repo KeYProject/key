@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
@@ -777,7 +778,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @return The loaded proof.
      */
     static de.uka.ilkd.key.proof.Proof loadProof(String proofFileName) {
-        java.io.File proofFile = new java.io.File("examples/" + proofFileName);
+        var proofFile = Paths.get("examples", proofFileName);
 
         try {
             de.uka.ilkd.key.control.KeYEnvironment<?> environment =

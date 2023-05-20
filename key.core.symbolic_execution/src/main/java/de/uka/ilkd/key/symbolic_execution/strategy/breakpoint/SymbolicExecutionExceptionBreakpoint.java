@@ -3,6 +3,7 @@ package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.Throw;

@@ -11,6 +11,7 @@ import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class brings some nice features to the visitors of key's ast.
@@ -45,8 +46,9 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
         try {
             return (T) ctx.accept(this);
         } catch (Exception e) {
+            LoggerFactory.getLogger(AbstractBuilder.class).error("", e);
             if (!(e instanceof BuildingException) && ctx instanceof ParserRuleContext) {
-                semanticError((ParserRuleContext) ctx, e.getMessage(), e);
+                throw new BuildingException((ParserRuleContext) ctx, e.getMessage(), e);
             }
             // otherwise we rethrow
             throw e;

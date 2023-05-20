@@ -11,6 +11,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
 import java.util.function.Function;
@@ -1329,11 +1330,14 @@ public final class MainWindow extends JFrame {
     }
 
     public void loadProblem(File file) {
+        loadProblem(file.toPath());
+    }
+
+    public void loadProblem(Path file) {
         getUserInterface().loadProblem(file);
     }
 
-    public void loadProblem(File file, List<File> classPath, File bootClassPath,
-            List<File> includes) {
+    public void loadProblem(Path file, List<Path> classPath, Path bootClassPath, List<Path> includes) {
         getUserInterface().loadProblem(file, classPath, bootClassPath, includes);
     }
 
@@ -1344,7 +1348,7 @@ public final class MainWindow extends JFrame {
      * @param proofPath the path of the proof to load (relative to the root of the bundle ->
      *        filename only)
      */
-    public void loadProofFromBundle(File proofBundle, File proofPath) {
+    public void loadProofFromBundle(Path proofBundle, Path proofPath) {
         getUserInterface().loadProofFromBundle(proofBundle, proofPath);
     }
 

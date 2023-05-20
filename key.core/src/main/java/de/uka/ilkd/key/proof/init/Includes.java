@@ -19,19 +19,19 @@ public class Includes {
     private final List<String> ldtIncludes;
     /** contains mappings from filenames to RuleSources */
     private final HashMap<String, RuleSource> name2Source;
-    private final List<Path> files;
+    //private final List<Path> files;
 
     public Includes() {
         includes = new LinkedList<>();
         ldtIncludes = new LinkedList<>();
         name2Source = new LinkedHashMap<>();
-        files = new LinkedList<>();
+        //files = new LinkedList<>();
     }
 
     private void put(String name, RuleSource source, List<String> list) {
         if (!list.contains(name)) {
             list.add(name);
-            files.add(source.file());
+            //files.add(source.file());
             name2Source.put(name, source);
         }
     }
@@ -53,9 +53,9 @@ public class Includes {
         return name2Source.get(name);
     }
 
-    public List<Path> getFiles() {
+   /* public List<Path> getFiles() {
         return files;
-    }
+    }*/
 
     /** removes the filename <code>name</code> and its mapping. */
     public void remove(String name) {

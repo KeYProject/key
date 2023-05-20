@@ -34,6 +34,7 @@ public class KeYJPMapping {
      * to the KeY-equivalent
      */
     private final HashMap<ResolvedType, KeYJavaType> typeMap;
+    private final Map<KeYJavaType, ResolvedType> typeMapRev = new HashMap<>();
 
     /**
      * maps a KeY programelement to the Recoder-equivalent
@@ -116,9 +117,15 @@ public class KeYJPMapping {
     public Node toRecoder(Object pe) {
         Node res = revMap.get(pe);
         Debug.assertTrue(res != null, "Model Element not known", pe);
-
         return res;
     }
+
+    public ResolvedType toRecoder(KeYJavaType pe) {
+        var res = typeMapRev.get(pe);
+        Debug.assertTrue(res != null, "Model Element not known", pe);
+        return res;
+    }
+
 
     public void put(Node rec, Object key) {
         Object formerValue = map.put(rec, key);
@@ -134,6 +141,7 @@ public class KeYJPMapping {
         if (formerValue != null)
             LOGGER.error("Duplicate registration of resolved type: {}, formerValue: {}", key,
                 formerValue);
+        typeMapRev.put(key, rec);
     }
 
     public boolean mapped(Node rec) {

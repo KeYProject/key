@@ -293,8 +293,8 @@ public final class KeYFileChooser extends JFileChooser {
      */
     public static KeYFileChooser getFileChooser(String title) {
         if (INSTANCE == null) {
-            File initDir = Main.getWorkingDir();
-            INSTANCE = new KeYFileChooser(initDir);
+            var initDir = Main.getWorkingDir();
+            INSTANCE = new KeYFileChooser(initDir.toFile());
             // not the best design probably: this constructor has the side effect of connecting
             // the new bookmark panel to the file chooser.
             new KeYFileChooserBookmarkPanel(INSTANCE);

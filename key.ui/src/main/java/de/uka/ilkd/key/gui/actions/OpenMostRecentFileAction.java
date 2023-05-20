@@ -42,7 +42,7 @@ public final class OpenMostRecentFileAction extends MainWindowAction {
                     if (proofPath == null) {
                         // canceled by user
                     } else {
-                        mainWindow.loadProofFromBundle(file, proofPath.toFile());
+                        mainWindow.loadProofFromBundle(file.toPath(), proofPath);
                     }
                 } else {
                     mainWindow.loadProblem(file);

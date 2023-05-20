@@ -170,12 +170,13 @@ public class ImplicitFieldAdder extends JavaTransformer {
     }
 
     public void apply(TypeDeclaration<?> td) {
-        addImplicitRecoderFields(td);
-        addFieldsForFinalVars(td);
         if (!transformedObject && td.resolve().isJavaLangObject()) {
             addGlobalImplicitRecoderFields(td);
             transformedObject = true;
         }
+
+        addImplicitRecoderFields(td);
+        addFieldsForFinalVars(td);
     }
 
 }

@@ -2,11 +2,13 @@ package de.uka.ilkd.key.gui.plugins.javac;
 
 import java.awt.*;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -35,8 +37,8 @@ import org.slf4j.LoggerFactory;
  * @see JavaCompilerCheckFacade
  */
 @KeYGuiExtension.Info(name = "Java Compiler Check", optional = true,
-    description = "Checks the loaded Java files for problems with Javac",
-    experimental = false)
+        description = "Checks the loaded Java files for problems with Javac",
+        experimental = false)
 public class JavacExtension
         implements KeYGuiExtension, KeYGuiExtension.StatusLine, KeYGuiExtension.Startup,
         KeYSelectionListener {
@@ -44,20 +46,20 @@ public class JavacExtension
      * Color used for the label if javac didn't produce any diagnostics.
      */
     private static final ColorSettings.ColorProperty COLOR_FINE =
-        ColorSettings.define("javac.fine", "",
-            new Color(80, 120, 200));
+            ColorSettings.define("javac.fine", "",
+                    new Color(80, 120, 200));
     /**
      * Color used if javac reported errors.
      */
     private static final ColorSettings.ColorProperty COLOR_ERROR =
-        ColorSettings.define("javac.error", "",
-            new Color(200, 20, 80));
+            ColorSettings.define("javac.error", "",
+                    new Color(200, 20, 80));
     /**
      * Color used if javac only reported warnings.
      */
     private static final ColorSettings.ColorProperty COLOR_WARN =
-        ColorSettings.define("javac.warn", "",
-            new Color(200, 120, 80));
+            ColorSettings.define("javac.warn", "",
+                    new Color(200, 120, 80));
     /**
      * Logger.
      */
@@ -67,23 +69,23 @@ public class JavacExtension
      * Icon used when no diagnostics were produced.
      */
     public static final IconFontProvider ICON_CHECK =
-        new IconFontProvider(MaterialDesignRegular.CHECK_BOX, COLOR_FINE.get());
+            new IconFontProvider(MaterialDesignRegular.CHECK_BOX, COLOR_FINE.get());
 
     /**
      * Icon used when only warnings were emitted.
      */
     public static final IconFontProvider ICON_WARN =
-        new IconFontProvider(MaterialDesignRegular.WARNING, COLOR_WARN.get());
+            new IconFontProvider(MaterialDesignRegular.WARNING, COLOR_WARN.get());
     /**
      * Icon used when errors were reported by javac.
      */
     public static final IconFontProvider ICON_ERROR =
-        new IconFontProvider(MaterialDesignRegular.ERROR_OUTLINE, COLOR_ERROR.get());
+            new IconFontProvider(MaterialDesignRegular.ERROR_OUTLINE, COLOR_ERROR.get());
     /**
      * Icon used whilst the code is compiling.
      */
     public static final IconFontProvider ICON_WAIT =
-        new IconFontProvider(MaterialDesignRegular.WATCH);
+            new IconFontProvider(MaterialDesignRegular.WATCH);
 
     /**
      * The button added to the status line.
@@ -102,18 +104,18 @@ public class JavacExtension
                     JavacData data = mediator.getSelectedProof().getUserData().get(JavacData.class);
                     if (data.nonJavaProof) {
                         JOptionPane.showMessageDialog(MainWindow.getInstance(),
-                            "The current proof contains no Java model.");
+                                "The current proof contains no Java model.");
                         return;
                     }
                     if (data.issues.isEmpty()) {
                         JOptionPane.showMessageDialog(MainWindow.getInstance(),
-                            "No Javac issues found.");
+                                "No Javac issues found.");
                         return;
                     }
                     IssueDialog is =
-                        new IssueDialog(MainWindow.getInstance(), "Java Compiler Diagnostics",
-                            "The Java compiler issued these diagnostics for your source code:",
-                            new TreeSet<>(data.issues));
+                            new IssueDialog(MainWindow.getInstance(), "Java Compiler Diagnostics",
+                                    "The Java compiler issued these diagnostics for your source code:",
+                                    new TreeSet<>(data.issues));
                     is.setVisible(true);
                 } catch (IllegalStateException e) {
                     LOGGER.info("No Javac information available for current proof.");
@@ -141,17 +143,17 @@ public class JavacExtension
                 return;
             }
 
-            File bootClassPath =
-                jm.getBootClassPath() != null ? new File(jm.getBootClassPath()) : null;
-            List<File> classpath = jm.getClassPathEntries();
-            File javaPath = new File(jm.getModelDir());
+            var bootClassPath = jm.getBootClassPath() != null ? jm.getBootClassPath() : null;
+            var classpath = jm.getClassPathEntries().stream().map(Path::toFile).collect(Collectors.toList());
+            var javaPath = jm.getModelDir();
 
             lblStatus.setForeground(Color.black);
             lblStatus.setText("Javac runs");
             lblStatus.setIcon(ICON_WAIT.get(16));
 
             CompletableFuture<List<PositionedIssueString>> task =
-                JavaCompilerCheckFacade.check(mediator.getUI(), bootClassPath, classpath, javaPath);
+                    JavaCompilerCheckFacade.check(mediator.getUI(),
+                            bootClassPath.toFile(), classpath, javaPath.toFile());
             try {
                 task.thenAccept(it -> SwingUtilities.invokeLater(() -> {
                     lblStatus.setText("Javac finished");

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
@@ -118,7 +119,7 @@ public final class TypeConverter {
     }
 
     private Term translateOperator(de.uka.ilkd.key.java.expression.Operator op,
-            ExecutionContext ec) {
+                                   ExecutionContext ec) {
 
         final Term[] subs = new Term[op.getArity()];
         for (int i = 0, n = op.getArity(); i < n; i++) {
@@ -152,9 +153,9 @@ public final class TypeConverter {
             return tb.cast(tc.getKeYJavaType(services).getSort(), subs[0]);
         } else {
             LOGGER.warn("no data type model " + "available to convert:{} {}", op,
-                op.getClass());
+                    op.getClass());
             throw new IllegalArgumentException(
-                "TypeConverter could not handle" + " this operator: " + op);
+                    "TypeConverter could not handle" + " this operator: " + op);
         }
     }
 
@@ -182,7 +183,7 @@ public final class TypeConverter {
             return convertToLogicElement(ec.getRuntimeInstance());
         } else {
             LOGGER.warn("unknown reference prefix: {} {}", prefix,
-                prefix == null ? null : prefix.getClass());
+                    prefix == null ? null : prefix.getClass());
             throw new IllegalArgumentException("TypeConverter failed to convert " + prefix);
         }
     }
@@ -255,20 +256,20 @@ public final class TypeConverter {
             return tb.dotLength(convertReferencePrefix(prefix, ec));
         } else if (var.isStatic()) {
             final Function fieldSymbol =
-                heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
+                    heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
             return tb.staticDot(var.sort(), fieldSymbol);
         } else if (prefix == null) {
             if (var.isMember()) {
                 final Function fieldSymbol =
-                    heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
+                        heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
                 return tb.dot(var.sort(), findThisForSort(var.getContainerType().getSort(), ec),
-                    fieldSymbol);
+                        fieldSymbol);
             } else {
                 return tb.var(var);
             }
         } else if (!(prefix instanceof PackageReference)) {
             final Function fieldSymbol =
-                heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
+                    heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
             return tb.dot(var.sort(), convertReferencePrefix(prefix, ec), fieldSymbol);
         }
         LOGGER.warn("Not supported reference type (fr {} , class {})", fr, fr.getClass());
@@ -329,8 +330,8 @@ public final class TypeConverter {
             assert !(pe instanceof MetaClassReference) : "not supported";
         }
         throw new IllegalArgumentException(
-            "TypeConverter: Unknown or not convertable ProgramElement " + pe + " of type "
-                + pe.getClass());
+                "TypeConverter: Unknown or not convertable ProgramElement " + pe + " of type "
+                        + pe.getClass());
     }
 
 
@@ -366,6 +367,7 @@ public final class TypeConverter {
 
 
     // TODO Adapt for @Reals
+
     /**
      * performs binary numeric promotion on the argument types
      */
@@ -381,7 +383,7 @@ public final class TypeConverter {
         } else if ((t1 == PrimitiveType.JAVA_BYTE || t1 == PrimitiveType.JAVA_SHORT
                 || t1 == PrimitiveType.JAVA_CHAR || t1 == PrimitiveType.JAVA_INT)
                 && (t2 == PrimitiveType.JAVA_BYTE || t2 == PrimitiveType.JAVA_SHORT
-                        || t2 == PrimitiveType.JAVA_CHAR || t2 == PrimitiveType.JAVA_INT)) {
+                || t2 == PrimitiveType.JAVA_CHAR || t2 == PrimitiveType.JAVA_INT)) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
         } else if ((t2 == PrimitiveType.JAVA_LONG) && (t1 == PrimitiveType.JAVA_BYTE
                 || t1 == PrimitiveType.JAVA_SHORT || t1 == PrimitiveType.JAVA_INT
@@ -405,13 +407,13 @@ public final class TypeConverter {
             return type2;
         } else if ((t2 == PrimitiveType.JAVA_FLOAT)
                 && (t1 == PrimitiveType.JAVA_BYTE || t1 == PrimitiveType.JAVA_SHORT
-                        || t1 == PrimitiveType.JAVA_INT || t1 == PrimitiveType.JAVA_CHAR
-                        || t1 == PrimitiveType.JAVA_LONG || t1 == PrimitiveType.JAVA_FLOAT)) {
+                || t1 == PrimitiveType.JAVA_INT || t1 == PrimitiveType.JAVA_CHAR
+                || t1 == PrimitiveType.JAVA_LONG || t1 == PrimitiveType.JAVA_FLOAT)) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
         } else if ((t1 == PrimitiveType.JAVA_FLOAT)
                 && (t2 == PrimitiveType.JAVA_BYTE || t2 == PrimitiveType.JAVA_SHORT
-                        || t2 == PrimitiveType.JAVA_INT || t2 == PrimitiveType.JAVA_CHAR
-                        || t2 == PrimitiveType.JAVA_LONG || t2 == PrimitiveType.JAVA_FLOAT)) {
+                || t2 == PrimitiveType.JAVA_INT || t2 == PrimitiveType.JAVA_CHAR
+                || t2 == PrimitiveType.JAVA_LONG || t2 == PrimitiveType.JAVA_FLOAT)) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
         } else if ((t2 == PrimitiveType.JAVA_DOUBLE) && (t1 == PrimitiveType.JAVA_BYTE
                 || t1 == PrimitiveType.JAVA_SHORT || t1 == PrimitiveType.JAVA_INT
@@ -425,7 +427,7 @@ public final class TypeConverter {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
         } else {
             throw new RuntimeException(
-                "Could not determine promoted type " + "of " + t1 + " and " + t2);
+                    "Could not determine promoted type " + "of " + t1 + " and " + t2);
         }
     }
 
@@ -495,7 +497,7 @@ public final class TypeConverter {
      * retrieves the type of the expression <tt>e</tt> with respect to the context in which it is
      * evaluated
      *
-     * @param e the Expression whose type has to be retrieved
+     * @param e  the Expression whose type has to be retrieved
      * @param ec the ExecutionContext of expression <tt>e</tt>
      * @return the KeYJavaType of expression <tt>e</tt>
      */
@@ -548,7 +550,7 @@ public final class TypeConverter {
             }
         }
         throw new RuntimeException(
-            "Cannot convert term to program: " + term + " " + term.op().getClass());
+                "Cannot convert term to program: " + term + " " + term.op().getClass());
     }
 
 
@@ -558,7 +560,7 @@ public final class TypeConverter {
             if (function instanceof SortDependingFunction) {
                 SortDependingFunction sdf = (SortDependingFunction) function;
                 SortDependingFunction castFunction =
-                    SortDependingFunction.getFirstInstance(Sort.CAST_NAME, services);
+                        SortDependingFunction.getFirstInstance(Sort.CAST_NAME, services);
                 if (sdf.isSimilar(castFunction)) {
                     Sort s = sdf.getSortDependingOn();
                     KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(s);
@@ -743,18 +745,18 @@ public final class TypeConverter {
         }
 
         ConstantExpressionEvaluator cee = services.getConstantExpressionEvaluator();
-
-        // TODO javaparser
-        ConstantEvaluator.EvaluationResult res = new ConstantEvaluator.EvaluationResult();
-
         try {
             var e = cee.evaluate(expr.toString());
-            if (!cee.isCompileTimeConstant(e)
+            /*if (!cee.isCompileTimeConstant(e)
                     || e.calculateResolvedType() != ResolvedPrimitiveType.INT) {
                 return false;
+            }*/
+            if (e instanceof IntegerLiteralExpr) {
+                int value = ((IntegerLiteralExpr) e).asNumber().intValue();
+                return (minValue <= value) && (value <= maxValue);
+            } else {
+                return false;
             }
-            int value = res.getInt();
-            return (minValue <= value) && (value <= maxValue);
         } catch (EvaluationException e) {
             throw new RuntimeException(e);
         }
@@ -789,7 +791,7 @@ public final class TypeConverter {
         if (a instanceof ClassType || a == null) {
             return to.getSort().extendsTrans(from.getSort())
                     || (from == services.getJavaInfo().getJavaLangObject()
-                            && a instanceof ArrayType);
+                    && a instanceof ArrayType);
         } else {
             if (b == null) {
                 return false;
@@ -929,8 +931,8 @@ public final class TypeConverter {
             t = ((KeYJavaType) t).getJavaType();
         }
         return
-        // there is currently no interface handling
-        t == null || (t instanceof ClassType && !(t instanceof NullType)) || t instanceof ArrayType;
+                // there is currently no interface handling
+                t == null || (t instanceof ClassType && !(t instanceof NullType)) || t instanceof ArrayType;
     }
 
 
@@ -956,7 +958,7 @@ public final class TypeConverter {
     }
 
     private LDT getResponsibleLDT(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
-            Services services, ExecutionContext ec) {
+                                  Services services, ExecutionContext ec) {
         for (LDT ldt : LDTs.values()) {
             if (ldt.isResponsible(op, subs, services, ec)) {
                 return ldt;

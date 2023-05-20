@@ -12,6 +12,7 @@ import java.nio.file.Path;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
+import org.key_project.util.java.IOUtil;
 
 public class UrlRuleSource extends RuleSource {
 
@@ -48,7 +49,7 @@ public class UrlRuleSource extends RuleSource {
 
     @Override
     public Path file() {
-        return Path.of(url.getFile());
+        return Path.of(url.toString());
     }
 
     @Override

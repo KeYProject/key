@@ -1,10 +1,5 @@
 package org.key_project.example;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -27,12 +22,16 @@ import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
-
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.StringUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Example application which symbolically executes {@code example/Number#equals(Number)}
@@ -48,11 +47,11 @@ public class Main {
      * @param args The start parameters.
      */
     public static void main(String[] args) {
-        File location = new File("example"); // Path to the source code folder/file or to a *.proof
+        Path location = Paths.get("example"); // Path to the source code folder/file or to a *.proof
                                              // file
-        List<File> classPaths = null; // Optionally: Additional specifications for API classes
-        File bootClassPath = null; // Optionally: Different default specifications for Java API
-        List<File> includes = null; // Optionally: Additional includes to consider
+        List<Path> classPaths = null; // Optionally: Additional specifications for API classes
+        Path bootClassPath = null; // Optionally: Different default specifications for Java API
+        List<Path> includes = null; // Optionally: Additional includes to consider
         try {
             // Ensure that Taclets are parsed
             if (!ProofSettings.isChoiceSettingInitialised()) {
