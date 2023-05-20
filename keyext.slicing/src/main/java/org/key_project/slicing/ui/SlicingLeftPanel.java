@@ -37,8 +37,11 @@ import org.key_project.slicing.SlicingExtension;
 import org.key_project.slicing.SlicingProofReplayer;
 import org.key_project.slicing.SlicingSettingsProvider;
 import org.key_project.slicing.analysis.AnalysisResults;
+import org.key_project.slicing.graph.AnnotatedEdge;
+import org.key_project.slicing.graph.DotExporter;
 import org.key_project.slicing.util.GenericWorker;
 import org.key_project.slicing.util.GraphvizDotExecutor;
+import org.key_project.util.collection.GraphUtil;
 
 import bibliothek.gui.dock.common.action.CAction;
 import org.slf4j.Logger;
@@ -90,6 +93,10 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
      * "Show rendering of graph" button.
      */
     private JButton showGraphRendering = null;
+    /**
+     * "Show rendering of graph (shortened)" button.
+     */
+    private JButton showGraphRenderingShort = null;
     /**
      * If {@link #ENABLE_DEBUGGING_UI} is true: a button that will call the garbage collector
      */
@@ -322,10 +329,15 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         dotExport.addActionListener(this::exportDot);
         showGraphRendering = new JButton("Show rendering of graph");
         showGraphRendering.addActionListener(this::previewGraph);
+        showGraphRenderingShort = new JButton("Show rendering of graph (shortened)");
+        showGraphRenderingShort.addActionListener(this::previewGraphShort);
 
         if (!GraphvizDotExecutor.isDotInstalled()) {
             showGraphRendering.setEnabled(false);
+            showGraphRenderingShort.setEnabled(false);
             showGraphRendering.setToolTipText(
+                "Install graphviz (dot) to enable graph rendering functionality.");
+            showGraphRenderingShort.setToolTipText(
                 "Install graphviz (dot) to enable graph rendering functionality.");
         }
 
@@ -342,6 +354,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         panel1.add(abbreviateFormulas);
         panel1.add(dotExport);
         panel1.add(showGraphRendering);
+        panel1.add(showGraphRenderingShort);
 
         return panel1;
     }
@@ -406,6 +419,16 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         }
         String text = extension.trackers.get(currentProof)
                 .exportDot(abbreviateFormulas.isSelected());
+        new PreviewDialog(MainWindow.getInstance(), text);
+    }
+
+    private void previewGraphShort(ActionEvent e) {
+        if (currentProof == null) {
+            return;
+        }
+        var g = extension.trackers.get(currentProof).getDependencyGraph().getInternalGraph();
+        GraphUtil.collapseChains(g, q -> new AnnotatedEdge(q.fourth.getProofStep(), false));
+        String text = DotExporter.exportDot2(g);
         new PreviewDialog(MainWindow.getInstance(), text);
     }
 

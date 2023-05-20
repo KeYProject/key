@@ -12,6 +12,7 @@ import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.collection.DirectedGraph;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -331,5 +332,14 @@ public class DependencyGraph {
             locationGuess = locationGuess.removeLast();
         }
         return null;
+    }
+
+    /**
+     * Get a copy of the internal graph.
+     *
+     * @return internal graph data
+     */
+    public DirectedGraph<GraphNode, AnnotatedEdge> getInternalGraph() {
+        return graph.copy();
     }
 }

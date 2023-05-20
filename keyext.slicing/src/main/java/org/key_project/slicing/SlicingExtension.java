@@ -47,7 +47,7 @@ public class SlicingExtension implements KeYGuiExtension,
         KeYGuiExtension.Startup,
         KeYGuiExtension.LeftPanel,
         KeYGuiExtension.Settings,
-KeYGuiExtension.Toolbar,
+        KeYGuiExtension.Toolbar,
         KeYSelectionListener,
         ProofDisposedListener {
     /**
@@ -185,7 +185,8 @@ KeYGuiExtension.Toolbar,
         b.setText("Reorder");
         b.addActionListener(e -> {
             KeYMediator m = MainWindow.getInstance().getMediator();
-            ProofReorder.reorderProof(m.getSelectedProof(), trackers.get(m.getSelectedProof()).getDependencyGraph());
+            ProofReorder.reorderProof(m.getSelectedProof(),
+                trackers.get(m.getSelectedProof()).getDependencyGraph());
         });
         bar.add(b);
         return bar;

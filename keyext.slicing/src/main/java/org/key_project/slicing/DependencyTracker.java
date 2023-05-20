@@ -47,9 +47,6 @@ import org.key_project.slicing.graph.PseudoOutput;
 import org.key_project.slicing.graph.TrackedFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Tracks proof steps as they are applied on the proof.
  * Each proof step is recorded in the dependency graph ({@link DependencyGraph}).
@@ -57,11 +54,6 @@ import org.slf4j.LoggerFactory;
  * @author Arne Keller
  */
 public class DependencyTracker implements RuleAppListener, ProofTreeListener {
-    /**
-     * Logger.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(DependencyTracker.class);
-
     /**
      * The proof this tracker monitors.
      */
@@ -81,7 +73,6 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @see DependencyAnalyzer
      */
     private AnalysisResults analysisResults = null;
-    private boolean proofUsedStateMerging = false;
 
     /**
      * Construct a new tracker for a proof.
@@ -354,7 +345,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @return DOT string
      */
     public String exportDot(boolean abbreviateFormulas) {
-        return DotExporter.exportDot(proof, graph, analysisResults, abbreviateFormulas);
+        return DotExporter.exportDot(proof, graph.getInternalGraph(), analysisResults,
+            abbreviateFormulas);
     }
 
     /**
