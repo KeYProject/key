@@ -28,7 +28,8 @@ import de.uka.ilkd.key.util.Pair;
 public class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
 
-    private ProofTreePopupFactory() {}
+    private ProofTreePopupFactory() {
+    }
 
     /**
      * A filter that returns true iff the given TreePath denotes a One-Step-Simplifier-Node.
