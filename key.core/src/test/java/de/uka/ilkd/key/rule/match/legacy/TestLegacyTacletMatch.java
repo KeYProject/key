@@ -1,10 +1,11 @@
 package de.uka.ilkd.key.rule.match.legacy;
 
 import java.io.File;
+import java.util.Collections;
 
+import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -200,10 +201,10 @@ public class TestLegacyTacletMatch {
     @Test
     public void testProgramMatch1() {
         Services services = TacletForTests.services();
-        JP2KeY c2k =
-            new JP2KeY(services, new NamespaceSet());
+        JavaService c2k =
+            new JavaService(services, Collections.emptyList());
         JavaBlock jb = c2k.readBlock("{ int i; int j; i=++j;" + " while(true) {break;}}",
-            c2k.createEmptyContext());
+            c2k.createEmptyContext(), null);
 
         de.uka.ilkd.key.java.StatementBlock sb = (de.uka.ilkd.key.java.StatementBlock) jb.program();
 

@@ -317,7 +317,7 @@ public class MergeRuleTests {
 
         try {
             KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
-                proofFile, null, null, null, true);
+                proofFile.toPath(), null, null, null, true);
             Proof proof = environment.getLoadedProof();
             Assertions.assertNotNull(proof);
 

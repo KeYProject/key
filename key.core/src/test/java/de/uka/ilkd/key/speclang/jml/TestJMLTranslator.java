@@ -4,10 +4,11 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -320,7 +321,7 @@ public class TestJMLTranslator {
         assertNotNull(result);
         assertEquals(Equality.EQUALS, result.op());
         assertTrue(termContains(result, TB.var(
-            javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED, testClassType))));
+            javaInfo.getAttribute(PipelineConstants.IMPLICIT_CLASS_INITIALIZED, testClassType))));
     }
 
     @Test

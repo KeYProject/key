@@ -1,7 +1,9 @@
 package de.uka.ilkd.key.parser;
 
 import java.io.IOException;
+import java.util.Collections;
 
+import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
@@ -27,10 +29,10 @@ public class TestTermParser extends AbstractTestTermParser {
     private LogicVariable x, y, z, xs, ys;
     private Term t_x, t_y, t_z, t_xs, t_ys;
     private Term t_headxs, t_tailys, t_nil;
-    private final JP2KeY r2k;
+    private final JavaService r2k;
 
     public TestTermParser() {
-        r2k = new JP2KeY(services, nss);
+        r2k = new JavaService(services, Collections.emptyList());
         r2k.parseSpecialClasses();
         r2k.readCompilationUnit(COMPILATION_UNIT);
     }

@@ -938,6 +938,7 @@ public class JavaService {
     }
 
     public JavaService(Services services, Collection<Path> sourcePaths) {
+        // TODO javaparser this is only called from tests, what is sourcePaths there?
         this(services, new KeYJPMapping(),
             Paths.get(JavaProfile.getDefaultProfile().getInternalClassDirectory()), sourcePaths);
     }

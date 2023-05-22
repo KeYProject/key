@@ -13,6 +13,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -23,12 +25,9 @@ public class TestContextStatementBlock {
 
     @BeforeEach
     public void setUp() {
-        JavaInfo ji = TacletForTests.javaInfo();
         Services services = TacletForTests.services();
-        JavaService c2k = new JavaService(services, ji.getKeYProgModelInfo().getServConf(),
-            ji.rec2key(), new NamespaceSet(), services.getTypeConverter());
-        blockOne = c2k.readBlock("{int a=1; {int b=3; b++;} a++;}", c2k.createEmptyContext());
-
+        JavaService c2k = new JavaService(services, Collections.emptyList());
+        blockOne = c2k.readBlock("{int a=1; {int b=3; b++;} a++;}", c2k.createEmptyContext(), null);
     }
 
     @AfterEach

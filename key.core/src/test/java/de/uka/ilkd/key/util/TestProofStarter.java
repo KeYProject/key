@@ -58,7 +58,7 @@ public class TestProofStarter {
         try {
             File file =
                 new File(HelperClassForTests.TESTCASE_DIRECTORY, "proofStarter/CC/project.key");
-            env = KeYEnvironment.load(file, null, null, null);
+            env = KeYEnvironment.load(file.toPath(), null, null, null);
             Proof proof = env.getLoadedProof();
             assertNotNull(proof);
             ProofStarter ps = new ProofStarter(false);

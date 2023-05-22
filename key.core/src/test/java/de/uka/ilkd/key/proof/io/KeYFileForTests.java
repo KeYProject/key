@@ -30,7 +30,7 @@ public class KeYFileForTests extends KeYFile {
      * the physical source of the .key file.
      */
     public KeYFileForTests(String name, File file, Profile profile) {
-        super(name, file, null, profile);
+        super(name, file.toPath(), null, profile);
     }
 
     /**

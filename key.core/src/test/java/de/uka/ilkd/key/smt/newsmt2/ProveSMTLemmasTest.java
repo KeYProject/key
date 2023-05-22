@@ -69,7 +69,7 @@ public class ProveSMTLemmasTest {
 
         LOGGER.info("Now processing file {}", file);
 
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file);
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file.toPath());
         try {
             Proof loadedProof = env.getLoadedProof();
             env.getProofControl().startAndWaitForAutoMode(loadedProof);

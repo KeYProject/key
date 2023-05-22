@@ -164,7 +164,7 @@ public class TestProofBundleIO {
      * @throws ProblemLoaderException if loading fails
      */
     private Proof loadBundle(Path p) throws ProblemLoaderException {
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(p.toFile());
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(p);
         AbstractProblemLoader.ReplayResult replayResult = env.getReplayResult();
         if (replayResult.hasErrors()) {
             LOGGER.debug("Error(s) while loading");
@@ -200,7 +200,7 @@ public class TestProofBundleIO {
         Path path = testDir.resolve(dirName).resolve("test.key");
 
         // load *.key file
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(path.toFile());
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(path);
         assertNotNull(env);
 
         Proof proof = env.getLoadedProof();

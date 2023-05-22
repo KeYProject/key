@@ -622,7 +622,7 @@ public class TestTermLabelManager {
         KeYEnvironment<?> env = null;
         try {
             env = KeYEnvironment.load(new File(HelperClassForTests.TESTCASE_DIRECTORY,
-                "termLabels/flatSteps/FlatSteps.java"), null, null, null);
+                "termLabels/flatSteps/FlatSteps.java").toPath(), null, null, null);
             Profile profile = new JavaProfile() {
                 @Override
                 protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {

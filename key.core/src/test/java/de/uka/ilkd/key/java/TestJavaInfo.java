@@ -3,7 +3,7 @@ package de.uka.ilkd.key.java;
 import java.io.File;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
@@ -90,12 +90,12 @@ public class TestJavaInfo {
     }
 
     private static final String[] implictFieldsClassOnly = new String[] {
-        ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS,
-        ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS,
-        ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED, ImplicitFieldAdder.IMPLICIT_CLASS_PREPARED };
+        PipelineConstants.IMPLICIT_CLASS_ERRONEOUS,
+        PipelineConstants.IMPLICIT_CLASS_INIT_IN_PROGRESS,
+        PipelineConstants.IMPLICIT_CLASS_INITIALIZED, PipelineConstants.IMPLICIT_CLASS_PREPARED };
 
     private static final String[] generalImplicitFields = new String[] {
-        ImplicitFieldAdder.IMPLICIT_CREATED, ImplicitFieldAdder.IMPLICIT_INITIALIZED };
+        PipelineConstants.IMPLICIT_CREATED, PipelineConstants.IMPLICIT_INITIALIZED };
 
 
     @Test
@@ -121,11 +121,11 @@ public class TestJavaInfo {
         KeYJavaType rte = javaInfo.getKeYJavaType("java.lang.RuntimeException");
 
 
-        assertNotNull(javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, obj),
-            "Did not find locally declared attribute " + ImplicitFieldAdder.IMPLICIT_CREATED);
+        assertNotNull(javaInfo.getAttribute(PipelineConstants.IMPLICIT_CREATED, obj),
+            "Did not find locally declared attribute " + PipelineConstants.IMPLICIT_CREATED);
 
-        assertNull(javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, rte),
-            "Attribute " + ImplicitFieldAdder.IMPLICIT_CREATED
+        assertNull(javaInfo.getAttribute(PipelineConstants.IMPLICIT_CREATED, rte),
+            "Attribute " + PipelineConstants.IMPLICIT_CREATED
                 + " is locally declared in class java.lang.Object and should not be "
                 + "returned by this method for type java.lang.RuntimeException");
 

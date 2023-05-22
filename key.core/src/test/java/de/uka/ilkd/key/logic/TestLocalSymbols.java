@@ -172,7 +172,7 @@ public class TestLocalSymbols {
 
         try {
             KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
-                proofFile, null, null, null, true);
+                proofFile.toPath(), null, null, null, true);
             return environment;
         } catch (ProblemLoaderException e) {
             Assertions.fail("Proof could not be loaded.");

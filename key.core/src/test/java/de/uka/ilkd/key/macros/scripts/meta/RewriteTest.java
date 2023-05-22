@@ -34,7 +34,7 @@ public class RewriteTest {
         assumeTrue(script.exists(), "Required script file not found: " + script);
         assumeTrue(keyFile.exists(), "Required KeY file not found: " + keyFile);
 
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile.toPath());
         assertNotNull(env);
 
         Proof p = env.getLoadedProof();
@@ -62,7 +62,7 @@ public class RewriteTest {
         assumeTrue(script.exists(), "Required script file not found: " + script);
         assumeTrue(keyFile.exists(), "Required KeY file not found: " + keyFile);
 
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile.toPath());
         Proof proof = env.getLoadedProof();
         ProofScriptEngine engine = new ProofScriptEngine(script);
         engine.execute(env.getUi(), proof);

@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
@@ -98,8 +99,7 @@ public class TestJP2KeY {
     @BeforeEach
     public void setUp() {
         if (c2k == null) {
-            c2k = new JavaService(TacletForTests.services(),
-                TacletForTests.services().getNamespaces());
+            c2k = new JavaService(TacletForTests.services(), Collections.emptyList());
         }
 
     }
@@ -110,7 +110,7 @@ public class TestJP2KeY {
         ProgramVariable pv = new LocationVariable(new ProgramElementName("i"),
             TacletForTests.services().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT));
         ImmutableList<ProgramVariable> list = ImmutableSLList.<ProgramVariable>nil().prepend(pv);
-        JavaBlock block = c2k.readBlock("{ i = 2; }", c2k.createContext(list));
+        JavaBlock block = c2k.readBlock("{ i = 2; }", c2k.createContext(list), null);
         ProgramVariable prgVarCmp =
             (ProgramVariable) ((Operator) ((StatementBlock) block.program()).getStatementAt(0))
                     .getChildAt(0);
@@ -123,9 +123,10 @@ public class TestJP2KeY {
     @Test
     public void testJBlocks() {
         for (int i = 0; i < jblocks.length; i++) {
-            String keyProg = removeBlanks(c2k.readBlockWithEmptyContext(jblocks[i]).toString());
+            String keyProg =
+                removeBlanks(c2k.readBlockWithEmptyContext(jblocks[i], null).toString());
             String recoderProg =
-                removeBlanks(c2k.recoderBlock(jblocks[i], c2k.createEmptyContext()).toSource());
+                removeBlanks(c2k.recoderBlock(jblocks[i], c2k.createEmptyContext()).toString());
             assertEquals(recoderProg, keyProg, "Block " + i);
         }
     }

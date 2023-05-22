@@ -1,8 +1,10 @@
 package de.uka.ilkd.key.logic;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Stack;
 
+import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -46,7 +48,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         parseDecls(sorts);
         assertNotNull(nss.sorts().lookup("boolean"));
 
-        JP2KeY r2k = new JP2KeY(services, nss);
+        JavaService r2k = new JavaService(services, Collections.emptyList());
         r2k.parseSpecialClasses();
 
         parseDecls(

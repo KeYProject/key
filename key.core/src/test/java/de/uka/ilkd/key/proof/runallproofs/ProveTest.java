@@ -181,7 +181,7 @@ public class ProveTest {
      */
     private Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> load(
             File keyFile) throws ProblemLoaderException {
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile.toPath());
         return new Pair<>(env, env.getProofScript());
     }
 
@@ -199,7 +199,7 @@ public class ProveTest {
         KeYEnvironment<DefaultUserInterfaceControl> proofLoadEnvironment = null;
         Proof reloadedProof = null;
         try {
-            proofLoadEnvironment = KeYEnvironment.load(proofFile);
+            proofLoadEnvironment = KeYEnvironment.load(proofFile.toPath());
 
             AbstractProblemLoader.ReplayResult result = proofLoadEnvironment.getReplayResult();
             if (result.hasErrors()) {

@@ -70,7 +70,7 @@ public class TestParser {
     @Test
     public void testIssue1566() throws ProblemLoaderException {
         File file = new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/1566/a.key");
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file);
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file.toPath());
     }
 
     @Test()
@@ -78,7 +78,7 @@ public class TestParser {
         assertThrows(ProblemLoaderException.class, () -> {
             File file = new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/39/A.java");
             KeYEnvironment<DefaultUserInterfaceControl> env =
-                KeYEnvironment.load(file, null, null, null);
+                KeYEnvironment.load(file.toPath(), null, null, null);
         });
 
     }
@@ -89,7 +89,7 @@ public class TestParser {
             new File(HelperClassForTests.TESTCASE_DIRECTORY, "parserErrorTest/AssignToArray.java");
         var problemLoaderException = assertThrows(ProblemLoaderException.class, () -> {
             KeYEnvironment<DefaultUserInterfaceControl> env =
-                KeYEnvironment.load(file, null, null, null);
+                KeYEnvironment.load(file.toPath(), null, null, null);
         });
         var error = (PosConvertException) problemLoaderException.getCause();
         assertEquals(4, error.getPosition().line());

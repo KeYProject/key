@@ -1,11 +1,12 @@
 package de.uka.ilkd.key.java.visitor;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.junit.jupiter.api.AfterEach;
@@ -45,9 +46,9 @@ public class TestDeclarationProgramVariableCollector {
         if (down != 0) {
             return;
         }
-        final JP2KeY r2k = new JP2KeY(TacletForTests.services(), new NamespaceSet());
+        final JavaService r2k = new JavaService(TacletForTests.services(), Collections.emptyList());
         for (int i = 0; i < jblocks.length; i++) {
-            test_block[i] = r2k.readBlockWithEmptyContext(jblocks[i]);
+            test_block[i] = r2k.readBlockWithEmptyContext(jblocks[i], null);
         }
     }
 
