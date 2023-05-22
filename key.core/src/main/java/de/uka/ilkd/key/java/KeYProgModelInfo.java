@@ -209,7 +209,7 @@ public class KeYProgModelInfo {
      * @return true iff name refers to a package
      */
     public boolean isPackage(String name) {
-        return !javaService.getTypeSolver().hasType(name);
+        return !javaService.getProgramFactory().getTypeSolver().hasType(name);
     }
 
     /**
@@ -510,7 +510,7 @@ public class KeYProgModelInfo {
 
         // fields of java.lang.Object visible in an array
         final ImmutableList<Field> javaLangObjectField = getAllVisibleFields((KeYJavaType) rec2key()
-                .toKeY(javaService.getTypeSolver().getSolvedJavaLangObject()));
+                .toKeY(javaService.getProgramFactory().getTypeSolver().getSolvedJavaLangObject()));
 
         for (Field aJavaLangObjectField : javaLangObjectField) {
             // TODO javaparser FieldDeclaration? was recoder.Field

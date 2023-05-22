@@ -49,7 +49,6 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.VoidType;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import com.github.javaparser.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,12 +80,6 @@ public class JavaService {
     private static AtomicInteger interactCounter = new AtomicInteger();
 
     /**
-     * This flag indicates whether we are currently parsing library classes
-     * (special classes)
-     */
-    private boolean parsingLibs = false;
-
-    /**
      * the object that handles the transformation from recoder AST to KeY AST
      */
     private final JP2KeYConverter converter;
@@ -97,20 +90,8 @@ public class JavaService {
      */
     private final JP2KeYTypeConverter typeConverter;
 
-    /**
-     * The list of dynamical created {@link CompilationUnit}s
-     * that contain the classes that are referenced but not defined. For those class types
-     * a dummy stub is created at parse time.
-     */
-    private Collection<? extends CompilationUnit> dynamicallyCreatedCompilationUnits;
-
     private final Services services;
     private final JavaParserFactory programFactory;
-
-
-    public JP2KeYConverter getConverter() {
-        return converter;
-    }
 
     /**
      * return the associated converter object
@@ -128,24 +109,6 @@ public class JavaService {
      */
     public JP2KeYTypeConverter getTypeConverter() {
         return typeConverter;
-    }
-
-    /**
-     * set this to true before parsing special classes and to false afterwards.
-     *
-     * @param v the state of the special parsing flage
-     */
-    private void setParsingLibs(boolean v) {
-        parsingLibs = v;
-    }
-
-    /**
-     * are we currently parsing library code (special classes)?
-     *
-     * @return true iff currently parsing special classes.
-     */
-    public boolean isParsingLibs() {
-        return parsingLibs;
     }
 
     public KeYJPMapping rec2key() {
@@ -173,7 +136,7 @@ public class JavaService {
      * @param fileRepo the fileRepo which will store the files
      * @return a new list containing the recoder compilation units corresponding
      *         to the given files.
-     * @throws ParseExceptionInFile any exception occurring while treating the file is wrapped
+     * @throws JavaBuildingExceptions any exception occurring while treating the file is wrapped
      *         into a parse exception that contains the filename.
      */
     public List<de.uka.ilkd.key.java.CompilationUnit> readCompilationUnitsAsFiles(
@@ -183,7 +146,7 @@ public class JavaService {
         List<CompilationUnit> cUnits = recoderCompilationUnitsAsFiles(cUnitStrings, fileRepo);
         var result = new ArrayList<de.uka.ilkd.key.java.CompilationUnit>(cUnits.size());
         for (CompilationUnit cu : cUnits) {
-            result.add(getConverter().processCompilationUnit(cu));
+            result.add(converter.processCompilationUnit(cu));
         }
         return result;
     }
@@ -281,7 +244,7 @@ public class JavaService {
     public de.uka.ilkd.key.java.CompilationUnit readCompilationUnit(String cUnitString) {
         var cc = recoderCompilationUnits(Collections.singletonList(cUnitString));
         var cu = cc.get(0);
-        return (de.uka.ilkd.key.java.CompilationUnit) getConverter().process(cu);
+        return (de.uka.ilkd.key.java.CompilationUnit) converter.process(cu);
     }
 
     /**
@@ -321,36 +284,14 @@ public class JavaService {
     }
 
     /**
-     * get the list of names of classes that have been created dynamically due
-     * to lacking definitions.
-     * <p>
-     * For all classes that are referenced but not defined, an empty dummy stub
-     * is created. This method returns the list of their fully qualified class
-     * names.
-     *
-     * @return an unmodifiable list of fully qualified class names
-     * @author mu, on rb's specification ;)
-     */
-    public List<String> getDynamicallyCreatedClasses() {
-        List<String> ret = new ArrayList<>();
-        if (dynamicallyCreatedCompilationUnits != null) {
-            for (CompilationUnit cu : dynamicallyCreatedCompilationUnits) {
-                final var pt = cu.getPrimaryTypeName();
-                pt.ifPresent(ret::add);
-            }
-        }
-        return ret;
-    }
-
-    /**
      * This method loads the internal classes - also called the "boot" classes.
      * <p>
-     * If {@link #bootClassPath} is set to null, it locates java classes that
+     * If the bootClassPath is set to null, it locates java classes that
      * are stored internally within the jar-file or the binary directory. The
      * JAVALANG.TXT file lists all files to be loaded. The files are found using
      * a special {@link JavaReduxFileCollection}.
      * <p>
-     * If, however, {@link #bootClassPath} is assigned a value, this is treated
+     * If, however, the bootClassPath is assigned a value, this is treated
      * as a directory (not a JAR file at the moment) and all files in this
      * directory are read in. This is done using a
      * {@link DirectoryFileCollection}.
@@ -422,7 +363,6 @@ public class JavaService {
      * @author mulbrich
      */
     private List<CompilationUnit> parseLibs(FileRepo fileRepo) throws IOException {
-
         var internal = parseInternalClasses(fileRepo);
         List<FileCollection> sources = new ArrayList<>();
         List<CompilationUnit> rcuList = new ArrayList<>(internal);
@@ -439,13 +379,12 @@ public class JavaService {
          * While the resources are read (and possibly copied) via the FileRepo, the data location
          * is left as it is. This leaves the line information intact.
          */
-        Path currentDataLocation;
 
         // -- read jml files --
         for (FileCollection fc : sources) {
             FileCollection.Walker walker = fc.createWalker(".jml");
             while (walker.step()) {
-                currentDataLocation = walker.getCurrentLocation();
+                var currentDataLocation = walker.getCurrentLocation();
                 try (InputStream is = walker.openCurrent(fileRepo);
                         Reader isr = new InputStreamReader(is);
                         Reader f = new BufferedReader(isr)) {
@@ -463,7 +402,7 @@ public class JavaService {
         for (FileCollection fc : sources) {
             FileCollection.Walker walker = fc.createWalker(".java");
             while (walker.step()) {
-                currentDataLocation = walker.getCurrentLocation();
+                var currentDataLocation = walker.getCurrentLocation();
                 try (InputStream is = walker.openCurrent(fileRepo);
                         Reader isr = new InputStreamReader(is);
                         Reader f = new BufferedReader(isr)) {
@@ -478,6 +417,7 @@ public class JavaService {
         }
 
         // -- read class files --
+        // TODO javaparser
         /*
          * ClassFileDeclarationManager manager = new ClassFileDeclarationManager(pf);
          * ByteCodeParser parser = new ByteCodeParser();
@@ -565,8 +505,6 @@ public class JavaService {
         if (mapping.parsedSpecial()) {
             return;
         }
-        // go to special mode -> used by the converter!
-        setParsingLibs(true);
 
         try {
             List<CompilationUnit> specialClasses = parseLibs(fileRepo);
@@ -584,7 +522,7 @@ public class JavaService {
                 // weigl: allowed for fragments
                 // if (dl.isEmpty())
                 // throw new AssertionError("DataLocation not set on compilation unit");
-                getConverter().processCompilationUnit(cu);
+                converter.processCompilationUnit(cu);
             }
 
             /*
@@ -609,8 +547,6 @@ public class JavaService {
 
         // tell the mapping that we have parsed the special classes
         rec2key().parsedSpecial(true);
-
-        setParsingLibs(false);
     }
 
     /**
@@ -1021,14 +957,9 @@ public class JavaService {
     }
 
     @Nonnull
-    public JavaSymbolSolver getSymbolResolver() {
+    private JavaSymbolSolver getSymbolResolver() {
         return programFactory.getSymbolSolver();
     }
-
-    public TypeSolver getTypeSolver() {
-        return programFactory.getTypeSolver();
-    }
-
 
     public void addSourcePath(Path javaPath) {
         var classpath = programFactory.getSourcePaths();
@@ -1049,9 +980,5 @@ public class JavaService {
             }
         }
         classpath.add(javaPath);
-    }
-
-    public void addSourcePath(String javaPath) {
-        addSourcePath(Paths.get(javaPath).toAbsolutePath());
     }
 }

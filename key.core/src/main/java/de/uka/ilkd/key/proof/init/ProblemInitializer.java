@@ -266,7 +266,7 @@ public final class ProblemInitializer {
         if (javaPath != null) {
             reportStatus("Reading Java source");
             var javaService = initConfig.getServices().getJavaService();
-            javaService.addSourcePath(javaPath);
+            javaService.addSourcePath(Paths.get(javaPath).toAbsolutePath());
             Collection<String> var = getClasses(javaPath);
             if (envInput.isIgnoreOtherJavaFiles()) {
                 String file = envInput.getJavaFile();

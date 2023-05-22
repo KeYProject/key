@@ -80,7 +80,8 @@ public class JP2KeYConverter {
     }
 
     public Object process(Node block) {
-        return block.accept(new JP2KeYVisitor(services, mapping, typeConverter, schemaVariables), null);
+        return block.accept(new JP2KeYVisitor(services, mapping, typeConverter, schemaVariables),
+            null);
     }
 }
 
