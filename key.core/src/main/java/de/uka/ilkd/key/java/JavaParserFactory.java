@@ -12,20 +12,21 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.github.javaparser.ast.key.sv.KeyContextStatementBlock;
-import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
-import com.github.javaparser.resolution.model.SymbolReference;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
+
+import org.key_project.util.java.IOUtil;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.key.sv.KeyContextStatementBlock;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.resolution.TypeSolver;
+import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
+import com.github.javaparser.resolution.model.SymbolReference;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.*;
-import org.key_project.util.java.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +66,7 @@ public class JavaParserFactory {
     public JavaParserFactory(Path bootClassPath, Collection<Path> sourcePaths) {
         this.bootClassPath = bootClassPath;
         if (bootClassPath == null) {
-            useSystemClassLoaderInResolution = true;//needed for finding java.lang.Object & Co.
+            useSystemClassLoaderInResolution = true;// needed for finding java.lang.Object & Co.
         }
         this.sourcePaths = new ArrayList<>(sourcePaths);
         typeSolver.rebuild();
@@ -152,12 +153,16 @@ public class JavaParserFactory {
     /**
      * A wrapper do make the type solver dynamic and aware of sourcePath changes.
      * The type solver is an attribute of {@link CompilationUnit} which are used to resolve types.
-     * But it is rather a fixed value, that is set by the preprocessing in {@link JavaParser}. To make the type solving
-     * aware of changes to this instance without changing the behavior of JP, we introduce one indirection with this class.
-     * This class behaves like a {@link TypeSolver} because everything is delegated to an intenral  {@link CombinedTypeSolver},
+     * But it is rather a fixed value, that is set by the preprocessing in {@link JavaParser}. To
+     * make the type solving
+     * aware of changes to this instance without changing the behavior of JP, we introduce one
+     * indirection with this class.
+     * This class behaves like a {@link TypeSolver} because everything is delegated to an intenral
+     * {@link CombinedTypeSolver},
      * which is rebuild on changes on the outer instance.
      * <p>
-     * Use {@link #rebuild()} to trigger a rebuild of the type solver on changing relevant setting in the outer
+     * Use {@link #rebuild()} to trigger a rebuild of the type solver on changing relevant setting
+     * in the outer
      * instance.
      *
      * @author Alexander Weigl
@@ -185,7 +190,8 @@ public class JavaParserFactory {
         }
 
         private void addToTypeSolver(CombinedTypeSolver ct, Path sourcePath) {
-            if (sourcePath == null) return;
+            if (sourcePath == null)
+                return;
             if (IOUtil.isFolderInsideJar(sourcePath)) {
                 try {
                     var fsPath = IOUtil.openFileInJar(sourcePath);
@@ -210,8 +216,9 @@ public class JavaParserFactory {
                 return;
             }
 
-            LOGGER.error("You gave me {} to add into the classpath. But I am not aware how to handle this path",
-                    sourcePath);
+            LOGGER.error(
+                "You gave me {} to add into the classpath. But I am not aware how to handle this path",
+                sourcePath);
         }
 
         @Override
@@ -226,7 +233,8 @@ public class JavaParserFactory {
 
         @Override
         public SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveType(String name) {
-            if (delegate == null) rebuild();
+            if (delegate == null)
+                rebuild();
             return delegate.tryToSolveType(name);
         }
     }

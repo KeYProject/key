@@ -1,5 +1,13 @@
 package de.uka.ilkd.key.core;
 
+import java.io.File;
+import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -22,21 +30,12 @@ import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
+
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * The main entry point for KeY
@@ -622,19 +621,21 @@ public final class Main {
             // only use one input file
             File fileNameOnStartUp = filesOnStartup.get(0).getAbsoluteFile();
             // final KeYRecoderExceptionHandler kexh = ui.getMediator().getExceptionHandler();
-            /* weigl: disable rifl
-            try {
-                RIFLTransformer transformer = new RIFLTransformer();
-                transformer.doTransform(riflFileName, fileNameOnStartUp,
-                    RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
-
-                LOGGER.info("[RIFL] Writing transformed Java files to {}  ...",
-                    fileNameOnStartUp);
-                return transformer.getProblemFiles();
-            } catch (ParserConfigurationException | SAXException | ParserException
-                    | IOException e) {
-                LOGGER.warn("rifl transform failed", e);
-            }*/
+            /*
+             * weigl: disable rifl
+             * try {
+             * RIFLTransformer transformer = new RIFLTransformer();
+             * transformer.doTransform(riflFileName, fileNameOnStartUp,
+             * RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
+             *
+             * LOGGER.info("[RIFL] Writing transformed Java files to {}  ...",
+             * fileNameOnStartUp);
+             * return transformer.getProblemFiles();
+             * } catch (ParserConfigurationException | SAXException | ParserException
+             * | IOException e) {
+             * LOGGER.warn("rifl transform failed", e);
+             * }
+             */
 
             return result;
         }

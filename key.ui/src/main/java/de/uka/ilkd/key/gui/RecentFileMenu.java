@@ -246,7 +246,7 @@ public class RecentFileMenu {
 
         Properties p = new Properties();
         try (FileInputStream fin = new FileInputStream(localRecentFiles);
-             FileOutputStream fout = new FileOutputStream(localRecentFiles)) {
+                FileOutputStream fout = new FileOutputStream(localRecentFiles)) {
             // creates a new file if it does not exist yet
             localRecentFiles.createNewFile();
             p.load(fin);

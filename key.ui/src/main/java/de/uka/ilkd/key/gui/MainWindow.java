@@ -1337,7 +1337,8 @@ public final class MainWindow extends JFrame {
         getUserInterface().loadProblem(file);
     }
 
-    public void loadProblem(Path file, List<Path> classPath, Path bootClassPath, List<Path> includes) {
+    public void loadProblem(Path file, List<Path> classPath, Path bootClassPath,
+            List<Path> includes) {
         getUserInterface().loadProblem(file, classPath, bootClassPath, includes);
     }
 

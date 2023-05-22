@@ -12,7 +12,6 @@ import java.nio.file.Path;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
-import org.key_project.util.java.IOUtil;
 
 public class UrlRuleSource extends RuleSource {
 

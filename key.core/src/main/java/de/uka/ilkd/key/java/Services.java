@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.logic.*;
@@ -14,9 +16,6 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 
 import org.key_project.util.lookup.Lookup;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * this is a collection of common services to the KeY prover. Services include information on the
@@ -77,7 +76,7 @@ public class Services implements TermServices {
     private NameRecorder nameRecorder;
 
     private ITermProgramVariableCollectorFactory factory =
-            TermProgramVariableCollector::new;
+        TermProgramVariableCollector::new;
 
     private final Profile profile;
 
@@ -102,7 +101,8 @@ public class Services implements TermServices {
         this(profile, new KeYJPMapping(), counters, caches);
     }
 
-    private Services(Profile profile, KeYJPMapping mapping, HashMap<String, Counter> counters, ServiceCaches caches) {
+    private Services(Profile profile, KeYJPMapping mapping, HashMap<String, Counter> counters,
+            ServiceCaches caches) {
         assert profile != null;
         assert counters != null;
         assert caches != null;
@@ -210,8 +210,8 @@ public class Services implements TermServices {
      * be used for a new proof.
      *
      * @param shareCaches {@code true} The created {@link Services} will use the same
-     *                    {@link ServiceCaches} like this instance; {@code false} the created {@link Services}
-     *                    will use a new empty {@link ServiceCaches} instance.
+     *        {@link ServiceCaches} like this instance; {@code false} the created {@link Services}
+     *        will use a new empty {@link ServiceCaches} instance.
      * @return the copy
      */
     public Services copy(boolean shareCaches) {
@@ -222,17 +222,17 @@ public class Services implements TermServices {
      * Creates a copy of this {@link Services} in which the {@link Profile} is replaced. The copy
      * does not belong to a {@link Proof} object and can hence be used for a new proof.
      *
-     * @param profile     The new {@link Profile} to use in the copy of this {@link Services}.
+     * @param profile The new {@link Profile} to use in the copy of this {@link Services}.
      * @param shareCaches {@code true} The created {@link Services} will use the same
-     *                    {@link ServiceCaches} like this instance; {@code false} the created {@link Services}
-     *                    will use a new empty {@link ServiceCaches} instance.
+     *        {@link ServiceCaches} like this instance; {@code false} the created {@link Services}
+     *        will use a new empty {@link ServiceCaches} instance.
      * @return The created copy.
      */
     public Services copy(Profile profile, boolean shareCaches) {
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
         Services s = new Services(profile,
-                getJavaInfo().getKeYProgModelInfo().rec2key().copy(),
-                copyCounters(), newCaches);
+            getJavaInfo().getKeYProgModelInfo().rec2key().copy(),
+            copyCounters(), newCaches);
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
@@ -289,7 +289,7 @@ public class Services implements TermServices {
     public void setProof(Proof p_proof) {
         if (this.proof != null) {
             throw new IllegalStateException(
-                    "Services are already owned by another proof:" + proof.name());
+                "Services are already owned by another proof:" + proof.name());
         }
         proof = p_proof;
     }

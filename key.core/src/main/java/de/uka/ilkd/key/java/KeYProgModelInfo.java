@@ -177,7 +177,8 @@ public class KeYProgModelInfo {
     }
 
     private boolean isSubtype(ResolvedType subType, ResolvedType superType) {
-        return superType.isAssignableBy(subType); // TODO weigl check if it is the right method and order.
+        return superType.isAssignableBy(subType); // TODO weigl check if it is the right method and
+                                                  // order.
 
         /*
          * if (subType instanceof ClassOrInterfaceType && superType instanceof ClassOrInterfaceType)

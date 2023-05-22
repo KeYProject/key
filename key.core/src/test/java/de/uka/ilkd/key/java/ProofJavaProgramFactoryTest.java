@@ -1,19 +1,21 @@
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.Test;
-import org.key_project.util.helper.FindResources;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Predicate;
+
+import de.uka.ilkd.key.util.HelperClassForTests;
+
+import org.key_project.util.helper.FindResources;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.StringUtil;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Alexander Weigl

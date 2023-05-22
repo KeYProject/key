@@ -79,7 +79,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * JMLTransformer::concatenate(), which does the same thing for Recoder ASTs)
      *
      * TODO weigl: The same functionality also exists in the jmlparser,
-     *             hence this is not needed after the migration to jmlparser.
+     * hence this is not needed after the migration to jmlparser.
      */
     private String concatenate(Comment[] comments) {
         if (comments.length == 0) {
@@ -88,7 +88,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         StringBuilder sb = new StringBuilder(comments[0].getText());
 
         // TODO javaparser: startPosition was relativePosition before migration to JavaParser
-        //                  test for accuracy of JML annotation errors.
+        // test for accuracy of JML annotation errors.
         int curLine = 0;
         for (int i = 1; i < comments.length; i++) {
             var relativePos = comments[i].getStartPosition();

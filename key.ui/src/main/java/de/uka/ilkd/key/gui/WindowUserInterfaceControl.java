@@ -314,8 +314,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      */
     @Override
     public AbstractProblemLoader load(Profile profile, Path file, List<Path> classPath,
-                                      Path bootClassPath, List<Path> includes, Properties poPropertiesToForce,
-                                      boolean forceNewProfileOfNewProofs, Consumer<Proof> callback)
+            Path bootClassPath, List<Path> includes, Properties poPropertiesToForce,
+            boolean forceNewProfileOfNewProofs, Consumer<Proof> callback)
             throws ProblemLoaderException {
         if (file != null) {
             mainWindow.getRecentFiles().addRecentFile(file.toAbsolutePath().toString());
@@ -323,7 +323,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         try {
             getMediator().stopInterface(true);
             return super.load(profile, file, classPath, bootClassPath, includes,
-                    poPropertiesToForce, forceNewProfileOfNewProofs, callback);
+                poPropertiesToForce, forceNewProfileOfNewProofs, callback);
         } finally {
             getMediator().startInterface(true);
         }

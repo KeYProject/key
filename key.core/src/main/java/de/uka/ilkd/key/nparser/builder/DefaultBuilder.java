@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import com.github.javaparser.resolution.UnsolvedSymbolException;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -39,7 +38,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     public static final String LIMIT_SUFFIX = "$lmtd";
 
     private static final ResourceBundle bundle =
-            ResourceBundle.getBundle("de.uka.ilkd.key.nparser.builder.resources");
+        ResourceBundle.getBundle("de.uka.ilkd.key.nparser.builder.resources");
 
     protected final Services services;
     protected final NamespaceSet nss;
@@ -86,7 +85,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
     protected Named lookup(Name n) {
         final Namespace[] lookups =
-                {programVariables(), variables(), schemaVariables(), functions()};
+            { programVariables(), variables(), schemaVariables(), functions() };
         return doLookup(n, lookups);
     }
 
@@ -141,14 +140,14 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      * @param varfuncName the String with the symbols name
      */
     protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName, String sortName,
-                                       Sort sort) {
+            Sort sort) {
         Name name = new Name(varfuncName);
         Operator[] operators =
-                new Operator[]{schemaVariables().lookup(name), variables().lookup(name),
-                        programVariables().lookup(new ProgramElementName(varfuncName)),
-                        functions().lookup(name), AbstractTermTransformer.name2metaop(varfuncName),
+            new Operator[] { schemaVariables().lookup(name), variables().lookup(name),
+                programVariables().lookup(new ProgramElementName(varfuncName)),
+                functions().lookup(name), AbstractTermTransformer.name2metaop(varfuncName),
 
-                };
+            };
 
         for (Operator op : operators) {
             if (op != null) {
@@ -158,12 +157,12 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
         if (sort != null || sortName != null) {
             Name fqName =
-                    new Name((sort != null ? sort.toString() : sortName) + "::" + varfuncName);
+                new Name((sort != null ? sort.toString() : sortName) + "::" + varfuncName);
             operators =
-                    new Operator[]{schemaVariables().lookup(fqName), variables().lookup(fqName),
-                            programVariables().lookup(new ProgramElementName(fqName.toString())),
-                            functions().lookup(fqName),
-                            AbstractTermTransformer.name2metaop(fqName.toString())};
+                new Operator[] { schemaVariables().lookup(fqName), variables().lookup(fqName),
+                    programVariables().lookup(new ProgramElementName(fqName.toString())),
+                    functions().lookup(fqName),
+                    AbstractTermTransformer.name2metaop(fqName.toString()) };
 
             for (Operator op : operators) {
                 if (op != null) {
@@ -172,7 +171,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             }
 
             SortDependingFunction firstInstance =
-                    SortDependingFunction.getFirstInstance(new Name(varfuncName), getServices());
+                SortDependingFunction.getFirstInstance(new Name(varfuncName), getServices());
             if (firstInstance != null) {
                 SortDependingFunction v = firstInstance.getInstanceFor(sort, getServices());
                 if (v != null) {
@@ -188,7 +187,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         if (numOfDimensions != 0) {
             final JavaInfo ji = getJavaInfo();
             Sort sort = ArraySort.getArraySortForDim(p.first, p.second, numOfDimensions,
-                    ji.objectSort(), ji.cloneableSort(), ji.serializableSort());
+                ji.objectSort(), ji.cloneableSort(), ji.serializableSort());
             Sort s = sort;
             do {
                 final ArraySort as = (ArraySort) s;
@@ -213,7 +212,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
                 Sort objectSort = sorts().lookup(new Name("java.lang.Object"));
                 if (objectSort == null) {
                     semanticError(null,
-                            "Null sort cannot be used before java.lang.Object is declared");
+                        "Null sort cannot be used before java.lang.Object is declared");
                 }
                 result = new NullSort(objectSort);
                 sorts().add(result);

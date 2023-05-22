@@ -59,7 +59,7 @@ public final class ProblemInitializer {
     private ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
 
     public ProblemInitializer(ProgressMonitor mon, Services services,
-                              ProblemInitializerListener listener) {
+            ProblemInitializerListener listener) {
         this.services = services;
         this.progMon = mon;
         this.listener = listener;
@@ -116,7 +116,7 @@ public final class ProblemInitializer {
     /**
      * displays the status report in the status line and the maximum used by a progress bar
      *
-     * @param status      the String to be displayed in the status line
+     * @param status the String to be displayed in the status line
      * @param progressMax an int describing what is 100 per cent
      */
     private void reportStatus(String status, int progressMax) {
@@ -155,7 +155,7 @@ public final class ProblemInitializer {
         for (String name : in.getLDTIncludes()) {
 
             keyFile[i] =
-                    new KeYFile(name, in.get(name), progMon, initConfig.getProfile(), fileRepo);
+                new KeYFile(name, in.get(name), progMon, initConfig.getProfile(), fileRepo);
             i++;
             setProgress(i);
         }
@@ -185,7 +185,7 @@ public final class ProblemInitializer {
         int i = 0;
         for (String fileName : in.getIncludes()) {
             KeYFile keyFile =
-                    new KeYFile(fileName, in.get(fileName), progMon, envInput.getProfile(), fileRepo);
+                new KeYFile(fileName, in.get(fileName), progMon, envInput.getProfile(), fileRepo);
             readEnvInput(keyFile, initConfig);
             setProgress(++i);
         }
@@ -253,8 +253,8 @@ public final class ProblemInitializer {
         // this allows to use included symbols inside JML.
         for (var fileName : includes.getRuleSets()) {
             KeYFile keyFile =
-                    new KeYFile(fileName.file().getFileName().toString(), fileName, progMon,
-                            envInput.getProfile(), fileRepo);
+                new KeYFile(fileName.file().getFileName().toString(), fileName, progMon,
+                    envInput.getProfile(), fileRepo);
             readEnvInput(keyFile, initConfig);
         }
 
@@ -282,7 +282,7 @@ public final class ProblemInitializer {
         }
         Path initialFile = envInput.getInitialFile();
         initConfig.getServices().setJavaModel(
-                JavaModel.createJavaModel(javaPath, classPath, bootClassPath, includes, initialFile));
+            JavaModel.createJavaModel(javaPath, classPath, bootClassPath, includes, initialFile));
     }
 
     /**
@@ -349,7 +349,7 @@ public final class ProblemInitializer {
             final ProgramElement pe = term.javaBlock().program();
             final Services serv = rootGoal.proof().getServices();
             final ImmutableSet<ProgramVariable> freeProgVars =
-                    MiscTools.getLocalIns(pe, serv).union(MiscTools.getLocalOuts(pe, serv));
+                MiscTools.getLocalIns(pe, serv).union(MiscTools.getLocalOuts(pe, serv));
             for (ProgramVariable pv : freeProgVars) {
                 if (namespaces.programVariables().lookup(pv.name()) == null) {
                     rootGoal.addProgramVariable(pv);
@@ -375,7 +375,7 @@ public final class ProblemInitializer {
             throws ProofInputException {
         // TODO: what does this actually do?
         ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().updateChoices(initConfig.choiceNS(),
-                false);
+            false);
         return initConfig;
     }
 
@@ -390,12 +390,12 @@ public final class ProblemInitializer {
         reportStatus("Registering rules", proofs.length * 10);
         for (int i = 0; i < proofs.length; i++) {
             proofs[i].getInitConfig().registerRules(proofs[i].getInitConfig().getTaclets(),
-                    AxiomJustification.INSTANCE);
+                AxiomJustification.INSTANCE);
             setProgress(3 + i * proofs.length);
             // register built in rules
             Profile profile = proofs[i].getInitConfig().getProfile();
             final ImmutableList<BuiltInRule> rules =
-                    profile.getStandardRules().getStandardBuiltInRules();
+                profile.getStandardRules().getStandardBuiltInRules();
             int j = 0;
             final int step = rules.size() != 0 ? (7 / rules.size()) : 0;
             for (Rule r : rules) {
@@ -434,13 +434,13 @@ public final class ProblemInitializer {
 
         try {
             final Path bootClassPath = envInput.readBootClassPath();
-            if(bootClassPath != null){
+            if (bootClassPath != null) {
                 services.activateJava(bootClassPath);
-            }else{
+            } else {
                 var p = services.getProfile().getInternalClassDirectory();
-                if(!p.isBlank()) {
+                if (!p.isBlank()) {
                     services.activateJava(Paths.get(p));
-                }else{
+                } else {
                     services.activateJava(null);
                 }
             }
@@ -456,7 +456,7 @@ public final class ProblemInitializer {
             RuleSource tacletBase = profile.getStandardRules().getTacletBase();
             if (tacletBase != null) {
                 KeYFile tacletBaseFile = new KeYFile("taclet base",
-                        profile.getStandardRules().getTacletBase(), progMon, profile);
+                    profile.getStandardRules().getTacletBase(), progMon, profile);
                 readEnvInput(tacletBaseFile, currentBaseConfig);
             }
             // remove traces of the generic sorts within the base configuration
@@ -481,7 +481,7 @@ public final class ProblemInitializer {
         }
         LOGGER.debug("Taclets under: {}", taclets1);
         try (PrintWriter out =
-                     new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
+            new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
             out.print(firstProof.toString());
         } catch (IOException e) {
             LOGGER.warn("Failed write proof", e);
@@ -498,7 +498,7 @@ public final class ProblemInitializer {
         }
         LOGGER.debug("Taclets under: {}", taclets1);
         try (PrintWriter out =
-                     new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
+            new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
             out.format("Date: %s%n", new Date());
 
             out.format("Choices: %n");
@@ -510,7 +510,7 @@ public final class ProblemInitializer {
             taclets.sort(Comparator.comparing(a -> a.name().toString()));
             for (Taclet taclet : taclets) {
                 out.format("== %s (%s) =========================================%n", taclet.name(),
-                        taclet.displayName());
+                    taclet.displayName());
                 out.println(taclet);
                 out.format("-----------------------------------------------------%n");
             }
@@ -545,7 +545,7 @@ public final class ProblemInitializer {
                         final ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
                         if (pv instanceof LocationVariable) {
                             heapLDT.getFieldSymbolForPV((LocationVariable) pv,
-                                    initConfig.getServices());
+                                initConfig.getServices());
                         }
                     }
                 }
