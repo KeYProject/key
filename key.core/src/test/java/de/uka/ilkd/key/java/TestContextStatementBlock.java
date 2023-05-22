@@ -1,9 +1,10 @@
 package de.uka.ilkd.key.java;
 
+import java.util.Collections;
+
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.operator.PostIncrement;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.rule.TacletForTests;
 
@@ -12,8 +13,6 @@ import org.key_project.util.ExtList;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
