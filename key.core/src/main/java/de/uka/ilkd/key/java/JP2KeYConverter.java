@@ -65,17 +65,14 @@ public class JP2KeYConverter {
     @Nonnull
     private final Namespace<SchemaVariable> schemaVariables;
     private final JP2KeYTypeConverter typeConverter;
-    private final ConstantExpressionEvaluator evaluator;
 
     public JP2KeYConverter(Services services, KeYJPMapping mapping,
             @Nonnull Namespace<SchemaVariable> schemaVariables,
-            JP2KeYTypeConverter typeConverter,
-            ConstantExpressionEvaluator evaluator) {
+            JP2KeYTypeConverter typeConverter) {
         this.services = services;
         this.mapping = mapping;
         this.schemaVariables = schemaVariables;
         this.typeConverter = typeConverter;
-        this.evaluator = evaluator;
     }
 
     public CompilationUnit processCompilationUnit(com.github.javaparser.ast.CompilationUnit cu) {
@@ -83,9 +80,7 @@ public class JP2KeYConverter {
     }
 
     public Object process(Node block) {
-        return block.accept(
-            new JP2KeYVisitor(services, mapping, typeConverter, schemaVariables, evaluator),
-            null);
+        return block.accept(new JP2KeYVisitor(services, mapping, typeConverter, schemaVariables), null);
     }
 }
 
@@ -108,13 +103,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     JP2KeYVisitor(@Nonnull Services services,
             @Nonnull KeYJPMapping mapping, @Nonnull JP2KeYTypeConverter typeConverter,
-            @Nonnull Namespace<SchemaVariable> schemaVariables,
-            @Nonnull ConstantExpressionEvaluator evaluator) {
+            @Nonnull Namespace<SchemaVariable> schemaVariables) {
         this.services = services;
         this.mapping = mapping;
         this.typeConverter = typeConverter;
         schemaVariableNamespace = schemaVariables;
-        this.evaluator = evaluator;
+        this.evaluator = new ConstantExpressionEvaluator();
     }
 
     private void reportError(Node n, String message) {

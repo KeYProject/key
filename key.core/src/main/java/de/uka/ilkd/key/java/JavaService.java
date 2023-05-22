@@ -118,8 +118,7 @@ public class JavaService {
      * @return not null
      */
     public JP2KeYConverter getConverter(Namespace<SchemaVariable> schemaVariables) {
-        return new JP2KeYConverter(services, mapping, schemaVariables, typeConverter,
-            programFactory.createConstantExpressionEvaluator());
+        return new JP2KeYConverter(services, mapping, schemaVariables, typeConverter);
     }
 
     /**
@@ -1013,8 +1012,7 @@ public class JavaService {
         this.mapping = mapping;
         programFactory = new JavaParserFactory(bootClassPath, sourcePaths);
         typeConverter = new JP2KeYTypeConverter(services, programFactory.getTypeSolver(), mapping);
-        converter = new JP2KeYConverter(services, mapping, new Namespace<>(), typeConverter,
-            programFactory.createConstantExpressionEvaluator());
+        converter = new JP2KeYConverter(services, mapping, new Namespace<>(), typeConverter);
     }
 
 

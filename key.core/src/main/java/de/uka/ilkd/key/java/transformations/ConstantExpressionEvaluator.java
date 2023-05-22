@@ -2,7 +2,6 @@ package de.uka.ilkd.key.java.transformations;
 
 import java.util.List;
 
-import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseProblemException;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.expr.Expression;
@@ -43,8 +42,8 @@ public class ConstantExpressionEvaluator {
         }
 
         try {
-            //weigl: use the static java parser; special feature (KeY or JML syntax) are not expected in the output
-            // of JShell
+            // weigl: use the static java parser; special feature (KeY or JML syntax) are not
+            // expected in the output of JShell
             return StaticJavaParser.parseExpression(evt.value());
         } catch (ParseProblemException e) {
             throw new EvaluationException("Could not evaluate " + expression, e);
