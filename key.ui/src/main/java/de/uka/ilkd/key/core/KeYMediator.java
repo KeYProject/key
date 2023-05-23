@@ -297,6 +297,9 @@ public class KeYMediator {
      * @param p the proof to select.
      */
     public void setProof(Proof p) {
+        if (getSelectedProof() == p) {
+            return;
+        }
         final Proof pp = p;
         if (SwingUtilities.isEventDispatchThread()) {
             setProofHelper(pp);

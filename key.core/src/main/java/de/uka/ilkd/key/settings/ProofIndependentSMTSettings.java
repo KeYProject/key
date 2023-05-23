@@ -33,6 +33,7 @@ public final class ProofIndependentSMTSettings
     public static final String SOLVER_COMMAND = "[SMTSettings]solverCommand";
     public static final String PROP_TIMEOUT = "[SMTSettings]timeout";
     public static final String SOLVER_CHECK_FOR_SUPPORT = "[SMTSettings]checkForSupport";
+    public static final String SOLVER_ENABLED_ON_LOAD = "[SMTSettings]enableWhenLoading";
 
     private static final ProofIndependentSMTSettings DEFAULT_DATA =
         new ProofIndependentSMTSettings();
@@ -71,6 +72,7 @@ public final class ProofIndependentSMTSettings
     private LinkedList<SolverTypeCollection> legacyTranslationSolverUnions = new LinkedList<>();
 
     private boolean checkForSupport = true;
+    private boolean enableOnLoad = true;
 
     private ProofIndependentSMTSettings(ProofIndependentSMTSettings data) {
         copy(data);
@@ -271,6 +273,13 @@ public final class ProofIndependentSMTSettings
 
     }
 
+    public boolean isEnableOnLoad() {
+        return enableOnLoad;
+    }
+
+    public void setEnableOnLoad(boolean enableOnLoad) {
+        this.enableOnLoad = enableOnLoad;
+    }
 
     public void copy(ProofIndependentSMTSettings data) {
         setShowResultsAfterExecution(data.showResultsAfterExecution);
@@ -287,6 +296,7 @@ public final class ProofIndependentSMTSettings
         setSeqBound(data.seqBound);
         setLocsetBound(data.locsetBound);
         setObjectBound(data.objectBound);
+        setEnableOnLoad(data.enableOnLoad);
 
 
         solverTypes.addAll(data.solverTypes);
@@ -348,6 +358,7 @@ public final class ProofIndependentSMTSettings
         seqBound = SettingsConverter.read(props, FIELD_BOUND, seqBound);
         locsetBound = SettingsConverter.read(props, LOCSET_BOUND, locsetBound);
         objectBound = SettingsConverter.read(props, OBJECT_BOUND, objectBound);
+        enableOnLoad = SettingsConverter.read(props, SOLVER_ENABLED_ON_LOAD, enableOnLoad);
 
         for (SolverType type : solverTypes) {
             type.setSolverTimeout(SettingsConverter.read(props, PROP_TIMEOUT + type.getName(),
@@ -373,6 +384,7 @@ public final class ProofIndependentSMTSettings
         SettingsConverter.store(props, OBJECT_BOUND, objectBound);
         SettingsConverter.store(props, FIELD_BOUND, seqBound);
         SettingsConverter.store(props, LOCSET_BOUND, locsetBound);
+        SettingsConverter.store(props, SOLVER_ENABLED_ON_LOAD, enableOnLoad);
 
         for (SolverType type : solverTypes) {
             SettingsConverter.store(props, PROP_TIMEOUT + type.getName(), type.getSolverTimeout());
