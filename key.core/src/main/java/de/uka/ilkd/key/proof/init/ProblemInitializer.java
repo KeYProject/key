@@ -233,13 +233,7 @@ public final class ProblemInitializer {
         envInput.setInitConfig(initConfig);
         final String javaPath = envInput.readJavaPath();
         final List<Path> classPath = envInput.readClassPath();
-        final Path bootClassPath;
-        try {
-            bootClassPath = envInput.readBootClassPath();
-        } catch (IOException ioe) {
-            throw new ProofInputException(ioe);
-        }
-
+        final Path bootClassPath = envInput.readBootClassPath();
         final Includes includes = envInput.readIncludes();
 
         if (fileRepo != null) {
@@ -428,42 +422,38 @@ public final class ProblemInitializer {
         // synchronized (SchemaJavaParser.class) {
         // It is required to work with a copy to make this method thread save required by the
         // Eclipse plug-ins.
-        InitConfig currentBaseConfig = baseConfig != null ? baseConfig.copy() : null;
+        InitConfig initConfig = baseConfig != null ? baseConfig.copy() : null;
         progressStarted(this);
         alreadyParsed.clear();
 
-        try {
-            final Path bootClassPath = envInput.readBootClassPath();
-            if (bootClassPath != null) {
-                services.activateJava(bootClassPath);
-            } else {
-                var p = services.getProfile().getInternalClassDirectory();
-                if (!p.isBlank()) {
-                    services.activateJava(Paths.get(p));
-                } else {
-                    services.activateJava(null);
-                }
-            }
-        } catch (IOException ioe) {
-            throw new ProofInputException(ioe);
-        }
-
-
         // the first time, read in standard rules
         Profile profile = services.getProfile();
-        if (currentBaseConfig == null || profile != currentBaseConfig.getProfile()) {
-            currentBaseConfig = new InitConfig(services);
+        if (initConfig == null || profile != initConfig.getProfile()) {
+            initConfig = new InitConfig(services);
             RuleSource tacletBase = profile.getStandardRules().getTacletBase();
             if (tacletBase != null) {
                 KeYFile tacletBaseFile = new KeYFile("taclet base",
                     profile.getStandardRules().getTacletBase(), progMon, profile);
-                readEnvInput(tacletBaseFile, currentBaseConfig);
+                readEnvInput(tacletBaseFile, initConfig);
             }
+
             // remove traces of the generic sorts within the base configuration
-            cleanupNamespaces(currentBaseConfig);
-            baseConfig = currentBaseConfig;
+            cleanupNamespaces(initConfig);
+            baseConfig = initConfig;
         }
-        InitConfig ic = prepare(envInput, currentBaseConfig);
+
+        final Path bootClassPath = envInput.readBootClassPath();
+        var services = initConfig.getServices();
+        Path path;
+        if (bootClassPath != null) {
+            path = bootClassPath;
+        } else {
+            var classDir = services.getProfile().getInternalClassDirectory();
+            path = classDir.isBlank() ? null : Paths.get(classDir);
+        }
+        services.activateJava(path);
+
+        InitConfig ic = prepare(envInput, initConfig);
         if (Debug.ENABLE_DEBUG) {
             print(ic);
         }
