@@ -1,13 +1,14 @@
 package de.uka.ilkd.key.java.reference;
 
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-
 import org.key_project.util.ExtList;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
 
 
 public class FieldReference extends VariableReference
@@ -16,40 +17,37 @@ public class FieldReference extends VariableReference
     /**
      * Reference prefix.
      */
-    protected ReferencePrefix prefix;
-
-
-    protected FieldReference() {
-        prefix = null;
-    }
+    @Nonnull
+    protected final ReferencePrefix prefix;
 
     public FieldReference(ProgramVariable pv, ReferencePrefix prefix) {
         super(pv);
-        initPrefix(pv, prefix);
+        this.prefix = constructPrefix(prefix, pv);
     }
 
     public FieldReference(PositionInfo pi, List<Comment> c, ProgramVariable variable,
-            ReferencePrefix prefix) {
+                          ReferencePrefix prefix) {
+        super(pi, c, variable);
+        this.prefix = constructPrefix(prefix, getProgramVariable());
     }
 
-    private void initPrefix(ProgramVariable pv, ReferencePrefix prefix) {
+    private ReferencePrefix constructPrefix(ReferencePrefix prefix, ProgramVariable pv) {
         if (prefix == null && !pv.isStatic() && pv.isMember()) {
-            this.prefix = new ThisReference();
+            return new ThisReference();
         } else {
-            this.prefix = prefix;
+            return prefix;
         }
     }
 
-    public FieldReference(ExtList children, ReferencePrefix prefix) {
+    public FieldReference(ExtList children, @Nullable ReferencePrefix prefix) {
         super(children);
-        initPrefix(getProgramVariable(), prefix);
+        this.prefix = constructPrefix(prefix, getProgramVariable());
     }
 
 
     public FieldReference(ProgramVariable pv, ReferencePrefix prefix, PositionInfo pi) {
         super(pv, pi);
-        initPrefix(pv, prefix);
-
+        this.prefix = constructPrefix(prefix, getProgramVariable());
     }
 
     /**
@@ -73,7 +71,7 @@ public class FieldReference extends VariableReference
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
@@ -181,7 +179,6 @@ public class FieldReference extends VariableReference
     }
 
 
-
     /**
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
@@ -192,7 +189,9 @@ public class FieldReference extends VariableReference
         v.performActionOnFieldReference(this);
     }
 
-    /** are there "dots" in the prefix? */
+    /**
+     * are there "dots" in the prefix?
+     */
     public boolean isSingleDeref() {
         return prefix.getReferencePrefix() == null;
     }

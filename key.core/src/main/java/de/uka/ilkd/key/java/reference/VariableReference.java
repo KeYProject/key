@@ -13,31 +13,27 @@
 
 package de.uka.ilkd.key.java.reference;
 
-import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-
 import org.key_project.util.ExtList;
+
+import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.Objects;
 
 
 public class VariableReference extends JavaNonTerminalProgramElement
         implements NameReference, Expression, ReferencePrefix {
-    @Nullable
+
+    @Nonnull
     protected final ProgramVariable variable;
 
-    public VariableReference(PositionInfo pi, List<Comment> comments, ProgramVariable variable) {
+    public VariableReference(PositionInfo pi, List<Comment> comments, @Nonnull ProgramVariable variable) {
         super(pi, comments);
-        this.variable = variable;
-    }
-
-    protected VariableReference() {
-        this(null, null, null);
+        this.variable = Objects.requireNonNull(variable);
     }
 
     public VariableReference(ExtList children) {
@@ -70,7 +66,7 @@ public class VariableReference extends JavaNonTerminalProgramElement
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
      * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *         of bounds
+     *                                        of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (variable != null) {
@@ -128,11 +124,11 @@ public class VariableReference extends JavaNonTerminalProgramElement
      * Gets the KeY java type.
      *
      * @param javaServ the java services
-     * @param ec the execution context
+     * @param ec       the execution context
      * @return the KeY java type
      */
     public KeYJavaType getKeYJavaType(Services javaServ,
-            ExecutionContext ec) {
+                                      ExecutionContext ec) {
         return getKeYJavaType();
     }
 

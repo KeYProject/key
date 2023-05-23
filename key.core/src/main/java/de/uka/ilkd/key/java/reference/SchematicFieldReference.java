@@ -3,10 +3,12 @@ package de.uka.ilkd.key.java.reference;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
-
 import org.key_project.util.ExtList;
 
 /**
@@ -17,6 +19,7 @@ import org.key_project.util.ExtList;
 public class SchematicFieldReference extends FieldReference
         implements MemberReference, ReferenceSuffix, TypeReferenceContainer, ExpressionContainer {
 
+    private static final ProgramVariable SCHEMA_VARIABLE = new LocationVariable(new ProgramElementName("SCHEMA_VARIABLE_IGNORE"), (Sort) null);
     /**
      * Reference suffix
      */
@@ -24,14 +27,14 @@ public class SchematicFieldReference extends FieldReference
 
 
     public SchematicFieldReference(SchemaVariable pe, ReferencePrefix prefix) {
+        super(SCHEMA_VARIABLE, prefix, null);
         this.schemaVariable = pe;
-        this.prefix = prefix;
     }
 
 
     public SchematicFieldReference(ExtList children, ReferencePrefix prefix) {
+        super(children, prefix);
         this.schemaVariable = children.get(SchemaVariable.class);
-        this.prefix = prefix;
     }
 
 
@@ -56,7 +59,7 @@ public class SchematicFieldReference extends FieldReference
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
@@ -118,7 +121,7 @@ public class SchematicFieldReference extends FieldReference
      *
      * @param index an index for a type reference.
      * @return the type reference with the given index.
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public TypeReference getTypeReferenceAt(int index) {
         if (prefix instanceof TypeReference && index == 0) {
@@ -141,7 +144,7 @@ public class SchematicFieldReference extends FieldReference
      *
      * @param index an index for an expression.
      * @return the expression with the given index.
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
         if (prefix instanceof Expression && index == 0) {

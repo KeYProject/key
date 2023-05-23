@@ -1318,10 +1318,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(KeyMethodBodyStatement n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        IProgramVariable resultVar = accept(n.getExpr());
+
+        MethodReference methodReference = accept(n.getExpr());
         TypeReference bodySource = accept(n.getSource());
-        MethodReference methodReference = null;// TODO javaparser missing?
-        IProgramMethod method = null;
+        IProgramVariable resultVar = n.getName().map(it -> (IProgramVariable) accept(it)).orElse(null);
+        IProgramMethod method = null; //TODO how to retrieve the method?
         return new MethodBodyStatement(pi, c, resultVar, bodySource, methodReference, method);
     }
 
