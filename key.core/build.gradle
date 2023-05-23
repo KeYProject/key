@@ -19,7 +19,7 @@ dependencies {
     antlr group: 'org.antlr', name: 'antlr', version: '3.5.3'   // use ANTLR version 3
 
     antlr4 "org.antlr:antlr4:4.12.0"
-    api "org.antlr:antlr4-runtime:4.12.0"
+    api "org.antlr:antlr4-runtime:4.13.0"
     //implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
 }
 
