@@ -118,7 +118,6 @@ public class Services implements TermServices {
         typeconverter = new TypeConverter(this);
         this.mapping = mapping;
         nameRecorder = new NameRecorder();
-        nameRecorder = new NameRecorder();
     }
 
     private Services(Services s) {
@@ -271,7 +270,7 @@ public class Services implements TermServices {
         Services s = new Services(getProfile());
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
-        nameRecorder = nameRecorder.copy();
+        s.nameRecorder = nameRecorder.copy();
         s.setJavaModel(getJavaModel());
 
         return s;

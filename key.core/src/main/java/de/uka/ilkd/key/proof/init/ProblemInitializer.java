@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
 public final class ProblemInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProblemInitializer.class);
 
-    private static InitConfig baseConfig;
+    private static InitConfig BASE_INPUT_CONFIG;
     private final Services services;
     private final ProgressMonitor progMon;
     private final Set<EnvInput> alreadyParsed = new LinkedHashSet<>();
@@ -226,8 +226,10 @@ public final class ProblemInitializer {
      */
     private void readJava(EnvInput envInput, InitConfig initConfig) throws ProofInputException {
         // this method must only be called once per init config
-        assert !initConfig.getServices().getJavaInfo().rec2key().parsedSpecial();
+        assert initConfig.getServices().getJavaInfo() == null;
         assert initConfig.getServices().getJavaModel() == null;
+
+        activateInitConfigJava(initConfig, envInput);
 
         // read Java source and classpath settings
         envInput.setInitConfig(initConfig);
@@ -406,44 +408,9 @@ public final class ProblemInitializer {
         }
     }
 
-    /**
-     * Creates an initConfig / a proof environment and reads an EnvInput into it
-     */
-    public InitConfig prepare(EnvInput envInput) throws ProofInputException {
-        // The synchronized statement is required for thread save parsing since all JavaCC parser
-        // are generated static.
-        // For our own parser (ProofJavaParser.jj and SchemaJavaParser.jj) it is possible to
-        // generate them non static
-        // which is done on branch "hentschelJavaCCInstanceNotStatic". But recoder still uses static
-        // methods and
-        // the synchronized statement can not be avoided for this reason.
-
-        // TODO javaparser
-        // synchronized (SchemaJavaParser.class) {
-        // It is required to work with a copy to make this method thread save required by the
-        // Eclipse plug-ins.
-        InitConfig initConfig = baseConfig != null ? baseConfig.copy() : null;
-        progressStarted(this);
-        alreadyParsed.clear();
-
-        // the first time, read in standard rules
-        Profile profile = services.getProfile();
-        if (initConfig == null || profile != initConfig.getProfile()) {
-            initConfig = new InitConfig(services);
-            RuleSource tacletBase = profile.getStandardRules().getTacletBase();
-            if (tacletBase != null) {
-                KeYFile tacletBaseFile = new KeYFile("taclet base",
-                    profile.getStandardRules().getTacletBase(), progMon, profile);
-                readEnvInput(tacletBaseFile, initConfig);
-            }
-
-            // remove traces of the generic sorts within the base configuration
-            cleanupNamespaces(initConfig);
-            baseConfig = initConfig;
-        }
-
+    private void activateInitConfigJava(InitConfig config, EnvInput envInput) {
         final Path bootClassPath = envInput.readBootClassPath();
-        var services = initConfig.getServices();
+        var services = config.getServices();
         Path path;
         if (bootClassPath != null) {
             path = bootClassPath;
@@ -452,13 +419,48 @@ public final class ProblemInitializer {
             path = classDir.isBlank() ? null : Paths.get(classDir);
         }
         services.activateJava(path);
+    }
 
+    /**
+     * Creates an input config for the given env input
+     * @param envInput the env input
+     * @return a *new* config
+     * @throws ProofInputException on load error
+     */
+    private InitConfig createInputConfigFor(EnvInput envInput) throws ProofInputException {
+        var profile = services.getProfile();
+        if (BASE_INPUT_CONFIG != null && profile == BASE_INPUT_CONFIG.getProfile()) {
+            return BASE_INPUT_CONFIG.copy();
+        }
+
+        var config = new InitConfig(services);
+        activateInitConfigJava(config, envInput);
+
+        RuleSource tacletBase = profile.getStandardRules().getTacletBase();
+        if (tacletBase != null) {
+            KeYFile tacletBaseFile = new KeYFile("taclet base",
+                    profile.getStandardRules().getTacletBase(), progMon, profile);
+            readEnvInput(tacletBaseFile, config);
+        }
+
+        // remove traces of the generic sorts within the base configuration
+        cleanupNamespaces(config);
+        BASE_INPUT_CONFIG = config;
+        return BASE_INPUT_CONFIG.copy();
+    }
+
+    /**
+     * Creates an initConfig / a proof environment and reads an EnvInput into it
+     */
+    public InitConfig prepare(EnvInput envInput) throws ProofInputException {
+        progressStarted(this);
+        alreadyParsed.clear();
+        InitConfig initConfig = createInputConfigFor(envInput);
         InitConfig ic = prepare(envInput, initConfig);
         if (Debug.ENABLE_DEBUG) {
             print(ic);
         }
         return ic;
-        // }
     }
 
     private void print(Proof firstProof) {
@@ -509,47 +511,38 @@ public final class ProblemInitializer {
         }
     }
 
-    // -------------------------------------------------------------------------
-    // public interface
-    // -------------------------------------------------------------------------
-
-    private InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)
+    private InitConfig prepare(EnvInput envInput, InitConfig initConfig)
             throws ProofInputException {
-        // create initConfig
-        InitConfig initConfig = referenceConfig.copy();
-
-
         // read Java
         readJava(envInput, initConfig);
 
         // register function and predicate symbols defined by Java program
-        final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
-        final Namespace<Function> functions = initConfig.getServices().getNamespaces().functions();
-        final HeapLDT heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
+        var services = initConfig.getServices();
+        final JavaInfo javaInfo = services.getJavaInfo();
+        assert javaInfo != null;
+        final Namespace<Function> functions = services.getNamespaces().functions();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         assert heapLDT != null;
-        if (javaInfo != null) {
-            for (KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
-                final Type type = kjt.getJavaType();
-                if (type instanceof ClassDeclaration || type instanceof InterfaceDeclaration) {
-                    for (Field f : javaInfo.getAllFields((TypeDeclaration) type)) {
-                        final ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
-                        if (pv instanceof LocationVariable) {
-                            heapLDT.getFieldSymbolForPV((LocationVariable) pv,
-                                initConfig.getServices());
-                        }
-                    }
-                }
-                for (ProgramMethod pm : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
-                    if (pm == null) {
-                        continue; // weigl 2021-11-10
-                    }
-                    if (!(pm.isVoid() || pm.isConstructor())) {
-                        functions.add(pm);
+
+        for (KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
+            final Type type = kjt.getJavaType();
+            if (type instanceof ClassDeclaration || type instanceof InterfaceDeclaration) {
+                for (Field f : javaInfo.getAllFields((TypeDeclaration) type)) {
+                    final ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
+                    if (pv instanceof LocationVariable) {
+                        heapLDT.getFieldSymbolForPV((LocationVariable) pv,
+                                services);
                     }
                 }
             }
-        } else {
-            throw new ProofInputException("Problem initialization without JavaInfo!");
+            for (ProgramMethod pm : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
+                if (pm == null) {
+                    continue; // weigl 2021-11-10
+                }
+                if (!(pm.isVoid() || pm.isConstructor())) {
+                    functions.add(pm);
+                }
+            }
         }
 
         // read envInput
@@ -562,6 +555,10 @@ public final class ProblemInitializer {
         progressStopped(this);
         return initConfig;
     }
+
+    // -------------------------------------------------------------------------
+    // public interface
+    // -------------------------------------------------------------------------
 
     public ProofAggregate startProver(InitConfig initConfig, ProofOblInput po)
             throws ProofInputException {
