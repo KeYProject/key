@@ -521,8 +521,8 @@ public class JavaService {
 
             // make them available to the rec2key mapping
             for (CompilationUnit cu : specialClasses) {
-                var dl = cu.getStorage();
                 // weigl: allowed for fragments
+                // var dl = cu.getStorage();
                 // if (dl.isEmpty())
                 // throw new AssertionError("DataLocation not set on compilation unit");
                 converter.processCompilationUnit(cu);
@@ -771,8 +771,6 @@ public class JavaService {
         }
         embedMethod(embedBlock(block1), context);
         // normalise constant string expressions
-        List<CompilationUnit> cunits = new ArrayList<>();
-        cunits.add(context.getCompilationUnitContext());
         new ConstantStringExpressionEvaluator(createPipelineServices())
                 .apply(context.getClassDeclaration());
         return block1;
@@ -869,9 +867,8 @@ public class JavaService {
      * @return a newly created recoder ClassDeclaration with a unique name
      */
     private ClassOrInterfaceDeclaration interactClassDecl() {
-        var classContext = new ClassOrInterfaceDeclaration(new NodeList<>(), false,
+        return new ClassOrInterfaceDeclaration(new NodeList<>(), false,
                 "$virtual_class_for_parsing" + interactCounter.incrementAndGet());
-        return classContext;
     }
 
     // ----- helpers
