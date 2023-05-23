@@ -206,7 +206,7 @@ public class JavaService {
                     .orElse(new Position(-1, -1));
             return new BuildingIssue(it.getVerboseMessage(),
                     null, false,
-                    de.uka.ilkd.key.java.Position.newOneBased(loc.line, loc.column));
+                    de.uka.ilkd.key.java.Position.fromJPPosition(loc));
         }).collect(Collectors.toList());
         throw new BuildingExceptions(be);
     }
@@ -281,9 +281,7 @@ public class JavaService {
 
     public void setClassPath(Path bootClassPath, List<Path> classPath) {
         programFactory.setBootClassPath(bootClassPath);
-        for (Path path : classPath) {
-            addSourcePath(path);
-        }
+        programFactory.addSourcePaths(classPath);
     }
 
     /**
@@ -971,26 +969,5 @@ public class JavaService {
     @Nonnull
     private JavaSymbolSolver getSymbolResolver() {
         return programFactory.getSymbolSolver();
-    }
-
-    public void addSourcePath(Path javaPath) {
-        var classpath = programFactory.getSourcePaths();
-
-        if (classpath.contains(javaPath)) {
-            return; // ignore that path is already set
-        }
-
-        for (Path path : classpath) {
-            if (javaPath.startsWith(path)) {
-                throw new IllegalStateException(
-                        "A parent of this path is already given in the classpath");
-            }
-
-            if (path.startsWith(javaPath)) {
-                throw new IllegalStateException(
-                        "A child folder of this path is already given in the classpath");
-            }
-        }
-        classpath.add(javaPath);
     }
 }

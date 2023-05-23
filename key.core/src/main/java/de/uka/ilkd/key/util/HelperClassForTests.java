@@ -77,7 +77,7 @@ public class HelperClassForTests {
 
             result = pi.startProver(po, po);
 
-        } catch (Exception e) {
+        } catch (ProofInputException e) {
             throw new RuntimeException(e);
         }
         return result;

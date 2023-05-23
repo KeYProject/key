@@ -77,6 +77,14 @@ public class Position implements Comparable<Position> {
         return fromOneZeroBased(token.getLine(), token.getCharPositionInLine());
     }
 
+    public static Position fromJPPosition(com.github.javaparser.Position p) {
+        if (p.invalid() || (p.line == -1 && p.column == -1)) {
+            return UNDEFINED;
+        } else {
+            return newOneBased(p.line, p.column);
+        }
+    }
+
     /**
      * Creates a new Position with the offset added to the line.
      *

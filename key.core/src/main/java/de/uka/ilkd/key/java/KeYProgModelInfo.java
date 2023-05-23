@@ -254,11 +254,9 @@ public class KeYProgModelInfo {
     }
 
     private List<ResolvedMethodDeclaration> getMethods(KeYJavaType kjt) {
-        com.github.javaparser.ast.type.Type type =
-            (com.github.javaparser.ast.type.Type) rec2key().toRecoder(kjt.getJavaType());
-        var rtype = type.resolve();
-        if (rtype.isReferenceType()) {
-            return rtype.asReferenceType().getAllMethods();
+        var type = getJPType(kjt);
+        if (type.isReferenceType()) {
+            return type.asReferenceType().getAllMethods();
         }
         return Collections.emptyList();
     }

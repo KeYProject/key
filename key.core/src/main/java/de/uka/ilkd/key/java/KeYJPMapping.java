@@ -149,8 +149,6 @@ public class KeYJPMapping {
     }
 
     public Set<Object> elemsKeY() {
-        // TODO javaparser remove
-        LOGGER.error("Size of rec2key: {} entries", map.size());
         return revMap.keySet();
     }
 

@@ -51,7 +51,7 @@ public class JavaParserFactory {
      * for classes or Java files.
      */
     @Nonnull
-    private final List<Path> sourcePaths;
+    private final ArrayList<Path> sourcePaths;
 
     @Nullable
     private ParserConfiguration config;
@@ -69,7 +69,7 @@ public class JavaParserFactory {
             useSystemClassLoaderInResolution = true;// needed for finding java.lang.Object & Co.
         }
         this.sourcePaths = new ArrayList<>(sourcePaths);
-        typeSolver.rebuild();
+        typeSolver.lazyRebuild();
     }
 
     @Nonnull
@@ -77,10 +77,27 @@ public class JavaParserFactory {
         return Collections.unmodifiableList(sourcePaths);
     }
 
-    public void setSourcePaths(List<Path> files) {
-        this.sourcePaths.clear();
-        this.sourcePaths.addAll(files);
-        typeSolver.rebuild();
+    public void addSourcePaths(Collection<Path> files) {
+        sourcePaths.ensureCapacity(sourcePaths.size() + files.size());
+        for (Path path : files) {
+            if (sourcePaths.contains(path)) {
+                continue; // ignore that path is already set
+            }
+            for (Path existing : sourcePaths) {
+                if (path.startsWith(existing)) {
+                    throw new IllegalStateException(
+                            "A parent of this path is already given in the classpath");
+                }
+
+                if (existing.startsWith(path)) {
+                    throw new IllegalStateException(
+                            "A child folder of this path is already given in the classpath");
+                }
+            }
+            sourcePaths.add(path);
+        }
+
+        typeSolver.lazyRebuild();
     }
 
     @Nonnull
@@ -117,7 +134,7 @@ public class JavaParserFactory {
      */
     public void setUseSystemClassLoaderInResolution(boolean useSystemClassLoaderInResolution) {
         this.useSystemClassLoaderInResolution = useSystemClassLoaderInResolution;
-        typeSolver.rebuild();
+        typeSolver.lazyRebuild();
     }
 
     @Nonnull
@@ -135,10 +152,6 @@ public class JavaParserFactory {
 
     public ParseResult<KeyContextStatementBlock> parseContextBlock(String sr) {
         return createJavaParser().parseSchemaBlock(sr);
-    }
-
-    public ConstantExpressionEvaluator createConstantExpressionEvaluator() {
-        return new ConstantExpressionEvaluator();
     }
 
     public void setBootClassPath(Path bootClassPath) {
@@ -229,6 +242,10 @@ public class JavaParserFactory {
         @Override
         public void setParent(TypeSolver parent) {
             this.parent = parent;
+        }
+
+        void lazyRebuild() {
+            delegate = null;
         }
 
         @Override

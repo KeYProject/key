@@ -365,11 +365,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         }
 
         KeYJavaType kjt;
-        try {
-            kjt = getJavaInfo().getKeYJavaType(type.toString());
-        } catch (AssertionFailure e) {
-            kjt = null;
-        }
+        kjt = getJavaInfo().getKeYJavaType(type.toString());
 
         // expand to "java.lang"
         if (kjt == null) {
