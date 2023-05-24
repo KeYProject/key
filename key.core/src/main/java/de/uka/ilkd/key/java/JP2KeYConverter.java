@@ -360,13 +360,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
-    public TypeReference visit(ClassOrInterfaceType n, Void arg) {
+    public Optional<TypeReference> visit(ClassOrInterfaceType n, Void arg) {
         if (n.getTypeArguments().isPresent()) {
             reportError(n, "Type arguments found.");
         }
-        var rt = n.resolve();
-        var kjt = getKeYJavaType(rt);
-        return new TypeRef(kjt);
+        var type = getKeYJavaType(n, n);
+        return type.map(TypeRef::new);
     }
 
     @Override
@@ -611,7 +610,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(LabeledStmt n, Void arg) {
-        var id = accept(n.getLabel());
+        Label id;
+        if (n.getLabel().asString().startsWith("#")) {
+            id = (ProgramSV) lookupSchemaVariable(n.getLabel().asString(), n);
+        } else {
+            id = new ProgramElementName(n.getLabel().asString());
+        }
         var stmt = accept(n.getStatement());
         return new LabeledStatement((Label) id, (Statement) stmt, createPositionInfo(n));
     }
@@ -665,7 +669,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     @Override
     public Object visit(NameExpr n, Void arg) {
         if (n.getNameAsString().startsWith("#")) {
-            return lookupSchemaVariable(n.getNameAsString());
+            return lookupSchemaVariable(n.getNameAsString(), n);
         }
 
         ResolvedType rtype = n.calculateResolvedType();
@@ -732,19 +736,36 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new PackageReference(pen, inner);
     }
 
+    @Nonnull
+    Optional<KeYJavaType> getKeYJavaType(Type type, Node context) {
+        if (type.isClassOrInterfaceType()) {
+            var cls = type.asClassOrInterfaceType();
+            if (cls.getName().toString().startsWith("#")) {
+                lookupSchemaVariable(cls.getName().toString(), context);
+                return Optional.empty();
+            }
+        }
+        return Optional.of(getKeYJavaType(type.resolve()));
+    }
+
     @Override
     public Object visit(Parameter n, Void arg) {
         ImmutableArray<de.uka.ilkd.key.java.declaration.Modifier> modifiers = map(n.getModifiers());
         var va = n.isVarArgs();
-        var type = getKeYJavaType(n.getType().resolve());
+        var type = getKeYJavaType(n.getType(), n);
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        var name = VariableNamer.parseName(n.getName().asString());
-        var pv = new LocationVariable(name, type, n.isFinal());
-        var spec = new VariableSpecification(pi, c, null, pv, 0, type);
+        IProgramVariable pv;
+        if (n.getName().toString().startsWith("#")) {
+            pv = (IProgramVariable) lookupSchemaVariable(n.getNameAsString(), n);
+        } else {
+            var name = VariableNamer.parseName(n.getName().asString());
+            pv = new LocationVariable(name, type.orElse(null), n.isFinal());
+        }
+        var spec = new VariableSpecification(pi, c, null, pv, 0, type.orElse(null));
         var isInInterface = parentIsInterface(n);
         return new ParameterDeclaration(new ImmutableArray<>(spec), pi, c, modifiers,
-                new TypeRef(type), isInInterface, va);
+                type.map(TypeRef::new).orElse(null), isInInterface, va);
     }
 
     @Override
@@ -947,7 +968,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         IProgramVariable pv;
         KeYJavaType kjt = type.getKeYJavaType();
         if (v.getNameAsString().startsWith("#")) {
-            pv = (IProgramVariable) lookupSchemaVariable(v.getNameAsString());
+            pv = (IProgramVariable) lookupSchemaVariable(v.getNameAsString(), v);
         } else {
             var name = VariableNamer.parseName(v.getNameAsString());
             pv = new LocationVariable(name, kjt, modifiers.hasModifier(Modifier.Keyword.FINAL));
@@ -1320,10 +1341,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var c = createComments(n);
 
         MethodReference methodReference = accept(n.getExpr());
-        TypeReference bodySource = accept(n.getSource());
+        Optional<TypeReference> bodySource = accept(n.getSource());
         IProgramVariable resultVar = n.getName().map(it -> (IProgramVariable) accept(it)).orElse(null);
         IProgramMethod method = null; //TODO how to retrieve the method?
-        return new MethodBodyStatement(pi, c, resultVar, bodySource, methodReference, method);
+        return new MethodBodyStatement(pi, c, resultVar, bodySource.orElse(null), methodReference, method);
     }
 
     @Override
@@ -1680,50 +1701,51 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public SchemaVariable visit(KeyMethodSignatureSV n, Void arg) {
-        return lookupSchemaVariable(n.getText());
+        return lookupSchemaVariable(n.getText(), n);
     }
 
     @Override
     public SchemaVariable visit(KeyProgramVariableSV n, Void arg) {
-        return lookupSchemaVariable(n.getText());
+        return lookupSchemaVariable(n.getText(), n);
     }
 
     @Override
     public SchemaVariable visit(KeyStatementSV n, Void arg) {
-        return lookupSchemaVariable(n.getText());
+        return lookupSchemaVariable(n.getText(), n);
     }
 
     @Override
     public SchemaVariable visit(KeyTypeSV n, Void arg) {
-        return lookupSchemaVariable(n.getText());
+        return lookupSchemaVariable(n.getText(), n);
     }
 
     @Override
     public SchemaVariable visit(KeyCcatchSV n, Void arg) {
-        return lookupSchemaVariable(n.getText());
+        return lookupSchemaVariable(n.getText(), n);
     }
 
     @Override
     public SchemaVariable visit(KeyExecutionContextSV n, Void arg) {
-        return lookupSchemaVariable(n.getText());
+        return lookupSchemaVariable(n.getText(), n);
     }
 
     @Override
     public SchemaVariable visit(KeyExecCtxtSV n, Void arg) {
-        return lookupSchemaVariable(n.getText());
+        return lookupSchemaVariable(n.getText(), n);
     }
 
     @Override
     public SchemaVariable visit(KeyJumpLabelSV n, Void arg) {
-        return lookupSchemaVariable(n.getText());
+        return lookupSchemaVariable(n.getText(), n);
     }
 
-    private SchemaVariable lookupSchemaVariable(String name) {
+    private SchemaVariable lookupSchemaVariable(String name, Node context) {
         SchemaVariable n = schemaVariableNamespace.lookup(new de.uka.ilkd.key.logic.Name(name));
         if (n != null) {
             return n;
         } else {
-            throw new IllegalArgumentException("Schema variable not declared: " + name);
+            reportError(context, "Schema variable not declared: " + name);
+            return null;
         }
     }
 

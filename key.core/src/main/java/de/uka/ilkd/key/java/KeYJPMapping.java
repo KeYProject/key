@@ -127,13 +127,13 @@ public class KeYJPMapping {
     }
 
 
-    public void put(Node rec, Object key) {
-        Object formerValue = map.put(rec, key);
-        if (formerValue != null)
-            LOGGER.error("Duplicate registration of type: {}, formerValue: {}", key, formerValue);
-        revMap.put(key, rec);
-        // TODO javaparser remove
-        LOGGER.warn("Size of rec2key: {} entries", map.size());
+    public void put(Node node, Object value) {
+        Object formerValue = map.put(node, value);
+        var formerNode = revMap.put(value, node);
+        if (formerValue != null && !Objects.equals(formerValue, value))
+            LOGGER.error("Duplicate registration of value: {}, formerValue: {}", value, formerValue);
+        if (formerNode != null && !Objects.equals(formerNode, node))
+            LOGGER.error("Duplicate registration of node: {}, formerNode: {}", node, formerNode);
     }
 
     public void put(ResolvedType rec, KeYJavaType key) {
