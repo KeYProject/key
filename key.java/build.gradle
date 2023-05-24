@@ -3,7 +3,7 @@ plugins {}
 dependencies {
     api project(':key.util')
 
-    def JP_VERSION = "3.25.2-K3-SNAPSHOT"
+    def JP_VERSION = "3.25.3-K4"
     api "com.github.javaparser:javaparser-core:$JP_VERSION"
     api "com.github.javaparser:javaparser-core-serialization:$JP_VERSION"
     api "com.github.javaparser:javaparser-symbol-solver-core:$JP_VERSION"
