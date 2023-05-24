@@ -570,17 +570,21 @@ public class PrettyPrinter implements Visitor {
         throw new UnsupportedOperationException();
     }
 
+    private void performActionOnType(Type type) {
+        if (type == null) {
+            l.print("unknown");
+        } else if (type instanceof ArrayDeclaration) {
+            var arr = (ArrayDeclaration) type;
+            performActionOnType(arr.getBaseType().getKeYJavaType().getJavaType());
+            l.print("[]");
+        } else {
+            l.print(type.getFullName());
+        }
+    }
+
     @Override
     public void performActionOnArrayDeclaration(ArrayDeclaration type) {
-        Type baseType = type.getBaseType().getKeYJavaType().getJavaType();
-        if (baseType == null) {
-            l.print("unknown");
-        } else if (baseType instanceof ArrayDeclaration) {
-            performActionOnArrayDeclaration((ArrayDeclaration) baseType);
-        } else {
-            l.print(baseType.getFullName());
-        }
-        l.print("[]");
+        performActionOnType(type);
     }
 
     @Override
@@ -1252,6 +1256,8 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnVariableSpecification(VariableSpecification x) {
+        performActionOnType(x.getType());
+        l.brk();
         x.getProgramVariable().visit(this);
         for (int i = 0; i < x.getDimensions(); i += 1) {
             l.print("[]");
