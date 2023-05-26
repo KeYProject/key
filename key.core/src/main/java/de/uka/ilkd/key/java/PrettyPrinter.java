@@ -3239,7 +3239,7 @@ public class PrettyPrinter {
         write(jmlAssert.getConditionText());
 
         if (jmlAssert.getAssertionProof() != null) {
-            write("\\by ...");
+            write(" \\by ...");
         }
 
         write(";");
