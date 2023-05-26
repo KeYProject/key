@@ -12,6 +12,9 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -28,9 +31,12 @@ import org.key_project.util.collection.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class ApplyScriptsMacro extends AbstractProofMacro {
     public static final Logger LOGGER = LoggerFactory.getLogger(ApplyScriptsMacro.class);
@@ -94,13 +100,16 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                 laterGoals.add(goal);
                 continue;
             }
-
             listener.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Other, "Running attached script from goal " + goal.node().serialNr(), 0));
 
             AssertionProofContext proofCtx = ass.getAssertionProof();
             String renderedProof = renderProof(proofCtx, goal.sequent().succedent().getLast().formula(), proof.getServices());
-
-            ProofScriptEngine pse = new ProofScriptEngine(renderedProof, new Location((URL) null, 0, 0), goal);
+      
+            Path script = Files.createTempFile("key.script", "key");
+            Files.writeString(script, renderedProof);
+            script.toFile().deleteOnExit();
+            Location loc = new Location(script.toUri().toURL(), 0, 0);
+            ProofScriptEngine pse = new ProofScriptEngine(renderedProof, loc, goal);
             LOGGER.info("Running script");
             LOGGER.info(renderedProof);
             try {
@@ -116,13 +125,16 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                 throw new InterruptedException();
             }
             fallBackMacro.applyTo(uic, proof, ImmutableList.of(goal), posInOcc, listener);
+            
         }
+
         return new ProofMacroFinishedInfo(this, proof);
     }
 
     private static String renderProof(AssertionProofContext ctx, Term assertion,
             Services services) {
         StringBuilder sb = new StringBuilder();
+        sb.append("@failonclosed off;\n");
         sb.append("set stack='push';\n");
         sb.append("let @assert='").append(printTerm(assertion, services)).append("';\n");
         for (ProofCmdContext proofCmdContext : ctx.proofCmd()) {
