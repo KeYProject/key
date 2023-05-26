@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.scripts.meta.ArgumentsLifter;
 import de.uka.ilkd.key.scripts.meta.ProofScriptArgument;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -39,12 +40,16 @@ public abstract class AbstractCommand implements ProofScriptCommand {
      */
     protected @Nullable String documentation = null;
 
-    protected final EngineState state() {
+    /**
+     * The state object of this engine.
+     */
+    protected final @NonNull EngineState state() {
         return Objects.requireNonNull(state);
     }
 
     /**
-     * ...
+     * The POJO class of the parameter object, or null if this command does not take any parameters via
+     * a POJO.
      */
     private final @Nullable Class<?> parameterClazz;
 
@@ -80,6 +85,8 @@ public abstract class AbstractCommand implements ProofScriptCommand {
     }
 
     /// Executes the command logic with the given parameters `args`.
+    ///
+    /// This is usually overridden by subclasses.
     ///
     /// @param args an instance of the parameters
     /// @throws ScriptException if something happened during execution

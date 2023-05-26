@@ -44,6 +44,8 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+
 public class ApplyScriptsMacro extends AbstractProofMacro {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplyScriptsMacro.class);
@@ -136,7 +138,9 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                 throw new InterruptedException();
             }
             fallBackMacro.applyTo(uic, proof, ImmutableList.of(goal), posInOcc, listener);
+
         }
+
         return new ProofMacroFinishedInfo(this, proof);
     }
 
@@ -162,6 +166,9 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
     private static List<ScriptCommandAst>  renderProof(KeyAst.JMLProofScript script,
                                                       Map<ParserRuleContext, JTerm> termMap, JTerm update, Services services) {
         List<ScriptCommandAst> result = new ArrayList<>();
+        // Do not fail on open proofs
+        // TODO Migrate into SetCommand
+        result.add(new ScriptCommandAst("failonopen", Map.of(), List.of("off")));
         // Push current settings onto the settings stack
         result.add(new ScriptCommandAst("set", Map.of("stack", "push"), List.of()));
         for (ProofCmdContext proofCmdContext : script.ctx.proofCmd()) {
