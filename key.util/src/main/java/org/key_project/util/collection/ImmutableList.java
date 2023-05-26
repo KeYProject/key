@@ -299,4 +299,19 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
         return Immutables.map(this, function);
     }
 
+    /**
+     * Returns the element at the specified position in this list.
+     *
+     * @param index index of the element to return
+     * @return the element at the specified position in this list
+     * @throws IndexOutOfBoundsException if the index is out of range
+     *         ({@code index < 0 || index >= size()})
+     */
+    default T get(int index) {
+        if(index < 0 || index >= size()) {
+            throw new IndexOutOfBoundsException();
+        } else {
+            return take(index).head();
+        }
+    }
 }
