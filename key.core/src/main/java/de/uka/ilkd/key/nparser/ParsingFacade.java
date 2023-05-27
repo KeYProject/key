@@ -120,8 +120,6 @@ public final class ParsingFacade {
         return parseFile(file.toPath());
     }
 
-    static int sum = 0;
-
     public static KeyAst.File parseFile(CharStream stream) {
         KeYParser p = createParser(stream);
 
@@ -129,7 +127,6 @@ public final class ParsingFacade {
         // we don't want error messages or recovery during first try
         p.removeErrorListeners();
         p.setErrorHandler(new BailErrorStrategy());
-        var start = System.currentTimeMillis();
         KeYParser.FileContext ctx;
         try {
             ctx = p.file();
@@ -138,12 +135,8 @@ public final class ParsingFacade {
             p = createParser(stream);
             ctx = p.file();
         }
-        var stop = System.currentTimeMillis();
 
         p.getErrorReporter().throwException();
-        sum += (stop - start);
-        LOGGER.warn("{} took {} ms to parse.", stream.getSourceName(), stop - start);
-        LOGGER.warn("Parsing time {} ms.", sum);
         return new KeyAst.File(ctx);
     }
 
