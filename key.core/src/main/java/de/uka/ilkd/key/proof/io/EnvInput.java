@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.proof.io;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import javax.annotation.Nonnull;

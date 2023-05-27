@@ -120,11 +120,10 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
 
     public MethodBodyStatement(PositionInfo pi, List<Comment> c, IProgramVariable resultVar,
             TypeReference bodySource,
-            MethodReference methodReference, IProgramMethod method) {
+            MethodReference methodReference) {
         super(pi, c);
         this.resultVar = resultVar;
         this.bodySource = bodySource;
-        this.method = method;
         this.methodReference = methodReference;
     }
 

@@ -132,8 +132,9 @@ public class JP2KeYTypeConverter {
      * Returned the cached value if present - otherwise create a new type.
      *
      * @param type type to be converted, may be null
-     * @return null iff t == null, otherwise a keytype.
+     * @return a keytype.
      */
+    @Nonnull
     public KeYJavaType getKeYJavaType(ResolvedType type) {
         // change from 2012-02-07: there must be a definite KJT
         if (type == null) {

@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.java.reference;
 
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.util.ExtList;
-
-import javax.annotation.Nonnull;
 
 public class TypeRef extends TypeReferenceImp {
 

@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
+
 import org.key_project.util.ExtList;
 
 /**
@@ -19,7 +20,8 @@ import org.key_project.util.ExtList;
 public class SchematicFieldReference extends FieldReference
         implements MemberReference, ReferenceSuffix, TypeReferenceContainer, ExpressionContainer {
 
-    private static final ProgramVariable SCHEMA_VARIABLE = new LocationVariable(new ProgramElementName("SCHEMA_VARIABLE_IGNORE"), (Sort) null);
+    private static final ProgramVariable SCHEMA_VARIABLE =
+        new LocationVariable(new ProgramElementName("SCHEMA_VARIABLE_IGNORE"), (Sort) null);
     /**
      * Reference suffix
      */

@@ -12,8 +12,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
-
 import org.key_project.util.java.IOUtil;
 
 import com.github.javaparser.JavaParser;
@@ -86,12 +84,12 @@ public class JavaParserFactory {
             for (Path existing : sourcePaths) {
                 if (path.startsWith(existing)) {
                     throw new IllegalStateException(
-                            "A parent of this path is already given in the classpath");
+                        "A parent of this path is already given in the classpath");
                 }
 
                 if (existing.startsWith(path)) {
                     throw new IllegalStateException(
-                            "A child folder of this path is already given in the classpath");
+                        "A child folder of this path is already given in the classpath");
                 }
             }
             sourcePaths.add(path);

@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.java.reference;
 
 
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import org.key_project.util.ExtList;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.List;
+import org.key_project.util.ExtList;
 
 
 public class FieldReference extends VariableReference
@@ -26,7 +27,7 @@ public class FieldReference extends VariableReference
     }
 
     public FieldReference(PositionInfo pi, List<Comment> c, ProgramVariable variable,
-                          ReferencePrefix prefix) {
+            ReferencePrefix prefix) {
         super(pi, c, variable);
         this.prefix = constructPrefix(prefix, getProgramVariable());
     }

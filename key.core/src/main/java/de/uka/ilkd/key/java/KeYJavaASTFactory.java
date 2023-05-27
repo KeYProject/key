@@ -55,7 +55,6 @@ import de.uka.ilkd.key.java.statement.Switch;
 import de.uka.ilkd.key.java.statement.SynchronizedBlock;
 import de.uka.ilkd.key.java.statement.Then;
 import de.uka.ilkd.key.java.statement.Throw;
-import de.uka.ilkd.key.java.statement.TransactionStatement;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -438,18 +437,6 @@ public abstract class KeYJavaASTFactory {
      */
     public static Throw throwClause(Expression e) {
         return new Throw(e);
-    }
-
-    /**
-     * Create a transaction statement.
-     *
-     * @param type the transaction statement type
-     * @return a new {@link TransactionStatement} of type <code>type</code>
-     */
-    public static TransactionStatement transactionStatement(final int type) {
-        final TransactionStatement statement = new TransactionStatement(type);
-
-        return statement;
     }
 
     /**

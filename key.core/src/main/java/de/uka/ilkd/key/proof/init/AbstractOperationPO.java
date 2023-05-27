@@ -898,19 +898,19 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 sb2 = new StatementBlock(transaction
                         ? new Statement[] {
                             new TransactionStatement(
-                                KeyTransactionStatement.TransactionType.BEGIN.ordinal()),
+                                KeyTransactionStatement.TransactionType.BEGIN),
                             nullStat, tryStat,
                             new TransactionStatement(
-                                KeyTransactionStatement.TransactionType.FINISH.ordinal()) }
+                                KeyTransactionStatement.TransactionType.FINISH) }
                         : new Statement[] { nullStat, tryStat });
             } else {
                 sb2 = new StatementBlock(transaction
                         ? new Statement[] {
                             new TransactionStatement(
-                                KeyTransactionStatement.TransactionType.BEGIN.ordinal()),
+                                KeyTransactionStatement.TransactionType.BEGIN),
                             nullStat, beforeTry, tryStat,
                             new TransactionStatement(
-                                KeyTransactionStatement.TransactionType.FINISH.ordinal()) }
+                                KeyTransactionStatement.TransactionType.FINISH) }
                         : new Statement[] { nullStat, beforeTry, tryStat });
             }
         }

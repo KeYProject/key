@@ -262,7 +262,8 @@ public final class ProblemInitializer {
         if (javaPath != null) {
             reportStatus("Reading Java source");
             var javaService = initConfig.getServices().getJavaService();
-            javaService.getProgramFactory().addSourcePaths(Collections.singletonList(Paths.get(javaPath).toAbsolutePath()));
+            javaService.getProgramFactory().addSourcePaths(
+                Collections.singletonList(Paths.get(javaPath).toAbsolutePath()));
             Collection<String> var = getClasses(javaPath);
             if (envInput.isIgnoreOtherJavaFiles()) {
                 String file = envInput.getJavaFile();
@@ -423,6 +424,7 @@ public final class ProblemInitializer {
 
     /**
      * Creates an input config for the given env input
+     *
      * @param envInput the env input
      * @return a *new* config
      * @throws ProofInputException on load error
@@ -439,7 +441,7 @@ public final class ProblemInitializer {
         RuleSource tacletBase = profile.getStandardRules().getTacletBase();
         if (tacletBase != null) {
             KeYFile tacletBaseFile = new KeYFile("taclet base",
-                    profile.getStandardRules().getTacletBase(), progMon, profile);
+                profile.getStandardRules().getTacletBase(), progMon, profile);
             readEnvInput(tacletBaseFile, config);
         }
 
@@ -531,7 +533,7 @@ public final class ProblemInitializer {
                     final ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
                     if (pv instanceof LocationVariable) {
                         heapLDT.getFieldSymbolForPV((LocationVariable) pv,
-                                services);
+                            services);
                     }
                 }
             }

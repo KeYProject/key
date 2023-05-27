@@ -20,7 +20,6 @@ import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.util.AssertionFailure;
 import de.uka.ilkd.key.util.Pair;
 
 import org.antlr.v4.runtime.ParserRuleContext;

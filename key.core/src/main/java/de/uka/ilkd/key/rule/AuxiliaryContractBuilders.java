@@ -1566,7 +1566,7 @@ public final class AuxiliaryContractBuilders {
                 final Statement statement) {
             if (instantiation.isTransactional()) {
                 return new StatementBlock(statement, new TransactionStatement(
-                    KeyTransactionStatement.TransactionType.FINISH.ordinal()));
+                    KeyTransactionStatement.TransactionType.FINISH));
             } else {
                 if (statement instanceof StatementBlock) {
                     return (StatementBlock) statement;

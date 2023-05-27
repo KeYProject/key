@@ -208,7 +208,7 @@ public final class WhileInvariantTransformer {
         JavaBlock mainJavaBlock = JavaBlock.createJavaBlock(transaction
                 ? new StatementBlock(resSta,
                     new TransactionStatement(
-                        KeyTransactionStatement.TransactionType.FINISH.ordinal()))
+                        KeyTransactionStatement.TransactionType.FINISH))
                 : new StatementBlock(resSta));
         return services.getTermBuilder().prog(loopBodyModality, mainJavaBlock, result,
             computeLoopBodyModalityLabels(termLabelState, services, applicationPos, rule, ruleApp,

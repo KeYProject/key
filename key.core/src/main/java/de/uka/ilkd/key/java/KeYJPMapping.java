@@ -128,20 +128,23 @@ public class KeYJPMapping {
 
 
     public void put(Node node, Object value) {
-        Object formerValue = map.put(node, value);
-        var formerNode = revMap.put(value, node);
+        Object formerValue = map.putIfAbsent(node, value);
+        var formerNode = revMap.putIfAbsent(value, node);
         if (formerValue != null && !Objects.equals(formerValue, value))
-            LOGGER.error("Duplicate registration of value: {}, formerValue: {}", value, formerValue);
+            LOGGER.error("Duplicate registration of value: {}, formerValue: {}", value,
+                formerValue);
         if (formerNode != null && !Objects.equals(formerNode, node))
             LOGGER.error("Duplicate registration of node: {}, formerNode: {}", node, formerNode);
     }
 
     public void put(ResolvedType rec, KeYJavaType key) {
-        var formerValue = typeMap.put(rec, key);
-        if (formerValue != null)
-            LOGGER.error("Duplicate registration of resolved type: {}, formerValue: {}", key,
-                formerValue);
-        typeMapRev.put(key, rec);
+        var formerValue = typeMap.putIfAbsent(rec, key);
+        if (formerValue != null && !Objects.equals(formerValue, key))
+            LOGGER.error("Duplicate registration of kjt: {}, former kjt: {}", key, formerValue);
+        var formerType = typeMapRev.putIfAbsent(key, rec);
+        if (formerType != null && !Objects.equals(rec, formerType))
+            LOGGER.error("Duplicate registration of resolved type: {}, former: {}", rec,
+                formerType);
     }
 
     public boolean mapped(Node rec) {

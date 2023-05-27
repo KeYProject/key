@@ -9,24 +9,15 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import com.github.javaparser.ast.key.KeyTransactionStatement;
 
 public class TransactionStatement extends JavaStatement {
+    private final KeyTransactionStatement.TransactionType type;
 
-    public static final String[] names = { "#beginJavaCardTransaction",
-        "#commitJavaCardTransaction", "#finishJavaCardTransaction", "#abortJavaCardTransaction" };
-
-    private final int type;
-
-    public TransactionStatement(int type) {
+    public TransactionStatement(KeyTransactionStatement.TransactionType type) {
         super();
-        if (type != KeyTransactionStatement.TransactionType.BEGIN.ordinal()
-                && type != KeyTransactionStatement.TransactionType.COMMIT.ordinal()
-                && type != KeyTransactionStatement.TransactionType.FINISH.ordinal()
-                && type != KeyTransactionStatement.TransactionType.ABORT.ordinal()) {
-            throw new IllegalArgumentException("Wrong transaction statement type " + type);
-        }
         this.type = type;
     }
 
-    public TransactionStatement(PositionInfo pi, List<Comment> c, int type) {
+    public TransactionStatement(PositionInfo pi, List<Comment> c,
+            KeyTransactionStatement.TransactionType type) {
         super(pi, c);
         this.type = type;
     }
@@ -51,7 +42,7 @@ public class TransactionStatement extends JavaStatement {
     }
 
     public String toString() {
-        return names[type - 1];
+        return type.symbol;
     }
 
     public boolean equals(Object o) {

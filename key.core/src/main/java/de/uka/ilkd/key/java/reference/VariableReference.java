@@ -13,16 +13,17 @@
 
 package de.uka.ilkd.key.java.reference;
 
+import java.util.List;
+import java.util.Objects;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import org.key_project.util.ExtList;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.Objects;
+import org.key_project.util.ExtList;
 
 
 public class VariableReference extends JavaNonTerminalProgramElement
@@ -31,7 +32,8 @@ public class VariableReference extends JavaNonTerminalProgramElement
     @Nonnull
     protected final ProgramVariable variable;
 
-    public VariableReference(PositionInfo pi, List<Comment> comments, @Nonnull ProgramVariable variable) {
+    public VariableReference(PositionInfo pi, List<Comment> comments,
+            @Nonnull ProgramVariable variable) {
         super(pi, comments);
         this.variable = Objects.requireNonNull(variable);
     }
@@ -66,7 +68,7 @@ public class VariableReference extends JavaNonTerminalProgramElement
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
      * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                                        of bounds
+     *         of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (variable != null) {
@@ -124,11 +126,11 @@ public class VariableReference extends JavaNonTerminalProgramElement
      * Gets the KeY java type.
      *
      * @param javaServ the java services
-     * @param ec       the execution context
+     * @param ec the execution context
      * @return the KeY java type
      */
     public KeYJavaType getKeYJavaType(Services javaServ,
-                                      ExecutionContext ec) {
+            ExecutionContext ec) {
         return getKeYJavaType();
     }
 
