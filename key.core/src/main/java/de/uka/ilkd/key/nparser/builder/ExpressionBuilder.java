@@ -1066,7 +1066,15 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (sort != null && id != null) {
             return bindVar(id, sort);
         }
-        return doLookup(new Name(ctx.id.getText()), schemaVariables(), variables());
+
+        QuantifiableVariable result =
+            doLookup(new Name(ctx.id.getText()), variables());
+
+        if (result == null) {
+            semanticError(ctx, "There is no schema variable or variable named " + id);
+        }
+
+        return result;
     }
 
 
