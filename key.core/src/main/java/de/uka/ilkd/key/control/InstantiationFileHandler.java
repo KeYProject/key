@@ -1,16 +1,8 @@
 package de.uka.ilkd.key.control;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletFindModel;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
@@ -55,10 +47,10 @@ public class InstantiationFileHandler {
         }
         String[] instFiles = dir.list();
         if (instFiles == null) {
-            hm = new LinkedHashMap<String, List<List<String>>>(0);
+            hm = new LinkedHashMap<>(0);
         } else {
             // Avoid resizing of HashMap
-            hm = new LinkedHashMap<String, List<List<String>>>(instFiles.length + 1, 1);
+            hm = new LinkedHashMap<>(instFiles.length + 1, 1);
             for (String instFile : instFiles) {
                 hm.put(instFile, null);
             }
@@ -66,29 +58,28 @@ public class InstantiationFileHandler {
     }
 
     private static void createListFor(Taclet taclet) {
-        java.util.List<List<String>> instList = new LinkedList<List<String>>();
-        java.util.List<String> instantiations = new LinkedList<String>();
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(
-                new FileReader(INSTANTIATION_DIR + File.separator + taclet.name().toString()));
+        java.util.List<List<String>> instList = new LinkedList<>();
+        java.util.List<String> instantiations = new LinkedList<>();
+        try (BufferedReader br = new BufferedReader(
+            new FileReader(INSTANTIATION_DIR + File.separator + taclet.name().toString(),
+                StandardCharsets.UTF_8))) {
             String line = br.readLine();
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             while (line != null) {
                 if (line.equals(SEPARATOR1)) {
                     if (sb.length() > 0) {
                         instantiations.add(sb.toString());
                     }
-                    sb = new StringBuffer();
+                    sb = new StringBuilder();
                     if (instantiations.size() > 0) {
                         instList.add(instantiations);
                     }
-                    instantiations = new LinkedList<String>();
+                    instantiations = new LinkedList<>();
                 } else if (line.equals(SEPARATOR2)) {
                     if (sb.length() > 0) {
                         instantiations.add(sb.toString());
                     }
-                    sb = new StringBuffer();
+                    sb = new StringBuilder();
                 } else {
                     if (sb.length() > 0) {
                         sb.append(LINE_END);
@@ -101,13 +92,6 @@ public class InstantiationFileHandler {
                 instantiations.add(sb.toString());
             }
         } catch (IOException e) {
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                }
-            }
         }
         if (instantiations.size() > 0) {
             instList.add(instantiations);
@@ -120,11 +104,10 @@ public class InstantiationFileHandler {
         TacletFindModel tableModel = model.tableModel();
         int start = model.tacletApp().instantiations().size();
         java.util.List<List<String>> instList = getInstantiationListsFor(taclet);
-        BufferedWriter bw = null;
-        try {
-            bw = new BufferedWriter(
-                new FileWriter(INSTANTIATION_DIR + File.separator + taclet.name().toString()));
-            StringBuffer sb = new StringBuffer();
+        try (BufferedWriter bw = new BufferedWriter(
+            new FileWriter(INSTANTIATION_DIR + File.separator + taclet.name().toString(),
+                StandardCharsets.UTF_8))) {
+            StringBuilder sb = new StringBuilder();
             for (int i = start; i < tableModel.getRowCount(); i++) {
                 if (i > start) {
                     sb.append(SEPARATOR2).append(LINE_END);
@@ -138,7 +121,7 @@ public class InstantiationFileHandler {
                 int count = 1;
                 while (instListIt.hasNext() && count < SAVE_COUNT) {
                     final ListIterator<String> instIt = instListIt.next().listIterator();
-                    sb = new StringBuffer();
+                    sb = new StringBuilder();
                     for (int i = 0; instIt.hasNext(); i++) {
                         if (i > 0) {
                             sb.append(SEPARATOR2).append(LINE_END);
@@ -153,13 +136,6 @@ public class InstantiationFileHandler {
                 }
             }
         } catch (IOException e) {
-        } finally {
-            if (bw != null) {
-                try {
-                    bw.close();
-                } catch (IOException e) {
-                }
-            }
         }
         hm.put(taclet.name().toString(), null);
     }

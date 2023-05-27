@@ -8,7 +8,7 @@
   * /*@ model_behavior         accessible<heapAtPre> \
   * /*@ model_behavior         accessible<heapAtPre> \
   * /*@ model_behavior         requires \old(lockRef()
-(0/1) -- recoder.java.declaration.MethodDeclaration
+(52/52) -- recoder.java.declaration.MethodDeclaration
   * /*@ model_behavior         accessible<heap> fpLock
   * /*@ model_behavior         accessible<heap> fpLock
   * /*@ model_behavior         accessible<heap> \nothi
@@ -19,7 +19,7 @@
   * /*@ model_behavior         accessible<heapAtPre> \
   * /*@ model_behavior         requires \old(lockRef()
   * /*@model two_state @*/
-(0/1) -- recoder.java.declaration.MethodDeclaration
+(45/45) -- recoder.java.declaration.MethodDeclaration
   * /*@ model_behavior         accessible<heap> fpLock
   * /*@ model_behavior         accessible<heap> fpLock
   * /*@ model_behavior         accessible<heap> \nothi
@@ -30,7 +30,7 @@
   * /*@ model_behavior         accessible<heapAtPre> \
   * /*@ model_behavior         requires \old(lockRef()
   * /*@model two_state @*/
-(0/1) -- recoder.java.declaration.MethodDeclaration
+(38/38) -- recoder.java.declaration.MethodDeclaration
   * /*@ model_behavior         accessible<heap> fpLock
   * /*@ model_behavior         accessible<heap> fpLock
   * /*@ model_behavior         accessible<heap> \nothi
@@ -41,7 +41,7 @@
   * /*@ model_behavior         accessible<heapAtPre> \
   * /*@ model_behavior         requires \old(lockRef()
   * /*@model two_state @*/
-(0/1) -- recoder.java.declaration.MethodDeclaration
+(31/31) -- recoder.java.declaration.MethodDeclaration
   * /*@ model_behavior         accessible<heap> fpLock
   * /*@ model_behavior         accessible<heap> fpLock
   * /*@ model_behavior         accessible<heap> \nothi
@@ -52,7 +52,7 @@
   * /*@ model_behavior         accessible<heapAtPre> \
   * /*@ model_behavior         requires \old(lockRef()
   * /*@model @*/
-(0/1) -- recoder.java.declaration.MethodDeclaration
+(26/26) -- recoder.java.declaration.MethodDeclaration
   * /*@ model_behavior         accessible<heap> fpLock
   * /*@ model_behavior         accessible<heap> fpLock
   * /*@ model_behavior         accessible<heap> \nothi
@@ -63,7 +63,7 @@
   * /*@ model_behavior         accessible<heapAtPre> \
   * /*@ model_behavior         requires \old(lockRef()
   * /*@model @*/
-(0/1) -- recoder.java.declaration.MethodDeclaration
+(21/21) -- recoder.java.declaration.MethodDeclaration
   * /*@ model_behavior         accessible<heap> fpLock
   * /*@ model_behavior         accessible<heap> fpLock
   * /*@ model_behavior         accessible<heap> \nothi
@@ -74,7 +74,7 @@
   * /*@ model_behavior         accessible<heapAtPre> \
   * /*@ model_behavior         requires \old(lockRef()
   * /*@model @*/
-(0/1) -- recoder.java.declaration.MethodDeclaration
+(16/16) -- recoder.java.declaration.MethodDeclaration
   * /*@ model_behavior         accessible<heap> fpLock
   * /*@ model_behavior         accessible<heap> fpLock
   * /*@ model_behavior         accessible<heap> \nothi
@@ -85,7 +85,7 @@
   * /*@ model_behavior         accessible<heapAtPre> \
   * /*@ model_behavior         requires \old(lockRef()
   * /*@model @*/
-(0/1) -- recoder.java.declaration.MethodDeclaration
+(11/11) -- recoder.java.declaration.MethodDeclaration
   * /*@ model_behavior         accessible<heap> fpLock
   * /*@ model_behavior         accessible<heap> fpLock
   * /*@ model_behavior         accessible<heap> \nothi
@@ -96,7 +96,7 @@
   * /*@ model_behavior         accessible<heapAtPre> \
   * /*@ model_behavior         requires \old(lockRef()
   * /*@model @*/
-(0/1) -- recoder.java.declaration.MethodDeclaration
+(6/6) -- recoder.java.declaration.MethodDeclaration
   * /*@ model_behavior         accessible<heap> fpLock
   * /*@ model_behavior         accessible<heap> fpLock
   * /*@ model_behavior         accessible<heap> \nothi
@@ -107,7 +107,7 @@
   * /*@ model_behavior         accessible<heapAtPre> \
   * /*@ model_behavior         requires \old(lockRef()
   * /*@model @*/
-(59/1) -- de.uka.ilkd.key.java.recoderext.JMLTransformer$1
+(61/61) -- de.uka.ilkd.key.java.recoderext.JMLTransformer$1
   * //@ public instance ghost LockSpec spec;
   * /*@ normal_behavior         requires spec.lockStat
   * /*@instance ghost @*/
@@ -120,7 +120,7 @@
   * /*@ normal_behavior         requires spec.lockStat
 (77/77) -- recoder.java.declaration.modifier.Native
   * /*@ helper @*/
-(0/1) -- recoder.java.declaration.MethodDeclaration
+(97/97) -- recoder.java.declaration.MethodDeclaration
   * //@ invariant this.lock != \dl_currentThread() &&
   * //@ accessible<heap> \inv : this.lock, lock.spec;
   * //@ accessible<permissions> \inv : this.lock, lock
@@ -134,7 +134,7 @@
   * /*@ model boolean lockStatus(boolean locked) { ret
   * /*@ normal_behavior          requires lockStatus(\
   * /*@model @*/
-(0/1) -- recoder.java.declaration.MethodDeclaration
+(96/96) -- recoder.java.declaration.MethodDeclaration
   * //@ invariant this.lock != \dl_currentThread() &&
   * //@ accessible<heap> \inv : this.lock, lock.spec;
   * //@ accessible<permissions> \inv : this.lock, lock
@@ -148,7 +148,7 @@
   * /*@ model boolean lockStatus(boolean locked) { ret
   * /*@ normal_behavior          requires lockStatus(\
   * /*@model @*/
-(0/1) -- recoder.java.declaration.MethodDeclaration
+(94/94) -- recoder.java.declaration.MethodDeclaration
   * //@ invariant this.lock != \dl_currentThread() &&
   * //@ accessible<heap> \inv : this.lock, lock.spec;
   * //@ accessible<permissions> \inv : this.lock, lock
@@ -162,7 +162,7 @@
   * /*@ model boolean lockStatus(boolean locked) { ret
   * /*@ normal_behavior          requires lockStatus(\
   * /*@model two_state @*/
-(0/1) -- recoder.java.declaration.MethodDeclaration
+(93/93) -- recoder.java.declaration.MethodDeclaration
   * //@ invariant this.lock != \dl_currentThread() &&
   * //@ accessible<heap> \inv : this.lock, lock.spec;
   * //@ accessible<permissions> \inv : this.lock, lock
@@ -176,7 +176,7 @@
   * /*@ model boolean lockStatus(boolean locked) { ret
   * /*@ normal_behavior          requires lockStatus(\
   * /*@model two_state @*/
-(0/1) -- recoder.java.declaration.MethodDeclaration
+(92/92) -- recoder.java.declaration.MethodDeclaration
   * //@ invariant this.lock != \dl_currentThread() &&
   * //@ accessible<heap> \inv : this.lock, lock.spec;
   * //@ accessible<permissions> \inv : this.lock, lock
@@ -190,7 +190,7 @@
   * /*@ model boolean lockStatus(boolean locked) { ret
   * /*@ normal_behavior          requires lockStatus(\
   * /*@model @*/
-(0/1) -- recoder.java.declaration.MethodDeclaration
+(91/91) -- recoder.java.declaration.MethodDeclaration
   * //@ invariant this.lock != \dl_currentThread() &&
   * //@ accessible<heap> \inv : this.lock, lock.spec;
   * //@ accessible<permissions> \inv : this.lock, lock
@@ -204,7 +204,7 @@
   * /*@ model boolean lockStatus(boolean locked) { ret
   * /*@ normal_behavior          requires lockStatus(\
   * /*@model @*/
-(0/1) -- recoder.java.declaration.MethodDeclaration
+(90/90) -- recoder.java.declaration.MethodDeclaration
   * //@ invariant this.lock != \dl_currentThread() &&
   * //@ accessible<heap> \inv : this.lock, lock.spec;
   * //@ accessible<permissions> \inv : this.lock, lock
@@ -218,7 +218,7 @@
   * /*@ model boolean lockStatus(boolean locked) { ret
   * /*@ normal_behavior          requires lockStatus(\
   * /*@model @*/
-(0/1) -- recoder.java.declaration.MethodDeclaration
+(87/87) -- recoder.java.declaration.MethodDeclaration
   * //@ invariant this.lock != \dl_currentThread() &&
   * //@ accessible<heap> \inv : this.lock, lock.spec;
   * //@ accessible<permissions> \inv : this.lock, lock
@@ -232,7 +232,7 @@
   * /*@ model boolean lockStatus(boolean locked) { ret
   * /*@ normal_behavior          requires lockStatus(\
   * /*@model @*/
-(-1/82) -- recoder.java.reference.TypeReference
+(82/82) -- recoder.java.reference.TypeReference
   * /*@ non_null @*/
 (104/108) -- recoder.java.declaration.MethodDeclaration
   * //@ invariant this.lock != \dl_currentThread() &&

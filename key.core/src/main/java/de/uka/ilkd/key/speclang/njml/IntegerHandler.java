@@ -1,17 +1,14 @@
 package de.uka.ilkd.key.speclang.njml;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
-
-import javax.annotation.Nullable;
 import java.util.EnumMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
 
 import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.*;
 
@@ -55,7 +52,7 @@ public class IntegerHandler extends LDTHandler {
         jmlIntMap.put(SHIFT_LEFT, new TypedOperator(intKjt, intLDT.getShiftleftJint()));
         jmlIntMap.put(UNSIGNED_SHIFT_RIGHT,
             new TypedOperator(intKjt, intLDT.getUnsignedshiftrightJint()));
-        // jmlIntMap.put(BITWISE_NEGATE, intLDT.getBitwiseNegateJint());
+        jmlIntMap.put(BITWISE_NEGATE, new TypedOperator(intKjt, intLDT.getBitwiseNegateJint()));
         jmlIntMap.put(UNARY_MINUS, new TypedOperator(intKjt, intLDT.getUnaryMinusJint()));
         jmlIntMap.put(GT, new TypedOperator(intKjt, intLDT.getGreaterThan()));
         jmlIntMap.put(LT, new TypedOperator(intKjt, intLDT.getLessThan()));
@@ -78,8 +75,8 @@ public class IntegerHandler extends LDTHandler {
             new TypedOperator(intKjt, intLDT.getCheckedShiftLeftInt()));
         jmlCheckedIntMap.put(UNSIGNED_SHIFT_RIGHT,
             new TypedOperator(intKjt, intLDT.getCheckedUnsignedShiftRightInt()));
-        // jmlCheckedIntMap.put( new TypedOperator(intKjt,BITWISE_NEGATE,
-        // inCheckedtLDT.getBitwiseNegateInt()));
+        jmlCheckedIntMap.put(BITWISE_NEGATE,
+            new TypedOperator(intKjt, intLDT.getCheckedBitwiseNegateInt()));
         jmlCheckedIntMap.put(UNARY_MINUS,
             new TypedOperator(intKjt, intLDT.getCheckedUnaryMinusInt()));
         jmlCheckedIntMap.put(GT, new TypedOperator(intKjt, intLDT.getGreaterThan()));
@@ -100,8 +97,7 @@ public class IntegerHandler extends LDTHandler {
         jmlLongMap.put(SHIFT_LEFT, new TypedOperator(longKjt, intLDT.getShiftleftJlong()));
         jmlLongMap.put(UNSIGNED_SHIFT_RIGHT,
             new TypedOperator(longKjt, intLDT.getUnsignedshiftrightJlong()));
-        // jmlLongMap.put(new TypedOperator(longKjt, BITWISE_NEGATE,
-        // intLDT.getBitwiseNegateJlong()));
+        jmlLongMap.put(BITWISE_NEGATE, new TypedOperator(longKjt, intLDT.getBitwiseNegateJlong()));
         jmlLongMap.put(UNARY_MINUS, new TypedOperator(longKjt, intLDT.getUnaryMinusJlong()));
         jmlLongMap.put(GT, new TypedOperator(longKjt, intLDT.getGreaterThan()));
         jmlLongMap.put(LT, new TypedOperator(longKjt, intLDT.getLessThan()));
@@ -124,8 +120,8 @@ public class IntegerHandler extends LDTHandler {
             new TypedOperator(longKjt, intLDT.getCheckedShiftLeftLong()));
         jmlCheckedLongMap.put(UNSIGNED_SHIFT_RIGHT,
             new TypedOperator(longKjt, intLDT.getCheckedUnsignedShiftRightLong()));
-        // jmlCheckedLongMap.put(new TypedOperator(longKjt, BITWISE_NEGATE,
-        // inCheckedtLDT.getBitwiseNegateLong()));
+        jmlCheckedLongMap.put(BITWISE_NEGATE,
+            new TypedOperator(longKjt, intLDT.getCheckedBitwiseNegateLong()));
         jmlCheckedLongMap.put(UNARY_MINUS,
             new TypedOperator(longKjt, intLDT.getCheckedUnaryMinusLong()));
         jmlCheckedLongMap.put(GT, new TypedOperator(longKjt, intLDT.getGreaterThan()));

@@ -7,6 +7,9 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Vector;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * this class represents a java style structured comment. Such a comment has an introductionary
  * description and a list of tagged descriptions.
@@ -16,6 +19,7 @@ import java.util.Vector;
  */
 @Deprecated
 public class TaggedComment {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaggedComment.class);
 
     /**
      * a simple empty vector used for returning empty enumerations
@@ -28,7 +32,7 @@ public class TaggedComment {
     /**
      * the raw (unparsed) comment string.
      */
-    protected String rawComment;
+    protected final String rawComment;
     /**
      * indicates that the comment has been analyzed
      */
@@ -89,14 +93,18 @@ public class TaggedComment {
         if (result.length() > 0) {
             int left = 0;
             int right = result.length() - 1;
-            if (result.charAt(left) == '/')
+            if (result.charAt(left) == '/') {
                 left++;
-            while ((left <= right) && (result.charAt(left) == '*'))
+            }
+            while ((left <= right) && (result.charAt(left) == '*')) {
                 left++;
-            if (result.charAt(right) == '/')
+            }
+            if (result.charAt(right) == '/') {
                 right--;
-            while ((left <= right) && (result.charAt(right) == '*'))
+            }
+            while ((left <= right) && (result.charAt(right) == '*')) {
                 right--;
+            }
             if (left <= right) {
                 result = result.substring(left, right + 1).trim();
             } else {
@@ -137,8 +145,9 @@ public class TaggedComment {
                     sw = new StringWriter();
                     pw = new PrintWriter(sw);
                     int pos = 1;
-                    while ((pos < line.length()) && !(Character.isWhitespace(line.charAt(pos))))
+                    while ((pos < line.length()) && !(Character.isWhitespace(line.charAt(pos)))) {
                         pos++;
+                    }
                     currentTag = line.substring(1, pos);
                     tagNames.addElement(currentTag);
                     line = line.substring(pos).trim();
@@ -162,7 +171,7 @@ public class TaggedComment {
             }
         } catch (IOException ioe) {
             // don't know how to handle this!
-            ioe.printStackTrace();
+            LOGGER.warn("Failed to parse comment", ioe);
         }
         analyzed = true;
     }
@@ -174,8 +183,9 @@ public class TaggedComment {
      * @return the intro of the comment
      */
     public String getIntro() {
-        if (!analyzed)
+        if (!analyzed) {
             parseRawComment();
+        }
         return (introText == null) ? "" : introText;
     }
 
@@ -194,8 +204,9 @@ public class TaggedComment {
      * @return the number of tags specified in the comment
      */
     public int getTagCount() {
-        if (!analyzed)
+        if (!analyzed) {
             parseRawComment();
+        }
         return (tagNames == null) ? 0 : tagNames.size();
     }
 
@@ -206,8 +217,9 @@ public class TaggedComment {
      * @return an non-empty enumeration object.
      */
     public Enumeration getTags() {
-        if (!analyzed)
+        if (!analyzed) {
             parseRawComment();
+        }
         if (tagNames == null) {
             return emptyEnumeration;
         } else {
@@ -224,8 +236,9 @@ public class TaggedComment {
     public String getTagValue(String tag) {
         String result = null;
         if (tag != null) {
-            if (!analyzed)
+            if (!analyzed) {
                 parseRawComment();
+            }
             if (tagValues != null) {
                 result = tagValues.getProperty(tag, null);
             }

@@ -1,23 +1,25 @@
 package de.uka.ilkd.key.proof;
 
+import de.uka.ilkd.key.java.Position;
+
 public class SVInstantiationParserException extends SVInstantiationExceptionWithPosition {
 
     /**
      *
      */
     private static final long serialVersionUID = 4411508672178909020L;
-    private String instantiation;
-    private String detail;
+    private final String instantiation;
+    private final String detail;
 
-    public SVInstantiationParserException(String instantiation, int row, int column, String detail,
+    public SVInstantiationParserException(String instantiation, Position position, String detail,
             boolean inIfSequent) {
-        super("Parser Error", row, column, inIfSequent);
+        super("Parser Error", position, inIfSequent);
         this.instantiation = instantiation;
         this.detail = (detail == null) ? "" : detail;
     }
 
     private String space(int i) {
-        StringBuffer res = new StringBuffer();
+        StringBuilder res = new StringBuilder();
         for (int j = 0; j < i; j++) {
             res.append(" ");
         }
@@ -25,24 +27,23 @@ public class SVInstantiationParserException extends SVInstantiationExceptionWith
     }
 
     public String getMessage() {
+        int column = getPosition().column();
 
-        int column = getColumn();
-
-        String errmsg = super.getMessage();
-        // needs non-prop font: errmsg +="\n"+inst;
+        String msg = super.getMessage();
+        // needs non-prop font: msg +="\n"+inst;
         if (column > 0) {
-            // needs non-prop font: errmsg +="\n"+space(column-1)+"^";
+            // needs non-prop font: msg +="\n"+space(column-1)+"^";
             String[] rows = instantiation.split("\n");
-            StringBuffer sb = new StringBuffer(rows[getRow() - 1]);
+            StringBuilder sb = new StringBuilder(rows[getPosition().line() - 1]);
             sb.insert(column - 1, " ~~> ");
-            errmsg += "\noccurred at: " + sb.toString();
+            msg += "\noccurred at: " + sb;
         } else {
-            errmsg += "\noccurred in:" + instantiation;
+            msg += "\noccurred in:" + instantiation;
         }
 
-        errmsg += "\nDetail:\n" + detail;
+        msg += "\nDetail:\n" + detail;
 
-        return errmsg;
+        return msg;
     }
 
     /**

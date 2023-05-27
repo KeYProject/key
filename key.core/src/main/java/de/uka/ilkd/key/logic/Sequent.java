@@ -4,11 +4,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This class represents a sequent. A sequent consists of an antecedent and succedent. As a sequent
@@ -279,6 +279,13 @@ public class Sequent implements Iterable<SequentFormula> {
             "Ghost formula " + cfma + " in sequent " + this + " [antec=" + inAntec + "]");
     }
 
+    /**
+     * Get a sequent formula by its position in the sequent.
+     * The first formula has number 1.
+     *
+     * @param formulaNumber formula number
+     * @return the sequent formula at that position
+     */
     public SequentFormula getFormulabyNr(int formulaNumber) {
         if (formulaNumber <= 0 || formulaNumber > size()) {
             throw new RuntimeException("No formula nr. " + formulaNumber + " in seq. " + this);

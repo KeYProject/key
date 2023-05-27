@@ -1,17 +1,19 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.settings.PathConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Properties;
+import javax.swing.*;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.settings.PathConfig;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class offers a mechanism to manage recent files; it adds the necessary menu items to a menu
@@ -63,25 +65,20 @@ public class RecentFileMenu {
      */
     public RecentFileMenu(final KeYMediator mediator) {
         this.menu = new JMenu("Recent Files");
-        this.lissy = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String absPath = getAbsolutePath((JMenuItem) e.getSource());
-                File file = new File(absPath);
+        this.lissy = e -> {
+            String absPath = getAbsolutePath((JMenuItem) e.getSource());
+            File file = new File(absPath);
 
-                // special case proof bundles -> allow to select the proof to load
-                if (ProofSelectionDialog.isProofBundle(file.toPath())) {
-                    Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
-                    if (proofPath == null) {
-                        // canceled by user!
-                        return;
-                    } else {
-                        mediator.getUI().loadProofFromBundle(file, proofPath.toFile());
-                        return;
-                    }
+            // special case proof bundles -> allow to select the proof to load
+            if (ProofSelectionDialog.isProofBundle(file.toPath())) {
+                Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
+                if (proofPath == null) {
+                    // canceled by user!
                 } else {
-                    mediator.getUI().loadProblem(file);
+                    mediator.getUI().loadProofFromBundle(file, proofPath.toFile());
                 }
+            } else {
+                mediator.getUI().loadProblem(file);
             }
         };
         this.maxNumberOfEntries = MAX_RECENT_FILES;
@@ -137,7 +134,7 @@ public class RecentFileMenu {
     }
 
     private void addRecentFileNoSave(final String path) {
-        LOGGER.debug("add file: {}, menu count is {}", path, menu.getItemCount());
+        LOGGER.trace("Adding file: {}", path);
         final RecentFileEntry existingEntry = pathToRecentFile.get(path);
 
         // Add the path to the recentFileList:

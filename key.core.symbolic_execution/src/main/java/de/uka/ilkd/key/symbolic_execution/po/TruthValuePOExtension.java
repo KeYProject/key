@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.symbolic_execution.po;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -13,6 +11,8 @@ import de.uka.ilkd.key.proof.init.POExtension;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Implementation of {@link POExtension} to support truth value evaluation.
@@ -63,7 +63,7 @@ public class TruthValuePOExtension implements POExtension {
                     }
                 }
                 term = subsChanged
-                        ? tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs),
+                        ? tf.createTerm(term.op(), new ImmutableArray<>(newSubs),
                             term.boundVars(), term.javaBlock(), term.getLabels())
                         : term;
             }
@@ -74,7 +74,7 @@ public class TruthValuePOExtension implements POExtension {
             int labelSubID = FormulaTermLabel.newLabelSubID(services, labelID);
             newLabels[oldLabels.size()] = new FormulaTermLabel(labelID, labelSubID);
             return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(),
-                new ImmutableArray<TermLabel>(newLabels));
+                new ImmutableArray<>(newLabels));
         } else {
             return null;
         }

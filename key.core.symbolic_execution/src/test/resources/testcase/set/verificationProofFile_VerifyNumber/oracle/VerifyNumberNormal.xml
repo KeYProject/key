@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call self.equals(_n)&gt;" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (this.content==_n.content)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+      <branchStatement name="if (this.content == _n.content)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
             <branchCondition name="equals(int::select(heap,self,VerifyNumber::$content),int::select(heap,n,VerifyNumber::$content))" pathCondition="equals(int::select(heap,self,VerifyNumber::$content),int::select(heap,n,VerifyNumber::$content))" pathConditionChanged="true" branchCondition="equals(int::select(heap,self,VerifyNumber::$content),int::select(heap,n,VerifyNumber::$content))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="return true;" pathCondition="equals(int::select(heap,self,VerifyNumber::$content),int::select(heap,n,VerifyNumber::$content))" pathConditionChanged="false">

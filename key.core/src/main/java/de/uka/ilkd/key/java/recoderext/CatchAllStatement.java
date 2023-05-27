@@ -111,10 +111,12 @@ public class CatchAllStatement extends JavaStatement
      */
     public int getChildCount() {
         int result = 0;
-        if (body != null)
+        if (body != null) {
             result++;
-        if (param != null)
+        }
+        if (param != null) {
             result++;
+        }
         return result;
     }
 
@@ -128,13 +130,15 @@ public class CatchAllStatement extends JavaStatement
      */
     public ProgramElement getChildAt(int index) {
         if (param != null) {
-            if (index == 0)
+            if (index == 0) {
                 return param;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();

@@ -126,7 +126,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      */
     @Override
     public String getName() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (isArrayRange()) {
             sb.append("[");
             if (getArrayStartIndex() != null) {

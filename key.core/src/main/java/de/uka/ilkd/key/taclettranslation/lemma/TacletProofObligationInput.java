@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -9,14 +14,12 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
 
 /**
  * The Class TacletProofObligationInput is a special purpose proof obligations for taclet proofs.
@@ -31,6 +34,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
 
     private final String tacletName;
     private ProofAggregate proofObligation;
+    private Throwable ex;
 
     // The following may all possibly be null
     private String definitionFile;
@@ -62,11 +66,13 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         @Override
         public void stopped(Throwable exception) {
             LOGGER.error("Exception while loading proof obligation for taclet:", exception);
+            ex = exception;
         }
 
         @Override
-        public void stopped(ProofAggregate p, ImmutableSet<Taclet> taclets, boolean addAsAxioms) {
-            proofObligation = Objects.requireNonNull(p);
+        public void stopped(@Nullable ProofAggregate p, ImmutableSet<Taclet> taclets,
+                boolean addAsAxioms) {
+            proofObligation = p;
         }
 
         @Override
@@ -157,7 +163,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         poloader.startSynchronously();
         if (proofObligation == null) {
             throw new ProofInputException("Cannot instantiate the proof obligation for taclet '"
-                + tacletName + "'. Is it defined (in the specified tacletFile?)");
+                + tacletName + "'. Is it defined (in the specified tacletFile?)", ex);
         }
     }
 

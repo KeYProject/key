@@ -1,26 +1,11 @@
 package de.uka.ilkd.key.rule;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
+import javax.annotation.Nullable;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
@@ -29,15 +14,13 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.VariableNameProposer;
-import de.uka.ilkd.key.rule.inst.GenericSortCondition;
-import de.uka.ilkd.key.rule.inst.GenericSortException;
-import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.inst.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.util.Debug;
 
-import javax.annotation.Nullable;
+import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.EqualsModProofIrrelevancyUtil;
+import org.key_project.util.collection.*;
 
 /**
  * A TacletApp object contains information required for a concrete application. These information
@@ -50,7 +33,10 @@ import javax.annotation.Nullable;
  * the information is complete or at least sufficient (can be completed using meta variables)
  * complete, so that is can be applied.
  */
-public abstract class TacletApp implements RuleApp {
+public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
+    public static final AtomicLong PERF_EXECUTE = new AtomicLong();
+    public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();
+    public static final AtomicLong PERF_PRE = new AtomicLong();
 
     /** the taclet for which the application information is collected */
     private final Taclet taclet;
@@ -129,8 +115,9 @@ public abstract class TacletApp implements RuleApp {
 
         ImmutableSet<QuantifiableVariable> result = boundAtOccurrenceSet(prefix, instantiations);
 
-        if (prefix.context())
+        if (prefix.context()) {
             result = result.union(collectBoundVarsAbove(pos));
+        }
 
         return result;
     }
@@ -147,7 +134,7 @@ public abstract class TacletApp implements RuleApp {
             SVInstantiations instantiations) {
 
         ImmutableSet<QuantifiableVariable> instanceSet =
-            DefaultImmutableSet.<QuantifiableVariable>nil();
+            DefaultImmutableSet.nil();
 
         for (final SchemaVariable var : pre.prefix()) {
             instanceSet =
@@ -250,9 +237,8 @@ public abstract class TacletApp implements RuleApp {
      * @return the term below the given quantifier in the find and if-parts of the Taclet
      */
     private static Term getTermBelowQuantifier(Taclet taclet, SchemaVariable varSV) {
-        Iterator<SequentFormula> it = taclet.ifSequent().iterator();
-        while (it.hasNext()) {
-            Term result = getTermBelowQuantifier(varSV, it.next().formula());
+        for (SequentFormula sequentFormula : taclet.ifSequent()) {
+            Term result = getTermBelowQuantifier(varSV, sequentFormula.formula());
             if (result != null) {
                 return result;
             }
@@ -260,8 +246,9 @@ public abstract class TacletApp implements RuleApp {
 
         if (taclet instanceof FindTaclet) {
             return getTermBelowQuantifier(varSV, ((FindTaclet) taclet).find());
-        } else
+        } else {
             return null;
+        }
     }
 
     /**
@@ -338,19 +325,32 @@ public abstract class TacletApp implements RuleApp {
      * @return list of new created goals
      */
     @Override
-    public ImmutableList<Goal> execute(Goal goal, Services services) {
-        if (!complete()) {
-            throw new IllegalStateException(
-                "Tried to apply rule \n" + taclet + "\nthat is not complete." + this);
-        }
+    public @Nullable ImmutableList<Goal> execute(Goal goal, Services services) {
+        var time = System.nanoTime();
+        var timeSetSequent = Goal.PERF_SET_SEQUENT.get();
+        try {
+            var timePre = System.nanoTime();
+            try {
+                if (!complete()) {
+                    throw new IllegalStateException(
+                        "Tried to apply rule \n" + taclet + "\nthat is not complete." + this);
+                }
 
-        if (!isExecutable(services)) {
-            throw new RuntimeException(
-                "taclet application with unsatisfied 'checkPrefix': " + this);
+                if (!isExecutable(services)) {
+                    throw new RuntimeException(
+                        "taclet application with unsatisfied 'checkPrefix': " + this);
+                }
+                registerSkolemConstants(goal.getLocalNamespaces());
+                goal.addAppliedRuleApp(this);
+            } finally {
+                PERF_PRE.getAndAdd(System.nanoTime() - timePre);
+            }
+
+            return taclet().apply(goal, services, this);
+        } finally {
+            PERF_EXECUTE.getAndAdd(System.nanoTime() - time);
+            PERF_SET_SEQUENT.getAndAdd(Goal.PERF_SET_SEQUENT.get() - timeSetSequent);
         }
-        registerSkolemConstants(goal.getLocalNamespaces());
-        goal.addAppliedRuleApp(this);
-        return taclet().apply(goal, services, this);
     }
 
     /*
@@ -369,9 +369,7 @@ public abstract class TacletApp implements RuleApp {
             }
             ImmutableList<UpdateLabelPair> newUpdCtx =
                 newConditions.getInstantiations().getUpdateContext();
-            if (!oldUpdCtx.equals(newUpdCtx)) {
-                return false;
-            }
+            return oldUpdCtx.equals(newUpdCtx);
         }
         return true;
     }
@@ -400,7 +398,7 @@ public abstract class TacletApp implements RuleApp {
     protected ImmutableSet<SchemaVariable> calculateNonInstantiatedSV() {
         if (missingVars == null) {
             ImmutableSet<SchemaVariable> localMissingVars =
-                DefaultImmutableSet.<SchemaVariable>nil();
+                DefaultImmutableSet.nil();
             TacletSchemaVariableCollector coll =
                 new TacletSchemaVariableCollector(instantiations());
             coll.visitWithoutAddrule(taclet());
@@ -485,7 +483,7 @@ public abstract class TacletApp implements RuleApp {
         final TermBuilder tb = services.getTermBuilder();
 
         TacletApp app = this;
-        ImmutableList<String> proposals = ImmutableSLList.<String>nil();
+        ImmutableList<String> proposals = ImmutableSLList.nil();
 
         for (final SchemaVariable sv : uninstantiatedVars()) {
             if (sv.arity() != 0) {
@@ -554,7 +552,6 @@ public abstract class TacletApp implements RuleApp {
 
                 app = app.addCheckedInstantiation(sv, tb.var(v), services, true);
             } else {
-                continue;
             }
         }
 
@@ -587,7 +584,7 @@ public abstract class TacletApp implements RuleApp {
         final TermBuilder tb = services.getTermBuilder();
 
         TacletApp app = this;
-        ImmutableList<String> proposals = ImmutableSLList.<String>nil();
+        ImmutableList<String> proposals = ImmutableSLList.nil();
 
         for (final SchemaVariable sv : uninstantiatedVars()) {
             if (sv.arity() != 0) {
@@ -623,8 +620,9 @@ public abstract class TacletApp implements RuleApp {
                 // if the sort of the schema variable is generic,
                 // ensure that it is instantiated
                 app = forceGenericSortInstantiation(app, sv, services);
-                if (app == null)
+                if (app == null) {
                     return null;
+                }
 
                 String proposal =
                     VariableNameProposer.DEFAULT.getProposal(app, sv, services, null, proposals);
@@ -637,8 +635,9 @@ public abstract class TacletApp implements RuleApp {
                 // if the sort of the schema variable is generic,
                 // ensure that it is instantiated
                 app = forceGenericSortInstantiation(app, sv, services);
-                if (app == null)
+                if (app == null) {
                     return null;
+                }
 
                 String proposal;
                 Collection<String> conflictNames = collectClashNames(sv, services);
@@ -892,7 +891,7 @@ public abstract class TacletApp implements RuleApp {
             // (LG 2022-02-07) Apparently findIfFormulaInstantiations() might return null
             // instantiations that should actually be nil().
             // So we replace null with nil() here as a bugfix.
-            p_list = ImmutableSLList.<IfFormulaInstantiation>nil();
+            p_list = ImmutableSLList.nil();
         }
         assert ifInstsCorrectSize(p_list) && ifInstantiations == null
                 : "If instantiations list has wrong size "
@@ -918,15 +917,16 @@ public abstract class TacletApp implements RuleApp {
         Debug.assertTrue(ifInstantiations == null,
             "The if formulas have already been instantiated");
 
-        if (taclet().ifSequent().isEmpty())
+        if (taclet().ifSequent().isEmpty()) {
             return ImmutableSLList.<TacletApp>nil().prepend(this);
+        }
 
         return findIfFormulaInstantiationsHelp(
             createSemisequentList(taclet().ifSequent().succedent()),
             createSemisequentList(taclet().ifSequent().antecedent()),
             IfFormulaInstSeq.createList(seq, false, services),
             IfFormulaInstSeq.createList(seq, true, services),
-            ImmutableSLList.<IfFormulaInstantiation>nil(), matchConditions(), services);
+            ImmutableSLList.nil(), matchConditions(), services);
     }
 
     /**
@@ -955,9 +955,10 @@ public abstract class TacletApp implements RuleApp {
             if (ruleAntecTail == null) {
                 // All formulas have been matched, collect the results
                 TacletApp res = setAllInstantiations(matchCond, instAlreadyMatched, services);
-                if (res != null)
+                if (res != null) {
                     return ImmutableSLList.<TacletApp>nil().prepend(res);
-                return ImmutableSLList.<TacletApp>nil();
+                }
+                return ImmutableSLList.nil();
             } else {
                 // Change from succedent to antecedent
                 ruleSuccTail = ruleAntecTail;
@@ -972,7 +973,7 @@ public abstract class TacletApp implements RuleApp {
 
         // For each matching formula call the method again to match
         // the remaining terms
-        ImmutableList<TacletApp> res = ImmutableSLList.<TacletApp>nil();
+        ImmutableList<TacletApp> res = ImmutableSLList.nil();
         Iterator<IfFormulaInstantiation> itCand = mr.getFormulas().iterator();
         Iterator<MatchConditions> itMC = mr.getMatchConditions().iterator();
         ruleSuccTail = ruleSuccTail.tail();
@@ -985,10 +986,11 @@ public abstract class TacletApp implements RuleApp {
     }
 
     private ImmutableList<SequentFormula> createSemisequentList(Semisequent p_ss) {
-        ImmutableList<SequentFormula> res = ImmutableSLList.<SequentFormula>nil();
+        ImmutableList<SequentFormula> res = ImmutableSLList.nil();
 
-        for (Object p_s : p_ss)
-            res = res.prepend((SequentFormula) p_s);
+        for (SequentFormula p_s : p_ss) {
+            res = res.prepend(p_s);
+        }
 
         return res;
     }
@@ -1027,15 +1029,15 @@ public abstract class TacletApp implements RuleApp {
      */
     @Override
     public boolean equals(Object o) {
-        if (o == this)
+        if (o == this) {
             return true;
+        }
         if (o == null || o.getClass() != this.getClass()) {
             return false;
         }
         final TacletApp s = (TacletApp) o;
         return (s.taclet.equals(taclet) && s.instantiations.equals(instantiations))
-                && (ifInstantiations == null ? s.ifInstantiations == null
-                        : ifInstantiations.equals(s.ifInstantiations));
+                && (Objects.equals(ifInstantiations, s.ifInstantiations));
     }
 
     @Override
@@ -1086,17 +1088,15 @@ public abstract class TacletApp implements RuleApp {
      */
     public Namespace<QuantifiableVariable> extendVarNamespaceForSV(
             Namespace<QuantifiableVariable> var_ns, SchemaVariable sv) {
-        Namespace<QuantifiableVariable> ns = new Namespace<QuantifiableVariable>(var_ns);
-        Iterator<SchemaVariable> it = taclet().getPrefix(sv).prefix().iterator();
-        while (it.hasNext()) {
+        Namespace<QuantifiableVariable> ns = new Namespace<>(var_ns);
+        for (SchemaVariable schemaVariable : taclet().getPrefix(sv).prefix()) {
             LogicVariable var =
-                (LogicVariable) ((Term) instantiations().getInstantiation(it.next())).op();
+                (LogicVariable) ((Term) instantiations().getInstantiation(schemaVariable)).op();
             ns.add(var);
         }
         if (taclet().getPrefix(sv).context()) {
-            Iterator<QuantifiableVariable> lit = contextVars(sv).iterator();
-            while (lit.hasNext()) {
-                ns.add(lit.next());
+            for (QuantifiableVariable quantifiableVariable : contextVars(sv)) {
+                ns.add(quantifiableVariable);
             }
         }
         return ns;
@@ -1111,7 +1111,7 @@ public abstract class TacletApp implements RuleApp {
      * @return the new function namespace that bases on the original one
      */
     public Namespace<Function> extendedFunctionNameSpace(Namespace<Function> func_ns) {
-        Namespace<Function> ns = new Namespace<Function>(func_ns);
+        Namespace<Function> ns = new Namespace<>(func_ns);
         Iterator<SchemaVariable> it = instantiations.svIterator();
         while (it.hasNext()) {
             SchemaVariable sv = it.next();
@@ -1268,7 +1268,7 @@ public abstract class TacletApp implements RuleApp {
      * @return a set of logic variables that are bound above the specified subterm
      */
     protected static ImmutableSet<QuantifiableVariable> collectBoundVarsAbove(PosInOccurrence pos) {
-        ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet.<QuantifiableVariable>nil();
+        ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet.nil();
 
         PIOPathIterator it = pos.iterator();
         int i;
@@ -1276,10 +1276,50 @@ public abstract class TacletApp implements RuleApp {
 
         while ((i = it.next()) != -1) {
             vars = it.getSubTerm().varsBoundHere(i);
-            for (i = 0; i < vars.size(); i++)
+            for (i = 0; i < vars.size(); i++) {
                 result = result.add(vars.get(i));
+            }
         }
 
         return result;
+    }
+
+    @Override
+    public boolean equalsModProofIrrelevancy(Object obj) {
+        if (!(obj instanceof TacletApp)) {
+            return false;
+        }
+        TacletApp that = (TacletApp) obj;
+        if ((ifInstantiations == null && that.ifInstantiations != null)
+                || (ifInstantiations != null
+                        && !EqualsModProofIrrelevancyUtil.compareImmutableLists(ifInstantiations,
+                            that.ifInstantiations))) {
+            return false;
+        }
+        if (!instantiations.equals(that.instantiations)) {
+            return false;
+        }
+        if (!matchConditions.equalsModProofIrrelevancy(that.matchConditions)) {
+            return false;
+        }
+        if (!Objects.equals(missingVars, that.missingVars)) {
+            return false;
+        }
+        if (updateContextFixed != that.updateContextFixed) {
+            return false;
+        }
+        if (!rule().equals(that.rule())) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        return Objects.hash(
+            EqualsModProofIrrelevancyUtil.hashCodeImmutableList(ifInstantiations),
+            instantiations, matchConditions.hashCodeModProofIrrelevancy(), missingVars,
+            updateContextFixed,
+            rule());
     }
 }

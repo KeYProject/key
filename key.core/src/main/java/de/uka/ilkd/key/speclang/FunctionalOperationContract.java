@@ -5,14 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -22,16 +22,16 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 public interface FunctionalOperationContract extends OperationContract {
 
     @Override
-    public FunctionalOperationContract map(UnaryOperator<Term> op, Services services);
+    FunctionalOperationContract map(UnaryOperator<Term> op, Services services);
 
     /**
      * Returns the modality of the contract.
      */
-    public Modality getModality();
+    Modality getModality();
 
-    public boolean isReadOnlyContract(Services services);
+    boolean isReadOnlyContract(Services services);
 
-    public Term getEnsures(LocationVariable heap);
+    Term getEnsures(LocationVariable heap);
 
     /**
      * Returns the postcondition of the contract.
@@ -45,12 +45,12 @@ public interface FunctionalOperationContract extends OperationContract {
      * @param services the services object.
      * @return the post condition.
      */
-    public Term getPost(LocationVariable heap, ProgramVariable selfVar,
+    Term getPost(LocationVariable heap, ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
             ProgramVariable excVar, Map<LocationVariable, ? extends ProgramVariable> atPreVars,
             Services services);
 
-    public Term getPost(List<LocationVariable> heapContext, ProgramVariable selfVar,
+    Term getPost(List<LocationVariable> heapContext, ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
             ProgramVariable excVar, Map<LocationVariable, ? extends ProgramVariable> atPreVars,
             Services services);
@@ -68,24 +68,24 @@ public interface FunctionalOperationContract extends OperationContract {
      * @param services the services object.
      * @return the postcondition.
      */
-    public Term getPost(LocationVariable heap, Term heapTerm, Term selfTerm,
+    Term getPost(LocationVariable heap, Term heapTerm, Term selfTerm,
             ImmutableList<Term> paramTerms, Term resultTerm, Term excTerm,
             Map<LocationVariable, Term> atPres, Services services);
 
-    public Term getPost(List<LocationVariable> heapContext, Map<LocationVariable, Term> heapTerms,
+    Term getPost(List<LocationVariable> heapContext, Map<LocationVariable, Term> heapTerms,
             Term selfTerm, ImmutableList<Term> paramTerms, Term resultTerm, Term excTerm,
             Map<LocationVariable, Term> atPres, Services services);
 
-    public Term getFreePost(LocationVariable heap, ProgramVariable selfVar,
+    Term getFreePost(LocationVariable heap, ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
             ProgramVariable excVar, Map<LocationVariable, ? extends ProgramVariable> atPreVars,
             Services services);
 
-    public Term getFreePost(LocationVariable heap, Term heapTerm, Term selfTerm,
+    Term getFreePost(LocationVariable heap, Term heapTerm, Term selfTerm,
             ImmutableList<Term> paramTerms, Term resultTerm, Term excTerm,
             Map<LocationVariable, Term> atPres, Services services);
 
-    public Term getFreePost(List<LocationVariable> heapContext,
+    Term getFreePost(List<LocationVariable> heapContext,
             Map<LocationVariable, Term> heapTerms, Term selfTerm, ImmutableList<Term> paramTerms,
             Term resultTerm, Term excTerm, Map<LocationVariable, Term> atPres, Services services);
 
@@ -97,34 +97,34 @@ public interface FunctionalOperationContract extends OperationContract {
     /**
      * Returns the model method definition for model method contracts
      */
-    public Term getRepresentsAxiom(LocationVariable heap, ProgramVariable selfVar,
+    Term getRepresentsAxiom(LocationVariable heap, ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
             Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services);
 
-    public Term getRepresentsAxiom(LocationVariable heap, Term heapTerm, Term selfTerm,
+    Term getRepresentsAxiom(LocationVariable heap, Term heapTerm, Term selfTerm,
             ImmutableList<Term> paramTerms, Term resultTerm, Term excTerm,
             Map<LocationVariable, Term> atPres, Services services);
 
-    public String getBaseName();
+    String getBaseName();
 
-    public Term getPre();
+    Term getPre();
 
-    public Term getPost();
+    Term getPost();
 
-    public Term getMod();
+    Term getMod();
 
     @Override
-    public Term getMby();
+    Term getMby();
 
-    public Term getSelf();
+    Term getSelf();
 
-    public ImmutableList<Term> getParams();
+    ImmutableList<Term> getParams();
 
-    public Term getResult();
+    Term getResult();
 
-    public Term getExc();
+    Term getExc();
 
-    public KeYJavaType getSpecifiedIn();
+    KeYJavaType getSpecifiedIn();
 
-    public boolean hasResultVar();
+    boolean hasResultVar();
 }

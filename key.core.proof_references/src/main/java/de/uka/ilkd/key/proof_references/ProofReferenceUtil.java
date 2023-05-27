@@ -2,22 +2,16 @@ package de.uka.ilkd.key.proof_references;
 
 import java.util.LinkedHashSet;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofVisitor;
-import de.uka.ilkd.key.proof_references.analyst.ClassAxiomAndInvariantProofReferencesAnalyst;
-import de.uka.ilkd.key.proof_references.analyst.ContractProofReferencesAnalyst;
-import de.uka.ilkd.key.proof_references.analyst.IProofReferencesAnalyst;
-import de.uka.ilkd.key.proof_references.analyst.MethodBodyExpandProofReferencesAnalyst;
-import de.uka.ilkd.key.proof_references.analyst.MethodCallProofReferencesAnalyst;
-import de.uka.ilkd.key.proof_references.analyst.ProgramVariableReferencesAnalyst;
+import de.uka.ilkd.key.proof_references.analyst.*;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * <p>
@@ -38,7 +32,7 @@ import de.uka.ilkd.key.proof_references.reference.IProofReference;
  *
  * @author Martin Hentschel
  * @see IProofReference
- * @see IProofReferencesAnalyst.
+ * @see IProofReferencesAnalyst
  */
 public final class ProofReferenceUtil {
     /**
@@ -96,13 +90,12 @@ public final class ProofReferenceUtil {
             proof.breadthFirstSearch(proof.root(), visitor);
             return visitor.getResult();
         } else {
-            return new LinkedHashSet<IProofReference<?>>();
+            return new LinkedHashSet<>();
         }
     }
 
     /**
-     * Utility class used by
-     * {@link KeyProofReferenceUtil#analyzeProof(KeyConnection, Services, Proof)}.
+     * Utility class used by {@link ProofReferenceUtil}.
      *
      * @author Martin Hentschel
      */
@@ -110,17 +103,18 @@ public final class ProofReferenceUtil {
         /**
          * The {@link Services} to use.
          */
-        private Services services;
+        private final Services services;
 
         /**
          * The {@link IProofReferencesAnalyst}s to use.
          */
-        private ImmutableList<IProofReferencesAnalyst> analysts;
+        private final ImmutableList<IProofReferencesAnalyst> analysts;
 
         /**
          * The result.
          */
-        private LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
+        private final LinkedHashSet<IProofReference<?>> result =
+            new LinkedHashSet<>();
 
         /**
          * Constructor.
@@ -174,7 +168,7 @@ public final class ProofReferenceUtil {
      */
     public static LinkedHashSet<IProofReference<?>> computeProofReferences(Node node,
             Services services, ImmutableList<IProofReferencesAnalyst> analysts) {
-        LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
+        LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<>();
         if (node != null && analysts != null) {
             for (IProofReferencesAnalyst analyst : analysts) {
                 LinkedHashSet<IProofReference<?>> analystResult =
@@ -209,14 +203,9 @@ public final class ProofReferenceUtil {
     public static void merge(LinkedHashSet<IProofReference<?>> target,
             final IProofReference<?> reference) {
         if (!target.add(reference)) {
-            // Reference exist before, so merge nodes of both references.
+            // Reference exists before, so merge nodes of both references.
             IProofReference<?> existingFirst =
-                CollectionUtil.search(target, new IFilter<IProofReference<?>>() {
-                    @Override
-                    public boolean select(IProofReference<?> element) {
-                        return element.equals(reference);
-                    }
-                });
+                CollectionUtil.search(target, element -> element.equals(reference));
             existingFirst.addNodes(reference.getNodes());
         }
     }

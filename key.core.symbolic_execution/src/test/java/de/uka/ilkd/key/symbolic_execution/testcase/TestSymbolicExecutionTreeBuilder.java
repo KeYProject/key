@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
+import java.io.File;
+import java.util.Iterator;
+import java.util.Map;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -11,13 +15,11 @@ import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+
 import org.junit.jupiter.api.*;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Iterator;
-
 import static org.junit.jupiter.api.Assertions.*;
+
 
 /**
  * Tests for {@link SymbolicExecutionTreeBuilder},
@@ -535,7 +537,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     @Test
     public void testSymbolicExecutionCompletionsTest() throws Exception {
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
         try {
             String javaPathInBaseDir =
@@ -1874,14 +1876,14 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
             assertNotSame(thenPosition, elsePosition);
             assertNotSame(PositionInfo.UNDEFINED, thenPosition);
             assertNotSame(PositionInfo.UNDEFINED, elsePosition);
-            assertEquals(6, thenPosition.getStartPosition().getLine());
-            assertEquals(21, thenPosition.getStartPosition().getColumn());
-            assertEquals(6, thenPosition.getEndPosition().getLine());
-            assertEquals(24, thenPosition.getEndPosition().getColumn());
-            assertEquals(9, elsePosition.getStartPosition().getLine());
-            assertEquals(17, elsePosition.getStartPosition().getColumn());
-            assertEquals(9, elsePosition.getEndPosition().getLine());
-            assertEquals(20, elsePosition.getEndPosition().getColumn());
+            assertEquals(6, thenPosition.getStartPosition().line());
+            assertEquals(21, thenPosition.getStartPosition().column());
+            assertEquals(6, thenPosition.getEndPosition().line());
+            assertEquals(24, thenPosition.getEndPosition().column());
+            assertEquals(9, elsePosition.getStartPosition().line());
+            assertEquals(17, elsePosition.getStartPosition().column());
+            assertEquals(9, elsePosition.getEndPosition().line());
+            assertEquals(20, elsePosition.getEndPosition().column());
         } finally {
             env.dispose();
         }

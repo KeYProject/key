@@ -33,6 +33,19 @@ public class SemisequentChangeInfo {
         this.modifiedSemisequent = formulas;
     }
 
+    private SemisequentChangeInfo(SemisequentChangeInfo o) {
+        this.added = o.added;
+        this.removed = o.removed;
+        this.modified = o.modified;
+        this.modifiedSemisequent = o.modifiedSemisequent;
+        this.rejected = o.rejected;
+        this.lastFormulaIndex = o.lastFormulaIndex;
+    }
+
+    public SemisequentChangeInfo copy() {
+        return new SemisequentChangeInfo(this);
+    }
+
     /**
      * returns true if the semisequent has changed
      */

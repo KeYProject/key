@@ -2,12 +2,15 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.pp.PrettyPrinter;
+
+import org.key_project.util.EqualsModProofIrrelevancy;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JavaBlock {
+public final class JavaBlock implements EqualsModProofIrrelevancy {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaBlock.class);
 
     /**
@@ -22,6 +25,7 @@ public class JavaBlock {
     public static final JavaBlock EMPTY_JAVABLOCK = new JavaBlock(new StatementBlock());
 
     private final JavaProgramElement prg;
+    private int hashCode = -1;
 
 
     /**
@@ -125,4 +129,27 @@ public class JavaBlock {
         return printer.result();
     }
 
+    @Override
+    public boolean equalsModProofIrrelevancy(Object obj) {
+        if (!(obj instanceof JavaBlock)) {
+            return false;
+        }
+        if (this == obj) {
+            return true;
+        }
+        JavaBlock other = (JavaBlock) obj;
+        // quite inefficient, but sufficient
+        return toString().equals(other.toString());
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        if (hashCode == -1) {
+            hashCode = toString().hashCode();
+            if (hashCode == -1) {
+                hashCode = 0;
+            }
+        }
+        return hashCode;
+    }
 }

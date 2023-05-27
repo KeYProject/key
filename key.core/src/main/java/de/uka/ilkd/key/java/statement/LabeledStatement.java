@@ -5,6 +5,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -126,9 +127,9 @@ public class LabeledStatement extends JavaStatement
         if (body instanceof StatementBlock) {
             return StatementBlock.computePrefixElements(((StatementBlock) body).getBody(), this);
         } else if (body instanceof ProgramPrefix) {
-            return StatementBlock.computePrefixElements(new ImmutableArray<Statement>(body), this);
+            return StatementBlock.computePrefixElements(new ImmutableArray<>(body), this);
         }
-        return new ImmutableArray<ProgramPrefix>(this);
+        return new ImmutableArray<>(this);
     }
 
 
@@ -209,10 +210,12 @@ public class LabeledStatement extends JavaStatement
 
     public int getChildCount() {
         int result = 0;
-        if (name != null)
+        if (name != null) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -226,13 +229,15 @@ public class LabeledStatement extends JavaStatement
 
     public ProgramElement getChildAt(int index) {
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();

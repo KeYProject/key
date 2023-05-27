@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.util.pp;
 
-import javax.annotation.Nonnull;
 import java.util.*;
+import javax.annotation.Nonnull;
 
 /**
  * This class pretty-prints information using line breaks and indentation. For instance, it can be
@@ -673,7 +673,7 @@ public class Layouter<M> {
 
     /** A token corresponding to a <code>print</code> call. */
     private static class StringToken<M> extends StreamToken<M> {
-        String s;
+        final String s;
 
         StringToken(String s) {
             this.s = s;
@@ -690,8 +690,8 @@ public class Layouter<M> {
 
     /** A token corresponding to an <code>ind</code> call. */
     private static class IndentationToken<M> extends StreamToken<M> {
-        protected int width;
-        protected int offset;
+        protected final int width;
+        protected final int offset;
 
         IndentationToken(int width, int offset) {
             this.width = width;
@@ -709,7 +709,7 @@ public class Layouter<M> {
 
     /** Superclass of tokens which calculate their followingSize. */
     private static abstract class SizeCalculatingToken<M> extends StreamToken<M> {
-        protected int begin;
+        protected final int begin;
         /** negative means that end has not been set yet. */
         protected int end = -1;
 
@@ -739,8 +739,8 @@ public class Layouter<M> {
 
     /** A token corresponding to a <code>brk</code> call. */
     private static class BreakToken<M> extends SizeCalculatingToken<M> {
-        protected int width;
-        protected int offset;
+        protected final int width;
+        protected final int offset;
 
         BreakToken(int begin, int width, int offset) {
             super(begin);
@@ -759,9 +759,9 @@ public class Layouter<M> {
 
     /** A token corresponding to a <code>begin</code> call. */
     private static class OpenBlockToken<M> extends SizeCalculatingToken<M> {
-        protected boolean consistent;
-        protected boolean relative;
-        protected int indent;
+        protected final boolean consistent;
+        protected final boolean relative;
+        protected final int indent;
 
         OpenBlockToken(int begin, boolean consistent, boolean relative, int indent) {
             super(begin);
@@ -795,7 +795,7 @@ public class Layouter<M> {
 
     /** A token corresponding to a <code>mark</code> call. */
     private static class MarkToken<M> extends StreamToken<M> {
-        protected M o;
+        protected final M o;
 
         MarkToken(M o) {
             this.o = o;

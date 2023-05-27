@@ -6,17 +6,17 @@
 
 package de.uka.ilkd.key.rule;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.Sequent;
+
+import org.key_project.util.collection.ImmutableList;
 
 public class TacletApplPart {
 
-    private Sequent ifseq;
-    private ImmutableList<NewVarcond> varsNew;
-    private ImmutableList<NotFreeIn> varsNotFreeIn;
-    private ImmutableList<NewDependingOn> varsNewDependingOn;
-    private ImmutableList<VariableCondition> variableConditions;
+    private final Sequent ifseq;
+    private final ImmutableList<NewVarcond> varsNew;
+    private final ImmutableList<NotFreeIn> varsNotFreeIn;
+    private final ImmutableList<NewDependingOn> varsNewDependingOn;
+    private final ImmutableList<VariableCondition> variableConditions;
 
     /**
      * constructs a new TacletApplPart object with the given Sequent, a list of variables that are

@@ -3,15 +3,15 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Generic removing lemma generator adds the default implementation only that all
@@ -28,7 +28,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
     /**
      * The map from generic sorts to proxy sorts.
      */
-    private final Map<Sort, Sort> sortMap = new HashMap<Sort, Sort>();
+    private final Map<Sort, Sort> sortMap = new HashMap<>();
 
 
     /**

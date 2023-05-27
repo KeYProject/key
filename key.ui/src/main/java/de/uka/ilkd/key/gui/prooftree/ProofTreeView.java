@@ -1,6 +1,18 @@
 package de.uka.ilkd.key.gui.prooftree;
 
-import bibliothek.gui.dock.common.action.CAction;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.swing.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.plaf.TreeUI;
+import javax.swing.plaf.basic.BasicTreeUI;
+import javax.swing.plaf.metal.MetalTreeUI;
+import javax.swing.tree.*;
+
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -18,29 +30,16 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.RuleApp;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import bibliothek.gui.dock.common.action.CAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.swing.*;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.plaf.TreeUI;
-import javax.swing.plaf.basic.BasicTreeUI;
-import javax.swing.plaf.metal.MetalTreeUI;
-import javax.swing.tree.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.List;
-import java.util.*;
 
 /**
  * The proof tree view, showing the nodes of the proof.
@@ -71,8 +70,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
     private static final long serialVersionUID = 3732875161168302809L;
 
-    // Taclet info can be shown for inner nodes.
-    private boolean showTacletInfo = false;
+    /** Whether to expand oss nodes when using expand all */
+    private boolean expandOSSNodes = false;
 
     /**
      * The JTree that is used for actual display and interaction
@@ -93,6 +92,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * Stores for each loaded proof the GUI tree model.
      */
     private final WeakHashMap<Proof, GUIProofTreeModel> models = new WeakHashMap<>(20);
+    /**
+     * Stores for each loaded proof the position of the scroll view.
+     */
+    private final WeakHashMap<Proof, Integer> scrollState = new WeakHashMap<>();
 
     /**
      * The (currently selected) proof this view shows.
@@ -255,12 +258,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
             KeYGuiExtension.KeyboardShortcuts.PROOF_TREE_VIEW);
     }
 
-    public void setShowTacletInfo(boolean value) {
-        showTacletInfo = value;
+    public boolean isExpandOSSNodes() {
+        return expandOSSNodes;
     }
 
-    public boolean getShowTacletInfo() {
-        return showTacletInfo;
+    public void setExpandOSSNodes(boolean expandOSSNodes) {
+        this.expandOSSNodes = expandOSSNodes;
     }
 
     @Override
@@ -378,10 +381,17 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * @param p the Proof that has been loaded
      */
     private void setProof(Proof p) {
+        if (proof != null) {
+            // save old scroll height
+            JScrollPane scroller = (JScrollPane) delegateView.getParent().getParent();
+            scrollState.put(proof, scroller.getVerticalScrollBar().getValue());
+        }
         if (proof == p) {
             return; // proof is already loaded
         }
+        ProofTreeViewFilter.NodeFilter filter = null;
         if (delegateModel != null) {
+            filter = delegateModel.getActiveNodeFilter();
             expansionState.disconnect();
             delegateModel.setExpansionState(expansionState.copyState());
             delegateModel.storeSelection(delegateView.getSelectionPath());
@@ -393,7 +403,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
             proof.removeRuleAppListener(proofListener);
         }
 
-        Proof oldProof = proof;
         proof = p;
 
         if (proof != null) {
@@ -410,14 +419,38 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 new ProofTreeExpansionState(delegateView, delegateModel.getExpansionState());
             delegateView.expandRow(0);
 
+            // Save expansion state to restore:
+            // since TreePaths are not valid after refreshing the filter, we need to store the
+            // row indices
+            List<Integer> rowsToExpand = new ArrayList<>();
+            for (TreePath tp : expansionState) {
+                rowsToExpand.add(delegateView.getUI().getRowForPath(delegateView, tp));
+            }
+            Collections.sort(rowsToExpand);
+
             // Redraw the tree in case the ProofTreeViewFilters have changed
             // since the last time the proof was loaded.
-            if (oldProof == null || !oldProof.equals(proof)) {
-                delegateModel.updateTree(null);
+            delegateModel.setFilterImmediately(filter, filter != null && filter.isActive());
+
+            // Expand previously visible rows.
+            for (int i : rowsToExpand) {
+                delegateView.expandRow(i);
             }
 
-            delegateView.setSelectionPath(delegateModel.getSelection());
-            delegateView.scrollPathToVisible(delegateModel.getSelection());
+            if (delegateModel.getSelection() != null) {
+                delegateView.setSelectionPath(delegateModel.getSelection());
+                delegateView.scrollPathToVisible(delegateModel.getSelection());
+            } else {
+                // new proof, select initial node
+                delegateView.setSelectionRow(1);
+            }
+
+            // Restore previous scroll position.
+            JScrollPane scroller = (JScrollPane) delegateView.getParent().getParent();
+            Integer i = scrollState.get(proof);
+            if (i != null) {
+                scroller.getVerticalScrollBar().setValue(i);
+            }
         } else {
             delegateModel = null;
             delegateView
@@ -430,6 +463,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     public void removeProofs(Proof[] ps) {
         for (final Proof p : ps) {
             models.remove(p);
+            scrollState.remove(p);
             mediator.getCurrentlyOpenedProofs().removeElement(p);
         }
     }
@@ -598,6 +632,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
         }
 
         final TreePath selectedPath = delegateModel.getSelection();
+        if (selectedPath == null) {
+            return false;
+        }
+
         final TreePath branch;
         final Node invokedNode;
         if (selectedPath.getLastPathComponent() instanceof GUIProofTreeNode) {
@@ -761,8 +799,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
          */
         @Override
         public void autoModeStarted(ProofEvent e) {
-            modifiedSubtrees = ImmutableSLList.<Node>nil();
-            modifiedSubtreesCache = new LinkedHashSet<Node>();
+            modifiedSubtrees = ImmutableSLList.nil();
+            modifiedSubtreesCache = new LinkedHashSet<>();
             if (delegateModel == null) {
                 LOGGER.debug("delegateModel is null");
                 return;
@@ -990,6 +1028,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
             if (notes != null) {
                 style.tooltip.addNotes(notes);
             }
+            if (leaf.getNodeInfo().isUselessApplication()) {
+                style.tooltip.addAdditionalInfo("Analysis", "Not required to close proof", false);
+            }
             style.tooltip.setTitle(toolTipText);
         }
 
@@ -1015,6 +1056,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 defaultIcon = IconFactory.WINDOW_ICON.get();
             } else if (notes != null) {
                 defaultIcon = IconFactory.editFile(16);
+            } else if (node.getNodeInfo().isUselessApplication()) {
+                defaultIcon = IconFactory.uselessAppLogo(16);
             } else if (node.getNodeInfo().getInteractiveRuleApplication()) {
                 defaultIcon = IconFactory.interactiveAppLogo(16);
             } else if (node.getNodeInfo().getScriptRuleApplication()) {

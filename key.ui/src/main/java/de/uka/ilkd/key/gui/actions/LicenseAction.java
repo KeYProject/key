@@ -1,15 +1,16 @@
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.util.KeYConstants;
-import de.uka.ilkd.key.util.KeYResourceManager;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.util.KeYConstants;
+import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
  * Shows the license dialog.
@@ -43,9 +44,10 @@ public class LicenseAction extends MainWindowAction {
     }
 
     private String readStream(URL resource, String fallback) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         try {
-            InputStreamReader inp = new InputStreamReader(resource.openStream(), "UTF-8");
+            InputStreamReader inp =
+                new InputStreamReader(resource.openStream(), StandardCharsets.UTF_8);
             int c;
             char[] buf = new char[1024];
             while ((c = inp.read(buf)) > 0) {

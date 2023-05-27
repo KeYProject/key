@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.gui.fonticons;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import javax.swing.*;
 
 /**
  * @author Alexander Weigl
@@ -11,9 +11,9 @@ import java.util.ArrayList;
 public class ShowIcons extends JFrame {
     private static final long serialVersionUID = 8775474163870717215L;
     // private Box box = new Box(BoxLayout.Y_AXIS);
-    private JPanel box = new JPanel(new GridLayout(0, 10));
-    private JPanel search = new JPanel();
-    private ArrayList<JLabel> icons = new ArrayList<>();
+    private final JPanel box = new JPanel(new GridLayout(0, 10));
+    private final JPanel search = new JPanel();
+    private final ArrayList<JLabel> icons = new ArrayList<>();
 
 
     public ShowIcons() {
@@ -27,14 +27,18 @@ public class ShowIcons extends JFrame {
         search.add(txtSearch);
         txtSearch.addActionListener(l -> filter(txtSearch.getText()));
 
-        for (IconFont fa : FontAwesomeRegular.values())
+        for (IconFont fa : FontAwesomeRegular.values()) {
             add(fa);
-        for (IconFont fa : FontAwesomeSolid.values())
+        }
+        for (IconFont fa : FontAwesomeSolid.values()) {
             add(fa);
-        for (IconFont fa : Entypo.values())
+        }
+        for (IconFont fa : Entypo.values()) {
             add(fa);
-        for (IconFont fa : Typicons.values())
+        }
+        for (IconFont fa : Typicons.values()) {
             add(fa);
+        }
 
         JScrollPane scroll = new JScrollPane(box);
         setSize(500, 500);
@@ -51,13 +55,15 @@ public class ShowIcons extends JFrame {
     private void filter(String text) {
         box.removeAll();
         if (text.isEmpty()) {
-            for (Component c : icons)
-                box.add(c);
-        } else {
             for (Component c : icons) {
-                String toolTipText = ((JComponent) c).getToolTipText();
-                if (toolTipText != null && toolTipText.toLowerCase().contains(text.toLowerCase()))
+                box.add(c);
+            }
+        } else {
+            for (JComponent c : icons) {
+                String toolTipText = c.getToolTipText();
+                if (toolTipText != null && toolTipText.toLowerCase().contains(text.toLowerCase())) {
                     box.add(c);
+                }
             }
         }
         box.revalidate();

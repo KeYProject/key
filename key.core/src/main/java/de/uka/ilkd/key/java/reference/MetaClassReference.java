@@ -3,6 +3,7 @@ package de.uka.ilkd.key.java.reference;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
 import org.key_project.util.ExtList;
 
 /**
@@ -63,8 +64,9 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -140,7 +142,7 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         throw new IllegalStateException("Metaclass references are not supported by KeY as"
-            + "\'java.lang.Class\' is not part of the Java Card standard");
+            + "'java.lang.Class' is not part of the Java Card standard");
     }
 
 }

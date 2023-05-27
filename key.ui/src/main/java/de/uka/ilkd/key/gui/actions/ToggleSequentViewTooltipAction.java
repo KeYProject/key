@@ -1,14 +1,13 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.EventObject;
-
+import java.beans.PropertyChangeListener;
+import javax.swing.*;
 import javax.swing.JCheckBoxMenuItem;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.settings.ViewSettings;
 
 /**
@@ -30,12 +29,7 @@ public class ToggleSequentViewTooltipAction extends MainWindowAction {
     private static final long serialVersionUID = -3352122484627890921L;
 
     /** Listens to changes to the view settings to call {@link #updateSelectedState()}. */
-    private final SettingsListener viewSettingsListener = new SettingsListener() {
-        @Override
-        public void settingsChanged(EventObject e) {
-            updateSelectedState();
-        }
-    };
+    private final PropertyChangeListener viewSettingsListener = e -> updateSelectedState();
 
     /**
      * Crate a new action.
@@ -47,7 +41,7 @@ public class ToggleSequentViewTooltipAction extends MainWindowAction {
         setName(NAME);
         setTooltip(TOOL_TIP);
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                .addSettingsListener(viewSettingsListener);
+                .addPropertyChangeListener(viewSettingsListener);
         updateSelectedState();
     }
 

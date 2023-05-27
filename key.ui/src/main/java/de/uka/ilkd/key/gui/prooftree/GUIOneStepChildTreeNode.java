@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.gui.prooftree;
 
+import javax.annotation.Nonnull;
+import javax.swing.tree.TreeNode;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.RuleApp;
-
-import javax.annotation.Nonnull;
-import javax.swing.tree.TreeNode;
 
 /**
  * A special kind of gui proof tree node to show intermediate intermediate steps of the

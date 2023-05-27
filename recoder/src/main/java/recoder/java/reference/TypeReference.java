@@ -173,12 +173,15 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
 
     public int getChildCount() {
         int result = 0;
-        if (prefix != null)
+        if (prefix != null) {
             result++;
-        if (name != null)
+        }
+        if (name != null) {
             result++;
-        if (typeArguments != null)
+        }
+        if (typeArguments != null) {
             result += typeArguments.size();
+        }
         return result;
     }
 
@@ -192,13 +195,15 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
 
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0)
+            if (index == 0) {
                 return prefix;
+            }
             index--;
         }
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (typeArguments != null) {
@@ -219,8 +224,9 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
         }
         if (typeArguments != null) {
             int idx = typeArguments.indexOf(child);
-            if (idx != -1)
+            if (idx != -1) {
                 return (idx << 4) | 2;
+            }
         }
         return -1;
     }

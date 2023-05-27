@@ -1,5 +1,13 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
+import java.lang.ref.WeakReference;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.text.html.HTMLDocument;
+
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -7,13 +15,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
-import javax.swing.text.html.HTMLDocument;
-import java.lang.ref.WeakReference;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.util.UnicodeHelper.*;
 
@@ -32,6 +35,7 @@ import static de.uka.ilkd.key.util.UnicodeHelper.*;
  * @author Dominic Scheurer
  */
 public class HTMLSyntaxHighlighter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HTMLSyntaxHighlighter.class);
 
     // The below two constants are thresholds used to decide whether
     // syntax highlighting for program variables should be realized
@@ -48,12 +52,8 @@ public class HTMLSyntaxHighlighter {
         "false", "" + EQV, "" + IMP, "" + AND, "" + OR, "" + NEG, "" + TOP, "" + BOT };
 
     private final static String PROP_LOGIC_KEYWORDS_REGEX =
-        concat("|", Arrays.asList(PROP_LOGIC_KEYWORDS), new StringTransformer() {
-            @Override
-            public String transform(Object input) {
-                return Pattern.quote(toHTML((String) input));
-            }
-        });
+        concat("|", Arrays.asList(PROP_LOGIC_KEYWORDS),
+            input -> Pattern.quote(toHTML((String) input)));
 
     public final static Pattern PROP_LOGIC_KEYWORDS_PATTERN =
         Pattern.compile(concat("(", PROP_LOGIC_KEYWORDS_REGEX, ")"));
@@ -71,12 +71,7 @@ public class HTMLSyntaxHighlighter {
             "" + FORALL, "" + EXISTS, "" + IN, "" + EMPTY };
 
     private final static String DYNAMIC_LOGIC_KEYWORDS_REGEX =
-        concat("|", Arrays.asList(DYNAMIC_LOGIC_KEYWORDS), new StringTransformer() {
-            @Override
-            public String transform(Object input) {
-                return Pattern.quote((String) input);
-            }
-        });
+        concat("|", Arrays.asList(DYNAMIC_LOGIC_KEYWORDS), input -> Pattern.quote((String) input));
 
     public final static Pattern DYNAMIC_LOGIC_KEYWORDS_PATTERN =
         Pattern.compile(concat("(", DYNAMIC_LOGIC_KEYWORDS_REGEX, ")"));
@@ -203,7 +198,7 @@ public class HTMLSyntaxHighlighter {
             // Syntax highlighting should never break the system;
             // so we catch all throwables. However, a bug should
             // be filed with the stack trace printed here.
-            t.printStackTrace();
+            LOGGER.warn("Syntax highlighting failed", t);
             return toHTML(plainTextString);
         }
 
@@ -240,12 +235,9 @@ public class HTMLSyntaxHighlighter {
             htmlString = htmlString.replace(modalityMatcher.group(), modality);
         }
 
-        StringTransformer progVarTransformer = new StringTransformer() {
-            @Override
-            public String transform(Object input) {
-                ProgramVariable progVar = (ProgramVariable) input;
-                return Pattern.quote(toHTML(progVar.name().toString()));
-            }
+        StringTransformer progVarTransformer = input -> {
+            ProgramVariable progVar = (ProgramVariable) input;
+            return Pattern.quote(toHTML(progVar.name().toString()));
         };
 
         final String concatenatedProgVars = concat("|", programVariables, progVarTransformer);
@@ -279,12 +271,7 @@ public class HTMLSyntaxHighlighter {
      * @return The concatenated array, elements separated by the given delimiter.
      */
     private static String concat(String delim, Iterable<?> strings) {
-        return concat(delim, strings, new StringTransformer() {
-            @Override
-            public String transform(Object input) {
-                return input.toString();
-            }
-        });
+        return concat(delim, strings, Object::toString);
     }
 
     /**
@@ -316,12 +303,7 @@ public class HTMLSyntaxHighlighter {
      * @return The concatenated Strings.
      */
     public static String concat(String... strings) {
-        return concat("", Arrays.asList(strings), new StringTransformer() {
-            @Override
-            public String transform(Object input) {
-                return (String) input;
-            }
-        });
+        return concat("", Arrays.asList(strings), input -> (String) input);
     }
 
     /**

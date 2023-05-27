@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.util.rifl;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A lattice of security domains in RIFL. While the lattice is not necessarily complete, there are
@@ -16,7 +16,7 @@ public class SecurityLattice {
 
     private final SecurityDomain top;
     private final SecurityDomain bottom;
-    private final Set<SecurityDomain> hash = new HashSet<SecurityDomain>();
+    private final Set<SecurityDomain> hash = new HashSet<>();
 
     /**
      * Creates a two-element lattice.
@@ -38,8 +38,9 @@ public class SecurityLattice {
      */
     SecurityDomain addDomain(String name) {
         SecurityDomain d = new SecurityDomain(name.intern());
-        if (hash.contains(d))
+        if (hash.contains(d)) {
             throw new IllegalArgumentException("Domain already in lattice (names must be unique)");
+        }
         d.putSubDomain(bottom);
         top.putSubDomain(d);
         hash.add(d);
@@ -51,16 +52,20 @@ public class SecurityLattice {
      * whether the domains are already in the lattice and that the lattice is still acyclic.
      */
     void putSubDomain(SecurityDomain sup, SecurityDomain sub) {
-        if (sup == top || sub == bottom)
+        if (sup == top || sub == bottom) {
             return; // safely ignore this
-        if (!hash.contains(sup))
+        }
+        if (!hash.contains(sup)) {
             throw new IllegalArgumentException(
                 "Security domain " + sup + " must be added to the lattice first.");
-        if (!hash.contains(sub))
+        }
+        if (!hash.contains(sub)) {
             throw new IllegalArgumentException(
                 "Security domain " + sub + " must be added to the lattice first.");
-        if (sup == sub || sub.isSuperDomain(sup))
+        }
+        if (sup == sub || sub.isSuperDomain(sup)) {
             throw new IllegalArgumentException("Security lattice must be acyclic.");
+        }
         sup.putSubDomain(sub);
     }
 
@@ -75,16 +80,16 @@ public class SecurityLattice {
      * The kind of elements to the security lattice. Keeps track of <i>direct</i> super- and
      * sub-elements. Instances are mutable, but only by the lattice owning it.
      */
-    public final class SecurityDomain {
+    public static final class SecurityDomain {
 
         private final String name;
-        private Set<SecurityDomain> superDomains;
-        private Set<SecurityDomain> subDomains;
+        private final Set<SecurityDomain> superDomains;
+        private final Set<SecurityDomain> subDomains;
 
         private SecurityDomain(String name) {
             this.name = name;
-            superDomains = new HashSet<SecurityDomain>();
-            subDomains = new HashSet<SecurityDomain>();
+            superDomains = new HashSet<>();
+            subDomains = new HashSet<>();
         }
 
         private void putSubDomain(SecurityDomain sub) {
@@ -97,11 +102,13 @@ public class SecurityLattice {
          */
         // TODO: do we really want strict super-elements??
         public boolean isSuperDomain(SecurityDomain other) {
-            if (other == this)
+            if (other == this) {
                 return false;
+            }
             for (SecurityDomain sub : subDomains) {
-                if (sub == other || sub.isSuperDomain(other))
+                if (sub == other || sub.isSuperDomain(other)) {
                     return true;
+                }
             }
             return false;
         }
@@ -110,11 +117,13 @@ public class SecurityLattice {
          * Returns whether this domain is strictly lower in the hierarchy than the other one.
          */
         public boolean isSubDomain(SecurityDomain other) {
-            if (other == this)
+            if (other == this) {
                 return false;
+            }
             for (SecurityDomain sup : superDomains) {
-                if (sup == other || sup.isSubDomain(other))
+                if (sup == other || sup.isSubDomain(other)) {
                     return true;
+                }
             }
             return false;
         }

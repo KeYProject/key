@@ -1,20 +1,20 @@
 package de.uka.ilkd.key.gui.colors;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
-
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
+import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
 
 /**
  * @author Alexander Weigl
@@ -127,8 +127,9 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
 
         @Override
         public Class<?> getColumnClass(int columnIndex) {
-            if (columnIndex == 2)
+            if (columnIndex == 2) {
                 return Color.class;
+            }
             return String.class;
         }
 

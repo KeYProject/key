@@ -2,12 +2,12 @@
 
 package recoder.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.ModelException;
 import recoder.abstraction.ClassType;
 import recoder.java.Import;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Exception indicating that a particular import is ambiguous.
@@ -68,7 +68,7 @@ public class AmbiguousImportException extends ModelException {
      * Returns the possible imported class types.
      */
     public List<ClassType> getChoices() {
-        List<ClassType> list = new ArrayList<ClassType>(2);
+        List<ClassType> list = new ArrayList<>(2);
         list.add(version1);
         list.add(version2);
         return list;

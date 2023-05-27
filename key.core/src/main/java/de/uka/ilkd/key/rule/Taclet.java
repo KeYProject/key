@@ -1,19 +1,17 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.*;
-
-import de.uka.ilkd.key.logic.*;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSet;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.LemmaJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -23,7 +21,10 @@ import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
-import javax.annotation.Nullable;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**
@@ -71,6 +72,12 @@ import javax.annotation.Nullable;
 public abstract class Taclet implements Rule, Named {
 
     protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
+
+    /**
+     * The proof node that added this taclet to the set of available taclets.
+     * May be null if this taclet wasn't added by another proof step.
+     */
+    private Node addedBy = null;
 
     public RuleJustification getRuleJustification() {
         if (tacletAnnotations.contains(TacletAnnotation.LEMMA)) {
@@ -174,8 +181,6 @@ public abstract class Taclet implements Rule, Named {
      */
     protected TacletExecutor<? extends Taclet> executor;
 
-
-
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
      *
@@ -264,7 +269,7 @@ public abstract class Taclet implements Rule, Named {
     public ImmutableSet<QuantifiableVariable> getBoundVariables() {
         if (boundVariables == null) {
             ImmutableSet<QuantifiableVariable> result =
-                DefaultImmutableSet.<QuantifiableVariable>nil();
+                DefaultImmutableSet.nil();
 
             for (final TacletGoalTemplate tgt : goalTemplates()) {
                 result = result.union(tgt.getBoundVariables());
@@ -441,8 +446,9 @@ public abstract class Taclet implements Rule, Named {
      */
     @Override
     public boolean equals(Object o) {
-        if (o == this)
+        if (o == this) {
             return true;
+        }
 
         if (o == null || o.getClass() != this.getClass()) {
             return false;
@@ -464,11 +470,7 @@ public abstract class Taclet implements Rule, Named {
             return false;
         }
 
-        if (!goalTemplates.equals(t2.goalTemplates)) {
-            return false;
-        }
-
-        return true;
+        return goalTemplates.equals(t2.goalTemplates);
     }
 
     @Override
@@ -493,7 +495,7 @@ public abstract class Taclet implements Rule, Named {
             TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector();
             svc.visit(ifSequent());
 
-            ifVariables = DefaultImmutableSet.<SchemaVariable>nil();
+            ifVariables = DefaultImmutableSet.nil();
             for (final SchemaVariable sv : svc.vars()) {
                 ifVariables = ifVariables.add(sv);
             }
@@ -554,16 +556,18 @@ public abstract class Taclet implements Rule, Named {
             for (NotFreeIn pair : varsNotFreeIn) {
                 sb = sb.append("\\notFreeIn(").append(pair.first()).append(", ")
                         .append(pair.second()).append(")");
-                if (countVarsNotFreeIn > 0 || !variableConditions.isEmpty())
+                if (countVarsNotFreeIn > 0 || !variableConditions.isEmpty()) {
                     sb = sb.append(", ");
+                }
                 --countVarsNotFreeIn;
             }
 
             int countVariableConditions = variableConditions.size();
             for (final VariableCondition vc : variableConditions) {
                 sb.append(vc);
-                if (countVariableConditions > 0)
+                if (countVariableConditions > 0) {
                     sb.append(", ");
+                }
                 --countVariableConditions;
             }
             sb = sb.append(")\n");
@@ -578,8 +582,9 @@ public abstract class Taclet implements Rule, Named {
             Iterator<TacletGoalTemplate> it = goalTemplates().iterator();
             while (it.hasNext()) {
                 sb = sb.append(it.next());
-                if (it.hasNext())
+                if (it.hasNext()) {
                     sb = sb.append(";");
+                }
                 sb = sb.append("\n");
             }
         }
@@ -592,8 +597,9 @@ public abstract class Taclet implements Rule, Named {
             sb = sb.append("\\heuristics(");
             while (itRS.hasNext()) {
                 sb = sb.append(itRS.next());
-                if (itRS.hasNext())
+                if (itRS.hasNext()) {
                     sb = sb.append(", ");
+                }
             }
             sb = sb.append(")");
         }
@@ -654,10 +660,11 @@ public abstract class Taclet implements Rule, Named {
      *         (interactive/non-interactive, activated rule sets)
      */
     public boolean admissible(boolean interactive, ImmutableList<RuleSet> p_ruleSets) {
-        if (interactive)
+        if (interactive) {
             return admissibleInteractive(p_ruleSets);
-        else
+        } else {
             return admissibleAutomatic(p_ruleSets);
+        }
     }
 
     protected boolean admissibleInteractive(ImmutableList<RuleSet> notAdmissibleRuleSets) {
@@ -666,8 +673,9 @@ public abstract class Taclet implements Rule, Named {
 
     protected boolean admissibleAutomatic(ImmutableList<RuleSet> admissibleRuleSets) {
         for (final RuleSet tacletRuleSet : getRuleSets()) {
-            if (admissibleRuleSets.contains(tacletRuleSet))
+            if (admissibleRuleSets.contains(tacletRuleSet)) {
                 return true;
+            }
         }
         return false;
     }
@@ -859,7 +867,7 @@ public abstract class Taclet implements Rule, Named {
          *
          * @author Martin Hentschel
          */
-        public static enum TacletOperation {
+        public enum TacletOperation {
             /**
              * Add clause of a {@link Taclet} applied to the antecedent. Available information are
              * {@link TacletLabelHint#getSequent()} and {@link TacletLabelHint#getSequentFormula()}.
@@ -907,7 +915,7 @@ public abstract class Taclet implements Rule, Named {
              * modify the {@link PosInOccurrence}. Available information are
              * {@link TacletLabelHint#getTerm()}.
              */
-            REPLACE_TERM;
+            REPLACE_TERM
         }
     }
 
@@ -921,6 +929,7 @@ public abstract class Taclet implements Rule, Named {
      *         close-goal-taclet ( this.closeGoal () ), the first goal of the return list is the
      *         goal that should be closed (with the constraint this taclet is applied under).
      */
+    @Nonnull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp tacletApp) {
         return getExecutor().apply(goal, services, tacletApp);
@@ -946,6 +955,12 @@ public abstract class Taclet implements Rule, Named {
     public String getOrigin() { return origin; }
 
     public void setOrigin(@Nullable String origin) { this.origin = origin; }
+
+    public void setAddedBy(Node addedBy) {
+        this.addedBy = addedBy;
+    }
+
+    public Node getAddedBy() {
+        return addedBy;
+    }
 }
-
-

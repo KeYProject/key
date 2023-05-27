@@ -6,11 +6,11 @@
  */
 package recoder.abstraction;
 
+import java.util.List;
+
 import recoder.ModelException;
 import recoder.convenience.Naming;
 import recoder.service.ProgramModelInfo;
-
-import java.util.List;
 
 /**
  * @author Tobias Gutzmann
@@ -27,8 +27,9 @@ public abstract class ImplicitEnumMethod implements Method {
      */
     public ImplicitEnumMethod(ClassType ownerClass) {
         super();
-        if (ownerClass == null)
+        if (ownerClass == null) {
             throw new NullPointerException();
+        }
         this.ownerClass = ownerClass;
     }
 

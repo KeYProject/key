@@ -1,11 +1,12 @@
 package org.key_project.util.testcase.java;
 
-import org.junit.jupiter.api.Test;
+import java.util.*;
+import java.util.function.Predicate;
+
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
 import org.key_project.util.java.IFilterWithException;
 
-import java.util.*;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class CollectionUtilTest {
     /**
-     * Tests for {@link CollectionUtil#searchAll(Iterable, IFilter)}.
+     * Tests for {@link CollectionUtil#searchAll(Iterable, Predicate)}.
      */
     @Test
     public void testSearchAll() {
@@ -43,7 +44,7 @@ public class CollectionUtilTest {
             element -> "A".equals(element) || "C".equals(element));
         assertList(found, "A", "C");
         found = CollectionUtil.searchAll(collection, element -> true);
-        assertList(found, collection.toArray(new String[collection.size()]));
+        assertList(found, collection.toArray(new String[0]));
     }
 
     /**
@@ -156,7 +157,7 @@ public class CollectionUtilTest {
     }
 
     /**
-     * Tests for {@link CollectionUtil#searchAndRemove(Iterable, IFilter)}.
+     * Tests for {@link CollectionUtil#searchAndRemove(Iterable, Predicate)}.
      */
     @Test
     public void testSearchAndRemove() {
@@ -180,7 +181,7 @@ public class CollectionUtilTest {
         assertNull(CollectionUtil.searchAndRemove(collection, "E"::equals));
         assertEquals(collection, List.of());
         assertNull(CollectionUtil.searchAndRemove(collection, null));
-        assertNull(CollectionUtil.searchAndRemove(null, (IFilter<String>) "E"::equals));
+        assertNull(CollectionUtil.searchAndRemove(null, "E"::equals));
         assertEquals(collection, List.of());
     }
 
@@ -343,7 +344,7 @@ public class CollectionUtilTest {
     }
 
     /**
-     * Tests {@link CollectionUtil#count(Iterable, IFilter)}.
+     * Tests {@link CollectionUtil#count(Iterable, Predicate)}.
      */
     @Test
     public void testCount() {
@@ -358,7 +359,7 @@ public class CollectionUtilTest {
         // Test counts
         assertEquals(0, CollectionUtil.count(null, null));
         assertEquals(0, CollectionUtil.count(list, null));
-        assertEquals(0, CollectionUtil.count(null, (IFilter<String>) element -> false));
+        assertEquals(0, CollectionUtil.count(null, element -> false));
         assertEquals(3, CollectionUtil.count(list, "A"::equals));
         assertEquals(2, CollectionUtil.count(list, "B"::equals));
         assertEquals(1, CollectionUtil.count(list, "C"::equals));
@@ -392,7 +393,7 @@ public class CollectionUtilTest {
     }
 
     /**
-     * Tests for {@link CollectionUtil#search(Iterable, org.key_project.util.java.IFilter)}.
+     * Tests for {@link CollectionUtil#search(Iterable, Predicate)}.
      */
     @Test
     public void testSearch() {
@@ -403,7 +404,7 @@ public class CollectionUtilTest {
         assertEquals("D", CollectionUtil.search(collection, "D"::equals));
         assertNull(CollectionUtil.search(collection, "E"::equals));
         assertNull(CollectionUtil.search(collection, null));
-        assertNull(CollectionUtil.search(null, (IFilter<String>) "E"::equals));
+        assertNull(CollectionUtil.search(null, "E"::equals));
     }
 
     /**
@@ -464,14 +465,14 @@ public class CollectionUtilTest {
     @Test
     public void testAddAll_Iterable() {
         List<String> collection = new LinkedList<>();
-        CollectionUtil.addAll(null, Arrays.asList("A"));
+        CollectionUtil.addAll(null, List.of("A"));
         assertEquals(0, collection.size());
-        CollectionUtil.addAll(collection, (Iterable<String>) null);
+        CollectionUtil.addAll(collection, null);
         assertEquals(0, collection.size());
-        CollectionUtil.addAll(collection, Arrays.asList("A"));
+        CollectionUtil.addAll(collection, List.of("A"));
         assertEquals(1, collection.size());
         assertEquals("A", collection.get(0));
-        CollectionUtil.addAll(collection, Arrays.asList("B"));
+        CollectionUtil.addAll(collection, List.of("B"));
         assertEquals(2, collection.size());
         assertEquals("A", collection.get(0));
         assertEquals("B", collection.get(1));
@@ -481,7 +482,7 @@ public class CollectionUtilTest {
         assertEquals("B", collection.get(1));
         assertEquals("C", collection.get(2));
         assertEquals("D", collection.get(3));
-        CollectionUtil.addAll(collection, Arrays.asList("E"));
+        CollectionUtil.addAll(collection, List.of("E"));
         assertEquals(5, collection.size());
         assertEquals("A", collection.get(0));
         assertEquals("B", collection.get(1));
@@ -497,25 +498,6 @@ public class CollectionUtilTest {
         assertEquals("E", collection.get(4));
         assertEquals("F", collection.get(5));
         assertEquals("G", collection.get(6));
-    }
-
-
-    /**
-     * Makes sure that the collection contains the given items.
-     *
-     * @param collection The {@link Collections} to test.
-     * @param expectedItems The expected items.
-     */
-    protected <T> void assertCollectionItems(Collection<T> collection, T... expectedItems) {
-        assertNotNull(collection);
-        assertEquals(collection.size(), expectedItems.length);
-        Iterator<T> iter = collection.iterator();
-        int i = 0;
-        while (iter.hasNext()) {
-            assertEquals(expectedItems[i], iter.next());
-            i++;
-        }
-        assertEquals(expectedItems.length, i);
     }
 
     /**

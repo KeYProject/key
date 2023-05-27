@@ -1,40 +1,34 @@
 package de.uka.ilkd.key.settings;
 
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * A base class for own settings based on properties.
  *
  * @author weigl
  */
-public abstract class AbstractPropertiesSettings implements Settings {
+public abstract class AbstractPropertiesSettings extends AbstractSettings {
     private static final String SET_DELIMITER = ",";
-    private static Function<String, Integer> parseInt = Integer::parseInt;
-    private static Function<String, Float> parseFloat = Float::parseFloat;
-    private static Function<String, Boolean> parseBoolean = Boolean::parseBoolean;
-    private static Function<String, Double> parseDouble = Double::parseDouble;
+    private static final Function<String, Integer> parseInt = Integer::parseInt;
+    private static final Function<String, Float> parseFloat = Float::parseFloat;
+    private static final Function<String, Boolean> parseBoolean = Boolean::parseBoolean;
+    private static final Function<String, Double> parseDouble = Double::parseDouble;
 
     /**
      * Properties stored in this settings object.
      * Updated by each {@link PropertyEntry} when a new non-null value is set.
      */
-    protected Properties properties = new Properties();
+    protected final Properties properties = new Properties();
 
     /**
      *
      */
-    protected List<PropertyEntry<?>> propertyEntries = new LinkedList<>();
-
-    /**
-     * Collection of listeners to notify when a setting changes its value.
-     */
-    protected List<SettingsListener> listenerList = new LinkedList<>();
+    protected final List<PropertyEntry<?>> propertyEntries = new LinkedList<>();
 
     private static Set<String> parseStringSet(String o) {
         Set<String> set = new TreeSet<>();
@@ -79,7 +73,6 @@ public abstract class AbstractPropertiesSettings implements Settings {
 
     @Override
     public void readSettings(Properties props) {
-        assert props != null;
         propertyEntries.forEach(it -> {
             String value = props.getProperty(it.getKey());
             if (value != null) {
@@ -92,22 +85,6 @@ public abstract class AbstractPropertiesSettings implements Settings {
     public void writeSettings(Properties props) {
         propertyEntries.forEach(PropertyEntry::update);
         props.putAll(properties);
-    }
-
-    @Override
-    public void addSettingsListener(SettingsListener l) {
-        listenerList.add(l);
-    }
-
-    @Override
-    public void removeSettingsListener(SettingsListener l) {
-        listenerList.remove(l);
-    }
-
-    protected void fireSettingsChange() {
-        for (SettingsListener listener : listenerList) {
-            listener.settingsChanged(new EventObject(this));
-        }
     }
 
     protected PropertyEntry<Double> createDoubleProperty(String key, double defValue) {
@@ -216,9 +193,7 @@ public abstract class AbstractPropertiesSettings implements Settings {
             // only store non-null values
             if (value != null) {
                 properties.setProperty(key, toString.apply(value));
-                if (!value.equals(old)) {
-                    fireSettingsChange();
-                }
+                firePropertyChange(key, old, value);
             }
         }
 

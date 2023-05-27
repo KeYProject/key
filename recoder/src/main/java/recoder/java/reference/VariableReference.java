@@ -114,8 +114,9 @@ public class VariableReference extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

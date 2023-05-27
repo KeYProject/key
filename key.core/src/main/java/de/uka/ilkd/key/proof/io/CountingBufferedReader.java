@@ -5,13 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import org.key_project.util.java.IOUtil;
-
 import de.uka.ilkd.key.util.ProgressMonitor;
+
+import org.key_project.util.java.IOUtil;
 
 public class CountingBufferedReader extends BufferedReader {
 
-    private int chars;
+    private long chars;
     private int step = 0;
     private ProgressMonitor monitor = ProgressMonitor.Empty.getInstance();
 
@@ -43,45 +43,43 @@ public class CountingBufferedReader extends BufferedReader {
     private void incCharCounter(long inc) {
         chars += inc;
         if (monitor != null && chars % step == 0) {
-            monitor.setProgress(chars);
+            monitor.setProgress((int) chars);
         }
     }
 
     @Override
     public int read() throws IOException {
         final int readChar = super.read();
-        if (readChar != -1)
+        if (readChar != -1) {
             incCharCounter(1);
+        }
         return readChar;
     }
 
     @Override
-    public int read(char cbuf[], int off, int len) throws IOException {
+    public int read(char[] cbuf, int off, int len) throws IOException {
         final int readChars = super.read(cbuf, off, len);
-        if (readChars > 0)
+        if (readChars > 0) {
             incCharCounter(readChars);
+        }
         return readChars;
     }
 
     @Override
     public String readLine() throws IOException {
         final String line = super.readLine();
-        if (line != null)
+        if (line != null) {
             incCharCounter(line.length());
+        }
         return line;
     }
 
     @Override
     public long skip(long n) throws IOException {
         final long skippedChars = super.skip(n);
-        if (skippedChars > 0)
+        if (skippedChars > 0) {
             incCharCounter(skippedChars);
+        }
         return skippedChars;
     }
-
-
-    public int getNumberOfParsedChars() {
-        return chars;
-    }
-
 }

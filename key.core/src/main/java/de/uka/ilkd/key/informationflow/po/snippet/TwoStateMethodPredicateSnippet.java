@@ -2,9 +2,6 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -17,6 +14,9 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -69,10 +69,11 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
          * This predicate needs to present on all branches and, therefore, must be added to the
          * toplevel function namespace. Hence, we rewind to the parent namespace here.
          */
-        while (functionNS.parent() != null)
+        while (functionNS.parent() != null) {
             functionNS = functionNS.parent();
+        }
 
-        Function pred = (Function) functionNS.lookup(name);
+        Function pred = functionNS.lookup(name);
 
         if (pred == null) {
             pred = new Function(name, Sort.FORMULA, argSorts);
@@ -111,8 +112,8 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
      */
     private ImmutableList<Term> extractTermListForPredicate(IProgramMethod pm,
             ProofObligationVars poVars, boolean hasMby) {
-        ImmutableList<Term> relevantPreVars = ImmutableSLList.<Term>nil();
-        ImmutableList<Term> relevantPostVars = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> relevantPreVars = ImmutableSLList.nil();
+        ImmutableList<Term> relevantPostVars = ImmutableSLList.nil();
 
         if (!pm.isStatic()) {
             // self is relevant in the pre and post state for constructors

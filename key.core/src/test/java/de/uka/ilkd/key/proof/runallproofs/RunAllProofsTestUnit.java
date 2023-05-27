@@ -12,6 +12,9 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A single unit that will be tested during {@link RunAllProofsTest} run.
  *
@@ -24,7 +27,7 @@ public final class RunAllProofsTestUnit implements Serializable {
     /**
      * The name of this test.
      */
-    private String testName;
+    private final String testName;
 
     private final ProofCollectionSettings settings;
     private final List<TestFile> testFiles;
@@ -67,12 +70,12 @@ public final class RunAllProofsTestUnit implements Serializable {
          */
         List<TestResult> testResults;
 
-        boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
+        boolean verbose = settings.getVerboseOutput();
         if (verbose) {
             LOGGER.info("Running test " + testName);
         }
 
-        boolean ignoreTest = "true".equals(settings.get(RunAllProofsTest.IGNORE_KEY));
+        boolean ignoreTest = settings.getIgnoreTest();
         if (ignoreTest) {
             if (verbose) {
                 LOGGER.info("... ignoring this test due to 'ignore=true' in file");
@@ -108,7 +111,7 @@ public final class RunAllProofsTestUnit implements Serializable {
         }
 
         if (verbose) {
-            System.out.println("Returning from test " + testName);
+            LOGGER.info("Returning from test " + testName);
         }
 
         /*

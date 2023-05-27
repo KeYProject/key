@@ -1,16 +1,10 @@
 package de.uka.ilkd.key.proof;
 
-import java.net.URI;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import de.uka.ilkd.key.util.MiscTools;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.Position;
@@ -23,7 +17,6 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
@@ -35,6 +28,10 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
+import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.collection.ImmutableList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +43,7 @@ import org.slf4j.LoggerFactory;
 public class NodeInfo {
     private static final Logger LOGGER = LoggerFactory.getLogger(NodeInfo.class);
 
-    private static Set<Name> symbolicExecNames = new HashSet<>(9);
+    private static final Set<Name> symbolicExecNames = new HashSet<>(9);
 
     /** firstStatement stripped of method frames */
     private SourceElement activeStatement = null;
@@ -70,6 +67,11 @@ public class NodeInfo {
     /** has the rule app of the node been applied by a proof script? */
     private boolean scriptingApplication = false;
 
+    /**
+     * Has the rule app been determined as superfluous by some proof analysis algorithm?
+     */
+    private boolean uselessApplication = false;
+
     /** User-provided plain-text annotations to the node. */
     private String notes;
 
@@ -92,6 +94,20 @@ public class NodeInfo {
         symbolicExecNames.add(new Name("loop_expand"));
         symbolicExecNames.add(new Name("loop_scope_expand"));
         symbolicExecNames.add(new Name("loop_scope_inv_taclet"));
+    }
+
+    /**
+     * Copy the NodeInfo of another proof node into this object.
+     * Copies {@link #interactiveApplication}, {@link #scriptingApplication},
+     * {@link #uselessApplication} and {@link #notes}.
+     *
+     * @param node a proof node
+     */
+    public void copyFrom(Node node) {
+        interactiveApplication = node.getNodeInfo().interactiveApplication;
+        scriptingApplication = node.getNodeInfo().scriptingApplication;
+        uselessApplication = node.getNodeInfo().uselessApplication;
+        notes = node.getNodeInfo().notes;
     }
 
 
@@ -291,9 +307,9 @@ public class NodeInfo {
         determineFirstAndActiveStatement();
         if (firstStatement != null) {
             if (firstStatementString == null) {
-                firstStatementString = "" + firstStatement;
+                firstStatementString = String.valueOf(firstStatement);
             }
-            firstStatementString = "" + activeStatement;
+            firstStatementString = String.valueOf(activeStatement);
             return firstStatementString;
         }
         return null;
@@ -402,7 +418,7 @@ public class NodeInfo {
     public void setNotes(String newNotes) {
         String oldNotes = notes;
         notes = newNotes;
-        if (!ObjectUtil.equals(oldNotes, newNotes)) {
+        if (!Objects.equals(oldNotes, newNotes)) {
             node.proof().fireNotesChanged(node);
         }
     }
@@ -422,5 +438,21 @@ public class NodeInfo {
 
     public void setSequentChangeInfo(SequentChangeInfo sequentChangeInfo) {
         this.sequentChangeInfo = sequentChangeInfo;
+    }
+
+    /**
+     * @return whether the proof step does not contribute to the proof
+     */
+    public boolean isUselessApplication() {
+        return uselessApplication;
+    }
+
+    /**
+     * Mark this node as useless or useful.
+     *
+     * @param uselessApplication whether this node should be marked as useless
+     */
+    public void setUselessApplication(boolean uselessApplication) {
+        this.uselessApplication = uselessApplication;
     }
 }

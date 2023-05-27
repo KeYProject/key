@@ -22,7 +22,7 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl>
     /**
      * The {@link SymbolicExecutionTreeBuilder} for execution tree extraction.
      */
-    private SymbolicExecutionTreeBuilder builder;
+    private final SymbolicExecutionTreeBuilder builder;
 
     /**
      * Constructor.

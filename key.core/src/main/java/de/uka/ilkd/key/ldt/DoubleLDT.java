@@ -1,23 +1,18 @@
 package de.uka.ilkd.key.ldt;
 
-import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.logic.op.Operator;
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
-import de.uka.ilkd.key.java.expression.literal.LongLiteral;
 import de.uka.ilkd.key.java.expression.operator.Negative;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
+
+import org.key_project.util.ExtList;
 
 public final class DoubleLDT extends LDT implements FloatingPointLDT {
 
@@ -224,9 +219,9 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
             // Use IntegerLDT to translate to literals
             String digits = intLDT.toNumberString(t.sub(0));
             long bits = Long.parseUnsignedLong(digits);
-            Double d1 = Double.longBitsToDouble(bits);
+            double d1 = Double.longBitsToDouble(bits);
 
-            return new DoubleLiteral(d1.toString());
+            return new DoubleLiteral(Double.toString(d1));
         }
 
         throw new RuntimeException("DoubleLDT: Cannot convert term to program: " + t);

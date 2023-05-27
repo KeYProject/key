@@ -1,20 +1,19 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
+import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.SearchBar;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.util.Pair;
-
-import javax.annotation.Nonnull;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 
@@ -31,15 +30,15 @@ public class SequentViewSearchBar extends SearchBar {
     public static final ColorSettings.ColorProperty SEARCH_HIGHLIGHT_COLOR_2 =
         ColorSettings.define("[sequentSearchBar]highlight_2", "", new Color(0, 140, 255, 100));
 
-    public static enum SearchMode {
+    public enum SearchMode {
         HIGHLIGHT("Highlight", IconFactory.SEARCH_HIGHLIGHT.get(16)),
         HIDE("Hide", IconFactory.SEARCH_HIDE.get(16)),
         REGROUP("Regroup", IconFactory.SEARCH_REGROUP.get(16));
 
-        private String displayName;
+        private final String displayName;
         public final Icon icon;
 
-        private SearchMode(String name, Icon icon) {
+        SearchMode(String name, Icon icon) {
             this.displayName = name;
             this.icon = icon;
         }
@@ -58,7 +57,7 @@ public class SequentViewSearchBar extends SearchBar {
 
     public SequentViewSearchBar(SequentView sequentView) {
         this.sequentView = sequentView;
-        searchResults = new ArrayList<Pair<Integer, Object>>();
+        searchResults = new ArrayList<>();
     }
 
     public void setSequentView(SequentView sequentView) {
@@ -83,45 +82,39 @@ public class SequentViewSearchBar extends SearchBar {
         super.createUI();
         regExpCheckBox = new JCheckBox("RegExp", false);
         regExpCheckBox.setName("toggleRegExpSearch");
-        regExpCheckBox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                searchField.requestFocus();
-                if (sequentView.getFilter() instanceof SearchSequentPrintFilter) {
-                    ((SearchSequentPrintFilter) sequentView.getFilter())
-                            .setRegex(regExpCheckBox.isSelected());
-                }
-                search();
+        regExpCheckBox.addItemListener(e -> {
+            searchField.requestFocus();
+            if (sequentView.getFilter() instanceof SearchSequentPrintFilter) {
+                ((SearchSequentPrintFilter) sequentView.getFilter())
+                        .setRegex(regExpCheckBox.isSelected());
             }
+            search();
         });
         regExpCheckBox.setToolTipText("Evaluate as regular expression");
         add(regExpCheckBox);
 
-        searchModeBox = new JComboBox<SearchMode>(SearchMode.values());
-        searchModeBox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    // search always does a repaint, therefore don't force update in setFilter
-                    switch ((SearchMode) searchModeBox.getSelectedItem()) {
-                    case HIDE:
-                        sequentView.setFilter(new HideSequentPrintFilter(
-                            sequentView.getLogicPrinter(), regExpCheckBox.isSelected()), false);
-                        search();
-                        break;
-                    case REGROUP:
-                        sequentView.setFilter(new RegroupSequentPrintFilter(
-                            sequentView.getLogicPrinter(), regExpCheckBox.isSelected()), false);
-                        search();
-                        break;
-                    case HIGHLIGHT:
-                        sequentView.setFilter(new IdentitySequentPrintFilter(), false);
-                        search();
-                        break;
-                    default:
-                        sequentView.setFilter(new IdentitySequentPrintFilter(), true);
-                        break;
-                    }
+        searchModeBox = new JComboBox<>(SearchMode.values());
+        searchModeBox.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                // search always does a repaint, therefore don't force update in setFilter
+                switch ((SearchMode) searchModeBox.getSelectedItem()) {
+                case HIDE:
+                    sequentView.setFilter(new HideSequentPrintFilter(
+                        sequentView.getLogicPrinter(), regExpCheckBox.isSelected()), false);
+                    search();
+                    break;
+                case REGROUP:
+                    sequentView.setFilter(new RegroupSequentPrintFilter(
+                        sequentView.getLogicPrinter(), regExpCheckBox.isSelected()), false);
+                    search();
+                    break;
+                case HIGHLIGHT:
+                    sequentView.setFilter(new IdentitySequentPrintFilter(), false);
+                    search();
+                    break;
+                default:
+                    sequentView.setFilter(new IdentitySequentPrintFilter(), true);
+                    break;
                 }
             }
         });
@@ -200,8 +193,9 @@ public class SequentViewSearchBar extends SearchBar {
             return false;
         }
 
-        if (p == null)
+        if (p == null) {
             return false;
+        }
 
         Matcher m = p.matcher(sequentView.getText().replace("\u00A0", "\u0020"));
 
@@ -209,7 +203,7 @@ public class SequentViewSearchBar extends SearchBar {
         while (m.find()) {
             int foundAt = m.start();
             Object highlight = sequentView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_2.get());
-            searchResults.add(new Pair<Integer, Object>(foundAt, highlight));
+            searchResults.add(new Pair<>(foundAt, highlight));
             sequentView.paintHighlight(new Range(foundAt, m.end()), highlight);
             loopEnterd = true;
         }

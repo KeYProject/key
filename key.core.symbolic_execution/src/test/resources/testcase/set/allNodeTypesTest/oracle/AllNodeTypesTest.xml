@@ -1,60 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call AllNodeTypesTest.main(_obj)&gt;" pathCondition="true" pathConditionChanged="false">
-      <statement name="_obj.value=1;" pathCondition="true" pathConditionChanged="false">
+      <statement name="_obj.value = 1;" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="not(equals(obj,null))" pathCondition="not(equals(obj,null))" pathConditionChanged="true" branchCondition="not(equals(obj,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <operationContract name="result_0 = doubleValue(1) catch(exc_1)
 pre: 1 &gt;= 0
-post: result_0 = javaAddInt(1, 1) &amp; (exc_1 = null)&lt;&lt;impl&gt;&gt;
+post: result_0 = 1 + 1 &amp; (exc_1 = null)&lt;&lt;impl&gt;&gt;
 mod: allLocs
 termination: diamond" pathCondition="not(equals(obj,null))" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_1" contractParameters="Z(1(#))" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-               <statement name="int result = 0;" pathCondition="not(equals(obj,null))" pathConditionChanged="false">
-                  <statement name="int i = 0;" pathCondition="not(equals(obj,null))" pathConditionChanged="false">
-                     <loopInvariant name="invariant: (i &gt;= 0 &amp; i &lt;= 1)&lt;&lt;SC&gt;&gt;;
-variant: javaSubInt(2, i)
-mod: false" pathCondition="not(equals(obj,null))" pathConditionChanged="false" initiallyValid="true">
-                        <branchCondition name="equals(i_0,Z(0(#)))" pathCondition="and(not(equals(obj,null)),equals(i_0,Z(0(#))))" pathConditionChanged="true" branchCondition="equals(i_0,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
-                           <loopCondition name="i==0" pathCondition="and(not(equals(obj,null)),equals(i_0,Z(0(#))))" pathConditionChanged="false" blockOpened="false">
-                              <statement name="result_1++;" pathCondition="and(not(equals(obj,null)),equals(i_0,Z(0(#))))" pathConditionChanged="false">
-                                 <statement name="i++;" pathCondition="and(not(equals(obj,null)),equals(i_0,Z(0(#))))" pathConditionChanged="false">
-                                    <termination name="&lt;loop body end&gt;" pathCondition="and(not(equals(obj,null)),equals(i_0,Z(0(#))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
-                                    </termination>
-                                 </statement>
-                              </statement>
-                           </loopCondition>
-                        </branchCondition>
-                        <branchCondition name="equals(i_0,Z(1(#)))" pathCondition="and(not(equals(obj,null)),equals(i_0,Z(1(#))))" pathConditionChanged="true" branchCondition="equals(i_0,Z(1(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
-                           <statement name="result_1=doubleValue(result_1);" pathCondition="and(not(equals(obj,null)),equals(i_0,Z(1(#))))" pathConditionChanged="false">
-                              <methodCall name="&lt;call AllNodeTypesTest.doubleValue(x_3)&gt;" pathCondition="and(not(equals(obj,null)),equals(i_0,Z(1(#))))" pathConditionChanged="false">
-                                 <statement name="return x_3+x_3;" pathCondition="and(not(equals(obj,null)),equals(i_0,Z(1(#))))" pathConditionChanged="false">
-                                    <methodReturn name="&lt;return of doubleValue&gt;" signature="&lt;return of AllNodeTypesTest.doubleValue(x_3)&gt;" pathCondition="and(not(equals(obj,null)),equals(i_0,Z(1(#))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
-                                       <statement name="int i = 0;" pathCondition="and(not(equals(obj,null)),equals(i_0,Z(1(#))))" pathConditionChanged="false">
-                                          <loopCondition name="i_1==0" pathCondition="and(not(equals(obj,null)),equals(i_0,Z(1(#))))" pathConditionChanged="false" blockOpened="true">
-                                             <statement name="result_1++;" pathCondition="and(not(equals(obj,null)),equals(i_0,Z(1(#))))" pathConditionChanged="false">
-                                                <statement name="i_1++;" pathCondition="and(not(equals(obj,null)),equals(i_0,Z(1(#))))" pathConditionChanged="false">
-                                                   <loopCondition name="i_1==0" pathCondition="and(not(equals(obj,null)),equals(i_0,Z(1(#))))" pathConditionChanged="false" blockOpened="false">
-                                                      <statement name="return result_1;" pathCondition="and(not(equals(obj,null)),equals(i_0,Z(1(#))))" pathConditionChanged="false">
-                                                         <methodReturn name="&lt;return of main&gt;" signature="&lt;return of AllNodeTypesTest.main(_obj)&gt;" pathCondition="and(not(equals(obj,null)),equals(i_0,Z(1(#))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(not(equals(obj,null)),equals(i_0,Z(1(#))))">
-                                                            <termination name="&lt;end&gt;" pathCondition="and(not(equals(obj,null)),equals(i_0,Z(1(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
-                                                            </termination>
-                                                         </methodReturn>
-                                                      </statement>
-                                                   </loopCondition>
-                                                   <completedBlockEntry path="/0/0/0/0/0/0/0/1/0/0/0/0/0/0" conditionString="true"/>
-                                                </statement>
-                                             </statement>
-                                             <blockCompletionEntry path="/0/0/0/0/0/0/0/1/0/0/0/0/0/0/0/0"/>
-                                          </loopCondition>
-                                       </statement>
-                                    </methodReturn>
-                                 </statement>
-                                 <methodReturnEntry path="/0/0/0/0/0/0/0/1/0/0/0/0"/>
-                              </methodCall>
-                           </statement>
-                        </branchCondition>
-                     </loopInvariant>
-                  </statement>
-               </statement>
             </operationContract>
          </branchCondition>
          <branchCondition name="equals(obj,null)" pathCondition="equals(obj,null)" pathConditionChanged="true" branchCondition="equals(obj,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -64,10 +17,7 @@ mod: false" pathCondition="not(equals(obj,null))" pathConditionChanged="false" i
             </exceptionalMethodReturn>
          </branchCondition>
       </statement>
-      <methodReturnEntry path="/0/0/0/0/0/0/0/1/0/0/0/0/0/0/0/0/0/0/0"/>
       <methodReturnEntry path="/0/0/1/0"/>
    </methodCall>
-   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
-   <terminationEntry path="/0/0/0/0/0/0/0/1/0/0/0/0/0/0/0/0/0/0/0/0"/>
    <terminationEntry path="/0/0/1/0/0"/>
 </start>

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.smt.lang;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -25,9 +26,9 @@ public class SMTFile {
 
 
     public SMTFile() {
-        sorts = new LinkedList<SMTSort>();
-        functions = new LinkedList<SMTFunction>();
-        formulas = new LinkedList<SMTTerm>();
+        sorts = new LinkedList<>();
+        functions = new LinkedList<>();
+        formulas = new LinkedList<>();
     }
 
     public List<SMTSort> getSorts() {
@@ -56,8 +57,8 @@ public class SMTFile {
 
 
     public void addSort(SMTSort sort) {
-        if (!sorts.contains(sort))
-            ;
+        if (!sorts.contains(sort)) {
+        }
         sorts.add(sort);
     }
 
@@ -70,7 +71,7 @@ public class SMTFile {
     }
 
     public void removeAllFunction(Set<SMTFunction> functions) {
-        functions.removeAll(functions);
+        this.functions.removeAll(functions);
     }
 
     public void addFormula(SMTTerm formula) {
@@ -112,7 +113,7 @@ public class SMTFile {
 
     public String toString() {
 
-        StringBuffer out = new StringBuffer();
+        StringBuilder out = new StringBuilder();
 
 
         out.append(";==========OPTIONS==========\n\n");
@@ -141,7 +142,7 @@ public class SMTFile {
                 out.append(comment);
                 out.append('\n');
             }
-            out.append(f.toString());
+            out.append(f);
             out.append('\n');
 
         }
@@ -150,8 +151,9 @@ public class SMTFile {
 
         for (SMTTerm f : formulas) {
 
-            if (f == SMTTerm.TRUE)
+            if (f == SMTTerm.TRUE) {
                 continue;
+            }
             out.append('\n');
             if (f.getComment() != null) {
                 String comment = f.getComment();
@@ -161,7 +163,7 @@ public class SMTFile {
             }
 
             out.append("(assert ");
-            out.append(f.toString());
+            out.append(f);
             out.append(")");
             out.append('\n');
 
@@ -180,7 +182,7 @@ public class SMTFile {
 
 
     public void write(OutputStream outStream) {
-        PrintStream out = new PrintStream(outStream);
+        PrintStream out = new PrintStream(outStream, false, StandardCharsets.UTF_8);
 
 
         out.println(";Scope: " + scope);
@@ -195,10 +197,11 @@ public class SMTFile {
 
         if (defaultLogic != null && scope == null) {
             out.println("(set-logic " + defaultLogic + ")");
-        } else if (scope == null)
+        } else if (scope == null) {
             out.println("(set-logic AUFLIA)");
-        else
+        } else {
             out.println("(set-logic UFBV)");
+        }
 
 
 

@@ -1,15 +1,13 @@
 package de.uka.ilkd.key.gui.configuration;
 
+import java.awt.*;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Properties;
-import java.util.Set;
-
+import java.util.*;
+import javax.swing.*;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -23,12 +21,12 @@ import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.ObjectUtil;
-
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.settings.ChoiceSettings;
+
+import org.key_project.util.java.ArrayUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +36,8 @@ public class ChoiceSelector extends JDialog {
     private static final String EXPLANATIONS_RESOURCE =
         "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
     private final ChoiceSettings settings;
-    private final HashMap<String, String> category2DefaultChoice;
-    private HashMap<String, Set<String>> category2Choices;
+    private final Map<String, String> category2DefaultChoice;
+    private Map<String, Set<String>> category2Choices;
     private boolean changed = false;
 
 
@@ -432,7 +430,7 @@ public class ChoiceSelector extends JDialog {
                 ChoiceEntry other = (ChoiceEntry) obj;
                 return choice.equals(other.getChoice()) && incomplete == other.isIncomplete()
                         && unsound == other.isUnsound()
-                        && ObjectUtil.equals(information, other.getInformation());
+                        && Objects.equals(information, other.getInformation());
             } else {
                 return false;
             }

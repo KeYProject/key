@@ -1,14 +1,14 @@
 package de.uka.ilkd.key.proof.io;
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-
 import java.io.*;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
+
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 
 /**
  * This file rule source derivative wraps its input stream into a {@link GZIPInputStream} thus
@@ -34,7 +34,6 @@ public class GZipFileRuleSource extends FileRuleSource {
         try {
             return new GZIPInputStream(new FileInputStream(ruleFile));
         } catch (IOException e) {
-            e.printStackTrace();
             throw new RuntimeException("Error while reading rules.", e);
         }
     }

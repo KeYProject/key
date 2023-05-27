@@ -1,20 +1,8 @@
 package de.uka.ilkd.key.gui.configuration;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
 import java.awt.event.KeyEvent;
-
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -104,50 +92,44 @@ public class ViewSelector extends JDialog {
         JButton okButton = new JButton("OK");
         okButton.setMnemonic(KeyEvent.VK_ENTER);
 
-        okButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // int maxSteps = Integer.parseInt(maxTooltipLinesInputField.getText());
-                // ProofSettings.DEFAULT_SETTINGS.getViewSettings().setMaxTooltipLines(maxSteps);
-                // boolean ifind = showWholeTacletCB.isSelected();
-                // ProofSettings.DEFAULT_SETTINGS.getViewSettings().setShowWholeTaclet(ifind);
-                int maxSteps = Integer.parseInt(maxTooltipLinesInputField.getText());
-                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                        .setMaxTooltipLines(maxSteps);
-                boolean ifind = showWholeTacletCB.isSelected();
-                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                        .setShowWholeTaclet(ifind);
-                boolean uninstTaclet = showUninstantiatedTacletCB.isSelected();
-                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                        .setShowUninstantiatedTaclet(uninstTaclet);
-                setVisible(false);
-                dispose();
-            }
+        okButton.addActionListener(e -> {
+            // int maxSteps = Integer.parseInt(maxTooltipLinesInputField.getText());
+            // ProofSettings.DEFAULT_SETTINGS.getViewSettings().setMaxTooltipLines(maxSteps);
+            // boolean ifind = showWholeTacletCB.isSelected();
+            // ProofSettings.DEFAULT_SETTINGS.getViewSettings().setShowWholeTaclet(ifind);
+            int maxSteps = Integer.parseInt(maxTooltipLinesInputField.getText());
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                    .setMaxTooltipLines(maxSteps);
+            boolean ifind = showWholeTacletCB.isSelected();
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                    .setShowWholeTaclet(ifind);
+            boolean uninstTaclet = showUninstantiatedTacletCB.isSelected();
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                    .setShowUninstantiatedTaclet(uninstTaclet);
+            setVisible(false);
+            dispose();
         });
         JButton saveButton = new JButton("Save as Default");
 
-        saveButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                int maxSteps = Integer.parseInt(maxTooltipLinesInputField.getText());
-                // ProofSettings dflt=ProofSettings.DEFAULT_SETTINGS;
-                ProofIndependentSettings dflt = ProofIndependentSettings.DEFAULT_INSTANCE;
-                boolean ifind = showWholeTacletCB.isSelected();
-                boolean uninstTaclet = showUninstantiatedTacletCB.isSelected();
-                dflt.getViewSettings().setMaxTooltipLines(maxSteps);
-                dflt.getViewSettings().setShowWholeTaclet(ifind);
-                dflt.getViewSettings().setShowUninstantiatedTaclet(uninstTaclet);
-                // temporary solution, stores more than wanted %%%%
-                dflt.saveSettings();
-                setVisible(false);
-                dispose();
-            }
+        saveButton.addActionListener(e -> {
+            int maxSteps = Integer.parseInt(maxTooltipLinesInputField.getText());
+            // ProofSettings dflt=ProofSettings.DEFAULT_SETTINGS;
+            ProofIndependentSettings dflt = ProofIndependentSettings.DEFAULT_INSTANCE;
+            boolean ifind = showWholeTacletCB.isSelected();
+            boolean uninstTaclet = showUninstantiatedTacletCB.isSelected();
+            dflt.getViewSettings().setMaxTooltipLines(maxSteps);
+            dflt.getViewSettings().setShowWholeTaclet(ifind);
+            dflt.getViewSettings().setShowUninstantiatedTaclet(uninstTaclet);
+            // temporary solution, stores more than wanted %%%%
+            dflt.saveSettings();
+            setVisible(false);
+            dispose();
         });
         JButton cancelButton = new JButton("Cancel");
         cancelButton.setMnemonic(KeyEvent.VK_ESCAPE);
-        cancelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-                dispose();
-            }
+        cancelButton.addActionListener(e -> {
+            setVisible(false);
+            dispose();
         });
 
         JPanel buttonPanel = new JPanel();
@@ -198,7 +180,7 @@ public class ViewSelector extends JDialog {
 
         public NumberInputField(int number, int cols) {
             super(cols);
-            setText("" + number);
+            setText(String.valueOf(number));
         }
 
         protected Document createDefaultModel() {

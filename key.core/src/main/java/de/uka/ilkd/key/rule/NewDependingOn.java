@@ -12,8 +12,8 @@ import de.uka.ilkd.key.logic.op.TermSV;
 @Deprecated
 public class NewDependingOn {
 
-    private SchemaVariable first;
-    private SchemaVariable second;
+    private final SchemaVariable first;
+    private final SchemaVariable second;
 
     /**
      * constructs a pair of variables given two SchemaVariables. The first SchemaVariable has to

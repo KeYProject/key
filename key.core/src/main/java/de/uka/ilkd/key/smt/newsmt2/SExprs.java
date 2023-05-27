@@ -1,15 +1,14 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.smt.SMTTranslationException;
-import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.smt.SMTTranslationException;
+import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 /**
  * This class is a collection of static functions to construct SExpr objects.
@@ -189,6 +188,22 @@ public class SExprs {
     }
 
     /**
+     * Wrap the provided expression with a name label.
+     * Result is {@code (e :named name)}.
+     *
+     * @param e expression
+     * @param name label
+     * @return the named expr
+     */
+    public static SExpr named(SExpr e, String name) {
+        ArrayList<SExpr> children = new ArrayList<>();
+        children.add(e);
+        children.add(new SExpr(":named", Type.VERBATIM));
+        children.add(new SExpr(name));
+        return new SExpr("!", e.getType(), children);
+    }
+
+    /**
      * Produce a smt matching pattern. The result is {@code (! e :patterns ((patterns))}.
      *
      * If the list is empty, then {@code e} is returned.
@@ -268,7 +283,7 @@ public class SExprs {
         if (collected.isEmpty()) {
             return matrix;
         } else {
-            return patternSExpr(matrix, collected.toArray(new SExpr[collected.size()]));
+            return patternSExpr(matrix, collected.toArray(new SExpr[0]));
         }
     }
 

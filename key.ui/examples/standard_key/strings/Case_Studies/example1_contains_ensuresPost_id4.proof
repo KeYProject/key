@@ -168,7 +168,7 @@ boolean result;
    )
    (branch " Post"
       (builtin "Update Simplification" (formula "11"))
-      (rule "inInt" (formula "11") (term "1,1,0,0"))
+      (rule "expandInInt" (formula "11") (term "1,1,0,0"))
       (rule "concrete_and_3" (formula "11") (term "1,0,0"))
       (rule "impRight" (formula "11"))
       (rule "andLeft" (formula "1"))
@@ -592,7 +592,7 @@ boolean result;
                )
                (branch " Post"
                   (builtin "Update Simplification" (formula "25"))
-                  (rule "inInt" (formula "25") (term "1,1,0,0"))
+                  (rule "expandInInt" (formula "25") (term "1,1,0,0"))
                   (rule "concrete_and_3" (formula "25") (term "1,0,0"))
                   (rule "impRight" (formula "25"))
                   (rule "andLeft" (formula "1"))
@@ -874,7 +874,7 @@ boolean result;
                                        )
                                        (branch " Post"
                                           (builtin "Update Simplification" (formula "35"))
-                                          (rule "inInt" (formula "35") (term "1,1,0,0"))
+                                          (rule "expandInInt" (formula "35") (term "1,1,0,0"))
                                           (rule "concrete_and_3" (formula "35") (term "1,0,0"))
                                           (rule "impRight" (formula "35"))
                                           (rule "andLeft" (formula "1"))
@@ -1240,7 +1240,7 @@ boolean result;
                                                 )
                                                 (branch " Post"
                                                    (builtin "Update Simplification" (formula "39"))
-                                                   (rule "inInt" (formula "39") (term "1,1,0,0"))
+                                                   (rule "expandInInt" (formula "39") (term "1,1,0,0"))
                                                    (rule "concrete_and_3" (formula "39") (term "1,0,0"))
                                                    (rule "impRight" (formula "39"))
                                                    (rule "andLeft" (formula "1"))
@@ -1465,7 +1465,7 @@ boolean result;
                                                 )
                                                 (branch " Post"
                                                    (builtin "Update Simplification" (formula "39"))
-                                                   (rule "inInt" (formula "39") (term "1,1,0,0"))
+                                                   (rule "expandInInt" (formula "39") (term "1,1,0,0"))
                                                    (rule "concrete_and_3" (formula "39") (term "1,0,0"))
                                                    (rule "impRight" (formula "39"))
                                                    (rule "andLeft" (formula "1"))
@@ -1947,7 +1947,7 @@ boolean result;
                                     )
                                     (branch " Post"
                                        (builtin "Update Simplification" (formula "31"))
-                                       (rule "inInt" (formula "31") (term "1,1,0,0"))
+                                       (rule "expandInInt" (formula "31") (term "1,1,0,0"))
                                        (rule "concrete_and_3" (formula "31") (term "1,0,0"))
                                        (rule "impRight" (formula "31"))
                                        (rule "andLeft" (formula "1"))
@@ -2157,7 +2157,7 @@ boolean result;
                                     )
                                     (branch " Post"
                                        (builtin "Update Simplification" (formula "29"))
-                                       (rule "inInt" (formula "29") (term "1,1,0,0"))
+                                       (rule "expandInInt" (formula "29") (term "1,1,0,0"))
                                        (rule "concrete_and_3" (formula "29") (term "1,0,0"))
                                        (rule "impRight" (formula "29"))
                                        (rule "andLeft" (formula "1"))
@@ -2590,7 +2590,7 @@ boolean result;
                                  )
                                  (branch " Post"
                                     (builtin "Update Simplification" (formula "28"))
-                                    (rule "inInt" (formula "28") (term "1,1,0,0"))
+                                    (rule "expandInInt" (formula "28") (term "1,1,0,0"))
                                     (rule "concrete_and_3" (formula "28") (term "1,0,0"))
                                     (rule "impRight" (formula "28"))
                                     (rule "andLeft" (formula "1"))

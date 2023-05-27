@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.logic.Term;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
@@ -14,6 +11,7 @@ import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -27,6 +25,8 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Extends the JavaASTWalker to use the visitor mechanism. The methods inherited by the Visitor
@@ -77,7 +77,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
         } else if (node instanceof MergePointStatement && services != null) {
             ImmutableSet<MergeContract> mcs =
                 services.getSpecificationRepository().getMergeContracts((MergePointStatement) node);
-            mcs.forEach(mc -> performActionOnMergeContract(mc));
+            mcs.forEach(this::performActionOnMergeContract);
         }
     }
 

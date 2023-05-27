@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.util.parsing;
 
-import de.uka.ilkd.key.parser.Location;
-
-import javax.annotation.Nullable;
 import java.net.MalformedURLException;
+import javax.annotation.Nullable;
+
+import de.uka.ilkd.key.parser.Location;
 
 /**
  * A simple checked exception which holds an location.

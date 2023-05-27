@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.java;
 
+import java.net.MalformedURLException;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.parsing.HasLocation;
-import recoder.parser.ParseException;
 
-import javax.annotation.Nullable;
-import java.net.MalformedURLException;
+import recoder.parser.ParseException;
 
 /**
  * This exception extends recoder's {@link ParseException} by a filename.
@@ -44,7 +45,7 @@ public class ParseExceptionInFile extends ParseException implements HasLocation 
         if (getCause() != null) {
             location = ExceptionTools.getLocation(getCause());
             if (location != null) {
-                location = new Location(getFilename(), location.getLine(), location.getColumn());
+                location = new Location(getFilename(), location.getPosition());
             }
         }
         return location;

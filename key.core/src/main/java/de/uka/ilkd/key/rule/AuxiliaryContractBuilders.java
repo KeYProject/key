@@ -1,70 +1,26 @@
 package de.uka.ilkd.key.rule;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.NotEquals;
-import de.uka.ilkd.key.java.statement.Branch;
-import de.uka.ilkd.key.java.statement.Break;
-import de.uka.ilkd.key.java.statement.Catch;
-import de.uka.ilkd.key.java.statement.Continue;
-import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.JavaStatement;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.TransactionStatement;
-import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnReplacer;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -80,6 +36,12 @@ import de.uka.ilkd.key.speclang.BlockWellDefinedness;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * This contains various builders used in building formulae and terms for block and loop contracts.
@@ -175,7 +137,7 @@ public final class AuxiliaryContractBuilders {
             this.variables = variables;
             this.services = services;
             this.exceptionParameter = exceptionParameter;
-            statements = new LinkedList<Statement>();
+            statements = new LinkedList<>();
             this.alreadyDeclared = alreadyDeclared;
         }
 
@@ -188,7 +150,7 @@ public final class AuxiliaryContractBuilders {
             declareResultDefault();
             declareExceptionNull();
             executeBlockSafely();
-            return new StatementBlock(statements.toArray(new Statement[statements.size()]));
+            return new StatementBlock(statements.toArray(new Statement[0]));
         }
 
         /**
@@ -469,7 +431,7 @@ public final class AuxiliaryContractBuilders {
          */
         private Map<Label, ProgramVariable> createAndRegisterFlags(
                 final Map<Label, ProgramVariable> placeholderFlags) {
-            Map<Label, ProgramVariable> result = new LinkedHashMap<Label, ProgramVariable>();
+            Map<Label, ProgramVariable> result = new LinkedHashMap<>();
             for (Map.Entry<Label, ProgramVariable> flag : placeholderFlags.entrySet()) {
                 result.put(flag.getKey(), createAndRegisterVariable(flag.getValue()));
             }
@@ -484,7 +446,7 @@ public final class AuxiliaryContractBuilders {
         private Map<LocationVariable, LocationVariable> createAndRegisterRemembranceVariables(
                 final Map<LocationVariable, LocationVariable> remembranceVariables) {
             final Map<LocationVariable, LocationVariable> result =
-                new LinkedHashMap<LocationVariable, LocationVariable>();
+                new LinkedHashMap<>();
             for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables
                     .entrySet()) {
                 result.put(remembranceVariable.getKey(),
@@ -553,7 +515,7 @@ public final class AuxiliaryContractBuilders {
             IntroAtPreDefsOp transformer =
                 (IntroAtPreDefsOp) AbstractTermTransformer.INTRODUCE_ATPRE_DEFINITIONS;
             final Map<LocationVariable, LocationVariable> atPreVars =
-                new LinkedHashMap<LocationVariable, LocationVariable>();
+                new LinkedHashMap<>();
             atPreVars.putAll(outerRemembranceHeaps);
             atPreVars.putAll(outerRemembranceVariables);
             transformer.updateBlockAndLoopContracts(innerBlocksAndLoops, atPreVars,
@@ -752,7 +714,7 @@ public final class AuxiliaryContractBuilders {
          * @see AuxiliaryContract#getVariables()
          * @see AuxiliaryContract.Variables#termify(Term)
          */
-        protected final BlockContract.Terms terms;
+        final BlockContract.Terms terms;
 
         /**
          * The contract being applied
@@ -879,7 +841,7 @@ public final class AuxiliaryContractBuilders {
          * @return the contract's modifies clause.
          */
         public Map<LocationVariable, Term> buildModifiesClauses() {
-            Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
+            Map<LocationVariable, Term> result = new LinkedHashMap<>();
             for (final LocationVariable heap : heaps) {
                 result.put(heap, contract.getModifiesClause(heap, var(heap), terms.self, services));
             }
@@ -965,11 +927,11 @@ public final class AuxiliaryContractBuilders {
          */
         private Map<LocationVariable, Map<Term, Term>> constructRemembranceVariables() {
             Map<LocationVariable, Map<Term, Term>> result =
-                new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+                new LinkedHashMap<>();
             for (Map.Entry<LocationVariable, LocationVariable> remembranceHeap : variables.remembranceHeaps
                     .entrySet()) {
                 final LocationVariable heap = remembranceHeap.getKey();
-                result.put(heap, new LinkedHashMap<Term, Term>());
+                result.put(heap, new LinkedHashMap<>());
                 result.get(heap).put(var(heap), var(remembranceHeap.getValue()));
             }
             for (Map.Entry<LocationVariable, LocationVariable> remembranceLocalVariable : variables.remembranceLocalVariables
@@ -1010,7 +972,7 @@ public final class AuxiliaryContractBuilders {
          * @return the condition that at most one flag for abrupt termination is {@code true}.
          */
         public Term buildAtMostOneFlagSetCondition() {
-            final List<Term> notSetConditions = new LinkedList<Term>();
+            final List<Term> notSetConditions = new LinkedList<>();
             notSetConditions.addAll(buildFlagsNotSetConditions(variables.breakFlags.values()));
             notSetConditions.addAll(buildFlagsNotSetConditions(variables.continueFlags.values()));
             if (variables.returnFlag != null) {
@@ -1077,7 +1039,7 @@ public final class AuxiliaryContractBuilders {
          * @return the condition that all flags are {@code false}.
          */
         private List<Term> buildFlagsNotSetConditions(final Collection<ProgramVariable> flags) {
-            final List<Term> result = new LinkedList<Term>();
+            final List<Term> result = new LinkedList<>();
             for (ProgramVariable flag : flags) {
                 result.add(buildFlagNotSetCondition(flag));
             }
@@ -1174,13 +1136,9 @@ public final class AuxiliaryContractBuilders {
             final boolean oldInfFlowCheckInfoValue =
                 goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null
                         && goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY);
-            StrategyInfoUndoMethod undo = new StrategyInfoUndoMethod() {
-                @Override
-                public void undo(de.uka.ilkd.key.util.properties.Properties strategyInfos) {
-                    strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY,
-                        oldInfFlowCheckInfoValue);
-                }
-            };
+            StrategyInfoUndoMethod undo =
+                strategyInfos -> strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY,
+                    oldInfFlowCheckInfoValue);
             goal.addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, false, undo);
         }
 
@@ -1402,7 +1360,7 @@ public final class AuxiliaryContractBuilders {
                 ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(
                     termLabelState, services, occurrence, application.rule(), application, goal,
                     BlockContractHint.createValidityBranchHint(variables.exception), null,
-                    instantiation.modality, new ImmutableArray<Term>(newPost), null, newJavaBlock,
+                    instantiation.modality, new ImmutableArray<>(newPost), null, newJavaBlock,
                     instantiation.formula.getLabels());
 
                 term = tb.applySequential(updates,
@@ -1623,7 +1581,7 @@ public final class AuxiliaryContractBuilders {
                 instantiation.formula.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services, occurrence,
                     application.rule(), application, goal, BlockContractHint.USAGE_BRANCH, null,
-                    instantiation.modality, new ImmutableArray<Term>(instantiation.formula.sub(0)),
+                    instantiation.modality, new ImmutableArray<>(instantiation.formula.sub(0)),
                     null, instantiation.formula.javaBlock(), instantiation.formula.getLabels()));
         }
 
@@ -1637,7 +1595,7 @@ public final class AuxiliaryContractBuilders {
         }
 
         private StatementBlock constructAbruptTerminationIfCascade() {
-            List<If> ifCascade = new ArrayList<If>();
+            List<If> ifCascade = new ArrayList<>();
             for (Map.Entry<Label, ProgramVariable> flag : variables.breakFlags.entrySet()) {
                 ifCascade.add(KeYJavaASTFactory.ifThen(flag.getValue(),
                     KeYJavaASTFactory.breakStatement(flag.getKey())));
@@ -1654,7 +1612,7 @@ public final class AuxiliaryContractBuilders {
                 new NotEquals(
                     new ExtList(new Expression[] { variables.exception, NullLiteral.NULL })),
                 KeYJavaASTFactory.throwClause(variables.exception)));
-            return new StatementBlock(ifCascade.toArray(new Statement[ifCascade.size()]));
+            return new StatementBlock(ifCascade.toArray(new Statement[0]));
         }
 
         private JavaBlock getJavaBlock(final ProgramVariable exceptionParameter) {
@@ -1675,7 +1633,7 @@ public final class AuxiliaryContractBuilders {
             return JavaBlock.createJavaBlock(finishedBlock);
         }
 
-        private final Map<Label, ProgramVariable> collectContinueFlags(final LoopContract contract,
+        private Map<Label, ProgramVariable> collectContinueFlags(final LoopContract contract,
                 ProgramVariable continuedLoopVariable, List<Continue> bodyContinues) {
             Map<Label, ProgramVariable> continueFlags =
                 new LinkedHashMap<>(variables.continueFlags);

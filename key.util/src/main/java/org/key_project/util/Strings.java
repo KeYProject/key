@@ -42,9 +42,9 @@ public class Strings {
         try {
             return (comment.startsWith("/*@") || comment.startsWith("//@")
                     || comment.startsWith("/*+KeY@") || comment.startsWith("//+KeY@")
-                    || (comment.startsWith("/*-") && !comment.substring(3, 6).equals("KeY")
+                    || (comment.startsWith("/*-") && !comment.startsWith("KeY", 3)
                             && comment.contains("@"))
-                    || (comment.startsWith("//-") && !comment.substring(3, 6).equals("KeY")
+                    || (comment.startsWith("//-") && !comment.startsWith("KeY", 3)
                             && comment.contains("@")));
         } catch (IndexOutOfBoundsException e) {
             return false;

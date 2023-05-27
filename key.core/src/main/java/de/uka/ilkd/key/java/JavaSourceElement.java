@@ -1,11 +1,13 @@
 package de.uka.ilkd.key.java;
 
+import java.net.URI;
+
 import de.uka.ilkd.key.pp.PrettyPrinter;
+
 import org.key_project.util.ExtList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.URI;
 
 
 /**
@@ -137,7 +139,7 @@ public abstract class JavaSourceElement implements SourceElement {
      *
      * @return the relative position of the primary token.
      */
-    public Position getRelativePosition() {
+    public recoder.java.SourceElement.Position getRelativePosition() {
         return posInfo.getRelativePosition();
     }
 

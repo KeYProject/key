@@ -2,8 +2,6 @@ package de.uka.ilkd.key.gui;
 
 import java.util.List;
 
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -13,6 +11,8 @@ import de.uka.ilkd.key.rule.LoopContractInternalBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopContract;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Interactive completion for {@link LoopContractInternalBuiltInRuleApp}.

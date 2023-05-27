@@ -1,24 +1,11 @@
 package de.uka.ilkd.key.gui.utilities;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
-import de.uka.ilkd.key.gui.utilities.ClickableMessageBox.ClickableMessageBoxListener;
 
 
 /**
@@ -34,16 +21,16 @@ public class CheckedUserInput extends JPanel {
 
 
 
-    static public interface CheckedUserInputInspector {
+    public interface CheckedUserInputInspector {
 
-        public static final String NO_USER_INPUT = " ";
+        String NO_USER_INPUT = " ";
 
         /**
          * @param toBeChecked the user input to be checked.
          * @return <code>null</code> if the user input is valid, otherwise a string describing the
          *         error.
          */
-        public String check(String toBeChecked);
+        String check(String toBeChecked);
 
 
     }
@@ -51,8 +38,8 @@ public class CheckedUserInput extends JPanel {
     /**
      * Used for observing the checked user input.
      */
-    static public interface CheckedUserInputListener {
-        public void userInputChanged(String input, boolean valid, String reason);
+    public interface CheckedUserInputListener {
+        void userInputChanged(String input, boolean valid, String reason);
 
 
     }
@@ -67,16 +54,10 @@ public class CheckedUserInput extends JPanel {
 
     private CheckedUserInputInspector inspector;
     private final List<CheckedUserInputListener> listeners =
-        new LinkedList<CheckedUserInputListener>();
+        new LinkedList<>();
 
     public CheckedUserInput(boolean showInformation) {
-        this(new CheckedUserInputInspector() {
-
-            @Override
-            public String check(String toBeChecked) {
-                return null;
-            }
-        }, showInformation);
+        this(toBeChecked -> null, showInformation);
 
     }
 
@@ -142,14 +123,10 @@ public class CheckedUserInput extends JPanel {
             infoBox = new ClickableMessageBox();
             infoBox.setBackground(this.getBackground());
             infoBox.setFont(this.getFont());
-            infoBox.add(new ClickableMessageBoxListener() {
-
-                @Override
-                public void eventMessageClicked(Object object) {
-                    if (object != null) {
-                        JOptionPane.showMessageDialog(detailScrollPane, object,
-                            "Problem Description", JOptionPane.INFORMATION_MESSAGE);
-                    }
+            infoBox.add(object -> {
+                if (object != null) {
+                    JOptionPane.showMessageDialog(detailScrollPane, object,
+                        "Problem Description", JOptionPane.INFORMATION_MESSAGE);
                 }
             });
 
@@ -242,14 +219,9 @@ public class CheckedUserInput extends JPanel {
         final StdDialog dialog = new StdDialog(title, vertBox, 5, helpText != null);
         userInput.addListener((input, valid, reason) -> dialog.getOkButton().setEnabled(valid));
 
-        dialog.getHelpButton().addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(dialog, helpText, "Help",
-                    JOptionPane.INFORMATION_MESSAGE);
-            }
-        });
+        dialog.getHelpButton()
+                .addActionListener(e -> JOptionPane.showMessageDialog(dialog, helpText, "Help",
+                    JOptionPane.INFORMATION_MESSAGE));
 
         userInput.setInput(defaultInput);
         Dimension dim = dialog.getPreferredSize();
@@ -266,13 +238,7 @@ public class CheckedUserInput extends JPanel {
 
     public static void main(String[] args) {
         showAsDialog("Checked user input embedded in a dialog.", "type 'test'",
-            "that is only a test", "default", new CheckedUserInputInspector() {
-
-                @Override
-                public String check(String toBeChecked) {
-
-                    return toBeChecked.equals("test") ? null : "Syntax Error#test";
-                }
-            }, true);
+            "that is only a test", "default",
+            toBeChecked -> toBeChecked.equals("test") ? null : "Syntax Error#test", true);
     }
 }

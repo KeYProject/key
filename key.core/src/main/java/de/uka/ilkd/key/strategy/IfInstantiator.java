@@ -2,9 +2,6 @@ package de.uka.ilkd.key.strategy;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -21,6 +18,9 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.IfInstantiationCachePool.IfInstantiationCache;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This class implements custom instantiation of if-formulas.
@@ -91,12 +91,14 @@ public class IfInstantiator {
      */
     private ImmutableList<IfFormulaInstantiation> getSequentFormulas(boolean p_antec,
             boolean p_all) {
-        if (p_all)
+        if (p_all) {
             return getAllSequentFormulas(p_antec);
+        }
 
         final ImmutableList<IfFormulaInstantiation> cache = getNewSequentFormulasFromCache(p_antec);
-        if (cache != null)
+        if (cache != null) {
             return cache;
+        }
 
         final ImmutableList<IfFormulaInstantiation> newFormulas = selectNewFormulas(p_antec);
 
@@ -115,8 +117,9 @@ public class IfInstantiator {
         ImmutableList<IfFormulaInstantiation> res = ImmutableSLList.nil();
 
         for (final IfFormulaInstantiation ifInstantiation : getAllSequentFormulas(p_antec)) {
-            if (isNewFormulaDirect((IfFormulaInstSeq) ifInstantiation))
+            if (isNewFormulaDirect((IfFormulaInstSeq) ifInstantiation)) {
                 res = res.prepend(ifInstantiation);
+            }
         }
 
         return res;
@@ -132,8 +135,9 @@ public class IfInstantiator {
 
         final ImmutableList<IfFormulaInstantiation> cache = getNewSequentFormulasFromCache(antec);
 
-        if (cache != null)
+        if (cache != null) {
             return cache.contains(p_ifInstantiation);
+        }
 
         return isNewFormulaDirect(p_ifInstantiation);
     }

@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Collection;
 
 import de.uka.ilkd.key.proof.io.RuleSource;
 
@@ -26,10 +26,10 @@ public class Includes {
     private final List<File> files;
 
     public Includes() {
-        includes = new LinkedList<String>();
-        ldtIncludes = new LinkedList<String>();
-        name2Source = new LinkedHashMap<String, RuleSource>();
-        files = new LinkedList<File>();
+        includes = new LinkedList<>();
+        ldtIncludes = new LinkedList<>();
+        name2Source = new LinkedHashMap<>();
+        files = new LinkedList<>();
     }
 
     private void put(String name, RuleSource source, List<String> list) {

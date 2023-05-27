@@ -21,7 +21,7 @@ public interface PartialComparator<T> {
     /**
      * Possible results of the comparison.
      */
-    public static enum PartialComparisonResult {
+    enum PartialComparisonResult {
         LTE, GTE, EQ, UNDEF
     }
 
@@ -36,6 +36,6 @@ public interface PartialComparator<T> {
      * @return LTE, EQ, or GTE as the first argument is less than, equal to, or greater than the
      *         second; returns UNDEF if the arguments are incomparable.
      */
-    public PartialComparisonResult compare(T o1, T o2);
+    PartialComparisonResult compare(T o1, T o2);
 
 }

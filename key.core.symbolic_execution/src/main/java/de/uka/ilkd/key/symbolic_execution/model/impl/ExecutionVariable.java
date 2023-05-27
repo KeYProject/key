@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -30,6 +28,8 @@ import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The default implementation of {@link IExecutionVariable}.
@@ -194,10 +194,10 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             Services services, TermBuilder tb, ApplyStrategyInfo info, Operator resultOperator,
             Term siteProofSelectTerm, Term siteProofCondition) throws ProofInputException {
         List<ExecutionValue> result =
-            new ArrayList<ExecutionValue>(info.getProof().openGoals().size());
+            new ArrayList<>(info.getProof().openGoals().size());
         // Group values of the branches
-        Map<Term, List<Goal>> valueMap = new LinkedHashMap<Term, List<Goal>>();
-        List<Goal> unknownValues = new LinkedList<Goal>();
+        Map<Term, List<Goal>> valueMap = new LinkedHashMap<>();
+        List<Goal> unknownValues = new LinkedList<>();
         groupGoalsByValue(info.getProof().openGoals(), resultOperator, siteProofSelectTerm,
             siteProofCondition, valueMap, unknownValues, services);
         // Instantiate child values
@@ -232,7 +232,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
                 null, null, null, condition, conditionString));
         }
         // Return child values as result
-        return result.toArray(new ExecutionValue[result.size()]);
+        return result.toArray(new ExecutionValue[0]);
     }
 
     /**
@@ -278,11 +278,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             if (unknownValue) {
                 unknownValues.add(goal);
             } else {
-                List<Goal> valueList = valueMap.get(value);
-                if (valueList == null) {
-                    valueList = new LinkedList<Goal>();
-                    valueMap.put(value, valueList);
-                }
+                List<Goal> valueList = valueMap.computeIfAbsent(value, k -> new LinkedList<>());
                 valueList.add(goal);
             }
         }
@@ -302,7 +298,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     protected Term computeValueCondition(TermBuilder tb, List<Goal> valueGoals,
             InitConfig initConfig) throws ProofInputException {
         if (!valueGoals.isEmpty()) {
-            List<Term> pathConditions = new LinkedList<Term>();
+            List<Term> pathConditions = new LinkedList<>();
             Proof proof = null;
             for (Goal valueGoal : valueGoals) {
                 pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(),

@@ -20,10 +20,11 @@ public class ConditionalFeature implements Feature {
     }
 
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-        if (cond.filter(app.rule()))
+        if (cond.filter(app.rule())) {
             return thenFeature.computeCost(app, pos, goal);
-        else
+        } else {
             return elseFeature.computeCost(app, pos, goal);
+        }
     }
 
     /**

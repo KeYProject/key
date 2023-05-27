@@ -1,13 +1,12 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 
 /**
@@ -49,11 +48,6 @@ class ScriptLineParser {
     private URL fileURL;
 
     /**
-     * number of characters read so far
-     */
-    private int readChars;
-
-    /**
      * While within a string literal, this stores the character with which the string has started.
      */
     private int stringInitChar;
@@ -76,19 +70,8 @@ class ScriptLineParser {
         IN_COMMENT
     }
 
-    public ScriptLineParser(Reader reader) {
+    public ScriptLineParser(Reader reader, URL fileURL) {
         this.reader = reader;
-        this.fileURL = null;
-    }
-
-    /**
-     * Creates a ScriptLineParser that reads from the given resource.
-     *
-     * @param fileURL the resource to read from
-     * @throws IOException if opening an InputStream from the resource fails
-     */
-    public ScriptLineParser(URL fileURL) throws IOException {
-        this.reader = new BufferedReader(new InputStreamReader(fileURL.openStream()));
         this.fileURL = fileURL;
     }
 
@@ -117,7 +100,7 @@ class ScriptLineParser {
             case -1:
                 if (sb.length() > 0 || key != null || !result.isEmpty()) {
                     throw new ScriptException("Trailing characters at end of script (missing ';'?)",
-                        fileURL, line, col);
+                        getLocation());
                 }
                 return null;
             case '=':
@@ -256,7 +239,6 @@ class ScriptLineParser {
             if (state != State.IN_COMMENT) {
                 cmdBuilder.append((char) c);
             }
-            readChars++;
         }
     }
 
@@ -266,35 +248,24 @@ class ScriptLineParser {
 
     private void exc(int c) throws ScriptException {
         throw new ScriptException(
-            String.format("Unexpected char '%s' at %d:%d", (char) c, line, col), fileURL, line,
-            col);
-    }
-
-    /**
-     * Get the number of characters read so far.
-     *
-     * @return a non-negative integer
-     */
-    public int getReadChars() {
-        return readChars;
+            String.format("Unexpected char '%s' at %d:%d", (char) c, line, col), getLocation());
     }
 
     public int getLine() {
         return line;
     }
 
-    public int getColumn() {
-        return col;
+    public Location getLocation() {
+        return new Location(fileURL, Position.newOneBased(line, col));
     }
 
-    public int getPosition() {
+    public int getOffset() {
         return pos;
     }
 
     public void setLocation(Location location) {
-        this.line = location.getLine();
-        this.col = location.getColumn();
+        this.line = location.getPosition().line();
+        this.col = location.getPosition().column();
         this.fileURL = location.getFileURL();
     }
-
 }

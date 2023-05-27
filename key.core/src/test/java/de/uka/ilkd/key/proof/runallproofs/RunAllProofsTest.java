@@ -1,9 +1,11 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Stream;
+
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
-import org.antlr.runtime.*;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Tag;
@@ -54,10 +56,7 @@ import java.util.stream.Stream;
  * @author Martin Hentschel
  */
 @Tag("slow")
-public abstract class RunAllProofsTest {
-    public static final String VERBOSE_OUTPUT_KEY = "verboseOutput";
-    public static final String IGNORE_KEY = "ignore";
-
+public final class RunAllProofsTest {
 
     /**
      * Creates a set of constructor parameters for this class. Uses JUnits parameterized test case
@@ -91,30 +90,6 @@ public abstract class RunAllProofsTest {
             new JunitXmlWriter(new FileWriter(xmlFile), "runallproofs." + unit.getTestName())) {
             TestResult report = unit.runTest(xml);
             Assertions.assertTrue(report.success, report.message);
-        }
-    }
-
-    /**
-     * Uses {@link ProofCollectionParser} to parse the given file and returns a parse result that is
-     * received from main parser entry point.
-     */
-    public static ProofCollection parseIndexFile(final String index) throws IOException {
-        return parseIndexFile(index, ProofCollectionParser::new);
-    }
-
-    public static ProofCollection parseIndexFile(final String index,
-            Function<TokenStream, ProofCollectionParser> stream2Parser) throws IOException {
-        File automaticJAVADL = new File(RunAllProofsDirectories.EXAMPLE_DIR, index);
-        CharStream charStream = new ANTLRFileStream(automaticJAVADL.getAbsolutePath());
-        ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);
-        TokenStream tokenStream = new CommonTokenStream(lexer);
-        ProofCollectionParser parser = stream2Parser.apply(tokenStream);
-        try {
-            return parser.parserEntryPoint();
-        } catch (RecognitionException e) {
-            String msg = parser.getErrorMessage(e, parser.getTokenNames());
-            throw new IOException(
-                "Cannot parse " + automaticJAVADL + " at line " + e.line + ": " + msg, e);
         }
     }
 }

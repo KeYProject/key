@@ -88,10 +88,12 @@ public class SMTTermITE extends SMTTerm {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof SMTTermITE))
+        }
+        if (!(o instanceof SMTTermITE)) {
             return false;
+        }
         SMTTermITE that = (SMTTermITE) o;
         return condition.equals(that.condition) && trueCase.equals(that.trueCase)
                 && falseCase.equals(that.falseCase);

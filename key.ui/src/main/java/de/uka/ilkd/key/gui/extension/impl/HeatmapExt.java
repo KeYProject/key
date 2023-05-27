@@ -1,20 +1,21 @@
 package de.uka.ilkd.key.gui.extension.impl;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.HeatmapSettingsAction;
-import de.uka.ilkd.key.gui.actions.HeatmapToggleAction;
-import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
-import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.gui.settings.SettingsPanel;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.ViewSettings;
-import net.miginfocom.layout.CC;
-
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.HeatmapSettingsAction;
+import de.uka.ilkd.key.gui.actions.HeatmapToggleAction;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.settings.SettingsPanel;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
+
+import net.miginfocom.layout.CC;
 
 /**
  * Extension adapter for Heatmap
@@ -27,7 +28,7 @@ import java.util.Map;
     experimental = false)
 public class HeatmapExt implements KeYGuiExtension, KeYGuiExtension.MainMenu,
         KeYGuiExtension.Toolbar, KeYGuiExtension.Settings {
-    private List<Action> actions = new ArrayList<>(2);
+    private final List<Action> actions = new ArrayList<>(2);
     private HeatmapToggleAction toggleAction;
     private HeatmapSettingsAction settingsAction;
 
@@ -124,7 +125,9 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
 
         final String text;
         final String desc;
-        boolean enableHeatmap, sequent, newest;
+        final boolean enableHeatmap;
+        final boolean sequent;
+        final boolean newest;
 
 
         HeatmapMode(String shortText, String description, boolean enableHeatmap, boolean sequent,
@@ -141,7 +144,7 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
         }
     }
 
-    private Map<HeatmapMode, JRadioButton> map = new HashMap<>();
+    private final Map<HeatmapMode, JRadioButton> map = new HashMap<>();
 
     HeatmapSettingsProvider() {
         setHeaderText("Heatmap Options");

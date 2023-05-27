@@ -1,26 +1,18 @@
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
 import java.util.List;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.gui.lemmatagenerator.ItemChooser.ItemFilter;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * The core of the Selection-Dialog is the class SelectionPanel which extends JPanel. It contains a
@@ -41,21 +33,11 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
     private JPanel buttonPanel;
     private JPanel contentPanel;
     private ItemChooser<TacletInfo> tacletChooser;
-    private ItemFilter<TacletInfo> showOnlySupportedTaclets = new ItemFilter<TacletInfo>() {
+    private final ItemFilter<TacletInfo> showOnlySupportedTaclets =
+        itemData -> !itemData.isNotSupported();
 
-        @Override
-        public boolean include(TacletInfo itemData) {
-            return !itemData.isNotSupported();
-        }
-    };
-
-    private ItemFilter<TacletInfo> filterForMovingTaclets = new ItemFilter<TacletInfo>() {
-
-        @Override
-        public boolean include(TacletInfo itemData) {
-            return !itemData.isNotSupported() && !itemData.isAlreadyInUse();
-        }
-    };
+    private final ItemFilter<TacletInfo> filterForMovingTaclets =
+        itemData -> !itemData.isNotSupported() && !itemData.isAlreadyInUse();
 
 
     public LemmaSelectionDialog() {
@@ -87,19 +69,15 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
         if (showSupported == null) {
             showSupported = new JCheckBox("Show only supported taclets.");
             showSupported.setSelected(true);
-            showSupported.addActionListener(new ActionListener() {
+            showSupported.addActionListener(e -> {
+                if (showSupported.isSelected()) {
+                    getTacletChooser().addFilter(showOnlySupportedTaclets);
 
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (showSupported.isSelected()) {
-                        getTacletChooser().addFilter(showOnlySupportedTaclets);
-
-                    } else {
-                        getTacletChooser().removeFilter(showOnlySupportedTaclets);
-
-                    }
+                } else {
+                    getTacletChooser().removeFilter(showOnlySupportedTaclets);
 
                 }
+
             });
         }
         return showSupported;
@@ -157,13 +135,7 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
     private JButton getCancelButton() {
         if (cancelButton == null) {
             cancelButton = new JButton("Cancel");
-            cancelButton.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cancel();
-                }
-            });
+            cancelButton.addActionListener(e -> cancel());
             GuiUtilities.attachClickOnEscListener(cancelButton);
         }
         return cancelButton;
@@ -171,7 +143,7 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
 
     private ItemChooser<TacletInfo> getTacletChooser() {
         if (tacletChooser == null) {
-            tacletChooser = new ItemChooser<TacletInfo>("Search for taclets with names containing");
+            tacletChooser = new ItemChooser<>("Search for taclets with names containing");
             tacletChooser.addFilterForMovingItems(filterForMovingTaclets);
             tacletChooser.addFilter(showOnlySupportedTaclets);
         }

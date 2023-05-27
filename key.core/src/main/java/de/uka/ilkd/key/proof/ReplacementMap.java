@@ -33,12 +33,12 @@ public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
      * @param proof the currently loaded proof, or {@code null} if no proof is loaded.
      * @return a new replacement map.
      */
-    public static <S extends SVSubstitute, T> ReplacementMap<S, T> create(TermFactory tf,
+    static <S extends SVSubstitute, T> ReplacementMap<S, T> create(TermFactory tf,
             Proof proof) {
         if (ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels()) {
-            return new NoIrrelevantLabelsReplacementMap<S, T>(tf);
+            return new NoIrrelevantLabelsReplacementMap<>(tf);
         } else {
-            return new DefaultReplacementMap<S, T>();
+            return new DefaultReplacementMap<>();
         }
     }
 
@@ -52,7 +52,7 @@ public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
      * @param initialMappings a map whose mapping should be added to the new replacement map.
      * @return a new replacement map.
      */
-    public static <S extends SVSubstitute, T> ReplacementMap<S, T> create(TermFactory tf,
+    static <S extends SVSubstitute, T> ReplacementMap<S, T> create(TermFactory tf,
             Proof proof, Map<S, T> initialMappings) {
         ReplacementMap<S, T> result = create(tf, proof);
         result.putAll(initialMappings);
@@ -71,7 +71,7 @@ public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
      * @param <S> the type of the operators to replace.
      * @param <T> the type of the replacements.
      */
-    public static class DefaultReplacementMap<S extends SVSubstitute, T> extends LinkedHashMap<S, T>
+    class DefaultReplacementMap<S extends SVSubstitute, T> extends LinkedHashMap<S, T>
             implements ReplacementMap<S, T> {
         private static final long serialVersionUID = 6223486569442129676L;
     }
@@ -92,13 +92,13 @@ public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
      *
      * @see OriginTermLabel
      */
-    public static class NoIrrelevantLabelsReplacementMap<S extends SVSubstitute, T>
+    class NoIrrelevantLabelsReplacementMap<S extends SVSubstitute, T>
             implements ReplacementMap<S, T> {
 
         /**
          * The map wrapped by this one.
          */
-        private Map<S, T> map = new LinkedHashMap<>();
+        private final Map<S, T> map = new LinkedHashMap<>();
 
         /**
          * Term factory.
@@ -160,7 +160,7 @@ public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
 
         @Override
         public void putAll(Map<? extends S, ? extends T> m) {
-            m.forEach((k, v) -> put(k, v));
+            m.forEach(this::put);
         }
 
         @Override

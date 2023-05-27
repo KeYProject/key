@@ -19,7 +19,7 @@ import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
 public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
-    private static Map<String, ProofMacro> macroMap = loadMacroMap();
+    private static final Map<String, ProofMacro> macroMap = loadMacroMap();
 
     public MacroCommand() {
         super(Parameters.class);
@@ -27,7 +27,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
 
     private static Map<String, ProofMacro> loadMacroMap() {
         ServiceLoader<ProofMacro> loader = ServiceLoader.load(ProofMacro.class);
-        Map<String, ProofMacro> result = new HashMap<String, ProofMacro>();
+        Map<String, ProofMacro> result = new HashMap<>();
 
         for (ProofMacro proofMacro : loader) {
             String commandName = proofMacro.getScriptCommandName();

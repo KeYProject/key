@@ -1,5 +1,8 @@
 package recoder.kit.transformation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Type;
 import recoder.convenience.TreeWalker;
@@ -21,9 +24,6 @@ import recoder.kit.TypeKit;
 import recoder.service.SourceInfo;
 import recoder.util.ProgressListener;
 import recoder.util.ProgressListenerManager;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Transformation that removes all redundant type references from a compilation unit or a series of
@@ -76,7 +76,7 @@ public class RemoveRedundantTypeReferences extends TwoPassTransformation {
             throw new IllegalArgumentException("Missing units");
         }
         this.units = list;
-        references = new ArrayList<TypeReference>();
+        references = new ArrayList<>();
         this.removeInterfaces = removeInterfaces;
         this.removeExceptions = removeExceptions;
         this.removeTypeCasts = removeTypeCasts;

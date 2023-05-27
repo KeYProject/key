@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.speclang.njml;
 
+import java.io.File;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
@@ -8,10 +10,10 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.collection.ImmutableList;
 
-import java.io.File;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -38,7 +40,7 @@ public class NJmlTranslatorTests {
         preParser.clearWarnings();
         String contract = "/*+KEY@ invariant x == 4; */ /*+OPENJML@ invariant x == 54; */";
         ImmutableList<TextualJMLConstruct> result =
-            preParser.parseClassLevel(contract, "Test.java", new Position(0, 0));
+            preParser.parseClassLevel(contract, "Test.java", Position.newOneBased(1, 1));
         assertNotNull(result);
         assertEquals(1, result.size(), "Too many invariants found.");
     }
@@ -49,7 +51,7 @@ public class NJmlTranslatorTests {
     // ImmutableList<TextualJMLConstruct> result =
     // jmlIO.parseClassLevel("/*@ model int f(int x) { \n" +
     // "@ return x+1; " +
-    // "@ }*/", "Test.java", new Position(0, 0));
+    // "@ }*/", "Test.java", Position.newOneBased(0, 0));
     // assertNotNull(result);
     // TextualJMLMethodDecl decl = (TextualJMLMethodDecl) result.head();
     // assertEquals("int f (int x);", decl.getParsableDeclaration().trim());
@@ -63,7 +65,7 @@ public class NJmlTranslatorTests {
     // jmlIO.parseClassLevel("/*@ model int f(int[] arr) { \n" +
     // "@ //this is a comment \n" +
     // "@ return arr[1]; //comment\n" +
-    // "@ }*/", "Test.java", new Position(0, 0));
+    // "@ }*/", "Test.java", Position.newOneBased(0, 0));
     // assertNotNull(result);
     // TextualJMLMethodDecl decl = (TextualJMLMethodDecl) result.head();
     // assertEquals("int f (int[] arr);", decl.getParsableDeclaration().trim());
@@ -76,13 +78,13 @@ public class NJmlTranslatorTests {
         preParser.clearWarnings();
         String contract = "/*@ requires true; ensures true; requires true;";
         ImmutableList<TextualJMLConstruct> result =
-            preParser.parseClassLevel(contract, "Test.java", new Position(5, 5));
+            preParser.parseClassLevel(contract, "Test.java", Position.newOneBased(5, 5));
         assertNotNull(result);
         ImmutableList<PositionedString> warnings = preParser.getWarnings();
         PositionedString message = warnings.head();
         assertEquals(
             "Diverging Semantics form JML Reference: Requires does not initiate a new contract. "
-                + "See https://www.key-project.org/docs/user/JMLGrammar/#TODO (Test.java, 5/37)",
+                + "See https://www.key-project.org/docs/user/JMLGrammar/#TODO (Test.java, 5/38)",
             message.toString());
     }
 
@@ -91,7 +93,7 @@ public class NJmlTranslatorTests {
         preParser.clearWarnings();
         String contract = "/*@ public abstract final normal_behaviour\nrequires true;";
         ImmutableList<TextualJMLConstruct> result =
-            preParser.parseClassLevel(contract, "Test.java", new Position(5, 5));
+            preParser.parseClassLevel(contract, "Test.java", Position.newOneBased(5, 5));
         assertNotNull(result);
         assertEquals(1, result.size());
         TextualJMLConstruct jml = result.head();
@@ -101,14 +103,14 @@ public class NJmlTranslatorTests {
 
     @Test
     void testContractModifiersMultiple() {
-        preParser.clearWarnings();;
+        preParser.clearWarnings();
         String contracts = "/*@ public abstract final normal_behaviour\n" +
             "  @ requires true;\n" +
             "  @ private static exceptional_behaviour\n" +
             "  @ requires false;\n" +
             "  @*/";
         ImmutableList<TextualJMLConstruct> result =
-            preParser.parseClassLevel(contracts, "Test.java", new Position(5, 5));
+            preParser.parseClassLevel(contracts, "Test.java", Position.newOneBased(5, 5));
         assertNotNull(result);
         assertEquals(2, result.size());
         TextualJMLConstruct jml = result.head();
@@ -121,7 +123,7 @@ public class NJmlTranslatorTests {
 
     @Test
     void testContractModifiersMultipleAlso() {
-        preParser.clearWarnings();;
+        preParser.clearWarnings();
         String contracts = "/*@ public abstract final normal_behaviour\n" +
             "  @ requires true;\n" +
             "  @ also \n" +
@@ -129,7 +131,7 @@ public class NJmlTranslatorTests {
             "  @ requires false;\n" +
             "  @*/";
         ImmutableList<TextualJMLConstruct> result =
-            preParser.parseClassLevel(contracts, "Test.java", new Position(5, 5));
+            preParser.parseClassLevel(contracts, "Test.java", Position.newOneBased(5, 5));
         assertNotNull(result);
         assertEquals(2, result.size());
         TextualJMLConstruct jml = result.head();

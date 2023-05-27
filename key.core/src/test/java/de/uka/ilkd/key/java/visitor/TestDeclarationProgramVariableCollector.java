@@ -1,21 +1,19 @@
 package de.uka.ilkd.key.java.visitor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.rule.TacletForTests;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.HashSet;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashSet;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -45,8 +43,9 @@ public class TestDeclarationProgramVariableCollector {
 
     @BeforeEach
     public void setUp() {
-        if (down != 0)
+        if (down != 0) {
             return;
+        }
         final Recoder2KeY r2k = new Recoder2KeY(TacletForTests.services(), new NamespaceSet());
         for (int i = 0; i < jblocks.length; i++) {
             test_block[i] = r2k.readBlockWithEmptyContext(jblocks[i]);
@@ -56,8 +55,9 @@ public class TestDeclarationProgramVariableCollector {
     @AfterEach
     public void tearDown() {
         down++;
-        if (down < testCases)
+        if (down < testCases) {
             return;
+        }
         test_block = null;
     }
 

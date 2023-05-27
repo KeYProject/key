@@ -23,9 +23,9 @@ public class ContractProofReferencesAnalyst implements IProofReferencesAnalyst {
         if (node.getAppliedRuleApp() instanceof AbstractContractRuleApp) {
             AbstractContractRuleApp contractRuleApp =
                 (AbstractContractRuleApp) node.getAppliedRuleApp();
-            DefaultProofReference<Contract> reference = new DefaultProofReference<Contract>(
+            DefaultProofReference<Contract> reference = new DefaultProofReference<>(
                 IProofReference.USE_CONTRACT, node, contractRuleApp.getInstantiation());
-            LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
+            LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<>();
             result.add(reference);
             return result;
         } else {

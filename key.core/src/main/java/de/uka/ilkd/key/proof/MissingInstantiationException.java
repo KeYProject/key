@@ -1,17 +1,19 @@
 package de.uka.ilkd.key.proof;
 
 
+import de.uka.ilkd.key.java.Position;
+
 public class MissingInstantiationException extends SVInstantiationExceptionWithPosition {
 
     /**
      *
      */
     private static final long serialVersionUID = 6424217152885699595L;
-    private String toInstantiate;
+    private final String toInstantiate;
 
-    public MissingInstantiationException(String toInstantiate, int row, int column,
+    public MissingInstantiationException(String toInstantiate, Position position,
             boolean inIfSequent) {
-        super("Missing Instantantiation", row, column, inIfSequent);
+        super("Missing Instantantiation", position, inIfSequent);
         this.toInstantiate = toInstantiate;
     }
 

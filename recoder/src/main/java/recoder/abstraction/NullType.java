@@ -2,9 +2,9 @@
 
 package recoder.abstraction;
 
-import recoder.service.ProgramModelInfo;
-
 import java.util.List;
+
+import recoder.service.ProgramModelInfo;
 
 /**
  * A program model element representing the null type.

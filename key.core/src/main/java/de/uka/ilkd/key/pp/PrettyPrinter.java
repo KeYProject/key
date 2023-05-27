@@ -4,8 +4,8 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.*;
+import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
@@ -24,7 +24,9 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
+
 import org.key_project.util.collection.ImmutableArray;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,6 +86,19 @@ public class PrettyPrinter implements Visitor {
     public void print(SourceElement e) {
         l.beginRelativeC(0);
         performActionOnStatement(e);
+        l.end();
+    }
+
+    /**
+     * Alternative entry method for this class. Omits the trailing semicolon in the output.
+     *
+     * @param s source element to print
+     */
+    public void printFragment(SourceElement s) {
+        l.beginRelativeC(0);
+        markStart(s);
+        s.visit(this);
+        markEnd(s);
         l.end();
     }
 
@@ -494,20 +509,20 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnForUpdates(ForUpdates x) {
-        // handled by loop methods
-        throw new UnsupportedOperationException();
+        writeCommaList(x.getUpdates());
     }
 
     @Override
     public void performActionOnGuard(Guard x) {
-        // handled by loop methods
-        throw new UnsupportedOperationException();
+        var child = x.getChildAt(0);
+        if (child != null) {
+            child.visit(this);
+        }
     }
 
     @Override
     public void performActionOnLoopInit(LoopInit x) {
-        // handled by loop methods
-        throw new UnsupportedOperationException();
+        writeCommaList(x.getInits());
     }
 
     @Override
@@ -932,8 +947,8 @@ public class PrettyPrinter implements Visitor {
         l.keyWord("while");
         l.print(" ");
         beginMultilineBracket();
-        if (x.getGuardExpression() != null) {
-            x.getGuardExpression().visit(this);
+        if (x.getGuard() != null) {
+            x.getGuard().visit(this);
         }
         endMultilineBracket();
         l.print(";");
@@ -978,13 +993,10 @@ public class PrettyPrinter implements Visitor {
 
         // there is no "getLoopInit" method
         // so get the first child of the for loop
+
         ILoopInit init = x.getILoopInit();
         if (init != null) {
-            if (init instanceof ProgramSV) {
-                init.visit(this);
-            } else {
-                writeCommaList(x.getInitializers());
-            }
+            init.visit(this);
         }
         l.print(";").brk();
         if (x.getGuardExpression() != null) {
@@ -994,10 +1006,10 @@ public class PrettyPrinter implements Visitor {
 
         IForUpdates upd = x.getIForUpdates();
         if (upd != null) {
+            upd.visit(this);
             if (upd instanceof ProgramSV) {
-                upd.visit(this);
+
             } else {
-                writeCommaList(x.getUpdates());
             }
         }
         endMultilineBracket();
@@ -1653,8 +1665,7 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnThen(Then x) {
-        // Handled by if
-        throw new UnsupportedOperationException();
+        handleBlockOrSingleStatement(x.getBody());
     }
 
     @Override

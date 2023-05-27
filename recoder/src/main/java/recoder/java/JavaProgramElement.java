@@ -59,8 +59,8 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
     public void setComments(ASTList<Comment> list) {
         comments = list;
         if (comments != null) {
-            for (int i = 0; i < comments.size(); i++) {
-                comments.get(i).setParent(this);
+            for (Comment comment : comments) {
+                comment.setParent(this);
             }
         }
     }

@@ -2,16 +2,16 @@
 
 package recoder.service;
 
-import recoder.ServiceConfiguration;
-import recoder.abstraction.Package;
-import recoder.abstraction.*;
-import recoder.java.declaration.EnumDeclaration;
-import recoder.util.Debug;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import recoder.ServiceConfiguration;
+import recoder.abstraction.*;
+import recoder.abstraction.Package;
+import recoder.java.declaration.EnumDeclaration;
+import recoder.util.Debug;
 
 /**
  * Handles requests for implicitely defined program model elements. In particular these are
@@ -27,10 +27,10 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
      * maps type declarations to default constructors
      */
     private final Map<ClassType, DefaultConstructor> type2defaultConstructor =
-        new HashMap<ClassType, DefaultConstructor>();
+        new HashMap<>();
 
     private final Map<EnumDeclaration, List<ImplicitEnumMethod>> type2implicitEnumMethods =
-        new HashMap<EnumDeclaration, List<ImplicitEnumMethod>>();
+        new HashMap<>();
     private List<ClassType> enumValueOfExceptions = null;
 
     /**
@@ -53,12 +53,13 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
     }
 
     public List<ImplicitEnumMethod> getImplicitEnumMethods(EnumDeclaration etd) {
-        if (etd == null)
+        if (etd == null) {
             throw new NullPointerException();
+        }
         updateModel();
         List<ImplicitEnumMethod> res = type2implicitEnumMethods.get(etd);
         if (res == null) {
-            res = new ArrayList<ImplicitEnumMethod>(2);
+            res = new ArrayList<>(2);
             ImplicitEnumMethod meth = new ImplicitEnumValueOf(etd);
             meth.setProgramModelInfo(this);
             res.add(meth);
@@ -98,7 +99,7 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
             return serviceConfiguration.getNameInfo().getTypes((Package) ctc);
         }
         if (ctc instanceof DefaultConstructor) {
-            return new ArrayList<ClassType>(0);
+            return new ArrayList<>(0);
         }
         return null;
     }
@@ -126,7 +127,7 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
     public List<ClassType> getAllSupertypes(ClassType ct) {
         // valid for NullType
         if (ct instanceof NullType) {
-            List<ClassType> result = new ArrayList<ClassType>(1);
+            List<ClassType> result = new ArrayList<>(1);
             result.add(ct);
             return result;
         }
@@ -144,8 +145,9 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
 
     public List<Field> getAllFields(ClassType ct) {
         // valid for NullType
-        if (ct instanceof IntersectionType)
+        if (ct instanceof IntersectionType) {
             return super.getAllFields(ct);
+        }
         return null;
     }
 
@@ -157,8 +159,9 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
 
     public List<Method> getAllMethods(ClassType ct) {
         // valid for NullType
-        if (ct instanceof IntersectionType)
+        if (ct instanceof IntersectionType) {
             return super.getAllMethods(ct);
+        }
         return null;
     }
 
@@ -183,19 +186,19 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
 
     public List<Type> getSignature(Method m) {
         if (m instanceof ImplicitEnumValueOf) {
-            ArrayList<Type> tal = new ArrayList<Type>(1);
+            ArrayList<Type> tal = new ArrayList<>(1);
             tal.add(getServiceConfiguration().getNameInfo().getJavaLangString());
             return tal;
         }
         // valid for Default Constructor and values() in enums.
-        return new ArrayList<Type>(0);
+        return new ArrayList<>(0);
     }
 
     public List<ClassType> getExceptions(Method m) {
         if (m instanceof ImplicitEnumValueOf) {
             if (enumValueOfExceptions == null) {
                 // since list is not visible as mutable to the outside, can cache result here.
-                enumValueOfExceptions = new ArrayList<ClassType>(2);
+                enumValueOfExceptions = new ArrayList<>(2);
                 enumValueOfExceptions
                         .add(getNameInfo().getClassType("java.lang.IllegalArgumentException"));
                 enumValueOfExceptions
@@ -204,7 +207,7 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
             return enumValueOfExceptions;
         }
         // valid for Default Constructor and values() in enums.
-        return new ArrayList<ClassType>(0);
+        return new ArrayList<>(0);
     }
 
     public Type getReturnType(Method m) {

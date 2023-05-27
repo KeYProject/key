@@ -6,9 +6,9 @@
  */
 package recoder.bytecode;
 
-import recoder.abstraction.TypeArgument;
-
 import java.util.List;
+
+import recoder.abstraction.TypeArgument;
 
 /**
  * @author Tobias Gutzmann
@@ -27,8 +27,9 @@ public class TypeArgumentInfo implements TypeArgument {
             List<? extends TypeArgument> typeArgs, ByteCodeElement parent, boolean isTypeVariable) {
         super();
         if ((typeName == null && wildcardMode != WildcardMode.Any) || wildcardMode == null
-                || parent == null)
+                || parent == null) {
             throw new NullPointerException();
+        }
         this.wildcardMode = wildcardMode;
         this.typeName = typeName;
         this.typeArgs = typeArgs;
@@ -53,15 +54,17 @@ public class TypeArgumentInfo implements TypeArgument {
     }
 
     public ClassFile getContainingClassFile() {
-        if (parent instanceof ClassFile)
+        if (parent instanceof ClassFile) {
             return (ClassFile) parent;
-        else
+        } else {
             return (ClassFile) ((MethodInfo) parent).getContainingClassType();
+        }
     }
 
     public MethodInfo getContainingMethodInfo() {
-        if (parent instanceof MethodInfo)
+        if (parent instanceof MethodInfo) {
             return (MethodInfo) parent;
+        }
         return null;
     }
 

@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.nparser.builder;
 
+import java.util.*;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.nparser.ChoiceInformation;
 import de.uka.ilkd.key.nparser.KeYParser;
-import javax.annotation.Nonnull;
-
-import java.util.*;
 
 /**
  * This visitor gathers the choice information in {@link de.uka.ilkd.key.nparser.KeyAst.File} and
@@ -44,9 +44,7 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
     public Object visitChoice(KeYParser.ChoiceContext ctx) {
         String category = ctx.category.getText();
         List<String> options = new ArrayList<>(ctx.optionDecl().size());
-        ctx.optionDecl().forEach(it -> {
-            options.add(it.IDENT.getText());
-        });
+        ctx.optionDecl().forEach(it -> options.add(it.IDENT.getText()));
         if (options.isEmpty()) {
             options.add("on");
             options.add("off");

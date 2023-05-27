@@ -1,10 +1,11 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import de.uka.ilkd.key.speclang.njml.JmlParser;
-import javax.annotation.Nonnull;
-import org.key_project.util.collection.ImmutableList;
-
 import java.util.Objects;
+import javax.annotation.Nonnull;
+
+import de.uka.ilkd.key.speclang.njml.JmlParser;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * A JML merge point declaration in textual form.
@@ -35,10 +36,12 @@ public final class TextualJMLMergePointDecl extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof TextualJMLMergePointDecl))
+        }
+        if (!(o instanceof TextualJMLMergePointDecl)) {
             return false;
+        }
         TextualJMLMergePointDecl that = (TextualJMLMergePointDecl) o;
         return getMergeProc().equals(that.getMergeProc());
     }

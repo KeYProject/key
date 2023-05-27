@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.java.statement;
 
+import java.util.Map;
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -14,10 +17,8 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
-import org.key_project.util.ExtList;
 
-import java.util.Map;
-import java.util.Objects;
+import org.key_project.util.ExtList;
 
 /**
  * A JML assert statement.
@@ -45,7 +46,7 @@ public class JmlAssert extends JavaStatement {
     /**
      * services (needed for pretty printing)
      */
-    private Services services;
+    private final Services services;
 
     /**
      *
