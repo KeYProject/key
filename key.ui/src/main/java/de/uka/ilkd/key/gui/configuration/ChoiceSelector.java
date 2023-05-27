@@ -57,7 +57,7 @@ public class ChoiceSelector extends JDialog {
     public ChoiceSelector(JFrame mainWindow, ChoiceSettings settings) {
         super(mainWindow, "Taclet Base Configuration", true);
         this.settings = settings;
-        category2DefaultChoice = settings.getDefaultChoices();
+        category2DefaultChoice = new HashMap<>(settings.getDefaultChoices());
         if (category2DefaultChoice.isEmpty()) {
             JOptionPane.showConfirmDialog(ChoiceSelector.this,
                 "There are no Taclet Options available as the rule-files have not been parsed yet!",
