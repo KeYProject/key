@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 import de.uka.ilkd.key.util.parsing.BuildingException;
+import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -45,9 +46,11 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
         }
         try {
             return (T) ctx.accept(this);
+        } catch (BuildingExceptions | BuildingException e) {
+            throw e;
         } catch (Exception e) {
             LoggerFactory.getLogger(AbstractBuilder.class).error("", e);
-            if (!(e instanceof BuildingException) && ctx instanceof ParserRuleContext) {
+            if (ctx instanceof ParserRuleContext) {
                 throw new BuildingException((ParserRuleContext) ctx, e.getMessage(), e);
             }
             // otherwise we rethrow
@@ -146,10 +149,14 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
         return buildingIssues;
     }
 
-    protected BuildingIssue addWarning(ParserRuleContext node, String description) {
-        BuildingIssue be = BuildingIssue.createWarning(description, node, null);
+    protected BuildingIssue addWarning(ParserRuleContext ctx, Exception e, String message) {
+        BuildingIssue be = BuildingIssue.createWarning(message, ctx, e);
         getBuildingIssues().add(be);
         return be;
+    }
+
+    protected BuildingIssue addWarning(ParserRuleContext node, String description) {
+        return addWarning(node, null, description);
     }
 
     protected BuildingIssue addWarning(String description) {

@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.java;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
@@ -10,7 +11,12 @@ public class JavaBuildingExceptions extends RuntimeException {
     private final List<JavaBuildingIssue> issues;
 
     public JavaBuildingExceptions(List<JavaBuildingIssue> issues) {
+        super(createMessage(issues));
         this.issues = issues;
+    }
+
+    private static String createMessage(List<JavaBuildingIssue> issues) {
+        return issues.stream().map(JavaBuildingIssue::toString).collect(Collectors.joining("\n"));
     }
 
     public List<JavaBuildingIssue> getIssues() {
@@ -20,7 +26,7 @@ public class JavaBuildingExceptions extends RuntimeException {
     @Override
     public String toString() {
         return "JavaBuildingExceptions{" +
-            "issues=" + issues +
-            '}';
+                "issues=" + issues +
+                '}';
     }
 }

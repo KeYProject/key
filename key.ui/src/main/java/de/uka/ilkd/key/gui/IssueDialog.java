@@ -561,7 +561,7 @@ public final class IssueDialog extends JDialog {
         Set<PositionedIssueString> msg = Collections.singleton(extractMessage(exception));
         if (exception instanceof BuildingExceptions) {
             ((BuildingExceptions) exception).getErrors().forEach(
-                it -> LOGGER.info("Error: {}", it));
+                it -> LOGGER.info("Error", it));
         }
         IssueDialog dlg = new IssueDialog(parent, "Parser Error", msg, true, exception);
         dlg.setVisible(true);

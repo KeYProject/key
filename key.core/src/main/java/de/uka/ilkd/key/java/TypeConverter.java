@@ -746,12 +746,6 @@ public final class TypeConverter {
         ConstantExpressionEvaluator cee = services.getConstantExpressionEvaluator();
         try {
             var e = cee.evaluate(expr.toString());
-            /*
-             * if (!cee.isCompileTimeConstant(e)
-             * || e.calculateResolvedType() != ResolvedPrimitiveType.INT) {
-             * return false;
-             * }
-             */
             if (e instanceof IntegerLiteralExpr) {
                 int value = ((IntegerLiteralExpr) e).asNumber().intValue();
                 return (minValue <= value) && (value <= maxValue);

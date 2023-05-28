@@ -12,6 +12,8 @@ import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.util.ExtList;
 
+import java.util.List;
+
 /**
  * Field reference.
  *
@@ -21,7 +23,7 @@ public class SchematicFieldReference extends FieldReference
         implements MemberReference, ReferenceSuffix, TypeReferenceContainer, ExpressionContainer {
 
     private static final ProgramVariable SCHEMA_VARIABLE =
-        new LocationVariable(new ProgramElementName("SCHEMA_VARIABLE_IGNORE"), (Sort) null);
+            new LocationVariable(new ProgramElementName("SCHEMA_VARIABLE_IGNORE"), Sort.ANY);
     /**
      * Reference suffix
      */
@@ -33,10 +35,9 @@ public class SchematicFieldReference extends FieldReference
         this.schemaVariable = pe;
     }
 
-
-    public SchematicFieldReference(ExtList children, ReferencePrefix prefix) {
-        super(children, prefix);
-        this.schemaVariable = children.get(SchemaVariable.class);
+    public SchematicFieldReference(PositionInfo pi, List<Comment> c, SchemaVariable name, ReferencePrefix scope) {
+        super(pi, c, SCHEMA_VARIABLE, scope);
+        this.schemaVariable = name;
     }
 
 
@@ -63,6 +64,7 @@ public class SchematicFieldReference extends FieldReference
      * @return the program element at the given position
      * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
+    @Override
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
             if (index == 0) {
