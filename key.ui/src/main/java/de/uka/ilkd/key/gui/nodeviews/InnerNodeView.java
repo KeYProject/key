@@ -168,6 +168,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     @Override
     public synchronized void printSequent() {
         var time = System.nanoTime();
+        getHighlighter().removeAllHighlights();
         removeMouseListener(listener);
 
         setLineWidth(computeLineWidth());

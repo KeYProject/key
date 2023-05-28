@@ -9,7 +9,6 @@ import java.io.*;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.Collections;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -24,7 +23,7 @@ public class KeYResourceManager {
 
     private static final String DEFAULT_VERSION = "x.z.y";
     private static final Set<String> INVISIBLE_BRANCHES =
-        Set.copyOf(Collections.singletonList("master"));
+        Set.of("master", "main");
 
     /**
      * the unique instance

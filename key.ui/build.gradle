@@ -21,7 +21,7 @@ dependencies {
     api 'com.miglayout:miglayout-swing:11.1'
 
     //logging implementation used by the slf4j
-    implementation 'ch.qos.logback:logback-classic:1.4.6'
+    implementation 'ch.qos.logback:logback-classic:1.4.7'
 
     api 'org.dockingframes:docking-frames-common:1.1.3p1'
     api 'org.dockingframes:docking-frames-core:1.1.3p1'
