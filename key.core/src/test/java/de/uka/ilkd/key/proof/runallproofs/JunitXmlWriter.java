@@ -35,7 +35,8 @@ public class JunitXmlWriter implements AutoCloseable {
     public void close() {
         try (var p = new PrintWriter(writer)) {
             var total = testcases.size();
-            long disabled = testcases.stream().filter(it -> it.state == TestCaseState.SKIPPED).count();
+            long disabled =
+                testcases.stream().filter(it -> it.state == TestCaseState.SKIPPED).count();
             long errors = testcases.stream().filter(it -> it.state == TestCaseState.ERROR).count();
             long failures =
                 testcases.stream().filter(it -> it.state == TestCaseState.FAILED).count();

@@ -1,8 +1,10 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
+import java.io.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,12 +22,6 @@ import de.uka.ilkd.key.util.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -184,9 +180,9 @@ public class TestFile implements Serializable {
                 replayResult = env.getReplayResult();
                 if (replayResult.hasErrors() && verbose) {
                     LOGGER.warn("... error(s) while loading");
-                List<Throwable> errors = replayResult.getErrorList();
+                    List<Throwable> errors = replayResult.getErrorList();
                     for (int i = 0; i < errors.size(); i++) {
-                    Throwable error = errors.get(i);
+                        Throwable error = errors.get(i);
                         LOGGER.warn("Error " + (i + 1) + ":", error);
                     }
                 }
@@ -203,9 +199,11 @@ public class TestFile implements Serializable {
 
                 autoMode(env, loadedProof, script);
 
-                if (testProperty == TestProperty.PROVABLE || testProperty == TestProperty.NOTPROVABLE) {
-                loadedProof.saveToFile(new File(keyFile.getAbsolutePath() + ".save.proof"));
-            }boolean closed = loadedProof.closed();
+                if (testProperty == TestProperty.PROVABLE
+                        || testProperty == TestProperty.NOTPROVABLE) {
+                    loadedProof.saveToFile(new File(keyFile.getAbsolutePath() + ".save.proof"));
+                }
+                boolean closed = loadedProof.closed();
                 success = (testProperty == TestProperty.PROVABLE) == closed;
                 if (verbose) {
                     LOGGER.info("... finished proof: " + (closed ? "closed." : "open goal(s)"));

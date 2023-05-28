@@ -35,14 +35,6 @@ import recoder.java.statement.EmptyStatement;
 import recoder.java.statement.For;
 import recoder.list.generic.ASTList;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
 /**
  * @author Alexander Weigl
  * @version 1 (9/12/21)
