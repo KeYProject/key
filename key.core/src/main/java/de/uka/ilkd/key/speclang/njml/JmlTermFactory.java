@@ -546,13 +546,22 @@ public final class JmlTermFactory {
 
         Term ife = tb.ife(tb.convertToFormula(result.getTerm()), aTerm, bTerm);
         if (a.getType() != null && b.getType() != null) {
-            KeYJavaType promotedType = services.getTypeConverter().getPromotedType(a.getType(), b.getType());
-            if(promotedType != null) {
-                result = new SLExpression(ife, promotedType);
+            if(a.getType().equals(b.getType())) {
+                // same type: obvious case
+                result = new SLExpression(ife, a.getType());
             } else {
-                result = new SLExpression(ife);
+                KeYJavaType promotedType = services.getTypeConverter().getPromotedType(a.getType(), b.getType());
+                if(promotedType != null) {
+                    // different, put compatible types: add a cast to make sure that
+                    // an int is cast to a float e.g.
+                    result = new SLExpression(tb.cast(promotedType.getSort(), ife), promotedType);
+                } else {
+                    // TODO this is an NPE in the making
+                    result = new SLExpression(ife);
+                }
             }
         } else {
+            // TODO this is an NPE in the making
             result = new SLExpression(ife);
         }
         return result;
