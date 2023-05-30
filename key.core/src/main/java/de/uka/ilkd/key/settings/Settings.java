@@ -15,7 +15,7 @@ public interface Settings {
      * gets a Properties object and has to perform the necessary steps in order to change this
      * object in a way that it represents the stored settings
      *
-     * @deprecated Deprecated in favour of {@link #readSettings(Properties)}
+     * @deprecated Deprecated in favour of {@link #readSettings(Configuration)}
      */
     @Deprecated
     void readSettings(Properties props);
