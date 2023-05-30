@@ -137,7 +137,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
 
         public Configuration asConfiguration() {
             final var cfg = new ConfigurationBuilder();
-            var res = cfg.visitCfile(ctx);
+            List<Object> res = cfg.visitCfile(ctx);
             if (res.size() > 0)
                 return (Configuration) res.get(0);
             else
