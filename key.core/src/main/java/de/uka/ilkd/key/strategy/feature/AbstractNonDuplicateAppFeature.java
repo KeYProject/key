@@ -1,11 +1,9 @@
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.*;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
@@ -23,9 +21,7 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 
 
-
 public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeature {
-
     protected AbstractNonDuplicateAppFeature() {}
 
     /**
@@ -35,13 +31,6 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      */
     protected abstract boolean comparePio(TacletApp newApp, TacletApp oldApp,
             PosInOccurrence newPio, PosInOccurrence oldPio);
-
-    /**
-     * Check whether a semisequent contains a formula. Again, one can either search for the same or
-     * an equal formula
-     */
-    protected abstract boolean semiSequentContains(Semisequent semisequent, SequentFormula cfma);
-
 
     /**
      * Check whether the old rule application <code>ruleCmp</code> is a duplicate of the new
@@ -131,36 +120,16 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * the sequent
      */
     protected boolean noDuplicateFindTaclet(TacletApp app, PosInOccurrence pos, Goal goal) {
-        final SequentFormula focusFor = pos.sequentFormula();
-        final boolean antec = pos.isInAntec();
+        final Node node = goal.node();
+        final AppliedRuleAppsNameCache cache =
+            node.proof().getServices().getCaches().getAppliedRuleAppsNameCache();
+        List<RuleApp> apps = cache.get(node, app.rule().name());
 
-        Node node = goal.node();
-
-        int i = 0;
-        while (!node.root()) {
-            final Node par = node.parent();
-
-            ++i;
-            if (i > 100) {
-                i = 0;
-
-                final Sequent pseq = par.sequent();
-                if (antec) {
-                    if (!semiSequentContains(pseq.antecedent(), focusFor)) {
-                        return true;
-                    }
-                } else {
-                    if (!semiSequentContains(pseq.succedent(), focusFor)) {
-                        return true;
-                    }
-                }
-            }
-
-            if (sameApplication(par.getAppliedRuleApp(), app, pos)) {
+        // Check all rules with this name
+        for (RuleApp a : apps) {
+            if (sameApplication(a, app, pos)) {
                 return false;
             }
-
-            node = par;
         }
 
         return true;

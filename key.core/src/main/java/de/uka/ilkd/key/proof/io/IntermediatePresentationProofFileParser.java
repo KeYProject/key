@@ -256,7 +256,9 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
                 ((AppNodeIntermediate) currNode).setNotes(ruleInfo.notes);
             }
             break;
-
+        case SOLVERTYPE:
+            ((BuiltinRuleInformation) ruleInfo).solver = str;
+            break;
         default:
             break;
         }
@@ -361,6 +363,10 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
             result = new MergePartnerAppIntermediate(builtinInfo.currRuleName,
                 new Pair<>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
                 builtinInfo.currCorrespondingMergeNodeId, builtinInfo.currNewNames);
+        } else if (builtinInfo.currRuleName.equals("SMTRule")) {
+            result = new SMTAppIntermediate(builtinInfo.currRuleName,
+                new Pair<>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
+                builtinInfo.solver);
         } else {
             result = new BuiltInAppIntermediate(builtinInfo.currRuleName,
                 new Pair<>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
@@ -448,7 +454,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         protected Class<? extends AbstractPredicateAbstractionLattice> currPredAbstraLatticeType =
             null;
         protected String currAbstractionPredicates = null;
-        public String currUserChoices = null;
+        protected String currUserChoices = null;
+        protected String solver;
 
         public BuiltinRuleInformation(String ruleName) {
             super(ruleName);
