@@ -545,8 +545,13 @@ public final class JmlTermFactory {
         Term bTerm = b.getType() == bool ? tb.convertToFormula(b.getTerm()) : b.getTerm();
 
         Term ife = tb.ife(tb.convertToFormula(result.getTerm()), aTerm, bTerm);
-        if (a.getType() != null && a.getType().equals(b.getType())) {
-            result = new SLExpression(ife, a.getType());
+        if (a.getType() != null && b.getType() != null) {
+            KeYJavaType promotedType = services.getTypeConverter().getPromotedType(a.getType(), b.getType());
+            if(promotedType != null) {
+                result = new SLExpression(ife, promotedType);
+            } else {
+                result = new SLExpression(ife);
+            }
         } else {
             result = new SLExpression(ife);
         }
