@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 import de.uka.ilkd.key.strategy.IfInstantiationCachePool;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature.TermInfo;
+import de.uka.ilkd.key.strategy.feature.AppliedRuleAppsNameCache;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesGraph;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
 import de.uka.ilkd.key.util.Pair;
@@ -139,6 +140,9 @@ public class ServiceCaches {
     private final IfFormulaInstantiationCache ifFormulaInstantiationCache =
         new IfFormulaInstantiationCache();
 
+    /** applied rule apps name cache */
+    private final AppliedRuleAppsNameCache appliedRuleAppsNameCache =
+        new AppliedRuleAppsNameCache();
 
     /**
      * Returns the cache used by {@link TermTacletAppIndexCacheSet} instances.
@@ -209,4 +213,7 @@ public class ServiceCaches {
         return ifFormulaInstantiationCache;
     }
 
+    public AppliedRuleAppsNameCache getAppliedRuleAppsNameCache() {
+        return appliedRuleAppsNameCache;
+    }
 }

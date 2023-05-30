@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.nparser.builder;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -49,12 +48,6 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         this.nss = nss;
     }
 
-    protected void semanticErrorMsg(String label, ParserRuleContext ctx, Object... args) {
-        String msg = bundle.getString(label);
-        MessageFormat formatter = new MessageFormat(msg);
-        semanticError(ctx, formatter.format(args));
-    }
-
     @Override
     public List<String> visitPvset(KeYParser.PvsetContext ctx) {
         return mapOf(ctx.varId());
@@ -83,13 +76,13 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     protected Named lookup(Name n) {
-        final Namespace[] lookups =
+        final Namespace<?>[] lookups =
             { programVariables(), variables(), schemaVariables(), functions() };
         return doLookup(n, lookups);
     }
 
-    protected <T> T doLookup(Name n, Namespace... lookups) {
-        for (Namespace lookup : lookups) {
+    protected <T> T doLookup(Name n, Namespace<?>... lookups) {
+        for (Namespace<?> lookup : lookups) {
             Object l;
             if (lookup != null && (l = lookup.lookup(n)) != null) {
                 try {
@@ -369,8 +362,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             try {
                 String guess = "java.lang." + type;
                 kjt = getJavaInfo().getKeYJavaType(guess);
-            } catch (Exception e) {
-                kjt = null;
+            } catch (Exception ignored) {
             }
         }
 
@@ -380,8 +372,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
                 JavaBlock jb = getJavaInfo().readJavaBlock("{" + type + " k;}");
                 kjt = ((VariableDeclaration) ((StatementBlock) jb.program()).getChildAt(0))
                         .getTypeReference().getKeYJavaType();
-            } catch (Exception e) {
-                kjt = null;
+            } catch (Exception ignored) {
             }
         }
 

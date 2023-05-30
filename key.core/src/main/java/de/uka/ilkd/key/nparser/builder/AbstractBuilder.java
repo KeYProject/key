@@ -46,7 +46,7 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
             return (T) ctx.accept(this);
         } catch (Exception e) {
             if (!(e instanceof BuildingException) && ctx instanceof ParserRuleContext) {
-                semanticError((ParserRuleContext) ctx, e.getMessage(), e);
+                throw new BuildingException((ParserRuleContext) ctx, e);
             }
             // otherwise we rethrow
             throw e;
