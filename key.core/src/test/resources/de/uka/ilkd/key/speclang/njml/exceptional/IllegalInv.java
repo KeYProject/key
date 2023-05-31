@@ -1,11 +1,12 @@
-// exceptionClass: Something
-// msgContains: Unexepected
-// location: xxxx
+// exceptionClass: ConvertException
+// msgContains: mismatched input ';'
+// position: 17/19
 // verbose: true
+// broken: true
 
-// This is ignored for the moment to allow the testing infrastructure to reach main. ...
+// currently reports the wrong position
 
-/* Used to be an NPE 
+/* Used to be an NPE
 Caused by: java.lang.NullPointerException: Cannot read field "second" because "pos" is null
 	at de.uka.ilkd.key.java.Recoder2KeY.reportError(Recoder2KeY.java:1258)
 	at de.uka.ilkd.key.java.Recoder2KeY.recoderCompilationUnitsAsFiles(Recoder2KeY.java:401)

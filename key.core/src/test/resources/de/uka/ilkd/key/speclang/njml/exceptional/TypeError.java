@@ -1,10 +1,10 @@
-// exceptionClass: Something
-// msgContains: Unexepected
-// location: xxxx
+// exceptionClass: ConvertException
+// msgContains: XXXX
+// positiion: 19/xxx
 // verbose: true
-// ignore: true
+// broken: true
 
-// This is ignored for the moment to allow the testing infrastructure to reach main. ...
+// This is broken since it exposes an IllegalArgumentException
 
 /* Used to be an NPE 
 Caused by: java.lang.NullPointerException: Cannot read field "second" because "pos" is null
@@ -15,7 +15,7 @@ Caused by: java.lang.NullPointerException: Cannot read field "second" because "p
 
 class TypeError {
 
-    /*@ public normal_bevhaviour
+    /*@ public normal_behaviour
       @  ensures 1 + 1 == true;
       @*/
     public void m() {}

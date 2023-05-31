@@ -2,9 +2,15 @@ package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
+import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
+import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
+import de.uka.ilkd.key.util.ExceptionTools;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
@@ -26,19 +32,21 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class JMLParserExceptionTest {
 
+    public static final boolean IGNORE_BROKEN = true;
+
     private final static Pattern PROP_LINE = Pattern.compile("// *(\\p{Alnum}+) *[:=] *(.*)");
 
-    public static Stream<Path> getFiles() throws URISyntaxException, IOException {
+    public static Stream<Arguments> getFiles() throws URISyntaxException, IOException {
         URL fileURL = JMLParserExceptionTest.class.getResource("exceptional");
         assert fileURL != null : "Directory 'exceptional' not found";
         assert fileURL.getProtocol().equals("file") : "Test resources must be in file system";
         Path dir = Paths.get(fileURL.toURI());
-        return Files.list(dir);
+        return Files.list(dir).map(it -> Arguments.of(it, it.getFileName()));
     }
 
-    @ParameterizedTest(name = "exceptional case {0}")
+    @ParameterizedTest(name = "case {1}")
     @MethodSource("getFiles")
-    public void testParseAndInterpret(Path file) throws Exception {
+    public void testParseAndInterpret(Path file, Path localFilename) throws Exception {
         List<String> lines = Files.readAllLines(file);
         Properties props = new Properties();
         for (String line : lines) {
@@ -50,16 +58,14 @@ public class JMLParserExceptionTest {
             }
         }
 
-        if("true".equals(props.get("ignore"))) {
+        if("true".equals(props.get("ignore")) || IGNORE_BROKEN && "true".equals(props.get("broken"))) {
             Assumptions.abort("This test case has been marked to be ignored");
         }
 
         try {
-            UserInterfaceControl ui = new DefaultUserInterfaceControl();
-            AbstractProblemLoader pl = ui.load(null, file.toFile(),
-                    null, null, null,
-                    null, false, null);
-
+            ProblemLoaderControl control = new DefaultUserInterfaceControl(null);
+            AbstractProblemLoader pl = new SingleThreadProblemLoader(file.toFile(), null, null, null, AbstractProfile.getDefaultProfile(), false,
+                    control, false, new Properties());
             pl.setLoadSingleJavaFile(true);
             pl.load();
             // No exception encountered
@@ -93,6 +99,14 @@ public class JMLParserExceptionTest {
             msg = props.getProperty("msgIs");
             if (msg != null) {
                 assertEquals(msg, e.getMessage());
+            }
+
+            String loc = props.getProperty("position");
+            if (loc != null) {
+                Location actLoc = ExceptionTools.getLocation(e);
+                assertNotNull(actLoc, "Exception location must not be null");
+                assertEquals(file.toUri().toURL(), actLoc.getFileURL(), "Exception location must point to file under test");
+                assertEquals(loc, actLoc.getPosition().toString());
             }
         }
     }
