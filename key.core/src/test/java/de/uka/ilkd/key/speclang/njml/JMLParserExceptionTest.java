@@ -25,6 +25,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentest4j.AssertionFailedError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,72 +40,16 @@ import static org.junit.jupiter.api.Assertions.*;
  * that contains an error that should be presented to the user (like syntax
  * error, unresolved names, ...)
  *
- * The first lines of the Java file may contain meta data on what to expect
- * from the exception. Meta data are key-value pairs like
- *
- * <pre>
- * // &lt;key&gt;: &lt;value&gt;
- * </pre>
- *
- * The following keys are supported
- * <table>
- * <tr>
- * <th>Key</th>
- * <th>Description</th>
- * </tr>
- * <tr>
- * <td>{@code noException}</td>
- * <td>This particular file must
- * <b>not</b> throw an exception. Default: false</td>
- * </tr>
- * <tr>
- * <td>{@code exceptionClass}</td>
- * <td>Either a fully qualified class name or
- * a short classname (w/o package prefix) of the actual type of the
- * exception. Optional.</td>
- * </tr>
- * <tr>
- * <td>{@code msgContains}</td>
- * <td>A string which occur somewhere in the
- * exception message (obtained via {@link Exception#getMessage()}). Optional</td>
- * </tr>
- * <tr>
- * <td>{@code msgMatches}</td>
- * <td>A regular expression that must match the exception message (obtained via
- * {@link Exception#getMessage()}). Optional</td>
- * </tr>
- * <tr>
- * <td>{@code msgIs}</td>
- * <td>A string to which the exception message (obtained via {@link Exception#getMessage()}) must be
- * equal. Optional</td>
- * </tr>
- * <tr>
- * <td>{@code position}</td>
- * <td>A tuple in form {@code <line>/<col>} describing the position within this file. Both line and
- * column are 1-based.
- * It is also checked that the URL of the location points to the file under test. Optional</td>
- * </tr>
- * <tr>
- * <td>{@code ignore}</td>
- * <td>Ignore this test case if set to true. Default is false.</td>
- * </tr>
- * <tr>
- * <td>{@code broken}</td>
- * <td>If broken tests are disabled, ignore this test case if set to true. Indicates that this needs
- * to be fixed! Default is false.</td>
- * </tr>
- * <tr>
- * <td>{@code verbose}</td>
- * <td>Print the stacktrace if set to true. Default is false.</td>
- * </tr>
- * </table>
- *
+ * See README.md in said directory for information on the meta-data inside
+ * the Java files.
  *
  * @author Mattias Ulbrich
  */
 public class JMLParserExceptionTest {
 
-    public static final boolean IGNORE_BROKEN = true;
+    private static final boolean IGNORE_BROKEN = true;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JMLParserExceptionTest.class);
 
     private final static Pattern PROP_LINE =
         Pattern.compile("//\\s*(\\p{Alnum}+)\\s*[:=]\\s*(.*?)\\s*");
@@ -113,12 +59,20 @@ public class JMLParserExceptionTest {
         assert fileURL != null : "Directory 'exceptional' not found";
         assert fileURL.getProtocol().equals("file") : "Test resources must be in file system";
         Path dir = Paths.get(fileURL.toURI());
-        return Files.list(dir).map(it -> Arguments.of(it, it.getFileName()));
+        return Files.walk(dir).filter(it -> it.getFileName().toString().endsWith(".java"))
+                .map(it -> Arguments.of(it, it.getFileName()));
     }
+
 
     @ParameterizedTest(name = "case {1}")
     @MethodSource("getFiles")
     public void testParseAndInterpret(Path file, Path localFilename) throws Exception {
+        parseAndInterpret(file);
+    }
+
+    // This method does not depend on anything can also be called from other test cases.
+    public static void parseAndInterpret(Path file) throws Exception {
+
         List<String> lines = Files.readAllLines(file);
         Properties props = new Properties();
         for (String line : lines) {
@@ -148,7 +102,7 @@ public class JMLParserExceptionTest {
 
         } catch (Throwable e) {
             if ("true".equals(props.getProperty("verbose"))) {
-                e.printStackTrace();
+                LOGGER.info("Exception raised while parsing " + file.getFileName(), e);
             }
 
             try {
@@ -189,9 +143,9 @@ public class JMLParserExceptionTest {
                     assertEquals(loc, actLoc.getPosition().toString());
                 }
             } catch (AssertionFailedError assertionFailedError) {
-                // in case of a failed assertion print the stacktrace
-                System.err.println("Original stacktrace:");
-                e.printStackTrace();
+                // in case of a failed assertion log the stacktrace
+                LOGGER.debug("Original stacktrace leading to failed junit assertion in "
+                    + file.getFileName(), e);
                 throw assertionFailedError;
             }
         }
