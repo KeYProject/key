@@ -1255,7 +1255,7 @@ public class Recoder2KeY implements JavaReader {
         }
 
         Pair<String, Position> pos = extractPositionInfo(cause.toString());
-        if(pos != null) {
+        if (pos != null) {
             reportErrorWithPositionInFile(message, cause, pos.second, pos.first);
         } else {
             reportErrorWithPositionInFile(message, cause, null, null);

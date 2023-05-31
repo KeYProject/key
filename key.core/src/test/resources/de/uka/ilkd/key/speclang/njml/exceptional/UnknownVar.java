@@ -1,7 +1,7 @@
 // exceptionClass: PosConvertException
 // msgContains: Could not resolve FieldReference "unknownVar"
 // position: 12/9
-// verbose: true
+
 
 class UnknownVar {
 
