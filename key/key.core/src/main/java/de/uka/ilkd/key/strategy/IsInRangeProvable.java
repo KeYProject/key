@@ -3,6 +3,7 @@ package de.uka.ilkd.key.strategy;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.uka.ilkd.key.loopinvgen.RuleApplication;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -30,12 +31,13 @@ public class IsInRangeProvable implements Feature {
     
     private final int timeoutInMillis;
     private final int maxRuleApps;
-    
-    private IsInRangeProvable(int timeoutInMillis, int maxRuleApps) {
+
+    protected IsInRangeProvable(int timeoutInMillis, int maxRuleApps) {
         this.timeoutInMillis = timeoutInMillis;
         this.maxRuleApps = maxRuleApps;
     }
-    
+
+
     /**
      * Helper method used to extract the axioms from a given sequent
      * @param seq the {@link Sequent} from which the axioms are extracted
@@ -57,9 +59,9 @@ public class IsInRangeProvable implements Feature {
         final SequentFormula formulaToIgnore = ignore.sequentFormula();
         
         // extract formulas with equality (on integer terms) or one of the operators in <code>ops</code> as top level operator
-        final ImmutableSet<Term> result = 
+        final ImmutableSet<Term> result =
                 extractAssumptionsFrom(seq.antecedent(), false, DefaultImmutableSet.<Term>nil(), ops, formulaToIgnore, services);
-        
+
         return extractAssumptionsFrom(seq.succedent(), true, result, ops, formulaToIgnore, services);
     }
 
@@ -162,7 +164,7 @@ public class IsInRangeProvable implements Feature {
        
         final ImmutableSet<Term> axioms = collectAxioms(goal.sequent(), pos, services);
                 
-        Term toProve = createConsequence(pos, services);              
+        Term toProve = createConsequence(app, pos, goal);
         
         if (isProvable(toSequent(axioms, toProve), services)) {
             return NumberRuleAppCost.getZeroCost();
@@ -175,11 +177,14 @@ public class IsInRangeProvable implements Feature {
     /**
      * creates the term to be proven to follow from a (possibly empty) set of axioms
      * @param pos the {@link PosInOccurrence} of the focus term
-     * @param services the {@link Services}
+     * @param goal the {@link Goal}
      * @return the term to prove
      */
-    protected Term createConsequence(final PosInOccurrence pos, final Services services) {
-        
+    protected Term createConsequence(final RuleApp app,
+                                     final PosInOccurrence pos,
+                                     final Goal goal) {
+
+        final Services services = goal.proof().getServices();
         final Term termToCheck = pos.subTerm().sub(0);
         final TermBuilder tb = services.getTermBuilder();
         final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();

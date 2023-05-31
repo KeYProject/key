@@ -733,7 +733,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "similarLocSetArguments",
             ifZero(MatchedIfFeature.INSTANCE,
                 ScaleFeature.createAffine(
-                    SimilarityCountFeature.create(instOf("loc1"), instOf("loc2")),
+                    SimilarityCountFeature.create(instOf("loc1"),
+                            instOf("loc2")),
                     -10, 250),
                 longConst(-500)));
 
@@ -1230,17 +1231,66 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 instOf("colEnd"),
                 instOf("colStart")));
 
+        Feature nonEmptyRows = add(
+                applyTF("rowStart", tf.polynomial),
+                applyTF("rowEnd", tf.polynomial),
+                PolynomialValuesCmpFeature.leq(
+                        instOf("rowStart"),
+                        instOf("rowEnd")));
+
+        Feature nonEmptyCols = add(
+                applyTF("colStart", tf.polynomial),
+                applyTF("colEnd", tf.polynomial),
+                PolynomialValuesCmpFeature.leq(
+                        instOf("colStart"),
+                        instOf("colEnd")));
+
+
 //        Feature rowEndGeqRowStart = geq("rowEnd", "rowStart");
 //        Feature colEndGeqColStart = geq("colEnd", "colStart");
 
+        Feature emptyRows = IsInRangeCustom.create(instOf("rowStart"),
+                instOf("rowEnd"));
+        Feature emptyCols = IsInRangeCustom.create(instOf("colStart"),
+                instOf("colEnd"));
+
+        Feature rowStartIsLiteral = applyTF(instOf("rowStart"), tf.literal);
+        Feature rowEndIsLiteral = applyTF(instOf("rowEnd"), tf.literal);
+        Feature colStartIsLiteral = applyTF(instOf("colStart"), tf.literal);
+        Feature colEndIsLiteral = applyTF(instOf("colEnd"), tf.literal);
+
         bindRuleSet(d, "simplify_matrix_range_literal",
+                ifZero(or(rowEndLessThanRowStart, colEndLessThanColStart),
+                        longConst(-3000),
+                        ifZero(or(applyTF(instOf("rowEnd"), tf.negLiteral),
+                                        applyTF(instOf("colEnd"), tf.negLiteral)),
+                                add(longConst(-250),
+                                        ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 50)),
+                                //   ifZero(add(nonEmptyRows, nonEmptyCols),
+                                //   inftyConst(),
+                                 inftyConst())));
+
+
+
+        bindRuleSet(d, "simplify_matrix_range_literal_2",
             ifZero(or(rowEndLessThanRowStart, colEndLessThanColStart),
                 longConst(-3000),
                 ifZero(or(applyTF(instOf("rowEnd"), tf.negLiteral),
                         applyTF(instOf("colEnd"), tf.negLiteral)),
                         add(longConst(-250),
                             ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 50)),
-                    inftyConst()))) ;
+                     //   ifZero(add(nonEmptyRows, nonEmptyCols),
+                     //   inftyConst(),
+                        ifZero(or(
+                                //or(add(rowStartIsLiteral, not(rowEndIsLiteral)),
+                                   add(not(rowStartIsLiteral), rowEndIsLiteral),
+                                //or(add(colStartIsLiteral, not(colEndIsLiteral)),
+                                        add(not(colStartIsLiteral), colEndIsLiteral)
+                                ),
+                            ifZero(or(emptyRows, emptyCols),
+                                add(longConst(-250),
+                                        ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 50)),
+                                                         inftyConst()), inftyConst()))));
 
 
         bindRuleSet(d, "pull_out_matrixRange",

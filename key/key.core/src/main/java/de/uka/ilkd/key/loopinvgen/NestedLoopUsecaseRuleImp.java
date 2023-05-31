@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.ldt.DependenciesLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -95,7 +96,22 @@ public class NestedLoopUsecaseRuleImp{
     private void constructUsecase(Term innerLI, Term anonUpdAndEv, Term guard) {
         if(guard!=null) {
             //Ante:
-            Term updatedLeft = tb.apply(anonUpdAndEv, tb.and(innerLI, tb.not(guard)));
+//            Term negatedGuard = tb.not(guard); // too weak
+            IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
+            Term strongNegatedGuard = tb.tt();
+            if(guard.op() == intLDT.getLessThan()){
+                strongNegatedGuard = tb.equals(guard.sub(0), guard.sub(1));
+            } else if(guard.op() == intLDT.getLessOrEquals()){
+                strongNegatedGuard = tb.equals(guard.sub(0), tb.add(guard.sub(1),tb.one()));
+            } else if(guard.op() == intLDT.getGreaterThan()){
+                strongNegatedGuard = tb.equals(guard.sub(0), guard.sub(1));
+            } else if(guard.op() == intLDT.getGreaterOrEquals()){
+                strongNegatedGuard = tb.equals(guard.sub(0), tb.sub(guard.sub(1),tb.one()));
+            } else {
+                strongNegatedGuard = tb.not(guard);
+            }
+
+            Term updatedLeft = tb.apply(anonUpdAndEv, tb.and(innerLI, strongNegatedGuard));
             goal.addFormula(new SequentFormula(updatedLeft), true, true);
             //Succ:
             SequentFormula programFormula = null;// hand the sequent formula over and remove the code below

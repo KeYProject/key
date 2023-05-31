@@ -71,26 +71,27 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
 
 		for (Term w : weakenedDepPreds) {
-			if (locSetToPredicate.hasVertex(w.sub(0)) && locSetToPredicate.hasEdge(w.sub(0),w)) {
+			if(w.arity()>0){
+				System.out.println("Checking lattice for: " + w);
+				if (locSetToPredicate.hasVertex(w.sub(0)) && locSetToPredicate.hasEdge(w.sub(0), w)) {
 					depPredicates.add(w);
 					System.out.println("In lattice: " + w);
 					inlattice++;
-			}
-			else{
-				if (sequentImpliesPredicate(w)) {
-					depPredicates.add(w);
-					locSetToPredicate.addEdge(w.sub(0), w, false);
-					if(w.op() == depLDT.getNoR()){
-						locSetToPredicate.addEdge(w.sub(0),tb.noRaW(w.sub(0)), false);
-						locSetToPredicate.addEdge(w.sub(0),tb.noWaR(w.sub(0)), false);
-					} else if(w.op() == depLDT.getNoW()){
-						locSetToPredicate.addEdge(w.sub(0),tb.noRaW(w.sub(0)), false);
-						locSetToPredicate.addEdge(w.sub(0),tb.noWaR(w.sub(0)), false);
-						locSetToPredicate.addEdge(w.sub(0),tb.noWaW(w.sub(0)), false);
+				} else {
+					if (sequentImpliesPredicate(w)) {
+						depPredicates.add(w);
+						locSetToPredicate.addEdge(w.sub(0), w, false);
+						if (w.op() == depLDT.getNoR()) {
+							locSetToPredicate.addEdge(w.sub(0), tb.noRaW(w.sub(0)), false);
+							locSetToPredicate.addEdge(w.sub(0), tb.noWaR(w.sub(0)), false);
+						} else if (w.op() == depLDT.getNoW()) {
+							locSetToPredicate.addEdge(w.sub(0), tb.noRaW(w.sub(0)), false);
+							locSetToPredicate.addEdge(w.sub(0), tb.noWaR(w.sub(0)), false);
+							locSetToPredicate.addEdge(w.sub(0), tb.noWaW(w.sub(0)), false);
+						}
 					}
 				}
 			}
-
 		}
 		System.out.println("Lattice was useful " + inlattice + " times");
 		System.out.println("DEP PREDS: " + depPredicates);
@@ -526,18 +527,20 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 					}
 				}
 			}
+			Term outerIndexPlusOne = tb.add(indexOuter,tb.one());
 			if(!sProof.proofEquality(outLow, outHigh)) {
 				if (sProof.proofLEQ(outLow, indexOuter)) {
 					lowToOuter = tb.matrixRange(heap, arr, outLow, indexOuter, inLow, inHigh);
-					if (sProof.proofLEQ(indexOuter, outHigh)) {
-						outerToHigh = tb.matrixRange(heap, arr, indexOuter, outHigh, inLow, inHigh);
+
+					if (sProof.proofLEQ(outerIndexPlusOne, outHigh)) {
+						outerToHigh = tb.matrixRange(heap, arr, outerIndexPlusOne, outHigh, inLow, inHigh);
 					} else {
 						outerToHigh = tb.empty();
 					}
 				} else {
 					lowToOuter = tb.empty();
-					if (sProof.proofLEQ(indexOuter, outHigh)) {
-						outerToHigh = tb.matrixRange(heap, arr, indexOuter, outHigh, inLow, inHigh);
+					if (sProof.proofLEQ(outerIndexPlusOne, outHigh)) {
+						outerToHigh = tb.matrixRange(heap, arr, outerIndexPlusOne, outHigh, inLow, inHigh);
 					} else {
 						outerToHigh = tb.empty();
 					}
