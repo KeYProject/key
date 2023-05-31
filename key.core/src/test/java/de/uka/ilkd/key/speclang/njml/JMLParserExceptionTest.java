@@ -105,7 +105,8 @@ public class JMLParserExceptionTest {
 
     public static final boolean IGNORE_BROKEN = true;
 
-    private final static Pattern PROP_LINE = Pattern.compile("//\\s*(\\p{Alnum}+)\\s*[:=]\\s*(.*?)\\s*");
+    private final static Pattern PROP_LINE =
+        Pattern.compile("//\\s*(\\p{Alnum}+)\\s*[:=]\\s*(.*?)\\s*");
 
     public static Stream<Arguments> getFiles() throws URISyntaxException, IOException {
         URL fileURL = JMLParserExceptionTest.class.getResource("exceptional");
