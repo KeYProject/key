@@ -96,16 +96,18 @@ public class JMLParserExceptionTest {
             pl.setLoadSingleJavaFile(true);
             pl.load();
             // No exception encountered
-            assertEquals("true", props.get("noException"),
+            assertEquals("true", props.getProperty("noException"),
                 "Unless 'noException: true' has been set, an exception is expected");
 
+        } catch (AssertionFailedError ae) {
+            throw ae;
         } catch (Throwable e) {
             if ("true".equals(props.getProperty("verbose"))) {
                 LOGGER.info("Exception raised while parsing {}", file.getFileName(), e);
             }
 
             try {
-                assertNotEquals("true", props.get("noException"),
+                assertNotEquals("true", props.getProperty("noException"),
                     "'noException: true' has been set: no exception expected");
 
                 // We must use throwable here since there are some Errors around ...
@@ -143,7 +145,8 @@ public class JMLParserExceptionTest {
                 }
             } catch (AssertionFailedError assertionFailedError) {
                 // in case of a failed assertion log the stacktrace
-                LOGGER.debug("Original stacktrace leading to failed junit assertion in {}", file.getFileName(), e);
+                LOGGER.debug("Original stacktrace leading to failed junit assertion in {}",
+                    file.getFileName(), e);
                 throw assertionFailedError;
             }
         }
