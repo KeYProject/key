@@ -72,7 +72,6 @@ public class JMLParserExceptionTest {
 
     // This method does not depend on anything can also be called from other test cases.
     public static void parseAndInterpret(Path file) throws Exception {
-
         List<String> lines = Files.readAllLines(file);
         Properties props = new Properties();
         for (String line : lines) {
@@ -102,7 +101,7 @@ public class JMLParserExceptionTest {
 
         } catch (Throwable e) {
             if ("true".equals(props.getProperty("verbose"))) {
-                LOGGER.info("Exception raised while parsing " + file.getFileName(), e);
+                LOGGER.info("Exception raised while parsing {}", file.getFileName(), e);
             }
 
             try {
@@ -144,8 +143,7 @@ public class JMLParserExceptionTest {
                 }
             } catch (AssertionFailedError assertionFailedError) {
                 // in case of a failed assertion log the stacktrace
-                LOGGER.debug("Original stacktrace leading to failed junit assertion in "
-                    + file.getFileName(), e);
+                LOGGER.debug("Original stacktrace leading to failed junit assertion in {}", file.getFileName(), e);
                 throw assertionFailedError;
             }
         }
