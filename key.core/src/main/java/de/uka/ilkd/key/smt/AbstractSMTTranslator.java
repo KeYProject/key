@@ -3,36 +3,21 @@ package de.uka.ilkd.key.smt;
 
 import java.util.*;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.assumptions.DefaultTacletSetTranslation;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,8 +47,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     /** remember all function declarations */
     protected static class FunctionWrapper {
-        private StringBuilder name;
-        private Function function;
+        private final StringBuilder name;
+        private final Function function;
         private boolean usedForUnique;
 
         /**
@@ -108,37 +93,39 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     // key is the term to identify the function binding vars, value is the name used for the
     // function
-    private HashMap<Term, StringBuilder> uninterpretedBindingFunctionNames = new LinkedHashMap<>();
+    private final HashMap<Term, StringBuilder> uninterpretedBindingFunctionNames =
+        new LinkedHashMap<>();
 
     // key is the term to identify the predicate binding vars, value is the name used for the
     // predicate
-    private HashMap<Term, StringBuilder> uninterpretedBindingPredicateNames = new LinkedHashMap<>();
+    private final HashMap<Term, StringBuilder> uninterpretedBindingPredicateNames =
+        new LinkedHashMap<>();
 
-    private HashMap<Operator, ArrayList<Sort>> functionDecls = new LinkedHashMap<>();
+    private final HashMap<Operator, ArrayList<Sort>> functionDecls = new LinkedHashMap<>();
 
-    private HashSet<Function> specialFunctions = new LinkedHashSet<>();
+    private final HashSet<Function> specialFunctions = new LinkedHashSet<>();
 
-    private HashMap<Operator, ArrayList<Sort>> predicateDecls = new LinkedHashMap<>();
+    private final HashMap<Operator, ArrayList<Sort>> predicateDecls = new LinkedHashMap<>();
 
-    private HashMap<Operator, StringBuilder> usedVariableNames = new LinkedHashMap<>();
+    private final HashMap<Operator, StringBuilder> usedVariableNames = new LinkedHashMap<>();
 
-    private HashMap<Operator, StringBuilder> usedFunctionNames = new LinkedHashMap<>();
+    private final HashMap<Operator, StringBuilder> usedFunctionNames = new LinkedHashMap<>();
 
-    private Collection<FunctionWrapper> usedFunctions = new LinkedList<>();
+    private final Collection<FunctionWrapper> usedFunctions = new LinkedList<>();
 
-    private HashMap<Operator, StringBuilder> usedPredicateNames = new LinkedHashMap<>();
+    private final HashMap<Operator, StringBuilder> usedPredicateNames = new LinkedHashMap<>();
 
-    protected HashMap<Sort, StringBuilder> usedDisplaySort = new LinkedHashMap<>();
+    protected final HashMap<Sort, StringBuilder> usedDisplaySort = new LinkedHashMap<>();
 
-    protected HashMap<Sort, StringBuilder> usedRealSort = new LinkedHashMap<>();
+    protected final HashMap<Sort, StringBuilder> usedRealSort = new LinkedHashMap<>();
 
-    private HashMap<Sort, StringBuilder> typePredicates = new LinkedHashMap<>();
+    private final HashMap<Sort, StringBuilder> typePredicates = new LinkedHashMap<>();
 
     // used type predicates for constant values, e.g. 1, 2, ...
-    private HashMap<Term, StringBuilder> constantTypePreds = new LinkedHashMap<>();
+    private final HashMap<Term, StringBuilder> constantTypePreds = new LinkedHashMap<>();
 
     /** map used for storing predicates representing modalities or updates */
-    private HashMap<Term, StringBuilder> modalityPredicates = new LinkedHashMap<>();
+    private final HashMap<Term, StringBuilder> modalityPredicates = new LinkedHashMap<>();
 
     /**
      * If a integer is not supported by a solver because it is too big, the integer is translated
@@ -152,12 +139,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     private final HashMap<Long, StringBuilder> constantsForSmallIntegers = new LinkedHashMap<>();
 
     // assumptions. they have to be added to the formula!
-    private ArrayList<StringBuilder> assumptions = new ArrayList<>();
+    private final ArrayList<StringBuilder> assumptions = new ArrayList<>();
 
     /** Formulae made of taclets, used for assumptions. */
     private TacletSetTranslation tacletSetTranslation = null;
 
-    private Collection<Throwable> exceptionsForTacletTranslation = new LinkedList<>();
+    private final Collection<Throwable> exceptionsForTacletTranslation = new LinkedList<>();
 
     /**
      * Assumptions made of taclets - the translation of <code>tacletFormulae</code>
@@ -185,7 +172,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             SMTSettings settings) throws IllegalFormulaException {
         smtSettings = settings;
         Term problem = sequentToTerm(sequent, services);
-        StringBuilder hb = translateTerm(problem, new Vector<>(), services);
+        StringBuilder hb = translateTerm(problem, new ArrayList<>(), services);
 
         // add one variable for each sort
         for (Sort s : this.usedRealSort.keySet()) {
@@ -355,8 +342,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
             StringBuilder form = this.translateLogicalImply(leftForm, rightForm);
 
-            for (int i = 0; i < varList.size(); i++) {
-                form = this.translateLogicalAll(varList.get(i), this.getIntegerSort(), form);
+            for (StringBuilder stringBuilder : varList) {
+                form = this.translateLogicalAll(stringBuilder, this.getIntegerSort(), form);
             }
 
             toReturn.add(form);
@@ -466,9 +453,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         // add the type predicates for constant values like number
         // symbols
         if (!this.isMultiSorted()) {
-            for (StringBuilder s : this.constantTypePreds.values()) {
-                toReturn.add(s);
-            }
+            toReturn.addAll(this.constantTypePreds.values());
         }
 
         return toReturn;
@@ -758,9 +743,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 StringBuilder newSort = this.usedDisplaySort.get(s);
                 // make sure, no sort is added twice!!
                 boolean alreadyIn = false;
-                for (int i = 0; !alreadyIn && i < toReturn.size(); i++) {
-                    if (toReturn.get(i).equals(newSort)) {
+                for (StringBuilder stringBuilder : toReturn) {
+                    if (stringBuilder.equals(newSort)) {
                         alreadyIn = true;
+                        break;
                     }
                 }
                 if (!alreadyIn) {
@@ -825,7 +811,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             tb.and(tb.equals(x, one), tb.equals(y, one))));
         for (Term assumption : multAssumptions) {
             assumption = tb.allClose(assumption);
-            result.add(translateTerm(assumption, new Vector<>(), services));
+            result.add(translateTerm(assumption, new ArrayList<>(), services));
         }
         return result;
     }
@@ -1337,7 +1323,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         StringBuilder result = translateLogicalTrue();
         for (FunctionWrapper fw : distinct) {
             if (!fw.isUsedForUnique() && fw.getFunction().isUnique()) {
-                FunctionWrapper array[] = { function, fw };
+                FunctionWrapper[] array = { function, fw };
                 if (function.function.sort().extendsTrans(fw.function.sort())
                         || fw.function.sort().extendsTrans(function.function.sort())
                         || fw.function.sort().equals(function.function.sort())) {
@@ -1381,7 +1367,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     private StringBuilder createGenericVariable(int pos) {
-        return translateLogicalVar(new StringBuilder("n" + Integer.toString(pos)));
+        return translateLogicalVar(new StringBuilder("n" + pos));
     }
 
     protected ArrayList<StringBuilder> createGenericVariables(int count, int start) {
@@ -1395,7 +1381,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     protected StringBuilder translateDistinct(FunctionWrapper[] functions, Services services) {
         assert functions.length == 2;
         int start = 0;
-        StringBuilder functionTranslation[] = new StringBuilder[functions.length];
+        StringBuilder[] functionTranslation = new StringBuilder[functions.length];
         ArrayList<StringBuilder> createdVariables = new ArrayList<>();
         ArrayList<Sort> sorts = new ArrayList<>();
 
@@ -1430,7 +1416,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     private final StringBuilder translateTermIte(Term iteTerm,
-            Vector<QuantifiableVariable> quantifiedVars, Services services)
+            List<QuantifiableVariable> quantifiedVars, Services services)
             throws IllegalFormulaException {
 
         // make typecasts, if this is neccesary. Subterms might contain
@@ -1491,7 +1477,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      *        It is only used for the translation of modulo terms, but must be looped through until
      *        we get there.
      */
-    protected StringBuilder translateTerm(Term term, Vector<QuantifiableVariable> quantifiedVars,
+    protected StringBuilder translateTerm(Term term, List<QuantifiableVariable> quantifiedVars,
             Services services) throws IllegalFormulaException {
 
 
@@ -1805,7 +1791,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     private StringBuilder translateAsBindingUninterpretedPredicate(Term term, Function fun,
-            Vector<QuantifiableVariable> quantifiedVars, ImmutableArray<Term> subs,
+            List<QuantifiableVariable> quantifiedVars, ImmutableArray<Term> subs,
             Services services) throws IllegalFormulaException {
 
         ArrayList<StringBuilder> subterms = new ArrayList<>();
@@ -1914,7 +1900,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @throws IllegalFormulaException
      */
     private StringBuilder translateAsBindingUninterpretedFunction(Term term, Function fun,
-            Vector<QuantifiableVariable> quantifiedVars, ImmutableArray<Term> subs,
+            List<QuantifiableVariable> quantifiedVars, ImmutableArray<Term> subs,
             Services services) throws IllegalFormulaException {
 
         ArrayList<StringBuilder> subterms = new ArrayList<>();
@@ -2011,7 +1997,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     private StringBuilder translateAsUninterpretedFunction(Function fun,
-            Vector<QuantifiableVariable> quantifiedVars, ImmutableArray<Term> subs,
+            List<QuantifiableVariable> quantifiedVars, ImmutableArray<Term> subs,
             Services services) throws IllegalFormulaException {
         // an uninterpreted function. just
         // translate it as such
@@ -2107,7 +2093,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @param services the services object to use.
      * @return a unique predicate representing a modality.
      */
-    private StringBuilder getModalityPredicate(Term t, Vector<QuantifiableVariable> quantifiedVars,
+    private StringBuilder getModalityPredicate(Term t, List<QuantifiableVariable> quantifiedVars,
             Services services) throws IllegalFormulaException {
         // check, if the modality was already translated.
         for (Term toMatch : modalityPredicates.keySet()) {
@@ -2156,9 +2142,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @param fun the interpreted function to be added.
      */
     private void addSpecialFunction(Function fun) {
-        if (!specialFunctions.contains(fun)) {
-            specialFunctions.add(fun);
-        }
+        specialFunctions.add(fun);
     }
 
     /**
@@ -2171,9 +2155,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     protected StringBuilder getTypePredicate(Sort s, StringBuilder arg) {
         ArrayList<StringBuilder> arguments = new ArrayList<>();
         arguments.add(arg);
-        StringBuilder toReturn = this.translatePredicate(typePredicates.get(s), arguments);
-
-        return toReturn;
+        return this.translatePredicate(typePredicates.get(s), arguments);
     }
 
     /**
@@ -2184,7 +2166,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @throws IllegalFormulaException
      */
     protected final StringBuilder translateUnknown(Term term,
-            Vector<QuantifiableVariable> quantifiedVars, Services services)
+            List<QuantifiableVariable> quantifiedVars, Services services)
             throws IllegalFormulaException {
 
         // translate the term as uninterpreted function/predicate
@@ -2280,6 +2262,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 for (StringBuilder s : usedBsumTerms.values()) {
                     if (s.toString().equals(BSUM_STRING + i)) {
                         alreadyContains = true;
+                        break;
                     }
                 }
             }
@@ -2305,7 +2288,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         for (Term t : usedBprodTerms.keySet()) {
             if (t.equalsModRenaming(bprodterm)) {
                 name = usedBprodTerms.get(t);
-                continue;
             }
         }
         if (name == null) {
@@ -2318,6 +2300,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 for (StringBuilder s : usedBprodTerms.values()) {
                     if (s.toString().equals(BPROD_STRING + i)) {
                         alreadyContains = true;
+                        break;
                     }
                 }
             }
@@ -2506,10 +2489,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         tacletSetTranslation = new DefaultTacletSetTranslation(services, settings);
 
 
-        Vector<QuantifiableVariable> vector = new Vector<>();
+        List<QuantifiableVariable> vector = new ArrayList<>();
         ImmutableSet<Sort> sorts = DefaultImmutableSet.nil();
-        HashSet<Sort> tempSorts = new LinkedHashSet<>();
-        tempSorts.addAll(usedRealSort.keySet());
+        HashSet<Sort> tempSorts = new LinkedHashSet<>(usedRealSort.keySet());
 
         for (Operator op : usedFunctionNames.keySet()) {
 

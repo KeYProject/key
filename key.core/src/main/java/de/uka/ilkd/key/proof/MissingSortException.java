@@ -1,19 +1,22 @@
 package de.uka.ilkd.key.proof;
 
 
+import de.uka.ilkd.key.java.Position;
+
 public class MissingSortException extends SVInstantiationExceptionWithPosition {
 
     /**
      *
      */
     private static final long serialVersionUID = 2491948230461429971L;
-    private String toInstantiate;
+    private final String toInstantiate;
 
-    public MissingSortException(String toInstantiate, int row, int column) {
-        super("Missing Sort", row, column, false);
+    public MissingSortException(String toInstantiate, Position position) {
+        super("Missing Sort", position, false);
         this.toInstantiate = toInstantiate;
     }
 
+    @Override
     public String getMessage() {
         String errmsg = super.getMessage();
         errmsg += "\n Sort of " + toInstantiate + " is unknown.\n"
@@ -24,6 +27,7 @@ public class MissingSortException extends SVInstantiationExceptionWithPosition {
     /**
      * Returns a string representation of this exception.
      */
+    @Override
     public String toString() {
         return getMessage();
     }

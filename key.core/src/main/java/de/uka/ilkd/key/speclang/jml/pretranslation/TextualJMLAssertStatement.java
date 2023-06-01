@@ -2,8 +2,10 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.JmlParser.AssertionProofContext;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
-import org.antlr.v4.runtime.RuleContext;
+
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.antlr.v4.runtime.RuleContext;
 
 /**
  * A JML assert/assume statement.
@@ -64,12 +66,12 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
         return kind;
     }
 
-    public static enum Kind {
+    public enum Kind {
         ASSERT("assert"), ASSUME("assume");
 
-        private String name;
+        private final String name;
 
-        private Kind(String name) {
+        Kind(String name) {
             this.name = name;
         }
 

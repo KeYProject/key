@@ -1,25 +1,17 @@
 package de.uka.ilkd.key.java.declaration;
 
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
-import de.uka.ilkd.key.speclang.njml.SpecMathMode;
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.NamedProgramElement;
-import de.uka.ilkd.key.java.ParameterContainer;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.VariableScope;
 import de.uka.ilkd.key.java.abstraction.Method;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import de.uka.ilkd.key.speclang.njml.SpecMathMode;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Method declaration. taken from COMPOST and changed to achieve an immutable structure
@@ -83,7 +75,7 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
         this.voidComments = voidComments;
         name = children.get(ProgramElementName.class);
         this.parameters =
-            new ImmutableArray<ParameterDeclaration>(children.collect(ParameterDeclaration.class));
+            new ImmutableArray<>(children.collect(ParameterDeclaration.class));
         exceptions = children.get(Throws.class);
         body = children.get(StatementBlock.class);
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
@@ -106,7 +98,7 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     public MethodDeclaration(Modifier[] modifiers, TypeReference returnType,
             ProgramElementName name, ParameterDeclaration[] parameters, Throws exceptions,
             StatementBlock body, boolean parentIsInterfaceDeclaration) {
-        this(modifiers, returnType, name, new ImmutableArray<ParameterDeclaration>(parameters),
+        this(modifiers, returnType, name, new ImmutableArray<>(parameters),
             exceptions, body, parentIsInterfaceDeclaration);
     }
 
@@ -161,18 +153,24 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     @Override
     public int getChildCount() {
         int result = 0;
-        if (modArray != null)
+        if (modArray != null) {
             result += modArray.size();
-        if (returnType != null)
+        }
+        if (returnType != null) {
             result++;
-        if (name != null)
+        }
+        if (name != null) {
             result++;
-        if (parameters != null)
+        }
+        if (parameters != null) {
             result += parameters.size();
-        if (exceptions != null)
+        }
+        if (exceptions != null) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -188,13 +186,15 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
             index -= len;
         }
         if (returnType != null) {
-            if (index == 0)
+            if (index == 0) {
                 return returnType;
+            }
             index--;
         }
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (parameters != null) {
@@ -205,13 +205,15 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
             index -= len;
         }
         if (exceptions != null) {
-            if (index == 0)
+            if (index == 0) {
                 return exceptions;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -357,8 +359,9 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
      * @return true iff so
      */
     public boolean isVarArgMethod() {
-        if (parameters == null || parameters.size() == 0)
+        if (parameters == null || parameters.size() == 0) {
             return false;
+        }
         return parameters.get(parameters.size() - 1).isVarArg();
     }
 
@@ -396,10 +399,5 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     @Override
     public void visit(Visitor v) {
         v.performActionOnMethodDeclaration(this);
-    }
-
-    @Override
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printMethodDeclaration(this);
     }
 }

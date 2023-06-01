@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.java.expression;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+
+import org.key_project.util.ExtList;
 
 
 /**
@@ -86,10 +86,11 @@ public abstract class Assignment extends Operator implements ExpressionStatement
             // no second argument, e.g. PostIncrement
             return base;
         }
-        if (rhs instanceof BooleanLiteral)
+        if (rhs instanceof BooleanLiteral) {
             return base + "[" + rhs + "]";
-        else
+        } else {
             return base;
+        }
     }
 
 }

@@ -9,6 +9,7 @@ import de.uka.ilkd.key.control.RuleCompletionHandler;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
+import de.uka.ilkd.key.gui.actions.useractions.ProofLoadUserAction;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.informationflow.macros.StartSideProofMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -29,14 +30,13 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironmentListener;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ThreadUtilities;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 
 /**
  * Provides a basic implementation of {@link UserInterfaceControl} for user interfaces in which a
@@ -172,33 +172,27 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
             // stop interface again, because it is activated by the proof
             // change through startProver; the ProofMacroWorker will activate
             // it again at the right time
-            ThreadUtilities.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    getMediator().stopInterface(true);
-                    getMediator().setInteractive(false);
-                }
+            ThreadUtilities.invokeAndWait(() -> {
+                getMediator().stopInterface(true);
+                getMediator().setInteractive(false);
             });
         }
     }
 
     protected void macroSideProofDisposing(final ProofMacroFinishedInfo initiatingInfo,
             final Proof initiatingProof, final Proof sideProof) {
-        ThreadUtilities.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                saveSideProof(sideProof);
-                // make everyone listen to the proof remove
-                getMediator().startInterface(true);
-                if (initiatingProof.closed()) {
-                    getMediator().getSelectionModel().setSelectedNode(initiatingProof.root());
-                } else {
-                    getMediator().getSelectionModel()
-                            .setSelectedGoal(initiatingProof.openGoals().head());
-                }
-                // go into automode again
-                getMediator().stopInterface(true);
+        ThreadUtilities.invokeAndWait(() -> {
+            saveSideProof(sideProof);
+            // make everyone listen to the proof remove
+            getMediator().startInterface(true);
+            if (initiatingProof.closed()) {
+                getMediator().getSelectionModel().setSelectedNode(initiatingProof.root());
+            } else {
+                getMediator().getSelectionModel()
+                        .setSelectedGoal(initiatingProof.openGoals().head());
             }
+            // go into automode again
+            getMediator().stopInterface(true);
         });
     }
 
@@ -210,11 +204,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      */
     private void saveSideProof(Proof proof) {
         String proofName = proof.name().toString();
-        if (proofName.endsWith(".key")) {
-            proofName = proofName.substring(0, proofName.lastIndexOf(".key"));
-        } else if (proofName.endsWith(".proof")) {
-            proofName = proofName.substring(0, proofName.lastIndexOf(".proof"));
-        }
+        proofName = MiscTools.removeFileExtension(proofName);
         final String filename = MiscTools.toValidFileName(proofName) + ".proof";
         final File proofFolder;
         if (proof.getProofFile() != null) {
@@ -241,6 +231,9 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         final ProofEnvironment env = new ProofEnvironment(initConfig);
         env.addProofEnvironmentListener(this);
         env.registerProof(proofOblInput, proofList);
+        for (Proof proof : proofList.getProofs()) {
+            new ProofLoadUserAction(getMediator(), proof).actionPerformed(null);
+        }
         return env;
     }
 

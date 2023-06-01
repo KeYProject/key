@@ -1,15 +1,14 @@
 package de.uka.ilkd.key.java;
 
 
-import java.io.IOException;
-import java.io.StringWriter;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclarationContainer;
+import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.pp.PrettyPrinter;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclarationContainer;
-import de.uka.ilkd.key.java.visitor.Visitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,8 +50,8 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     public CompilationUnit(PackageSpecification packageSpec, Import[] imports,
             TypeDeclaration[] typeDeclarations) {
         this.packageSpec = packageSpec;
-        this.imports = new ImmutableArray<Import>(imports);
-        this.typeDeclarations = new ImmutableArray<TypeDeclaration>(typeDeclarations);
+        this.imports = new ImmutableArray<>(imports);
+        this.typeDeclarations = new ImmutableArray<>(typeDeclarations);
     }
 
 
@@ -64,9 +63,9 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     public CompilationUnit(ExtList children) {
         super(children);
         packageSpec = children.get(PackageSpecification.class);
-        this.imports = new ImmutableArray<Import>(children.collect(Import.class));
+        this.imports = new ImmutableArray<>(children.collect(Import.class));
         this.typeDeclarations =
-            new ImmutableArray<TypeDeclaration>(children.collect(TypeDeclaration.class));
+            new ImmutableArray<>(children.collect(TypeDeclaration.class));
     }
 
 
@@ -102,12 +101,15 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
 
     public int getChildCount() {
         int result = 0;
-        if (packageSpec != null)
+        if (packageSpec != null) {
             result++;
-        if (imports != null)
+        }
+        if (imports != null) {
             result += imports.size();
-        if (typeDeclarations != null)
+        }
+        if (typeDeclarations != null) {
             result += typeDeclarations.size();
+        }
         return result;
     }
 
@@ -122,8 +124,9 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     public ProgramElement getChildAt(int index) {
         int len;
         if (packageSpec != null) {
-            if (index == 0)
+            if (index == 0) {
                 return packageSpec;
+            }
             index--;
         }
         if (imports != null) {
@@ -225,10 +228,6 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
         return res;
     }
 
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printCompilationUnit(this);
-    }
-
     /**
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
@@ -242,14 +241,8 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
 
     /** toString */
     public String toString() {
-        StringWriter sw = new StringWriter();
-        try {
-            PrettyPrinter pp = new PrettyPrinter(sw);
-            pp.setIndentationLevel(3);
-            prettyPrint(pp);
-        } catch (IOException e) {
-            LOGGER.error("Pretty printing of compilation unit failed", e);
-        }
-        return sw.toString();
+        PrettyPrinter pp = PrettyPrinter.purePrinter();
+        pp.print(this);
+        return pp.result();
     }
 }

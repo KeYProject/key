@@ -1,16 +1,33 @@
 package de.uka.ilkd.key.util;
 
-import static de.uka.ilkd.key.util.MiscTools.equalsOrNull;
-
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
+/**
+ * Simple value object to hold two values.
+ *
+ * @param <T1> type of first element
+ * @param <T2> type of second element
+ */
 public class Pair<T1, T2> {
+    /**
+     * First element.
+     */
     public final T1 first;
+    /**
+     * Second element.
+     */
     public final T2 second;
 
 
+    /**
+     * Construct a new pair containing the given values.
+     *
+     * @param first first element
+     * @param second second element
+     */
     public Pair(T1 first, T2 second) {
         this.first = first;
         this.second = second;
@@ -22,22 +39,19 @@ public class Pair<T1, T2> {
     }
 
 
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof Pair<?, ?>)) {
             return false;
         }
         Pair<?, ?> p = (Pair<?, ?>) o;
-        return equalsOrNull(first, p.first) && equalsOrNull(second, p.second);
+        return Objects.equals(first, p.first) && Objects.equals(second, p.second);
     }
 
 
+    @Override
     public int hashCode() {
-        int res = 0;
-        if (first != null)
-            res += first.hashCode();
-        if (second != null)
-            res += second.hashCode();
-        return res;
+        return Objects.hash(first, second);
     }
 
     ///////////////////////////////////////////////////////////
@@ -49,11 +63,12 @@ public class Pair<T1, T2> {
      * @throws IllegalArgumentException if it contains duplicate first entries
      */
     public static <S, T> Map<S, T> toMap(Collection<Pair<S, T>> pairs) {
-        Map<S, T> res = new java.util.LinkedHashMap<S, T>();
+        Map<S, T> res = new java.util.LinkedHashMap<>();
         for (Pair<S, T> p : pairs) {
-            if (res.containsKey(p.first))
+            if (res.containsKey(p.first)) {
                 throw new IllegalArgumentException(
                     "Cannot covert " + pairs + " into a map; it contains duplicate first entries.");
+            }
             res.put(p.first, p.second);
         }
         return res;
@@ -63,7 +78,7 @@ public class Pair<T1, T2> {
      * Returns the set of first entries from a collection of pairs.
      */
     public static <S, T> Set<S> getFirstSet(Collection<Pair<S, T>> pairs) {
-        Set<S> res = new java.util.HashSet<S>();
+        Set<S> res = new java.util.HashSet<>();
         for (Pair<S, T> p : pairs) {
             res.add(p.first);
         }
@@ -74,7 +89,7 @@ public class Pair<T1, T2> {
      * Returns the set of second entries from a collection of pairs.
      */
     public static <S, T> Set<T> getSecondSet(Collection<Pair<S, T>> pairs) {
-        Set<T> res = new java.util.HashSet<T>();
+        Set<T> res = new java.util.HashSet<>();
         for (Pair<S, T> p : pairs) {
             res.add(p.second);
         }

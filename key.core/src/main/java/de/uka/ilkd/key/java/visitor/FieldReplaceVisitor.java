@@ -1,10 +1,7 @@
 package de.uka.ilkd.key.java.visitor;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ArrayLengthReference;
@@ -13,6 +10,9 @@ import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.pp.PrettyPrinter;
+
+import org.key_project.util.ExtList;
 
 /**
  * Replaces field references o.a by methodcalls o._a(). This is needed for unit test generation.

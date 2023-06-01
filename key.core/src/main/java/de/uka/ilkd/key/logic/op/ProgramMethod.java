@@ -1,30 +1,9 @@
 package de.uka.ilkd.key.logic.op;
 
-import java.io.IOException;
-
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceData;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.Constructor;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.declaration.Modifier;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.Throws;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
@@ -35,7 +14,12 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.speclang.ContractFactory;
-import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +66,7 @@ public final class ProgramMethod extends ObserverFunction
             result[i] = md.getParameterDeclarationAt(i).getVariableSpecification()
                     .getProgramVariable().getKeYJavaType();
         }
-        return new ImmutableArray<KeYJavaType>(result);
+        return new ImmutableArray<>(result);
     }
 
     // -------------------------------------------------------------------------
@@ -144,11 +128,6 @@ public final class ProgramMethod extends ObserverFunction
         return method.getComments();
     }
 
-    @Override
-    public void prettyPrint(PrettyPrinter w) throws IOException {
-        method.prettyPrint(w);
-    }
-
     /**
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
@@ -190,7 +169,7 @@ public final class ProgramMethod extends ObserverFunction
      * @return the relative position of the primary token.
      */
     @Override
-    public Position getRelativePosition() {
+    public recoder.java.SourceElement.Position getRelativePosition() {
         return pi.getRelativePosition();
     }
 
@@ -281,7 +260,7 @@ public final class ProgramMethod extends ObserverFunction
      */
     @Override
     public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        if (se == null || !(se instanceof IProgramMethod)) {
+        if (!(se instanceof IProgramMethod)) {
             return false;
         }
 
@@ -465,14 +444,13 @@ public final class ProgramMethod extends ObserverFunction
             source.next();
             return matchCond;
         } else {
-            LOGGER.debug("Program match failed (pattern {}, source {})", this, src);
             return null;
         }
     }
 
     @Override
     public ImmutableList<LocationVariable> collectParameters() {
-        ImmutableList<LocationVariable> paramVars = ImmutableSLList.<LocationVariable>nil();
+        ImmutableList<LocationVariable> paramVars = ImmutableSLList.nil();
         int numParams = getParameterDeclarationCount();
         for (int i = numParams - 1; i >= 0; i--) {
             ParameterDeclaration pd = getParameterDeclarationAt(i);

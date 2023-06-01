@@ -3,8 +3,9 @@ package de.uka.ilkd.key.macros.scripts;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayDeque;
 import java.util.Map;
-import java.util.Stack;
 
 public class ScriptTreeParser {
 
@@ -12,15 +13,15 @@ public class ScriptTreeParser {
 
         ScriptNode root = null;
         ScriptNode last = null;
-        Stack<ScriptNode> branchStack = new Stack<>();
+        ArrayDeque<ScriptNode> branchStack = new ArrayDeque<>();
 
-        ScriptLineParser lineParser = new ScriptLineParser(reader);
+        ScriptLineParser lineParser = new ScriptLineParser(reader, null);
 
         while (true) {
 
-            int from = lineParser.getPosition();
+            int from = lineParser.getOffset();
             Map<String, String> command = lineParser.parseCommand();
-            int to = lineParser.getPosition();
+            int to = lineParser.getOffset();
 
             if (command == null) {
                 return root;
@@ -55,7 +56,8 @@ public class ScriptTreeParser {
 
     public static void main(String[] args) throws IOException, ScriptException {
 
-        ScriptNode root = ScriptTreeParser.parse(new InputStreamReader(System.in));
+        ScriptNode root =
+            ScriptTreeParser.parse(new InputStreamReader(System.in, StandardCharsets.UTF_8));
 
         root.dump(0);
 

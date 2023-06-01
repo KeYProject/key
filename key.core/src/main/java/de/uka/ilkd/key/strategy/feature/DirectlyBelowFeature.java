@@ -24,12 +24,15 @@ public abstract class DirectlyBelowFeature extends BinaryFeature {
     }
 
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
-        if (pos == null)
+        if (pos == null) {
             return false;
-        if (pos.isTopLevel())
+        }
+        if (pos.isTopLevel()) {
             return false;
-        if (!isBadSymbol(pos.up().subTerm().op()))
+        }
+        if (!isBadSymbol(pos.up().subTerm().op())) {
             return false;
+        }
         return index == -1 || index == pos.getIndex();
     }
 

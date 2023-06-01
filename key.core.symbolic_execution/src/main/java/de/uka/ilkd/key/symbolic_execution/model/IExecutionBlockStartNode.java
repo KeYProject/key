@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.SourceElement;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * An extended {@link IExecutionNode} which groups several child nodes.
@@ -16,12 +16,12 @@ public interface IExecutionBlockStartNode<S extends SourceElement> extends IExec
      * @return {@code false} block is definitively not opened, {@code true} block is or might be
      *         opened.
      */
-    public boolean isBlockOpened();
+    boolean isBlockOpened();
 
     /**
      * Returns the up to now discovered {@link IExecutionNode}s.
      *
      * @return The up to now discovered {@link IExecutionNode}s.
      */
-    public ImmutableList<IExecutionNode<?>> getBlockCompletions();
+    ImmutableList<IExecutionNode<?>> getBlockCompletions();
 }

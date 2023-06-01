@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.java;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
@@ -10,6 +8,8 @@ import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+
+import org.key_project.util.ExtList;
 
 /**
  * Miscellaneous static methods related to Java blocks or statements in KeY. Mostly moved from

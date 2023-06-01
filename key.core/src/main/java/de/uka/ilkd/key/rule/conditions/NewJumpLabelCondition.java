@@ -4,8 +4,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.key_project.util.collection.ImmutableMapEntry;
-
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -18,6 +16,8 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.util.collection.ImmutableMapEntry;
 
 /**
  * This variable condition ensures that no other label of the same name exists in the context
@@ -59,7 +59,7 @@ public final class NewJumpLabelCondition implements VariableCondition {
     }
 
     private List<ProgramElement> collect(SVInstantiations inst) {
-        final List<ProgramElement> result = new LinkedList<ProgramElement>();
+        final List<ProgramElement> result = new LinkedList<>();
         final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
             inst.pairIterator();
         while (it.hasNext()) {

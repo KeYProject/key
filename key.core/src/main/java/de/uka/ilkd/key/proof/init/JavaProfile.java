@@ -4,7 +4,6 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -36,6 +35,7 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -94,30 +94,30 @@ public class JavaProfile extends AbstractProfile {
         ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
         result =
             result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.ANON_HEAP_LABEL_NAME,
-                new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL)));
+                new SingletonLabelFactory<>(ParameterlessTermLabel.ANON_HEAP_LABEL)));
         result = result.prepend(new TermLabelConfiguration(
             ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL_NAME,
-            new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL)));
+            new SingletonLabelFactory<>(ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL)));
         result = result.prepend(
             new TermLabelConfiguration(ParameterlessTermLabel.SELECT_SKOLEM_LABEL_NAME,
-                new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.SELECT_SKOLEM_LABEL)));
+                new SingletonLabelFactory<>(ParameterlessTermLabel.SELECT_SKOLEM_LABEL)));
         result = result.prepend(
             new TermLabelConfiguration(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL_NAME,
-                new SingletonLabelFactory<TermLabel>(
+                new SingletonLabelFactory<>(
                     ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)));
         result = result.prepend(
             new TermLabelConfiguration(ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL_NAME,
-                new SingletonLabelFactory<TermLabel>(
+                new SingletonLabelFactory<>(
                     ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL)));
         result = result.prepend(new TermLabelConfiguration(
             ParameterlessTermLabel.UNDEFINED_VALUE_LABEL_NAME,
-            new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.UNDEFINED_VALUE_LABEL)));
+            new SingletonLabelFactory<>(ParameterlessTermLabel.UNDEFINED_VALUE_LABEL)));
         result = result.prepend(new TermLabelConfiguration(
             ParameterlessTermLabel.SELF_COMPOSITION_LABEL_NAME,
-            new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)));
+            new SingletonLabelFactory<>(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)));
         result = result.prepend(
             new TermLabelConfiguration(ParameterlessTermLabel.POST_CONDITION_LABEL_NAME,
-                new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.POST_CONDITION_LABEL)));
+                new SingletonLabelFactory<>(ParameterlessTermLabel.POST_CONDITION_LABEL)));
         result = result.prepend(new TermLabelConfiguration(OriginTermLabel.NAME,
             new OriginTermLabelFactory(), originTermLabelPolicyList, null, null, null, null,
             originTermLabelRefactorings, null));

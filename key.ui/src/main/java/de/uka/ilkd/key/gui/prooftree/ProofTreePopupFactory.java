@@ -1,36 +1,57 @@
 package de.uka.ilkd.key.gui.prooftree;
 
+import java.awt.event.ActionEvent;
+import java.util.Iterator;
+import java.util.function.Predicate;
+import javax.swing.*;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.actions.useractions.RunStrategyOnNodeUserAction;
 import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewDock;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
-import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Pair;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import javax.swing.*;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-import java.awt.event.ActionEvent;
-import java.util.Iterator;
-
-import static de.uka.ilkd.key.gui.ProofMacroMenu.REGISTERED_MACROS;
 
 public class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
 
     private ProofTreePopupFactory() {}
+
+    /**
+     * A filter that returns true iff the given TreePath denotes a One-Step-Simplifier-Node.
+     */
+    public static boolean ossPathFilter(TreePath tp) {
+        // filter out nodes with only OSS children (i.e., OSS nodes are not expanded)
+        // (take care to not filter out any GUIBranchNodes accidentally!)
+        Object o = tp.getLastPathComponent();
+        if (o instanceof GUIProofTreeNode) {
+            GUIProofTreeNode n = ((GUIProofTreeNode) o);
+            if (n.getNode().getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * A predicate that filters oss nodes if filterOss is true
+     */
+    public static Predicate<TreePath> ossPathFilter(boolean filterOss) {
+        return filterOss ? n -> true : ProofTreePopupFactory::ossPathFilter;
+    }
 
     public static ProofTreeContext createContext(ProofTreeView view, TreePath selectedPath) {
         ProofTreeContext context = new ProofTreeContext();
@@ -162,22 +183,24 @@ public class ProofTreePopupFactory {
                     }
                 }
 
-                String stats;
+                StringBuilder stats;
                 if (openGoals > 0) {
-                    stats = openGoals + " open goal" + (openGoals > 1 ? "s." : ".");
+                    stats =
+                        new StringBuilder(openGoals + " open goal" + (openGoals > 1 ? "s." : "."));
                 } else {
-                    stats = "Closed.";
+                    stats = new StringBuilder("Closed.");
                 }
-                stats += "\n\n";
+                stats.append("\n\n");
 
                 for (Pair<String, String> x : context.invokedNode.statistics().getSummary()) {
                     if ("".equals(x.second)) {
-                        stats += "\n";
+                        stats.append("\n");
                     }
-                    stats += x.first + ": " + x.second + "\n";
+                    stats.append(x.first).append(": ").append(x.second).append("\n");
                 }
 
-                JOptionPane.showMessageDialog(MainWindow.getInstance(), stats, "Proof Statistics",
+                JOptionPane.showMessageDialog(MainWindow.getInstance(), stats.toString(),
+                    "Proof Statistics",
                     JOptionPane.INFORMATION_MESSAGE);
             }
         }
@@ -241,7 +264,9 @@ public class ProofTreePopupFactory {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ProofTreeExpansionState.expandAllBelow(context.delegateView, context.path);
+            // expands everything below the given path except for OSS nodes
+            ProofTreeExpansionState.expandAllBelow(context.delegateView, context.path,
+                ossPathFilter(context.proofTreeView.isExpandOSSNodes()));
         }
     }
 
@@ -278,16 +303,16 @@ public class ProofTreePopupFactory {
             }
             Object sibling = context.delegateModel.getChild(parent,
                 context.delegateModel.getIndexOfChild(parent, node) - 1);
-            if (!(sibling != null && sibling instanceof GUIBranchNode)) {
+            if (!(sibling instanceof GUIBranchNode)) {
                 int index = context.delegateModel.getIndexOfChild(parent, node);
                 for (int i = parent.getChildCount(); i > index; i--) {
                     sibling = context.delegateModel.getChild(parent, i);
-                    if (sibling != null && sibling instanceof GUIBranchNode) {
+                    if (sibling instanceof GUIBranchNode) {
                         break;
                     }
                 }
             }
-            if (sibling != null && sibling instanceof GUIBranchNode) {
+            if (sibling instanceof GUIBranchNode) {
                 context.proofTreeView.selectBranchNode((GUIBranchNode) sibling);
             }
         }
@@ -311,16 +336,16 @@ public class ProofTreePopupFactory {
             }
             Object sibling = context.delegateModel.getChild(parent,
                 context.delegateModel.getIndexOfChild(parent, node) + 1);
-            if (!(sibling != null && sibling instanceof GUIBranchNode)) {
+            if (!(sibling instanceof GUIBranchNode)) {
                 int index = context.delegateModel.getIndexOfChild(parent, node);
                 for (int i = 0; i < index; i++) {
                     sibling = context.delegateModel.getChild(parent, i);
-                    if (sibling != null && sibling instanceof GUIBranchNode) {
+                    if (sibling instanceof GUIBranchNode) {
                         break;
                     }
                 }
             }
-            if (sibling != null && sibling instanceof GUIBranchNode) {
+            if (sibling instanceof GUIBranchNode) {
                 context.proofTreeView.selectBranchNode((GUIBranchNode) sibling);
             }
         }
@@ -429,23 +454,8 @@ public class ProofTreePopupFactory {
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            Goal invokedGoal = context.proof.getGoal(context.invokedNode);
-            KeYMediator r = context.mediator;
-            // is the node a goal?
-            if (invokedGoal == null) {
-                ImmutableList<Goal> enabledGoals =
-                    context.proof.getSubtreeEnabledGoals(context.invokedNode);
-                // This method delegates the request only to the UserInterfaceControl
-                // which implements the functionality.
-                // No functionality is allowed in this method body!
-                r.getUI().getProofControl().startAutoMode(r.getSelectedProof(), enabledGoals);
-            } else {
-                // This method delegates the request only to the UserInterfaceControl
-                // which implements the functionality.
-                // No functionality is allowed in this method body!
-                r.getUI().getProofControl().startAutoMode(r.getSelectedProof(),
-                    ImmutableSLList.<Goal>nil().prepend(invokedGoal));
-            }
+            new RunStrategyOnNodeUserAction(context.mediator, context.proof, context.invokedNode)
+                    .actionPerformed(e);
         }
     }
 

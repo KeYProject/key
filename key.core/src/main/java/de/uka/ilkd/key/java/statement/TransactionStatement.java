@@ -12,7 +12,7 @@ public class TransactionStatement extends JavaStatement {
     public static final String[] names = { "#beginJavaCardTransaction",
         "#commitJavaCardTransaction", "#finishJavaCardTransaction", "#abortJavaCardTransaction" };
 
-    private int type;
+    private final int type;
 
     public TransactionStatement(int type) {
         super();
@@ -40,10 +40,6 @@ public class TransactionStatement extends JavaStatement {
         return 0;
     }
 
-    public void prettyPrint(de.uka.ilkd.key.java.PrettyPrinter p) throws java.io.IOException {
-        p.printTransactionStatement(this);
-    }
-
     public int getPrecedence() {
         return 13;
     }
@@ -53,7 +49,7 @@ public class TransactionStatement extends JavaStatement {
     }
 
     public boolean equals(Object o) {
-        if (o != null && o instanceof TransactionStatement) {
+        if (o instanceof TransactionStatement) {
             return ((TransactionStatement) o).type == this.type;
         }
         return false;

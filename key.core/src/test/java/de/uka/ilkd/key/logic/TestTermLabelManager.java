@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.logic;
 
+import java.io.File;
+import java.util.*;
+
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
@@ -23,14 +26,13 @@ import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.io.File;
-import java.util.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -136,10 +138,8 @@ public class TestTermLabelManager {
         Proof proof = new Proof("TestTermLabelManager", initConfig.deepCopy());
         Node node = new Node(proof, sequent);
         return new Goal(node,
-            new RuleAppIndex(
-                new TacletAppIndex(TacletIndexKit.getKit().createTacletIndex(),
-                    initConfig.getServices()),
-                new BuiltInRuleAppIndex(new BuiltInRuleIndex()), initConfig.getServices()));
+            TacletIndexKit.getKit().createTacletIndex(),
+            new BuiltInRuleAppIndex(new BuiltInRuleIndex()), initConfig.getServices());
     }
 
     protected void compareSequents(Sequent expected, Sequent current, boolean changed,

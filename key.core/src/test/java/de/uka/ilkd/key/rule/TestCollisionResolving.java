@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,9 +44,7 @@ public class TestCollisionResolving {
         Node node = new Node(proof, seq);
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         BuiltInRuleAppIndex builtInRuleAppIndex = new BuiltInRuleAppIndex(null);
-        RuleAppIndex ruleAppIndex =
-            new RuleAppIndex(tacletIndex, builtInRuleAppIndex, proof.getServices());
-        goal = new Goal(node, ruleAppIndex);
+        goal = new Goal(node, tacletIndex, builtInRuleAppIndex, proof.getServices());
     }
 
     @AfterEach

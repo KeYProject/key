@@ -1,15 +1,17 @@
 package de.uka.ilkd.key.speclang.njml;
 
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import javax.annotation.Nullable;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec.ClauseHd.INVARIANT;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec.ClauseHd.INVARIANT_FREE;
@@ -104,11 +106,19 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitSpec_case(JmlParser.Spec_caseContext ctx) {
+        // read contract modifier and behavior ID
+        mods = ImmutableSLList.nil();
+        if (ctx.modifiers() != null) {
+            for (JmlParser.ModifierContext mod : ctx.modifiers().modifier()) {
+                mods = mods.append(modifierFromToken(mod.mod));
+            }
+        }
         Behavior behaviour = getBehavior(ctx.behavior);
+
         methodContract = new TextualJMLSpecCase(mods, behaviour);
         loopContract = null;
         constructs = constructs.append(methodContract);
-        super.visitSpec_case(ctx);
+        super.visitSpec_body(ctx.spec_body());
         methodContract = null;
         return null;
     }
@@ -320,9 +330,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitDetermines_clause(JmlParser.Determines_clauseContext ctx) {
-        if (methodContract != null)
+        if (methodContract != null) {
             methodContract.addClause(INFORMATION_FLOW, ctx);
-        else if (loopContract != null) {
+        } else if (loopContract != null) {
             loopContract.addClause(TextualJMLLoopSpec.ClauseHd.INFORMATION_FLOW,
                 HeapLDT.BASE_HEAP_NAME, new LabeledParserRuleContext(ctx));
         }
@@ -389,8 +399,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @SuppressWarnings("unchecked")
     private <T> T accept(ParserRuleContext ctx) {
-        if (ctx == null)
+        if (ctx == null) {
             return null;
+        }
         return (T) ctx.accept(this);
     }
 

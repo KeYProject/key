@@ -2,29 +2,26 @@
 package de.uka.ilkd.key.gui;
 
 
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Collection;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.util.pp.StringBackend;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.Collection;
 
 /** common superclass of TacletIfSelectionDialog and TacletMatchCompletionDialog */
 public abstract class ApplyTacletDialog extends JDialog {
@@ -37,13 +34,13 @@ public abstract class ApplyTacletDialog extends JDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplyTacletDialog.class);
 
     // buttons
-    protected JButton cancelButton;
-    protected JButton applyButton;
+    protected final JButton cancelButton;
+    protected final JButton applyButton;
 
-    protected KeYMediator mediator;
-    protected boolean checkAfterEachInput = true;
+    protected final KeYMediator mediator;
+    protected final boolean checkAfterEachInput = true;
 
-    protected TacletInstantiationModel[] model;
+    protected final TacletInstantiationModel[] model;
     private JTextArea statusArea;
 
     public ApplyTacletDialog(Frame parent, TacletInstantiationModel[] model, KeYMediator mediator) {
@@ -82,7 +79,7 @@ public abstract class ApplyTacletDialog extends JDialog {
     private int countLines(String s) {
         int i = 0;
         int p = 0;
-        while ((p = s.indexOf("\n", p)) >= 0) {
+        while ((p = s.indexOf('\n', p)) >= 0) {
             i++;
             p++;
         }
@@ -112,26 +109,23 @@ public abstract class ApplyTacletDialog extends JDialog {
         LOGGER.debug("TacletApp: {}", model[0].taclet());
 
         Taclet taclet = model[0].taclet();
-        StringBackend backend = new StringBackend(68);
         StringBuilder tacletSB = new StringBuilder();
 
-        Writer w = new StringWriter();
-
-        SequentViewLogicPrinter tp =
-            new SequentViewLogicPrinter(new ProgramPrinter(w), new NotationInfo(), backend,
-                mediator.getServices(), true, MainWindow.getInstance().getVisibleTermLabels());
+        SequentViewLogicPrinter tp = SequentViewLogicPrinter.purePrinter(68, new NotationInfo(),
+            mediator.getServices(), MainWindow.getInstance().getVisibleTermLabels());
 
         tp.printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),
             false);
-        tacletSB.append(backend.getString());
+        tacletSB.append(tp.result());
 
         panel.setAlignmentY(Component.TOP_ALIGNMENT);
         // show taclet
         JScrollPane scroll = new JScrollPane();
         int nolines = countLines(model[0].taclet().toString()) + 1;
-        if (nolines > 10)
+        if (nolines > 10) {
             nolines = 11;
+        }
         JTextArea text = new JTextArea(tacletSB.toString(), nolines, 68);
         text.setEditable(false);
         scroll.setViewportView(text);

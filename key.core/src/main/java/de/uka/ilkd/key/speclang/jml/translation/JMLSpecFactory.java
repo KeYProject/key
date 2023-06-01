@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.speclang.jml.translation;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -37,14 +43,10 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
-import org.antlr.v4.runtime.Token;
+
 import org.key_project.util.collection.*;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import org.antlr.v4.runtime.Token;
 
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.DIVERGES;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.SIGNALS;
@@ -73,8 +75,9 @@ public class JMLSpecFactory {
     // constructors
     // -------------------------------------------------------------------------
     public JMLSpecFactory(Services services) {
-        if (services == null)
+        if (services == null) {
             throw new AssertionError();
+        }
         this.services = services;
         this.tb = services.getTermBuilder();
         cf = new ContractFactory(services);
@@ -190,22 +193,22 @@ public class JMLSpecFactory {
     // -------------------------------------------------------------------------
     public static class ContractClauses {
         public ImmutableList<Term> abbreviations = ImmutableSLList.nil();
-        public Map<LocationVariable, Term> requires = new LinkedHashMap<>();
-        public Map<LocationVariable, Term> requiresFree = new LinkedHashMap<>();
+        public final Map<LocationVariable, Term> requires = new LinkedHashMap<>();
+        public final Map<LocationVariable, Term> requiresFree = new LinkedHashMap<>();
         public Term measuredBy;
         public Term decreases;
-        public Map<LocationVariable, Term> assignables = new LinkedHashMap<>();
-        public Map<ProgramVariable, Term> accessibles = new LinkedHashMap<>();
-        public Map<LocationVariable, Term> ensures = new LinkedHashMap<>();
-        public Map<LocationVariable, Term> ensuresFree = new LinkedHashMap<>();
-        public Map<LocationVariable, Term> axioms = new LinkedHashMap<>();
+        public final Map<LocationVariable, Term> assignables = new LinkedHashMap<>();
+        public final Map<ProgramVariable, Term> accessibles = new LinkedHashMap<>();
+        public final Map<LocationVariable, Term> ensures = new LinkedHashMap<>();
+        public final Map<LocationVariable, Term> ensuresFree = new LinkedHashMap<>();
+        public final Map<LocationVariable, Term> axioms = new LinkedHashMap<>();
         public Term signals;
         public Term signalsOnly;
         public Term diverges;
         public Map<Label, Term> breaks;
         public Map<Label, Term> continues;
         public Term returns;
-        public Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<>();
+        public final Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<>();
         public ImmutableList<InfFlowSpec> infFlowSpecs;
 
         public void clear() {
@@ -670,9 +673,10 @@ public class JMLSpecFactory {
             Map<LocationVariable, Term> atBefores, Behavior originalBehavior,
             ImmutableList<LabeledParserRuleContext> originalClauses) {
         if (originalBehavior == Behavior.EXCEPTIONAL_BEHAVIOR) {
-            if (!originalClauses.isEmpty())
+            if (!originalClauses.isEmpty()) {
                 throw new IllegalArgumentException(
                     "An exceptional_behavior contract is not allowed to have ensures clauses.");
+            }
             return tb.ff();
         } else {
             return translateAndClauses(context, paramVars, resultVar, excVar, atPres, atBefores,
@@ -1040,7 +1044,7 @@ public class JMLSpecFactory {
                 "JML represents clauses must occur uniquely per " + "type and target."
                     + "\nAll but one are ignored.",
                 start.getTokenSource().getSourceName(),
-                new Position(start.getLine(), start.getCharPositionInLine()));
+                Position.fromToken(start));
         }
         // create class axiom
         String name = "JML represents clause for " + rep.first.name();
@@ -1061,8 +1065,9 @@ public class JMLSpecFactory {
      */
     public ClassAxiom createJMLClassAxiom(@Nonnull KeYJavaType kjt, TextualJMLClassAxiom textual) {
         LabeledParserRuleContext originalRep = textual.getAxiom();
-        if (originalRep == null)
+        if (originalRep == null) {
             throw new NullPointerException();
+        }
 
         var context = Context.inClass(kjt, false, tb);
 
@@ -1079,10 +1084,12 @@ public class JMLSpecFactory {
 
     public Contract createJMLDependencyContract(KeYJavaType kjt, LocationVariable targetHeap,
             LabeledParserRuleContext originalDep) {
-        if (kjt == null)
+        if (kjt == null) {
             throw new NullPointerException();
-        if (originalDep == null)
+        }
+        if (originalDep == null) {
             throw new NullPointerException();
+        }
 
         var context = Context.inClass(kjt, false, tb);
 
@@ -1115,10 +1122,12 @@ public class JMLSpecFactory {
      */
     public ImmutableSet<Contract> createJMLOperationContracts(IProgramMethod pm,
             TextualJMLSpecCase textualSpecCase) throws SLTranslationException {
-        if (pm == null)
+        if (pm == null) {
             throw new NullPointerException();
-        if (textualSpecCase == null)
+        }
+        if (textualSpecCase == null) {
             throw new NullPointerException();
+        }
 
         Behavior originalBehavior =
             pm.isModel() ? Behavior.MODEL_BEHAVIOR : textualSpecCase.getBehavior();
@@ -1173,9 +1182,10 @@ public class JMLSpecFactory {
             result = result.add(unparameterizedMergeContract);
         } else if (mergeProc instanceof ParametricMergeProcedure) { // arguments expected looking
                                                                     // for params
-            if (!(mergeProc instanceof MergeWithPredicateAbstraction))
+            if (!(mergeProc instanceof MergeWithPredicateAbstraction)) {
                 throw new IllegalStateException("Currently, MergeWithPredicateAbstraction(Factory) "
                     + "is the only supported ParametricMergeProcedure");
+            }
 
             // @formatter:off
             // Expected merge params structure:
@@ -1448,7 +1458,7 @@ public class JMLSpecFactory {
             Map<String, ImmutableList<LabeledParserRuleContext>> originalFreeInvariants,
             Map<String, ImmutableList<LabeledParserRuleContext>> originalAssignables,
             ImmutableList<LabeledParserRuleContext> originalInfFlowSpecs,
-            LabeledParserRuleContext originalVariant) throws SLTranslationException {
+            LabeledParserRuleContext originalVariant) {
         assert pm != null;
         assert loop != null;
         assert originalInvariants != null;
@@ -1573,7 +1583,7 @@ public class JMLSpecFactory {
     }
 
     public LoopSpecification createJMLLoopInvariant(IProgramMethod pm, LoopStatement loop,
-            TextualJMLLoopSpec textualLoopSpec) throws SLTranslationException {
+            TextualJMLLoopSpec textualLoopSpec) {
         return createJMLLoopInvariant(pm, loop, textualLoopSpec.getInvariants(),
             textualLoopSpec.getFreeInvariants(), textualLoopSpec.getAssignablesInit(),
             textualLoopSpec.getInfFlowSpecs(), textualLoopSpec.getVariant());
@@ -1630,8 +1640,7 @@ public class JMLSpecFactory {
                         p.getVariableSpecification().getName(),
                         p.getVariableSpecification().getProgramVariable().getKeYJavaType(), false,
                         originalSpec.first.start.getTokenSource().getSourceName(),
-                        new Position(originalSpec.first.start.getLine(),
-                            originalSpec.first.start.getCharPositionInLine()),
+                        Position.fromToken(originalSpec.first.start),
                         services);
                 res = res.append(nonNullPositionedString);
             }

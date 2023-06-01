@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.symbolic_execution.slicing;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.ObjectUtil;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Represents a location like a local variable, method parameter, static field or an instance field
@@ -77,7 +78,7 @@ public class Location {
     public boolean equals(Object obj) {
         if (obj instanceof Location) {
             Location other = (Location) obj;
-            return ObjectUtil.equals(accesses, other.getAccesses());
+            return Objects.equals(accesses, other.getAccesses());
         } else {
             return false;
         }
@@ -88,7 +89,7 @@ public class Location {
      */
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         boolean afterFirst = false;
         for (Access access : accesses) {
             if (afterFirst) {

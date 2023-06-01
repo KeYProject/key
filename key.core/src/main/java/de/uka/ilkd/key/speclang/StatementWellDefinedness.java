@@ -4,10 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -18,6 +14,10 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO.Variables;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * A contract for checking the well-definedness of a jml statement. Contrary to jml specifications
@@ -65,7 +65,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @return a list of the parameter variables
      */
     final static ImmutableList<ProgramVariable> convertParams(ImmutableSet<ProgramVariable> set) {
-        ImmutableList<ProgramVariable> list = ImmutableSLList.<ProgramVariable>nil();
+        ImmutableList<ProgramVariable> list = ImmutableSLList.nil();
         for (ProgramVariable pv : set) {
             list = list.append(pv);
         }
@@ -126,7 +126,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
             Services services) {
         final ImmutableList<ProgramVariable> params = convertParams(ps);
         final Map<LocationVariable, ProgramVariable> atPres =
-            new LinkedHashMap<LocationVariable, ProgramVariable>();
+            new LinkedHashMap<>();
         atPres.put(heap, heapAtPre);
         final Variables vars =
             new Variables(self, result, exception, atPres, params, heap, anonHeap);

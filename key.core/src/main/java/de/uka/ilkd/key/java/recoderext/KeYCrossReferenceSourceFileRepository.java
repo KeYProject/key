@@ -1,10 +1,11 @@
 package de.uka.ilkd.key.java.recoderext;
 
+import de.uka.ilkd.key.util.SpecDataLocation;
+
 import recoder.ServiceConfiguration;
 import recoder.io.DataLocation;
 import recoder.io.DefaultSourceFileRepository;
 import recoder.java.CompilationUnit;
-import de.uka.ilkd.key.util.SpecDataLocation;
 
 /**
  * This class is used to handle source files within recoder.
@@ -35,8 +36,9 @@ public class KeYCrossReferenceSourceFileRepository extends DefaultSourceFileRepo
      */
     protected DataLocation createDataLocation(CompilationUnit cu) {
         DataLocation dataLocation = cu.getDataLocation();
-        if (dataLocation == null)
+        if (dataLocation == null) {
             dataLocation = SpecDataLocation.UNKNOWN_LOCATION;
+        }
         return dataLocation;
     }
 

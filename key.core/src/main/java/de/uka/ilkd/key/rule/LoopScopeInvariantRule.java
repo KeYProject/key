@@ -2,9 +2,7 @@ package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
 import java.util.Optional;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -33,6 +31,9 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * <p>
@@ -132,6 +133,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
                 && !(modality == Modality.BOX_TRANSACTION || modality == Modality.DIA_TRANSACTION);
     }
 
+    @Nonnull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException {
@@ -273,10 +275,10 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     private ProgramElement newProgram(Services services, final While loop,
             Optional<Label> loopLabel, Statement stmtToReplace, final JavaBlock origProg,
             final ProgramVariable loopScopeIdxVar) {
-        final ArrayList<ProgramElement> stmnt = new ArrayList<ProgramElement>();
+        final ArrayList<ProgramElement> stmnt = new ArrayList<>();
 
         if (loop.getBody() instanceof StatementBlock) {
-            ((StatementBlock) loop.getBody()).getBody().forEach(elem -> stmnt.add(elem));
+            ((StatementBlock) loop.getBody()).getBody().forEach(stmnt::add);
         } else {
             stmnt.add(loop.getBody());
         }
@@ -286,7 +288,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
         stmnt.add(KeYJavaASTFactory.assign(loopScopeIdxVar, KeYJavaASTFactory.falseLiteral()));
 
-        Statement ifBody = new StatementBlock(stmnt.toArray(new Statement[stmnt.size()]));
+        Statement ifBody = new StatementBlock(stmnt.toArray(new Statement[0]));
 
         if (loopLabel.isPresent()) {
             final Label label = loopLabel.get();

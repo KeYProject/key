@@ -1,13 +1,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import org.key_project.util.collection.ImmutableList;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -15,15 +9,13 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
+
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -33,7 +25,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
 
     private Term mbyAtPre;
 
-    private DependencyContract contract;
+    private final DependencyContract contract;
 
     private InitConfig proofConfig;
     private TermBuilder tb;
@@ -125,8 +117,9 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
             target = javaInfo.getToplevelPM(contract.getKJT(), (IProgramMethod) target);
             // FIXME: for some reason the above method call returns null now and then, the following
             // line (hopefully) is a work-around
-            if (target == null)
+            if (target == null) {
                 target = contract.getTarget();
+            }
         }
 
         final Services proofServices = postInit();
@@ -140,10 +133,10 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
         final int heapCount = contract.getTarget().getHeapCount(proofServices);
 
         final Map<LocationVariable, LocationVariable> preHeapVars =
-            new LinkedHashMap<LocationVariable, LocationVariable>();
+            new LinkedHashMap<>();
         final Map<LocationVariable, LocationVariable> preHeapVarsReverse =
-            new LinkedHashMap<LocationVariable, LocationVariable>();
-        List<LocationVariable> heaps = new LinkedList<LocationVariable>();
+            new LinkedHashMap<>();
+        List<LocationVariable> heaps = new LinkedList<>();
         int hc = 0;
         for (LocationVariable h : HeapContext.getModHeaps(proofServices, false)) {
             if (hc >= heapCount) {
@@ -201,7 +194,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
                 wellFormedHeaps = tb.and(wellFormedHeaps, wellFormedAnonHeap);
             }
             // prepare update
-            final boolean atPre = preHeapVars.values().contains(h);
+            final boolean atPre = preHeapVars.containsValue(h);
             final Term dep = getContract().getDep(atPre ? preHeapVarsReverse.get(h) : h, atPre,
                 selfVar, paramVars, preHeapVars, proofServices);
             final Term changedHeap = tb.anon(tb.var(h), tb.setMinus(tb.allLocs(), dep), anonHeap);
@@ -296,7 +289,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
      * {@inheritDoc}
      */
     @Override
-    public void fillSaveProperties(Properties properties) throws IOException {
+    public void fillSaveProperties(Properties properties) {
         super.fillSaveProperties(properties);
         properties.setProperty("contract", contract.getName());
     }

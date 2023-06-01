@@ -7,10 +7,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -26,6 +22,10 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSet;
+
 /**
  * This class is used to select and store <code>Trigger</code>s for a quantified formula in Prenex
  * CNF(PCNF).
@@ -35,12 +35,12 @@ public class TriggersSet {
     /** Quantified formula of PCNF */
     private final Term allTerm;
     /** all <code>Trigger</code>s for <code>allTerm</code> */
-    private ImmutableSet<Trigger> allTriggers = DefaultImmutableSet.<Trigger>nil();
+    private ImmutableSet<Trigger> allTriggers = DefaultImmutableSet.nil();
     /**
      * a <code>HashMap</code> from <code>Term</code> to <code>Trigger</code> which stores different
      * subterms of <code>allTerm</code> with its according trigger
      */
-    private final Map<Term, Trigger> termToTrigger = new LinkedHashMap<Term, Trigger>();
+    private final Map<Term, Trigger> termToTrigger = new LinkedHashMap<>();
     /** all universal variables of <code>allTerm</code> */
     private final ImmutableSet<QuantifiableVariable> uniQuantifiedVariables;
     /**
@@ -88,7 +88,7 @@ public class TriggersSet {
         if (op == Quantifier.EX) {
             return getAllUQS(allterm.sub(0));
         }
-        return DefaultImmutableSet.<QuantifiableVariable>nil();
+        return DefaultImmutableSet.nil();
     }
 
     /**
@@ -160,7 +160,7 @@ public class TriggersSet {
          * elements which are uni-trigges and will be used to construct several multi-triggers for
          * <code>clause</code>
          */
-        private ImmutableSet<Trigger> elementsOfMultiTrigger = DefaultImmutableSet.<Trigger>nil();
+        private ImmutableSet<Trigger> elementsOfMultiTrigger = DefaultImmutableSet.nil();
 
         public ClauseTrigger(Term clause) {
             this.clause = clause;
@@ -229,7 +229,7 @@ public class TriggersSet {
                         || possibleSubs[i].iterator().next() != oriSub;
             }
 
-            final Set<Term> res = new LinkedHashSet<Term>();
+            final Set<Term> res = new LinkedHashSet<>();
             if (t.op() == IfThenElse.IF_THEN_ELSE) {
                 res.addAll(possibleSubs[1]);
                 res.addAll(possibleSubs[2]);
@@ -247,7 +247,7 @@ public class TriggersSet {
 
         private Set<Term> combineSubterms(Term oriTerm, Set<Term>[] possibleSubs, Term[] chosenSubs,
                 ImmutableArray<QuantifiableVariable> boundVars, int i, TermServices services) {
-            final HashSet<Term> set = new LinkedHashSet<Term>();
+            final HashSet<Term> set = new LinkedHashSet<>();
             if (i >= possibleSubs.length) {
                 final Term res = services.getTermFactory().createTerm(oriTerm.op(), chosenSubs,
                     boundVars, oriTerm.javaBlock());
@@ -278,10 +278,7 @@ public class TriggersSet {
                     || op instanceof QuantifiableVariable) {
                 return false;
             }
-            if (!UniTrigger.passedLoopTest(term, allTerm)) {
-                return false;
-            }
-            return true;
+            return UniTrigger.passedLoopTest(term, allTerm);
         }
 
         /**
@@ -304,10 +301,8 @@ public class TriggersSet {
             final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
             // matching on equations and inequalities does not seem to have any
             // positive effect for the time being
-            if (op == Equality.EQUALS || op == integerLDT.getLessOrEquals()
-                    || op == integerLDT.getGreaterOrEquals()) {
-                return false;
-            }
+            return op != Equality.EQUALS && op != integerLDT.getLessOrEquals()
+                    && op != integerLDT.getGreaterOrEquals();
 
             /*
              * if ( op == Op.EQUALS ) { // we do not want to match on equations t = null if (
@@ -316,8 +311,6 @@ public class TriggersSet {
              * ( 0 ).op ().name ().toString () ) || "TRUE".equals ( term.sub ( 1 ).op ().name
              * ().toString () ) ) return false; }
              */
-
-            return true;
         }
 
         /**
@@ -349,7 +342,7 @@ public class TriggersSet {
          * @return a set of triggers
          */
         private Set<ImmutableSet<Trigger>> setMultiTriggers(Iterator<Trigger> ts) {
-            Set<ImmutableSet<Trigger>> res = new LinkedHashSet<ImmutableSet<Trigger>>();
+            Set<ImmutableSet<Trigger>> res = new LinkedHashSet<>();
             if (ts.hasNext()) {
                 final Trigger trigger = ts.next();
                 ImmutableSet<Trigger> tsi = DefaultImmutableSet.<Trigger>nil().add(trigger);
@@ -378,7 +371,7 @@ public class TriggersSet {
          */
         private boolean addMultiTrigger(ImmutableSet<Trigger> trs) {
             ImmutableSet<QuantifiableVariable> mulqvs =
-                DefaultImmutableSet.<QuantifiableVariable>nil();
+                DefaultImmutableSet.nil();
             for (Trigger tr : trs) {
                 mulqvs = mulqvs.union(tr.getTriggerTerm().freeVars());
             }

@@ -1,10 +1,11 @@
 package de.uka.ilkd.key.java;
 
+import java.util.HashMap;
+
 import de.uka.ilkd.key.java.statement.EmptyStatement;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;

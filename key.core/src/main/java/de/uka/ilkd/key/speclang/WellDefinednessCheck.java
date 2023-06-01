@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
@@ -39,6 +36,9 @@ import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 /**
  * A contract for checking the well-definedness of a jml specification element (i.e. a class
  * invariant, a method contract, a model field or any jml statement), consisting of precondition,
@@ -53,14 +53,14 @@ public abstract class WellDefinednessCheck implements Contract {
     public static final String OP_TACLET = "wd_Operation";
     public static final String OP_EXC_TACLET = "wd_Exc_Operation";
 
-    static enum Type {
+    enum Type {
         CLASS_INVARIANT, OPERATION_CONTRACT, LOOP_INVARIANT, BLOCK_CONTRACT
     }
 
     private final String name;
     private final int id;
     private final Type type;
-    private IObserverFunction target;
+    private final IObserverFunction target;
     private final LocationVariable heap;
     private final OriginalVariables origVars;
 
@@ -115,8 +115,8 @@ public abstract class WellDefinednessCheck implements Contract {
      */
     private Pair<ImmutableList<Term>, ImmutableList<Term>> sort(Term spec) {
         assert spec != null;
-        ImmutableList<Term> implicit = ImmutableSLList.<Term>nil();
-        ImmutableList<Term> explicit = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> implicit = ImmutableSLList.nil();
+        ImmutableList<Term> explicit = ImmutableSLList.nil();
         if (spec.arity() > 0 && spec.op().equals(Junctor.AND)) { // Conjunctions
             assert spec.arity() == 2;
             if (spec.hasLabels()
@@ -177,7 +177,7 @@ public abstract class WellDefinednessCheck implements Contract {
                 explicit = explicit.append(spec);
             }
         }
-        return new Pair<ImmutableList<Term>, ImmutableList<Term>>(implicit, explicit);
+        return new Pair<>(implicit, explicit);
     }
 
     private Term replaceSV(Term t, SchemaVariable self, ImmutableList<ParsableVariable> params) {
@@ -210,7 +210,7 @@ public abstract class WellDefinednessCheck implements Contract {
             ImmutableList<ParsableVariable> paramVars, OriginalVariables vars,
             ImmutableList<LocationVariable> heaps) {
         final Map<ProgramVariable, SchemaVariable> result =
-            new LinkedHashMap<ProgramVariable, SchemaVariable>();
+            new LinkedHashMap<>();
         // self
         if (selfVar != null && vars.self != null) {
             assert selfVar.sort().extendsTrans(vars.self.sort());
@@ -259,7 +259,7 @@ public abstract class WellDefinednessCheck implements Contract {
             ImmutableList<ProgramVariable> paramVars, OriginalVariables vars,
             ImmutableList<LocationVariable> heaps) {
         final Map<ProgramVariable, ProgramVariable> result =
-            new LinkedHashMap<ProgramVariable, ProgramVariable>();
+            new LinkedHashMap<>();
         // self
         if (selfVar != null && vars.self != null) {
             assert vars.self.sort().extendsTrans(selfVar.sort())
@@ -329,7 +329,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     private ImmutableList<Term> replace(Iterable<Term> l, Variables vars) {
-        ImmutableList<Term> res = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> res = ImmutableSLList.nil();
         for (Term t : l) {
             res = res.append(replace(t, vars));
         }
@@ -337,7 +337,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     private ImmutableList<LocationVariable> getHeaps() {
-        ImmutableList<LocationVariable> result = ImmutableSLList.<LocationVariable>nil();
+        ImmutableList<LocationVariable> result = ImmutableSLList.nil();
         return result.append(getHeap());
     }
 
@@ -353,7 +353,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return String to display
      */
     private String getText(boolean includeHtmlMarkup, Services services) {
-        final StringBuffer sig = new StringBuffer();
+        final StringBuilder sig = new StringBuilder();
         OriginalVariables origVars = getOrigVars();
         if (origVars.result != null) {
             sig.append(origVars.result);
@@ -412,7 +412,7 @@ public abstract class WellDefinednessCheck implements Contract {
             globalUpdates = (includeHtmlMarkup ? "<br><b>" : "\n") + "defs"
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printUpdates, false)
-                        : printUpdates.trim());
+                        : printUpdates);
         }
         String pres = "";
         if (getRequires(null) != null) {
@@ -420,7 +420,7 @@ public abstract class WellDefinednessCheck implements Contract {
             pres = pres + (includeHtmlMarkup ? "<br><b>" : "\n")
                     + ((!isInv && !isLoop) ? "pre" : "inv") + (includeHtmlMarkup ? "</b> " : ": ")
                     + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printPres, false)
-                            : printPres.trim());
+                            : printPres);
         }
         String deps = "";
         if (getAccessible() != null) {
@@ -428,7 +428,7 @@ public abstract class WellDefinednessCheck implements Contract {
             deps = deps + (includeHtmlMarkup ? "<br><b>" : "\n") + "dep"
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printDeps, false)
-                        : printDeps.trim());
+                        : printDeps);
         }
         String reps = "";
         if (getRepresents() != null) {
@@ -436,7 +436,7 @@ public abstract class WellDefinednessCheck implements Contract {
             reps = reps + (includeHtmlMarkup ? "<br><b>" : "\n") + "rep"
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printReps, false)
-                        : printReps.trim());
+                        : printReps);
         }
         String posts = "";
         if (getEnsures(null) != null && showSig && !isLoop) {
@@ -444,7 +444,7 @@ public abstract class WellDefinednessCheck implements Contract {
             posts = posts + (includeHtmlMarkup ? "<br><b>" : "\n") + "post"
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printPosts, false)
-                        : printPosts.trim());
+                        : printPosts);
         }
         String axioms = "";
         if (getAxiom() != null) {
@@ -452,7 +452,7 @@ public abstract class WellDefinednessCheck implements Contract {
             axioms = axioms + (includeHtmlMarkup ? "<br><b>" : "\n") + "axiom"
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printAxioms, false)
-                        : printAxioms.trim());
+                        : printAxioms);
         }
         String transactionApplicable = "";
         if (transactionApplicableContract()) {
@@ -571,7 +571,7 @@ public abstract class WellDefinednessCheck implements Contract {
     private TermListAndFunc buildFreePre(Term implicitPre, ParsableVariable self,
             ParsableVariable heap, ImmutableList<ParsableVariable> params, boolean taclet,
             Services services) {
-        ImmutableList<Term> resList = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> resList = ImmutableSLList.nil();
 
         // "self != null"
         final Term selfNotNull = generateSelfNotNull(self);
@@ -635,7 +635,7 @@ public abstract class WellDefinednessCheck implements Contract {
         assert find1.sub(0).arity() == find2.sub(0).arity();
 
         Map<ParsableVariable, ParsableVariable> map =
-            new LinkedHashMap<ParsableVariable, ParsableVariable>();
+            new LinkedHashMap<>();
         int i = 0;
         for (Term sub : find1.sub(0).subs()) {
             map.put((ParsableVariable) find2.sub(0).sub(i).op(), (ParsableVariable) sub.op());
@@ -643,7 +643,7 @@ public abstract class WellDefinednessCheck implements Contract {
         }
         final OpReplacer or = new OpReplacer(map, services.getTermFactory());
         final Term goal = services.getTermBuilder().orSC(goal1, or.replace(goal2));
-        final RewriteTacletBuilder<RewriteTaclet> tb = new RewriteTacletBuilder<RewriteTaclet>();
+        final RewriteTacletBuilder<RewriteTaclet> tb = new RewriteTacletBuilder<>();
         tb.setFind(find1);
         tb.setName(MiscTools.toValidTacletName(name));
         tb.addRuleSet(new RuleSet(new Name("simplify")));
@@ -666,7 +666,7 @@ public abstract class WellDefinednessCheck implements Contract {
     final static RewriteTaclet createTaclet(String name, Term callee, Term callTerm, Term pre,
             boolean isStatic, TermServices services) {
         final TermBuilder TB = services.getTermBuilder();
-        final RewriteTacletBuilder<RewriteTaclet> tb = new RewriteTacletBuilder<RewriteTaclet>();
+        final RewriteTacletBuilder<RewriteTaclet> tb = new RewriteTacletBuilder<>();
         final Term notNull = isStatic ? TB.tt() : TB.not(TB.equals(callee, TB.NULL()));
         final Term created = isStatic ? TB.tt() : TB.created(callee);
         tb.setFind(TB.wd(callTerm));
@@ -687,7 +687,7 @@ public abstract class WellDefinednessCheck implements Contract {
      */
     final static RewriteTaclet createExcTaclet(String name, Term callTerm, TermServices services) {
         final TermBuilder TB = services.getTermBuilder();
-        final RewriteTacletBuilder<RewriteTaclet> tb = new RewriteTacletBuilder<RewriteTaclet>();
+        final RewriteTacletBuilder<RewriteTaclet> tb = new RewriteTacletBuilder<>();
         tb.setFind(TB.wd(callTerm));
         tb.setName(MiscTools.toValidTacletName(name));
         tb.addRuleSet(new RuleSet(new Name("simplify")));
@@ -799,7 +799,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return a list of all remaining clauses
      */
     ImmutableList<Term> getRest() {
-        ImmutableList<Term> rest = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> rest = ImmutableSLList.nil();
         final Term accessible = this.accessible;
         if (accessible != null) {
             rest = rest.append(accessible);
@@ -902,8 +902,9 @@ public abstract class WellDefinednessCheck implements Contract {
     public final static boolean isOn() {
         final String setting =
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().get(OPTION);
-        if (setting == null)
+        if (setting == null) {
             return false;
+        }
         if (setting.equals(OPTION + ":on")) {
             return true;
         } else if (setting.equals(OPTION + ":off")) {
@@ -951,7 +952,7 @@ public abstract class WellDefinednessCheck implements Contract {
     public final TermAndFunc getPre(final Condition pre, ParsableVariable self,
             ParsableVariable heap, ImmutableList<? extends ParsableVariable> parameters,
             boolean taclet, Services services) {
-        ImmutableList<ParsableVariable> params = ImmutableSLList.<ParsableVariable>nil();
+        ImmutableList<ParsableVariable> params = ImmutableSLList.nil();
         for (ParsableVariable pv : parameters) {
             params = params.append(pv);
         }

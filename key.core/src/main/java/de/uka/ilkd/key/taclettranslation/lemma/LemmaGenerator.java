@@ -14,13 +14,13 @@ import de.uka.ilkd.key.taclettranslation.TacletTranslator;
  * validity implies the validity of the taclet.
  */
 public interface LemmaGenerator extends TacletTranslator {
-    public TacletFormula translate(Taclet taclet, TermServices services);
+    TacletFormula translate(Taclet taclet, TermServices services);
 }
 
 
 class LemmaFormula implements TacletFormula {
-    private Taclet taclet;
-    private LinkedList<Term> formula = new LinkedList<Term>();
+    private final Taclet taclet;
+    private final LinkedList<Term> formula = new LinkedList<>();
 
     public LemmaFormula(Taclet taclet, Term formula) {
         this.taclet = taclet;

@@ -1,8 +1,13 @@
 package de.uka.ilkd.key.macros;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.JmlAssert;
@@ -14,7 +19,7 @@ import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -27,16 +32,11 @@ import de.uka.ilkd.key.speclang.njml.JmlParser.AssertionProofContext;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofArgContext;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofCmdCaseContext;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofCmdContext;
+
 import org.key_project.util.collection.ImmutableList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 public class ApplyScriptsMacro extends AbstractProofMacro {
     public static final Logger LOGGER = LoggerFactory.getLogger(ApplyScriptsMacro.class);
@@ -100,32 +100,37 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                 laterGoals.add(goal);
                 continue;
             }
-            listener.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Other, "Running attached script from goal " + goal.node().serialNr(), 0));
+            listener.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Other,
+                "Running attached script from goal " + goal.node().serialNr(), 0));
 
             AssertionProofContext proofCtx = ass.getAssertionProof();
-            String renderedProof = renderProof(proofCtx, goal.sequent().succedent().getLast().formula(), proof.getServices());
-      
+            String renderedProof = renderProof(proofCtx,
+                goal.sequent().succedent().getLast().formula(), proof.getServices());
+
             Path script = Files.createTempFile("key.script", "key");
             Files.writeString(script, renderedProof);
             script.toFile().deleteOnExit();
-            Location loc = new Location(script.toUri().toURL(), 0, 0);
+            Location loc = new Location(script.toUri().toURL(), Position.UNDEFINED);
             ProofScriptEngine pse = new ProofScriptEngine(renderedProof, loc, goal);
             LOGGER.info("Running script");
             LOGGER.info(renderedProof);
             try {
                 pse.execute((AbstractUserInterfaceControl) uic, proof);
             } catch (ScriptException e) {
-                int line = e.getLocation() == null ? 0 : e.getLocation().getLine();
-                throw new ScriptException("Failed to run the following script in line " + line + ":\n" + renderedProof, Location.fromPositionInfo(ass.getPositionInfo()), e);
+                int line = e.getLocation() == null ? 0 : e.getLocation().getPosition().line();
+                throw new ScriptException(
+                    "Failed to run the following script in line " + line + ":\n" + renderedProof,
+                    Location.fromPositionInfo(ass.getPositionInfo()), e);
             }
         }
-        listener.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Other, "Running fallback macro on the remaining goals", 0));
+        listener.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Other,
+            "Running fallback macro on the remaining goals", 0));
         for (Goal goal : laterGoals) {
             if (Thread.interrupted()) {
                 throw new InterruptedException();
             }
             fallBackMacro.applyTo(uic, proof, ImmutableList.of(goal), posInOcc, listener);
-            
+
         }
 
         return new ProofMacroFinishedInfo(this, proof);
@@ -189,23 +194,18 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
     }
 
 
-    public static StringBuffer printTerm(Term t, Services serv) {
-        StringBuffer result;
+    public static CharSequence printTerm(Term t, Services serv) {
+        String result;
 
         final NotationInfo ni = new NotationInfo();
         ni.refresh(serv, false, false);
 
         final LogicPrinter logicPrinter =
-            new LogicPrinter(new ProgramPrinter(null), ni, null,
-                true);
-        try {
-            logicPrinter.printTerm(t);
-        } catch (final IOException ioe) {
-            ioe.printStackTrace();
-        }
+            new LogicPrinter(ni, null, new PosTableLayouter(100, 4, true));
+        logicPrinter.printTerm(t);
         result = logicPrinter.result();
         if (result.charAt(result.length() - 1) == '\n') {
-            result.deleteCharAt(result.length() - 1);
+            result = result.substring(0, result.length() - 1);
         }
         return result;
     }

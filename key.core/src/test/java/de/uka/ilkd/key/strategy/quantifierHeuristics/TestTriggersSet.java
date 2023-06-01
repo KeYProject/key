@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.TacletForTests;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -179,10 +180,8 @@ public class TestTriggersSet {
 
         proof = new Proof("TestTriggersSet", TacletForTests.initConfig());
         g = new Goal(new Node(proof, Sequent.EMPTY_SEQUENT),
-            new RuleAppIndex(
-                new TacletAppIndex(TacletIndexKit.getKit().createTacletIndex(),
-                    proof.getServices()),
-                new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices()));
+            TacletIndexKit.getKit().createTacletIndex(),
+            new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices());
         proof.setRoot(g.node());
         proof.add(g);
 

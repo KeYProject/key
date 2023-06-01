@@ -1,35 +1,20 @@
 package de.uka.ilkd.key.gui.join;
 
-import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.*;
 import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputListener;
 import de.uka.ilkd.key.gui.utilities.ClickableMessageBox;
-import de.uka.ilkd.key.gui.utilities.ClickableMessageBox.ClickableMessageBoxListener;
 import de.uka.ilkd.key.gui.utilities.InspectorForFormulas;
 import de.uka.ilkd.key.gui.utilities.StdDialog;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
@@ -49,15 +34,8 @@ public class JoinDialog extends StdDialog {
     public JoinDialog(List<ProspectivePartner> partnerList, Proof proof,
             PredicateEstimator estimator, Services services) {
         super("Joining", 5, false);
-        content = new ContentPanel(partnerList, proof, estimator, new CheckedUserInputListener() {
-
-            @Override
-            public void userInputChanged(String input, boolean valid, String reason) {
-                getOkButton().setEnabled(valid);
-
-            }
-
-        }, services);
+        content = new ContentPanel(partnerList, proof, estimator,
+            (input, valid, reason) -> getOkButton().setEnabled(valid), services);
         this.setContent(content);
 
     }
@@ -127,17 +105,9 @@ public class JoinDialog extends StdDialog {
                     return "";
                 }
                 LogicPrinter printer =
-                    new LogicPrinter(new ProgramPrinter(), new NotationInfo(), proof.getServices());
-                try {
-                    printer.printTerm(partner.getCommonPredicate());
-                } catch (Throwable e) {
-                    throw new RuntimeException(e);
-                }
-                String result = printer.toString();
-                if (result.endsWith("\n")) {
-                    result = result.substring(0, result.length() - 1);
-                }
-                return result;
+                    LogicPrinter.purePrinter(new NotationInfo(), proof.getServices());
+                printer.printTerm(partner.getCommonPredicate());
+                return printer.result();
             }
         }
 
@@ -151,23 +121,15 @@ public class JoinDialog extends StdDialog {
             this.estimator = estimator;
             create();
 
-            getPredicateInput().addListener(new CheckedUserInputListener() {
-
-                @Override
-                public void userInputChanged(String input, boolean valid, String reason) {
-                    if (valid) {
-                        getSelectedPartner().setCommonPredicate(
-                            InspectorForFormulas.translate(proof.getServices(), input));
-                        if (getSelectedItem().isApplicable()) {
-                            listener.userInputChanged(input, true, reason);
-                        } else {
-                            listener.userInputChanged(input, false, reason);
-                        }
-                    } else {
-                        listener.userInputChanged(input, false, reason);
-                    }
-                    refreshInfoBox(reason);
+            getPredicateInput().addListener((input, valid, reason) -> {
+                if (valid) {
+                    getSelectedPartner().setCommonPredicate(
+                        InspectorForFormulas.translate(proof.getServices(), input));
+                    listener.userInputChanged(input, getSelectedItem().isApplicable(), reason);
+                } else {
+                    listener.userInputChanged(input, false, reason);
                 }
+                refreshInfoBox(reason);
             });
 
 
@@ -184,7 +146,7 @@ public class JoinDialog extends StdDialog {
 
 
 
-            DefaultListModel<ContentItem> model = new DefaultListModel<ContentItem>();
+            DefaultListModel<ContentItem> model = new DefaultListModel<>();
             for (final ProspectivePartner partner : partnerList) {
 
                 Result result = estimator.estimate(partner, proof);
@@ -323,14 +285,8 @@ public class JoinDialog extends StdDialog {
 
                 infoBox.setBackground(this.getBackground());
 
-                infoBox.add(new ClickableMessageBoxListener() {
-
-                    @Override
-                    public void eventMessageClicked(Object object) {
-                        JOptionPane.showMessageDialog(infoBox, object.toString(),
-                            "Problem Description", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                });
+                infoBox.add(object -> JOptionPane.showMessageDialog(infoBox, object.toString(),
+                    "Problem Description", JOptionPane.INFORMATION_MESSAGE));
 
             }
             return infoBox;
@@ -354,21 +310,11 @@ public class JoinDialog extends StdDialog {
 
         private JList<ContentItem> getChoiceList() {
             if (choiceList == null) {
-                choiceList = new JList<ContentItem>();
+                choiceList = new JList<>();
                 choiceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
                 choiceList.setPreferredSize(new Dimension(100, 300));
-                choiceList.addListSelectionListener(new ListSelectionListener() {
-
-                    @Override
-                    public void valueChanged(ListSelectionEvent e) {
-
-
-                        selectionChanged(choiceList.getSelectedIndex());
-
-
-
-                    }
-                });
+                choiceList.addListSelectionListener(
+                    e -> selectionChanged(choiceList.getSelectedIndex()));
             }
             return choiceList;
         }

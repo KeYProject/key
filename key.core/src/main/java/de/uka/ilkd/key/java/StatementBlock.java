@@ -2,9 +2,6 @@ package de.uka.ilkd.key.java;
 
 import java.util.ArrayList;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclarationContainer;
 import de.uka.ilkd.key.java.statement.JavaStatement;
@@ -13,6 +10,9 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Statement block. taken from COMPOST and changed to achieve an immutable structure
@@ -32,7 +32,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
 
     public StatementBlock() {
-        body = new ImmutableArray<Statement>();
+        body = new ImmutableArray<>();
         prefixLength = 1;
         innerMostMethodFrame = null;
     }
@@ -46,7 +46,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     public StatementBlock(ExtList children) {
         super(children);
-        body = new ImmutableArray<Statement>(children.collect(Statement.class));
+        body = new ImmutableArray<>(children.collect(Statement.class));
 
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
@@ -64,11 +64,11 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
 
     public StatementBlock(Statement as) {
-        this(new ImmutableArray<Statement>(as));
+        this(new ImmutableArray<>(as));
     }
 
     public StatementBlock(Statement... body) {
-        this(new ImmutableArray<Statement>(body));
+        this(new ImmutableArray<>(body));
     }
 
     @Override
@@ -78,7 +78,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
                                                                           // about position info and
                                                                           // nowhere else?
                         se.getStartPosition().equals(Position.UNDEFINED)
-                        || this.getStartPosition().getLine() == se.getStartPosition().getLine());
+                        || this.getStartPosition().line() == se.getStartPosition().line());
     }
 
     /** computes the prefix elements for the given array of statment block */
@@ -92,7 +92,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
             prefix.add(current);
         }
 
-        return new ImmutableArray<ProgramPrefix>(prefix);
+        return new ImmutableArray<>(prefix);
     }
 
 
@@ -219,24 +219,22 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         v.performActionOnStatementBlock(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printStatementBlock(this);
-    }
-
 
     public SourceElement getFirstElement() {
-        if (isEmpty())
+        if (isEmpty()) {
             return this;
+        }
         final SourceElement e = getBody().get(0);
         return (e instanceof StatementBlock) ? e.getFirstElement() : e;
     }
 
     @Override
     public SourceElement getFirstElementIncludingBlocks() {
-        if (isEmpty())
+        if (isEmpty()) {
             return this;
-        else
+        } else {
             return getBody().get(0);
+        }
     }
 
 

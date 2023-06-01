@@ -89,16 +89,21 @@ public class Property implements DesignPattern {
      */
     public int getParticipantCount() {
         int res = 0;
-        if (field != null)
+        if (field != null) {
             res += 1;
-        if (getter != null)
+        }
+        if (getter != null) {
             res += 1;
-        if (setter != null)
+        }
+        if (setter != null) {
             res += 1;
-        if (indexedGetter != null)
+        }
+        if (indexedGetter != null) {
             res += 1;
-        if (indexedSetter != null)
+        }
+        if (indexedSetter != null) {
             res += 1;
+        }
         return res;
     }
 
@@ -111,28 +116,33 @@ public class Property implements DesignPattern {
      */
     public ModelElement getParticipantAt(int index) {
         if (field != null) {
-            if (index == 0)
+            if (index == 0) {
                 return field;
+            }
             index -= 1;
         }
         if (getter != null) {
-            if (index == 0)
+            if (index == 0) {
                 return getter;
+            }
             index -= 1;
         }
         if (setter != null) {
-            if (index == 0)
+            if (index == 0) {
                 return setter;
+            }
             index -= 1;
         }
         if (indexedGetter != null) {
-            if (index == 0)
+            if (index == 0) {
                 return indexedGetter;
+            }
             index -= 1;
         }
         if (indexedSetter != null) {
-            if (index == 0)
+            if (index == 0) {
                 return indexedSetter;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

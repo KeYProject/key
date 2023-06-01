@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.rule.label;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.Name;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Instances of this class provides functionality only if a supported rule is active.
@@ -20,5 +20,5 @@ public interface RuleSpecificTask {
      * @return The list of supported rule {@link Name}s or {@code null}/empty list if all rules are
      *         supported.
      */
-    public ImmutableList<Name> getSupportedRuleNames();
+    ImmutableList<Name> getSupportedRuleNames();
 }

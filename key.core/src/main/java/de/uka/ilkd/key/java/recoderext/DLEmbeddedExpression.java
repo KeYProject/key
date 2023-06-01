@@ -2,8 +2,9 @@ package de.uka.ilkd.key.java.recoderext;
 
 import java.util.List;
 
-import recoder.java.Expression;
 import de.uka.ilkd.key.util.MiscTools;
+
+import recoder.java.Expression;
 
 /**
  * This class is used to parse function applications with JavaDL escapes within set statements or

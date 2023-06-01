@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.strategy.feature;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.LexPathOrdering;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermOrdering;
 import de.uka.ilkd.key.proof.Goal;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -32,13 +32,15 @@ public abstract class SmallerThanFeature extends BinaryTacletAppFeature {
      */
     protected final boolean lessThan(ImmutableList<Term> list1, ImmutableList<Term> list2,
             PosInOccurrence focus, Goal currentGoal) {
-        if (list2.isEmpty())
+        if (list2.isEmpty()) {
             return false;
+        }
         for (Term aList1 : list1) {
             final Term te1 = aList1;
             for (Term aList2 : list2) {
-                if (!lessThan(te1, aList2, focus, currentGoal))
+                if (!lessThan(te1, aList2, focus, currentGoal)) {
                     return false;
+                }
             }
         }
         return true;
@@ -46,7 +48,7 @@ public abstract class SmallerThanFeature extends BinaryTacletAppFeature {
 
     protected abstract static class Collector {
 
-        private ImmutableList<Term> terms = ImmutableSLList.<Term>nil();
+        private ImmutableList<Term> terms = ImmutableSLList.nil();
 
         protected void addTerm(Term mon) {
             terms = terms.prepend(mon);

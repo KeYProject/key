@@ -1,10 +1,9 @@
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 /**
  * Continue.
@@ -46,9 +45,5 @@ public class Continue extends LabelJumpStatement {
      */
     public void visit(Visitor v) {
         v.performActionOnContinue(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printContinue(this);
     }
 }

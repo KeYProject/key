@@ -1,15 +1,17 @@
 package de.uka.ilkd.key.nparser;
 
+import java.net.URL;
+import java.util.*;
+import javax.annotation.Nonnull;
+
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.util.parsing.LocatableException;
+
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
-
-import javax.annotation.Nonnull;
-import java.net.URL;
-import java.util.*;
 
 /**
  * A short little hack, but completely working and fast, for replaying proofs inside KeY files.
@@ -69,8 +71,9 @@ public class ProofReplayer {
             URL source) {
         KeYLexer lexer = ParsingFacade.createLexer(input);
         CommonTokenStream stream = new CommonTokenStream(lexer);
-        Stack<IProofFileParser.ProofElementID> stack = new Stack<>(); // currently open proof
-                                                                      // elements
+        ArrayDeque<IProofFileParser.ProofElementID> stack = new ArrayDeque<>(); // currently open
+                                                                                // proof
+        // elements
         Deque<Integer> posStack = new ArrayDeque<>(); // stack of opened commands position
         while (true) {
             int type = stream.LA(1); // current token type
@@ -82,8 +85,8 @@ public class ProofReplayer {
                 IProofFileParser.ProofElementID cur = proofSymbolElementId.get(idToken.getText());
 
                 if (cur == null) {
-                    Location loc = new Location(source, idToken.getLine() + startLine - 1,
-                        idToken.getCharPositionInLine() + 1);
+                    Location loc =
+                        new Location(source, Position.fromToken(idToken).offsetLine(startLine - 1));
                     throw new LocatableException("Unknown proof element: " + idToken.getText(),
                         loc);
                 }

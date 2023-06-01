@@ -28,23 +28,28 @@ public class ContainsExecutableCodeTermFeature extends BinaryTermFeature {
     }
 
     private boolean containsExec(Term t, Services services) {
-        if (t.isRigid())
+        if (t.isRigid()) {
             return false;
+        }
         // if ( t.isContainsJavaBlockRecursive() ) return true;
 
         final Operator op = t.op();
-        if (op instanceof Quantifier)
+        if (op instanceof Quantifier) {
             return false;
+        }
 
-        if (op instanceof Modality)
+        if (op instanceof Modality) {
             return true;
-        if (considerQueries && op instanceof IProgramMethod)
+        }
+        if (considerQueries && op instanceof IProgramMethod) {
             return true;
+        }
 
         for (int i = 0; i != op.arity(); ++i) {
             final boolean res = filter(t.sub(i), services);
-            if (res)
+            if (res) {
                 return true;
+            }
         }
 
         return false;

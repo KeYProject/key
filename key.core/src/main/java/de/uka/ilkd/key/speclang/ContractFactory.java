@@ -2,15 +2,12 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.*;
 
-import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.label.TermLabel;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -22,8 +19,10 @@ import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.InfFlowSpec;
-import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Triple;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import static de.uka.ilkd.key.logic.label.OriginTermLabel.*;
 
@@ -86,7 +85,7 @@ public class ContractFactory {
             foci.originalSelfVar, foci.originalResultVar, foci.originalExcVar,
             foci.originalParamVars, foci.originalAtPreVars);
 
-        Map<LocationVariable, Term> newPosts = new LinkedHashMap<LocationVariable, Term>(10);
+        Map<LocationVariable, Term> newPosts = new LinkedHashMap<>(10);
         for (LocationVariable h : foci.originalPosts.keySet()) {
             if (h == services.getTypeConverter().getHeapLDT().getHeap()) {
                 newPosts.put(h, tb.andSC(foci.originalPosts.get(h), addedPost));
@@ -137,7 +136,7 @@ public class ContractFactory {
         addedPre = replaceVariables(addedPre, selfVar, paramVars, atPreVars, foci.originalSelfVar,
             foci.originalParamVars, foci.originalAtPreVars);
 
-        Map<LocationVariable, Term> newPres = new LinkedHashMap<LocationVariable, Term>(10);
+        Map<LocationVariable, Term> newPres = new LinkedHashMap<>(10);
         for (LocationVariable h : foci.originalPres.keySet()) {
             if (h == services.getTypeConverter().getHeapLDT().getHeap()) {
                 newPres.put(h, tb.and(foci.originalPres.get(h), addedPre));
@@ -191,10 +190,10 @@ public class ContractFactory {
             Triple<IObserverFunction, Term, Term> dep, ProgramVariable selfVar) {
         final ImmutableList<ProgramVariable> paramVars = tb.paramVars(dep.first, false);
         assert (selfVar == null) == dep.first.isStatic();
-        Map<LocationVariable, Term> pres = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> pres = new LinkedHashMap<>();
         pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
             selfVar == null ? tb.tt() : tb.inv(tb.var(selfVar)));
-        Map<ProgramVariable, Term> accessibles = new LinkedHashMap<ProgramVariable, Term>();
+        Map<ProgramVariable, Term> accessibles = new LinkedHashMap<>();
         for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
             if (heap == targetHeap) {
                 accessibles.put(heap, dep.second);
@@ -237,7 +236,7 @@ public class ContractFactory {
     @Override
     public boolean equals(Object o) {
         if (o instanceof ContractFactory) {
-            return MiscTools.equalsOrNull(services, ((ContractFactory) o).services);
+            return Objects.equals(services, ((ContractFactory) o).services);
         } else {
             return false;
         }
@@ -737,7 +736,7 @@ public class ContractFactory {
     }
 
     private Term atPreify(Term t, Map<LocationVariable, ? extends ProgramVariable> atPreVars) {
-        final Map<Term, Term> map = new LinkedHashMap<Term, Term>(atPreVars.size());
+        final Map<Term, Term> map = new LinkedHashMap<>(atPreVars.size());
         for (LocationVariable h : atPreVars.keySet()) {
             if (atPreVars.get(h) != null) {
                 map.put(tb.var(h), tb.var(atPreVars.get(h)));
@@ -763,7 +762,7 @@ public class ContractFactory {
             ProgramVariable originalResultVar, ProgramVariable originalExcVar,
             ImmutableList<ProgramVariable> originalParamVars,
             Map<LocationVariable, LocationVariable> originalAtPreVars) {
-        Map<Operator, Operator> map = new LinkedHashMap<Operator, Operator>();
+        Map<Operator, Operator> map = new LinkedHashMap<>();
         addToMap(selfVar, originalSelfVar, map);
         addToMap(resultVar, originalResultVar, map);
         addToMap(excVar, originalExcVar, map);

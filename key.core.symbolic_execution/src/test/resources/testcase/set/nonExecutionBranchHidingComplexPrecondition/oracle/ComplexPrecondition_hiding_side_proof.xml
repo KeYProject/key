@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="&lt;call ComplexPrecondition.main(x,y)&gt;" pathCondition="true" pathConditionChanged="false">
-      <statement name="int magicValue = magic(x,y);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call ComplexPrecondition.main(x, y)&gt;" pathCondition="true" pathConditionChanged="false">
+      <statement name="int magicValue = magic(x, y);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_magic = magic(x, y) catch(exc_0)
 pre: (x &gt;= 0 &amp; y &lt; 0)&lt;&lt;SC&gt;&gt; | !((x &gt;= 0 &amp; y &lt; 0)&lt;&lt;SC&gt;&gt;)
-post: (   (x &gt;= 0 &amp; y &lt; 0)&lt;&lt;SC&gt;&gt;
+post:   (   (x &gt;= 0 &amp; y &lt; 0)&lt;&lt;SC&gt;&gt;
    -&gt;     result_magic
         = ComplexPrecondition.subFirst(x, y)
       &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;)
@@ -15,13 +15,13 @@ post: (   (x &gt;= 0 &amp; y &lt; 0)&lt;&lt;SC&gt;&gt;
 mod: {}
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_magic" exceptionTerm="exc_0" contractParameters="x, y" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
-               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of ComplexPrecondition.main(x,y)&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
+               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of ComplexPrecondition.main(x, y)&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
 	Z(2(4(#))) {and(gt(x,Z(neglit(1(#)))),lt(y,Z(0(#))))}, 
 	Z(neglit(1(1(7(4(#)))))) {not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))}
 as result of main&gt;" signatureIncludingReturnValue="&lt;return 
 	Z(2(4(#))) {and(gt(x,Z(neglit(1(#)))),lt(y,Z(0(#))))}, 
 	Z(neglit(1(1(7(4(#)))))) {not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))}
-as result of ComplexPrecondition.main(x,y)&gt;" isReturnValueComputed="true" methodReturnCondition="true">
+as result of ComplexPrecondition.main(x, y)&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                   <methodReturnValue name="Z(2(4(#))) {and(gt(x,Z(neglit(1(#)))),lt(y,Z(0(#))))}" returnValueString="Z(2(4(#)))" hasCondition="true" conditionString="and(gt(x,Z(neglit(1(#)))),lt(y,Z(0(#))))">
                   </methodReturnValue>
                   <methodReturnValue name="Z(neglit(1(1(7(4(#)))))) {not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))}" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="true" conditionString="not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))">

@@ -1,12 +1,11 @@
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 /**
  * Then.
@@ -20,7 +19,7 @@ public class Then extends BranchImp {
      * Body.
      */
 
-    protected Statement body;
+    protected final Statement body;
 
 
     /**
@@ -77,8 +76,9 @@ public class Then extends BranchImp {
 
     public ProgramElement getChildAt(int index) {
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -126,9 +126,5 @@ public class Then extends BranchImp {
      */
     public void visit(Visitor v) {
         v.performActionOnThen(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printThen(this);
     }
 }

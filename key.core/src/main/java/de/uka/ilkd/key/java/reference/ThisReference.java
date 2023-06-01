@@ -1,16 +1,10 @@
 package de.uka.ilkd.key.java.reference;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Reference;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 /**
  * A reference to the current object. "this" can be prefixed by a type reference (to resolve
@@ -71,8 +65,9 @@ public class ThisReference extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int count = 0;
-        if (prefix != null)
+        if (prefix != null) {
             count++;
+        }
         return count;
     }
 
@@ -85,8 +80,9 @@ public class ThisReference extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0)
+            if (index == 0) {
                 return prefix;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -135,10 +131,6 @@ public class ThisReference extends JavaNonTerminalProgramElement
      */
     public void visit(Visitor v) {
         v.performActionOnThisReference(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printThisReference(this);
     }
 
     public ReferencePrefix setReferencePrefix(ReferencePrefix r) {

@@ -1,10 +1,10 @@
 package org.key_project.exploration;
 
-import de.uka.ilkd.key.proof.Node;
-
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Objects;
+
+import de.uka.ilkd.key.proof.Node;
 
 /**
  * Information on exploration that is attached to nodes. If such an object is attached to a node,
@@ -42,12 +42,15 @@ public class ExplorationNodeData {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null)
+        }
+        if (o == null) {
             return false;
-        if (o.getClass() != getClass())
+        }
+        if (o.getClass() != getClass()) {
             return false;
+        }
         ExplorationNodeData that = (ExplorationNodeData) o;
         return Objects.equals(getExplorationAction(), that.getExplorationAction());
     }

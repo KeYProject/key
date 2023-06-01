@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.parser;
 
+import java.io.File;
+import java.io.IOException;
+
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -9,12 +12,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
-
-import java.io.File;
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -81,11 +80,11 @@ public class AbstractTestTermParser {
      *
      * @param t The {@link Term} that will be converted.
      */
-    protected String printTerm(Term t) throws IOException {
-        LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), services);
+    protected String printTerm(Term t) {
+        LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), services);
         lp.getNotationInfo().setHidePackagePrefix(false);
         lp.printTerm(t);
-        return lp.toString();
+        return lp.result();
     }
 
     /**

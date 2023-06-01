@@ -1,13 +1,14 @@
 package de.uka.ilkd.key.nparser.builder;
 
+import java.util.List;
+import java.util.Objects;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.ProblemInformation;
-import org.key_project.util.java.StringUtil;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.Objects;
+import org.key_project.util.java.StringUtil;
 
 /**
  * The visitor for extracting the {@link ProblemInformation}.
@@ -20,14 +21,18 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
 
     @Override
     public Object visitFile(KeYParser.FileContext ctx) {
+        if (ctx.profile() != null) {
+            information.setProfile(accept(ctx.profile()));
+        }
+        if (ctx.preferences() != null) {
+            information.setPreferences(accept(ctx.preferences()));
+        }
         each(ctx.decls(), ctx.problem());
         return null;
     }
 
     @Override
     public Object visitDecls(KeYParser.DeclsContext ctx) {
-        information.setProfile(acceptFirst(ctx.profile()));
-        information.setPreferences(acceptFirst(ctx.preferences()));
         information.setBootClassPath(acceptFirst(ctx.bootClassPath()));
         ctx.classPaths().forEach(
             it -> information.getClasspath().addAll(Objects.requireNonNull(accept(it))));
@@ -38,16 +43,18 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
     @Override
     public Object visitProblem(KeYParser.ProblemContext ctx) {
         if (ctx.CHOOSECONTRACT() != null) {
-            if (ctx.chooseContract != null)
+            if (ctx.chooseContract != null) {
                 information.setChooseContract(accept(ctx.chooseContract));
-            else
+            } else {
                 information.setChooseContract("");
+            }
         }
         if (ctx.PROOFOBLIGATION() != null) {
-            if (ctx.proofObligation != null)
+            if (ctx.proofObligation != null) {
                 information.setProofObligation(accept(ctx.proofObligation));
-            else
+            } else {
                 information.setProofObligation("");
+            }
         }
         information.setHasProblemTerm(ctx.PROBLEM() != null);
         return null;

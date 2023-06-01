@@ -1,16 +1,11 @@
 package de.uka.ilkd.key.java.reference;
 
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ExpressionContainer;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
+import org.key_project.util.ExtList;
 
 
 public class FieldReference extends VariableReference
@@ -58,10 +53,12 @@ public class FieldReference extends VariableReference
      */
     public int getChildCount() {
         int result = 0;
-        if (prefix != null)
+        if (prefix != null) {
             result++;
-        if (variable != null)
+        }
+        if (variable != null) {
             result++;
+        }
         return result;
     }
 
@@ -74,13 +71,15 @@ public class FieldReference extends VariableReference
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0)
+            if (index == 0) {
                 return prefix;
+            }
             index--;
         }
         if (variable != null) {
-            if (index == 0)
+            if (index == 0) {
                 return variable;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -173,11 +172,6 @@ public class FieldReference extends VariableReference
     @Override
     public SourceElement getFirstElementIncludingBlocks() {
         return (prefix == null) ? variable : prefix.getFirstElementIncludingBlocks();
-    }
-
-    /** pretty print */
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printFieldReference(this);
     }
 
 

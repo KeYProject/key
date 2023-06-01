@@ -1,15 +1,11 @@
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ExpressionContainer;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+
+import org.key_project.util.ExtList;
 
 /**
  * A statement indicating a merge point.
@@ -85,8 +81,9 @@ public class MergePointStatement extends JavaStatement implements ExpressionCont
      */
     public int getChildCount() {
         int result = 0;
-        if (identifier != null)
+        if (identifier != null) {
             result++;
+        }
         return result;
     }
 
@@ -99,8 +96,9 @@ public class MergePointStatement extends JavaStatement implements ExpressionCont
      */
     public ProgramElement getChildAt(int index) {
         if (identifier != null) {
-            if (index == 0)
+            if (index == 0) {
                 return identifier;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -114,9 +112,5 @@ public class MergePointStatement extends JavaStatement implements ExpressionCont
      */
     public void visit(Visitor v) {
         v.performActionOnMergePointStatement(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printMergePointStatementBlock(this);
     }
 }

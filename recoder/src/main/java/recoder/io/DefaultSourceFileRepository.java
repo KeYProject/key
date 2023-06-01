@@ -2,6 +2,11 @@
 
 package recoder.io;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.*;
+import java.util.*;
+
 import recoder.AbstractService;
 import recoder.ParserException;
 import recoder.ServiceConfiguration;
@@ -14,11 +19,6 @@ import recoder.util.Debug;
 import recoder.util.ProgressListener;
 import recoder.util.ProgressListenerManager;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.*;
-import java.util.*;
-
 /**
  * @author RN
  * @author AL
@@ -26,29 +26,25 @@ import java.util.*;
 public class DefaultSourceFileRepository extends AbstractService
         implements SourceFileRepository, ChangeHistoryListener, PropertyChangeListener {
 
-    public final static FilenameFilter JAVA_FILENAME_FILTER = new FilenameFilter() {
-        public boolean accept(File dir, String name) {
-            return name.endsWith(".java");
-        }
-    };
+    public final static FilenameFilter JAVA_FILENAME_FILTER = (dir, name) -> name.endsWith(".java");
     private final static boolean DEBUG = false;
     /**
      * Cache: data location to compilation units.
      */
     private final Map<DataLocation, CompilationUnit> location2cu =
-        new HashMap<DataLocation, CompilationUnit>();
+        new HashMap<>();
     /**
      * Set of units that have been changed and have to be rewritten.
      */
-    private final Set<CompilationUnit> changedUnits = new HashSet<CompilationUnit>();
+    private final Set<CompilationUnit> changedUnits = new HashSet<>();
     /**
      * Set of units that are obsolete and should be deleted.
      */
-    private final Set<DataLocation> deleteUnits = new HashSet<DataLocation>();
+    private final Set<DataLocation> deleteUnits = new HashSet<>();
     /**
      * Progress listener management.
      */
-    ProgressListenerManager listeners = new ProgressListenerManager(this);
+    final ProgressListenerManager listeners = new ProgressListenerManager(this);
     /**
      * The change history service.
      */
@@ -116,8 +112,9 @@ public class DefaultSourceFileRepository extends AbstractService
             if (location2cu.get(loc) == cu) {
                 location2cu.remove(loc);
                 changedUnits.remove(cu); // no need to write it back
-                if (DEBUG)
+                if (DEBUG) {
                     Debug.log("Deregistering " + loc);
+                }
                 DataLocation orig = cu.getOriginalDataLocation();
                 if (!loc.equals(orig)) {
                     // remove it except when from original location
@@ -136,8 +133,9 @@ public class DefaultSourceFileRepository extends AbstractService
             cu.setDataLocation(loc);
         }
         if (location2cu.get(loc) != cu) {
-            if (DEBUG)
+            if (DEBUG) {
                 Debug.log("Registering " + loc);
+            }
             deleteUnits.remove(loc);
             location2cu.put(loc, cu);
         }
@@ -254,11 +252,11 @@ public class DefaultSourceFileRepository extends AbstractService
     public List<CompilationUnit> getCompilationUnitsFromFiles(String[] filenames)
             throws ParserException {
         Debug.assertNonnull(filenames);
-        List<CompilationUnit> res = new ArrayList<CompilationUnit>();
+        List<CompilationUnit> res = new ArrayList<>();
         listeners.fireProgressEvent(0, filenames.length, "Importing Source Files");
         for (int i = 0; i < filenames.length; i += 1) {
             listeners.fireProgressEvent(i,
-                new StringBuffer("Parsing ").append(filenames[i]).toString());
+                "Parsing " + filenames[i]);
             CompilationUnit cu = getCompilationUnitFromFile(filenames[i]);
             if (cu != null) {
                 res.add(cu);
@@ -288,7 +286,7 @@ public class DefaultSourceFileRepository extends AbstractService
 
     public List<CompilationUnit> getKnownCompilationUnits() {
         int n = location2cu.size();
-        List<CompilationUnit> res = new ArrayList<CompilationUnit>(n);
+        List<CompilationUnit> res = new ArrayList<>(n);
         for (CompilationUnit cu : location2cu.values()) {
             res.add(cu);
         }
@@ -302,7 +300,7 @@ public class DefaultSourceFileRepository extends AbstractService
     public List<CompilationUnit> getAllCompilationUnitsFromPath(FilenameFilter filter)
             throws ParserException {
         DataLocation[] locations = getSearchPathList().findAll(filter);
-        List<CompilationUnit> res = new ArrayList<CompilationUnit>(locations.length);
+        List<CompilationUnit> res = new ArrayList<>(locations.length);
         listeners.fireProgressEvent(0, res.size(), "Importing Source Files From Path");
         for (int i = 0; i < locations.length; i++) {
             listeners.fireProgressEvent(i, "Parsing " + locations[i]);
@@ -406,4 +404,3 @@ public class DefaultSourceFileRepository extends AbstractService
     }
 
 }
-

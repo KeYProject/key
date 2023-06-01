@@ -34,7 +34,7 @@ class SequentViewChangeListener
             // But only update them if we have the correct SequentView
             // (i.e., the main window's sequent view) (lanzinger)
             if (sequentView.isMainSequentView()) {
-                MainWindow.getInstance().sequentViewSearchBar.setSequentView(sequentView);
+                MainWindow.getInstance().setSequentView(sequentView);
             }
         }
 

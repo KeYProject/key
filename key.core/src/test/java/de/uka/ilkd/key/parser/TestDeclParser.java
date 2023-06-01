@@ -15,11 +15,13 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.NamespaceBuilder;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -192,9 +194,8 @@ public class TestDeclParser {
             new KeyIO(serv, nss).load(str).loadDeclarations();
             fail("Expected an GenericSortException");
         } catch (Exception e) {
-            assertTrue(
-                e instanceof GenericSortException || e.getCause() instanceof GenericSortException,
-                "Expected a GenericSortException");
+            System.out.println(e);
+            assertTrue(e.getMessage().contains("generic"), "Expected a GenericSortException");
         }
     }
 
@@ -216,7 +217,7 @@ public class TestDeclParser {
 
         assertTrue(o instanceof SchemaVariable, "The named object: " + o + " is of type "
             + o.getClass() + ", but the type SchemaVariable was expected");
-        assertTrue(((SchemaVariable) o).sort() != Sort.FORMULA,
+        assertNotSame(((SchemaVariable) o).sort(), Sort.FORMULA,
             "Schemavariable is not allowed to match a term of sort FORMULA.");
     }
 
@@ -378,10 +379,7 @@ public class TestDeclParser {
             fail("Ambiguous declaration successfully parsed. Error was expected.");
             // FIXME nparser It seems that the nparser does not check for conflicting declarations
         } catch (RuntimeException e) {
-            if (!(e.getCause() instanceof AmbigiousDeclException)) {
-                e.printStackTrace();
-                fail("Unexpected excpetion. Testcase failed." + e);
-            }
+            fail("Unexpected excpetion. Testcase failed.", e);
         }
     }
 

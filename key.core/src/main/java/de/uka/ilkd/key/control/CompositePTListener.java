@@ -11,7 +11,7 @@ import de.uka.ilkd.key.prover.TaskStartedInfo;
  * @author Michael Kirsten
  */
 public class CompositePTListener implements ProverTaskListener {
-    private ProverTaskListener[] listeners;
+    private final ProverTaskListener[] listeners;
 
     public CompositePTListener(ProverTaskListener[] l) {
         this.listeners = l;

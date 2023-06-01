@@ -1,10 +1,9 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
-
-import javax.annotation.Nullable;
-import java.net.URL;
 
 public class ScriptException extends Exception implements HasLocation {
 
@@ -17,14 +16,9 @@ public class ScriptException extends Exception implements HasLocation {
         this.location = null;
     }
 
-    public ScriptException(String message, URL url, int line, int col, Throwable cause) {
-        super(message, cause);
-        this.location = new Location(url, line, col);
-    }
-
-    public ScriptException(String message, URL url, int line, int col) {
+    public ScriptException(String message, Location location) {
         super(message);
-        this.location = new Location(url, line, col);
+        this.location = location;
     }
 
     public ScriptException(String message, Location location, Throwable cause) {

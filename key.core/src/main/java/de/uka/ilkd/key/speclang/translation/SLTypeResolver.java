@@ -37,7 +37,7 @@ public final class SLTypeResolver extends SLExpressionResolver {
                     KeYJavaType containingType = receiver.getType();
                     while (true) {
                         String typeName = containingType.getSort().name().toString();
-                        if (typeName.substring(typeName.lastIndexOf(".") + 1).equals(name)) {
+                        if (typeName.substring(typeName.lastIndexOf('.') + 1).equals(name)) {
                             return new SLExpression(containingType);
                         }
                         ProgramVariable et = javaInfo.getAttribute(

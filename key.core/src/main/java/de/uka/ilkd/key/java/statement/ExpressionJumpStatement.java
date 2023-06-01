@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ExpressionContainer;
 import de.uka.ilkd.key.java.ProgramElement;
+
+import org.key_project.util.ExtList;
 
 /**
  * Expression jump statement.
@@ -95,8 +95,9 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
      */
     public ProgramElement getChildAt(int index) {
         if (expression != null) {
-            if (index == 0)
+            if (index == 0) {
                 return expression;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

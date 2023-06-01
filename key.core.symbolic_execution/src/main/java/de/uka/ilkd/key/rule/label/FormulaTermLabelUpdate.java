@@ -6,17 +6,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -30,6 +21,10 @@ import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * The {@link TermLabelUpdate} used to label predicates with a {@link FormulaTermLabel} of add
@@ -81,7 +76,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
             TacletApp ta = (TacletApp) ruleApp;
             if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {
                 Map<SequentFormula, FormulaTermLabel> ifLabels =
-                    new LinkedHashMap<SequentFormula, FormulaTermLabel>();
+                    new LinkedHashMap<>();
                 for (IfFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
                     FormulaTermLabel ifLabel = StayOnFormulaTermLabelPolicy.searchFormulaTermLabel(
                         ifInst.getConstrainedFormula().formula().getLabels());
@@ -117,11 +112,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
      * @return The found {@link TermLabel} or {@code} null if no element was found.
      */
     protected TermLabel getTermLabel(Set<TermLabel> labels, final Name name) {
-        return CollectionUtil.search(labels, new IFilter<TermLabel>() {
-            @Override
-            public boolean select(TermLabel element) {
-                return element != null && element.name().equals(name);
-            }
-        });
+        return CollectionUtil.search(labels,
+            element -> element != null && element.name().equals(name));
     }
 }

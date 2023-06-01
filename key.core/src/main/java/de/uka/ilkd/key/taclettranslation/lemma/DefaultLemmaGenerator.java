@@ -6,9 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -34,6 +31,9 @@ import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletVisitor;
 
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSet;
+
 /**
  * The default lemma generator: Supports only certain types of taclets. If a taclet is not
  * supported, the generator throws an exception.
@@ -42,7 +42,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
 
     // Describes how a schema variable is mapped to another operator, e.g.
     // logical variable.
-    private HashMap<SchemaVariable, Term> mapping = new LinkedHashMap<SchemaVariable, Term>();
+    private final HashMap<SchemaVariable, Term> mapping = new LinkedHashMap<>();
 
     @Override
     public TacletFormula translate(Taclet taclet, TermServices services) {
@@ -51,7 +51,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
             throw new IllegalTacletException(result);
         }
         Term formula = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(taclet, services);
-        formula = rebuild(taclet, formula, services, new LinkedHashSet<QuantifiableVariable>());
+        formula = rebuild(taclet, formula, services, new LinkedHashSet<>());
         result = checkForIllegalOps(formula, taclet, false);
         if (result != null) {
             throw new IllegalTacletException(result);
@@ -69,8 +69,9 @@ class DefaultLemmaGenerator implements LemmaGenerator {
 
     public static String checkTaclet(final Taclet taclet) {
         String result = checkForIllegalConditions(taclet);
-        if (result != null)
+        if (result != null) {
             return result;
+        }
         TacletVisitor visitor = new TacletVisitor() {
 
             @Override
@@ -264,7 +265,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
             HashSet<QuantifiableVariable> boundedVariables) {
         Term[] newSubs = new Term[term.arity()];
         int i = 0;
-        LinkedList<QuantifiableVariable> qvars = new LinkedList<QuantifiableVariable>();
+        LinkedList<QuantifiableVariable> qvars = new LinkedList<>();
         for (QuantifiableVariable qvar : term.boundVars()) {
             boundedVariables.add(qvar);
             if (qvar instanceof VariableSV) {
@@ -286,7 +287,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         Operator newOp = replaceOp(term.op(), services);
 
         return services.getTermFactory().createTerm(newOp, newSubs,
-            new ImmutableArray<QuantifiableVariable>(qvars), term.javaBlock());
+            new ImmutableArray<>(qvars), term.javaBlock());
     }
 
     /**

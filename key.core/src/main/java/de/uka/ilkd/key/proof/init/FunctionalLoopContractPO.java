@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.ArrayUtil;
-
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -30,14 +27,11 @@ import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilde
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.UpdatesBuilder;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.VariablesCreatorAndRegistrar;
-import de.uka.ilkd.key.speclang.AuxiliaryContract;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.FunctionalLoopContract;
-import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.LoopContract;
-import de.uka.ilkd.key.speclang.SpecificationElement;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.ArrayUtil;
 
 /**
  * A proof obligation for a {@link FunctionalLoopContract}.
@@ -50,7 +44,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      * Transaction tags.
      */
     private static final Map<Boolean, String> TRANSACTION_TAGS =
-        new LinkedHashMap<Boolean, String>();
+        new LinkedHashMap<>();
 
     static {
         TRANSACTION_TAGS.put(false, "transaction_inactive");
@@ -60,7 +54,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
     /**
      * The contract from which this PO is generated.
      */
-    private FunctionalLoopContract contract;
+    private final FunctionalLoopContract contract;
 
     /**
      * The initial proof configuration.
@@ -115,7 +109,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
     }
 
     @Override
-    public void fillSaveProperties(Properties properties) throws IOException {
+    public void fillSaveProperties(Properties properties) {
         super.fillSaveProperties(properties);
         properties.setProperty("contract", contract.getName());
     }
@@ -159,13 +153,10 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
             return false;
         }
         if (environmentConfig == null) {
-            if (other.environmentConfig != null) {
-                return false;
-            }
-        } else if (!environmentConfig.equals(other.environmentConfig)) {
-            return false;
+            return other.environmentConfig == null;
+        } else {
+            return environmentConfig.equals(other.environmentConfig);
         }
-        return true;
     }
 
     @Override
@@ -339,7 +330,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
     private static Map<LocationVariable, Function> createAnonInHeaps(
             final List<LocationVariable> heaps, final Services services, final TermBuilder tb) {
         Map<LocationVariable, Function> anonInHeaps =
-            new LinkedHashMap<LocationVariable, Function>(40);
+            new LinkedHashMap<>(40);
 
         for (LocationVariable heap : heaps) {
             final String anonymisationName =
@@ -362,7 +353,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
     private Map<LocationVariable, Function> createAnonOutHeaps(final List<LocationVariable> heaps,
             final Services services, final TermBuilder tb) {
         Map<LocationVariable, Function> anonOutHeaps =
-            new LinkedHashMap<LocationVariable, Function>(40);
+            new LinkedHashMap<>(40);
         for (LocationVariable heap : heaps) {
             if (contract.hasModifiesClause(heap)) {
                 final String anonymisationName =

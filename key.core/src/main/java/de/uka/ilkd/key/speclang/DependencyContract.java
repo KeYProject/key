@@ -12,5 +12,5 @@ import de.uka.ilkd.key.logic.Term;
 public interface DependencyContract extends Contract {
 
     @Override
-    public DependencyContract map(UnaryOperator<Term> op, Services services);
+    DependencyContract map(UnaryOperator<Term> op, Services services);
 }

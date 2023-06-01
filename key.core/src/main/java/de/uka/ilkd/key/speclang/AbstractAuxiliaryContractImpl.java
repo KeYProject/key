@@ -1,15 +1,6 @@
 package de.uka.ilkd.key.speclang;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.StringUtil;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
@@ -29,6 +20,10 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Abstract base class for all default implementations of the sub-interfaces of
@@ -593,7 +588,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         String mods = getPlainMods(terms.self, baseHeap, heapLDT, services);
         String pres = getPlainPres(terms, baseHeap, heapLDT, services);
         String posts = getPlainPosts(terms, baseHeap, heapLDT, services);
-        return stringBuilder.toString() + pres + posts + mods + "termination " + getModality();
+        return stringBuilder + pres + posts + mods + "termination " + getModality();
     }
 
     @Override
@@ -642,11 +637,10 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             return false;
         } else if (transactionApplicable != other.transactionApplicable) {
             return false;
-        } else if ((variables == null && other.variables != null)
-                || (variables != null && !variables.equals(other.variables))) {
-            return false;
+        } else {
+            return (variables != null || other.variables == null)
+                    && (variables == null || variables.equals(other.variables));
         }
-        return true;
     }
 
     @Override
@@ -745,21 +739,20 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      */
     private String getHtmlMods(final LocationVariable baseHeap, final HeapLDT heapLDT,
             final Services services) {
-        String mods = "";
+        StringBuilder mods = new StringBuilder();
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             if (modifiesClauses.get(heap) != null) {
-                mods =
-                    mods + "<br><b>mod" + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
-                        + LogicPrinter.escapeHTML(
+                mods.append("<br><b>mod").append(heap == baseHeap ? "" : "[" + heap + "]")
+                        .append("</b> ").append(LogicPrinter.escapeHTML(
                             LogicPrinter.quickPrintTerm(modifiesClauses.get(heap), services),
-                            false);
+                            false));
                 /*
                  * if (heap == baseHeap && !hasRealModifiesClause) { mods = mods +
                  * "<b>, creates no new objects</b>"; }
                  */
             }
         }
-        return mods;
+        return mods.toString();
     }
 
     /**
@@ -771,15 +764,15 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      */
     private String getHtmlPres(final LocationVariable baseHeap, final HeapLDT heapLDT,
             final Services services) {
-        String pres = "";
+        StringBuilder pres = new StringBuilder();
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             if (preconditions.get(heap) != null) {
-                pres = pres + "<br><b>pre" + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
-                    + LogicPrinter.escapeHTML(
-                        LogicPrinter.quickPrintTerm(preconditions.get(heap), services), false);
+                pres.append("<br><b>pre").append(heap == baseHeap ? "" : "[" + heap + "]")
+                        .append("</b> ").append(LogicPrinter.escapeHTML(
+                            LogicPrinter.quickPrintTerm(preconditions.get(heap), services), false));
             }
         }
-        return pres;
+        return pres.toString();
     }
 
     /**
@@ -791,15 +784,16 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      */
     private String getHtmlPosts(final LocationVariable baseHeap, final HeapLDT heapLDT,
             final Services services) {
-        String posts = "";
+        StringBuilder posts = new StringBuilder();
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             if (postconditions.get(heap) != null) {
-                posts = posts + "<br><b>post" + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
-                    + LogicPrinter.escapeHTML(
-                        LogicPrinter.quickPrintTerm(postconditions.get(heap), services), false);
+                posts.append("<br><b>post").append(heap == baseHeap ? "" : "[" + heap + "]")
+                        .append("</b> ").append(LogicPrinter.escapeHTML(
+                            LogicPrinter.quickPrintTerm(postconditions.get(heap), services),
+                            false));
             }
         }
-        return posts;
+        return posts.toString();
     }
 
     /**
@@ -812,20 +806,20 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      */
     private String getPlainMods(Term self, final LocationVariable baseHeap, final HeapLDT heapLDT,
             final Services services) {
-        String mods = "";
+        StringBuilder mods = new StringBuilder();
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             Term modifiesClause =
                 getModifiesClause(heap, services.getTermBuilder().var(heap), self, services);
             if (modifiesClause != null) {
-                mods = mods + "\nmod" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
-                    + StringUtil.trim(LogicPrinter.quickPrintTerm(modifiesClause, services));
+                mods.append("\nmod").append(heap == baseHeap ? "" : "[" + heap + "]").append(" ")
+                        .append(LogicPrinter.quickPrintTerm(modifiesClause, services));
                 /*
                  * if (heap == baseHeap && !hasRealModifiesClause) { mods = mods +
                  * "<b>, creates no new objects</b>"; }
                  */
             }
         }
-        return mods;
+        return mods.toString();
     }
 
     /**
@@ -838,16 +832,16 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      */
     private String getPlainPres(Terms terms, final LocationVariable baseHeap, final HeapLDT heapLDT,
             final Services services) {
-        String pres = "";
+        StringBuilder pres = new StringBuilder();
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             Term precondition = getPrecondition(heap, services.getTermBuilder().var(baseHeap),
                 terms.self, terms.remembranceHeaps, services);
             if (precondition != null) {
-                pres = pres + "\npre" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
-                    + StringUtil.trim(LogicPrinter.quickPrintTerm(precondition, services));
+                pres.append("\npre").append(heap == baseHeap ? "" : "[" + heap + "]").append(" ")
+                        .append(LogicPrinter.quickPrintTerm(precondition, services));
             }
         }
-        return pres;
+        return pres.toString();
     }
 
     /**
@@ -860,16 +854,16 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      */
     private String getPlainPosts(Terms terms, final LocationVariable baseHeap,
             final HeapLDT heapLDT, final Services services) {
-        String posts = "";
+        StringBuilder posts = new StringBuilder();
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             Term postcondition =
                 getPostcondition(heap, services.getTermBuilder().var(baseHeap), terms, services);
             if (postcondition != null) {
-                posts = posts + "\npost" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
-                    + StringUtil.trim(LogicPrinter.quickPrintTerm(postcondition, services));
+                posts.append("\npost").append(heap == baseHeap ? "" : "[" + heap + "]").append(" ")
+                        .append(LogicPrinter.quickPrintTerm(postcondition, services));
             }
         }
-        return posts;
+        return posts.toString();
     }
 
     /**
@@ -1060,7 +1054,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @return the contract's preconditions.
          */
         protected Map<LocationVariable, Term> buildPreconditions() {
-            final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
+            final Map<LocationVariable, Term> result = new LinkedHashMap<>();
             for (LocationVariable heap : heaps) {
                 // Add JML precondition to precondition
                 if (requires.get(heap) != null) {
@@ -1072,7 +1066,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 Term mbyTerm;
 
                 if (measuredBy != null && !measuredBy.equals(measuredByEmpty())) {
-                    Map<Term, Term> replacementMap = new LinkedHashMap<Term, Term>();
+                    Map<Term, Term> replacementMap = new LinkedHashMap<>();
 
                     for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : variables.outerRemembranceVariables
                             .entrySet()) {
@@ -1111,7 +1105,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @return the contract's free preconditions.
          */
         protected Map<LocationVariable, Term> buildFreePreconditions() {
-            final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
+            final Map<LocationVariable, Term> result = new LinkedHashMap<>();
             for (LocationVariable heap : heaps) {
                 // Add JML precondition to precondition
                 if (requiresFree.get(heap) != null) {
@@ -1127,7 +1121,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         protected Map<LocationVariable, Term> buildPostconditions() {
             final Map<LocationVariable, Term> postconditions =
-                new LinkedHashMap<LocationVariable, Term>();
+                new LinkedHashMap<>();
             for (LocationVariable heap : heaps) {
                 if (ensures.get(heap) != null) {
                     postconditions.put(heap, buildPostcondition(heap));
@@ -1142,7 +1136,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         protected Map<LocationVariable, Term> buildFreePostconditions() {
             final Map<LocationVariable, Term> freePostconditions =
-                new LinkedHashMap<LocationVariable, Term>();
+                new LinkedHashMap<>();
             for (LocationVariable heap : heaps) {
                 if (ensuresFree.get(heap) != null) {
                     freePostconditions.put(heap, buildFreePostcondition(heap));
@@ -1436,7 +1430,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         private Map<LocationVariable, Term> addNegatedDivergesConditionToPreconditions(
                 final Map<LocationVariable, Term> preconditions) {
-            final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
+            final Map<LocationVariable, Term> result = new LinkedHashMap<>();
             for (LocationVariable heap : heaps) {
                 if (preconditions.get(heap) != null) {
                     result.put(heap, and(preconditions.get(heap), not(convertToFormula(diverges))));
@@ -1503,11 +1497,11 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         public Combinator(final T[] contracts, final Services services) {
             super(services.getTermFactory(), services);
             this.contracts = sort(contracts);
-            preconditions = new LinkedHashMap<LocationVariable, Term>();
-            freePreconditions = new LinkedHashMap<LocationVariable, Term>();
-            postconditions = new LinkedHashMap<LocationVariable, Term>();
-            freePostconditions = new LinkedHashMap<LocationVariable, Term>();
-            modifiesClauses = new LinkedHashMap<LocationVariable, Term>();
+            preconditions = new LinkedHashMap<>();
+            freePreconditions = new LinkedHashMap<>();
+            postconditions = new LinkedHashMap<>();
+            freePostconditions = new LinkedHashMap<>();
+            modifiesClauses = new LinkedHashMap<>();
         }
 
         /**
@@ -1517,12 +1511,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         private T[] sort(final T[] contracts) {
             // sort contracts alphabetically (for determinism)
-            Arrays.sort(contracts, new Comparator<T>() {
-                @Override
-                public int compare(T firstContract, T secondContract) {
-                    return firstContract.getName().compareTo(secondContract.getName());
-                }
-            });
+            Arrays.sort(contracts, Comparator.comparing(SpecificationElement::getName));
             return contracts;
         }
 
@@ -1679,7 +1668,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             if (formula == null) {
                 return tt();
             } else {
-                final Map<Term, Term> replacementMap = new LinkedHashMap<Term, Term>();
+                final Map<Term, Term> replacementMap = new LinkedHashMap<>();
 
                 for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables
                         .entrySet()) {

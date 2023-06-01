@@ -1,12 +1,6 @@
 package de.uka.ilkd.key.java.expression.operator;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclarationContainer;
@@ -16,6 +10,8 @@ import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.ReferenceSuffix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 /**
  * The object allocation operator. There are two variants for New:
@@ -145,14 +141,18 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     @Override
     public int getChildCount() {
         int result = 0;
-        if (accessPath != null)
+        if (accessPath != null) {
             result++;
-        if (typeReference != null)
+        }
+        if (typeReference != null) {
             result++;
-        if (children != null)
+        }
+        if (children != null) {
             result += children.size();
-        if (anonymousClass != null)
+        }
+        if (anonymousClass != null) {
             result++;
+        }
         return result;
     }
 
@@ -161,13 +161,15 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     public ProgramElement getChildAt(int index) {
         int len;
         if (accessPath != null) {
-            if (index == 0)
+            if (index == 0) {
                 return accessPath;
+            }
             index--;
         }
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
             index--;
         }
         if (children != null) {
@@ -178,8 +180,9 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
             index -= len;
         }
         if (anonymousClass != null) {
-            if (index == 0)
+            if (index == 0) {
                 return anonymousClass;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -199,12 +202,6 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     @Override
     public void visit(Visitor v) {
         v.performActionOnNew(this);
-    }
-
-
-    @Override
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printNew(this);
     }
 
 

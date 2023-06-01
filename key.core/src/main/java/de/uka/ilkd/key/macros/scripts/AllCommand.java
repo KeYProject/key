@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 
 public class AllCommand extends AbstractCommand<Map<String, String>> {
 

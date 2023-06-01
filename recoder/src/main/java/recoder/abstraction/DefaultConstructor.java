@@ -2,12 +2,12 @@
 
 package recoder.abstraction;
 
+import java.util.List;
+
 import recoder.ModelException;
 import recoder.convenience.Naming;
 import recoder.service.ProgramModelInfo;
 import recoder.util.Debug;
-
-import java.util.List;
 
 /**
  * Default constructor of class types.
@@ -18,7 +18,7 @@ public class DefaultConstructor implements Constructor {
 
     protected ProgramModelInfo service;
 
-    protected ClassType ownerClass;
+    protected final ClassType ownerClass;
 
     /**
      * Create a new default constructor for the given class type. The name of the constructor is set

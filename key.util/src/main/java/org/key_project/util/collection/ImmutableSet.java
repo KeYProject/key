@@ -1,13 +1,11 @@
 package org.key_project.util.collection;
 
-import javax.annotation.Nonnull;
-
 import java.util.*;
-
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 
 /**
  * interface implemented by non-destructive Sets. CONVENTION: Each SetOf<T> implementation has to
@@ -21,11 +19,11 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
      *
      * @return a Collector that accumulates the input elements into a new ImmutableSet.
      */
-    public static <T> Collector<T, Set<T>, ImmutableSet<T>> collector() {
-        return Collector.of(HashSet<T>::new, (set, el) -> set.add(el), (set1, set2) -> {
+    static <T> Collector<T, Set<T>, ImmutableSet<T>> collector() {
+        return Collector.of(HashSet::new, Set::add, (set1, set2) -> {
             set1.addAll(set2);
             return set1;
-        }, ImmutableSet::<T>fromSet, Characteristics.UNORDERED);
+        }, ImmutableSet::fromSet, Characteristics.UNORDERED);
     }
 
     /**
@@ -34,7 +32,7 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
      * @param set a Set.
      * @return an ImmutableSet containing the same elements as the specified set.
      */
-    public static <T> ImmutableSet<T> fromSet(Set<T> set) {
+    static <T> ImmutableSet<T> fromSet(Set<T> set) {
         ImmutableSet<T> result = DefaultImmutableSet.nil();
 
         for (T el : set) {
@@ -113,10 +111,10 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
      * @return true iff the this set is subset of o and vice versa.
      */
     @Override
-    public boolean equals(Object o);
+    boolean equals(Object o);
 
     @Override
-    public int hashCode();
+    int hashCode();
 
     /**
      * adds an element, barfs if the element is already present

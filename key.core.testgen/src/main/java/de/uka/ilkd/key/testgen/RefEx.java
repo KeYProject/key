@@ -6,10 +6,10 @@ package de.uka.ilkd.key.testgen;
  * @author gladisch
  */
 public class RefEx {
-    public String rcObjType;
-    public String rcObj;
-    public String fieldType;
-    public String field;
+    public final String rcObjType;
+    public final String rcObj;
+    public final String fieldType;
+    public final String field;
 
     /**
      * Example: rcObj.field, where rcObjType is the type of rcObj. The prefix "rc" stands for
@@ -24,7 +24,7 @@ public class RefEx {
 
     @Override
     public String toString() {
-        if (rcObjType != null && rcObjType != "") {
+        if (rcObjType != null && !rcObjType.isEmpty()) {
             return "((" + rcObjType + ")" + rcObj + ")." + field;
         }
         return rcObj + "." + field;

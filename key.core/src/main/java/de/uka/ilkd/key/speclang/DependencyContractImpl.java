@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.java.MapUtil;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -22,6 +19,9 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.DependencyContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.MapUtil;
 
 /**
  * Standard implementation of the DependencyContract interface.
@@ -143,7 +143,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
         if (originalSelfVar != null) {
             map.put(originalSelfVar, selfVar);
         }
@@ -190,7 +190,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
         map.put(services.getTermBuilder().var(heap), heapTerm);
         if (originalSelfVar != null) {
             map.put(services.getTermBuilder().var(originalSelfVar), selfTerm);
@@ -257,7 +257,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
         if (originalSelfVar != null) {
             map.put(originalSelfVar, selfVar);
         }
@@ -279,7 +279,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
         for (LocationVariable heap : heapTerms.keySet()) {
             map.put(services.getTermBuilder().var(heap), heapTerms.get(heap));
         }
@@ -314,23 +314,23 @@ public final class DependencyContractImpl implements DependencyContract {
     }
 
     private String getText(boolean includeHtmlMarkup, Services services) {
-        String pres = "";
+        StringBuilder pres = new StringBuilder();
         for (LocationVariable h : originalPres.keySet()) {
             Term originalPre = originalPres.get(h);
             if (originalPre != null) {
-                pres = pres + "<b>pre[" + h + "]</b> " + LogicPrinter.escapeHTML(
-                    LogicPrinter.quickPrintTerm(originalPre, services), false) + "<br>";
+                pres.append("<b>pre[").append(h).append("]</b> ").append(LogicPrinter.escapeHTML(
+                    LogicPrinter.quickPrintTerm(originalPre, services), false)).append("<br>");
             }
         }
-        String deps = "";
+        StringBuilder deps = new StringBuilder();
         for (ProgramVariable h : originalDeps.keySet()) {
             if (h.name().toString().endsWith("AtPre") && target.getStateCount() == 1) {
                 continue;
             }
             Term originalDep = originalDeps.get(h);
             if (originalDep != null) {
-                deps = deps + "<b>dep[" + h + "]</b> " + LogicPrinter.escapeHTML(
-                    LogicPrinter.quickPrintTerm(originalDep, services), false) + "<br>";
+                deps.append("<b>dep[").append(h).append("]</b> ").append(LogicPrinter.escapeHTML(
+                    LogicPrinter.quickPrintTerm(originalDep, services), false)).append("<br>");
             }
         }
         final String mby = hasMby() ? LogicPrinter.quickPrintTerm(originalMby, services) : null;
@@ -368,7 +368,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
         if (originalSelfVar != null) {
             map.put(originalSelfVar, selfVar);
         }
@@ -398,7 +398,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
         map.put(services.getTermBuilder().var(heap), heapTerm);
         if (originalSelfVar != null) {
             map.put(services.getTermBuilder().var(originalSelfVar), selfTerm);
@@ -456,7 +456,7 @@ public final class DependencyContractImpl implements DependencyContract {
     }
 
     @Override
-    public final ProofOblInput createProofObl(InitConfig initConfig, Contract contract,
+    public ProofOblInput createProofObl(InitConfig initConfig, Contract contract,
             boolean addSymbolicExecutionLabel) {
         if (addSymbolicExecutionLabel) {
             throw new IllegalStateException("Symbolic Execution API is not supported.");
@@ -473,7 +473,7 @@ public final class DependencyContractImpl implements DependencyContract {
 
 
     @Override
-    public final ContractPO createProofObl(InitConfig initConfig) {
+    public ContractPO createProofObl(InitConfig initConfig) {
         return (ContractPO) createProofObl(initConfig, this);
     }
 
@@ -513,7 +513,7 @@ public final class DependencyContractImpl implements DependencyContract {
     @Override
     public OriginalVariables getOrigVars() {
         Map<LocationVariable, ProgramVariable> atPreVars =
-            new LinkedHashMap<LocationVariable, ProgramVariable>();
+            new LinkedHashMap<>();
         if (originalAtPreVars != null) {
             for (LocationVariable h : originalAtPreVars.keySet()) {
                 atPreVars.put(h, originalAtPreVars.get(h));

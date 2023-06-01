@@ -2,18 +2,11 @@ package de.uka.ilkd.key.java.statement;
 
 import java.util.Optional;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.CcatchNonstandardParameterDeclaration;
-import de.uka.ilkd.key.java.ParameterContainer;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.VariableScope;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 /**
  * Ccatch.
@@ -104,12 +97,15 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
     @Override
     public int getChildCount() {
         int result = 0;
-        if (hasParameterDeclaration())
+        if (hasParameterDeclaration()) {
             result++;
-        if (hasNonStdParameterDeclaration())
+        }
+        if (hasNonStdParameterDeclaration()) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -123,18 +119,21 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
     @Override
     public ProgramElement getChildAt(int index) {
         if (hasParameterDeclaration()) {
-            if (index == 0)
+            if (index == 0) {
                 return parameter.get();
+            }
             index--;
         }
         if (hasNonStdParameterDeclaration()) {
-            if (index == 0)
+            if (index == 0) {
                 return nonStdParameter.get();
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -217,7 +216,7 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
      *
      * @return the statement.
      */
-    public Statement getBody() {
+    public StatementBlock getBody() {
         return body;
     }
 
@@ -248,10 +247,5 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
     @Override
     public void visit(Visitor v) {
         v.performActionOnCcatch(this);
-    }
-
-    @Override
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printCcatch(this);
     }
 }

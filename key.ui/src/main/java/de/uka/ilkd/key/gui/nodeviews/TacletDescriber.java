@@ -1,32 +1,17 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import javax.swing.JTextArea;
-
-import org.key_project.util.collection.ImmutableSet;
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.TermLabelSV;
-import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.UpdateSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.NewDependingOn;
-import de.uka.ilkd.key.rule.NewVarcond;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * The methods of class TacletDescriber have been extracted from class {@link InnerNodeView}. They
@@ -135,48 +120,39 @@ class TacletDescriber {
      *
      * @param mediator The {@link KeYMediator} to use.
      * @param node The {@link Node} to use.
-     * @param filter The {@link SequentPrintFilter} to use.
      * @return The text to show.
      */
-    public static String getTacletDescription(KeYMediator mediator, Node node,
-            SequentPrintFilter filter) {
-
+    public static String getTacletDescription(KeYMediator mediator, Node node, int width) {
         RuleApp app = node.getAppliedRuleApp();
-        String s = "";
+        StringBuilder s = new StringBuilder();
 
         if (app != null) {
-            s += "The following rule was applied on this node: \n\n";
+            s.append("The following rule was applied on this node: \n\n");
             if (app.rule() instanceof Taclet) {
-                SequentViewLogicPrinter logicPrinter = new SequentViewLogicPrinter(
-                    new ProgramPrinter(null), mediator.getNotationInfo(), mediator.getServices(),
-                    true, getVisibleTermLabels());
+                SequentViewLogicPrinter logicPrinter =
+                    SequentViewLogicPrinter.purePrinter(width, mediator.getNotationInfo(),
+                        mediator.getServices(), getVisibleTermLabels());
                 logicPrinter.printTaclet((Taclet) (app.rule()));
-                s += logicPrinter;
+                s.append(logicPrinter.result());
             } else {
-                s = s + app.rule();
+                s.append(app.rule());
             }
 
             if (app instanceof TacletApp) {
                 TacletApp tapp = (TacletApp) app;
                 if (tapp.instantiations()
                         .getGenericSortInstantiations() != GenericSortInstantiations.EMPTY_INSTANTIATIONS) {
-                    s = s + "\n\nWith sorts:\n";
-                    s = s + tapp.instantiations().getGenericSortInstantiations();
+                    s.append("\n\nWith sorts:\n");
+                    s.append(tapp.instantiations().getGenericSortInstantiations());
                 }
-
-                StringBuffer sb = new StringBuffer("\n\n");
-                writeTacletSchemaVariablesHelper(sb, tapp.taclet());
-                s = s + sb;
+                // Removed call to writeTacletSchemaVariablesHelper since schema vars are printed by
+                // the logic printer
             }
-
-            // s = s + "\n\nApplication justified by: ";
-            // s = s + mediator.getSelectedProof().env().getJustifInfo()
-            // .getJustification(app, mediator.getServices())+"\n";
         } else {
             // Is this case possible?
-            s += "No rule was applied on this node.";
+            s.append("No rule was applied on this node.");
         }
-        return s;
+        return s.toString();
     }
 
     private static VisibleTermLabels getVisibleTermLabels() {

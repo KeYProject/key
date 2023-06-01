@@ -2,14 +2,14 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 class TriggerUtils {
 
@@ -18,8 +18,9 @@ class TriggerUtils {
      */
     public static Term discardQuantifiers(Term qterm) {
         Term t = qterm;
-        while (t.op() instanceof Quantifier)
+        while (t.op() instanceof Quantifier) {
             t = t.sub(0);
+        }
         return t;
     }
 
@@ -31,8 +32,9 @@ class TriggerUtils {
     }
 
     public static ImmutableSet<Term> setByOperator(Term term, Operator op) {
-        if (term.op() == op)
+        if (term.op() == op) {
             return setByOperator(term.sub(0), op).union(setByOperator(term.sub(1), op));
+        }
         return DefaultImmutableSet.<Term>nil().add(term);
     }
 
@@ -45,11 +47,12 @@ class TriggerUtils {
      */
     public static ImmutableSet<QuantifiableVariable> intersect(
             ImmutableSet<QuantifiableVariable> set0, ImmutableSet<QuantifiableVariable> set1) {
-        ImmutableSet<QuantifiableVariable> res = DefaultImmutableSet.<QuantifiableVariable>nil();
+        ImmutableSet<QuantifiableVariable> res = DefaultImmutableSet.nil();
         for (QuantifiableVariable aSet0 : set0) {
             final QuantifiableVariable el = aSet0;
-            if (set1.contains(el))
+            if (set1.contains(el)) {
                 res = res.add(el);
+            }
         }
         return res;
     }

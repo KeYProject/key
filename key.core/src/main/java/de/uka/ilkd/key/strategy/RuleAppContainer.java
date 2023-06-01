@@ -1,14 +1,14 @@
 package de.uka.ilkd.key.strategy;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Container for RuleApp instances with cost as determined by a given Strategy. Instances of this
@@ -64,12 +64,14 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
     public static RuleAppContainer createAppContainer(RuleApp p_app, PosInOccurrence p_pio,
             Goal p_goal) {
 
-        if (p_app instanceof NoPosTacletApp)
+        if (p_app instanceof NoPosTacletApp) {
             return TacletAppContainer.createAppContainers((NoPosTacletApp) p_app, p_pio, p_goal);
+        }
 
-        if (p_app instanceof IBuiltInRuleApp)
+        if (p_app instanceof IBuiltInRuleApp) {
             return BuiltInRuleAppContainer.createAppContainer((IBuiltInRuleApp) p_app, p_pio,
                 p_goal);
+        }
 
         Debug.fail("Unexpected kind of rule.");
 
@@ -84,15 +86,15 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      */
     public static ImmutableList<RuleAppContainer> createAppContainers(
             ImmutableList<? extends RuleApp> rules, PosInOccurrence pos, Goal goal) {
-        ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
+        ImmutableList<RuleAppContainer> result = ImmutableSLList.nil();
 
         if (rules.size() == 1) {
             result = result.prepend(createAppContainer(rules.head(), pos, goal));
         } else if (rules.size() > 1) {
             ImmutableList<NoPosTacletApp> tacletApplications =
-                ImmutableSLList.<NoPosTacletApp>nil();
+                ImmutableSLList.nil();
             ImmutableList<IBuiltInRuleApp> builtInRuleApplications =
-                ImmutableSLList.<IBuiltInRuleApp>nil();
+                ImmutableSLList.nil();
 
             for (RuleApp rule : rules) {
                 if (rule instanceof NoPosTacletApp) {

@@ -9,8 +9,6 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Stack;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.JavaProgramElement;
@@ -40,6 +38,8 @@ import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor;
 
+import org.key_project.util.collection.ImmutableArray;
+
 public class SyntacticalReplaceVisitor extends DefaultVisitor {
     public static final String SUBSTITUTION_WITH_LABELS_HINT = "SUBSTITUTION_WITH_LABELS";
     protected final SVInstantiations svInst;
@@ -62,8 +62,8 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
      * one, because one of its subterms has been built, too.
      */
     private final Stack<Object> subStack; // of Term (and Boolean)
-    private final Boolean newMarker = new Boolean(true);
-    private final Deque<Term> tacletTermStack = new ArrayDeque<Term>();
+    private final Boolean newMarker = Boolean.TRUE;
+    private final Deque<Term> tacletTermStack = new ArrayDeque<>();
 
 
     /**
@@ -92,7 +92,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         this.ruleApp = ruleApp;
         this.labelHint = labelHint;
         this.goal = goal;
-        subStack = new Stack<Object>(); // of Term
+        subStack = new Stack<>(); // of Term
         if (labelHint instanceof TacletLabelHint) {
             labelHint.setTacletTermStack(tacletTermStack);
         }
@@ -270,7 +270,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             }
 
             if (varsChanged) {
-                vBoundVars = new ImmutableArray<QuantifiableVariable>(newVars);
+                vBoundVars = new ImmutableArray<>(newVars);
             }
         }
         return vBoundVars;
@@ -313,7 +313,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             if (boundVars != visited.boundVars() || jblockChanged || (newOp != visitedOp)
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
                 final ImmutableArray<TermLabel> labels = instantiateLabels(visited, newOp,
-                    new ImmutableArray<Term>(neededsubs), boundVars, jb, visited.getLabels());
+                    new ImmutableArray<>(neededsubs), boundVars, jb, visited.getLabels());
                 final Term newTerm = tb.tf().createTerm(newOp, neededsubs, boundVars, jb, labels);
                 pushNew(resolveSubst(newTerm));
             } else {
@@ -327,10 +327,11 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
                         visited.javaBlock(), labels);
                 }
                 t = resolveSubst(t);
-                if (t == visited)
+                if (t == visited) {
                     subStack.push(t);
-                else
+                } else {
                     pushNew(t);
+                }
             }
         }
     }

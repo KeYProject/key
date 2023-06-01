@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
-import de.uka.ilkd.key.java.Services;
-
 import java.util.Map;
+
+import de.uka.ilkd.key.java.Services;
 
 /**
  * SMT handler properties are properties for the new modular smt handler.

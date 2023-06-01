@@ -1,6 +1,7 @@
 package org.key_project.util.collection;
 
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestImmutables {
@@ -157,9 +158,9 @@ public class TestImmutables {
 
     @Test
     public void testFilter() {
-        ImmutableList<Integer> l = ImmutableList.of(1,2,3,4,5,6,7,8,9);
+        ImmutableList<Integer> l = ImmutableList.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
         ImmutableList<Integer> filtered = Immutables.filter(l, n -> n % 2 == 0);
-        assertEquals(ImmutableList.of(2,4,6,8), filtered);
+        assertEquals(ImmutableList.of(2, 4, 6, 8), filtered);
     }
 
     @Test
@@ -177,7 +178,7 @@ public class TestImmutables {
 
     @Test
     public void testMap() {
-        ImmutableList<Integer> l = ImmutableList.of(1,2,3,4);
+        ImmutableList<Integer> l = ImmutableList.of(1, 2, 3, 4);
         ImmutableList<Boolean> mapped = Immutables.map(l, n -> n % 2 == 0);
         assertEquals(ImmutableList.of(false, true, false, true), mapped);
     }

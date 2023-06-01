@@ -1,6 +1,10 @@
 package de.uka.ilkd.key.smt.lang;
 
-public class Util {
+public final class Util {
+    private Util() {
+
+    }
+
     public static String processName(String id) {
         // is symbol already quoted?
         if (id.startsWith("|") && id.endsWith("|")) {

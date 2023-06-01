@@ -1,13 +1,12 @@
 package de.uka.ilkd.key.java.reference;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
+
+import org.key_project.util.ExtList;
 
 /**
  * Package reference.
@@ -63,10 +62,12 @@ public class PackageReference extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int result = 0;
-        if (prefix != null)
+        if (prefix != null) {
             result++;
-        if (name != null)
+        }
+        if (name != null) {
             result++;
+        }
         return result;
     }
 
@@ -79,13 +80,15 @@ public class PackageReference extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0)
+            if (index == 0) {
                 return prefix;
+            }
             index--;
         }
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -137,10 +140,6 @@ public class PackageReference extends JavaNonTerminalProgramElement
         v.performActionOnPackageReference(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printPackageReference(this);
-    }
-
     public ReferencePrefix setReferencePrefix(ReferencePrefix r) {
         return this;
     }
@@ -156,6 +155,6 @@ public class PackageReference extends JavaNonTerminalProgramElement
 
 
     public String toString() {
-        return (prefix != null ? prefix.toString() + "." : "") + getName();
+        return (prefix != null ? prefix + "." : "") + getName();
     }
 }

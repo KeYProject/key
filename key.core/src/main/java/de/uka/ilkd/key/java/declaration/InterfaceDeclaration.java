@@ -1,14 +1,13 @@
 package de.uka.ilkd.key.java.declaration;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Interface declaration.
@@ -65,14 +64,18 @@ public class InterfaceDeclaration extends TypeDeclaration {
      */
     public int getChildCount() {
         int result = 0;
-        if (modArray != null)
+        if (modArray != null) {
             result += modArray.size();
-        if (name != null)
+        }
+        if (name != null) {
             result++;
-        if (extending != null)
+        }
+        if (extending != null) {
             result++;
-        if (members != null)
+        }
+        if (members != null) {
             result += members.size();
+        }
         return result;
     }
 
@@ -93,13 +96,15 @@ public class InterfaceDeclaration extends TypeDeclaration {
             index -= len;
         }
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (extending != null) {
-            if (index == 0)
+            if (index == 0) {
                 return extending;
+            }
             index--;
         }
         if (members != null) {
@@ -186,7 +191,7 @@ public class InterfaceDeclaration extends TypeDeclaration {
      * returns the local declared supertypes
      */
     public ImmutableList<KeYJavaType> getSupertypes() {
-        ImmutableList<KeYJavaType> types = ImmutableSLList.<KeYJavaType>nil();
+        ImmutableList<KeYJavaType> types = ImmutableSLList.nil();
         if (extending != null) {
             for (int i = extending.getTypeReferenceCount() - 1; i >= 0; i--) {
                 types = types.prepend(extending.getTypeReferenceAt(i).getKeYJavaType());
@@ -203,9 +208,5 @@ public class InterfaceDeclaration extends TypeDeclaration {
      */
     public void visit(Visitor v) {
         v.performActionOnInterfaceDeclaration(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printInterfaceDeclaration(this);
     }
 }

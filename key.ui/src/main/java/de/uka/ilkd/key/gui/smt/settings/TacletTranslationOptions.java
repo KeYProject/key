@@ -1,14 +1,14 @@
 package de.uka.ilkd.key.gui.smt.settings;
 
 
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
-import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
-
-import javax.swing.*;
 
 public class TacletTranslationOptions extends SettingsPanel implements SettingsProvider {
     private static final long serialVersionUID = 5273966151509876358L;
@@ -57,7 +57,7 @@ public class TacletTranslationOptions extends SettingsPanel implements SettingsP
     public JComponent getPanel(MainWindow window) {
         ProofDependentSMTSettings pdSettings = SettingsManager.getSmtPdSettings(window).clone();
         ProofIndependentSMTSettings piSettings = SettingsManager.getSmtPiSettings().clone();
-        maxNumberOfGenerics.setValue(pdSettings.maxGenericSorts);
+        maxNumberOfGenerics.setValue(pdSettings.getMaxGenericSorts());
         fileChooserPanel.setText(piSettings.getPathForTacletTranslation());
         // fileChooserPanel.setEnabled(piSettings.storeTacletTranslationToFile);
         return this;
@@ -68,12 +68,8 @@ public class TacletTranslationOptions extends SettingsPanel implements SettingsP
         ProofDependentSMTSettings currentPd = SettingsManager.getSmtPdSettings(window);
         ProofIndependentSMTSettings currentPi = SettingsManager.getSmtPiSettings();
 
-        currentPd.maxGenericSorts = (Integer) maxNumberOfGenerics.getValue();
+        currentPd.setMaxGenericSorts((Integer) maxNumberOfGenerics.getValue());
         currentPi.setPathForTacletTranslation(fileChooserPanel.getText());
         currentPi.setStoreTacletTranslationToFile(!fileChooserPanel.getText().trim().isEmpty());
-
-        currentPd.fireSettingsChanged();
-        currentPi.fireSettingsChanged();
     }
 }
-

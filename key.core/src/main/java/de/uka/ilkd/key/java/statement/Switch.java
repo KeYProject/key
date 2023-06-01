@@ -1,15 +1,10 @@
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.visitor.Visitor;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ExpressionContainer;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.TypeScope;
-import de.uka.ilkd.key.java.VariableScope;
-import de.uka.ilkd.key.java.visitor.Visitor;
 
 /**
  * Switch.
@@ -60,7 +55,7 @@ public class Switch extends BranchStatement
      */
 
     public Switch(Expression e, Branch[] branches) {
-        this.branches = new ImmutableArray<Branch>(branches);
+        this.branches = new ImmutableArray<>(branches);
         this.expression = e;
     }
 
@@ -73,7 +68,7 @@ public class Switch extends BranchStatement
     public Switch(ExtList children) {
         super(children);
         this.expression = children.get(Expression.class);
-        this.branches = new ImmutableArray<Branch>(children.collect(Branch.class));
+        this.branches = new ImmutableArray<>(children.collect(Branch.class));
     }
 
 
@@ -85,10 +80,12 @@ public class Switch extends BranchStatement
 
     public int getChildCount() {
         int result = 0;
-        if (expression != null)
+        if (expression != null) {
             result++;
-        if (branches != null)
+        }
+        if (branches != null) {
             result += branches.size();
+        }
         return result;
     }
 
@@ -102,8 +99,9 @@ public class Switch extends BranchStatement
 
     public ProgramElement getChildAt(int index) {
         if (expression != null) {
-            if (index == 0)
+            if (index == 0) {
                 return expression;
+            }
             index--;
         }
         if (branches != null) {
@@ -195,9 +193,5 @@ public class Switch extends BranchStatement
      */
     public void visit(Visitor v) {
         v.performActionOnSwitch(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printSwitch(this);
     }
 }

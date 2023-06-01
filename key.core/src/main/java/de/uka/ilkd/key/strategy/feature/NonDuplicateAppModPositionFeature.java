@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.strategy.feature;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
+
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -22,7 +22,7 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
             return true;
         }
 
-        return !containsRuleApp(goal.appliedRuleApps(), app, pos);
+        return noDuplicateFindTaclet(app, pos, goal);
     }
 
     @Override

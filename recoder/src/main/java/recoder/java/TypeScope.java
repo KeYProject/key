@@ -2,9 +2,9 @@
 
 package recoder.java;
 
-import recoder.abstraction.ClassType;
-
 import java.util.List;
+
+import recoder.abstraction.ClassType;
 
 /**
  * The property of a non terminal program element to define a scope for types.

@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
-import java.awt.*;
+
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 /**
  * Status line of the KeY MainWindow.
@@ -28,7 +28,6 @@ class MainStatusLine extends JPanel {
     private static final long serialVersionUID = 2278249652314818379L;
     private final JLabel lblStatusText = new JLabel();
     private final JProgressBar progressBar = new JProgressBar();
-    // private boolean phantomBoxAdded = false;
 
     MainStatusLine(String initialText, Font font) {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));

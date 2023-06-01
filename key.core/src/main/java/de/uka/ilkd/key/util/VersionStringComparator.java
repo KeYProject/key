@@ -12,7 +12,7 @@ public class VersionStringComparator implements Comparator<String> {
 
     private final static String SEPARATOR_PATTERN = "\\D";
 
-    private final LexicographicComparator<Integer> lxc = new LexicographicComparator<Integer>();
+    private final LexicographicComparator<Integer> lxc = new LexicographicComparator<>();
 
     @Override
     public int compare(String arg0, String arg1) {
@@ -36,7 +36,7 @@ public class VersionStringComparator implements Comparator<String> {
         try {
             return Integer.parseInt(s);
         } catch (NumberFormatException e) {
-            return Integer.valueOf(-1);
+            return -1;
         }
     }
 }

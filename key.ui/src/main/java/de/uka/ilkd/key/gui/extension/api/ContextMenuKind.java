@@ -5,5 +5,5 @@ package de.uka.ilkd.key.gui.extension.api;
  * @version 1 (07.04.19)
  */
 public interface ContextMenuKind {
-    public Class<?> getType();
+    Class<?> getType();
 }

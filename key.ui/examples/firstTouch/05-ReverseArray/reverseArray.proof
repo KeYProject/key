@@ -58,7 +58,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
 
 (branch "dummy ID"
 (rule "elementOfAllFields" (formula "1") (term "0,0,0,0,1,0,1,1") (newnames "heapAtPre,o,f"))
-(rule "inInt" (formula "1") (term "1,0,0,0,0,0,0,1,1"))
+(rule "expandInInt" (formula "1") (term "1,0,0,0,0,0,0,1,1"))
 (rule "concrete_and_3" (formula "1") (term "0,0,0,0,0,0,1,1"))
 (rule "impRight" (formula "1"))
 (rule "andLeft" (formula "1"))
@@ -133,7 +133,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                (branch "Case 1"
                   (rule "andRight" (formula "8"))
                   (branch "Case 1"
-                     (rule "inInt" (formula "8") (term "1,0,0,1"))
+                     (rule "expandInInt" (formula "8") (term "1,0,0,1"))
                      (rule "concrete_and_3" (formula "8") (term "0,0,1"))
                      (rule "simplifyUpdate2" (formula "8"))
                      (rule "allRight" (formula "8") (inst "sk=j_0"))
@@ -196,7 +196,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                      (rule "closeFalse" (formula "1"))
                   )
                   (branch "Case 2"
-                     (rule "inInt" (formula "8") (term "1,0,0,1"))
+                     (rule "expandInInt" (formula "8") (term "1,0,0,1"))
                      (rule "concrete_and_3" (formula "8") (term "0,0,1"))
                      (rule "simplifyUpdate2" (formula "8"))
                      (rule "allRight" (formula "8") (inst "sk=j_0"))
@@ -358,14 +358,14 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
       (branch "Invariant Preserved and Used"
          (rule "false_to_not_true" (formula "9") (term "0,1,0,1,1,1,1"))
          (rule "concrete_and_3" (formula "9") (term "0,1,1,1"))
-         (rule "inInt" (formula "9") (term "1,0,0,1,0,0,0,0,1,1,1"))
+         (rule "expandInInt" (formula "9") (term "1,0,0,1,0,0,0,0,1,1,1"))
          (rule "concrete_and_3" (formula "9") (term "0,0,1,0,0,0,0,1,1,1"))
-         (rule "inInt" (formula "9") (term "1,0,0,0,0,0,0,0,1,1,1"))
+         (rule "expandInInt" (formula "9") (term "1,0,0,0,0,0,0,0,1,1,1"))
          (rule "concrete_and_3" (formula "9") (term "0,0,0,0,0,0,0,1,1,1"))
          (rule "elementOfAllFields" (formula "9") (term "0,0,0,0,1,0,1,1,0,1,1,1,1"))
-         (rule "inInt" (formula "9") (term "1,0,0,1,0,0,0,0,0,1,1,0,1,1,1,1"))
+         (rule "expandInInt" (formula "9") (term "1,0,0,1,0,0,0,0,0,1,1,0,1,1,1,1"))
          (rule "concrete_and_3" (formula "9") (term "0,0,1,0,0,0,0,0,1,1,0,1,1,1,1"))
-         (rule "inInt" (formula "9") (term "1,0,0,0,0,0,0,0,0,1,1,0,1,1,1,1"))
+         (rule "expandInInt" (formula "9") (term "1,0,0,0,0,0,0,0,0,1,1,0,1,1,1,1"))
          (rule "concrete_and_3" (formula "9") (term "0,0,0,0,0,0,0,0,1,1,0,1,1,1,1"))
          (rule "eqSymm" (formula "9") (term "1,0,0,1,0,1,1,0,1,1,1,1"))
          (rule "eqSymm" (formula "9") (term "1,1,0,0,0,0,0,0,0,1,1,0,1,1,1,1"))
@@ -711,7 +711,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
          (rule "commute_and" (formula "2") (term "0,0"))
          (rule "arrayLengthNotNegative" (formula "11") (term "0"))
          (rule "arrayLengthIsAShort" (formula "11") (term "0"))
-         (rule "inShort" (formula "11"))
+         (rule "expandInShort" (formula "11"))
          (rule "true_left" (formula "11"))
          (rule "commute_and" (formula "2") (term "1,0"))
          (rule "ifElseUnfold" (formula "14") (term "1") (inst "#boolv=x_2"))

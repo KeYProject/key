@@ -1,17 +1,15 @@
 package de.uka.ilkd.key.gui.settings;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
-
-import javax.swing.*;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author Alexander Weigl
@@ -29,14 +27,12 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     /**
      * Labels for the selectable look and feels. Must be kept in sync with {@link #LAF_CLASSES}.
      */
-    private static final String[] LAF_LABELS = new String[] { "System", "Metal" };
+    private static final List<String> LAF_LABELS = new ArrayList<>(List.of("System"));
     /**
      * Classnames corresponding to the labels in {@link #LAF_LABELS}.
      */
-    private static final String[] LAF_CLASSES = new String[] {
-        UIManager.getSystemLookAndFeelClassName(),
-        MetalLookAndFeel.class.getName()
-    };
+    private static final List<String> LAF_CLASSES =
+        new ArrayList<>(List.of(UIManager.getSystemLookAndFeelClassName()));
 
     private final JComboBox<String> lookAndFeel;
     private final JSpinner spFontSizeGlobal;
@@ -60,7 +56,15 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     public StandardUISettings() {
         setHeaderText(getDescription());
 
-        lookAndFeel = createSelection(LAF_LABELS, emptyValidator());
+        // load all available look and feels
+        if (LAF_LABELS.size() == 1) {
+            for (UIManager.LookAndFeelInfo it : UIManager.getInstalledLookAndFeels()) {
+                LAF_LABELS.add(it.getName());
+                LAF_CLASSES.add(it.getClassName());
+            }
+        }
+
+        lookAndFeel = createSelection(LAF_LABELS.toArray(new String[0]), emptyValidator());
         addTitledComponent("Look and feel: ", lookAndFeel, LOOK_AND_FEEL_INFO);
 
         spFontSizeGlobal =
@@ -69,7 +73,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
 
         String[] sizes =
             Arrays.stream(Config.SIZES).boxed().map(it -> it + " pt").toArray(String[]::new);
-        spFontSizeTreeSequent = this.<String>createSelection(sizes, emptyValidator());
+        spFontSizeTreeSequent = this.createSelection(sizes, emptyValidator());
         addTitledComponent("Tree and sequent font factor: ", spFontSizeTreeSequent, "");
 
 
@@ -126,8 +130,8 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         txtClutterRules.setText(vs.clutterRules().value().replace(',', '\n'));
         txtClutterRuleSets.setText(vs.clutterRuleSets().value().replace(',', '\n'));
 
-        for (int i = 0; i < LAF_CLASSES.length; i++) {
-            if (LAF_CLASSES[i].equals(vs.getLookAndFeel())) {
+        for (int i = 0; i < LAF_CLASSES.size(); i++) {
+            if (LAF_CLASSES.get(i).equals(vs.getLookAndFeel())) {
                 lookAndFeel.setSelectedIndex(i);
                 break;
             }
@@ -145,7 +149,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         chkRightClickMacros.setSelected(generalSettings.isRightClickMacro());
         chkConfirmExit.setSelected(vs.confirmExit());
         spAutoSaveProof.setValue(generalSettings.autoSavePeriod());
-        chkMinimizeInteraction.setSelected(generalSettings.tacletFilter());
+        chkMinimizeInteraction.setSelected(generalSettings.getTacletFilter());
         spFontSizeTreeSequent.setSelectedIndex(vs.sizeIndex());
 
         return this;
@@ -161,7 +165,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
-        vs.setLookAndFeel(LAF_CLASSES[lookAndFeel.getSelectedIndex()]);
+        vs.setLookAndFeel(LAF_CLASSES.get(lookAndFeel.getSelectedIndex()));
         vs.setUIFontSizeFactor((Double) spFontSizeGlobal.getValue());
         vs.setMaxTooltipLines((Integer) txtMaxTooltipLines.getValue());
 
@@ -180,7 +184,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         vs.setConfirmExit(chkConfirmExit.isSelected());
         gs.setAutoSave((Integer) spAutoSaveProof.getValue());
         gs.setTacletFilter(chkMinimizeInteraction.isSelected());
-        vs.setFontIndex((Integer) spFontSizeTreeSequent.getSelectedIndex());
+        vs.setFontIndex(spFontSizeTreeSequent.getSelectedIndex());
         FontSizeFacade.resizeFonts(vs.getUIFontSizeFactor());
         Config.DEFAULT.setDefaultFonts();
         Config.DEFAULT.fireConfigChange();

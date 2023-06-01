@@ -1,15 +1,15 @@
 package de.uka.ilkd.key.logic;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+
+import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * The labeled term class is used for terms that have a label attached.
@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
  * @see Term
  * @see TermImpl
  */
-class LabeledTermImpl extends TermImpl {
+class LabeledTermImpl extends TermImpl implements EqualsModProofIrrelevancy {
 
     /**
      * @see #getLabels()
@@ -64,12 +64,8 @@ class LabeledTermImpl extends TermImpl {
 
     @Override
     public TermLabel getLabel(final Name termLabelName) {
-        return CollectionUtil.search(labels, new IFilter<TermLabel>() {
-            @Override
-            public boolean select(TermLabel element) {
-                return ObjectUtil.equals(element.name(), termLabelName);
-            }
-        });
+        return CollectionUtil.search(labels,
+            element -> Objects.equals(element.name(), termLabelName));
     }
 
     /**
@@ -113,6 +109,44 @@ class LabeledTermImpl extends TermImpl {
         int hash = super.computeHashCode();
         for (int i = 0, sz = labels.size(); i < sz; i++) {
             hash += 7 * labels.get(i).hashCode();
+        }
+        return hash;
+    }
+
+    @Override
+    public boolean equalsModProofIrrelevancy(Object o) {
+        if (!super.equalsModProofIrrelevancy(o)) {
+            return false;
+        }
+
+        if (o instanceof LabeledTermImpl) {
+            final LabeledTermImpl cmp = (LabeledTermImpl) o;
+            if (labels.size() == cmp.labels.size()) {
+                for (int i = 0, sz = labels.size(); i < sz; i++) {
+                    // skip irrelevant (origin) labels that differ for no real reason
+                    if (!labels.get(i).isProofRelevant()) {
+                        continue;
+                    }
+                    // this is not optimal, but as long as number of labels limited ok
+                    if (!cmp.labels.contains(labels.get(i))) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        } else {
+            return o.getClass() == TermImpl.class;
+        }
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        int hash = super.hashCodeModProofIrrelevancy();
+        for (int i = 0, sz = labels.size(); i < sz; i++) {
+            if (labels.get(i).isProofRelevant()) {
+                hash += 7 * labels.get(i).hashCode();
+            }
         }
         return hash;
     }

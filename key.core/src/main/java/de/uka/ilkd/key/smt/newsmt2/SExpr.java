@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -71,7 +71,7 @@ public class SExpr implements Writable {
     private final Type type;
 
     /** The collection of the direct child s-expr of this object. Not null */
-    private List<SExpr> children;
+    private final List<SExpr> children;
 
     /**
      * Create a new s-expr without children, but with a given type.
@@ -241,7 +241,7 @@ public class SExpr implements Writable {
     @Override
     public void appendTo(StringBuilder sb) {
         boolean noSpace = name.isEmpty();
-        if (children.size() > 0 || noSpace) {
+        if (!children.isEmpty() || noSpace) {
             sb.append("(").append(getEscapedName());
             for (SExpr child : children) {
                 if (!noSpace) {
@@ -267,7 +267,7 @@ public class SExpr implements Writable {
      * @return a new SEXpr with the same name and type and with the mapFunction applied to all
      *         children.
      */
-    public SExpr map(Function<SExpr, SExpr> mapFunction) {
+    public SExpr map(UnaryOperator<SExpr> mapFunction) {
         return new SExpr(name, type,
             children.stream().map(mapFunction).collect(Collectors.toList()));
     }

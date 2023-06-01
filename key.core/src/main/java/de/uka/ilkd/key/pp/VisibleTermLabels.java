@@ -10,7 +10,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public interface VisibleTermLabels {
-    public boolean contains(TermLabel label);
+    boolean contains(TermLabel label);
 
-    public abstract boolean contains(Name name);
+    boolean contains(Name name);
 }

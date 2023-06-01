@@ -1,13 +1,9 @@
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ExpressionContainer;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 /**
  * If.
@@ -20,19 +16,19 @@ public class If extends BranchStatement implements ExpressionContainer {
      * Then branch.
      */
 
-    protected Then thenBranch;
+    protected final Then thenBranch;
 
     /**
      * Else branch.
      */
 
-    protected Else elseBranch;
+    protected final Else elseBranch;
 
     /**
      * Expression.
      */
 
-    protected Expression expression;
+    protected final Expression expression;
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
@@ -114,18 +110,21 @@ public class If extends BranchStatement implements ExpressionContainer {
      */
     public ProgramElement getChildAt(int index) {
         if (expression != null) {
-            if (index == 0)
+            if (index == 0) {
                 return expression;
+            }
             index--;
         }
         if (thenBranch != null) {
-            if (index == 0)
+            if (index == 0) {
                 return thenBranch;
+            }
             index--;
         }
         if (elseBranch != null) {
-            if (index == 0)
+            if (index == 0) {
                 return elseBranch;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -190,8 +189,9 @@ public class If extends BranchStatement implements ExpressionContainer {
      */
     public int getBranchCount() {
         int result = 1;
-        if (elseBranch != null)
+        if (elseBranch != null) {
             result += 1;
+        }
         return result;
     }
 
@@ -222,9 +222,5 @@ public class If extends BranchStatement implements ExpressionContainer {
      */
     public void visit(Visitor v) {
         v.performActionOnIf(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printIf(this);
     }
 }

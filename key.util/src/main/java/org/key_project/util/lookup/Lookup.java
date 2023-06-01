@@ -37,7 +37,7 @@ public class Lookup {
     /**
      * Listeners, that are called on a change. All.class is the key for non specified types.
      */
-    private HashMap<Class<?>, List<LookupListener>> propertyListener = new HashMap<>();
+    private final HashMap<Class<?>, List<LookupListener>> propertyListener = new HashMap<>();
 
     public Lookup() {
         this(null);
@@ -45,8 +45,9 @@ public class Lookup {
 
     public Lookup(Lookup parent) {
         this.parent = parent;
-        if (parent != null)
+        if (parent != null) {
             parent.children.add(new WeakReference<>(this));
+        }
     }
 
     /*
@@ -83,10 +84,11 @@ public class Lookup {
     public <T> T get(Class<T> service) {
         List<? extends T> t = getList(service);
         if (t.isEmpty()) {
-            if (parent != null)
+            if (parent != null) {
                 return parent.get(service);
-            else
+            } else {
                 throw new IllegalStateException("Service \"" + service + "\" not registered");
+            }
         } else {
             return t.get(0);
         }
@@ -107,23 +109,27 @@ public class Lookup {
 
     public <T> void deregister(T obj, Class<T> service) {
         boolean b = getList(service).remove(obj);
-        if (b)
+        if (b) {
             firePropertyChange(service);
-        if (parent != null)
+        }
+        if (parent != null) {
             parent.deregister(obj, service);
+        }
     }
 
     public <T> void deregister(Class<T> service) {
         getList(service).clear();
         firePropertyChange(service);
-        if (parent != null)
+        if (parent != null) {
             parent.deregister(service);
+        }
     }
 
 
     public void dispose() {
-        if (parent != null)
+        if (parent != null) {
             parent.children.remove(this);
+        }
     }
 
     public <T> List<LookupListener> getListeners(Class<?> name) {
@@ -150,14 +156,16 @@ public class Lookup {
         getListeners(name).forEach(it -> it.update(name, this));
         children.forEach(it -> {
             Lookup child = it.get();
-            if (child != null)
+            if (child != null) {
                 child.firePropertyChange(name);
+            }
         });
         getListeners(ALL.class).forEach(it -> it.update(name, this));
         children.forEach(it -> {
             Lookup child = it.get();
-            if (child != null)
+            if (child != null) {
                 child.firePropertyChange(ALL.class);
+            }
         });
     }
 
@@ -186,8 +194,9 @@ public class Lookup {
         for (Constructor<?> ctor : clazz.getConstructors()) {
             if (ctor.getAnnotation(Inject.class) != null) {
                 T instance = (T) tryToInject(ctor);
-                if (instance != null)
+                if (instance != null) {
                     return instance;
+                }
             }
         }
         return null;

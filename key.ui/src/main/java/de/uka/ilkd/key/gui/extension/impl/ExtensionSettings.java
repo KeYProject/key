@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.gui.extension.impl;
 
-import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
-
 import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
+
+import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 
 public class ExtensionSettings extends AbstractPropertiesSettings {
     public final static String KEY_DISABLED = "[Extensions]disabled";
@@ -30,8 +30,9 @@ public class ExtensionSettings extends AbstractPropertiesSettings {
         if (activated) {
             classes.remove(text);
         } else {
-            if (!classes.contains(text))
+            if (!classes.contains(text)) {
                 classes.add(text);
+            }
         }
         setForbiddenClasses(classes);
     }

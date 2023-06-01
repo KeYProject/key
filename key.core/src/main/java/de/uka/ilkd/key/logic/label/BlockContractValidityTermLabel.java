@@ -31,7 +31,7 @@ public class BlockContractValidityTermLabel implements TermLabel {
      * {@inheritDoc}
      */
     public String toString() {
-        return NAME.toString() + "(" + getExceptionVariable() + ")";
+        return NAME + "(" + getExceptionVariable() + ")";
     }
 
     /**

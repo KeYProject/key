@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
 import javax.swing.JComponent;
 
 import de.uka.ilkd.key.logic.Name;
@@ -27,23 +26,23 @@ public abstract class NodeInfoVisualizer extends JComponent
     private static final long serialVersionUID = 4205276651552216532L;
 
     /** @see #getInstances(Node) */
-    private static Map<Name, Map<Integer, SortedSet<NodeInfoVisualizer>>> instances =
+    private static final Map<Name, Map<Integer, SortedSet<NodeInfoVisualizer>>> instances =
         new HashMap<>();
 
     /**
      * @see #addListener(NodeInfoVisualizerListener)
      * @see #removeListener(NodeInfoVisualizerListener)
      */
-    private static Set<NodeInfoVisualizerListener> listeners = new HashSet<>();
+    private static final Set<NodeInfoVisualizerListener> listeners = new HashSet<>();
 
     /** @see #getNode() */
     private Node node;
 
     /** @see #getLongName() */
-    private String longName;
+    private final String longName;
 
     /** @see #getShortName() */
-    private String shortName;
+    private final String shortName;
 
     /**
      * Creates a new {@link NodeInfoVisualizer}.

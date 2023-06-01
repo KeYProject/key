@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
@@ -15,6 +12,9 @@ import de.uka.ilkd.key.rule.conditions.TypeCondition;
 import de.uka.ilkd.key.rule.conditions.TypeResolver.GenericSortResolver;
 import de.uka.ilkd.key.rule.conditions.TypeResolver.NonGenericSortResolver;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This class is used for wrapping all variable conditions of a taclet in one object.
@@ -143,12 +143,10 @@ class TacletConditions {
     public boolean conatainsComparisionConditionSymmetric(Sort s1, Sort s2,
             TypeComparisonCondition.Mode mode) {
         if (!containsComparisionCondition(s1, s2, mode)) {
-            if (containsComparisionCondition(s2, s1, mode))
-                return true;
+            return containsComparisionCondition(s2, s1, mode);
         } else {
             return true;
         }
-        return false;
     }
 
     /**
@@ -193,9 +191,7 @@ class TacletConditions {
                 if (first.getGenericSort().equals(s1) && second.getGenericSort().equals(s2)) {
                     return true;
                 }
-                if (first.getGenericSort().equals(s2) && second.getGenericSort().equals(s1)) {
-                    return true;
-                }
+                return first.getGenericSort().equals(s2) && second.getGenericSort().equals(s1);
             }
         }
         return false;

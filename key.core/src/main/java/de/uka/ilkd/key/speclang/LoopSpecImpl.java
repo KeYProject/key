@@ -4,10 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.MapUtil;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -24,6 +20,10 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.InfFlowSpec;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.MapUtil;
 
 /**
  * Standard implementation of the LoopInvariant interface.
@@ -91,19 +91,19 @@ public final class LoopSpecImpl implements LoopSpecification {
         this.pm = pm;
         this.kjt = kjt;
         this.originalInvariants =
-            invariants == null ? new LinkedHashMap<LocationVariable, Term>() : invariants;
+            invariants == null ? new LinkedHashMap<>() : invariants;
         this.originalFreeInvariants =
-            freeInvariants == null ? new LinkedHashMap<LocationVariable, Term>() : freeInvariants;
+            freeInvariants == null ? new LinkedHashMap<>() : freeInvariants;
         this.originalVariant = variant;
         this.originalModifies =
-            modifies == null ? new LinkedHashMap<LocationVariable, Term>() : modifies;
+            modifies == null ? new LinkedHashMap<>() : modifies;
         this.originalInfFlowSpecs =
-            infFlowSpecs == null ? new LinkedHashMap<LocationVariable, ImmutableList<InfFlowSpec>>()
+            infFlowSpecs == null ? new LinkedHashMap<>()
                     : infFlowSpecs;
         this.originalSelfTerm = selfTerm;
         this.localIns = localIns;
         this.localOuts = localOuts;
-        this.originalAtPres = atPres == null ? new LinkedHashMap<LocationVariable, Term>() : atPres;
+        this.originalAtPres = atPres == null ? new LinkedHashMap<>() : atPres;
     }
 
     /**
@@ -126,7 +126,7 @@ public final class LoopSpecImpl implements LoopSpecification {
 
     private Map /* Operator, Operator, Term -> Term */<Term, Term> getReplaceMap(Term selfTerm,
             Map<LocationVariable, Term> atPres, Services services) {
-        final Map<Term, Term> result = new LinkedHashMap<Term, Term>();
+        final Map<Term, Term> result = new LinkedHashMap<>();
 
         // self
         if (selfTerm != null) {
@@ -157,7 +157,7 @@ public final class LoopSpecImpl implements LoopSpecification {
 
     private Map<Term, Term> getInverseReplaceMap(Term selfTerm, Map<LocationVariable, Term> atPres,
             Services services) {
-        final Map<Term, Term> result = new LinkedHashMap<Term, Term>();
+        final Map<Term, Term> result = new LinkedHashMap<>();
         final Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
         for (Map.Entry<Term, Term> next : replaceMap.entrySet()) {
             result.put(next.getValue(), next.getKey());
@@ -310,11 +310,10 @@ public final class LoopSpecImpl implements LoopSpecification {
 
     @Override
     public Map<LocationVariable, Term> getInternalAtPres() {
-        Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
         // for(LocationVariable h : originalAtPres.keySet()) {
         // result.put(h, originalAtPres.get(h));
         // }
-        result.putAll(originalAtPres);
+        Map<LocationVariable, Term> result = new LinkedHashMap<>(originalAtPres);
         return result;
     }
 
@@ -377,12 +376,12 @@ public final class LoopSpecImpl implements LoopSpecification {
         OpReplacer or =
             new OpReplacer(inverseReplaceMap, services.getTermFactory(), services.getProof());
 
-        Map<LocationVariable, Term> newInvariants = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> newInvariants = new LinkedHashMap<>();
         for (LocationVariable heap : invariants.keySet()) {
             newInvariants.put(heap, or.replace(invariants.get(heap)));
         }
 
-        Map<LocationVariable, Term> newFreeInvariants = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> newFreeInvariants = new LinkedHashMap<>();
         for (LocationVariable heap : freeInvariants.keySet()) {
             newFreeInvariants.put(heap, or.replace(freeInvariants.get(heap)));
         }
@@ -424,29 +423,29 @@ public final class LoopSpecImpl implements LoopSpecification {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final LocationVariable baseHeap = heapLDT.getHeap();
 
-        String mods = "";
+        StringBuilder mods = new StringBuilder();
         for (LocationVariable h : heapContext) {
             if (originalModifies.get(h) != null) {
                 String printMods = LogicPrinter.quickPrintTerm(originalModifies.get(h), services,
                     usePrettyPrinting, useUnicodeSymbols);
-                mods = mods + "\n" + "mod" + (h == baseHeap ? "" : "[" + h + "]") + ": "
-                    + printMods.trim();
+                mods.append("\n").append("mod").append(h == baseHeap ? "" : "[" + h + "]")
+                        .append(": ").append(printMods);
             }
         }
 
-        String invariants = "";
+        StringBuilder invariants = new StringBuilder();
         for (LocationVariable h : heapContext) {
             if (originalInvariants.get(h) != null) {
                 String printPosts = LogicPrinter.quickPrintTerm(originalInvariants.get(h), services,
                     usePrettyPrinting, useUnicodeSymbols);
-                invariants = invariants + "\n" + "invariant" + (h == baseHeap ? "" : "[" + h + "]")
-                    + ": " + printPosts.trim();
+                invariants.append("\n").append("invariant")
+                        .append(h == baseHeap ? "" : "[" + h + "]").append(": ").append(printPosts);
             }
         }
 
         return invariants + (originalVariant != null
                 ? ";\nvariant: " + LogicPrinter.quickPrintTerm(originalVariant, services,
-                    usePrettyPrinting, useUnicodeSymbols).trim()
+                    usePrettyPrinting, useUnicodeSymbols)
                 : ";") + mods;
     }
 
@@ -473,10 +472,10 @@ public final class LoopSpecImpl implements LoopSpecification {
     @Override
     public String getUniqueName() {
         if (pm != null) {
-            return "Loop Invariant " + getLoop().getStartPosition().getLine() + " "
+            return "Loop Invariant " + getLoop().getStartPosition().line() + " "
                 + getTarget().getUniqueName();
         } else {
-            return "Loop Invariant " + getLoop().getStartPosition().getLine() + " "
+            return "Loop Invariant " + getLoop().getStartPosition().line() + " "
                 + Math.abs(getLoop().hashCode());
         }
     }
@@ -503,7 +502,7 @@ public final class LoopSpecImpl implements LoopSpecification {
     @Override
     public OriginalVariables getOrigVars() {
         Map<LocationVariable, ProgramVariable> atPreVars =
-            new LinkedHashMap<LocationVariable, ProgramVariable>();
+            new LinkedHashMap<>();
         for (LocationVariable h : originalAtPres.keySet()) {
             atPreVars.put(h, (ProgramVariable) originalAtPres.get(h).op());
         }
@@ -518,7 +517,7 @@ public final class LoopSpecImpl implements LoopSpecification {
             self = null;
         }
         return new OriginalVariables(self, null, null, atPreVars,
-            ImmutableSLList.<ProgramVariable>nil());
+            ImmutableSLList.nil());
     }
 
 }

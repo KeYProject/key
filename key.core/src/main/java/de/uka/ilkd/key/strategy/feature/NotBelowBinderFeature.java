@@ -30,8 +30,9 @@ public class NotBelowBinderFeature extends BinaryFeature {
         while (it.next() != -1) {
             final Term t = it.getSubTerm();
 
-            if (t.varsBoundHere(it.getChild()).size() > 0)
+            if (t.varsBoundHere(it.getChild()).size() > 0) {
                 return true;
+            }
         }
 
         return false;

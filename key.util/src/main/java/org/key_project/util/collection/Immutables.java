@@ -33,7 +33,7 @@ public final class Immutables {
      */
     public static <T> boolean isDuplicateFree(ImmutableList<T> list) {
 
-        HashSet<T> set = new HashSet<T>();
+        HashSet<T> set = new HashSet<>();
         for (T element : list) {
             if (set.contains(element)) {
                 return false;
@@ -82,7 +82,7 @@ public final class Immutables {
             list = list.tail();
         }
 
-        HashSet<T> alreadySeen = new HashSet<T>();
+        HashSet<T> alreadySeen = new HashSet<>();
         ImmutableList<T> result = ImmutableSLList.nil();
 
         while (!stack.isEmpty()) {
@@ -133,39 +133,41 @@ public final class Immutables {
         return DefaultImmutableSet.fromImmutableList(createListFrom(iterable));
     }
 
-    /*
+    /**
      * Returns an immutable list consisting of the elements of the
      * given iterable collection.
      *
      * The iteration order of the result is identical to that of the argument.
      *
      * @param iterable the collection to iterate through to obtain the elements
-     * for the resulting list
+     *        for the resulting list
+     *
      * @returns the view onto the iterable as an immutable list
      */
     public static <T> ImmutableList<T> createListFrom(Iterable<T> iterable) {
-        ImmutableList<T> result = ImmutableSLList.<T>nil();
+        ImmutableList<T> result = ImmutableSLList.nil();
         for (T t : iterable) {
             result = result.prepend(t);
         }
         return result.reverse();
     }
 
-    /*
+    /**
      * Returns an immutable list consisting of the elements of the list that match
      * the given predicate.
      *
      * @param ts non-null immutable list.
      * @param predicate a non-interfering, stateless
-     *                  predicate to apply to each element to determine if it
-     *                  should be included
+     *        predicate to apply to each element to determine if it
+     *        should be included
+     *
      * @returns the filtered list
      */
     public static <T> ImmutableList<T> filter(ImmutableList<T> ts, Predicate<T> predicate) {
         // This must be a loop. A tail recursive implementation is not optimised
         // by the compiler and quickly leads to a stack overlow.
         ImmutableList<T> acc = ImmutableSLList.nil();
-        while(ts.size() > 0) {
+        while (ts.size() > 0) {
             T hd = ts.head();
             if (predicate.test(hd)) {
                 acc = acc.prepend(hd);
@@ -188,7 +190,7 @@ public final class Immutables {
         // This must be a loop. A tail recursive implementation is not optimised
         // by the compiler and quickly leads to a stack overlow.
         ImmutableList<R> acc = ImmutableSLList.nil();
-        while(ts.size() > 0) {
+        while (ts.size() > 0) {
             T hd = ts.head();
             acc = acc.prepend(function.apply(hd));
             ts = ts.tail();

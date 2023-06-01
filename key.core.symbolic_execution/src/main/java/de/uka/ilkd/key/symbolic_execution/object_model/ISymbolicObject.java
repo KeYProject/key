@@ -21,26 +21,26 @@ public interface ISymbolicObject extends ISymbolicAssociationValueContainer {
      *
      * @return The name of this object.
      */
-    public Term getName();
+    Term getName();
 
     /**
      * Returns the name of this object as human readable {@link String}.
      *
      * @return The name of this object as human readable {@link String}.
      */
-    public String getNameString();
+    String getNameString();
 
     /**
      * Returns the type of this object.
      *
      * @return The type of this object.
      */
-    public Sort getType();
+    Sort getType();
 
     /**
      * Returns the type of this object as human readable string.
      *
      * @return The type of this object as human readable string.
      */
-    public String getTypeString();
+    String getTypeString();
 }

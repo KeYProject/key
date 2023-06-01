@@ -1,18 +1,5 @@
 package org.key_project.util.testcase.java;
 
-import org.junit.jupiter.api.Test;
-import org.key_project.util.helper.HelperClassForUtilityTests;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.IOUtil.IFileVisitor;
-import org.key_project.util.java.IOUtil.LineInformation;
-import org.key_project.util.java.XMLUtil;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -20,6 +7,20 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Predicate;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.key_project.util.helper.HelperClassForUtilityTests;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.IOUtil.IFileVisitor;
+import org.key_project.util.java.IOUtil.LineInformation;
+import org.key_project.util.java.XMLUtil;
+
+import org.junit.jupiter.api.Test;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -79,7 +80,7 @@ public class IOUtilTest {
             File noFolder = HelperClassForUtilityTests.createFolder(new File(noDir, "yesSub"));
             File noSubFile =
                 HelperClassForUtilityTests.createFile(new File(noFolder, "Hello.txt"), "Hello");
-            List<File> parents = CollectionUtil.toList(yesDir, alsoYesDir);
+            List<File> parents = Arrays.asList(yesDir, alsoYesDir);
             assertFalse(IOUtil.contains((Iterable<File>) null, yesFile));
             assertFalse(IOUtil.contains(parents, null));
             assertFalse(IOUtil.contains((Iterable<File>) null, null));
@@ -158,59 +159,10 @@ public class IOUtilTest {
      */
     protected void doTestUnifyLineBreaks(String toTest, String expected) throws IOException {
         ByteArrayInputStream in =
-            toTest != null ? new ByteArrayInputStream(toTest.getBytes()) : null;
+            toTest != null ? new ByteArrayInputStream(toTest.getBytes(StandardCharsets.UTF_8))
+                    : null;
         InputStream converted = IOUtil.unifyLineBreaks(in);
         assertEquals(expected, IOUtil.readFrom(converted));
-    }
-
-    /**
-     * Tests {@link IOUtil#computeMD5(File)}.
-     */
-    @Test
-    public void testComputeMD5_File() throws IOException {
-        // Test null
-        try {
-            IOUtil.computeMD5((File) null);
-            fail("MD5 without File should not be possible.");
-        } catch (IOException e) {
-            assertEquals("Can't compute MD5 without a File.", e.getMessage());
-        }
-        // Test not existing file
-        try {
-            IOUtil.computeMD5(new File("NOT_EXISTING_FILE.txt"));
-            fail("MD5 without existing File should not be possible.");
-        } catch (IOException e) {
-            assertEquals(
-                "Can't compute MD5, because \"NOT_EXISTING_FILE.txt\" is not an existing file.",
-                e.getMessage());
-        }
-        // Test content
-        File file = File.createTempFile("HelloWorld", ".txt");
-        IOUtil.writeTo(new FileOutputStream(file), "Hello World");
-        try {
-            assertEquals("b10a8db164e0754105b7a99be72e3fe5", IOUtil.computeMD5(file));
-        } finally {
-            file.delete();
-        }
-    }
-
-    /**
-     * Tests {@link IOUtil#computeMD5(InputStream)}.
-     */
-    @Test
-    public void testComputeMD5_InputStream() throws IOException {
-        // Test null
-        try {
-            IOUtil.computeMD5((InputStream) null);
-            fail("MD5 without InputStream should not be possible.");
-        } catch (IOException e) {
-            assertEquals("Can't compute MD5 without an InputStream.", e.getMessage());
-        }
-        // Test content
-        TextInputStream in = new TextInputStream("Hello World");
-        assertFalse(in.isClosed());
-        assertEquals("b10a8db164e0754105b7a99be72e3fe5", IOUtil.computeMD5(in));
-        assertTrue(in.isClosed());
     }
 
     /**
@@ -230,7 +182,7 @@ public class IOUtilTest {
          * @param text The fixed text.
          */
         public TextInputStream(String text) {
-            super(text.getBytes());
+            super(text.getBytes(StandardCharsets.UTF_8));
         }
 
         /**
@@ -306,7 +258,7 @@ public class IOUtilTest {
         /**
          * The visited {@link File}s.
          */
-        private List<File> visitedFiles = new LinkedList<File>();
+        private final List<File> visitedFiles = new LinkedList<>();
 
         /**
          * {@inheritDoc}
@@ -327,7 +279,7 @@ public class IOUtilTest {
     }
 
     /**
-     * Tests {@link IOUtil#search(File, org.key_project.util.java.IFilter)}.
+     * Tests {@link IOUtil#search(File, Predicate)}.
      */
     @Test
     public void testSearch() throws IOException {
@@ -349,7 +301,7 @@ public class IOUtilTest {
             File text = new File(tempDir, "Text.txt");
             IOUtil.writeTo(new FileOutputStream(text), "Text.txt");
             // Create filter
-            IFilter<File> filter = element -> element.getName().contains("Sub");
+            Predicate<File> filter = element -> element.getName().contains("Sub");
             // Test null
             List<File> result = IOUtil.search(null, filter);
             assertEquals(0, result.size());
@@ -460,7 +412,7 @@ public class IOUtilTest {
             new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 });
         // Test invalid column index
         LineInformation[] infos = IOUtil.computeLineInformation(
-            new ByteArrayInputStream("AB\tCD EF GH\t\tIJ\t.".getBytes()));
+            new ByteArrayInputStream("AB\tCD EF GH\t\tIJ\t.".getBytes(StandardCharsets.UTF_8)));
         assertNotNull(infos);
         assertEquals(1, infos.length);
         LineInformation info = infos[0];
@@ -484,7 +436,8 @@ public class IOUtilTest {
             int[] expectedIndices) throws IOException {
         // Compute line information
         LineInformation[] infos =
-            IOUtil.computeLineInformation(new ByteArrayInputStream(text.getBytes()));
+            IOUtil.computeLineInformation(
+                new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8)));
         assertNotNull(infos);
         assertEquals(1, infos.length);
         LineInformation info = infos[0];
@@ -542,7 +495,8 @@ public class IOUtilTest {
         // Create new file content
         try (CharArrayWriter writer = new CharArrayWriter();
                 BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(new FileInputStream(source)))) {
+                    new BufferedReader(new InputStreamReader(new FileInputStream(source),
+                        StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 writer.write(line);
@@ -551,7 +505,7 @@ public class IOUtilTest {
             String newText = writer.toString();
             // Create new file
             File target = new File(source.getParentFile(), newFileName);
-            try (FileWriter targetWriter = new FileWriter(target)) {
+            try (FileWriter targetWriter = new FileWriter(target, StandardCharsets.UTF_8)) {
                 targetWriter.write(newText);
             }
             return target;
@@ -672,7 +626,7 @@ public class IOUtilTest {
     protected void assertLineInformation(String text, LineInformation... expectedInfos)
             throws IOException {
         LineInformation[] result = IOUtil.computeLineInformation(
-            text != null ? new ByteArrayInputStream(text.getBytes()) : null);
+            text != null ? new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8)) : null);
         assertNotNull(result, text);
         assertEquals(expectedInfos.length, result.length, text);
         for (int i = 0; i < expectedInfos.length; i++) {
@@ -832,14 +786,14 @@ public class IOUtilTest {
             doTestReadFrom("One Line\n\r");
             doTestReadFrom("A".repeat(IOUtil.BUFFER_SIZE * 3));
         } catch (IOException e) {
-            e.printStackTrace();
-            fail();
+            fail(e);
         }
     }
 
     protected void doTestReadFrom(String text) throws IOException {
         if (text != null) {
-            assertEquals(text, IOUtil.readFrom(new ByteArrayInputStream(text.getBytes())));
+            assertEquals(text,
+                IOUtil.readFrom(new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))));
         } else {
             assertNull(IOUtil.readFrom((InputStream) null));
         }
@@ -889,7 +843,8 @@ public class IOUtilTest {
     public void testCopy() throws IOException {
         doTestCopy(null);
         assertFalse(IOUtil.copy((InputStream) null, null));
-        assertFalse(IOUtil.copy(new ByteArrayInputStream("NotCopied".getBytes()), null));
+        assertFalse(IOUtil.copy(
+            new ByteArrayInputStream("NotCopied".getBytes(StandardCharsets.UTF_8)), null));
         doTestCopy("One Line");
         doTestCopy("First Line\n\rSecond Line");
         doTestCopy("One Line\r");
@@ -907,7 +862,7 @@ public class IOUtilTest {
      */
     protected void doTestCopy(String text) throws IOException {
         if (text != null) {
-            byte[] inBytes = text.getBytes();
+            byte[] inBytes = text.getBytes(StandardCharsets.UTF_8);
             ByteArrayInputStream in = new ByteArrayInputStream(inBytes);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             assertTrue(IOUtil.copy(in, out));

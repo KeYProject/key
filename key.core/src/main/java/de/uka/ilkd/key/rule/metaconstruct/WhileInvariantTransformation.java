@@ -3,29 +3,15 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.statement.Branch;
-import de.uka.ilkd.key.java.statement.Break;
-import de.uka.ilkd.key.java.statement.Catch;
-import de.uka.ilkd.key.java.statement.Continue;
-import de.uka.ilkd.key.java.statement.EnhancedFor;
-import de.uka.ilkd.key.java.statement.Guard;
-import de.uka.ilkd.key.java.statement.Return;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.ExtList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +72,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
     public WhileInvariantTransformation(ProgramElement root, SVInstantiations inst,
             Services services) {
         super(root, inst, services);
-        this.breakList = new LinkedList<BreakToBeReplaced>();
+        this.breakList = new LinkedList<>();
     }
 
     /**
@@ -113,10 +99,11 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
 
     public void performActionOnReturn(Return x) {
         boolean matched = true;
-        if (!methodStack.empty())
+        if (!methodStack.isEmpty()) {
             methodStack.pop();
-        else
+        } else {
             matched = false;
+        }
 
         if (!matched) {
             if (runMode == CHECK) {
@@ -139,22 +126,25 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                     // changed order of statements to fix #991 (MT-1579)
                     stmnts = KeYJavaASTFactory.block(assignExpr, assignFlag, breakInnerLabel);
                 } else
-                    // Keep the PositionInfo because it is required for symbolic
-                    // execution tree extraction and there is no other unique
-                    // representation of the replaced return
+                // Keep the PositionInfo because it is required for symbolic
+                // execution tree extraction and there is no other unique
+                // representation of the replaced return
+                {
                     stmnts = KeYJavaASTFactory.block(assignFlag, KeYJavaASTFactory
                             .breakStatement(breakInnerLabel.getLabel(), x.getPositionInfo()));
+                }
                 addChild(stmnts);
                 changed();
             }
-        } else
+        } else {
             doDefaultAction(x);
+        }
     }
 
 
     public void performActionOnContinue(Continue x) {
         if (replaceJumpStatement(x)
-                || ((x.getLabel() != null) && (labelStack.search(x.getLabel()) == -1))) {
+                || ((x.getLabel() != null) && (!labelStack.contains(x.getLabel())))) {
             continueOccurred = true;
             if (runMode == CHECK) {
                 needInnerLabel = true;
@@ -175,7 +165,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
     public void performActionOnBreak(Break x) {
         boolean replaced = false;
         if (replaceJumpStatement(x)
-                || ((x.getLabel() != null) && (labelStack.search(x.getLabel()) == -1))) {
+                || ((x.getLabel() != null) && (!labelStack.contains(x.getLabel())))) {
             if (runMode == CHECK) {
                 needInnerLabel = true;
                 breakList.add(new BreakToBeReplaced(x));
@@ -197,8 +187,9 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                         break;
                     }
                 }
-                if (!replaced)
+                if (!replaced) {
                     doDefaultAction(x);
+                }
             }
         } else {
             doDefaultAction(x);
@@ -282,9 +273,10 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                 changeList.removeFirst();
             }
 
-            if (breakInnerLabel != breakOuterLabel)
+            if (breakInnerLabel != breakOuterLabel) {
                 LOGGER.warn("inner and outer label must be the same in "
                     + "WhileInvariantTransformation.performActionOnEnhancedFor");
+            }
 
             Statement body = changeList.get(Statement.class);
 

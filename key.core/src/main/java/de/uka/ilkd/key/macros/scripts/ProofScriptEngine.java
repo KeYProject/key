@@ -7,17 +7,15 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Observer;
-import java.util.Optional;
-import java.util.ServiceLoader;
+import java.util.*;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,8 +42,8 @@ public class ProofScriptEngine {
     private Observer commandMonitor;
 
     public ProofScriptEngine(File file) throws IOException {
-        this.initialLocation = new Location(file.toURI().toURL(), 1, 1);
-        this.script = new String(Files.readAllBytes(file.toPath()));
+        this.initialLocation = new Location(file.toURI().toURL(), Position.newOneBased(1, 1));
+        this.script = Files.readString(file.toPath());
         this.initiallySelectedGoal = null;
     }
 
@@ -81,7 +79,8 @@ public class ProofScriptEngine {
     public void execute(AbstractUserInterfaceControl uiControl, Proof proof)
             throws IOException, InterruptedException, ScriptException {
 
-        ScriptLineParser mlp = new ScriptLineParser(new StringReader(script));
+        ScriptLineParser mlp =
+            new ScriptLineParser(new StringReader(script), initialLocation.getFileURL());
         mlp.setLocation(initialLocation);
 
         stateMap = new EngineState(proof);
@@ -131,17 +130,21 @@ public class ProofScriptEngine {
             try {
                 String name = argMap.get(ScriptLineParser.COMMAND_KEY);
                 if (name == null) {
-                    throw new ScriptException("No command", initialLocation.getFileURL(), mlp.getLine(), mlp.getColumn());
+                    Location loc = new Location(initialLocation.getFileURL(),
+                        Position.newOneBased(mlp.getLine(), mlp.getOffset()));
+                    throw new ScriptException("No command", loc);
                 }
 
                 ProofScriptCommand<Object> command =
                     (ProofScriptCommand<Object>) COMMANDS.get(name);
                 if (command == null) {
-                    throw new ScriptException("Unknown command " + name, initialLocation.getFileURL(), mlp.getLine(), mlp.getColumn());
+                    Location loc = new Location(initialLocation.getFileURL(),
+                        Position.newOneBased(mlp.getLine(), mlp.getOffset()));
+                    throw new ScriptException("Unknown command " + name, loc);
                 }
 
                 if (!name.startsWith(SYSTEM_COMMAND_PREFIX) && stateMap.isEchoOn()) {
-                    LOGGER.info("{}: {}", ++cnt, cmd);
+                    LOGGER.debug("{}: {}", ++cnt, cmd);
                 }
 
                 Object o = command.evaluateArguments(stateMap, argMap);
@@ -159,7 +162,7 @@ public class ProofScriptEngine {
                                 + "This error can be suppressed by setting '@failonclosed off'.\n\n"
                                 + "Command: %s\nLine:%d\n",
                             argMap.get(ScriptLineParser.LITERAL_KEY), mlp.getLine()),
-                        initialLocation.getFileURL(), mlp.getLine(), mlp.getColumn(), e);
+                        mlp.getLocation(), e);
                 } else {
                     LOGGER.info(
                         "Proof already closed at command \"{}\" at line %d, terminating in line {}",
@@ -173,7 +176,7 @@ public class ProofScriptEngine {
                 throw new ScriptException(
                     String.format("Error while executing script: %s\n\nCommand: %s", e.getMessage(),
                         argMap.get(ScriptLineParser.LITERAL_KEY)),
-                    initialLocation.getFileURL(), mlp.getLine(), mlp.getColumn(), e);
+                    mlp.getLocation(), e);
             }
         }
     }

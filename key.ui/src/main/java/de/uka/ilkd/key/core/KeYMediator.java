@@ -1,19 +1,20 @@
 package de.uka.ilkd.key.core;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
-
+import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
+import de.uka.ilkd.key.gui.UserActionListener;
+import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
@@ -30,13 +31,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.RuleAppListener;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
@@ -55,6 +50,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ThreadUtilities;
+
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.lookup.Lookup;
 
 /**
@@ -66,24 +63,29 @@ import org.key_project.util.lookup.Lookup;
 public class KeYMediator {
 
     /** The user interface */
-    private AbstractMediatorUserInterfaceControl ui;
+    private final AbstractMediatorUserInterfaceControl ui;
 
     /** the notation info used to print sequents */
     private final NotationInfo notationInfo;
 
     /** listenerList with to gui listeners */
-    private EventListenerList listenerList = new EventListenerList();
+    private final EventListenerList listenerList = new EventListenerList();
 
     /** listens to the proof */
-    private KeYMediatorProofListener proofListener;
+    private final KeYMediatorProofListener proofListener;
 
     /** listens to the ProofTree */
-    private KeYMediatorProofTreeListener proofTreeListener;
+    private final KeYMediatorProofTreeListener proofTreeListener;
 
     /**
      * current proof and node the user works with. All user interaction is relative to this model
      */
-    private KeYSelectionModel keySelectionModel;
+    private final KeYSelectionModel keySelectionModel;
+
+    /**
+     * Registered proof load listeners.
+     */
+    private final Collection<Consumer<Proof>> proofLoadListeners = new ArrayList<>();
 
     private TacletFilter filterForInteractiveProving;
 
@@ -103,6 +105,13 @@ public class KeYMediator {
     private boolean inAutoMode = false;
 
     /**
+     * Currently activated listeners for user actions. Notified whenever a user action is applied.
+     *
+     * @see #fireActionPerformed(UserAction)
+     */
+    private final Collection<UserActionListener> userActionListeners = new ArrayList<>();
+
+    /**
      * creates the KeYMediator with a reference to the application's main frame and the current
      * proof settings
      */
@@ -115,6 +124,16 @@ public class KeYMediator {
         keySelectionModel = new KeYSelectionModel();
 
         ui.getProofControl().addAutoModeListener(proofListener);
+    }
+
+    /**
+     * Register a proof load listener. Will be called whenever a new proof is loaded, but before
+     * it is replayed.
+     *
+     * @param listener callback
+     */
+    public synchronized void registerProofLoadListener(Consumer<Proof> listener) {
+        proofLoadListeners.add(listener);
     }
 
     /**
@@ -278,16 +297,14 @@ public class KeYMediator {
      * @param p the proof to select.
      */
     public void setProof(Proof p) {
+        if (getSelectedProof() == p) {
+            return;
+        }
         final Proof pp = p;
         if (SwingUtilities.isEventDispatchThread()) {
             setProofHelper(pp);
         } else {
-            Runnable swingProzac = new Runnable() {
-                @Override
-                public void run() {
-                    setProofHelper(pp);
-                }
-            };
+            Runnable swingProzac = () -> setProofHelper(pp);
             ThreadUtilities.invokeAndWait(swingProzac);
         }
     }
@@ -468,7 +485,7 @@ public class KeYMediator {
     }
 
     /**
-     * Fires the shut down event.
+     * Fires the shut-down event.
      */
     public synchronized void fireShutDown(EventObject e) {
         Object[] listeners = listenerList.getListenerList();
@@ -480,11 +497,26 @@ public class KeYMediator {
     }
 
     /**
+     * Fire the proof loaded event.
+     *
+     * @param p the proof that was just loaded and is about to be replayed
+     */
+    public synchronized void fireProofLoaded(Proof p) {
+        if (p == null) {
+            return;
+        }
+        for (Consumer<Proof> listener : proofLoadListeners) {
+            listener.accept(p);
+        }
+    }
+
+    /**
      * returns the current selected proof
      *
      * @return the current selected proof
      * @see #getProof()
      */
+    @Nullable
     public Proof getSelectedProof() {
         return keySelectionModel.getSelectedProof();
     }
@@ -556,21 +588,18 @@ public class KeYMediator {
 
     public void stopInterface(boolean fullStop) {
         final boolean b = fullStop;
-        Runnable interfaceSignaller = new Runnable() {
-            @Override
-            public void run() {
-                ui.notifyAutoModeBeingStarted();
-                if (b) {
-                    inAutoMode = true;
-                    getUI().getProofControl()
-                            .fireAutoModeStarted(new ProofEvent(getSelectedProof())); // TODO: Is
-                                                                                      // this
-                                                                                      // wrong use
-                                                                                      // of
-                                                                                      // auto mode
-                                                                                      // really
-                                                                                      // required?
-                }
+        Runnable interfaceSignaller = () -> {
+            ui.notifyAutoModeBeingStarted();
+            if (b) {
+                inAutoMode = true;
+                getUI().getProofControl()
+                        .fireAutoModeStarted(new ProofEvent(getSelectedProof())); // TODO: Is
+                                                                                  // this
+                                                                                  // wrong use
+                                                                                  // of
+                                                                                  // auto mode
+                                                                                  // really
+                                                                                  // required?
             }
         };
         ThreadUtilities.invokeAndWait(interfaceSignaller);
@@ -578,24 +607,21 @@ public class KeYMediator {
 
     public void startInterface(boolean fullStop) {
         final boolean b = fullStop;
-        Runnable interfaceSignaller = new Runnable() {
-            @Override
-            public void run() {
-                if (b) {
-                    inAutoMode = false;
-                    getUI().getProofControl()
-                            .fireAutoModeStopped(new ProofEvent(getSelectedProof())); // TODO: Is
-                                                                                      // this
-                                                                                      // wrong use
-                                                                                      // of
-                                                                                      // auto mode
-                                                                                      // really
-                                                                                      // required?
-                }
-                ui.notifyAutomodeStopped();
-                if (getSelectedProof() != null) {
-                    keySelectionModel.fireSelectedProofChanged();
-                }
+        Runnable interfaceSignaller = () -> {
+            if (b) {
+                inAutoMode = false;
+                getUI().getProofControl()
+                        .fireAutoModeStopped(new ProofEvent(getSelectedProof())); // TODO: Is
+                                                                                  // this
+                                                                                  // wrong use
+                                                                                  // of
+                                                                                  // auto mode
+                                                                                  // really
+                                                                                  // required?
+            }
+            ui.notifyAutomodeStopped();
+            if (getSelectedProof() != null) {
+                keySelectionModel.fireSelectedProofChanged();
             }
         };
         ThreadUtilities.invokeOnEventQueue(interfaceSignaller);
@@ -662,8 +688,9 @@ public class KeYMediator {
      * @return
      */
     public @Nonnull Lookup getUserData() {
-        if (userData == null)
+        if (userData == null) {
             userData = new Lookup();
+        }
         return userData;
     }
 
@@ -685,12 +712,9 @@ public class KeYMediator {
 
         @Override
         public void proofPruned(final ProofTreeEvent e) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    if (!e.getSource().find(getSelectedNode())) {
-                        keySelectionModel.setSelectedNode(e.getNode());
-                    }
+            SwingUtilities.invokeLater(() -> {
+                if (!e.getSource().find(getSelectedNode())) {
+                    keySelectionModel.setSelectedNode(e.getNode());
                 }
             });
             OneStepSimplifier.refreshOSS(e.getSource());
@@ -885,15 +909,11 @@ public class KeYMediator {
                 public void eventRebuildingTree(final int currentTacletNumber,
                         final int totalNumber) {
 
-                    SwingUtilities.invokeLater(new Runnable() {
+                    SwingUtilities.invokeLater(() -> {
+                        ui.taskStarted(new DefaultTaskStartedInfo(TaskKind.Other,
+                            "Rebuilding...", totalNumber));
+                        ui.taskProgress(currentTacletNumber);
 
-                        @Override
-                        public void run() {
-                            ui.taskStarted(new DefaultTaskStartedInfo(TaskKind.Other,
-                                "Rebuilding...", totalNumber));
-                            ui.taskProgress(currentTacletNumber);
-
-                        }
                     });
                 }
 
@@ -912,14 +932,8 @@ public class KeYMediator {
 
                 @Override
                 public void eventCutting() {
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            ui.taskStarted(
-                                new DefaultTaskStartedInfo(TaskKind.Other, "Cutting...", 0));
-                        }
-                    });
+                    SwingUtilities.invokeLater(() -> ui.taskStarted(
+                        new DefaultTaskStartedInfo(TaskKind.Other, "Cutting...", 0)));
 
                 }
 
@@ -927,20 +941,13 @@ public class KeYMediator {
                 public void eventException(Throwable throwable) {
                     KeYMediator.this.startInterface(true);
 
-                    throwable.printStackTrace();
                     KeYMediator.this.notify(new ExceptionFailureEvent(
                         "The cut could" + "not be processed successfully. In order to "
                             + "preserve consistency the proof is pruned."
                             + " For more information see details or output of your console.",
                         throwable));
 
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            getSelectedProof().pruneProof(invokedNode);
-                        }
-                    });
+                    SwingUtilities.invokeLater(() -> getSelectedProof().pruneProof(invokedNode));
                 }
             });
             this.stopInterface(true);
@@ -971,5 +978,25 @@ public class KeYMediator {
      */
     public @Nonnull DefaultListModel<Proof> getCurrentlyOpenedProofs() {
         return currentlyOpenedProofs;
+    }
+
+    /**
+     * Add another listener for user actions.
+     *
+     * @param listener listener object
+     */
+    public void addUserActionListener(UserActionListener listener) {
+        userActionListeners.add(listener);
+    }
+
+    /**
+     * Notify all user action listeners about a performed action.
+     *
+     * @param action the user action
+     */
+    public void fireActionPerformed(UserAction action) {
+        for (UserActionListener listener : userActionListeners) {
+            listener.actionPerformed(action);
+        }
     }
 }

@@ -1,13 +1,15 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
-import org.antlr.v4.runtime.ParserRuleContext;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
 
-import java.util.Objects;
-import java.util.stream.Collectors;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * A JML model method declaration in textual form.
@@ -20,6 +22,7 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
             JmlParser.Method_declarationContext methodDefinition) {
         super(mods);
         this.methodDefinition = methodDefinition;
+        setPosition(methodDefinition);
     }
 
     public String getParsableDeclaration() {
@@ -58,10 +61,12 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
         TextualJMLMethodDecl that = (TextualJMLMethodDecl) o;
         return Objects.equals(methodDefinition, that.methodDefinition);
     }

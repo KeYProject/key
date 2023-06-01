@@ -1,10 +1,11 @@
 package de.uka.ilkd.key.java.recoderext;
 
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+
 import recoder.java.Identifier;
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
 import recoder.java.statement.Catch;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 public class CatchSVWrapper extends Catch implements KeYRecoderExtension, SVWrapper {
 

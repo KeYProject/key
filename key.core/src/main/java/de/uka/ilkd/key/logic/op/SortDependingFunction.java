@@ -8,7 +8,9 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+
 import org.key_project.util.collection.ImmutableArray;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,10 +105,12 @@ public final class SortDependingFunction extends Function {
                 .lookup(instantiateName(getKind(), sort));
 
 
-        if (sort instanceof ProgramSVSort)
+        if (sort instanceof ProgramSVSort) {
             throw new AssertionError();
-        if (sort == AbstractTermTransformer.METASORT)
+        }
+        if (sort == AbstractTermTransformer.METASORT) {
             throw new AssertionError();
+        }
 
         final NamespaceSet namespaces = services.getNamespaces();
         Namespace<Function> functions = namespaces.functions();

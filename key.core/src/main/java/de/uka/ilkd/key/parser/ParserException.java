@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.parser;
 
 
-import de.uka.ilkd.key.util.parsing.HasLocation;
-
 import javax.annotation.Nullable;
+
+import de.uka.ilkd.key.util.parsing.HasLocation;
 
 /**
  * This class represents an error of a parser.

@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.logic.op;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -14,10 +11,13 @@ import de.uka.ilkd.key.java.declaration.Throws;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+
 public interface IProgramMethod
         extends IObserverFunction, SourceElement, ProgramElement, MemberDeclaration {
 
-    public abstract MethodDeclaration getMethodDeclaration();
+    MethodDeclaration getMethodDeclaration();
 
     /**
      * returns the KeYJavaType of the <tt>i</tt>-th parameter declaration. This method does not care
@@ -26,64 +26,64 @@ public interface IProgramMethod
      * @param i the int specifying the parameter position
      * @return the KeYJavaType of the <tt>i</tt>-th parameter
      */
-    public abstract KeYJavaType getParameterType(int i);
+    KeYJavaType getParameterType(int i);
 
-    public abstract StatementBlock getBody();
+    StatementBlock getBody();
 
     /**
      * Test whether the declaration is a constructor.
      */
-    public abstract boolean isConstructor();
+    boolean isConstructor();
 
     /**
      * Test whether the declaration is model.
      */
-    public abstract boolean isModel();
+    boolean isModel();
 
-    public abstract boolean isVoid();
+    boolean isVoid();
 
     /**
      * @return the return type
      */
-    public abstract KeYJavaType getReturnType();
+    KeYJavaType getReturnType();
 
-    public abstract ProgramElementName getProgramElementName();
+    ProgramElementName getProgramElementName();
 
-    public abstract String getUniqueName();
+    String getUniqueName();
 
-    public abstract String getFullName();
+    String getFullName();
 
-    public abstract String getName();
+    String getName();
 
-    public abstract boolean isAbstract();
+    boolean isAbstract();
 
-    public abstract boolean isImplicit();
+    boolean isImplicit();
 
-    public abstract boolean isNative();
+    boolean isNative();
 
-    public abstract boolean isFinal();
+    boolean isFinal();
 
-    public abstract boolean isSynchronized();
+    boolean isSynchronized();
 
-    public abstract Throws getThrown();
+    Throws getThrown();
 
-    public abstract ParameterDeclaration getParameterDeclarationAt(int index);
+    ParameterDeclaration getParameterDeclarationAt(int index);
 
     /**
      * Returns the variablespecification of the i-th parameterdeclaration
      */
-    public abstract VariableSpecification getVariableSpecification(int index);
+    VariableSpecification getVariableSpecification(int index);
 
-    public abstract int getParameterDeclarationCount();
+    int getParameterDeclarationCount();
 
-    public abstract ImmutableArray<ParameterDeclaration> getParameters();
+    ImmutableArray<ParameterDeclaration> getParameters();
 
     // Methods from OberverFunction, TODO Create interface for ObersverFunction
-    public ImmutableArray<KeYJavaType> getParamTypes();
+    ImmutableArray<KeYJavaType> getParamTypes();
 
     /**
      * @return The list of {@link LocationVariable}s passed as parameters to this
      *         {@link IProgramMethod}.
      */
-    public ImmutableList<LocationVariable> collectParameters();
+    ImmutableList<LocationVariable> collectParameters();
 }

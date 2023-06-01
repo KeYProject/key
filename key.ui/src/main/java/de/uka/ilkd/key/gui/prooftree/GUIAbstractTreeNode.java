@@ -4,7 +4,6 @@ package de.uka.ilkd.key.gui.prooftree;
 import java.lang.ref.WeakReference;
 import java.util.Enumeration;
 import java.util.LinkedList;
-
 import javax.annotation.Nonnull;
 import javax.swing.tree.TreeNode;
 
@@ -13,11 +12,11 @@ import de.uka.ilkd.key.proof.Node;
 
 public abstract class GUIAbstractTreeNode implements TreeNode {
 
-    private GUIProofTreeModel tree;
+    private final GUIProofTreeModel tree;
 
     // made weak otherwise there are leaks in ExpansionState.map
     // and ProofTreeView.delegateView.lastPathComponent
-    private WeakReference<Node> noderef;
+    private final WeakReference<Node> noderef;
 
     protected GUIProofTreeModel getProofTreeModel() {
         return tree;
@@ -25,7 +24,7 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
 
     public GUIAbstractTreeNode(GUIProofTreeModel tree, Node node) {
         this.tree = tree;
-        this.noderef = new WeakReference<Node>(node);
+        this.noderef = new WeakReference<>(node);
     }
 
     public abstract TreeNode getChildAt(int childIndex);
@@ -59,19 +58,20 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
 
 
     public TreeNode[] getPath() {
-        LinkedList<TreeNode> path = new LinkedList<TreeNode>();
+        LinkedList<TreeNode> path = new LinkedList<>();
         TreeNode n = this;
         path.addFirst(n);
         while ((n = n.getParent()) != null) {
             path.addFirst(n);
         }
-        return path.toArray(new TreeNode[path.size()]);
+        return path.toArray(new TreeNode[0]);
     }
 
     protected TreeNode findBranch(Node p_node) {
         TreeNode res = getProofTreeModel().findBranch(p_node);
-        if (res != null)
+        if (res != null) {
             return res;
+        }
 
         String label = ensureBranchLabelIsSet(p_node);
 
@@ -112,17 +112,20 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
     }
 
     protected Node findChild(Node n) {
-        if (n.childrenCount() == 1)
+        if (n.childrenCount() == 1) {
             return n.child(0);
+        }
 
-        if (!getProofTreeModel().globalFilterActive())
+        if (!getProofTreeModel().globalFilterActive()) {
             return null;
+        }
 
         Node nextN = null;
         for (int i = 0; i != n.childrenCount(); ++i) {
             if (!ProofTreeViewFilter.hiddenByGlobalFilters(n.child(i))) {
-                if (nextN != null)
+                if (nextN != null) {
                     return null;
+                }
                 nextN = n.child(i);
             }
         }

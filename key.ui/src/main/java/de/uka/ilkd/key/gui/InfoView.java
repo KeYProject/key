@@ -1,5 +1,13 @@
 package de.uka.ilkd.key.gui;
 
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -17,14 +25,6 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.util.ThreadUtilities;
 import de.uka.ilkd.key.util.XMLResources;
 
-import javax.swing.*;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
 /**
  * Class for info contents displayed in {@link MainWindow}.
  *
@@ -32,12 +32,9 @@ import java.awt.event.MouseEvent;
  */
 public class InfoView extends JSplitPane implements TabPanel {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = -6944612837850368411L;
     public static final Icon INFO_ICON =
-        IconFactory.INFO_VIEW.get(MainWindowTabbedPane.TAB_ICON_SIZE);
+        IconFactory.INFO_VIEW.get(MainWindow.TAB_ICON_SIZE);
 
 
     private final InfoTree infoTree;
@@ -154,8 +151,9 @@ public class InfoView extends JSplitPane implements TabPanel {
 
     public void setMediator(KeYMediator m) {
         assert m != null;
-        if (mediator != null)
+        if (mediator != null) {
             mediator.removeKeYSelectionListener(selectionListener);
+        }
         m.addKeYSelectionListener(selectionListener);
         mediator = m;
     }

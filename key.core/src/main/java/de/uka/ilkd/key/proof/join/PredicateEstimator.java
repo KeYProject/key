@@ -16,7 +16,7 @@ import de.uka.ilkd.key.proof.Proof;
  * @author Benjamin Niedermann
  */
 public interface PredicateEstimator {
-    public static final PredicateEstimator STD_ESTIMATOR = new StdPredicateEstimator();
+    PredicateEstimator STD_ESTIMATOR = new StdPredicateEstimator();
 
     /**
      * @param partner Structure comprising the partners of a join.
@@ -24,13 +24,13 @@ public interface PredicateEstimator {
      * @return A decision predicate for the two nodes in partner. The predicate should be true in
      *         the sequent of the first node and false in the sequent of the second node.
      */
-    public Result estimate(ProspectivePartner partner, Proof proof);
+    Result estimate(ProspectivePartner partner, Proof proof);
 
     /**
      * Encapsulates a decision predicate for the delayed cut mechanism and the common parent node at
      * which to prune, i.e. apply the delayed cut.
      */
-    public interface Result {
+    interface Result {
         Term getPredicate();
 
         Node getCommonParent();
@@ -112,14 +112,7 @@ class StdPredicateEstimator implements PredicateEstimator {
      * @return The next node on the path to partner.getNode(0).
      */
     private Node getFirstDifferentNode(ProspectivePartner partner) {
-        TreeSet<Node> set = new TreeSet<Node>(new Comparator<Node>() {
-
-            @Override
-            public int compare(Node o1, Node o2) {
-
-                return o1.serialNr() - o2.serialNr();
-            }
-        });
+        TreeSet<Node> set = new TreeSet<>(Comparator.comparingInt(Node::serialNr));
 
         Node node = partner.getNode(0);
         while (!node.root()) {

@@ -159,17 +159,17 @@ public final class CommandLine {
     /**
      * The options that have been defined. Mapped from their image.
      */
-    private final Map<String, Option> options = new LinkedHashMap<String, Option>();
+    private final Map<String, Option> options = new LinkedHashMap<>();
 
     /**
      * The collected list of elements to be printed on the usage page.
      */
-    private final List<HelpElement> helpElements = new ArrayList<HelpElement>();
+    private final List<HelpElement> helpElements = new ArrayList<>();
 
     /**
      * The additional arguments which do not belong to an option.
      */
-    private final List<String> arguments = new LinkedList<String>();
+    private final List<String> arguments = new LinkedList<>();
 
     /**
      * This is the number of characters printed in one line when printing the usage page. Longer
@@ -310,12 +310,11 @@ public final class CommandLine {
      */
     public ArrayList<File> getFileArguments() {
 
-        ArrayList<File> ret = new ArrayList<File>();
+        ArrayList<File> ret = new ArrayList<>();
         List<String> FileNameList = Collections.unmodifiableList(arguments);
 
-        for (int i = 0; i < FileNameList.size(); i++) {
+        for (String fileArg : FileNameList) {
 
-            String fileArg = FileNameList.get(i);
             File tmp = new File(fileArg);
             if (tmp.exists()) {
                 ret.add(tmp);

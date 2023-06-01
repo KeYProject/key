@@ -2,27 +2,22 @@ package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * A no position taclet application has no position information yet. This can have different
@@ -137,18 +132,21 @@ public class NoPosTacletApp extends TacletApp {
             final SchemaVariable sv = it.next();
 
             if (sv instanceof ModalOperatorSV || sv instanceof ProgramSV || sv instanceof VariableSV
-                    || sv instanceof SkolemTermSV)
+                    || sv instanceof SkolemTermSV) {
                 continue;
+            }
 
             final TacletPrefix prefix = taclet.getPrefix(sv);
-            if (prefix.context())
+            if (prefix.context()) {
                 continue;
+            }
 
             final ImmutableSet<QuantifiableVariable> boundVarSet =
                 boundAtOccurrenceSet(prefix, instantiations);
             final Term inst = (Term) instantiations.getInstantiation(sv);
-            if (!inst.freeVars().subset(boundVarSet))
+            if (!inst.freeVars().subset(boundVarSet)) {
                 return false;
+            }
         }
 
         return true;
@@ -165,13 +163,14 @@ public class NoPosTacletApp extends TacletApp {
     @Override
     public TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
             Services services) {
-        if (interesting)
+        if (interesting) {
             return createNoPosTacletApp(taclet(),
                 instantiations().addInteresting(sv, term, services), ifFormulaInstantiations(),
                 services);
-        else
+        } else {
             return createNoPosTacletApp(taclet(), instantiations().add(sv, term, services),
                 ifFormulaInstantiations(), services);
+        }
     }
 
 
@@ -274,7 +273,7 @@ public class NoPosTacletApp extends TacletApp {
 
     @Override
     protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
-        return DefaultImmutableSet.<QuantifiableVariable>nil();
+        return DefaultImmutableSet.nil();
     }
 
 
@@ -307,8 +306,9 @@ public class NoPosTacletApp extends TacletApp {
      * current subterm is known anyway).
      */
     public NoPosTacletApp matchFind(PosInOccurrence pos, Services services, Term t) {
-        if ((t == null) && (pos != null))
+        if ((t == null) && (pos != null)) {
             t = pos.subTerm();
+        }
 
         MatchConditions mc = setupMatchConditions(pos, services);
 
@@ -318,7 +318,7 @@ public class NoPosTacletApp extends TacletApp {
 
         MatchConditions res;
         if (taclet() instanceof FindTaclet) {
-            res = ((FindTaclet) taclet()).getMatcher().matchFind(t, mc, services);
+            res = taclet().getMatcher().matchFind(t, mc, services);
             // the following check will partly be repeated within the
             // constructor; this could be optimised
             if (res == null || !checkVarCondNotFreeIn(taclet(), res.getInstantiations(), pos)) {
@@ -360,9 +360,6 @@ public class NoPosTacletApp extends TacletApp {
 
         if (taclet() instanceof RewriteTaclet) {
             mc = ((RewriteTaclet) taclet()).checkPrefix(pos, mc);
-            if (mc == null) {
-                LOGGER.debug("NoPosTacletApp: Update prefix check failed.");
-            }
         }
 
         return mc;

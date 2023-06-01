@@ -2,12 +2,6 @@ package de.uka.ilkd.key.rule.label;
 
 import java.util.Set;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -18,15 +12,12 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.rule.AbstractBlockContractRule;
-import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule;
-import de.uka.ilkd.key.rule.BlockContractExternalRule;
-import de.uka.ilkd.key.rule.BlockContractInternalRule;
-import de.uka.ilkd.key.rule.LoopContractExternalRule;
-import de.uka.ilkd.key.rule.LoopContractInternalRule;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.rule.*;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * Makes sure that the ID of {@link SymbolicExecutionTermLabel}s is increased when a
@@ -60,12 +51,8 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
                 || (rule instanceof AbstractAuxiliaryContractRule
                         && ((AbstractBlockContractRule.BlockContractHint) hint)
                                 .getExceptionalVariable() != null)) {
-            TermLabel label = CollectionUtil.searchAndRemove(labels, new IFilter<TermLabel>() {
-                @Override
-                public boolean select(TermLabel element) {
-                    return element instanceof SymbolicExecutionTermLabel;
-                }
-            });
+            TermLabel label = CollectionUtil.searchAndRemove(labels,
+                element -> element instanceof SymbolicExecutionTermLabel);
             if (label instanceof SymbolicExecutionTermLabel) {
                 int labelID = services.getCounter(SymbolicExecutionTermLabel.PROOF_COUNTER_NAME)
                         .getCountPlusPlus();

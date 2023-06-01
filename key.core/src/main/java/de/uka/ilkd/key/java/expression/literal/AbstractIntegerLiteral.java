@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.java.expression.literal;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
+
+import org.key_project.util.ExtList;
 
 /**
  * This class is a superclass for integer literals (Int, Long, Char). It provides a getValue()

@@ -1,14 +1,16 @@
 package de.uka.ilkd.key.util.parsing;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import javax.annotation.Nullable;
+
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.MiscTools;
+
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-
-import javax.annotation.Nullable;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * @author Alexander Weigl
@@ -37,10 +39,11 @@ public class BuildingException extends RuntimeException implements HasLocation {
 
     private static String getPosition(Token t) {
         if (t != null) {
-            return t.getTokenSource().getSourceName() + ":" + t.getLine() + ":"
-                + t.getCharPositionInLine();
-        } else
+            var p = Position.fromToken(t);
+            return t.getTokenSource().getSourceName() + ":" + p.line() + ":" + p.column();
+        } else {
             return "";
+        }
     }
 
     public BuildingException(ParserRuleContext ctx, Throwable ex) {
@@ -61,12 +64,7 @@ public class BuildingException extends RuntimeException implements HasLocation {
             if (!IntStream.UNKNOWN_SOURCE_NAME.equals(source)) {
                 url = MiscTools.parseURL(source);
             }
-            return new Location(url, offendingSymbol.getLine(),
-                /*
-                 * Location is assumed to be 1-based in line and column, while ANTLR generates
-                 * 1-based line and 0-based column numbers!
-                 */
-                offendingSymbol.getCharPositionInLine() + 1);
+            return new Location(url, Position.fromToken(offendingSymbol));
         }
         return null;
     }

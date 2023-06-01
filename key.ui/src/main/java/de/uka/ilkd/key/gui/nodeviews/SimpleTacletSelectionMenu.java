@@ -4,14 +4,13 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.ActionListener;
-
 import javax.swing.JMenu;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.rule.PosTacletApp;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * This simple taclet menu displays the user a list of applicable taclets and lets select her/him
@@ -55,7 +54,7 @@ public class SimpleTacletSelectionMenu extends JMenu {
     private void addMenuEntries(ImmutableList<PosTacletApp> apps, NotationInfo info,
             ActionListener listener, Services services) {
         for (PosTacletApp app : apps) {
-            final DefaultTacletMenuItem item = new DefaultTacletMenuItem(this, app, info, services);
+            final DefaultTacletMenuItem item = new DefaultTacletMenuItem(app, info, services);
             item.addActionListener(listener);
             add(item);
         }

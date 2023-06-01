@@ -2,13 +2,13 @@ package de.uka.ilkd.key.strategy.definition;
 
 import java.util.ArrayList;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Triple;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * <p>
@@ -75,97 +75,91 @@ public class StrategySettingsDefinition {
 
     static {
         STD_FURTHER_DEFAULTS =
-            new ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>>();
+            new ArrayList<>();
 
         // Java verification standard preset (tested in TimSort case study)
-        STD_FURTHER_DEFAULTS.add(new Triple<String, Integer, IDefaultStrategyPropertiesFactory>(
-            "Java verif. std.", 7000, new IDefaultStrategyPropertiesFactory() {
-                @Override
-                public StrategyProperties createDefaultStrategyProperties() {
-                    final StrategyProperties newProps =
-                        IDefaultStrategyPropertiesFactory.DEFAULT_FACTORY
-                                .createDefaultStrategyProperties();
+        STD_FURTHER_DEFAULTS.add(new Triple<>(
+            "Java verif. std.", 7000, () -> {
+                final StrategyProperties newProps =
+                    IDefaultStrategyPropertiesFactory.DEFAULT_FACTORY
+                            .createDefaultStrategyProperties();
 
-                    newProps.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
-                        StrategyProperties.SPLITTING_DELAYED);
+                newProps.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
+                    StrategyProperties.SPLITTING_DELAYED);
 
-                    newProps.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
-                        StrategyProperties.LOOP_SCOPE_INV_TACLET);
+                newProps.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
+                    StrategyProperties.LOOP_SCOPE_INV_TACLET);
 
-                    newProps.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY,
-                        StrategyProperties.BLOCK_CONTRACT_INTERNAL);
+                newProps.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY,
+                    StrategyProperties.BLOCK_CONTRACT_INTERNAL);
 
-                    newProps.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
-                        StrategyProperties.METHOD_CONTRACT);
+                newProps.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
+                    StrategyProperties.METHOD_CONTRACT);
 
-                    newProps.setProperty(StrategyProperties.MPS_OPTIONS_KEY,
-                        StrategyProperties.MPS_MERGE);
+                newProps.setProperty(StrategyProperties.MPS_OPTIONS_KEY,
+                    StrategyProperties.MPS_MERGE);
 
-                    newProps.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
-                        StrategyProperties.DEP_ON);
+                newProps.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
+                    StrategyProperties.DEP_ON);
 
-                    newProps.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
-                        StrategyProperties.QUERY_ON);
+                newProps.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
+                    StrategyProperties.QUERY_ON);
 
-                    newProps.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
-                        StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+                newProps.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
+                    StrategyProperties.NON_LIN_ARITH_DEF_OPS);
 
-                    newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY,
-                        StrategyProperties.OSS_ON);
+                newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY,
+                    StrategyProperties.OSS_ON);
 
-                    newProps.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
-                        StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
+                newProps.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
+                    StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
 
-                    newProps.setProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
-                        StrategyProperties.CLASS_AXIOM_DELAYED);
+                newProps.setProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
+                    StrategyProperties.CLASS_AXIOM_DELAYED);
 
-                    return newProps;
-                }
+                return newProps;
             }));
 
         // Simplification preset
-        STD_FURTHER_DEFAULTS.add(new Triple<String, Integer, IDefaultStrategyPropertiesFactory>(
-            "Simplification", 5000, new IDefaultStrategyPropertiesFactory() {
-                @Override
-                public StrategyProperties createDefaultStrategyProperties() {
-                    final StrategyProperties newProps =
-                        IDefaultStrategyPropertiesFactory.DEFAULT_FACTORY
-                                .createDefaultStrategyProperties();
+        STD_FURTHER_DEFAULTS.add(new Triple<>(
+            "Simplification", 5000, () -> {
+                final StrategyProperties newProps =
+                    IDefaultStrategyPropertiesFactory.DEFAULT_FACTORY
+                            .createDefaultStrategyProperties();
 
-                    newProps.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
-                        StrategyProperties.SPLITTING_OFF);
+                newProps.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
+                    StrategyProperties.SPLITTING_OFF);
 
-                    newProps.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
-                        StrategyProperties.LOOP_NONE);
+                newProps.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
+                    StrategyProperties.LOOP_NONE);
 
-                    newProps.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY,
-                        StrategyProperties.BLOCK_NONE);
+                newProps.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY,
+                    StrategyProperties.BLOCK_NONE);
 
-                    newProps.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
-                        StrategyProperties.METHOD_NONE);
+                newProps.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
+                    StrategyProperties.METHOD_NONE);
 
-                    newProps.setProperty(StrategyProperties.MPS_MERGE, StrategyProperties.MPS_NONE);
+                newProps.setProperty(StrategyProperties.MPS_MERGE, StrategyProperties.MPS_NONE);
 
-                    newProps.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
-                        StrategyProperties.DEP_OFF);
+                newProps.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
+                    StrategyProperties.DEP_OFF);
 
-                    newProps.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
-                        StrategyProperties.QUERY_OFF);
+                newProps.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
+                    StrategyProperties.QUERY_OFF);
 
-                    newProps.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY,
-                        StrategyProperties.QUERYAXIOM_OFF);
+                newProps.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY,
+                    StrategyProperties.QUERYAXIOM_OFF);
 
-                    newProps.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
-                        StrategyProperties.NON_LIN_ARITH_NONE);
+                newProps.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
+                    StrategyProperties.NON_LIN_ARITH_NONE);
 
-                    newProps.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
-                        StrategyProperties.QUANTIFIERS_NONE);
+                newProps.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
+                    StrategyProperties.QUANTIFIERS_NONE);
 
-                    newProps.setProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
-                        StrategyProperties.CLASS_AXIOM_OFF);
+                newProps.setProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
+                    StrategyProperties.CLASS_AXIOM_OFF);
 
-                    return newProps;
-                }
+                return newProps;
             }));
     }
 
@@ -209,7 +203,7 @@ public class StrategySettingsDefinition {
         this.propertiesTitle = propertiesTitle;
         this.defaultPropertiesFactory = defaultPropertiesFactory;
         this.furtherDefaults = furtherDefaults;
-        this.properties = new ImmutableArray<AbstractStrategyPropertyDefinition>(properties);
+        this.properties = new ImmutableArray<>(properties);
     }
 
     /**

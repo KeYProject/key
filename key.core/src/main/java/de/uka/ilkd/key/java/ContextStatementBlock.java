@@ -1,9 +1,5 @@
 package de.uka.ilkd.key.java;
 
-import java.io.IOException;
-
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -13,7 +9,8 @@ import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.ExtList;
 
 /**
  * In the DL-formulae description of Taclets the program part can have the following form < pi
@@ -87,8 +84,9 @@ public class ContextStatementBlock extends StatementBlock {
 
     public int getChildCount() {
         int count = 0;
-        if (executionContext != null)
+        if (executionContext != null) {
             count++;
+        }
         count += super.getChildCount();
         return count;
     }
@@ -120,18 +118,13 @@ public class ContextStatementBlock extends StatementBlock {
         v.performActionOnContextStatementBlock(this);
     }
 
-    public void prettyPrint(PrettyPrinter w) throws IOException {
-        w.printContextStatementBlock(this);
-    }
-
     /* toString */
     public String toString() {
-        StringBuffer result = new StringBuffer();
-        result.append("..");
-        result.append(super.toString());
-        result.append("\n");
-        result.append("...");
-        return result.toString();
+        String result = ".." +
+            super.toString() +
+            "\n" +
+            "...";
+        return result;
     }
 
 
@@ -175,9 +168,6 @@ public class ContextStatementBlock extends StatementBlock {
             final int srcPrefixLength = prefix.getPrefixLength();
 
             if (patternPrefixLength > srcPrefixLength) {
-                LOGGER.debug(
-                    "Program match FAILED. Source has not enough prefix elements. This: {} Source: {}",
-                    this, source);
                 return null;
             }
 
@@ -231,7 +221,6 @@ public class ContextStatementBlock extends StatementBlock {
             return null;
         }
 
-        LOGGER.debug("Successful match.");
         return matchCond;
     }
 
@@ -291,10 +280,8 @@ public class ContextStatementBlock extends StatementBlock {
             matchCond =
                 executionContext.match(new SourceData(innerContext, -1, services), matchCond);
             if (matchCond == null) {
-                LOGGER.debug("Program match. ExecutionContext mismatch.");
                 return null;
             }
-            LOGGER.debug("Program match. ExecutionContext matched.");
         }
 
         matchCond = matchCond.setInstantiations(

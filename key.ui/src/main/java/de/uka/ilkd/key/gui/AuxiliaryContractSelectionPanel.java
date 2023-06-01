@@ -1,24 +1,10 @@
 package de.uka.ilkd.key.gui;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.MouseListener;
 import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule;
@@ -58,15 +44,13 @@ public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContrac
         add(scrollPane);
 
         // create contract list
-        contractList = new JList<T>();
+        contractList = new JList<>();
         contractList
                 .setSelectionMode(multipleSelection ? ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
                         : ListSelectionModel.SINGLE_SELECTION);
-        contractList.addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-                if (contractList.isSelectionEmpty()) {
-                    contractList.setSelectedIndex(e.getFirstIndex());
-                }
+        contractList.addListSelectionListener(e -> {
+            if (contractList.isSelectionEmpty()) {
+                contractList.setSelectedIndex(e.getFirstIndex());
             }
         });
         final Services serv = services;

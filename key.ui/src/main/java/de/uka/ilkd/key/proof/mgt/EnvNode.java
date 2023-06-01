@@ -11,7 +11,7 @@ public class EnvNode extends DefaultMutableTreeNode implements TaskTreeNode {
      *
      */
     private static final long serialVersionUID = 5739765420005738444L;
-    private ProofEnvironment env;
+    private final ProofEnvironment env;
 
     public EnvNode(ProofEnvironment e) {
         super(e);

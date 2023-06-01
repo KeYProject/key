@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.smt.communication;
 
-import de.uka.ilkd.key.smt.SMTSolverResult;
-
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.smt.SMTSolverResult;
 
 /**
  * Stores the communication between KeY and an external solver: Contains a list that stores the

@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.nparser;
 
+import java.net.URL;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
@@ -7,16 +11,14 @@ import de.uka.ilkd.key.nparser.builder.IncludeFinder;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Triple;
+
+import org.key_project.util.java.StringUtil;
+
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
-import org.key_project.util.java.StringUtil;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.net.URL;
 
 /**
  * This is a monad around the parse tree. We use this class to hide the
@@ -53,9 +55,9 @@ public abstract class KeyAst<T extends ParserRuleContext> {
 
         public @Nullable ProofSettings findProofSettings() {
             ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
-            if (ctx.decls() != null && ctx.decls().pref != null) {
+            if (ctx.preferences() != null) {
                 String text =
-                    StringUtil.trim(ctx.decls().pref.s.getText(), '"').replace("\\\\:", ":");
+                    StringUtil.trim(ctx.preferences().s.getText(), '"').replace("\\\\:", ":");
                 settings.loadSettingsFromString(text);
             }
             return settings;
@@ -91,18 +93,23 @@ public abstract class KeyAst<T extends ParserRuleContext> {
 
         public Token findProof() {
             KeYParser.ProofContext a = ctx.proof();
-            if (a != null)
+            if (a != null) {
                 return a.PROOF().getSymbol();
+            }
             return null;
         }
 
         /**
-         * Extracts the decls and taclets into a string. This method is required for saving and
-         * loading proofs.
+         * Extracts the decls and taclets into a string.
+         * The problem header may contain the bootstrap classpath,
+         * the regular classpath, the Java source file to load,
+         * include statements to load other files, configuration of options,
+         * declarations of sorts, program variables, schema variables, predicates, and more.
+         * See the grammar (KeYParser.g4) for more possible elements.
          */
         public String getProblemHeader() {
             final KeYParser.DeclsContext decls = ctx.decls();
-            if (decls != null) {
+            if (decls != null && decls.getChildCount() > 0) {
                 final Token start = decls.start;
                 final Token stop = decls.stop;
                 if (start != null && stop != null) {

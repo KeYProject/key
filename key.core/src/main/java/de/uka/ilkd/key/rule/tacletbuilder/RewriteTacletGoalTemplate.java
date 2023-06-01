@@ -1,16 +1,16 @@
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * this class inherits from TacletGoalTemplate. It is used if there is a replacewith in the
@@ -19,7 +19,7 @@ import de.uka.ilkd.key.rule.Taclet;
 public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
     /** term that replaces another one */
-    private Term replacewith;
+    private final Term replacewith;
 
     /**
      * creates new Goaldescription
@@ -38,12 +38,12 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
     public RewriteTacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules,
             Term replacewith) {
-        this(addedSeq, addedRules, replacewith, DefaultImmutableSet.<SchemaVariable>nil());
+        this(addedSeq, addedRules, replacewith, DefaultImmutableSet.nil());
     }
 
 
     public RewriteTacletGoalTemplate(Term replacewith) {
-        this(Sequent.EMPTY_SEQUENT, ImmutableSLList.<Taclet>nil(), replacewith);
+        this(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), replacewith);
     }
 
 

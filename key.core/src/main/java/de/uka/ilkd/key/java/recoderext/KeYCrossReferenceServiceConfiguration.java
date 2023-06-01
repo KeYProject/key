@@ -1,13 +1,14 @@
 package de.uka.ilkd.key.java.recoderext;
 
+import de.uka.ilkd.key.java.KeYProgModelInfo;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
 import recoder.io.SourceFileRepository;
 import recoder.service.KeYCrossReferenceSourceInfo;
 import recoder.service.NameInfo;
 import recoder.service.SourceInfo;
-import de.uka.ilkd.key.java.KeYProgModelInfo;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public class KeYCrossReferenceServiceConfiguration extends CrossReferenceServiceConfiguration {
 

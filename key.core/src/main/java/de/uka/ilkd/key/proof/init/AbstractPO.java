@@ -1,27 +1,15 @@
 package de.uka.ilkd.key.proof.init;
 
-import java.io.IOException;
 import java.util.*;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
@@ -31,12 +19,13 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassWellDefinedness;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.MethodWellDefinedness;
-import de.uka.ilkd.key.speclang.WellDefinednessCheck;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**
@@ -59,7 +48,8 @@ public abstract class AbstractPO implements IPersistablePO {
 
 
     // fields used by Tarjan Algorithm
-    private HashMap<Vertex, ImmutableList<Pair<Sort, IObserverFunction>>> allSCCs = new HashMap<>();
+    private final HashMap<Vertex, ImmutableList<Pair<Sort, IObserverFunction>>> allSCCs =
+        new HashMap<>();
     private final HashMap<Pair<Sort, IObserverFunction>, Vertex> vertices = new HashMap<>();
     private final ArrayDeque<Vertex> stack = new ArrayDeque<>();
 
@@ -71,7 +61,7 @@ public abstract class AbstractPO implements IPersistablePO {
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
-    public AbstractPO(InitConfig initConfig, String name) {
+    protected AbstractPO(InitConfig initConfig, String name) {
         this.environmentConfig = initConfig;
         this.environmentServices = initConfig.getServices();
         this.javaInfo = initConfig.getServices().getJavaInfo();
@@ -106,8 +96,8 @@ public abstract class AbstractPO implements IPersistablePO {
         if (!WellDefinednessCheck.isOn()) {
             return;
         }
-        ImmutableSet<RewriteTaclet> res = DefaultImmutableSet.<RewriteTaclet>nil();
-        ImmutableSet<String> names = DefaultImmutableSet.<String>nil();
+        ImmutableSet<RewriteTaclet> res = DefaultImmutableSet.nil();
+        ImmutableSet<String> names = DefaultImmutableSet.nil();
         for (WellDefinednessCheck ch : specRepos.getAllWdChecks()) {
             if (ch instanceof MethodWellDefinedness) {
                 MethodWellDefinedness mwd = (MethodWellDefinedness) ch;
@@ -251,9 +241,8 @@ public abstract class AbstractPO implements IPersistablePO {
      * @return The term representing the general assumption.
      */
     protected Term generateSelfExactType(IProgramMethod pm, Term selfVar, KeYJavaType selfKJT) {
-        final Term selfExactType = selfVar == null || pm.isConstructor() ? tb.tt()
+        return selfVar == null || pm.isConstructor() ? tb.tt()
                 : tb.exactInstance(selfKJT.getSort(), selfVar);
-        return selfExactType;
     }
 
     // ==================================================
@@ -342,7 +331,7 @@ public abstract class AbstractPO implements IPersistablePO {
             ImmutableList<Pair<Sort, IObserverFunction>> scc = allSCCs.get(node);
             for (Taclet axiomTaclet : axiom.getTaclets(
                 DefaultImmutableSet.fromImmutableList(
-                    scc == null ? ImmutableSLList.<Pair<Sort, IObserverFunction>>nil() : scc),
+                    scc == null ? ImmutableSLList.nil() : scc),
                 proofConfig.getServices())) {
                 assert axiomTaclet != null : "class axiom returned null taclet: " + axiom.getName();
                 // only include if choices are appropriate
@@ -395,7 +384,7 @@ public abstract class AbstractPO implements IPersistablePO {
 
         if (node.index == node.lowLink) {
             ImmutableList<Pair<Sort, IObserverFunction>> scc =
-                ImmutableSLList.<Pair<Sort, IObserverFunction>>nil();
+                ImmutableSLList.nil();
             Vertex sccMember;
             do {
                 sccMember = stack.pop();
@@ -425,7 +414,7 @@ public abstract class AbstractPO implements IPersistablePO {
         if (header != null) {
             return;
         }
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
 
         // bootclasspath
         if (bootClassPath != null && !bootClassPath.equals("")) {
@@ -489,8 +478,7 @@ public abstract class AbstractPO implements IPersistablePO {
 
     protected Proof createProofObject(String proofName, String proofHeader, Term poTerm,
             InitConfig proofConfig) {
-        Proof proof = new Proof(proofName, poTerm, proofHeader, proofConfig);
-        return proof;
+        return new Proof(proofName, poTerm, proofHeader, proofConfig);
     }
 
 
@@ -537,7 +525,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * {@inheritDoc}
      */
     @Override
-    public void fillSaveProperties(Properties properties) throws IOException {
+    public void fillSaveProperties(Properties properties) {
         properties.setProperty(IPersistablePO.PROPERTY_CLASS, getClass().getCanonicalName());
         properties.setProperty(IPersistablePO.PROPERTY_NAME, name);
     }

@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.rule.label;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -15,6 +13,8 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * <p>
@@ -61,7 +61,7 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
      * @return {@code true} keep {@link TermLabel} and add it to the new {@link Term}. {@code false}
      *         drop {@link TermLabel} and do not need it to the new {@link Term}.
      */
-    public boolean isRuleApplicationSupported(TermServices services,
+    boolean isRuleApplicationSupported(TermServices services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs,
             ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock);
@@ -100,7 +100,7 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
      * @return {@code true} add {@link TermLabel} to new {@link Term}. {@code false} do not add
      *         {@link TermLabel} to new {@link Term}.
      */
-    public boolean addLabel(TermServices services, PosInOccurrence applicationPosInOccurrence,
+    boolean addLabel(TermServices services, PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm,
             Operator newTermOp, ImmutableArray<Term> newTermSubs,
             ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock,

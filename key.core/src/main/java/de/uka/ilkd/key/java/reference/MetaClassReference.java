@@ -1,16 +1,10 @@
 package de.uka.ilkd.key.java.reference;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Reference;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 /**
  * Meta class reference.
@@ -70,8 +64,9 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -140,10 +135,6 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
         v.performActionOnMetaClassReference(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printMetaClassReference(this);
-    }
-
     public ReferencePrefix setReferencePrefix(ReferencePrefix r) {
         return this;
     }
@@ -151,7 +142,7 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         throw new IllegalStateException("Metaclass references are not supported by KeY as"
-            + "\'java.lang.Class\' is not part of the Java Card standard");
+            + "'java.lang.Class' is not part of the Java Card standard");
     }
 
 }

@@ -4,12 +4,10 @@
 package de.uka.ilkd.key.gui.notification;
 
 import java.lang.reflect.InvocationTargetException;
-
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.util.Debug;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,15 +41,8 @@ public class ExitKeYNotification extends NotificationTask {
             final NotificationEvent eventObject = event;
             final NotificationManager notManager = manager;
             try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        executeActions(eventObject, notManager);
-                    }
-                });
-            } catch (InterruptedException e) {
-                LOGGER.debug("unexpected exception during notification");
-            } catch (InvocationTargetException e) {
+                SwingUtilities.invokeAndWait(() -> executeActions(eventObject, notManager));
+            } catch (InterruptedException | InvocationTargetException e) {
                 LOGGER.debug("unexpected exception during notification");
             }
         }

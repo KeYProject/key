@@ -1,16 +1,9 @@
 package de.uka.ilkd.key.rule.merge.procedures;
 
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.countAtoms;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getDistinguishingFormula;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateRightSideFor;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.trySimplify;
-
 import java.util.LinkedHashSet;
-
-import org.key_project.util.collection.DefaultImmutableSet;
+import java.util.Optional;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -19,7 +12,13 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Quadruple;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
-import de.uka.ilkd.key.util.mergerule.MergeRuleUtils.Option;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.countAtoms;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getDistinguishingFormula;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateRightSideFor;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.trySimplify;
 
 /**
  * Rule that merges two sequents based on the if-then-else construction: If two locations are
@@ -67,10 +66,10 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
             Term valueInState1, SymbolicExecutionState state2, Term valueInState2,
             Term distinguishingFormula, Services services) {
 
-        return new ValuesMergeResult(DefaultImmutableSet.<Term>nil(),
+        return new ValuesMergeResult(DefaultImmutableSet.nil(),
             createIfThenElseTerm(state1, state2, valueInState1, valueInState2,
                 distinguishingFormula, services),
-            new LinkedHashSet<Name>(), new LinkedHashSet<Term>());
+            new LinkedHashSet<>(), new LinkedHashSet<>());
 
     }
 
@@ -197,17 +196,15 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
         // formula is implied by the original path condition; for completeness,
         // we add the common subformula in the new path condition, if it
         // is not already implied by that.
-        Option<Pair<Term, Term>> distinguishingAndEqualFormula1 =
+        Optional<Pair<Term, Term>> distinguishingAndEqualFormula1 =
             getDistinguishingFormula(state1.second, state2.second, services);
-        Term distinguishingFormula = distinguishingAndEqualFormula1.isSome()
-                ? distinguishingAndEqualFormula1.getValue().first
-                : null;
+        Term distinguishingFormula = distinguishingAndEqualFormula1
+                .map(termTermPair -> termTermPair.first).orElse(null);
 
-        Option<Pair<Term, Term>> distinguishingAndEqualFormula2 =
+        Optional<Pair<Term, Term>> distinguishingAndEqualFormula2 =
             getDistinguishingFormula(state2.second, state1.second, services);
-        Term distinguishingFormula2 = distinguishingAndEqualFormula2.isSome()
-                ? distinguishingAndEqualFormula2.getValue().first
-                : null;
+        Term distinguishingFormula2 = distinguishingAndEqualFormula2
+                .map(termTermPair -> termTermPair.first).orElse(null);
 
         // NOTE (DS): This assertion does not prevent the merging of states with
         // equal
@@ -237,7 +234,7 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
         distinguishingFormula = trySimplify(services.getProof(), distinguishingFormula, true,
             SIMPLIFICATION_TIMEOUT_MS);
 
-        return new Quadruple<Term, Term, Term, Boolean>(distinguishingFormula,
+        return new Quadruple<>(distinguishingFormula,
             commuteSides ? elseTerm : ifTerm, commuteSides ? ifTerm : elseTerm, commuteSides);
 
     }

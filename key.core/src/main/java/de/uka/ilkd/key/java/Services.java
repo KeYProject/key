@@ -6,25 +6,14 @@ import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.logic.InnerVariableNamer;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.proof.Counter;
-import de.uka.ilkd.key.proof.JavaModel;
-import de.uka.ilkd.key.proof.NameRecorder;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.TermProgramVariableCollector;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+
 import org.key_project.util.lookup.Lookup;
 
 /**
@@ -47,7 +36,7 @@ public class Services implements TermServices {
      * used to determine whether an expression is a compile-time constant and if so the type and
      * result of the expression
      */
-    private ConstantExpressionEvaluator cee;
+    private final ConstantExpressionEvaluator cee;
 
     /**
      * used to convert types, expressions and so on to logic elements (in special into to terms or
@@ -68,7 +57,7 @@ public class Services implements TermServices {
     /**
      * map of names to counters
      */
-    private HashMap<String, Counter> counters;
+    private final HashMap<String, Counter> counters;
 
     /**
      * specification repository
@@ -83,12 +72,7 @@ public class Services implements TermServices {
     private NameRecorder nameRecorder;
 
     private ITermProgramVariableCollectorFactory factory =
-        new ITermProgramVariableCollectorFactory() {
-            @Override
-            public TermProgramVariableCollector create(Services services) {
-                return new TermProgramVariableCollector(services);
-            }
-        };
+        TermProgramVariableCollector::new;
 
     private final Profile profile;
 
@@ -105,7 +89,7 @@ public class Services implements TermServices {
     public Services(Profile profile) {
         assert profile != null;
         this.profile = profile;
-        this.counters = new LinkedHashMap<String, Counter>();
+        this.counters = new LinkedHashMap<>();
         this.caches = new ServiceCaches();
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
@@ -272,7 +256,7 @@ public class Services implements TermServices {
      * @return The created deep copy with new {@link Counter} instances.
      */
     private HashMap<String, Counter> copyCounters() {
-        HashMap<String, Counter> result = new LinkedHashMap<String, Counter>();
+        HashMap<String, Counter> result = new LinkedHashMap<>();
         for (Entry<String, Counter> entry : counters.entrySet()) {
             result.put(entry.getKey(), entry.getValue().copy());
         }
@@ -335,8 +319,9 @@ public class Services implements TermServices {
      */
     public Counter getCounter(String name) {
         Counter c = counters.get(name);
-        if (c != null)
+        if (c != null) {
             return c;
+        }
         c = new Counter(name);
         counters.put(name, c);
         return c;
@@ -371,7 +356,7 @@ public class Services implements TermServices {
     }
 
     public interface ITermProgramVariableCollectorFactory {
-        public TermProgramVariableCollector create(Services services);
+        TermProgramVariableCollector create(Services services);
     }
 
     /**

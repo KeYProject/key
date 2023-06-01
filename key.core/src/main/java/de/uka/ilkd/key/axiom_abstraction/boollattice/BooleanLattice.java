@@ -73,7 +73,7 @@ public class BooleanLattice extends AbstractDomainLattice {
 
     @Override
     public Iterator<AbstractDomainElement> iterator() {
-        return new Iterator<AbstractDomainElement>() {
+        return new Iterator<>() {
 
             int pos = 0;
             final int size = ABSTRACT_DOMAIN_ELEMS.length;

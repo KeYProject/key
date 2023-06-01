@@ -1,18 +1,5 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.smt.newsmt2.MasterHandlerTest;
-import de.uka.ilkd.key.util.LineProperties;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.key_project.util.collection.ImmutableList;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -23,7 +10,23 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.smt.newsmt2.MasterHandlerTest;
+import de.uka.ilkd.key.util.LineProperties;
+
+import org.key_project.util.collection.ImmutableList;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -32,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * see {@link MasterHandlerTest} from where I copied quite a bit.
  */
 public class TestProofScriptCommand {
-    public static Stream<Arguments> data() throws IOException, URISyntaxException {
+    public static List<Arguments> data() throws IOException, URISyntaxException {
         URL url = TestProofScriptCommand.class.getResource("cases");
         if (url == null) {
             throw new FileNotFoundException("Cannot find resource 'cases'.");
@@ -44,7 +47,10 @@ public class TestProofScriptCommand {
 
         Path directory = Paths.get(url.toURI());
         assertTrue(Files.isDirectory(directory));
-        return Files.list(directory).map(f -> Arguments.of(f.getFileName().toString(), f));
+        try (var s = Files.list(directory)) {
+            return s.map(f -> Arguments.of(f.getFileName().toString(), f))
+                    .collect(Collectors.toList());
+        }
     }
 
     @ParameterizedTest
@@ -65,7 +71,8 @@ public class TestProofScriptCommand {
 
         String script = props.get("script");
         ProofScriptEngine pse =
-            new ProofScriptEngine(script, new Location(path.toUri().toURL(), 0, 0));
+            new ProofScriptEngine(script,
+                new Location(path.toUri().toURL(), Position.newOneBased(1, 1)));
 
         try {
             pse.execute(env.getUi(), proof);

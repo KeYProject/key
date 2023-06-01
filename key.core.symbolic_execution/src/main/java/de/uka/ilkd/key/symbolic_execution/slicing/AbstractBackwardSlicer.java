@@ -7,10 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -23,6 +19,10 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Provides a basic implementation of backward slicing algorithms.
@@ -38,7 +38,7 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
             ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException {
         final Services services = seedNode.proof().getServices();
         Set<Location> relevantLocations = null;
-        List<Node> result = new LinkedList<Node>();
+        List<Node> result = new LinkedList<>();
         Map<Location, SortedSet<Location>> oldAliases = null;
         Node previousChild = null;
         while (seedNode != null && (relevantLocations == null || !relevantLocations.isEmpty())) {
@@ -50,7 +50,7 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
                     ReferencePrefix thisReference = info.getThisReference();
                     if (relevantLocations == null) {
                         // Initialize relevant locations if required
-                        relevantLocations = new HashSet<Location>();
+                        relevantLocations = new HashSet<>();
                         relevantLocations.add(normalizeAlias(services, seedLocation, info));
                     }
                     // Check if current node is part of the slice or not
@@ -81,7 +81,7 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
             previousChild = seedNode;
             seedNode = seedNode.parent();
         }
-        return new ImmutableArray<Node>(result);
+        return new ImmutableArray<>(result);
     }
 
     /**
@@ -165,7 +165,7 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
                 // Compute new alternative
                 Location newAlternative = findNewAlternative(oldAlternatives, newAlternatives);
                 // Compute new locations
-                Set<Location> newLocations = new HashSet<Location>();
+                Set<Location> newLocations = new HashSet<>();
                 for (Location oldLocation : oldLocationsToUpdate) {
                     ImmutableList<Access> oldVariables = oldLocation.getAccesses();
                     int commonPrefixLength =

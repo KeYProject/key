@@ -1,20 +1,19 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.settings.PathConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.nio.file.Path;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Properties;
+import javax.swing.*;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.settings.PathConfig;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class offers a mechanism to manage recent files; it adds the necessary menu items to a menu
@@ -66,25 +65,20 @@ public class RecentFileMenu {
      */
     public RecentFileMenu(final KeYMediator mediator) {
         this.menu = new JMenu("Recent Files");
-        this.lissy = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String absPath = getAbsolutePath((JMenuItem) e.getSource());
-                File file = new File(absPath);
+        this.lissy = e -> {
+            String absPath = getAbsolutePath((JMenuItem) e.getSource());
+            File file = new File(absPath);
 
-                // special case proof bundles -> allow to select the proof to load
-                if (ProofSelectionDialog.isProofBundle(file.toPath())) {
-                    Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
-                    if (proofPath == null) {
-                        // canceled by user!
-                        return;
-                    } else {
-                        mediator.getUI().loadProofFromBundle(file, proofPath.toFile());
-                        return;
-                    }
+            // special case proof bundles -> allow to select the proof to load
+            if (ProofSelectionDialog.isProofBundle(file.toPath())) {
+                Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
+                if (proofPath == null) {
+                    // canceled by user!
                 } else {
-                    mediator.getUI().loadProblem(file);
+                    mediator.getUI().loadProofFromBundle(file, proofPath.toFile());
                 }
+            } else {
+                mediator.getUI().loadProblem(file);
             }
         };
         this.maxNumberOfEntries = MAX_RECENT_FILES;
@@ -94,7 +88,7 @@ public class RecentFileMenu {
         menu.setEnabled(menu.getItemCount() != 0);
         menu.setIcon(IconFactory.recentFiles(16));
 
-        load(PathConfig.getRecentFileStorage());
+        loadFrom(PathConfig.getRecentFileStorage());
     }
 
     private void insertFirstEntry(RecentFileEntry entry) {
@@ -139,20 +133,12 @@ public class RecentFileMenu {
         return menuItemToRecentFile.get(item).getAbsolutePath();
     }
 
-    /**
-     * call this method to add a new file to the beginning of the RecentFiles list. If the path is
-     * already part of the list, it will be moved to the first position. No more than a specified
-     * maximum number of names will be allowed in the list, and additional names will be removed at
-     * the end. (set the maximum number with the {@link #setMaxNumberOfEntries(int i)} method).
-     *
-     * @param path the path of the file.
-     */
-    public void addRecentFile(final String path) {
+    private void addRecentFileNoSave(final String path) {
+        LOGGER.trace("Adding file: {}", path);
+        final RecentFileEntry existingEntry = pathToRecentFile.get(path);
+
         // Add the path to the recentFileList:
         // check whether this path is already there
-        LOGGER.debug("recentfilemenu: add file: {}", path);
-        LOGGER.debug("recentfilemenu: at menu count: {}", menu.getItemCount());
-        final RecentFileEntry existingEntry = pathToRecentFile.get(path);
         if (existingEntry != null) {
             menu.remove(existingEntry.getMenuItem());
             insertFirstEntry(existingEntry);
@@ -169,6 +155,19 @@ public class RecentFileMenu {
         }
         addNewToModelAndView(path);
         menu.setEnabled(menu.getItemCount() != 0);
+    }
+
+    /**
+     * call this method to add a new file to the beginning of the RecentFiles list. If the path is
+     * already part of the list, it will be moved to the first position. No more than a specified
+     * maximum number of names will be allowed in the list, and additional names will be removed at
+     * the end. (set the maximum number with the {@link #setMaxNumberOfEntries(int i)} method).
+     *
+     * @param path the path of the file.
+     */
+    public void addRecentFile(final String path) {
+        addRecentFileNoSave(path);
+        save();
     }
 
     /**
@@ -196,13 +195,13 @@ public class RecentFileMenu {
      * read the recent file names from the properties object. the property names are expected to be
      * "RecentFile0" "RecentFile1" ...
      */
-    public void load(Properties p) {
+    private void load(Properties p) {
         int i = maxNumberOfEntries;
-        String s;
         do {
-            s = p.getProperty("RecentFile" + i);
-            if (s != null)
-                addRecentFile(s);
+            String s = p.getProperty("RecentFile" + i);
+            if (s != null) {
+                addRecentFileNoSave(s);
+            }
             i--;
         } while (i >= 0);
     }
@@ -221,31 +220,15 @@ public class RecentFileMenu {
     /**
      * read the recent files from the given properties file
      */
-    public final void load(String filename) {
-        FileInputStream propStream = null;
-        try {
-            propStream = new FileInputStream(filename);
+    public final void loadFrom(String filename) {
+        try (FileInputStream propStream = new FileInputStream(filename)) {
             Properties p = new Properties();
             p.load(propStream);
-            Enumeration<?> e = p.propertyNames();
-            while (e.hasMoreElements()) {
-                String s = (String) e.nextElement();
-                if (s.indexOf("RecentFile") != -1)
-                    addRecentFile(p.getProperty(s));
-            }
+            load(p);
         } catch (FileNotFoundException ex) {
             LOGGER.debug("Could not read RecentFileList. Did not find file {}", filename);
         } catch (IOException ioe) {
             LOGGER.debug("Could not read RecentFileList. Some IO Error occured ", ioe);
-        } finally {
-            try {
-                if (propStream != null) {
-                    propStream.close();
-                }
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
         }
     }
 
@@ -269,8 +252,12 @@ public class RecentFileMenu {
             store(p);
             p.store(fout, "recent files");
         } catch (IOException ex) {
-            LOGGER.info("Cound not write recentFileList", ex);
+            LOGGER.info("Could not write recent files list", ex);
         }
+    }
+
+    public void save() {
+        store(PathConfig.getRecentFileStorage());
     }
 
     private static class RecentFileEntry {

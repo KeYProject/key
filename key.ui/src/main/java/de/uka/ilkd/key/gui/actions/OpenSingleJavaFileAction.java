@@ -1,16 +1,16 @@
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.gui.KeYFileChooser;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
-import de.uka.ilkd.key.proof.io.ProblemLoader;
-
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.Collections;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.KeYFileChooser;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
+import de.uka.ilkd.key.proof.io.ProblemLoader;
 
 /**
  * Offers a loading of a single Java file, without considering the folder as part of a classpath.

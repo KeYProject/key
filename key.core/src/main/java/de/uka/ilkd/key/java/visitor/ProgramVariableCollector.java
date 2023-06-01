@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.statement.JmlAssert;
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.statement.JmlAssert;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -23,13 +21,15 @@ import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
 import de.uka.ilkd.key.speclang.UnparameterizedMergeContract;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
+import org.key_project.util.collection.ImmutableList;
+
 /**
  * Walks through a java AST in depth-left-fist-order. This walker is used collect all
  * LocationVariables and optional function locations.
  */
 public class ProgramVariableCollector extends JavaASTVisitor {
 
-    private final LinkedHashSet<LocationVariable> result = new LinkedHashSet<LocationVariable>();
+    private final LinkedHashSet<LocationVariable> result = new LinkedHashSet<>();
 
     /**
      * collects all program variables occurring in the AST <tt>root</tt> using this constructor is
@@ -92,9 +92,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
 
         final ArrayList<AbstractionPredicate> preds =
             pamc.getAbstractionPredicates(atPres, services);
-        preds.forEach(pred -> {
-            pred.getPredicateFormWithPlaceholder().second.execPostOrder(tpvc);
-        });
+        preds.forEach(pred -> pred.getPredicateFormWithPlaceholder().second.execPostOrder(tpvc));
 
         result.addAll(tpvc.result());
     }

@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 /**
@@ -29,7 +30,7 @@ public class RuleIndependentData {
          * Load previous totaltimes from filesystem.
          */
         if (totalTimesFile.exists()) {
-            try (Reader r = new FileReader(totalTimesFile)) {
+            try (Reader r = new FileReader(totalTimesFile, StandardCharsets.UTF_8)) {
                 totalTimesData.load(r);
             } catch (IOException e) {
                 throw new RuntimeException(e);

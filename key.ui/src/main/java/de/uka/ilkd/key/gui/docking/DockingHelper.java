@@ -3,12 +3,20 @@ package de.uka.ilkd.key.gui.docking;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
-
+import javax.annotation.Nonnull;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 
-import javax.annotation.Nonnull;
+import de.uka.ilkd.key.gui.GoalList;
+import de.uka.ilkd.key.gui.InfoView;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.StrategySelectionView;
+import de.uka.ilkd.key.gui.TaskTree;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import de.uka.ilkd.key.gui.nodeviews.MainFrame;
+import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
+import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
@@ -20,15 +28,6 @@ import bibliothek.gui.dock.common.action.CCheckBox;
 import bibliothek.gui.dock.common.action.core.CommonDecoratableDockAction;
 import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.intern.action.CDecorateableAction;
-import de.uka.ilkd.key.gui.GoalList;
-import de.uka.ilkd.key.gui.InfoView;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.StrategySelectionView;
-import de.uka.ilkd.key.gui.TaskTree;
-import de.uka.ilkd.key.gui.extension.api.TabPanel;
-import de.uka.ilkd.key.gui.nodeviews.MainFrame;
-import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
-import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 
 public class DockingHelper {
     public final static List<String> LEFT_TOP_PANEL = new LinkedList<>();
@@ -47,6 +46,15 @@ public class DockingHelper {
         MAIN_PANEL.add(MainFrame.class.getName());
 
         RIGHT_PANEL.add(SourceViewFrame.class.getName());
+    }
+
+    /**
+     * Define that another panel should be in the lower left corner on factory reset.
+     *
+     * @param className class name of that panel
+     */
+    public static void addLeftPanel(String className) {
+        LEFT_PANEL.add(className);
     }
 
     /**
@@ -104,6 +112,25 @@ public class DockingHelper {
         grid.add(1, 0, 2, 3, mainPanels.toArray(new CDockable[] {}));
         grid.add(2, 0, 1, 3, rightPanels.toArray(new CDockable[] {}));
         mainWindow.getDockControl().getContentArea().deploy(grid);
+    }
+
+    /**
+     * Iterates through all dockables and restores the visibility of all hidden dockables.
+     * Dockables may be hidden if they are part of an extension that was disabled previously.
+     * They are inserted in the left panels (more precisely, next to the goal list).
+     *
+     * @param mainWindow the main window
+     */
+    public static void restoreMissingPanels(MainWindow mainWindow) {
+        for (int c = mainWindow.getDockControl().getCDockableCount(), i = 0; i < c; i++) {
+            final CDockable cur = mainWindow.getDockControl().getCDockable(i);
+            if (cur.isVisible()) {
+                continue;
+            }
+            cur.setLocationsAside(
+                mainWindow.getDockControl().getSingleDockable(GoalList.class.getName()));
+            cur.setVisible(true);
+        }
     }
 
 

@@ -2,11 +2,11 @@ package de.uka.ilkd.key.testgen.oracle;
 
 public class OracleLocation {
 
-    public static String ALL_FIELDS = "<allFields>";
+    public static final String ALL_FIELDS = "<allFields>";
 
-    private String object;
+    private final String object;
 
-    private String field;
+    private final String field;
 
     public OracleLocation(String object, String field) {
         this.object = object;

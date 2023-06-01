@@ -12,5 +12,5 @@ public interface IFilter<T> {
      * @param element The element to test.
      * @return {@code true} handle element, {@code false} ignore element.
      */
-    public boolean select(T element);
+    boolean select(T element);
 }

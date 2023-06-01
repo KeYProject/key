@@ -1,54 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="&lt;call ArrayUtil.indexOf(array,toSearch)&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call ArrayUtil.indexOf(array, toSearch)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
          <loopInvariant name="invariant: (  (i &gt;= 0
  &amp; i &lt;= array.length)&lt;&lt;SC&gt;&gt;
  &amp; \forall int j;
      (   (j &gt;= 0 &amp; j &lt; i)&lt;&lt;SC&gt;&gt; &amp; inInt(j)
       -&gt; !array[j] = toSearch))&lt;&lt;SC&gt;&gt;;
-variant: javaSubInt(array.length, i)
+variant: array.length - i
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
-            <branchCondition name="update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+            <branchCondition name="update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(sub(length(array),i)),\[{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
-}\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i))))))))" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+}\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i))))))))" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(sub(length(array),i)),\[{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
-}\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i))))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+}\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i))))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(sub(length(array),i)),\[{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
 }\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i))))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
-               <branchCondition name="not(update-application(elem-update(x)(i_0),equals(array,null)))" pathCondition="and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+               <branchCondition name="not(update-application(elem-update(x)(i_0),equals(array,null)))" pathCondition="and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(sub(length(array),i)),\[{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
 }\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i)))))))),not(update-application(elem-update(x)(i_0),equals(array,null))))" pathConditionChanged="true" branchCondition="not(update-application(elem-update(x)(i_0),equals(array,null)))" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <loopCondition name="i&lt;array.length" pathCondition="and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+                  <loopCondition name="i &lt; array.length;" pathCondition="and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(sub(length(array),i)),\[{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
 }\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i)))))))),not(update-application(elem-update(x)(i_0),equals(array,null))))" pathConditionChanged="false" blockOpened="false">
                   </loopCondition>
-                  <branchStatement name="if (toSearch==array[i])" pathCondition="and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+                  <branchStatement name="if (toSearch == array[i])" pathCondition="and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(sub(length(array),i)),\[{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
 }\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i)))))))),not(update-application(elem-update(x)(i_0),equals(array,null))))" pathConditionChanged="false" blockOpened="true">
-                     <branchCondition name="update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),parallel-upd(elem-update(heapBefore_LOOP)(heap),parallel-upd(elem-update(i)(i_0),elem-update(variant)(add(mul(i_0,Z(neglit(1(#)))),length(array)))))),elem-update(rtrn)(FALSE)),elem-update(exc_1)(FALSE)),elem-update(x_5)(if-then-else(equals(java.lang.Object::select(heap,array,arr(i_0)),toSearch),TRUE,FALSE))),equals(x_5,TRUE))" pathCondition="and(and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+                     <branchCondition name="update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),parallel-upd(elem-update(heapBefore_LOOP)(heap),parallel-upd(elem-update(i)(i_0),elem-update(variant)(add(mul(i_0,Z(neglit(1(#)))),length(array)))))),elem-update(rtrn)(FALSE)),elem-update(exc_1)(FALSE)),elem-update(x_5)(if-then-else(equals(java.lang.Object::select(heap,array,arr(i_0)),toSearch),TRUE,FALSE))),equals(x_5,TRUE))" pathCondition="and(and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(sub(length(array),i)),\[{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
 }\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i)))))))),not(update-application(elem-update(x)(i_0),equals(array,null)))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),parallel-upd(elem-update(heapBefore_LOOP)(heap),parallel-upd(elem-update(i)(i_0),elem-update(variant)(add(mul(i_0,Z(neglit(1(#)))),length(array)))))),elem-update(rtrn)(FALSE)),elem-update(exc_1)(FALSE)),elem-update(x_5)(if-then-else(equals(java.lang.Object::select(heap,array,arr(i_0)),toSearch),TRUE,FALSE))),equals(x_5,TRUE)))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),parallel-upd(elem-update(heapBefore_LOOP)(heap),parallel-upd(elem-update(i)(i_0),elem-update(variant)(add(mul(i_0,Z(neglit(1(#)))),length(array)))))),elem-update(rtrn)(FALSE)),elem-update(exc_1)(FALSE)),elem-update(x_5)(if-then-else(equals(java.lang.Object::select(heap,array,arr(i_0)),toSearch),TRUE,FALSE))),equals(x_5,TRUE))" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <statement name="returnExpr=i;" pathCondition="and(and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+                        <statement name="returnExpr = i;" pathCondition="and(and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(sub(length(array),i)),\[{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
 }\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i)))))))),not(update-application(elem-update(x)(i_0),equals(array,null)))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),parallel-upd(elem-update(heapBefore_LOOP)(heap),parallel-upd(elem-update(i)(i_0),elem-update(variant)(add(mul(i_0,Z(neglit(1(#)))),length(array)))))),elem-update(rtrn)(FALSE)),elem-update(exc_1)(FALSE)),elem-update(x_5)(if-then-else(equals(java.lang.Object::select(heap,array,arr(i_0)),toSearch),TRUE,FALSE))),equals(x_5,TRUE)))" pathConditionChanged="false">
-                           <methodReturn name="&lt;return of indexOf&gt;" signature="&lt;return of ArrayUtil.indexOf(array,toSearch)&gt;" pathCondition="and(and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+                           <methodReturn name="&lt;return of indexOf&gt;" signature="&lt;return of ArrayUtil.indexOf(array, toSearch)&gt;" pathCondition="and(and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(sub(length(array),i)),\[{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
-}\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i)))))))),not(update-application(elem-update(x)(i_0),equals(array,null)))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),parallel-upd(elem-update(heapBefore_LOOP)(heap),parallel-upd(elem-update(i)(i_0),elem-update(variant)(add(mul(i_0,Z(neglit(1(#)))),length(array)))))),elem-update(rtrn)(FALSE)),elem-update(exc_1)(FALSE)),elem-update(x_5)(if-then-else(equals(java.lang.Object::select(heap,array,arr(i_0)),toSearch),TRUE,FALSE))),equals(x_5,TRUE)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(and(update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),parallel-upd(elem-update(heapBefore_LOOP)(heap),parallel-upd(elem-update(i)(i_0),elem-update(variant)(add(mul(i_0,Z(neglit(1(#)))),length(array)))))),elem-update(rtrn)(FALSE)),elem-update(exc_1)(FALSE)),elem-update(x_5)(if-then-else(equals(java.lang.Object::select(heap,array,arr(i_0)),toSearch),TRUE,FALSE))),equals(x_5,TRUE)),not(update-application(elem-update(x)(i_0),equals(array,null)))),update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+}\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i)))))))),not(update-application(elem-update(x)(i_0),equals(array,null)))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),parallel-upd(elem-update(heapBefore_LOOP)(heap),parallel-upd(elem-update(i)(i_0),elem-update(variant)(add(mul(i_0,Z(neglit(1(#)))),length(array)))))),elem-update(rtrn)(FALSE)),elem-update(exc_1)(FALSE)),elem-update(x_5)(if-then-else(equals(java.lang.Object::select(heap,array,arr(i_0)),toSearch),TRUE,FALSE))),equals(x_5,TRUE)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(and(update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),parallel-upd(elem-update(heapBefore_LOOP)(heap),parallel-upd(elem-update(i)(i_0),elem-update(variant)(add(mul(i_0,Z(neglit(1(#)))),length(array)))))),elem-update(rtrn)(FALSE)),elem-update(exc_1)(FALSE)),elem-update(x_5)(if-then-else(equals(java.lang.Object::select(heap,array,arr(i_0)),toSearch),TRUE,FALSE))),equals(x_5,TRUE)),not(update-application(elem-update(x)(i_0),equals(array,null)))),update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(sub(length(array),i)),\[{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
 }\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i)))))))))">
-                              <termination name="&lt;end&gt;" pathCondition="and(and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+                              <termination name="&lt;end&gt;" pathCondition="and(and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(sub(length(array),i)),\[{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
 }\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i)))))))),not(update-application(elem-update(x)(i_0),equals(array,null)))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),parallel-upd(elem-update(heapBefore_LOOP)(heap),parallel-upd(elem-update(i)(i_0),elem-update(variant)(add(mul(i_0,Z(neglit(1(#)))),length(array)))))),elem-update(rtrn)(FALSE)),elem-update(exc_1)(FALSE)),elem-update(x_5)(if-then-else(equals(java.lang.Object::select(heap,array,arr(i_0)),toSearch),TRUE,FALSE))),equals(x_5,TRUE)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
@@ -56,16 +89,25 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                            <completedBlockEntry path="/0/0/0/0/0/1" conditionString="update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),parallel-upd(elem-update(heapBefore_LOOP)(heap),parallel-upd(elem-update(i)(i_0),elem-update(variant)(add(mul(i_0,Z(neglit(1(#)))),length(array)))))),elem-update(rtrn)(FALSE)),elem-update(exc_1)(FALSE)),elem-update(x_5)(if-then-else(equals(java.lang.Object::select(heap,array,arr(i_0)),toSearch),TRUE,FALSE))),equals(x_5,TRUE))"/>
                         </statement>
                      </branchCondition>
-                     <branchCondition name="update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),parallel-upd(elem-update(heapBefore_LOOP)(heap),parallel-upd(elem-update(i)(i_0),elem-update(variant)(add(mul(i_0,Z(neglit(1(#)))),length(array)))))),elem-update(rtrn)(FALSE)),elem-update(exc_1)(FALSE)),elem-update(x_5)(if-then-else(equals(java.lang.Object::select(heap,array,arr(i_0)),toSearch),TRUE,FALSE))),equals(x_5,FALSE))" pathCondition="and(and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+                     <branchCondition name="update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),parallel-upd(elem-update(heapBefore_LOOP)(heap),parallel-upd(elem-update(i)(i_0),elem-update(variant)(add(mul(i_0,Z(neglit(1(#)))),length(array)))))),elem-update(rtrn)(FALSE)),elem-update(exc_1)(FALSE)),elem-update(x_5)(if-then-else(equals(java.lang.Object::select(heap,array,arr(i_0)),toSearch),TRUE,FALSE))),equals(x_5,FALSE))" pathCondition="and(and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(sub(length(array),i)),\[{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
 }\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i)))))))),not(update-application(elem-update(x)(i_0),equals(array,null)))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),parallel-upd(elem-update(heapBefore_LOOP)(heap),parallel-upd(elem-update(i)(i_0),elem-update(variant)(add(mul(i_0,Z(neglit(1(#)))),length(array)))))),elem-update(rtrn)(FALSE)),elem-update(exc_1)(FALSE)),elem-update(x_5)(if-then-else(equals(java.lang.Object::select(heap,array,arr(i_0)),toSearch),TRUE,FALSE))),equals(x_5,FALSE)))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),parallel-upd(elem-update(heapBefore_LOOP)(heap),parallel-upd(elem-update(i)(i_0),elem-update(variant)(add(mul(i_0,Z(neglit(1(#)))),length(array)))))),elem-update(rtrn)(FALSE)),elem-update(exc_1)(FALSE)),elem-update(x_5)(if-then-else(equals(java.lang.Object::select(heap,array,arr(i_0)),toSearch),TRUE,FALSE))),equals(x_5,FALSE))" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <statement name="i++;" pathCondition="and(and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+                        <statement name="i++;" pathCondition="and(and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(sub(length(array),i)),\[{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
 }\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i)))))))),not(update-application(elem-update(x)(i_0),equals(array,null)))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),parallel-upd(elem-update(heapBefore_LOOP)(heap),parallel-upd(elem-update(i)(i_0),elem-update(variant)(add(mul(i_0,Z(neglit(1(#)))),length(array)))))),elem-update(rtrn)(FALSE)),elem-update(exc_1)(FALSE)),elem-update(x_5)(if-then-else(equals(java.lang.Object::select(heap,array,arr(i_0)),toSearch),TRUE,FALSE))),equals(x_5,FALSE)))" pathConditionChanged="false">
-                           <termination name="&lt;loop body end&gt;" pathCondition="and(and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+                           <termination name="&lt;loop body end&gt;" pathCondition="and(and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(sub(length(array),i)),\[{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
 }\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i)))))))),not(update-application(elem-update(x)(i_0),equals(array,null)))),update-application(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(exc)(null),parallel-upd(elem-update(heapBefore_LOOP)(heap),parallel-upd(elem-update(i)(i_0),elem-update(variant)(add(mul(i_0,Z(neglit(1(#)))),length(array)))))),elem-update(rtrn)(FALSE)),elem-update(exc_1)(FALSE)),elem-update(x_5)(if-then-else(equals(java.lang.Object::select(heap,array,arr(i_0)),toSearch),TRUE,FALSE))),equals(x_5,FALSE)))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
                            </termination>
@@ -76,53 +118,89 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                      <blockCompletionEntry path="/0/0/0/0/0/1/1/0"/>
                   </branchStatement>
                </branchCondition>
-               <branchCondition name="update-application(elem-update(x)(i_0),equals(array,null))" pathCondition="and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+               <branchCondition name="update-application(elem-update(x)(i_0),equals(array,null))" pathCondition="and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(sub(length(array),i)),\[{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
 }\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i)))))))),update-application(elem-update(x)(i_0),equals(array,null)))" pathConditionChanged="true" branchCondition="update-application(elem-update(x)(i_0),equals(array,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <loopCondition name="i&lt;array.length" pathCondition="and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+                  <loopCondition name="i &lt; array.length;" pathCondition="and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(sub(length(array),i)),\[{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
 }\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i)))))))),update-application(elem-update(x)(i_0),equals(array,null)))" pathConditionChanged="false" blockOpened="false">
                   </loopCondition>
-                  <exceptionalMethodReturn name="&lt;throw java.lang.Throwable&gt;" signature="&lt;exceptional return of &lt;call ArrayUtil.indexOf(array,toSearch)&gt;&gt;" pathCondition="and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+                  <exceptionalMethodReturn name="&lt;throw java.lang.Throwable&gt;" signature="&lt;exceptional return of &lt;call ArrayUtil.indexOf(array, toSearch)&gt;&gt;" pathCondition="and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(sub(length(array),i)),\[{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
-}\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i)))))))),update-application(elem-update(x)(i_0),equals(array,null)))" pathConditionChanged="false" methodReturnCondition="and(update-application(elem-update(x)(i_0),equals(array,null)),update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+}\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i)))))))),update-application(elem-update(x)(i_0),equals(array,null)))" pathConditionChanged="false" methodReturnCondition="and(update-application(elem-update(x)(i_0),equals(array,null)),update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(sub(length(array),i)),\[{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
 }\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i)))))))))">
-                     <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(javaSubInt(length(array),i)),\[{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+                     <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(heapBefore_LOOP)(heap),elem-update(iBefore_LOOP)(i)),update-application(elem-update(i)(i_0),update-application(elem-update(variant)(sub(length(array),i)),\[{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
 }\] (and(equals(b,TRUE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i)))))))),update-application(elem-update(x)(i_0),equals(array,null)))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                      </termination>
                   </exceptionalMethodReturn>
                </branchCondition>
             </branchCondition>
-            <branchCondition name="update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(elem-update(i)(i_0),\&lt;{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+            <branchCondition name="update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(elem-update(i)(i_0),\&lt;{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
-}\&gt; (and(equals(b,FALSE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i))))))" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(elem-update(i)(i_0),\&lt;{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+}\&gt; (and(equals(b,FALSE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i))))))" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(elem-update(i)(i_0),\&lt;{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
-}\&gt; (and(equals(b,FALSE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(elem-update(i)(i_0),\&lt;{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+}\&gt; (and(equals(b,FALSE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i))))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(elem-update(i)(i_0),\&lt;{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
 }\&gt; (and(equals(b,FALSE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
-               <statement name="return 0;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(elem-update(i)(i_0),\&lt;{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+               <statement name="return 0;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(elem-update(i)(i_0),\&lt;{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
 }\&gt; (and(equals(b,FALSE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i))))))" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of indexOf&gt;" signature="&lt;return of ArrayUtil.indexOf(array,toSearch)&gt;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(elem-update(i)(i_0),\&lt;{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+                  <methodReturn name="&lt;return of indexOf&gt;" signature="&lt;return of ArrayUtil.indexOf(array, toSearch)&gt;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(elem-update(i)(i_0),\&lt;{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
-}\&gt; (and(equals(b,FALSE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i))))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(elem-update(i)(i_0),\&lt;{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+}\&gt; (and(equals(b,FALSE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i))))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(elem-update(i)(i_0),\&lt;{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
 }\&gt; (and(equals(b,FALSE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i))))))">
-                     <termination name="&lt;end&gt;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(elem-update(i)(i_0),\&lt;{method-frame(source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil): {
-    boolean b = i&lt;array.length;
+                     <termination name="&lt;end&gt;" pathCondition="update-application(parallel-upd(elem-update(exc)(null),elem-update(i)(Z(0(#)))),update-application(elem-update(i)(i_0),\&lt;{
+  method-frame (
+    source=indexOf(java.lang.Object[], java.lang.Object)@ArrayUtil
+  ) {
+    boolean b = i &lt; array.length;
   }
 }\&gt; (and(equals(b,FALSE),and(and(and(geq(i,Z(0(#))),leq(i,length(array)))&lt;&lt;SC&gt;&gt;,all{j:int}(imp(and(and(geq(j,Z(0(#))),lt(j,i))&lt;&lt;SC&gt;&gt;,inInt(j)),not(equals(java.lang.Object::select(heap,array,arr(j)),toSearch)))))&lt;&lt;SC&gt;&gt;,inInt(i))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>

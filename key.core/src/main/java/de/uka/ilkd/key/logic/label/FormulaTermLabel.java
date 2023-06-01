@@ -94,7 +94,7 @@ public class FormulaTermLabel implements TermLabel {
         this.majorId = majorId;
         this.minorId = minorId;
         if (beforeIds != null && !beforeIds.isEmpty()) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             boolean afterFirst = false;
             for (String id : beforeIds) {
                 if (id != null) {
@@ -123,7 +123,7 @@ public class FormulaTermLabel implements TermLabel {
      * {@inheritDoc}
      */
     public String toString() {
-        return NAME.toString() + "(" + getId() + (beforeIds != null ? ", " + beforeIds : "") + ")";
+        return NAME + "(" + getId() + (beforeIds != null ? ", " + beforeIds : "") + ")";
     }
 
     /**
@@ -179,7 +179,7 @@ public class FormulaTermLabel implements TermLabel {
      * @throws TermLabelException Occurred Exception in case that the given ID is not valid.
      */
     public static int getMajorId(String id) throws TermLabelException {
-        int index = id.indexOf(".");
+        int index = id.indexOf('.');
         if (index < 0) {
             throw new TermLabelException(
                 "The ID '" + id + "' is not separated into major and minor ID by '.'.");
@@ -208,7 +208,7 @@ public class FormulaTermLabel implements TermLabel {
      * @throws TermLabelException Occurred Exception in case that the given ID is not valid.
      */
     public static int getMinorId(String id) throws TermLabelException {
-        int index = id.indexOf(".");
+        int index = id.indexOf('.');
         if (index < 0) {
             throw new TermLabelException(
                 "The ID '" + id + "' is not separated into major and minor ID by '.'.");
@@ -250,7 +250,7 @@ public class FormulaTermLabel implements TermLabel {
         if (beforeIds == null || beforeIds.isEmpty()) {
             throw new TermLabelException("No before IDs defined.");
         }
-        List<String> result = new LinkedList<String>();
+        List<String> result = new LinkedList<>();
         String[] candidates = getBeforeIds(beforeIds);
         for (String id : candidates) {
             if (!id.isEmpty()) {

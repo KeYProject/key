@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.smt.communication;
 
 
-import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
-import de.uka.ilkd.key.smt.communication.SolverCommunication.MessageType;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
+import de.uka.ilkd.key.smt.communication.SolverCommunication.MessageType;
 
 /**
  * On each side of the pipe there are sender and receivers: **** Receiver ====<=Output======= Sender
@@ -76,7 +77,8 @@ class LegacyPipe implements Pipe {
             // do not use BufferedReader, but this wrapper in order to support different
             // message delimiters.
             BufferedMessageReader reader =
-                new BufferedMessageReader(new InputStreamReader(input), messageDelimiters);
+                new BufferedMessageReader(new InputStreamReader(input, StandardCharsets.UTF_8),
+                    messageDelimiters);
 
             try {
 
@@ -128,7 +130,7 @@ class LegacyPipe implements Pipe {
         InputStream stderr = process.getErrorStream();
 
         this.process = process;
-        this.outputWriter = new OutputStreamWriter(stdin);
+        this.outputWriter = new OutputStreamWriter(stdin, StandardCharsets.UTF_8);
 
         stdoutReceiver = new Receiver(stdout, MessageType.OUTPUT, "receiver for normal messages");
         stderrReceiver = new Receiver(stderr, MessageType.ERROR, "receiver for stderr messages");

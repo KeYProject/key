@@ -3,25 +3,25 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.KeyStroke;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.useractions.AutoModeUserAction;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
+
+import org.key_project.util.collection.ImmutableList;
 
 public final class AutoModeAction extends MainWindowAction {
 
@@ -158,7 +158,7 @@ public final class AutoModeAction extends MainWindowAction {
                 // This method delegates the request only to the UserInterfaceControl which
                 // implements the functionality.
                 // No functionality is allowed in this method body!
-                r.getUI().getProofControl().startAutoMode(proof, proof.openEnabledGoals());
+                new AutoModeUserAction(r, proof).actionPerformed(e);
             }
         } else {
             // this interface is no longer used (MU)

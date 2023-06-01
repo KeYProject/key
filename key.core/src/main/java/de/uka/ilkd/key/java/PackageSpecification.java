@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.java;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.reference.PackageReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 /**
  * Package specification. taken from COMPOST and changed to achieve an immutable structure
@@ -45,8 +45,9 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
 
     public int getChildCount() {
         int result = 0;
-        if (reference != null)
+        if (reference != null) {
             result++;
+        }
         return result;
     }
 
@@ -60,8 +61,9 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
 
     public ProgramElement getChildAt(int index) {
         if (reference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return reference;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -84,9 +86,5 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
      */
     public void visit(Visitor v) {
         v.performActionOnPackageSpecification(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printPackageSpecification(this);
     }
 }

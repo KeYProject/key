@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.pp;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * A PositionTable describes the start and end positions of substrings of a String in order to get a
@@ -23,13 +23,13 @@ import de.uka.ilkd.key.logic.SequentFormula;
 public class PositionTable {
 
     // the start positions of the direct subterms (or parts of sequent, etc.)
-    protected int[] startPos;
+    protected final int[] startPos;
 
     // the end positions of the direct subterms (or parts of sequent, etc.)
-    protected int[] endPos;
+    protected final int[] endPos;
 
     /** the PositionTables for the direct subterms (or parts of sequent, etc.) */
-    protected PositionTable[] children;
+    protected final PositionTable[] children;
 
     // the current active entry number.
     // When a new "in-order" element is started, the counter is increased.
@@ -86,9 +86,9 @@ public class PositionTable {
     protected ImmutableList<Integer> pathForIndex(int index) {
         int sub = searchEntry(index);
         if (sub == -1) {
-            return ImmutableSLList.<Integer>nil();
+            return ImmutableSLList.nil();
         } else {
-            return children[sub].pathForIndex(index - startPos[sub]).prepend(Integer.valueOf(sub));
+            return children[sub].pathForIndex(index - startPos[sub]).prepend(sub);
         }
     }
 
@@ -153,7 +153,7 @@ public class PositionTable {
         if (path.isEmpty()) {
             return new Range(0, length);
         } else {
-            int sub = path.head().intValue();
+            int sub = path.head();
             Range r = children[sub].rangeForPath(path.tail(), endPos[sub] - startPos[sub]);
             r.start += startPos[sub];
             r.end += startPos[sub];
@@ -207,11 +207,13 @@ public class PositionTable {
      * returns a String representation of the position table
      */
     public String toString() {
-        String result = "[";
+        StringBuilder result = new StringBuilder("[");
         for (int i = 0; i < rows; i++) {
-            result = result + "<" + startPos[i] + "," + endPos[i] + "," + children[i] + ">";
-            if (rows - 1 != i)
-                result = result + ",";
+            result.append("<").append(startPos[i]).append(",").append(endPos[i]).append(",")
+                    .append(children[i]).append(">");
+            if (rows - 1 != i) {
+                result.append(",");
+            }
         }
         return result + "]";
     }
@@ -231,7 +233,7 @@ public class PositionTable {
 
     protected PosInSequent getSequentPIS(ImmutableList<Integer> posList,
             SequentPrintFilter filter) {
-        int cfmaNo = posList.head().intValue();
+        int cfmaNo = posList.head();
         ImmutableList<Integer> tail = posList.tail();
 
         SequentPrintFilterEntry filterEntry = getFilterEntry(cfmaNo, filter);
@@ -261,7 +263,7 @@ public class PositionTable {
         if (posList.isEmpty()) {
             return PosInSequent.createCfmaPos(pio);
         } else {
-            int subNo = posList.head().intValue();
+            int subNo = posList.head();
             PosInOccurrence subpio = pio.down(subNo);
 
             return children[subNo].getTermPIS(filterEntry, posList.tail(), subpio);
@@ -272,8 +274,9 @@ public class PositionTable {
         int i = cfmaNo;
         ImmutableList<SequentPrintFilterEntry> list =
             filter.getFilteredAntec().append(filter.getFilteredSucc());
-        while (i-- != 0)
+        while (i-- != 0) {
             list = list.tail();
+        }
         return list.head();
     }
 }

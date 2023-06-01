@@ -1,26 +1,14 @@
 package de.uka.ilkd.key.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
+import java.awt.dnd.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Map;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -39,14 +27,16 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.Notation;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ModelChangeListener;
 import de.uka.ilkd.key.proof.ModelEvent;
 import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.util.Debug;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +49,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
     private static final long serialVersionUID = 5124050224007103908L;
 
     // the table showing the instantiations
-    private DataTable[] dataTable;
+    private final DataTable[] dataTable;
 
     // the current chosen model
     private int current = 0;
@@ -69,11 +59,11 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
     private JTabbedPane alternatives;
 
     /** the goal the application of the rule has to be performed */
-    private Goal goal;
+    private final Goal goal;
 
     private JScrollPane tablePane;
 
-    private MainWindow mainWindow;
+    private final MainWindow mainWindow;
 
     public TacletMatchCompletionDialog(MainWindow parent, TacletInstantiationModel[] model,
             Goal goal, KeYMediator mediator) {
@@ -232,7 +222,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
     private void adaptSizes(DataTable dt) {
         int tableSize_x = dt.getTotalColumnWidth();
-        int visible_rows = dt.getRowCount() > 8 ? 8 : dt.getRowCount();
+        int visible_rows = Math.min(dt.getRowCount(), 8);
         int tableSize_y = (visible_rows + 1) * 48;
         Dimension tableDim = new Dimension(tableSize_x, tableSize_y);
         // bugfix. march-09 m.u.:
@@ -265,8 +255,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
      */
     @Override
     protected void closeDlg() {
-        if (mainWindow != null)
+        if (mainWindow != null) {
             mainWindow.savePreferences(this);
+        }
         super.closeDlg();
     }
 
@@ -326,10 +317,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                     mediator().getUI().getProofControl().applyInteractive(app, goal);
                 } catch (Exception exc) {
                     if (exc instanceof SVInstantiationExceptionWithPosition) {
-                        errorPositionKnown(exc.getMessage(),
-                            ((SVInstantiationExceptionWithPosition) exc).getRow(),
-                            ((SVInstantiationExceptionWithPosition) exc).getColumn(),
-                            ((SVInstantiationExceptionWithPosition) exc).inIfSequent());
+                        var ex = (SVInstantiationExceptionWithPosition) exc;
+                        errorPositionKnown(exc.getMessage(), ex.getPosition().line(),
+                            ex.getPosition().column(), ex.inIfSequent());
                     }
                     IssueDialog.showExceptionDialog(TacletMatchCompletionDialog.this, exc);
                     return;
@@ -351,17 +341,17 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
         private static final long serialVersionUID = 5988602390976062610L;
 
-        JTextArea inputArea = new BracketMatchingTextArea("Nothing", 3, 16);
+        final JTextArea inputArea = new BracketMatchingTextArea("Nothing", 3, 16);
         final InputEditor iEditor = new InputEditor(inputArea);
         final InputCellRenderer iRenderer = new InputCellRenderer();
 
         /** the number of the model the data table belongs to */
-        private int modelNr;
+        private final int modelNr;
 
         /** the enclosing dialog */
-        private TacletMatchCompletionDialog owner;
+        private final TacletMatchCompletionDialog owner;
 
-        private KeYMediator mediator;
+        private final KeYMediator mediator;
         /**
          * the TacletIfSelectionPanel that shows the different possible instantiations of the
          * if-sequent or a manual entered instantiation. The value is null if and only if the taclet
@@ -442,11 +432,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                             } else {
                                 event.rejectDrop();
                             }
-                        } catch (IOException exception) {
-                            exception.printStackTrace();
-                            event.rejectDrop();
-                        } catch (UnsupportedFlavorException ufException) {
-                            ufException.printStackTrace();
+                        } catch (IOException | UnsupportedFlavorException exception) {
+                            LOGGER.warn("Drop failed", exception);
                             event.rejectDrop();
                         }
                     } else {
@@ -476,8 +463,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
         public Object getValueAt(int x, int y) {
             Object value = super.getValueAt(x, y);
-            if (value == null)
+            if (value == null) {
                 return "";
+            }
             return value;
         }
 
@@ -539,8 +527,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         class InputEditor extends DefaultCellEditor implements PositionSettable {
 
             private static final long serialVersionUID = 1547755822847646366L;
-            JPanel editPanel;
-            JTextArea textarea;
+            final JPanel editPanel;
+            final JTextArea textarea;
 
             public InputEditor(JTextArea ta) {
                 super(new JCheckBox()); // Unfortunately, the constructor
@@ -568,21 +556,17 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                 more.setMaximumSize(smallSq);
                 more.setMinimumSize(smallSq);
                 more.setPreferredSize(smallSq);
-                less.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        if (textarea.getRows() > 3) {
-                            textarea.setRows(textarea.getRows() - 1);
-                            setRowHeight(getSelectedRow(), getRowHeight(getSelectedRow()) - 16);
-                            setValueAt(textarea.getText(), getSelectedRow(), getSelectedColumn());
-                        }
-                    }
-                });
-                more.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        textarea.setRows(textarea.getRows() + 1);
-                        setRowHeight(getSelectedRow(), getRowHeight(getSelectedRow()) + 16);
+                less.addActionListener(e -> {
+                    if (textarea.getRows() > 3) {
+                        textarea.setRows(textarea.getRows() - 1);
+                        setRowHeight(getSelectedRow(), getRowHeight(getSelectedRow()) - 16);
                         setValueAt(textarea.getText(), getSelectedRow(), getSelectedColumn());
                     }
+                });
+                more.addActionListener(e -> {
+                    textarea.setRows(textarea.getRows() + 1);
+                    setRowHeight(getSelectedRow(), getRowHeight(getSelectedRow()) + 16);
+                    setValueAt(textarea.getText(), getSelectedRow(), getSelectedColumn());
                 });
                 // buttonPanel.add(less, BorderLayout.SOUTH);
                 // buttonPanel.add(more, BorderLayout.NORTH);
@@ -633,11 +617,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                                 int pos = textarea.viewToModel(event.getLocation());
                                 textarea.insert(droppedString, pos);
                                 event.getDropTargetContext().dropComplete(true);
-                            } catch (UnsupportedFlavorException e) {
-                                e.printStackTrace();
-                                event.rejectDrop();
-                            } catch (java.io.IOException e) {
-                                e.printStackTrace();
+                            } catch (UnsupportedFlavorException | IOException e) {
+                                LOGGER.warn("Drop failed", e);
                                 event.rejectDrop();
                             }
                         } else {
@@ -680,8 +661,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
             public Component getTableCellEditorComponent(JTable table, Object value,
                     boolean isSelected, int row, int column) {
-                if (value == null)
+                if (value == null) {
                     value = "";
+                }
                 textarea.setText(value.toString());
                 textarea.setRows(getRowHeight(row) / 16);
                 return editorComponent;
@@ -695,12 +677,13 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
              *
              */
             private static final long serialVersionUID = -7270236368657110379L;
-            JTextArea ta = new JTextArea("nothing");
+            final JTextArea ta = new JTextArea("nothing");
 
             public Component getTableCellRendererComponent(JTable table, Object obj,
                     boolean isSelected, boolean hasFocus, int row, int column) {
-                if (obj == null)
+                if (obj == null) {
                     obj = "";
+                }
                 ta.setRows(getRowHeight(row) / 16);
                 ta.setText(obj.toString());
                 if (table.isCellEditable(row, column)) {
@@ -720,7 +703,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
         Services services = mediator.getServices();
         final Term t = TermLabel.removeIrrelevantLabels(term, services);
-        LogicPrinter p = new LogicPrinter(new ProgramPrinter(), ni, services);
+        LogicPrinter p = LogicPrinter.purePrinter(ni, services);
         boolean pretty = mediator.getNotationInfo().isPrettySyntax();
         ni.refresh(services, pretty, false);
         Map<Object, Notation> tbl = ni.getNotationTable();
@@ -740,12 +723,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             tbl.remove(IProgramMethod.class);
         }
 
-        try {
-            p.printTerm(t);
-        } catch (IOException ioe) {
-            return t.toString();
-        }
-        return p.result().toString();
+        p.printTerm(t);
+        return p.result();
     }
 
     interface PositionSettable {

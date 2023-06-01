@@ -1,22 +1,9 @@
 package de.uka.ilkd.key.rule.label;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -26,6 +13,9 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * The {@link TermLabelRefactoring} used to label predicates with a {@link FormulaTermLabel} on
@@ -233,8 +223,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
                 labels.add(applicationLabel);
             } else {
                 labels.remove(termLabel);
-                Set<String> beforeIds = new LinkedHashSet<String>();
-                CollectionUtil.addAll(beforeIds, termLabel.getBeforeIds());
+                Set<String> beforeIds =
+                    new LinkedHashSet<>(Arrays.asList(termLabel.getBeforeIds()));
                 beforeIds.add(applicationLabel.getId());
                 labels.add(new FormulaTermLabel(termLabel.getMajorId(), termLabel.getMinorId(),
                     beforeIds));
@@ -254,16 +244,11 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     protected void refactorSequentFormulas(TermLabelState state, Services services, final Term term,
             List<TermLabel> labels) {
         Set<SequentFormula> sequentFormulas = getSequentFormulasToRefactor(state);
-        if (CollectionUtil.search(sequentFormulas, new IFilter<SequentFormula>() {
-            @Override
-            public boolean select(SequentFormula element) {
-                return element.formula() == term;
-            }
-        }) != null) {
+        if (CollectionUtil.search(sequentFormulas, element -> element.formula() == term) != null) {
             FormulaTermLabel termLabel = (FormulaTermLabel) term.getLabel(FormulaTermLabel.NAME);
             if (termLabel != null) {
                 labels.remove(termLabel);
-                Set<String> beforeIds = new LinkedHashSet<String>();
+                Set<String> beforeIds = new LinkedHashSet<>();
                 beforeIds.add(termLabel.getId());
                 int labelSubID = FormulaTermLabel.newLabelSubID(services, termLabel);
                 labels.add(new FormulaTermLabel(termLabel.getMajorId(), labelSubID, beforeIds));
@@ -288,8 +273,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
             if (existingLabel == null) {
                 labels.add(tacletLabel);
             } else {
-                List<String> beforeIds = new LinkedList<String>();
-                CollectionUtil.addAll(beforeIds, existingLabel.getBeforeIds());
+                List<String> beforeIds =
+                    new ArrayList<>(Arrays.asList(existingLabel.getBeforeIds()));
                 boolean changed = true;
                 if (!beforeIds.contains(tacletLabel.getId())) {
                     changed = true;
@@ -333,7 +318,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
             boolean refactored) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         labelState.put(INNER_MOST_PARENT_REFACTORED_PREFIX + goal.node().serialNr(),
-            Boolean.valueOf(refactored));
+            refactored);
     }
 
     /**
@@ -345,7 +330,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     public static boolean isUpdateRefactroingRequired(TermLabelState state) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         Object value = labelState.get(UPDATE_REFACTORING_REQUIRED);
-        return value instanceof Boolean && ((Boolean) value).booleanValue();
+        return value instanceof Boolean && (Boolean) value;
     }
 
     /**
@@ -356,7 +341,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      */
     public static void setUpdateRefactroingRequired(TermLabelState state, boolean required) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
-        labelState.put(UPDATE_REFACTORING_REQUIRED, Boolean.valueOf(required));
+        labelState.put(UPDATE_REFACTORING_REQUIRED, required);
     }
 
     /**
@@ -368,7 +353,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     public static boolean isParentRefactroingRequired(TermLabelState state) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         Object value = labelState.get(PARENT_REFACTORING_REQUIRED);
-        return value instanceof Boolean && ((Boolean) value).booleanValue();
+        return value instanceof Boolean && (Boolean) value;
     }
 
     /**
@@ -379,7 +364,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      */
     public static void setParentRefactroingRequired(TermLabelState state, boolean required) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
-        labelState.put(PARENT_REFACTORING_REQUIRED, Boolean.valueOf(required));
+        labelState.put(PARENT_REFACTORING_REQUIRED, required);
     }
 
     /**

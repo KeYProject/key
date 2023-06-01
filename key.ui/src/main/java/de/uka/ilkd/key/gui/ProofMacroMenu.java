@@ -1,19 +1,19 @@
 package de.uka.ilkd.key.gui;
 
+import java.util.*;
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.ProofScriptFromFileAction;
 import de.uka.ilkd.key.gui.actions.ProofScriptInputAction;
+import de.uka.ilkd.key.gui.actions.useractions.ProofMacroUserAction;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Node;
-import org.key_project.util.reflection.ClassLoaderUtil;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.*;
+import org.key_project.util.reflection.ClassLoaderUtil;
 
 /**
  * This class provides the user interface to the macro extensions.
@@ -118,17 +118,9 @@ public class ProofMacroMenu extends JMenu {
         if (macroKey != null && posInOcc == null) { // currently only for global macro applications
             menuItem.setAccelerator(macroKey);
         }
-        menuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (mediator.isInAutoMode()) {
-                    return;
-                }
-                mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro,
-                    posInOcc);
-            }
-        });
 
+        menuItem.addActionListener(
+            new ProofMacroUserAction(mediator, macro, posInOcc, mediator.getSelectedProof()));
         return menuItem;
     }
 

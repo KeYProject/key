@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.rule.merge;
 
+import java.io.File;
+import java.util.Iterator;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -16,12 +20,9 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.ProofStarter;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import javax.annotation.Nonnull;
-import java.io.File;
-import java.util.Iterator;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -322,8 +323,7 @@ public class MergeRuleTests {
 
             return proof;
         } catch (ProblemLoaderException e) {
-            e.printStackTrace();
-            Assertions.fail("Proof could not be loaded:\n" + e.getMessage());
+            Assertions.fail("Proof could not be loaded", e);
             return null;
         }
     }

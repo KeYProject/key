@@ -1,13 +1,12 @@
 package de.uka.ilkd.key.java.reference;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Reference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+
+import org.key_project.util.ExtList;
 
 public class ExecutionContext extends JavaNonTerminalProgramElement
         implements IExecutionContext, Reference {
@@ -25,7 +24,7 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
     /**
      * the currently active method
      */
-    private IProgramMethod methodContext;
+    private final IProgramMethod methodContext;
 
     /**
      * creates an execution context reference
@@ -63,12 +62,15 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
     @Override
     public int getChildCount() {
         int count = 0;
-        if (classContext != null)
+        if (classContext != null) {
             count++;
-        if (methodContext != null)
+        }
+        if (methodContext != null) {
             count++;
-        if (runtimeInstance != null)
+        }
+        if (runtimeInstance != null) {
             count++;
+        }
         return count;
     }
 
@@ -82,18 +84,21 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
     @Override
     public ProgramElement getChildAt(int index) {
         if (classContext != null) {
-            if (index == 0)
+            if (index == 0) {
                 return classContext;
+            }
             index--;
         }
         if (methodContext != null) {
-            if (index == 0)
+            if (index == 0) {
                 return methodContext;
+            }
             index--;
         }
         if (runtimeInstance != null) {
-            if (index == 0)
+            if (index == 0) {
                 return runtimeInstance;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -132,11 +137,6 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
     @Override
     public void visit(Visitor v) {
         v.performActionOnExecutionContext(this);
-    }
-
-    @Override
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printExecutionContext(this);
     }
 
     @Override

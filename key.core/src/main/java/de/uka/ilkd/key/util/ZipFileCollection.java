@@ -14,6 +14,9 @@ import java.util.zip.ZipFile;
 
 import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.io.DataLocation;
 
 
@@ -25,8 +28,9 @@ import recoder.io.DataLocation;
 
 
 public class ZipFileCollection implements FileCollection {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZipFileCollection.class);
 
-    File file;
+    final File file;
     ZipFile zipFile;
 
     public ZipFileCollection(File file) {
@@ -35,14 +39,15 @@ public class ZipFileCollection implements FileCollection {
 
 
     public Walker createWalker(String[] extensions) throws IOException {
-        if (zipFile == null)
+        if (zipFile == null) {
             try {
                 zipFile = new ZipFile(file);
             } catch (ZipException ex) {
-                IOException iox = new IOException("can't open " + file + ": " + ex.getMessage());
-                iox.initCause(ex);
+                IOException iox =
+                    new IOException("can't open " + file + ": " + ex.getMessage(), ex);
                 throw iox;
             }
+        }
         return new Walker(extensions);
     }
 
@@ -52,30 +57,32 @@ public class ZipFileCollection implements FileCollection {
 
     class Walker implements FileCollection.Walker {
 
-        private Enumeration<? extends ZipEntry> enumeration;
+        private final Enumeration<? extends ZipEntry> enumeration;
         private ZipEntry currentEntry;
-        private List<String> extensions;
+        private final List<String> extensions;
 
         public Walker(String[] extensions) {
             this.enumeration = zipFile.entries();
-            this.extensions = new ArrayList<String>();
+            this.extensions = new ArrayList<>();
             for (String extension : extensions) {
                 this.extensions.add(extension.toLowerCase());
             }
         }
 
         public String getCurrentName() {
-            if (currentEntry == null)
+            if (currentEntry == null) {
                 throw new NoSuchElementException();
-            else
+            } else {
                 return file.getAbsolutePath() + File.separatorChar + currentEntry.getName();
+            }
         }
 
         public InputStream openCurrent() throws IOException {
-            if (currentEntry == null)
+            if (currentEntry == null) {
                 throw new NoSuchElementException();
-            else
+            } else {
                 return zipFile.getInputStream(currentEntry);
+            }
         }
 
         @Override
@@ -97,10 +104,11 @@ public class ZipFileCollection implements FileCollection {
                 currentEntry = enumeration.nextElement();
                 for (String extension : extensions) {
                     if (extension != null
-                            && !currentEntry.getName().toLowerCase().endsWith(extension))
+                            && !currentEntry.getName().toLowerCase().endsWith(extension)) {
                         currentEntry = null;
-                    else
+                    } else {
                         break;
+                    }
                 }
             }
             return currentEntry != null;
@@ -117,7 +125,7 @@ public class ZipFileCollection implements FileCollection {
                 URI uri = MiscTools.getZipEntryURI(zipFile, currentEntry.getName());
                 return new URLDataLocation(uri.toURL());
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("Failed to get zip entry uri", e);
             }
             return SpecDataLocation.UNKNOWN_LOCATION; // fallback
         }

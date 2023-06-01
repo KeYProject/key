@@ -2,6 +2,8 @@
 
 package recoder.kit;
 
+import java.util.Map;
+
 import recoder.ProgramFactory;
 import recoder.convenience.TreeWalker;
 import recoder.java.*;
@@ -12,8 +14,6 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.ChangeHistory;
 import recoder.util.Debug;
-
-import java.util.Map;
 
 /**
  * This utility class provides queries, factory methods and transformations on abstract entities
@@ -280,7 +280,7 @@ public class MiscKit {
         Debug.assertNonnull(parent, child);
         ASTList<Import> list = parent.getImports();
         if (list == null) {
-            parent.setImports(new ASTArrayList<Import>(child));
+            parent.setImports(new ASTArrayList<>(child));
         } else {
             if (asHead) {
                 list.add(0, child);
@@ -331,7 +331,7 @@ public class MiscKit {
         Debug.assertNonnull(parent, child);
         ASTList<Statement> list = parent.getBody();
         if (list == null) {
-            parent.setBody(new ASTArrayList<Statement>(child));
+            parent.setBody(new ASTArrayList<>(child));
         } else {
             if (asHead) {
                 list.add(0, child);
@@ -428,4 +428,3 @@ public class MiscKit {
     }
 
 }
-

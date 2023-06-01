@@ -8,7 +8,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
@@ -21,7 +20,6 @@ import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.AbandonTaskEvent;
-import de.uka.ilkd.key.nparser.DebugKeyLexer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
@@ -32,10 +30,14 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
-import de.uka.ilkd.key.util.Debug;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Task tree panel, showing all currently opened proofs.
+ * Usually located in the top left panel.
+ */
 public class TaskTree extends JPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskTree.class);
 
@@ -44,19 +46,19 @@ public class TaskTree extends JPanel {
      */
     private static final long serialVersionUID = -6084969108377936099L;
 
-    private JTree delegateView;
+    private final JTree delegateView;
 
     /** the KeYMediator */
-    private KeYMediator mediator;
+    private final KeYMediator mediator;
 
     /** listener for mouse events of this gui component */
-    private MouseListener mouseListener = new TaskTreeMouseListener();
+    private final MouseListener mouseListener = new TaskTreeMouseListener();
 
     /** listener to the prof tree events */
-    private ProofTreeListener proofTreeListener = new TaskTreeProofTreeListener();
+    private final ProofTreeListener proofTreeListener = new TaskTreeProofTreeListener();
 
     /** the list model to be used */
-    private TaskTreeModel model = new TaskTreeModel();
+    private final TaskTreeModel model = new TaskTreeModel();
 
     public TaskTree(KeYMediator mediator) {
         super();
@@ -142,15 +144,16 @@ public class TaskTree extends JPanel {
     /** returns all selected basic tasks */
     public BasicTask[] getAllSelectedBasicTasks() {
         TreePath[] paths = delegateView.getSelectionModel().getSelectionPaths();
-        if (paths == null)
+        if (paths == null) {
             return new BasicTask[0];
-        final List<BasicTask> result = new LinkedList<BasicTask>();
+        }
+        final List<BasicTask> result = new LinkedList<>();
         for (TreePath path : paths) {
             if (path.getLastPathComponent() instanceof BasicTask) {
                 result.add((BasicTask) path.getLastPathComponent());
             }
         }
-        return result.toArray(new BasicTask[result.size()]);
+        return result.toArray(new BasicTask[0]);
     }
 
     /** called when the user has clicked on a problem */
@@ -315,12 +318,15 @@ public class TaskTree extends JPanel {
             if (value instanceof TaskTreeNode) {
                 ProofStatus ps = ((TaskTreeNode) value).getStatus();
                 if (ps != null) {
-                    if (ps.getProofClosed())
+                    if (ps.getProofClosed()) {
                         sup.setIcon(keyClosedIcon);
-                    if (ps.getProofClosedButLemmasLeft())
+                    }
+                    if (ps.getProofClosedButLemmasLeft()) {
                         sup.setIcon(keyAlmostClosedIcon);
-                    if (ps.getProofOpen())
+                    }
+                    if (ps.getProofOpen()) {
                         sup.setIcon(keyIcon);
+                    }
                 }
 
             }
