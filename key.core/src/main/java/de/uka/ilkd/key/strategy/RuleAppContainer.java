@@ -115,4 +115,11 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
         return result;
     }
 
+    @Override
+    public String toString() {
+        return "RuleAppContainer{" +
+            "ruleApp=" + ruleApp.rule().name() +
+            ", cost=" + cost +
+            '}';
+    }
 }
