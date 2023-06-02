@@ -111,6 +111,12 @@ public class JavaProfile extends AbstractProfile {
             ));
         result = result.prepend(
             new TermLabelConfiguration(
+                ParameterlessTermLabel.LOCATION_SET_NON_EMPTY_NAME,
+                new SingletonLabelFactory<>(
+                    ParameterlessTermLabel.LOCATION_SET_NON_EMPTY)
+            ));
+        result = result.prepend(
+            new TermLabelConfiguration(
                     ParameterlessTermLabel.SELECT_SKOLEM_LABEL_NAME,
                     new SingletonLabelFactory<TermLabel>(
                             ParameterlessTermLabel.SELECT_SKOLEM_LABEL)

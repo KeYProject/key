@@ -6,6 +6,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.loopinvgen.NestedLoopUsecaseRule;
 import de.uka.ilkd.key.loopinvgen.RelaxedShiftUpdateRule;
@@ -1259,20 +1260,26 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         Feature colStartIsLiteral = applyTF(instOf("colStart"), tf.literal);
         Feature colEndIsLiteral = applyTF(instOf("colEnd"), tf.literal);
 
+        TermFeature hasNonEmptyLabel = TermLabelTermFeature.create(ParameterlessTermLabel.LOCATION_SET_NON_EMPTY);
         bindRuleSet(d, "simplify_matrix_range_literal",
-                ifZero(or(rowEndLessThanRowStart, colEndLessThanColStart),
-                        longConst(-3000),
-                        ifZero(or(applyTF(instOf("rowEnd"), tf.negLiteral),
-                                        applyTF(instOf("colEnd"), tf.negLiteral)),
-                                add(longConst(-250),
-                                        ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 50)),
-                                //   ifZero(add(nonEmptyRows, nonEmptyCols),
-                                //   inftyConst(),
-                                 inftyConst())));
+            ifZero(or(rowEndLessThanRowStart, colEndLessThanColStart),
+                longConst(-3000),
+                ifZero(add(nonEmptyRows, nonEmptyCols),
+                    inftyConst(),
+                    ifZero(or(applyTF(instOf("rowEnd"), tf.negLiteral),
+                            applyTF(instOf("colEnd"), tf.negLiteral)),
+                        add(longConst(-250),
+                            ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 50)),
+                        //   ifZero(add(nonEmptyRows, nonEmptyCols),
+                        //   inftyConst(),
+                        ifZero(applyTF(FocusProjection.INSTANCE, hasNonEmptyLabel),
+                            inftyConst(),
+                            longConst(-1910))
+                    ))));
 
 
 
-        bindRuleSet(d, "simplify_matrix_range_literal_2",
+/*        bindRuleSet(d, "simplify_matrix_range_literal_2",
             ifZero(or(rowEndLessThanRowStart, colEndLessThanColStart),
                 longConst(-3000),
                 ifZero(or(applyTF(instOf("rowEnd"), tf.negLiteral),
@@ -1291,7 +1298,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                 add(longConst(-250),
                                         ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 50)),
                                                          inftyConst()), inftyConst()))));
-
+*/
 
         bindRuleSet(d, "pull_out_matrixRange",
             add(not(isBelow(tf.eqF)), longConst(-3500)));
