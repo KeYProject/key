@@ -603,14 +603,17 @@ public final class IssueDialog extends JDialog {
                             exception.getCause().toString());
             }
 
-            String resourceLocation = "";
+            String resourceLocation = null;
             Position pos = Position.UNDEFINED;
-            Location location = ExceptionTools.getLocation(exception);
-            if (location != null && !location.getPosition().isNegative()) {
-                pos = location.getPosition();
-            }
-            if (Location.isValidLocation(location)) {
-                resourceLocation = location.getFileURL().toString();
+            Optional<Location> location = ExceptionTools.getLocation(exception);
+            if (location.isPresent()) {
+                var loc = location.get();
+                if (!loc.getPosition().isNegative()) {
+                    pos = loc.getPosition();
+                }
+                if (loc.getFileURL().isPresent()) {
+                    resourceLocation = loc.getFileURL().get().toString();
+                }
             }
             return new PositionedIssueString(message == null ? exception.toString() : message,
                 resourceLocation, pos, info);
@@ -641,15 +644,17 @@ public final class IssueDialog extends JDialog {
         btnEditFile.setEnabled(issue.pos != Position.UNDEFINED);
 
         try {
-            String source =
-                StringUtil.replaceNewlines(fileContentsCache.computeIfAbsent(issue.fileName, fn -> {
-                    try (InputStream stream = IOUtil.openStream(issue.fileName)) {
-                        return IOUtil.readFrom(stream);
-                    } catch (IOException e) {
-                        LOGGER.debug("Unknown IOException!", e);
-                        return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
-                    }
-                }), "\n");
+            String source = issue.fileName.equals(PositionedString.UNDEFINED_FILE)
+                    ? "[SOURCE COULD NOT BE LOADED]"
+                    : StringUtil.replaceNewlines(
+                        fileContentsCache.computeIfAbsent(issue.fileName, fn -> {
+                            try (InputStream stream = IOUtil.openStream(issue.fileName)) {
+                                return IOUtil.readFrom(stream);
+                            } catch (IOException e) {
+                                LOGGER.debug("Unknown IOException!", e);
+                                return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
+                            }
+                        }), "\n");
 
             if (isJava(issue.fileName)) {
                 showJavaSourceCode(source);

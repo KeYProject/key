@@ -80,7 +80,8 @@ public class ProofScriptEngine {
             throws IOException, InterruptedException, ScriptException {
 
         ScriptLineParser mlp =
-            new ScriptLineParser(new StringReader(script), initialLocation.getFileURL());
+            new ScriptLineParser(new StringReader(script),
+                initialLocation.getFileURL().orElse(null));
         mlp.setLocation(initialLocation);
 
         stateMap = new EngineState(proof);
@@ -90,10 +91,10 @@ public class ProofScriptEngine {
         }
 
         // add the filename (if available) to the statemap.
-        URL url = initialLocation.getFileURL();
-        if (url != null) {
+        Optional<URL> url = initialLocation.getFileURL();
+        if (url.isPresent()) {
             try {
-                stateMap.setBaseFileName(Paths.get(url.toURI()).toFile());
+                stateMap.setBaseFileName(Paths.get(url.get().toURI()).toFile());
             } catch (URISyntaxException e) {
                 throw new IOException(e);
             }

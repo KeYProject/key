@@ -2,6 +2,7 @@ package de.uka.ilkd.key.parser;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.util.MiscTools;
@@ -63,19 +64,6 @@ public final class Location {
     }
 
     /**
-     * Creates a new Location with the given resource location, 1-based line and 0-based column
-     * numbers.
-     * This format is used by most parsers so this deserves an explicit method call.
-     *
-     * @param url location of the resource
-     * @param line_1 1-based line of the Location
-     * @param column_0 0-based column of the Location
-     */
-    public static Location newOneZeroBased(URL url, int line_1, int column_0) {
-        return new Location(url, Position.fromOneZeroBased(line_1, column_0));
-    }
-
-    /**
      * This factory method can be used to create a Location for a RecognitionException. A possibly
      * thrown MalformedURLException is caught and printed to debug output, null is returned instead.
      *
@@ -94,18 +82,8 @@ public final class Location {
         }
     }
 
-    /**
-     * Checks if the given Location is valid, i.e. not null and has a URL.
-     *
-     * @param location the Location to check
-     * @return true iff Location is valid
-     */
-    public static boolean isValidLocation(final Location location) {
-        return !(location == null || location.getFileURL() == null);
-    }
-
-    public URL getFileURL() {
-        return fileUrl;
+    public Optional<URL> getFileURL() {
+        return Optional.ofNullable(fileUrl);
     }
 
     public Position getPosition() {

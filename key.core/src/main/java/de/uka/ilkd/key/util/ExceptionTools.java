@@ -2,6 +2,7 @@ package de.uka.ilkd.key.util;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -45,22 +46,21 @@ public final class ExceptionTools {
      *         given Throwable can not be successfully converted to a URL and thus no Location can
      *         be created
      */
-    public static @Nullable Location getLocation(@Nonnull Throwable exc)
+    public static Optional<Location> getLocation(@Nonnull Throwable exc)
             throws MalformedURLException {
-        Location location = null;
         if (exc instanceof HasLocation) {
-            return ((HasLocation) exc).getLocation();
+            return Optional.ofNullable(((HasLocation) exc).getLocation());
         } else if (exc instanceof ParseException) {
-            location = getLocation((ParseException) exc);
+            return Optional.ofNullable(getLocation((ParseException) exc));
         } else if (exc instanceof TokenMgrError) {
-            location = getLocation((TokenMgrError) exc);
+            return Optional.ofNullable(getLocation((TokenMgrError) exc));
         }
 
-        if (location == null && exc.getCause() != null) {
-            location = getLocation(exc.getCause());
+        if (exc.getCause() != null) {
+            return getLocation(exc.getCause());
         }
 
-        return location;
+        return Optional.empty();
     }
 
     @Nullable

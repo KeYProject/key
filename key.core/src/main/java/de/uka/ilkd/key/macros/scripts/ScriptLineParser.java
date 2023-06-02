@@ -266,6 +266,6 @@ class ScriptLineParser {
     public void setLocation(Location location) {
         this.line = location.getPosition().line();
         this.col = location.getPosition().column();
-        this.fileURL = location.getFileURL();
+        this.fileURL = location.getFileURL().orElse(null);
     }
 }

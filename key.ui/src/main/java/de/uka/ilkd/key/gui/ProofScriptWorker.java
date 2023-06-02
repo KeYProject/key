@@ -88,7 +88,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
     }
 
     private void makeDialog() {
-        URL url = initialLocation.getFileURL();
+        URL url = initialLocation.getFileURL().orElse(null);
 
         if (monitor != null) {
             logArea.setText("Running script from URL '" + url + "':\n");
