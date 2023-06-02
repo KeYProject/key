@@ -25,12 +25,14 @@ class TestEqualsModProofIrrelevancy {
     void testJavaProof() throws Exception {
         KeYEnvironment<DefaultUserInterfaceControl> env =
             KeYEnvironment.load(new File(testCaseDirectory,
-                "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
+                "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof")
+                        .toPath());
         Assertions.assertNotNull(env.getLoadedProof());
         Assertions.assertTrue(env.getLoadedProof().closed());
         KeYEnvironment<DefaultUserInterfaceControl> env2 =
             KeYEnvironment.load(new File(testCaseDirectory,
-                "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
+                "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof")
+                        .toPath());
         Assertions.assertNotNull(env2.getLoadedProof());
         Assertions.assertTrue(env2.getLoadedProof().closed());
 
