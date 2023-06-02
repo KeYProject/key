@@ -26,7 +26,7 @@ public class JavaBuildingExceptions extends RuntimeException {
     @Override
     public String toString() {
         return "JavaBuildingExceptions{" +
-                "issues=" + issues +
-                '}';
+            "issues=" + issues +
+            '}';
     }
 }

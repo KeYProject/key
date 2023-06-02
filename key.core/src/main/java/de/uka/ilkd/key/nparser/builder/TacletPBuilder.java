@@ -137,7 +137,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             Sequent ifSeq = Sequent.EMPTY_SEQUENT;
             ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.nil();
             if (ctx.LEMMA() != null) {
-                tacletAnnotations = tacletAnnotations.add(de.uka.ilkd.key.rule.TacletAnnotation.LEMMA);
+                tacletAnnotations =
+                    tacletAnnotations.add(de.uka.ilkd.key.rule.TacletAnnotation.LEMMA);
             }
             String name = ctx.name.getText();
             ChoiceExpr ch = accept(ctx.option_list());
@@ -211,7 +212,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             } catch (RuntimeException e) {
                 throw new BuildingException(ctx, e);
             }
-        }catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             LOGGER.error("Error in parsing taclet.", e);
             addWarning(ctx, e, e.getMessage());
         }

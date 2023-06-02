@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.expression.operator.adt;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -9,9 +11,8 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import org.key_project.util.collection.ImmutableArray;
 
-import java.util.List;
+import org.key_project.util.collection.ImmutableArray;
 
 public class AllObjects extends Operator {
 

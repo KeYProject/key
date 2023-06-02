@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.reference;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -10,10 +12,6 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 
-import org.key_project.util.ExtList;
-
-import java.util.List;
-
 /**
  * Field reference.
  *
@@ -23,7 +21,7 @@ public class SchematicFieldReference extends FieldReference
         implements MemberReference, ReferenceSuffix, TypeReferenceContainer, ExpressionContainer {
 
     private static final ProgramVariable SCHEMA_VARIABLE =
-            new LocationVariable(new ProgramElementName("SCHEMA_VARIABLE_IGNORE"), Sort.ANY);
+        new LocationVariable(new ProgramElementName("SCHEMA_VARIABLE_IGNORE"), Sort.ANY);
     /**
      * Reference suffix
      */
@@ -35,7 +33,8 @@ public class SchematicFieldReference extends FieldReference
         this.schemaVariable = pe;
     }
 
-    public SchematicFieldReference(PositionInfo pi, List<Comment> c, SchemaVariable name, ReferencePrefix scope) {
+    public SchematicFieldReference(PositionInfo pi, List<Comment> c, SchemaVariable name,
+            ReferencePrefix scope) {
         super(pi, c, SCHEMA_VARIABLE, scope);
         this.schemaVariable = name;
     }
