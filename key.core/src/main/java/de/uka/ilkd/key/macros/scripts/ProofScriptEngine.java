@@ -80,10 +80,7 @@ public class ProofScriptEngine {
     public void execute(AbstractUserInterfaceControl uiControl, Proof proof)
             throws IOException, InterruptedException, ScriptException {
 
-        ScriptLineParser mlp =
-            new ScriptLineParser(new StringReader(script),
-                initialLocation.getFileURL().orElse(null));
-        mlp.setLocation(initialLocation);
+        ScriptLineParser mlp = new ScriptLineParser(new StringReader(script), initialLocation);
 
         stateMap = new EngineState(proof);
 
@@ -112,11 +109,13 @@ public class ProofScriptEngine {
                 throw new InterruptedException();
             }
 
-            Map<String, String> argMap = mlp.parseCommand();
-            if (argMap == null) {
+            ScriptLineParser.ParsedCommand parsed = mlp.parseCommand();
+            if (parsed == null) {
                 // EOF reached
                 break;
             }
+            final Map<String, String> argMap = parsed.args;
+            final Location start = parsed.start;
 
             String cmd = "'" + argMap.get(ScriptLineParser.LITERAL_KEY) + "'";
             if (cmd.length() > MAX_CHARS_PER_COMMAND) {
@@ -128,7 +127,7 @@ public class ProofScriptEngine {
                     && !Optional.ofNullable(argMap.get(ScriptLineParser.COMMAND_KEY)).orElse("")
                             .startsWith(SYSTEM_COMMAND_PREFIX)) {
                 commandMonitor
-                        .accept(new ExecuteInfo(cmd, mlp.getLocation(), firstNode.serialNr()));
+                        .accept(new ExecuteInfo(cmd, start, firstNode.serialNr()));
             }
 
             try {
@@ -146,7 +145,7 @@ public class ProofScriptEngine {
                 Object o = command.evaluateArguments(stateMap, argMap);
                 if (!name.startsWith(SYSTEM_COMMAND_PREFIX) && stateMap.isEchoOn()) {
                     LOGGER.debug("[{}] goal: {}, source line: {}, command: {}", ++cnt,
-                        firstNode.serialNr(), mlp.getLine(), cmd);
+                        firstNode.serialNr(), parsed.start.getPosition().line(), cmd);
                 }
                 command.execute(uiControl, o, stateMap);
                 firstNode.getNodeInfo().setScriptRuleApplication(true);
@@ -159,12 +158,12 @@ public class ProofScriptEngine {
                             "Proof already closed while trying to fetch next goal.\n"
                                 + "This error can be suppressed by setting '@failonclosed off'.\n\n"
                                 + "Command: %s\nLine:%d\n",
-                            argMap.get(ScriptLineParser.LITERAL_KEY), mlp.getLine()),
-                        mlp.getLocation(), e);
+                            argMap.get(ScriptLineParser.LITERAL_KEY), start.getPosition().line()),
+                        start, e);
                 } else {
                     LOGGER.info(
                         "Proof already closed at command \"{}\" at line %d, terminating in line {}",
-                        argMap.get(ScriptLineParser.LITERAL_KEY), mlp.getLine());
+                        argMap.get(ScriptLineParser.LITERAL_KEY), start.getPosition().line());
                     break;
                 }
             } catch (Exception e) {
@@ -174,7 +173,7 @@ public class ProofScriptEngine {
                 throw new ScriptException(
                     String.format("Error while executing script: %s\n\nCommand: %s", e.getMessage(),
                         argMap.get(ScriptLineParser.LITERAL_KEY)),
-                    mlp.getLocation(), e);
+                    start, e);
             }
         }
     }
