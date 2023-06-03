@@ -17,7 +17,7 @@ plugins {
     //Some Licenses requires an entry in the credits (MIT, BSD)
     id "com.github.hierynomus.license-report" version "0.16.1"
 
-    id "org.sonarqube" version "4.0.0.2929"
+    id "org.sonarqube" version "4.1.0.3113"
 
     // Gives `gradle dependencyUpdate` to show which dependency has a newer version
     // id "com.github.ben-manes.versions" version "0.39.0"

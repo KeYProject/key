@@ -234,7 +234,7 @@
   * /*@model @*/
 (82/82) -- recoder.java.reference.TypeReference
   * /*@ non_null @*/
-(104/108) -- recoder.java.declaration.MethodDeclaration
+(104/109) -- recoder.java.declaration.MethodDeclaration
   * //@ invariant this.lock != \dl_currentThread() &&
   * //@ accessible<heap> \inv : this.lock, lock.spec;
   * //@ accessible<permissions> \inv : this.lock, lock
@@ -247,3 +247,5 @@
   * /*@ model Lock lockRef() { return this.lock; } @*/
   * /*@ model boolean lockStatus(boolean locked) { ret
   * /*@ normal_behavior          requires lockStatus(\
+(-1/-1) -- recoder.java.statement.EmptyStatement
+  * //@ assert lockStatus(\dl_FALSE());
