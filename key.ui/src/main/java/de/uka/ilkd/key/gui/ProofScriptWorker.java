@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.List;
-import java.util.Observer;
 import java.util.concurrent.*;
+import java.util.function.Consumer;
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -24,7 +24,8 @@ import de.uka.ilkd.key.proof.Goal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ProofScriptWorker extends SwingWorker<Object, Object> implements InterruptListener {
+public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Message>
+        implements InterruptListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofScriptWorker.class);
 
     private final KeYMediator mediator;
@@ -39,7 +40,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
     private JDialog monitor;
     private JTextArea logArea;
 
-    private final Observer observer = (o, arg) -> publish(arg);
+    private final Consumer<ProofScriptEngine.Message> observer = this::publish;
 
     public ProofScriptWorker(KeYMediator mediator, File file) throws IOException {
         this.initialLocation = new Location(file.toURI().toURL(), Position.newOneBased(1, 1));
@@ -117,17 +118,22 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
     }
 
     @Override
-    protected void process(List<Object> chunks) {
+    protected void process(List<ProofScriptEngine.Message> chunks) {
         Document doc = logArea.getDocument();
-        for (Object chunk : chunks) {
-            assert chunk instanceof String;
-
-            try {
-                if (!((String) chunk).startsWith("'")) {
-                    doc.insertString(doc.getLength(), "\n---\n" + chunk, null);
-                } else if (!((String) chunk).startsWith("'echo ")) {
-                    doc.insertString(doc.getLength(), "\n---\nExecuting: " + chunk, null);
+        for (ProofScriptEngine.Message info : chunks) {
+            var message = new StringBuilder("\n---\n");
+            if (info instanceof ProofScriptEngine.EchoMessage) {
+                var echo = (ProofScriptEngine.EchoMessage) info;
+                message.append(echo.message);
+            } else {
+                var exec = (ProofScriptEngine.ExecuteInfo) info;
+                if (exec.command.startsWith("'echo ")) {
+                    continue;
                 }
+                message.append("Executing: ").append(exec.command);
+            }
+            try {
+                doc.insertString(doc.getLength(), message.toString(), null);
             } catch (BadLocationException e) {
                 LOGGER.warn("Failed to insert string", e);
             }
