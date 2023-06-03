@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,6 +35,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -416,8 +418,16 @@ public final class ProblemInitializer {
         if (bootClassPath != null) {
             path = bootClassPath;
         } else {
-            var classDir = services.getProfile().getInternalClassDirectory();
-            path = classDir.isBlank() ? null : Paths.get(classDir);
+            // TODO weigl: where to put this code. The implementation of services.getProfile() is
+            // stupid.
+            var resourcePath = "JavaRedux/JAVALANG.TXT";
+            var url =
+                KeYResourceManager.getManager().getResourceFile(JavaService.class, resourcePath);
+            try {
+                path = Paths.get(url.toURI()).getParent();
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
         }
         services.activateJava(path);
     }

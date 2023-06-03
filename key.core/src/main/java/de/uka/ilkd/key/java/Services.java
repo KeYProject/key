@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.java;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -427,6 +428,13 @@ public class Services implements TermServices {
         var jpTypoConv = javaService.getTypeConverter();
         var kpmi = new KeYProgModelInfo(this, mapping, jpTypoConv);
         javainfo = new JavaInfo(kpmi, this);
+    }
+
+    public void activateJava() {
+        var classDir = getProfile().getInternalClassDirectory();
+        if (classDir != null && !classDir.isBlank()) {
+            activateJava(Paths.get(classDir));
+        }
     }
 
     public Lookup createLookup() {

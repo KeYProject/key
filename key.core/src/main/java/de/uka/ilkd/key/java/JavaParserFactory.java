@@ -194,9 +194,11 @@ public class JavaParserFactory {
                 addToTypeSolver(ct, sourcePath);
             }
 
-            if (useSystemClassLoaderInResolution) {
-                ct.add(new ReflectionTypeSolver(true));
-            }
+            /*
+             * if (useSystemClassLoaderInResolution) {
+             * ct.add(new ReflectionTypeSolver(true));
+             * }
+             */
             delegate = ct;
         }
 
@@ -223,7 +225,7 @@ public class JavaParserFactory {
             }
 
             if (Files.isDirectory(sourcePath)) {
-                ct.add(new JavaParserTypeSolver(sourcePath, config));
+                ct.add(new JavaParserTypeSolver(sourcePath, getConfiguration()));
                 return;
             }
 

@@ -36,6 +36,7 @@ public class AbstractTestTermParser {
         tb = services.getTermBuilder();
         tf = tb.tf();
         nss = services.getNamespaces();
+        services.activateJava();
         io = new KeyIO(services, nss);
     }
 
