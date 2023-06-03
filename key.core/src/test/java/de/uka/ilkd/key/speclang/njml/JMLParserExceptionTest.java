@@ -90,7 +90,7 @@ public class JMLParserExceptionTest {
 
         try {
             ProblemLoaderControl control = new DefaultUserInterfaceControl(null);
-            AbstractProblemLoader pl = new SingleThreadProblemLoader(file.toFile(), null, null,
+            AbstractProblemLoader pl = new SingleThreadProblemLoader(file, null, null,
                 null, AbstractProfile.getDefaultProfile(), false,
                 control, false, new Properties());
             pl.setLoadSingleJavaFile(true);
