@@ -76,9 +76,10 @@ public class JP2KeYTypeConverter {
     private final KeYJPMapping jp2KeY;
     private final TypeSolver typeSolver;
     private final Sort objectSort;
-    private KeYJavaType objectType;
-    private KeYJavaType cloneableType;
-    private KeYJavaType serializableType;
+
+    private KeYJavaType __objectType;
+    private KeYJavaType __cloneableType;
+    private KeYJavaType __serializableType;
 
     public JP2KeYTypeConverter(Services services, TypeSolver typeSolver, KeYJPMapping jp2KeY) {
         this.jp2KeY = jp2KeY;
@@ -210,8 +211,8 @@ public class JP2KeYTypeConverter {
         var kjt = getKeYJavaType(componentType);
         // I may not use JavaInfo here because the classes may not yet be cached!
         de.uka.ilkd.key.java.abstraction.Type elemType = kjt.getJavaType();
-        var arraySort = ArraySort.getArraySort(kjt.getSort(), elemType, objectType.getSort(),
-            cloneableType.getSort(), serializableType.getSort());
+        var arraySort = ArraySort.getArraySort(kjt.getSort(), elemType, getObjectType().getSort(),
+            getCloneableType().getSort(), getSerializableType().getSort());
         var result = new KeYJavaType(arraySort);
         if (namespaces.sorts().lookup(arraySort.name()) == null) {
             namespaces.sorts().add(arraySort);
@@ -224,12 +225,27 @@ public class JP2KeYTypeConverter {
         result.setJavaType(arrayType);
     }
 
+    private KeYJavaType getSerializableType() {
+        if(__serializableType==null) __serializableType = getKeYJavaType("java.io.Serializable");
+        return __serializableType;
+    }
+
+    private KeYJavaType getCloneableType() {
+        if(__cloneableType==null) __cloneableType = getKeYJavaType("java.lang.Cloneable");
+        return __cloneableType;
+    }
+
+    private KeYJavaType getObjectType() {
+        if(__objectType==null) __objectType = getKeYJavaType("java.lang.Object");
+        return __objectType;
+    }
+
     private void addReferenceType(ResolvedReferenceType type) {
         var ref = type.asReferenceType().getTypeDeclaration().get();
         var sort = namespaces.sorts().lookup(new Name(type.describe()));
         if (sort == null) {
             if (ref.isInterface()) {
-                sort = createObjectSort(ref, directSuperSorts(ref).add(objectType.getSort()));
+                sort = createObjectSort(ref, directSuperSorts(ref).add(getObjectType().getSort()));
             } else {
                 sort = createObjectSort(ref, directSuperSorts(ref));
             }
@@ -433,6 +449,6 @@ public class JP2KeYTypeConverter {
         Sort heapSort = heapLDT == null ? Sort.ANY : heapLDT.targetSort();
         int heapCount = (heapLDT == null) ? 1 : (heapLDT.getAllHeaps().size() - 1);
         arrayMethodBuilder =
-            new CreateArrayMethodBuilder(integerType, objectType, heapSort, heapCount);
+            new CreateArrayMethodBuilder(integerType, getObjectType(), heapSort, heapCount);
     }
 }

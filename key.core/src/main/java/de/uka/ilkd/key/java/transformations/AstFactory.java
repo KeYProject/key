@@ -8,6 +8,8 @@ import com.github.javaparser.ast.key.KeyPassiveExpression;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
+import java.util.Objects;
+
 
 /**
  * This class provides static function for constructing AST more efficiently.

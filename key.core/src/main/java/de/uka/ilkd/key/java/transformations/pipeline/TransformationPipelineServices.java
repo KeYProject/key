@@ -1,13 +1,5 @@
 package de.uka.ilkd.key.java.transformations.pipeline;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-
-import de.uka.ilkd.key.java.JavaParserFactory;
-import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
-import de.uka.ilkd.key.java.transformations.EvaluationException;
-
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
@@ -24,8 +16,15 @@ import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import com.github.javaparser.resolution.model.SymbolReference;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
+import de.uka.ilkd.key.java.JavaParserFactory;
+import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
+import de.uka.ilkd.key.java.transformations.EvaluationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nonnull;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
@@ -33,7 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TransformationPipelineServices {
     private static final Logger LOGGER =
-        LoggerFactory.getLogger(TransformationPipelineServices.class);
+            LoggerFactory.getLogger(TransformationPipelineServices.class);
 
     @Nonnull
     private final TransformerCache cache;
@@ -43,7 +42,7 @@ public class TransformationPipelineServices {
 
 
     public TransformationPipelineServices(@Nonnull JavaParserFactory javaParserFactory,
-            @Nonnull TransformerCache cache) {
+                                          @Nonnull TransformerCache cache) {
         this.cache = cache;
         this.javaParserFactory = javaParserFactory;
     }
@@ -89,7 +88,7 @@ public class TransformationPipelineServices {
      * according to JLS Sect. 4.5.5
      *
      * @return the default value of the given type
-     *         according to JLS Sect. 4.5.5
+     * according to JLS Sect. 4.5.5
      */
     public Expression getDefaultValue(Type type) {
         if (type instanceof ReferenceType) {
@@ -97,29 +96,29 @@ public class TransformationPipelineServices {
         } else if (type instanceof PrimitiveType) {
             PrimitiveType ptype = (PrimitiveType) type;
             switch (ptype.getType()) {
-            case BOOLEAN:
-                return new BooleanLiteralExpr(false);
-            case KEY_BIGINT:
-            case BYTE:
-            case SHORT:
-            case INT:
-                return new IntegerLiteralExpr("0");
-            case LONG:
-                return new LongLiteralExpr("0");
+                case BOOLEAN:
+                    return new BooleanLiteralExpr(false);
+                case KEY_BIGINT:
+                case BYTE:
+                case SHORT:
+                case INT:
+                    return new IntegerLiteralExpr("0");
+                case LONG:
+                    return new LongLiteralExpr("0");
 
-            case CHAR:
-                return new CharLiteralExpr((char) 0);
-            case FLOAT:
-            case DOUBLE:
-            case KEY_REAL:
-                return new DoubleLiteralExpr("0.0");
+                case CHAR:
+                    return new CharLiteralExpr((char) 0);
+                case FLOAT:
+                case DOUBLE:
+                case KEY_REAL:
+                    return new DoubleLiteralExpr("0.0");
 
-            case KEY_LOCSET:
-            case KEY_SEQ:
-            case KEY_FREE:
-            case KEY_MAP:
-                throw new IllegalArgumentException("TODO");
-            // return new KeyEscapeExpression(null, new NodeList<>());
+                case KEY_LOCSET:
+                case KEY_SEQ:
+                case KEY_FREE:
+                case KEY_MAP:
+                    throw new IllegalArgumentException("TODO");
+                    // return new KeyEscapeExpression(null, new NodeList<>());
             }
         }
         LOGGER.error("makeImplicitMembersExplicit: unknown primitive type: {}", type);
@@ -233,20 +232,20 @@ public class TransformationPipelineServices {
      * </code>
      *
      * @param cd the TypeDeclaration<?> of which the initilizers have to
-     *        be collected
+     *           be collected
      * @return the list of copy assignments and method references
-     *         realising the initializers.
+     * realising the initializers.
      */
     public NodeList<Statement> getInitializers(ClassOrInterfaceDeclaration cd) {
         NodeList<Statement> result = new NodeList<>();
         NodeList<MethodDeclaration> mdl = new NodeList<>();
 
         var initializers =
-            cd.getMembers().stream()
-                    .filter(BodyDeclaration::isInitializerDeclaration)
-                    .map(it -> (InitializerDeclaration) it)
-                    .filter(it -> !it.isStatic())
-                    .collect(Collectors.toList());
+                cd.getMembers().stream()
+                        .filter(BodyDeclaration::isInitializerDeclaration)
+                        .map(it -> (InitializerDeclaration) it)
+                        .filter(it -> !it.isStatic())
+                        .collect(Collectors.toList());
 
 
         for (InitializerDeclaration initializer : initializers) {
@@ -259,20 +258,20 @@ public class TransformationPipelineServices {
         }
 
         var memberFields =
-            cd.getMembers().stream()
-                    .filter(BodyDeclaration::isFieldDeclaration)
-                    .map(it -> (FieldDeclaration) it)
-                    .filter(it -> !it.isStatic())
-                    .collect(Collectors.toList());
+                cd.getMembers().stream()
+                        .filter(BodyDeclaration::isFieldDeclaration)
+                        .map(it -> (FieldDeclaration) it)
+                        .filter(it -> !it.isStatic())
+                        .collect(Collectors.toList());
 
         for (FieldDeclaration field : memberFields) {
             for (VariableDeclarator variable : field.getVariables()) {
                 if (variable.getInitializer().isPresent()) {
                     Expression fieldInit = variable.getInitializer().get();
                     final var access = new FieldAccessExpr(
-                        new ThisExpr(), new NodeList<>(), variable.getName());
+                            new ThisExpr(), new NodeList<>(), variable.getName());
                     var fieldCopy =
-                        new AssignExpr(access, fieldInit.clone(), AssignExpr.Operator.ASSIGN);
+                            new AssignExpr(access, fieldInit.clone(), AssignExpr.Operator.ASSIGN);
                     result.add(new ExpressionStmt(fieldCopy));
                 }
             }
@@ -298,16 +297,17 @@ public class TransformationPipelineServices {
                 return new BooleanLiteralExpr(false);
             }
 
-            switch (p.name()) {
-            case "int":
-            case "byte":
-            case "short":
-                return new IntegerLiteralExpr("0");
-            case "char":
-                return new CharLiteralExpr("0");
-            case "float":
-            case "double":
-                return new DoubleLiteralExpr("0.0");
+            final var name = p.name();
+            switch (name.toLowerCase()) {
+                case "int":
+                case "byte":
+                case "short":
+                    return new IntegerLiteralExpr("0");
+                case "char":
+                    return new CharLiteralExpr("0");
+                case "float":
+                case "double":
+                    return new DoubleLiteralExpr("0.0");
             }
         }
 
