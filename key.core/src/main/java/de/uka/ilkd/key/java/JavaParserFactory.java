@@ -1,32 +1,36 @@
 package de.uka.ilkd.key.java;
 
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseResult;
+import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.key.sv.KeyContextStatementBlock;
+import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.resolution.Navigator;
+import com.github.javaparser.resolution.TypeSolver;
+import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
+import com.github.javaparser.resolution.model.SymbolReference;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.ClassLoaderTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import org.key_project.util.java.IOUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import org.key_project.util.java.IOUtil;
-
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParseResult;
-import com.github.javaparser.ParserConfiguration;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.key.sv.KeyContextStatementBlock;
-import com.github.javaparser.ast.stmt.BlockStmt;
-import com.github.javaparser.resolution.TypeSolver;
-import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
-import com.github.javaparser.resolution.model.SymbolReference;
-import com.github.javaparser.symbolsolver.JavaSymbolSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.*;
 
 /**
  * @author Alexander Weigl
@@ -59,7 +63,12 @@ public class JavaParserFactory {
     @Nonnull
     private final JavaSymbolSolver symbolResolver = new JavaSymbolSolver(typeSolver);
 
+
+    @Nonnull
+    private List<CompilationUnit> javaBootClassCollection = new ArrayList<>();
+
     private boolean useSystemClassLoaderInResolution;
+
 
     public JavaParserFactory(Path bootClassPath, Collection<Path> sourcePaths) {
         this.bootClassPath = bootClassPath;
@@ -75,6 +84,12 @@ public class JavaParserFactory {
         return Collections.unmodifiableList(sourcePaths);
     }
 
+    public void setJavaRedux(Collection<CompilationUnit> redux) {
+        javaBootClassCollection.clear();
+        javaBootClassCollection.addAll(redux);
+        typeSolver.lazyRebuild();
+    }
+
     public void addSourcePaths(Collection<Path> files) {
         sourcePaths.ensureCapacity(sourcePaths.size() + files.size());
         for (Path path : files) {
@@ -84,12 +99,12 @@ public class JavaParserFactory {
             for (Path existing : sourcePaths) {
                 if (path.startsWith(existing)) {
                     throw new IllegalStateException(
-                        "A parent of this path is already given in the classpath");
+                            "A parent of this path is already given in the classpath");
                 }
 
                 if (existing.startsWith(path)) {
                     throw new IllegalStateException(
-                        "A child folder of this path is already given in the classpath");
+                            "A child folder of this path is already given in the classpath");
                 }
             }
             sourcePaths.add(path);
@@ -102,6 +117,7 @@ public class JavaParserFactory {
     private ParserConfiguration getConfiguration() {
         if (config == null) {
             config = new ParserConfiguration();
+            config.setStoreTokens(true);
         }
         config.setSymbolResolver(getSymbolResolver());
         return config;
@@ -187,7 +203,12 @@ public class JavaParserFactory {
          */
         void rebuild() {
             var ct = new CombinedTypeSolver();
-            addToTypeSolver(ct, bootClassPath);
+            if (javaBootClassCollection.isEmpty()) {
+                addToTypeSolver(ct, bootClassPath);
+            } else {
+                var ts = new ListTypeSolver();
+                ct.add(ts);
+            }
 
 
             for (var sourcePath : sourcePaths) {
@@ -201,6 +222,7 @@ public class JavaParserFactory {
              */
             delegate = ct;
         }
+
 
         private void addToTypeSolver(CombinedTypeSolver ct, Path sourcePath) {
             if (sourcePath == null)
@@ -230,8 +252,8 @@ public class JavaParserFactory {
             }
 
             LOGGER.error(
-                "You gave me {} to add into the classpath. But I am not aware how to handle this path",
-                sourcePath);
+                    "You gave me {} to add into the classpath. But I am not aware how to handle this path",
+                    sourcePath);
         }
 
         @Override
@@ -253,6 +275,59 @@ public class JavaParserFactory {
             if (delegate == null)
                 rebuild();
             return delegate.tryToSolveType(name);
+        }
+    }
+
+    private class ListTypeSolver implements TypeSolver {
+        private TypeSolver parent;
+
+        private final Cache<String, SymbolReference<ResolvedReferenceTypeDeclaration>> foundTypes =
+                CacheBuilder.newBuilder().softValues()
+                        .maximumSize(1024)
+                        .build();
+
+        @Override
+        public TypeSolver getParent() {
+            return parent;
+        }
+
+        @Override
+        public void setParent(TypeSolver parent) {
+            this.parent = parent;
+        }
+
+        @Override
+        public SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveType(String name) {
+            SymbolReference<ResolvedReferenceTypeDeclaration> cachedValue = foundTypes.getIfPresent(name);
+            if (cachedValue != null) {
+                return cachedValue;
+            }
+
+            // Otherwise load it
+            SymbolReference<ResolvedReferenceTypeDeclaration> result = tryToSolveTypeUncached(name);
+            foundTypes.put(name, result);
+            return result;
+        }
+
+        private SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveTypeUncached(String name) {
+            for (CompilationUnit unit : javaBootClassCollection) {
+
+                final var primaryType = unit.getPrimaryType();
+                if(primaryType.isPresent()) {
+                    var cname = primaryType.get().getFullyQualifiedName();
+                    if (cname.isPresent() && cname.get().equals(name)) {
+                        return SymbolReference
+                                .solved(JavaParserFacade.get(this).getTypeDeclaration(primaryType.get()));
+                    }
+                }
+
+                var astTypeDeclaration = Navigator.findType(unit, name);
+                if (astTypeDeclaration.isPresent()) {
+                    return SymbolReference
+                            .solved(JavaParserFacade.get(this).getTypeDeclaration(astTypeDeclaration.get()));
+                }
+            }
+            return SymbolReference.unsolved();
         }
     }
 }

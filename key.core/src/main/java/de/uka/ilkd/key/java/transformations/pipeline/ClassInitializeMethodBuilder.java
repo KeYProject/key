@@ -13,9 +13,11 @@
 
 package de.uka.ilkd.key.java.transformations.pipeline;
 
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nonnull;
 
+import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
 
@@ -171,10 +173,13 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
         if (td instanceof ClassOrInterfaceDeclaration && !td.resolve().isJavaLangObject()) {
             var cd = (ClassOrInterfaceDeclaration) td;
             var type = cd.resolve();
-            final var superType = type.getAncestors().get(0);
-            final var scope = new NameExpr(superType.getQualifiedName());
-            initializerExecutionBody.add(0,
-                callPassively(scope, CLASS_INITIALIZE_IDENTIFIER));
+            final var ancestors = type.getAncestors();
+            if(!ancestors.isEmpty()) {
+                final var superType = ancestors.get(0);
+                final var scope = new NameExpr(superType.getQualifiedName());
+                initializerExecutionBody.add(0,
+                        callPassively(scope, CLASS_INITIALIZE_IDENTIFIER));
+            }
         }
 
         // catch clauses

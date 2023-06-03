@@ -72,11 +72,18 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
      * @param cons the Constructor to be transformed
      */
     private void normalform(ClassOrInterfaceDeclaration cd, ConstructorDeclaration cons) {
+        final var enclosingClass = getEnclosingClass(cd);
+        if(enclosingClass.isEmpty()){
+            return; //throw reportError(cd, "No enclosing class found");
+        }
+
         NodeList<Modifier> mods = new NodeList<>();
         var et = getImplicitEnclosingThis(cd);
-        var td = getEnclosingClass(cd).get();
+
+
+        var td = enclosingClass.get();
         var outerVars = services.getFinalVariables(cd);
-        int j = !et.isPresent() ? 0 : 1;
+        int j = et.isEmpty() ? 0 : 1;
         if (outerVars != null)
             j += outerVars.size();
         Parameter pd = null;
@@ -199,6 +206,7 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
         nf.setBody(body);
         cd.addMember(nf);
     }
+
 
     private Optional<ClassOrInterfaceDeclaration> getEnclosingClass(
             ClassOrInterfaceDeclaration cd) {

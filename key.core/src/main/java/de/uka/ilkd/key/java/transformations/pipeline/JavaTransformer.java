@@ -13,9 +13,11 @@
 
 package de.uka.ilkd.key.java.transformations.pipeline;
 
-import javax.annotation.Nonnull;
-
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.TypeDeclaration;
+
+import javax.annotation.Nonnull;
 
 /**
  * The JavaDL requires some implicit fields, that are available in each
@@ -56,7 +58,7 @@ public abstract class JavaTransformer {
      * creates a transformer for the recoder model
      *
      * @param services the CrossReferenceServiceConfiguration to access
-     *        model information
+     *                 model information
      */
     public JavaTransformer(@Nonnull TransformationPipelineServices services) {
         this.services = services;
@@ -70,6 +72,17 @@ public abstract class JavaTransformer {
      * yourself.
      */
     public abstract void apply(TypeDeclaration<?> td);
+
+    public static RuntimeException reportError(Node node, String message, Object... args) {
+        var path = node.findCompilationUnit().flatMap(CompilationUnit::getStorage)
+                .map(it -> it.getPath().toString())
+                .orElse("<unknown>");
+        var line = node.getRange().map(it -> it.begin.line).orElse(-1);
+        var col = node.getRange().map(it -> it.begin.column).orElse(-1);
+        var pos = " at " + path + ":" + line + ":" + col;
+        return new IllegalStateException(String.format(message + pos, args));
+    }
+
 
     /*
      * protected class FinalOuterVarsCollector extends SourceVisitorExtended {

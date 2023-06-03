@@ -86,6 +86,7 @@ public class JP2KeYTypeConverter {
         this.typeConverter = services.getTypeConverter();
         this.namespaces = services.getNamespaces();
         this.objectSort = namespaces.sorts().lookup(new Name("java.lang.Object"));
+        /*
         this.objectType = getKeYJavaType("java.lang.Object");
         this.cloneableType = getKeYJavaType("java.lang.Cloneable");
         this.serializableType = getKeYJavaType("java.io.Serializable");
@@ -94,6 +95,7 @@ public class JP2KeYTypeConverter {
             throw new RuntimeException(
                 "Missing core classes: java.lang.Object, java.lang.Cloneable, java.io.Serializable must always be present");
         }
+         */
     }
 
     public TypeConverter getTypeConverter() {
