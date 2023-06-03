@@ -130,7 +130,12 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
                 if (exec.command.startsWith("'echo ")) {
                     continue;
                 }
-                message.append("Executing: ").append(exec.command);
+                if (exec.location.getFileURL().isPresent()) {
+                    message.append(exec.location.getFileURL().get()).append(":");
+                }
+                message.append(exec.location.getPosition().line())
+                        .append(": Executing on goal ").append(exec.nodeSerial).append('\n')
+                        .append(exec.command);
             }
             try {
                 doc.insertString(doc.getLength(), message.toString(), null);

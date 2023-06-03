@@ -143,12 +143,11 @@ public class ProofScriptEngine {
                     throw new ScriptException("Unknown command " + name);
                 }
 
-                if (!name.startsWith(SYSTEM_COMMAND_PREFIX) && stateMap.isEchoOn()) {
-                    LOGGER.debug("{}: {}", ++cnt, cmd);
-                }
-
                 Object o = command.evaluateArguments(stateMap, argMap);
-                final Node firstNode = stateMap.getFirstOpenAutomaticGoal().node();
+                if (!name.startsWith(SYSTEM_COMMAND_PREFIX) && stateMap.isEchoOn()) {
+                    LOGGER.debug("[{}] goal: {}, source line: {}, command: {}", ++cnt,
+                        firstNode.serialNr(), mlp.getLine(), cmd);
+                }
                 command.execute(uiControl, o, stateMap);
                 firstNode.getNodeInfo().setScriptRuleApplication(true);
             } catch (InterruptedException ie) {
