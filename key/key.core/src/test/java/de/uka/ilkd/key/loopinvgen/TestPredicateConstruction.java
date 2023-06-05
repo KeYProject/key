@@ -1249,9 +1249,9 @@ public LoopInvariantGenerationResult correlation_init_array() {//Change length o
 //		result = tpc.basicMltpArrDiffIndex();
 //		System.out.println(result);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		result = tpc.correlation_init_array();
-//		result = tpc.correlation_print_array();
-//		result = tpc.gem_ver_scope_1();
+//		result = tpc.correlation_init_array();// 40min
+//		result = tpc.correlation_print_array();// 26min
+		result = tpc.gem_ver_scope_1();
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation took " + (end - start) + " ms");
 	}

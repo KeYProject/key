@@ -499,6 +499,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
 			Term lowToInner, innerToHigh;
 			Term lowToOuter, outerToHigh;
+			Term lowToOuterPlusOne, outerPlusOneToHigh;
 
 			if(!sProof.proofEquality(inLow, inHigh)) {
 				if (sProof.proofLEQ(inLow, index)) {
@@ -531,25 +532,44 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 			if(!sProof.proofEquality(outLow, outHigh)) {
 				if (sProof.proofLEQ(outLow, indexOuter)) {
 					lowToOuter = tb.matrixRange(heap, arr, outLow, indexOuter, inLow, inHigh);
+					lowToOuterPlusOne = tb.matrixRange(heap, arr, outLow, outerIndexPlusOne, inLow, inHigh);
 
-					if (sProof.proofLEQ(outerIndexPlusOne, outHigh)) {
-						outerToHigh = tb.matrixRange(heap, arr, outerIndexPlusOne, outHigh, inLow, inHigh);
+					if (sProof.proofLEQ(indexOuter, outHigh)) {
+						outerToHigh = tb.matrixRange(heap, arr, indexOuter, outHigh, inLow, inHigh);
 					} else {
 						outerToHigh = tb.empty();
 					}
+
+					if (sProof.proofLEQ(outerIndexPlusOne, outHigh)) {
+						outerPlusOneToHigh = tb.matrixRange(heap, arr, outerIndexPlusOne, outHigh, inLow, inHigh);
+					} else {
+						outerPlusOneToHigh = tb.empty();
+					}
 				} else {
 					lowToOuter = tb.empty();
-					if (sProof.proofLEQ(outerIndexPlusOne, outHigh)) {
-						outerToHigh = tb.matrixRange(heap, arr, outerIndexPlusOne, outHigh, inLow, inHigh);
+					lowToOuterPlusOne=tb.empty();
+					if (sProof.proofLEQ(indexOuter, outHigh)) {
+						outerToHigh = tb.matrixRange(heap, arr, indexOuter, outHigh, inLow, inHigh);
 					} else {
 						outerToHigh = tb.empty();
+					}
+					if (sProof.proofLEQ(outerIndexPlusOne, outHigh)) {
+						outerPlusOneToHigh = tb.matrixRange(heap, arr, outerIndexPlusOne, outHigh, inLow, inHigh);
+					} else {
+						outerPlusOneToHigh = tb.empty();
 					}
 				}
 
 				if (depLDT.isDependencePredicate(pred.op())) {
 					final Function dependencyOp = (Function) pred.op();
+					if (lowToOuterPlusOne != null && lowToOuterPlusOne != tb.empty()) {
+						result.add(tb.func(dependencyOp, lowToOuterPlusOne));
+					}
 					if (lowToOuter != null && lowToOuter != tb.empty()) {
 						result.add(tb.func(dependencyOp, lowToOuter));
+					}
+					if (outerPlusOneToHigh != null && outerPlusOneToHigh != tb.empty()) {
+						result.add(tb.func(dependencyOp, outerPlusOneToHigh));
 					}
 					if (outerToHigh != null && outerToHigh != tb.empty()) {
 						result.add(tb.func(dependencyOp, outerToHigh));
