@@ -122,17 +122,18 @@ public class JMLParserExceptionTest {
 
                 String msg = props.getProperty("msgContains");
                 if (msg != null) {
-                    assertTrue(e.getMessage().contains(msg));
+                    assertTrue(e.getMessage().contains(msg), "Message must contain " + msg);
                 }
 
                 msg = props.getProperty("msgMatches");
                 if (msg != null) {
-                    assertTrue(e.getMessage().matches(msg));
+                    assertTrue(e.getMessage().matches(msg),
+                        "Message must match regular exp " + msg);
                 }
 
                 msg = props.getProperty("msgIs");
                 if (msg != null) {
-                    assertEquals(msg, e.getMessage());
+                    assertEquals(msg, e.getMessage(), "Message must be " + msg);
                 }
 
                 String loc = props.getProperty("position");
@@ -145,7 +146,7 @@ public class JMLParserExceptionTest {
                 }
             } catch (AssertionFailedError assertionFailedError) {
                 // in case of a failed assertion log the stacktrace
-                LOGGER.debug("Original stacktrace leading to failed junit assertion in {}",
+                LOGGER.info("Original stacktrace leading to failed junit assertion in {}",
                     file.getFileName(), e);
                 throw assertionFailedError;
             }
