@@ -294,9 +294,6 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
         final ProgramElement pe = source.getSource();
         matchCond = super.match(source, matchCond);
         if (matchCond != null && getDimensions() != ((VariableSpecification) pe).getDimensions()) {
-            LOGGER.debug(
-                "Program match. Variables have different dimension " + "(template {}, source {})",
-                this, pe);
             return null;
         }
         return matchCond;

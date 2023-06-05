@@ -62,6 +62,9 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Martin Hentschel
  */
 public abstract class AbstractSymbolicExecutionTestCase {
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(AbstractSymbolicExecutionTestCase.class);
+
     /**
      * <p>
      * If this constant is {@code true} a temporary directory is created with new oracle files. The
@@ -76,7 +79,13 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * they are outdated.
      * </p>
      */
-    public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = false;
+    public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY =
+        Boolean.getBoolean("UPDATE_TEST_ORACLE");
+
+
+    static {
+        LOGGER.warn("UPDATE_TEST_ORACLE is set to {}", CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY);
+    }
 
     /**
      * If the fast mode is enabled the step wise creation of models is disabled.
@@ -109,8 +118,6 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * The directory which contains the KeY repository.
      */
     public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
-    private static final Logger LOGGER =
-        LoggerFactory.getLogger(AbstractSymbolicExecutionTestCase.class);
 
     static {
         assertNotNull(testCaseDirectory, "Could not find test case directory");
@@ -131,6 +138,11 @@ public abstract class AbstractSymbolicExecutionTestCase {
         try {
             if (CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
                 directory = File.createTempFile("SYMBOLIC_EXECUTION", "ORACLE_DIRECTORY");
+                if (System.getProperty("ORACLE_DIRECTORY") != null
+                        && !System.getProperty("ORACLE_DIRECTORY").isBlank()) {
+                    directory = new File(System.getProperty("ORACLE_DIRECTORY"));
+                }
+                LOGGER.warn("Create oracle files in {}", directory);
                 directory.delete();
                 directory.mkdirs();
             }
@@ -1103,7 +1115,6 @@ public abstract class AbstractSymbolicExecutionTestCase {
         assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, oracleIndex, oracleFileExtension,
             baseDir);
     }
-
 
 
     /**

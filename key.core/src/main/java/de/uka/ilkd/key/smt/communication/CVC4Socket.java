@@ -32,17 +32,18 @@ public class CVC4Socket extends AbstractSolverSocket {
         // Currently we rely on the solver to terminate after receiving "(exit)". If this does
         // not work in future, it may be that we have to forcibly close the pipe.
         if (sc.getState() == WAIT_FOR_RESULT) {
-            if (msg.contains("\n" + "unsat")) {
+            msg = msg.trim();
+            if (msg.equals("unsat")) {
                 sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
                 sc.setState(FINISH);
                 pipe.sendMessage("(exit)");
                 // pipe.close();
-            } else if (msg.contains("\n" + "sat")) {
+            } else if (msg.equals("sat")) {
                 sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
                 sc.setState(FINISH);
                 pipe.sendMessage("(exit)");
                 // pipe.close();
-            } else if (msg.contains("\n" + "unknown")) {
+            } else if (msg.equals("unknown")) {
                 sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
                 sc.setState(FINISH);
                 pipe.sendMessage("(exit)");

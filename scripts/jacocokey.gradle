@@ -1,7 +1,7 @@
 apply plugin: 'jacoco'
 
 jacoco {
-    toolVersion = '0.8.6'
+    toolVersion = '0.8.8'
 }
 
 subprojects {
@@ -9,11 +9,16 @@ subprojects {
 
     jacocoTestReport {
         reports {
-            html.enabled false
-            xml.enabled true
-            csv.enabled false
+            html.required = false
+            xml.required = true
+            csv.required = false
         }
     }
+
+    test {
+        finalizedBy jacocoTestReport
+    }
+
 
     testFast {
         finalizedBy jacocoTestReport
