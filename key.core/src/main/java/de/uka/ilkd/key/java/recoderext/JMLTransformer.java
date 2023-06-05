@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java.recoderext;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.util.*;
 import javax.annotation.Nonnull;
 
@@ -471,7 +470,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
         }
     }
 
-    private void transformClasslevelComments(TypeDeclaration td, URL fileName)
+    private void transformClasslevelComments(TypeDeclaration td, URI fileName)
             throws SLTranslationException {
         // iterate over all pre-existing children
         ProgramElement[] children = getChildren(td);
@@ -532,7 +531,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
         }
     }
 
-    private void transformMethodlevelCommentsHelper(ProgramElement pe, URL fileName)
+    private void transformMethodlevelCommentsHelper(ProgramElement pe, URI fileName)
             throws SLTranslationException {
         // recurse to all pre-existing children
         ProgramElement[] children = getChildren(pe);
@@ -576,7 +575,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
         }
     }
 
-    private void transformMethodlevelComments(MethodDeclaration md, URL fileName)
+    private void transformMethodlevelComments(MethodDeclaration md, URI fileName)
             throws SLTranslationException {
         StatementBlock body = md.getBody();
         if (body != null) {
@@ -680,14 +679,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
                      * a MalformedURLException later if a parsing error occurs, but at least show
                      * the error message of the parser.
                      */
-                    URL resource =
-                        dl == null ? null : MiscTools.extractURI(dl).map(u -> {
-                            try {
-                                return u.toURL();
-                            } catch (MalformedURLException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }).orElse(null);
+                    URI resource = dl == null ? null : MiscTools.extractURI(dl).orElse(null);
 
                     transformClasslevelComments(td, resource);
 

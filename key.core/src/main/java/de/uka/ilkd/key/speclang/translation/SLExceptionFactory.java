@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.speclang.translation;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -28,7 +27,7 @@ import static java.text.MessageFormat.format;
 public class SLExceptionFactory {
     public static final Logger LOGGER = LoggerFactory.getLogger(SLExceptionFactory.class);
 
-    private URL fileName;
+    private URI fileName;
     private final int offsetLine, offsetColumn;
     /**
      * line, 1-based
@@ -45,7 +44,7 @@ public class SLExceptionFactory {
     // constructors
     // -------------------------------------------------------------------------
 
-    public SLExceptionFactory(@Nonnull Parser parser, URL fileName, Position offsetPos) {
+    public SLExceptionFactory(@Nonnull Parser parser, URI fileName, Position offsetPos) {
         this.line = parser.getInputStream().LT(1).getLine();
         this.column = parser.getInputStream().LT(1).getCharPositionInLine();
         this.fileName = fileName;
@@ -53,7 +52,7 @@ public class SLExceptionFactory {
         this.offsetLine = offsetPos.line();
     }
 
-    public SLExceptionFactory(URL fileName, int line, int column) {
+    public SLExceptionFactory(URI fileName, int line, int column) {
         this.fileName = fileName;
         this.offsetColumn = column;
         this.offsetLine = line;
@@ -62,12 +61,7 @@ public class SLExceptionFactory {
     }
 
     public SLExceptionFactory updatePosition(Token start) {
-        try {
-            var file = MiscTools.getFileNameFromTokenSource(start.getTokenSource());
-            fileName = file == null ? null : new URL(file);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+        fileName = MiscTools.getURIFromTokenSource(start.getTokenSource());
         line = start.getLine();
         column = start.getCharPositionInLine();
         return this;

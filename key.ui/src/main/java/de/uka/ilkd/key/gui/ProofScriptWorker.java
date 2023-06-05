@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.Dialog.ModalityType;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.concurrent.*;
@@ -43,7 +43,7 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
     private final Consumer<ProofScriptEngine.Message> observer = this::publish;
 
     public ProofScriptWorker(KeYMediator mediator, File file) throws IOException {
-        this.initialLocation = new Location(file.toURI().toURL(), Position.newOneBased(1, 1));
+        this.initialLocation = new Location(file.toURI(), Position.newOneBased(1, 1));
         this.script = Files.readString(file.toPath());
         this.mediator = mediator;
         this.initiallySelectedGoal = null;
@@ -89,10 +89,10 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
     }
 
     private void makeDialog() {
-        URL url = initialLocation.getFileURL().orElse(null);
+        URI uri = initialLocation.getFileURI().orElse(null);
 
         if (monitor != null) {
-            logArea.setText("Running script from URL '" + url + "':\n");
+            logArea.setText("Running script from URL '" + uri + "':\n");
             return;
         }
 
@@ -102,7 +102,7 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
         logArea = new JTextArea();
         logArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         logArea.setEditable(false);
-        logArea.setText("Running script from URL '" + url + "':\n");
+        logArea.setText("Running script from URL '" + uri + "':\n");
         cp.add(new JScrollPane(logArea), BorderLayout.CENTER);
 
         JButton cancelButton = new JButton("Cancel");
@@ -130,8 +130,8 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
                 if (exec.command.startsWith("'echo ")) {
                     continue;
                 }
-                if (exec.location.getFileURL().isPresent()) {
-                    message.append(exec.location.getFileURL().get()).append(":");
+                if (exec.location.getFileURI().isPresent()) {
+                    message.append(exec.location.getFileURI().get()).append(":");
                 }
                 message.append(exec.location.getPosition().line())
                         .append(": Executing on goal ").append(exec.nodeSerial).append('\n')

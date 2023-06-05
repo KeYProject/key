@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 public abstract class TextualJMLConstruct {
 
     protected final ImmutableList<JMLModifier> mods;
-    private Location location = new Location((URL) null, Position.UNDEFINED);
+    private Location location = new Location(null, Position.UNDEFINED);
     private boolean loopContract;
 
     /**

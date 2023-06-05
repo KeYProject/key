@@ -185,9 +185,9 @@ public class TestMiscTools {
 
             URI tmpZipURI = zipP.toUri();
             assertEquals("jar:" + tmpZipURI + "!/" + "entry.txt",
-                MiscTools.extractURI(entry0).toString());
+                MiscTools.extractURI(entry0).orElseThrow().toString());
             assertEquals("jar:" + tmpZipURI + "!/" + "entry%20with%20whitespace.txt",
-                MiscTools.extractURI(entry1).toString());
+                MiscTools.extractURI(entry1).orElseThrow().toString());
             URI read = MiscTools.extractURI(entry2).orElseThrow();
 
             // we can not simply use read.toURL().openStream(), because that uses caches and thus

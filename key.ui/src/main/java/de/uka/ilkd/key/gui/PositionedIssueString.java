@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import java.net.URL;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 
@@ -40,7 +39,7 @@ public class PositionedIssueString extends PositionedString
     }
 
     public PositionedIssueString(@Nonnull String text) {
-        this(text, new Location((URL) null, Position.UNDEFINED), "", Kind.ERROR);
+        this(text, new Location(null, Position.UNDEFINED), "", Kind.ERROR);
     }
 
     public PositionedIssueString(@Nonnull PositionedString o, @Nonnull String additionalInfo) {

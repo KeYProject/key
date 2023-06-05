@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.util.parsing;
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Position;
@@ -58,12 +58,8 @@ public class BuildingException extends RuntimeException implements HasLocation {
     @Override
     public Location getLocation() throws MalformedURLException {
         if (offendingSymbol != null) {
-            var source = MiscTools.getFileNameFromTokenSource(offendingSymbol.getTokenSource());
-            URL url = null;
-            if (source != null) {
-                url = MiscTools.parseURL(source);
-            }
-            return new Location(url, Position.fromToken(offendingSymbol));
+            URI uri = MiscTools.getURIFromTokenSource(offendingSymbol.getTokenSource());
+            return new Location(uri, Position.fromToken(offendingSymbol));
         }
         return null;
     }

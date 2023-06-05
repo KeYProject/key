@@ -93,10 +93,10 @@ public class ParserMessageTest {
 
         assertNotNull(location, "Cannot recover error location from Exception: " + exception);
 
-        assertNotNull(location.getFileURL().orElse(null),
+        assertNotNull(location.getFileURI().orElse(null),
             "Couldn't recreate file URL from received exception.");
 
-        assertEquals(javaFile.getAbsoluteFile(), Paths.get(location.getFileURL().get().toURI()),
+        assertEquals(javaFile.getAbsoluteFile(), Paths.get(location.getFileURI().get()),
             "Filename retrieved from parser message "
                 + "doesn't match filename of originally parsed file.");
     }

@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -407,9 +408,9 @@ public class KeYFile implements EnvInput {
         return issues.stream().map(w -> {
             try {
                 return new PositionedString(w.getMessage(),
-                    new Location(file != null ? new URL(file.getExternalForm()) : null,
+                    new Location(file != null ? new URL(file.getExternalForm()).toURI() : null,
                         w.getPosition()));
-            } catch (MalformedURLException e) {
+            } catch (MalformedURLException | URISyntaxException e) {
                 throw new RuntimeException(e);
             }
         })

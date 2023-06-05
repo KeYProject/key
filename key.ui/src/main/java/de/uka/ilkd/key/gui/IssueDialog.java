@@ -3,10 +3,10 @@ package de.uka.ilkd.key.gui;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.*;
 import java.util.List;
@@ -89,7 +89,7 @@ public final class IssueDialog extends JDialog {
     /** the warnings that are shown in this dialog */
     private final List<PositionedIssueString> warnings;
 
-    private final Map<URL, String> fileContentsCache = new HashMap<>();
+    private final Map<URI, String> fileContentsCache = new HashMap<>();
 
     private final JTextField fTextField = new JTextField();
     private final JTextField lTextField = new JTextField();
@@ -603,7 +603,7 @@ public final class IssueDialog extends JDialog {
                             exception.getCause().toString());
             }
 
-            URL resourceLocation = null;
+            URI resourceLocation = null;
             Position pos = Position.UNDEFINED;
             Optional<Location> location = ExceptionTools.getLocation(exception);
             if (location.isPresent()) {
@@ -611,8 +611,8 @@ public final class IssueDialog extends JDialog {
                 if (!loc.getPosition().isNegative()) {
                     pos = loc.getPosition();
                 }
-                if (loc.getFileURL().isPresent()) {
-                    resourceLocation = loc.getFileURL().get();
+                if (loc.getFileURI().isPresent()) {
+                    resourceLocation = loc.getFileURI().get();
                 }
             }
             return new PositionedIssueString(message == null ? exception.toString() : message,
@@ -640,32 +640,33 @@ public final class IssueDialog extends JDialog {
 
         btnEditFile.setEnabled(pos != Position.UNDEFINED);
 
-        if (location.getFileURL().isEmpty()) {
-            fTextField.setText("");
+        if (location.getFileURI().isEmpty()) {
+            fTextField.setVisible(false);
             txtSource.setText("[SOURCE COULD NOT BE LOADED]");
         } else {
-            URL url = location.getFileURL().get();
-            fTextField.setText("URL: " + url);
+            URI uri = location.getFileURI().get();
+            fTextField.setText("URL: " + uri);
+            fTextField.setVisible(true);
 
             try {
                 String source = StringUtil.replaceNewlines(
-                    fileContentsCache.computeIfAbsent(url, fn -> {
-                        try (InputStream stream = url.openStream()) {
-                            return IOUtil.readFrom(stream);
+                    fileContentsCache.computeIfAbsent(uri, fn -> {
+                        try {
+                            return IOUtil.readFrom(uri).orElseThrow();
                         } catch (IOException e) {
                             LOGGER.debug("Unknown IOException!", e);
                             return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
                         }
                     }), "\n");
 
-                if (isJava(url.getFile())) {
+                if (isJava(uri.getPath())) {
                     showJavaSourceCode(source);
                 } else {
                     txtSource.setText(source);
                 }
                 DefaultHighlighter dh = new DefaultHighlighter();
                 txtSource.setHighlighter(dh);
-                addHighlights(dh, url);
+                addHighlights(dh, uri);
 
                 // ensure that the currently selected problem is shown in view
                 int offset = pos.isNegative() ? 0 : getOffsetFromLineColumn(source, pos);
@@ -691,8 +692,8 @@ public final class IssueDialog extends JDialog {
         }
     }
 
-    private void addHighlights(DefaultHighlighter dh, URL url) {
-        warnings.stream().filter(ps -> ps.getLocation().getFileURL().equals(Optional.of(url)))
+    private void addHighlights(DefaultHighlighter dh, URI url) {
+        warnings.stream().filter(ps -> ps.getLocation().getFileURI().equals(Optional.of(url)))
                 .forEach(ps -> addHighlights(dh, ps));
     }
 

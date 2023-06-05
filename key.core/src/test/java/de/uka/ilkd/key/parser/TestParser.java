@@ -94,7 +94,7 @@ public class TestParser {
         var error = (PosConvertException) problemLoaderException.getCause();
         assertEquals(4, error.getPosition().line());
         assertEquals(9, error.getPosition().column());
-        assertEquals(file.toURI().toURL(), error.getLocation().getFileURL().orElseThrow());
+        assertEquals(file.toURI(), error.getLocation().getFileURI().orElseThrow());
 
     }
 }

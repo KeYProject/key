@@ -7,8 +7,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -136,7 +135,7 @@ public class EditSourceFileAction extends KeyAction {
                 textAreaGoto(this, location.getPosition());
             }
         };
-        Optional<URL> file = location.getFileURL();
+        Optional<URI> file = location.getFileURI();
         String source = IOUtil.readFrom(file.orElse(null)).orElse("");
         // workaround for #1641: replace all carriage returns, since JavaDocument can currently
         // not handle them
@@ -205,19 +204,15 @@ public class EditSourceFileAction extends KeyAction {
         return textPane;
     }
 
-    private static @Nullable File tryGetFile(@Nullable URL sourceURL) {
+    private static @Nullable File tryGetFile(@Nullable URI sourceURL) {
         File sourceFile = null;
-        if (sourceURL != null && sourceURL.getProtocol().equals("file")) {
-            try {
-                sourceFile = Paths.get(sourceURL.toURI()).toFile();
-            } catch (URISyntaxException e) {
-                LOGGER.debug("Exception", e);
-            }
+        if (sourceURL != null && sourceURL.getScheme().equals("file")) {
+            sourceFile = Paths.get(sourceURL).toFile();
         }
         return sourceFile;
     }
 
-    private JPanel createButtonPanel(final URL sourceURL, final JTextPane textPane,
+    private JPanel createButtonPanel(final URI sourceURI, final JTextPane textPane,
             final JDialog dialog) {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
@@ -227,7 +222,7 @@ public class EditSourceFileAction extends KeyAction {
         ActionListener closeAction = event -> dialog.dispose();
         cancelButton.addActionListener(closeAction);
 
-        final File sourceFile = tryGetFile(sourceURL);
+        final File sourceFile = tryGetFile(sourceURI);
         if (sourceFile == null) {
             // make content read-only and show tooltips
             saveButton.setEnabled(false);
@@ -278,19 +273,19 @@ public class EditSourceFileAction extends KeyAction {
 
         try {
             final Location location = ExceptionTools.getLocation(exception)
-                    .filter(l -> l.getFileURL().isPresent())
+                    .filter(l -> l.getFileURI().isPresent())
                     .orElseThrow(
                         () -> new IOException("Cannot recover file location from exception."));
-            final URL url = location.getFileURL().orElseThrow();
+            final URI uri = location.getFileURI().orElseThrow();
 
             // indicate edit/readonly in dialog title
             String prefix;
-            if (tryGetFile(url) != null) {
+            if (tryGetFile(uri) != null) {
                 prefix = "Edit ";
             } else {
                 prefix = "[Readonly] ";
             }
-            final JDialog dialog = new JDialog(parent, prefix + url,
+            final JDialog dialog = new JDialog(parent, prefix + uri,
                 Dialog.ModalityType.DOCUMENT_MODAL);
             dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -308,7 +303,7 @@ public class EditSourceFileAction extends KeyAction {
             sourceScrollPane.setViewportView(nowrap);
             sourceScrollPane.getVerticalScrollBar().setUnitIncrement(30);
             sourceScrollPane.getHorizontalScrollBar().setUnitIncrement(30);
-            sourceScrollPane.setBorder(new TitledBorder(url.toString()));
+            sourceScrollPane.setBorder(new TitledBorder(uri.toString()));
 
             TextLineNumber lineNumbers = new TextLineNumber(txtSource, 2);
             sourceScrollPane.setRowHeaderView(lineNumbers);
@@ -318,7 +313,7 @@ public class EditSourceFileAction extends KeyAction {
             sourceScrollPane.setHorizontalScrollBarPolicy(
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-            JPanel buttonPanel = createButtonPanel(url, txtSource, dialog);
+            JPanel buttonPanel = createButtonPanel(uri, txtSource, dialog);
 
             Container container = dialog.getContentPane();
             JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);

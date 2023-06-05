@@ -421,9 +421,7 @@ public final class SourceView extends JComponent {
      * @throws IOException if the file cannot be opened.
      */
     public void openFile(URI fileURI) throws IOException {
-        Set<URI> set = new HashSet<>();
-        set.add(fileURI);
-        openFiles(set);
+        openFiles(Collections.singleton(fileURI));
     }
 
     /**
@@ -433,7 +431,7 @@ public final class SourceView extends JComponent {
      *
      * @throws IOException if one of the files cannot be opened.
      */
-    public void openFiles(Set<URI> fileURIs) throws IOException {
+    public void openFiles(Iterable<URI> fileURIs) throws IOException {
         boolean updateNecessary = false;
 
         for (URI fileURI : fileURIs) {

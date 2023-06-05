@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.speclang.jml;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.util.*;
 
 import de.uka.ilkd.key.java.*;
@@ -211,12 +210,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
         // get type declaration, file name
         TypeDeclaration td = (TypeDeclaration) kjt.getJavaType();
-        URL fileName = null;
-        try {
-            fileName = td.getPositionInfo().getURL().orElse(null);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+        URI fileName = td.getPositionInfo().getURI().orElse(null);
 
         // add invariants for non_null fields
         for (MemberDeclaration member : td.getMembers()) {
@@ -347,12 +341,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
         // get type declaration, file name
         TypeDeclaration td = (TypeDeclaration) pm.getContainerType().getJavaType();
-        URL fileName = null;
-        try {
-            fileName = td.getPositionInfo().getURL().orElse(null);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+        URI fileName = td.getPositionInfo().getURI().orElse(null);
 
         // determine purity
         final boolean isStrictlyPure = JMLInfoExtractor.isStrictlyPure(pm);
@@ -639,17 +628,13 @@ public final class JMLSpecExtractor implements SpecExtractor {
         return result;
     }
 
-    private URL getFileName(final IProgramMethod method) {
+    private URI getFileName(final IProgramMethod method) {
         final TypeDeclaration type = (TypeDeclaration) method.getContainerType().getJavaType();
-        try {
-            return type.getPositionInfo().getURL().orElse(null);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+        return type.getPositionInfo().getURI().orElse(null);
     }
 
     private TextualJMLConstruct[] parseMethodLevelComments(final Comment[] comments,
-            final URL fileName) {
+            final URI fileName) {
         if (comments.length == 0) {
             return new TextualJMLConstruct[0];
         }
@@ -673,12 +658,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
         // get type declaration, file name
         TypeDeclaration td = (TypeDeclaration) pm.getContainerType().getJavaType();
-        URL fileName = null;
-        try {
-            fileName = td.getPositionInfo().getURL().orElse(null);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+        URI fileName = td.getPositionInfo().getURI().orElse(null);
 
         // get comments
         Comment[] comments = loop.getComments();
@@ -708,15 +688,11 @@ public final class JMLSpecExtractor implements SpecExtractor {
             // Check that a decreases clause exists
             if (result.getInternalVariant() == null) {
                 PositionInfo info = loop.getPositionInfo();
-                try {
-                    warnings = warnings.append(
-                        new PositionedString(
-                            "Missing \"decreases\" for loop invariant. " +
-                                "Termination of this loop will not be provable.",
-                            new Location(info.getURL().orElse(null), info.getStartPosition())));
-                } catch (MalformedURLException e) {
-                    throw new RuntimeException(e);
-                }
+                warnings = warnings.append(
+                    new PositionedString(
+                        "Missing \"decreases\" for loop invariant. " +
+                            "Termination of this loop will not be provable.",
+                        new Location(info.getURI().orElse(null), info.getStartPosition())));
             }
         }
         return result;

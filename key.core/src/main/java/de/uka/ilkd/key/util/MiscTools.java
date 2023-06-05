@@ -75,7 +75,6 @@ public final class MiscTools {
      * otherwise results in undefined behavior in that case.
      *
      * @param loopTerm The term for which to return the {@link LoopSpecification}.
-     * @param localSpecRepo TODO
      * @return The {@link LoopSpecification} for the loop statement in the given term or an empty
      *         optional if there is no specified invariant for the loop.
      */
@@ -724,25 +723,6 @@ public final class MiscTools {
     }
 
     /**
-     * Returns the path to the source file defined by the given {@link PositionInfo}.
-     *
-     * @param posInfo The {@link PositionInfo} to extract source file from.
-     * @return The source file name or {@code null} if not available.
-     */
-    public static String getSourcePath(PositionInfo posInfo) {
-        String result = null;
-        if (posInfo.getFileName() != null) {
-            result = posInfo.getFileName(); // posInfo.getFileName() is a path to a file
-        } else if (posInfo.getParentClass() != null) {
-            result = posInfo.getParentClass(); // posInfo.getParentClass() is a path to a file
-        }
-        if (result != null && result.startsWith("FILE:")) {
-            result = result.substring("FILE:".length());
-        }
-        return result;
-    }
-
-    /**
      * Tries to extract a valid URI from the given DataLocation.
      *
      * @param loc the given DataLocation
@@ -829,9 +809,21 @@ public final class MiscTools {
     }
 
     @Nullable
-    public static String getFileNameFromTokenSource(TokenSource source) {
-        var file = source.getSourceName();
-        return IntStream.UNKNOWN_SOURCE_NAME.equals(file) ? null : file;
+    public static URI getURIFromTokenSource(TokenSource source) {
+        return getURIFromTokenSource(source.getSourceName());
+    }
+
+    @Nullable
+    public static URI getURIFromTokenSource(String source) {
+        if (IntStream.UNKNOWN_SOURCE_NAME.equals(source)) {
+            return null;
+        }
+
+        try {
+            return new URI(source);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

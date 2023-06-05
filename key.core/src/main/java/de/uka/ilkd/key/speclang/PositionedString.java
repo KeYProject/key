@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.speclang;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 
@@ -32,20 +32,20 @@ public class PositionedString {
         this.location = location;
     }
 
-    public PositionedString(@Nonnull String text, URL fileName) {
-        this(text, new Location((URL) fileName, Position.UNDEFINED));
+    public PositionedString(@Nonnull String text, URI fileName) {
+        this(text, new Location(fileName, Position.UNDEFINED));
     }
 
 
     public PositionedString(String text) {
-        this(text, (URL) null);
+        this(text, (URI) null);
     }
 
     /**
      * Returns true, if the position information contains a file name.
      */
     public boolean hasFilename() {
-        return location.getFileURL().isPresent();
+        return location.getFileURI().isPresent();
     }
 
     public PositionedString prepend(String text) {
@@ -55,7 +55,7 @@ public class PositionedString {
 
     public String toString() {
         return text + " ("
-            + (location.getFileURL().isPresent() ? location.getFileURL().get() + ", " : "")
+            + (location.getFileURI().isPresent() ? location.getFileURI().get() + ", " : "")
             + location.getPosition() + ")";
     }
 

@@ -3,8 +3,7 @@ package de.uka.ilkd.key.macros.scripts;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -43,7 +42,7 @@ public class ProofScriptEngine {
     private Consumer<Message> commandMonitor;
 
     public ProofScriptEngine(File file) throws IOException {
-        this.initialLocation = new Location(file.toURI().toURL(), Position.newOneBased(1, 1));
+        this.initialLocation = new Location(file.toURI(), Position.newOneBased(1, 1));
         this.script = Files.readString(file.toPath());
         this.initiallySelectedGoal = null;
     }
@@ -89,13 +88,9 @@ public class ProofScriptEngine {
         }
 
         // add the filename (if available) to the statemap.
-        Optional<URL> url = initialLocation.getFileURL();
-        if (url.isPresent()) {
-            try {
-                stateMap.setBaseFileName(Paths.get(url.get().toURI()).toFile());
-            } catch (URISyntaxException e) {
-                throw new IOException(e);
-            }
+        Optional<URI> uri = initialLocation.getFileURI();
+        if (uri.isPresent()) {
+            stateMap.setBaseFileName(Paths.get(uri.get()).toFile());
         }
 
         // add the observer (if installed) to the state map

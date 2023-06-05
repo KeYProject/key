@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.speclang.njml;
 
-import java.net.URL;
+import java.net.URI;
 import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Position;
@@ -42,7 +42,7 @@ public final class JmlFacade {
      */
     public static @Nonnull JmlLexer createLexer(@Nonnull PositionedString ps) {
         CharStream result = CharStreams.fromString(ps.text,
-            ps.getLocation().getFileURL().map(URL::toString).orElse(null));
+            ps.getLocation().getFileURI().map(URI::toString).orElse(null));
         JmlLexer lexer = createLexer(result);
         Position pos = ps.getLocation().getPosition();
         if (!pos.isNegative()) {

@@ -2,7 +2,7 @@ package de.uka.ilkd.key.macros.scripts;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.net.URL;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -46,7 +46,7 @@ class ScriptLineParser {
     /**
      * the file URL from which the script is taken.
      */
-    private URL fileURL;
+    private URI fileURI;
 
     /**
      * While within a string literal, this stores the character with which the string has started.
@@ -74,7 +74,7 @@ class ScriptLineParser {
     public ScriptLineParser(Reader reader, @Nullable Location initialLocation) {
         this.reader = reader;
         if (initialLocation != null) {
-            this.fileURL = initialLocation.getFileURL().orElse(null);
+            this.fileURI = initialLocation.getFileURI().orElse(null);
             this.line = initialLocation.getPosition().line();
             this.col = initialLocation.getPosition().column();
         }
@@ -263,7 +263,7 @@ class ScriptLineParser {
     }
 
     private Location getLocation() {
-        return new Location(fileURL, Position.newOneBased(line, col));
+        return new Location(fileURI, Position.newOneBased(line, col));
     }
 
     public int getOffset() {
