@@ -620,6 +620,8 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             dotExport.setToolTipText(noProof);
             showGraphRendering.setEnabled(false);
             showGraphRendering.setToolTipText(noProof);
+            showGraphRenderingShort.setEnabled(false);
+            showGraphRenderingShort.setToolTipText(noProof);
             runAnalysis.setEnabled(false);
             runAnalysis.setToolTipText(noProof);
             showRuleStatistics.setEnabled(false);

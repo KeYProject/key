@@ -29,7 +29,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.lookup.Lookup;
 
-public class Node implements Iterable<Node> {
+public class Node implements Iterable<Node>, Comparable<Node> {
     private static final String RULE_WITHOUT_NAME = "rule without name";
 
     private static final String RULE_APPLICATION_WITHOUT_RULE = "rule application without rule";
@@ -844,5 +844,10 @@ public class Node implements Iterable<Node> {
             candidate = candidate.parent;
         }
         return candidate;
+    }
+
+    @Override
+    public int compareTo(Node node) {
+        return Integer.compare(this.serialNr, node.serialNr);
     }
 }

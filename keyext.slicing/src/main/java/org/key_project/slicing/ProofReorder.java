@@ -1,21 +1,23 @@
 package org.key_project.slicing;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.slicing.graph.DependencyGraph;
@@ -26,8 +28,10 @@ public final class ProofReorder {
 
     }
 
-    public static void reorderProof(Proof proof, DependencyGraph depGraph) {
+    public static void reorderProof(Proof proof, DependencyGraph depGraph) throws IOException, ProofInputException, ProblemLoaderException, IntermediateProofReplayer.BuiltInConstructionException {
         MainWindow.getInstance().getMediator().stopInterface(true);
+
+        SortedMap<BranchLocation, List<Node>> steps = new TreeMap<>();
 
         Set<BranchLocation> done = new HashSet<>();
 
@@ -53,6 +57,7 @@ public final class ProofReorder {
             Set<Node> newOrderSorted = new HashSet<>();
             while (!q.isEmpty()) {
                 var nextNode = q.pop();
+                List<Node> finalNewOrder = newOrder;
                 depGraph.outgoingEdgesOf(nextNode).forEach(node -> {
                     if (!node.getBranchLocation().equals(loc)) {
                         todo.add(new Pair<>(node.getBranchLocation(), node.getFirstInBranch()));
@@ -71,7 +76,7 @@ public final class ProofReorder {
                         q.addLast(nextNode);
                         return;
                     }
-                    newOrder.add(node);
+                    finalNewOrder.add(node);
                     newOrderSorted.add(node);
 
                     var outputs = depGraph.outputsOf(node).collect(Collectors.toList());
@@ -79,6 +84,14 @@ public final class ProofReorder {
                     outputs.forEach(q::addFirst);
                 });
             }
+            for (int i = 0; i < newOrder.size(); i++) {
+                if (newOrder.get(i).childrenCount() == 0) {
+                    newOrder = newOrder.subList(0, i + 1);
+                    break;
+                }
+            }
+            steps.put(loc, newOrder);
+            /*
             var firstNode = newOrder.stream().min(Comparator.comparing(Node::serialNr)).get();
             var lastNode = newOrder.stream().max(Comparator.comparing(Node::serialNr)).get();
             newOrder.remove(lastNode);
@@ -115,9 +128,36 @@ public final class ProofReorder {
                 last.removeChildren();
                 last.add(lastNode);
             }
+             */
         }
 
         System.out.println("done!");
-        MainWindow.getInstance().getMediator().startInterface(true);
+
+        ProblemLoaderControl control = new DefaultUserInterfaceControl();
+        Path tmpFile = Files.createTempFile("proof", ".proof");
+        proof.saveProofObligationToFile(tmpFile.toFile());
+
+        String bootClassPath = proof.getEnv().getJavaModel().getBootClassPath();
+        AbstractProblemLoader problemLoader = new SingleThreadProblemLoader(
+                tmpFile.toFile(),
+                proof.getEnv().getJavaModel().getClassPathEntries(),
+                bootClassPath != null ? new File(bootClassPath) : null,
+                null,
+                proof.getEnv().getInitConfigForEnvironment().getProfile(),
+                false,
+                control, false, null);
+        problemLoader.load();
+        //Files.delete(tmpFile);
+        Proof newProof = problemLoader.getProof();
+        new ReorderingReplayer(proof, newProof, steps).copy();
+        newProof.saveToFile(tmpFile.toFile());
+        KeYMediator mediator = MainWindow.getInstance().getMediator();
+        mediator.startInterface(true);
+
+        ProblemLoader problemLoader2 =
+                mediator.getUI().getProblemLoader(tmpFile.toFile(), null, null, null, mediator);
+        // user already knows about any warnings
+        problemLoader2.setIgnoreWarnings(true);
+        problemLoader2.runAsynchronously();
     }
 }
