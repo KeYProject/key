@@ -185,8 +185,12 @@ public class SlicingExtension implements KeYGuiExtension,
         b.setText("Reorder");
         b.addActionListener(e -> {
             KeYMediator m = MainWindow.getInstance().getMediator();
-            ProofReorder.reorderProof(m.getSelectedProof(),
-                trackers.get(m.getSelectedProof()).getDependencyGraph());
+            try {
+                ProofReorder.reorderProof(m.getSelectedProof(),
+                        trackers.get(m.getSelectedProof()).getDependencyGraph());
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
         });
         bar.add(b);
         return bar;

@@ -14,7 +14,7 @@ import org.key_project.util.collection.ImmutableSLList;
  *
  * @author Arne Keller
  */
-public class BranchLocation {
+public class BranchLocation implements Comparable<BranchLocation> {
     /**
      * Branch location of the initial proof branch.
      */
@@ -167,5 +167,16 @@ public class BranchLocation {
     @Override
     public int hashCode() {
         return Objects.hash(location);
+    }
+
+    @Override
+    public int compareTo(BranchLocation other) {
+        if (this == BranchLocation.ROOT) {
+            return -1;
+        } else if (other == BranchLocation.ROOT) {
+            return 1;
+        } else {
+            return location.compareTo(other.location);
+        }
     }
 }

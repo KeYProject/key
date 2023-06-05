@@ -64,7 +64,7 @@ public abstract class AbstractProofReplayer {
     /**
      * The new proof.
      */
-    private final Proof proof;
+    protected final Proof proof;
 
     /**
      * Instantiate a new replayer.
