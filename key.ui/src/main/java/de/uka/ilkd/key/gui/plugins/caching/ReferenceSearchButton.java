@@ -55,8 +55,7 @@ public class ReferenceSearchButton extends JButton
     public void actionPerformed(ActionEvent e) {
         Proof p = mediator.getSelectedProof();
         for (Goal goal : p.openEnabledGoals()) {
-            ClosedBy c = ReferenceSearcher.findPreviousProof(mediator.getCurrentlyOpenedProofs(),
-                goal.node());
+            ClosedBy c = ReferenceSearcher.findPreviousProof(mediator, goal.node());
             if (c != null) {
                 // p.closeGoal(goal);
                 goal.setEnabled(false);

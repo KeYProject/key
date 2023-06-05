@@ -15,6 +15,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.plugins.caching.CachingSettingsProvider;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -23,6 +24,7 @@ import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
+import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.util.collection.ImmutableList;
@@ -66,7 +68,7 @@ public class CloseReferenceExtension
         if (e.getSource().lookup(CopyingProofReplayer.class) != null) {
             return; // copy in progress!
         }
-        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getProofCachingSettings().getEnabled()) {
+        if (!CachingSettingsProvider.getCachingSettings().getEnabled()) {
             return;
         }
         Proof p = e.getSource();
@@ -78,8 +80,7 @@ public class CloseReferenceExtension
             return;
         }
         for (Goal goal : newGoals) {
-            ClosedBy c = ReferenceSearcher.findPreviousProof(mediator.getCurrentlyOpenedProofs(),
-                    goal.node());
+            ClosedBy c = ReferenceSearcher.findPreviousProof(mediator, goal.node());
             if (c != null) {
                 // p.closeGoal(goal);
                 goal.setEnabled(false);
@@ -151,7 +152,7 @@ public class CloseReferenceExtension
         public void proofDisposing(ProofDisposedEvent e) {
             if (!newProof.isDisposed()) {
                 mediator.stopInterface(true);
-                newProof.copyCachedGoals(referencedProof);
+                newProof.copyCachedGoals(referencedProof, null, null);
                 mediator.startInterface(true);
             }
         }
