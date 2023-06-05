@@ -50,7 +50,11 @@ public class SetCommand extends AbstractCommand {
                         : StrategyProperties.OSS_OFF);
             Strategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
-        }
+        } 
+
+        if (args.proofSteps != null) {
+            state.setMaxAutomaticSteps(args.proofSteps);
+        } 
 
         if (args.stackAction != null) {
             Stack<StrategyProperties> stack =
