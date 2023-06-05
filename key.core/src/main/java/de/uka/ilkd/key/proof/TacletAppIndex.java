@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -54,30 +55,25 @@ public class TacletAppIndex {
      */
     private RuleFilter ruleFilter;
 
-    /**
-     * The sequent with the formulas for which taclet indices are hold by this object. Invariant:
-     * <code>seq != null</code> implies that the indices <code>antecIndex</code>,
-     * <code>succIndex</code> are up to date for the sequent <code>seq</code>
-     */
-    private Sequent seq;
+    private State state;
 
     private final Map<CacheKey, TermTacletAppIndex> cache;
 
     public TacletAppIndex(TacletIndex tacletIndex, Goal goal, Services services) {
-        this(tacletIndex, null, null, goal, null, TacletFilter.TRUE,
+        this(tacletIndex, null, null, goal, new State(), TacletFilter.TRUE,
             new TermTacletAppIndexCacheSet(services.getCaches().getTermTacletAppIndexCache()),
             services.getCaches().getTermTacletAppIndexCache());
     }
 
     private TacletAppIndex(TacletIndex tacletIndex, SemisequentTacletAppIndex antecIndex,
-            SemisequentTacletAppIndex succIndex, @Nonnull Goal goal, Sequent seq,
+            SemisequentTacletAppIndex succIndex, @Nonnull Goal goal, State state,
             RuleFilter ruleFilter,
             TermTacletAppIndexCacheSet indexCaches, Map<CacheKey, TermTacletAppIndex> cache) {
         this.tacletIndex = tacletIndex;
         this.antecIndex = antecIndex;
         this.succIndex = succIndex;
         this.goal = goal;
-        this.seq = seq;
+        this.state = state;
         this.ruleFilter = ruleFilter;
         this.indexCaches = indexCaches;
         this.cache = cache;
@@ -98,13 +94,13 @@ public class TacletAppIndex {
      * returns a new TacletAppIndex with a given TacletIndex
      */
     TacletAppIndex copyWith(TacletIndex p_tacletIndex, Goal goal) {
-        return new TacletAppIndex(p_tacletIndex, antecIndex, succIndex, goal, getSequent(),
+        return new TacletAppIndex(p_tacletIndex, antecIndex, succIndex, goal, state.copy(),
             ruleFilter, indexCaches, cache);
     }
 
     /**
      * Delete all cached information about taclet apps. This also makes the index cache of this
-     * index independent from the caches of other indexes (expensive)
+     * index independent of the caches of other indexes (expensive)
      */
     public void clearAndDetachCache() {
         clearIndexes();
@@ -112,7 +108,7 @@ public class TacletAppIndex {
     }
 
     public void clearIndexes() {
-        seq = null; // This leads to a delayed rebuild
+        this.state.clear();
         antecIndex = null;
         succIndex = null;
     }
@@ -132,44 +128,75 @@ public class TacletAppIndex {
      * (NewRuleListener gets informed)
      */
     public void fillCache() {
-        ensureIndicesExist();
+        update(false);
     }
 
-    private void createAllFromGoal() {
+    private void createAllFromGoal(boolean silent) {
         var time = System.nanoTime();
-        try {
-            this.seq = getNode().sequent();
 
-            antecIndex =
-                new SemisequentTacletAppIndex(getSequent(), true, getServices(), tacletIndex(),
-                    newRuleListener, ruleFilter, indexCaches);
-            succIndex =
-                new SemisequentTacletAppIndex(getSequent(), false, getServices(), tacletIndex(),
-                    newRuleListener, ruleFilter, indexCaches);
-        } finally {
-            PERF_CREATE_ALL.getAndAdd(System.nanoTime() - time);
-        }
+        this.state.seq = goal.sequent();
+        var listener = silent ? NullNewRuleListener.INSTANCE : newRuleListener;
+
+        antecIndex =
+            new SemisequentTacletAppIndex(this.state.seq, true, getServices(), tacletIndex,
+                listener, ruleFilter, indexCaches);
+        succIndex =
+            new SemisequentTacletAppIndex(this.state.seq, false, getServices(), tacletIndex,
+                listener, ruleFilter, indexCaches);
+
+        // Full rebuild from the taclet index
+        this.state.sci = null;
+        this.state.newRules = null;
+
+        PERF_CREATE_ALL.getAndAdd(System.nanoTime() - time);
     }
 
-    private void ensureIndicesExist() {
-        if (isOutdated()) {
-            // Indices are not up-to-date
-            createAllFromGoal();
+    private void update(boolean silent) {
+        if (!isOutdated()) {
+            return;
         }
+        if (this.state.sci != null && this.state.sci.sequent() == goal.sequent()) {
+            deltaUpdateIndices(this.state.sci, silent);
+        } else {
+            createAllFromGoal(silent);
+        }
+        this.state.sci = null;
+    }
+
+    private void deltaUpdateIndices(SequentChangeInfo sci, boolean silent) {
+        var time = System.nanoTime();
+        this.state.seq = sci.sequent();
+
+        var listener = silent ? NullNewRuleListener.INSTANCE : newRuleListener;
+        // Sequent changes
+        antecIndex =
+            antecIndex.sequentChanged(sci, getServices(), tacletIndex, listener);
+        succIndex =
+            succIndex.sequentChanged(sci, getServices(), tacletIndex, listener);
+
+        if (this.state.newRules != null) {
+            // New rules
+            antecIndex =
+                antecIndex.addTaclets(this.state.newRules, getServices(), tacletIndex, listener);
+            succIndex =
+                succIndex.addTaclets(this.state.newRules, getServices(), tacletIndex, listener);
+            this.state.newRules = null;
+        }
+
+        PERF_UPDATE.getAndAdd(System.nanoTime() - time);
     }
 
     /**
-     * @return true iff this index is currently outdated with respect to the sequent of the
-     *         associated goal; this does not detect other modifications
-     *         like an altered user
-     *         constraint
+     * @return true iff this index is currently outdated; this does not detect other modifications
+     *         like an altered user constraint
      */
     private boolean isOutdated() {
-        return getGoal() == null || getSequent() != getNode().sequent();
+        assert state.seq == null || (state.seq != goal.sequent()) == (state.sci != null);
+        return state.seq != goal.sequent() || state.newRules != null;
     }
 
     private SemisequentTacletAppIndex getIndex(PosInOccurrence pos) {
-        ensureIndicesExist();
+        update(false);
         return pos.isInAntec() ? antecIndex : succIndex;
     }
 
@@ -233,7 +260,7 @@ public class TacletAppIndex {
      */
     public ImmutableList<NoPosTacletApp> getNoFindTaclet(TacletFilter filter, Services services) {
         RuleFilter effectiveFilter = new AndRuleFilter(filter, ruleFilter);
-        return tacletIndex().getNoFindTaclet(effectiveFilter, services);
+        return tacletIndex.getNoFindTaclet(effectiveFilter, services);
     }
 
     /**
@@ -295,31 +322,19 @@ public class TacletAppIndex {
      * @param sci SequentChangeInfo describing the change of the sequent
      */
     public void sequentChanged(SequentChangeInfo sci) {
-        if (sci.getOriginalSequent() != getSequent()) {
-            // we are not up-to-date and have to rebuild everything (lazy)
-            clearIndexes();
+        if (state.sci == null) {
+            if (state.seq != sci.getOriginalSequent()) {
+                // we are not up-to-date and have to rebuild everything
+                clearIndexes();
+            } else {
+                // Nothing stored, store change
+                state.sci = sci.copy();
+            }
         } else {
-            var time = System.nanoTime();
-            updateIndices(sci);
-            PERF_UPDATE.getAndAdd(System.nanoTime() - time);
+            assert state.sci.sequent() == sci.getOriginalSequent();
+            // Combine the changes
+            state.sci.combine(sci);
         }
-    }
-
-    private void updateIndices(SequentChangeInfo sci) {
-        seq = sci.sequent();
-
-        antecIndex =
-            antecIndex.sequentChanged(sci, getServices(), tacletIndex, newRuleListener);
-
-        succIndex =
-            succIndex.sequentChanged(sci, getServices(), tacletIndex, newRuleListener);
-    }
-
-    private void updateIndices(final SetRuleFilter newTaclets) {
-        antecIndex =
-            antecIndex.addTaclets(newTaclets, getServices(), tacletIndex, newRuleListener);
-        succIndex =
-            succIndex.addTaclets(newTaclets, getServices(), tacletIndex, newRuleListener);
     }
 
 
@@ -337,12 +352,6 @@ public class TacletAppIndex {
             createNewIndexCache();
         }
 
-        if (isOutdated()) {
-            // we are not up-to-date and have to rebuild everything (lazy)
-            clearIndexes();
-            return;
-        }
-
         if (tacletApp.taclet() instanceof NoFindTaclet) {
             if (ruleFilter.filter(tacletApp.taclet())) {
                 newRuleListener.ruleAdded(tacletApp, null);
@@ -350,10 +359,10 @@ public class TacletAppIndex {
             return;
         }
 
-        final SetRuleFilter newTaclets = new SetRuleFilter();
-        newTaclets.addRuleToSet(tacletApp.taclet());
-
-        updateIndices(newTaclets);
+        if (state.newRules == null) {
+            state.newRules = new SetRuleFilter();
+        }
+        state.newRules.addRuleToSet(tacletApp.taclet());
     }
 
     /**
@@ -373,31 +382,23 @@ public class TacletAppIndex {
             }
         }
 
-        if (isOutdated()) {
-            // we are not up-to-date and have to rebuild everything (lazy)
-            clearIndexes();
-            return;
+        if (state.newRules == null) {
+            state.newRules = new SetRuleFilter();
         }
-
-        final SetRuleFilter newTaclets = new SetRuleFilter();
         for (NoPosTacletApp tacletApp : tacletApps) {
             if (tacletApp.taclet() instanceof NoFindTaclet) {
                 if (ruleFilter.filter(tacletApp.taclet())) {
                     newRuleListener.ruleAdded(tacletApp, null);
                 }
             } else {
-                newTaclets.addRuleToSet(tacletApp.taclet());
+                state.newRules.addRuleToSet(tacletApp.taclet());
             }
         }
 
-        if (newTaclets.isEmpty()) {
-            return;
+        if (state.newRules.isEmpty()) {
+            state.newRules = null;
         }
-
-        updateIndices(newTaclets);
     }
-
-
 
     /**
      * updates the internal caches after a Taclet with instantiation information has been removed
@@ -430,31 +431,8 @@ public class TacletAppIndex {
         return l1;
     }
 
-    private Goal getGoal() {
-        return goal;
-    }
-
-    private Sequent getSequent() {
-        return seq;
-    }
-
     private Services getServices() {
-        return getProof().getServices();
-    }
-
-    private Proof getProof() {
-        return getNode().proof();
-    }
-
-    private Node getNode() {
-        return goal.node();
-    }
-
-    /**
-     * returns the Taclet index for this ruleAppIndex.
-     */
-    public TacletIndex tacletIndex() {
-        return tacletIndex;
+        return goal.node().proof().getServices();
     }
 
     /**
@@ -462,13 +440,60 @@ public class TacletAppIndex {
      * taclet app.
      */
     public void reportRuleApps(NewRuleListener l, Services services) {
-        if (antecIndex != null) {
+        if (antecIndex != null && succIndex != null) {
+            update(true);
             antecIndex.reportRuleApps(l);
-        }
-        if (succIndex != null) {
             succIndex.reportRuleApps(l);
         }
 
         l.rulesAdded(getNoFindTaclet(TacletFilter.TRUE, services), null);
+    }
+
+    private static final class State {
+        /**
+         * The sequent with the formulas for which taclet indices are hold by this object.
+         * Invariant:
+         * <code>seq != null</code> implies that the indices <code>antecIndex</code>,
+         * <code>succIndex</code> are up-to-date for the sequent <code>seq</code>
+         */
+        @Nullable
+        public Sequent seq;
+
+        /**
+         * Used for delta updates. If this is nonnull, originalSequent == seq and resultingSequent
+         * ==
+         * goal.sequent.
+         */
+        @Nullable
+        public SequentChangeInfo sci;
+        @Nullable
+        public SetRuleFilter newRules;
+
+        public State() {
+            this(null, null, null);
+        }
+
+        public State(@Nullable Sequent seq, @Nullable SequentChangeInfo sequentChangeInfo,
+                @Nullable SetRuleFilter newRules) {
+            this.seq = seq;
+            this.sci = sequentChangeInfo;
+            this.newRules = newRules;
+        }
+
+        public State copy() {
+            return new State(
+                seq,
+                sci == null ? null : sci.copy(),
+                newRules == null ? null : newRules.copy());
+        }
+
+        public void clear() {
+            // This leads to a delayed rebuild
+            this.seq = null;
+            // This is needed since delta updates must be disabled as well (e.g. new taclet was
+            // added)
+            this.sci = null;
+            this.newRules = null;
+        }
     }
 }
