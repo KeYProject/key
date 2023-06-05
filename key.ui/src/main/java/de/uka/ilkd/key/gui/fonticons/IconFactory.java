@@ -47,6 +47,10 @@ public final class IconFactory {
     public static final IconFontProvider INTERACTIVE =
         new IconFontProvider(FontAwesomeSolid.HAND_POINT_RIGHT);
     public static final IconFontProvider SCRIPT = new IconFontProvider(FontAwesomeSolid.SCROLL);
+    public static final IconFontProvider BACKREFERENCE =
+        new IconFontProvider(FontAwesomeSolid.BACKWARD);
+    public static final IconFontProvider BACKREFERENCE_ARROW =
+        new IconFontProvider(FontAwesomeSolid.ARROWS_TO_EYE);
     public static final IconFontProvider PRUNE = new IconFontProvider(FontAwesomeSolid.CUT);
     public static final IconFontProvider GOAL_BACK =
         new IconFontProvider(FontAwesomeSolid.BACKSPACE);

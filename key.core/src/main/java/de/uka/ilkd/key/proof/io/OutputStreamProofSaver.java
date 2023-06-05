@@ -70,8 +70,6 @@ public class OutputStreamProofSaver {
      */
     protected final boolean saveProofSteps;
 
-    private LogicPrinter printer;
-
 
     /**
      * Extracts java source directory from {@link Proof#header()}, if it exists.
@@ -150,6 +148,7 @@ public class OutputStreamProofSaver {
     }
 
     public void save(OutputStream out) throws IOException {
+        proof.copyCachedGoals(null, null, null);
         try (var ps = new PrintWriter(out, true, StandardCharsets.UTF_8)) {
             final ProofOblInput po =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
