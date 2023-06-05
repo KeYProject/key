@@ -89,7 +89,7 @@ public final class IssueDialog extends JDialog {
     /** the warnings that are shown in this dialog */
     private final List<PositionedIssueString> warnings;
 
-    private final Map<String, String> fileContentsCache = new HashMap<>();
+    private final Map<URL, String> fileContentsCache = new HashMap<>();
 
     private final JTextField fTextField = new JTextField();
     private final JTextField lTextField = new JTextField();
@@ -191,7 +191,7 @@ public final class IssueDialog extends JDialog {
             String escapedTail = LogicPrinter.escapeHTML(tail, true);
             sb.append(escapedTail);
 
-            return new PositionedIssueString(sb.toString(), pis.fileName, pis.pos,
+            return new PositionedIssueString(sb.toString(), pis.getLocation(),
                 pis.getAdditionalInfo());
         }).collect(Collectors.toList());
     }
@@ -231,7 +231,7 @@ public final class IssueDialog extends JDialog {
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.warnings = decorateHTML(warnings);
-        this.warnings.sort(Comparator.comparing(o -> o.fileName));
+        this.warnings.sort(Comparator.comparing(o -> o.location));
 
         setLayout(new BorderLayout());
 
@@ -603,7 +603,7 @@ public final class IssueDialog extends JDialog {
                             exception.getCause().toString());
             }
 
-            String resourceLocation = null;
+            URL resourceLocation = null;
             Position pos = Position.UNDEFINED;
             Optional<Location> location = ExceptionTools.getLocation(exception);
             if (location.isPresent()) {
@@ -612,11 +612,11 @@ public final class IssueDialog extends JDialog {
                     pos = loc.getPosition();
                 }
                 if (loc.getFileURL().isPresent()) {
-                    resourceLocation = loc.getFileURL().get().toString();
+                    resourceLocation = loc.getFileURL().get();
                 }
             }
             return new PositionedIssueString(message == null ? exception.toString() : message,
-                resourceLocation, pos, info);
+                new Location(resourceLocation, pos), info);
         } catch (IOException e) {
             // We must not suppress the dialog here -> catch and print only to debug stream
             LOGGER.debug("Creating a Location failed for {}", exception, e);
@@ -633,43 +633,46 @@ public final class IssueDialog extends JDialog {
 
     private void updatePreview(PositionedIssueString issue) {
         // update text fields with position information
-        if (!issue.fileName.isEmpty()) {
-            fTextField.setText("URL: " + issue.fileName);
-        } else {
+        Location location = issue.getLocation();
+        Position pos = location.getPosition();
+        cTextField.setText("Column: " + pos.column());
+        lTextField.setText("Line: " + pos.line());
+
+        btnEditFile.setEnabled(pos != Position.UNDEFINED);
+
+        if (location.getFileURL().isEmpty()) {
             fTextField.setText("");
-        }
-        cTextField.setText("Column: " + issue.pos.column());
-        lTextField.setText("Line: " + issue.pos.line());
+            txtSource.setText("[SOURCE COULD NOT BE LOADED]");
+        } else {
+            URL url = location.getFileURL().get();
+            fTextField.setText("URL: " + url);
 
-        btnEditFile.setEnabled(issue.pos != Position.UNDEFINED);
+            try {
+                String source = StringUtil.replaceNewlines(
+                    fileContentsCache.computeIfAbsent(url, fn -> {
+                        try (InputStream stream = url.openStream()) {
+                            return IOUtil.readFrom(stream);
+                        } catch (IOException e) {
+                            LOGGER.debug("Unknown IOException!", e);
+                            return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
+                        }
+                    }), "\n");
 
-        try {
-            String source = issue.fileName.equals(PositionedString.UNDEFINED_FILE)
-                    ? "[SOURCE COULD NOT BE LOADED]"
-                    : StringUtil.replaceNewlines(
-                        fileContentsCache.computeIfAbsent(issue.fileName, fn -> {
-                            try (InputStream stream = IOUtil.openStream(issue.fileName)) {
-                                return IOUtil.readFrom(stream);
-                            } catch (IOException e) {
-                                LOGGER.debug("Unknown IOException!", e);
-                                return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
-                            }
-                        }), "\n");
+                if (isJava(url.getFile())) {
+                    showJavaSourceCode(source);
+                } else {
+                    txtSource.setText(source);
+                }
+                DefaultHighlighter dh = new DefaultHighlighter();
+                txtSource.setHighlighter(dh);
+                addHighlights(dh, url);
 
-            if (isJava(issue.fileName)) {
-                showJavaSourceCode(source);
-            } else {
-                txtSource.setText(source);
+                // ensure that the currently selected problem is shown in view
+                int offset = pos.isNegative() ? 0 : getOffsetFromLineColumn(source, pos);
+                txtSource.setCaretPosition(offset);
+            } catch (Exception e) {
+                LOGGER.warn("Failed to update preview", e);
             }
-            DefaultHighlighter dh = new DefaultHighlighter();
-            txtSource.setHighlighter(dh);
-            addHighlights(dh, issue.fileName);
-
-            // ensure that the currently selected problem is shown in view
-            int offset = issue.pos.isNegative() ? 0 : getOffsetFromLineColumn(source, issue.pos);
-            txtSource.setCaretPosition(offset);
-        } catch (Exception e) {
-            LOGGER.warn("Failed to update preview", e);
         }
         validate();
     }
@@ -688,18 +691,19 @@ public final class IssueDialog extends JDialog {
         }
     }
 
-    private void addHighlights(DefaultHighlighter dh, String fileName) {
-        warnings.stream().filter(ps -> fileName.equals(ps.fileName))
+    private void addHighlights(DefaultHighlighter dh, URL url) {
+        warnings.stream().filter(ps -> ps.getLocation().getFileURL().equals(Optional.of(url)))
                 .forEach(ps -> addHighlights(dh, ps));
     }
 
     private void addHighlights(DefaultHighlighter dh, PositionedString ps) {
         // if we have no position there is no highlight
-        if (ps.pos.isNegative()) {
+        Position pos = ps.getLocation().getPosition();
+        if (pos.isNegative()) {
             return;
         }
         String source = txtSource.getText();
-        int offset = getOffsetFromLineColumn(source, ps.pos);
+        int offset = getOffsetFromLineColumn(source, pos);
         int end = offset;
         while (end < source.length() && !Character.isWhitespace(source.charAt(end))) {
             end++;

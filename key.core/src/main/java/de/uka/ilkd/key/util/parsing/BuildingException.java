@@ -8,7 +8,6 @@ import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
@@ -59,9 +58,9 @@ public class BuildingException extends RuntimeException implements HasLocation {
     @Override
     public Location getLocation() throws MalformedURLException {
         if (offendingSymbol != null) {
-            var source = offendingSymbol.getTokenSource().getSourceName();
+            var source = MiscTools.getFileNameFromTokenSource(offendingSymbol.getTokenSource());
             URL url = null;
-            if (!IntStream.UNKNOWN_SOURCE_NAME.equals(source)) {
+            if (source != null) {
                 url = MiscTools.parseURL(source);
             }
             return new Location(url, Position.fromToken(offendingSymbol));

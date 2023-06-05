@@ -46,7 +46,7 @@ public class ParseExceptionInFile extends ParseException implements HasLocation 
             if (location.isEmpty()) {
                 return null;
             }
-            return new Location(getFilename(), location.get().getPosition());
+            return Location.fromFileName(getFilename(), location.get().getPosition());
         }
         return null;
     }

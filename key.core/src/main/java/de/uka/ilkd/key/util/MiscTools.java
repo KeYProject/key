@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipFile;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
@@ -44,6 +45,8 @@ import org.key_project.util.Filenames;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.*;
 
+import org.antlr.v4.runtime.IntStream;
+import org.antlr.v4.runtime.TokenSource;
 import recoder.io.ArchiveDataLocation;
 import recoder.io.DataFileLocation;
 import recoder.io.DataLocation;
@@ -745,7 +748,7 @@ public final class MiscTools {
      * @param loc the given DataLocation
      * @return an URI identifying the resource of the DataLocation
      */
-    public static URI extractURI(DataLocation loc) {
+    public static Optional<URI> extractURI(DataLocation loc) {
         if (loc == null) {
             throw new IllegalArgumentException("The given DataLocation is null!");
         }
@@ -753,7 +756,7 @@ public final class MiscTools {
         try {
             switch (loc.getType()) {
             case "URL": // URLDataLocation
-                return ((URLDataLocation) loc).getUrl().toURI();
+                return Optional.of(((URLDataLocation) loc).getUrl().toURI());
             case "ARCHIVE": // ArchiveDataLocation
                 // format: "ARCHIVE:<filename>?<itemname>"
                 ArchiveDataLocation adl = (ArchiveDataLocation) loc;
@@ -764,14 +767,14 @@ public final class MiscTools {
                 ZipFile zip = adl.getFile();
 
                 // use special method to ensure that path separators are correct
-                return getZipEntryURI(zip, itemName);
+                return Optional.of(getZipEntryURI(zip, itemName));
             case "FILE": // DataFileLocation
                 // format: "FILE:<path>"
-                return ((DataFileLocation) loc).getFile().toURI();
+                return Optional.of(((DataFileLocation) loc).getFile().toURI());
             default: // SpecDataLocation
                 // format "<type>://<location>"
                 // wrap into URN to ensure URI encoding is correct (no spaces!)
-                return new URI("urn", loc.toString(), null);
+                return Optional.empty();
             }
         } catch (URISyntaxException | IOException e) {
             throw new IllegalArgumentException(
@@ -823,6 +826,12 @@ public final class MiscTools {
         // Path p = fs.getPath(entryName);
         // return p.toUri();
         // }
+    }
+
+    @Nullable
+    public static String getFileNameFromTokenSource(TokenSource source) {
+        var file = source.getSourceName();
+        return IntStream.UNKNOWN_SOURCE_NAME.equals(file) ? null : file;
     }
 
     /**

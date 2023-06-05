@@ -1,7 +1,9 @@
 package de.uka.ilkd.key.speclang.njml;
 
+import java.net.URL;
 import javax.annotation.Nonnull;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
 
@@ -39,11 +41,13 @@ public final class JmlFacade {
      * is changed accordingly.
      */
     public static @Nonnull JmlLexer createLexer(@Nonnull PositionedString ps) {
-        CharStream result = CharStreams.fromString(ps.text, ps.fileName);
+        CharStream result = CharStreams.fromString(ps.text,
+            ps.getLocation().getFileURL().map(URL::toString).orElse(null));
         JmlLexer lexer = createLexer(result);
-        if (!ps.pos.isNegative()) {
-            lexer.getInterpreter().setCharPositionInLine(ps.pos.column() - 1);
-            lexer.getInterpreter().setLine(ps.pos.line());
+        Position pos = ps.getLocation().getPosition();
+        if (!pos.isNegative()) {
+            lexer.getInterpreter().setCharPositionInLine(pos.column() - 1);
+            lexer.getInterpreter().setLine(pos.line());
         }
         return lexer;
     }

@@ -2,13 +2,17 @@ package de.uka.ilkd.key.parser;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Comparator;
+import java.util.Objects;
 import java.util.Optional;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.v4.runtime.IntStream;
+import org.antlr.v4.runtime.Token;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,9 +29,7 @@ import org.slf4j.LoggerFactory;
  * @author Hubert Schmid
  */
 
-public final class Location {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Location.class);
-
+public final class Location implements Comparable<Location> {
     /**
      * The location of the resource of the Location. May be null!
      */
@@ -37,20 +39,6 @@ public final class Location {
      * The position in the file
      */
     private final Position position;
-
-    /**
-     * Legacy constructor for creating a new Location from a String denoting the file path and line
-     * and column number, tries to convert the path given as String into a URL.
-     *
-     * @param filename path to the resource of the Location
-     * @param position position of the Location
-     * @throws MalformedURLException if the given string is null or can not be parsed to URL
-     * @deprecated Use {@link #Location(URL, Position)} instead.
-     */
-    @Deprecated
-    public Location(String filename, Position position) throws MalformedURLException {
-        this(filename == null ? null : MiscTools.parseURL(filename), position);
-    }
 
     /**
      * Creates a new Location with the given resource location, line and column numbers.
@@ -64,6 +52,24 @@ public final class Location {
     }
 
     /**
+     * Legacy constructor for creating a new Location from a String denoting the file path and line
+     * and column number, tries to convert the path given as String into a URL.
+     *
+     * @param filename path to the resource of the Location
+     * @param position position of the Location
+     * @throws RuntimeException if the given string is null or can not be parsed to URL
+     * @deprecated Use {@link #Location(URL, Position)} instead.
+     */
+    @Deprecated
+    public static Location fromFileName(String filename, Position position) {
+        try {
+            return new Location(filename == null ? null : MiscTools.parseURL(filename), position);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * This factory method can be used to create a Location for a RecognitionException. A possibly
      * thrown MalformedURLException is caught and printed to debug output, null is returned instead.
      *
@@ -71,15 +77,14 @@ public final class Location {
      * @return the created Location or null if creation failed
      */
     public static Location create(RecognitionException re) {
-        try {
-            // ANTLR starts lines in column 0, files in line 1.
-            return new Location(re.input.getSourceName(),
-                Position.fromOneZeroBased(re.line, re.charPositionInLine));
-        } catch (MalformedURLException e) {
-            LOGGER.error("Location could not be created from String: {}", re.input.getSourceName(),
-                e);
-            return null;
-        }
+        // ANTLR starts lines in column 0, files in line 1.
+        return Location.fromFileName(re.input.getSourceName(),
+            Position.fromOneZeroBased(re.line, re.charPositionInLine));
+    }
+
+    public static Location fromToken(Token token) {
+        return Location.fromFileName(MiscTools.getFileNameFromTokenSource(token.getTokenSource()),
+            Position.fromToken(token));
     }
 
     public Optional<URL> getFileURL() {
@@ -95,5 +100,28 @@ public final class Location {
     public String toString() {
         var url = fileUrl == null ? IntStream.UNKNOWN_SOURCE_NAME : fileUrl.toString();
         return "[" + url + ":" + position + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Location location = (Location) o;
+        return Objects.equals(fileUrl, location.fileUrl)
+                && Objects.equals(position, location.position);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fileUrl, position);
+    }
+
+    @Override
+    public int compareTo(@Nonnull Location o) {
+        return Comparator
+                .<Location, String>comparing(l -> l.getFileURL().map(URL::toString).orElse(null))
+                .thenComparing(Location::getPosition).compare(this, o);
     }
 }

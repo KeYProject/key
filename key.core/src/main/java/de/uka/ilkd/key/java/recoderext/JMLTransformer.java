@@ -1,8 +1,11 @@
 package de.uka.ilkd.key.java.recoderext;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 import javax.annotation.Nonnull;
 
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
@@ -123,7 +126,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
         }
         de.uka.ilkd.key.java.Position pos =
             de.uka.ilkd.key.java.Position.fromOneZeroBased(ctx.start.getLine(), column);
-        return new PositionedString(sb.toString(), ctx.start.getTokenSource().getSourceName(), pos);
+        return new PositionedString(sb.toString(), Location.fromToken(ctx.start));
     }
 
     public static String getFullText(ParserRuleContext context) {
@@ -237,7 +240,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
             if (isGhost) {
                 throw new SLTranslationException(
                     "JML field declaration cannot be" + " both ghost and model!",
-                    declWithMods.fileName, declWithMods.pos);
+                    declWithMods.location);
             }
         }
         if (!(isGhost || isModel)) {
@@ -247,7 +250,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 "Could not translate JML specification. "
                     + "You have either tried to use an unsupported keyword (" + s + ") "
                     + "or a JML field declaration without a ghost or model modifier.",
-                declWithMods.fileName, declWithMods.pos);
+                declWithMods.location);
         }
 
         // determine parent, child index
@@ -277,7 +280,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
                     fieldDecl.setEndPosition(old.getEndPosition());
                     fieldDecl.setRelativePosition(old.getRelativePosition());
                 }
-                updatePositionInformation(fieldDecl, declWithMods.pos);
+                updatePositionInformation(fieldDecl, declWithMods.location.getPosition());
 
                 // set comments: the original list of comments with the
                 // declaration,
@@ -309,13 +312,13 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 if (isModel) {
                     throw new SLTranslationException(
                         "JML model fields cannot be declared" + " within a method!",
-                        declWithMods.fileName, declWithMods.pos);
+                        declWithMods.location);
                 }
                 List<Statement> declStatement =
                     services.getProgramFactory().parseStatements(declWithMods.text);
                 assert declStatement.size() == 1;
                 fieldDecl = (LocalVariableDeclaration) declStatement.get(0);
-                updatePositionInformation(fieldDecl, declWithMods.pos);
+                updatePositionInformation(fieldDecl, declWithMods.location.getPosition());
                 attach((LocalVariableDeclaration) fieldDecl, (StatementBlock) astParent,
                     childIndex); // Unlike
                 // above, here
@@ -329,7 +332,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
             }
         } catch (Throwable e) {
             throw new SLTranslationException(e.getMessage() + " (" + e.getClass().getName() + ")",
-                declWithMods.fileName, declWithMods.pos, e);
+                declWithMods.location, e);
         }
 
         // add ghost or model modifier
@@ -346,13 +349,13 @@ public final class JMLTransformer extends RecoderModelTransformer {
         assert originalComments.length > 0;
 
         // prepend Java modifiers
-        PositionedString declWithMods = new PositionedString(decl.getParsableDeclaration(),
-            decl.getSourceFileName(), decl.getApproxPosition());
+        PositionedString declWithMods =
+            new PositionedString(decl.getParsableDeclaration(), decl.getLocation());
 
         // only handle model methods
         if (!decl.getMods().contains(JMLModifier.MODEL)) {
             throw new SLTranslationException("JML method declaration has to be model!",
-                declWithMods.fileName, declWithMods.pos);
+                declWithMods.location);
         }
 
         // determine parent
@@ -363,15 +366,15 @@ public final class JMLTransformer extends RecoderModelTransformer {
         MethodDeclaration methodDecl;
         try {
             methodDecl = services.getProgramFactory().parseMethodDeclaration(declWithMods.text);
-            if (declWithMods.pos != de.uka.ilkd.key.java.Position.UNDEFINED) {
-                updatePositionInformation(methodDecl, declWithMods.pos);
+            if (declWithMods.location.getPosition() != de.uka.ilkd.key.java.Position.UNDEFINED) {
+                updatePositionInformation(methodDecl, declWithMods.location.getPosition());
             }
             attach(methodDecl, astParent, 0); // about the 0 see the comment in
             // transformFieldDecl() above
         } catch (Throwable e) {
             throw new SLTranslationException(
-                format("%s (%s)", e.getMessage(), e.getClass().getName()), declWithMods.fileName,
-                declWithMods.pos, e);
+                format("%s (%s)", e.getMessage(), e.getClass().getName()), declWithMods.location,
+                e);
         }
 
         // add model modifier
@@ -415,7 +418,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
         } catch (Throwable e) {
             throw new SLTranslationException(
                 String.format("%s (%s)", e.getMessage(), e.getClass().getName()),
-                ctx.start.getTokenSource().getSourceName(), pos, e);
+                Location.fromToken(ctx.start), e);
         }
     }
 
@@ -439,7 +442,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
             doAttach(assignStmt, astParent, childIndex);
         } catch (Throwable e) {
             throw new SLTranslationException(e.getMessage() + " (" + e.getClass().getName() + ")",
-                stat.getAssignment().start.getTokenSource().getSourceName(), pos, e);
+                Location.fromToken(stat.getAssignment().start), e);
         }
     }
 
@@ -464,11 +467,11 @@ public final class JMLTransformer extends RecoderModelTransformer {
             doAttach(mps, astParent, childIndex);
         } catch (Throwable e) {
             throw new SLTranslationException(e.getMessage() + " (" + e.getClass().getName() + ")",
-                stat.getSourceFileName(), stat.getApproxPosition(), e);
+                stat.getLocation(), e);
         }
     }
 
-    private void transformClasslevelComments(TypeDeclaration td, String fileName)
+    private void transformClasslevelComments(TypeDeclaration td, URL fileName)
             throws SLTranslationException {
         // iterate over all pre-existing children
         ProgramElement[] children = getChildren(td);
@@ -514,8 +517,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 } else if (c instanceof TextualJMLSetStatement) {
                     if (i == 0 || !(children[i - 1] instanceof MethodDeclaration)) {
                         throw new SLTranslationException(
-                            "A set assignment only allowed inside of a method body.", fileName,
-                            pos);
+                            "A set assignment only allowed inside of a method body.",
+                            new Location(fileName, pos));
                     }
                     Statement emptyStmt = new EmptyStatement();
                     Comment emptyStmtComment = new Comment();
@@ -529,7 +532,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
         }
     }
 
-    private void transformMethodlevelCommentsHelper(ProgramElement pe, String fileName)
+    private void transformMethodlevelCommentsHelper(ProgramElement pe, URL fileName)
             throws SLTranslationException {
         // recurse to all pre-existing children
         ProgramElement[] children = getChildren(pe);
@@ -573,7 +576,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
         }
     }
 
-    private void transformMethodlevelComments(MethodDeclaration md, String fileName)
+    private void transformMethodlevelComments(MethodDeclaration md, URL fileName)
             throws SLTranslationException {
         StatementBlock body = md.getBody();
         if (body != null) {
@@ -677,8 +680,14 @@ public final class JMLTransformer extends RecoderModelTransformer {
                      * a MalformedURLException later if a parsing error occurs, but at least show
                      * the error message of the parser.
                      */
-                    String resource =
-                        dl == null ? "UNKNOWN:unknown" : MiscTools.extractURI(dl).toString();
+                    URL resource =
+                        dl == null ? null : MiscTools.extractURI(dl).map(u -> {
+                            try {
+                                return u.toURL();
+                            } catch (MalformedURLException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }).orElse(null);
 
                     transformClasslevelComments(td, resource);
 

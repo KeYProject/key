@@ -1,11 +1,15 @@
 package de.uka.ilkd.key.speclang.translation;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.util.MiscTools;
 
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
@@ -24,7 +28,7 @@ import static java.text.MessageFormat.format;
 public class SLExceptionFactory {
     public static final Logger LOGGER = LoggerFactory.getLogger(SLExceptionFactory.class);
 
-    private String fileName;
+    private URL fileName;
     private final int offsetLine, offsetColumn;
     /**
      * line, 1-based
@@ -41,7 +45,7 @@ public class SLExceptionFactory {
     // constructors
     // -------------------------------------------------------------------------
 
-    public SLExceptionFactory(@Nonnull Parser parser, String fileName, Position offsetPos) {
+    public SLExceptionFactory(@Nonnull Parser parser, URL fileName, Position offsetPos) {
         this.line = parser.getInputStream().LT(1).getLine();
         this.column = parser.getInputStream().LT(1).getCharPositionInLine();
         this.fileName = fileName;
@@ -49,7 +53,7 @@ public class SLExceptionFactory {
         this.offsetLine = offsetPos.line();
     }
 
-    public SLExceptionFactory(String fileName, int line, int column) {
+    public SLExceptionFactory(URL fileName, int line, int column) {
         this.fileName = fileName;
         this.offsetColumn = column;
         this.offsetLine = line;
@@ -58,7 +62,12 @@ public class SLExceptionFactory {
     }
 
     public SLExceptionFactory updatePosition(Token start) {
-        fileName = start.getTokenSource().getSourceName();
+        try {
+            var file = MiscTools.getFileNameFromTokenSource(start.getTokenSource());
+            fileName = file == null ? null : new URL(file);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
         line = start.getLine();
         column = start.getCharPositionInLine();
         return this;
@@ -67,10 +76,10 @@ public class SLExceptionFactory {
     // -------------------------------------------------------------------------
     // internal methods
     // -------------------------------------------------------------------------
-    private Position createAbsolutePosition(int relativeLine, int relativeColumn) {
+    private Location createAbsolutePosition(int relativeLine, int relativeColumn) {
         int absoluteLine = offsetLine + relativeLine - 1;
         int absoluteColumn = (relativeLine == 1 ? offsetColumn : 1) + relativeColumn;
-        return Position.fromOneZeroBased(absoluteLine, absoluteColumn);
+        return new Location(fileName, Position.fromOneZeroBased(absoluteLine, absoluteColumn));
     }
 
     // -------------------------------------------------------------------------
@@ -121,7 +130,7 @@ public class SLExceptionFactory {
 
     public void addWarning(String msg) {
         LOGGER.debug("JML translator warning: " + msg);
-        warnings.add(new PositionedString(msg, ""));
+        warnings.add(new PositionedString(msg));
     }
 
     public void addWarning(String msg, Token t) {
@@ -135,7 +144,7 @@ public class SLExceptionFactory {
     // endregion
 
     public PositionedString createPositionedString(String msg, Token t) {
-        return new PositionedString(msg, fileName,
+        return new PositionedString(msg,
             createAbsolutePosition(t.getLine(), t.getCharPositionInLine()));
     }
 
@@ -143,8 +152,7 @@ public class SLExceptionFactory {
      * Creates an SLTranslationException with current absolute position information.
      */
     public SLTranslationException createException(String message) {
-        return new SLTranslationException(message, fileName,
-            createAbsolutePosition(this.line, this.column));
+        return new SLTranslationException(message, createAbsolutePosition(this.line, this.column));
     }
 
 
@@ -152,7 +160,7 @@ public class SLExceptionFactory {
      * Creates an SLTranslationException with the position information of the passed token.
      */
     public SLTranslationException createException(String message, Token t) {
-        return new SLTranslationException(message, fileName,
+        return new SLTranslationException(message,
             createAbsolutePosition(t.getLine(), t.getCharPositionInLine()));
     }
 
@@ -190,13 +198,5 @@ public class SLExceptionFactory {
         SLTranslationException result = createException(message, t);
         result.initCause(cause);
         return result;
-    }
-
-    /**
-     * Creates an SLWarningException with current absolute position information.
-     */
-    public SLTranslationException createWarningException(String message) {
-        return new SLWarningException(message, fileName,
-            createAbsolutePosition(this.line, this.column));
     }
 }

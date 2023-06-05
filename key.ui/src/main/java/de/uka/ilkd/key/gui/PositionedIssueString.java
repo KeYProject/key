@@ -1,10 +1,11 @@
 package de.uka.ilkd.key.gui;
 
+import java.net.URL;
 import java.util.Objects;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 /**
@@ -26,24 +27,24 @@ public class PositionedIssueString extends PositionedString
 
     private final Kind kind;
 
-    public PositionedIssueString(@Nonnull String text, @Nullable String fileName,
-            @Nullable Position pos, @Nonnull String additionalInfo) {
-        this(text, fileName, pos, additionalInfo, Kind.ERROR);
+    public PositionedIssueString(@Nonnull String text, @Nonnull Location location,
+            @Nonnull String additionalInfo) {
+        this(text, location, additionalInfo, Kind.ERROR);
     }
 
-    public PositionedIssueString(@Nonnull String text, @Nullable String fileName,
-            @Nullable Position pos, @Nonnull String additionalInfo, Kind kind) {
-        super(text, fileName, pos);
+    public PositionedIssueString(@Nonnull String text, @Nonnull Location location,
+            @Nonnull String additionalInfo, Kind kind) {
+        super(text, location);
         this.additionalInfo = additionalInfo;
         this.kind = kind;
     }
 
     public PositionedIssueString(@Nonnull String text) {
-        this(text, null, null, "", Kind.ERROR);
+        this(text, new Location((URL) null, Position.UNDEFINED), "", Kind.ERROR);
     }
 
     public PositionedIssueString(@Nonnull PositionedString o, @Nonnull String additionalInfo) {
-        this(o.text, o.fileName, o.pos, additionalInfo, Kind.ERROR);
+        this(o.text, o.location, additionalInfo, Kind.ERROR);
     }
 
     public Kind getKind() {
@@ -77,13 +78,9 @@ public class PositionedIssueString extends PositionedString
 
     @Override
     public int compareTo(PositionedIssueString o) {
-        int compareFile = fileName.compareTo(o.fileName);
-        if (compareFile != 0) {
-            return compareFile;
-        }
-        int comparePosition = pos.compareTo(o.pos);
-        if (comparePosition != 0) {
-            return comparePosition;
+        int compareLocation = location.compareTo(o.location);
+        if (compareLocation != 0) {
+            return compareLocation;
         }
         return kind.compareTo(o.kind);
     }

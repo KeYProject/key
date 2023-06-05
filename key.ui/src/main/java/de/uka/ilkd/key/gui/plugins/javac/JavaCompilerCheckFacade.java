@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -17,6 +18,7 @@ import javax.tools.*;
 
 import de.uka.ilkd.key.gui.PositionedIssueString;
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 
 import org.slf4j.Logger;
@@ -117,11 +119,20 @@ public class JavaCompilerCheckFacade {
                 LOGGER.info("{}", diagnostic);
             }
             return diagnostics.getDiagnostics().stream().map(
-                it -> new PositionedIssueString(
-                    it.getMessage(Locale.ENGLISH),
-                    fileManager.asPath(it.getSource()).toFile().getAbsolutePath(),
-                    Position.newOneBased((int) it.getLineNumber(), (int) it.getColumnNumber()),
-                    it.getCode() + " " + it.getKind()))
+                it -> {
+                    try {
+                        return new PositionedIssueString(
+                            it.getMessage(Locale.ENGLISH),
+                            new Location(
+                                fileManager.asPath(it.getSource()).toFile().toPath().toUri()
+                                        .toURL(),
+                                Position.newOneBased((int) it.getLineNumber(),
+                                    (int) it.getColumnNumber())),
+                            it.getCode() + " " + it.getKind());
+                    } catch (MalformedURLException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
                     .collect(Collectors.toList());
         });
     }

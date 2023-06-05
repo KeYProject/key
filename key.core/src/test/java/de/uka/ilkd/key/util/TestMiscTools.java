@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -157,13 +158,13 @@ public class TestMiscTools {
         Path tmp = Files.createTempFile("test with whitespace", ".txt");
         URI tmpURI = tmp.toUri();
         DataLocation urlDataLoc = new URLDataLocation(tmpURI.toURL());
-        assertEquals(tmpURI, MiscTools.extractURI(urlDataLoc));
+        assertEquals(tmpURI, MiscTools.extractURI(urlDataLoc).orElseThrow());
 
         // additional test for URLDataLocation with whitespace in filename
         Path tmpSpace = Files.createTempFile("test with whitespace", ".txt");
         URI tmpSpaceURI = tmpSpace.toUri();
         DataLocation urlDataLoc2 = new URLDataLocation(tmpSpaceURI.toURL());
-        assertEquals(tmpSpaceURI, MiscTools.extractURI(urlDataLoc2));
+        assertEquals(tmpSpaceURI, MiscTools.extractURI(urlDataLoc2).orElseThrow());
 
         // test for ArchiveDataLocation
         byte[] b = "test content".getBytes(StandardCharsets.UTF_8);
@@ -187,7 +188,7 @@ public class TestMiscTools {
                 MiscTools.extractURI(entry0).toString());
             assertEquals("jar:" + tmpZipURI + "!/" + "entry%20with%20whitespace.txt",
                 MiscTools.extractURI(entry1).toString());
-            URI read = MiscTools.extractURI(entry2);
+            URI read = MiscTools.extractURI(entry2).orElseThrow();
 
             // we can not simply use read.toURL().openStream(), because that uses caches and thus
             // keeps the file open (at least on Windows)
@@ -203,11 +204,11 @@ public class TestMiscTools {
 
         // test for SpecDataLocation
         DataLocation specDataLoc = new SpecDataLocation("UNKNOWN", "unknown");
-        assertEquals("urn:UNKNOWN:unknown", MiscTools.extractURI(specDataLoc).toString());
+        assertEquals(Optional.empty(), MiscTools.extractURI(specDataLoc));
 
         // test for DataFileLocation
         DataLocation fileDataLoc = new DataFileLocation(tmp.toFile());
-        assertEquals(tmpURI, MiscTools.extractURI(fileDataLoc));
+        assertEquals(tmpURI, MiscTools.extractURI(fileDataLoc).orElseThrow());
 
         // clean up temporary files
         Files.deleteIfExists(tmp);
