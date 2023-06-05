@@ -67,14 +67,16 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
         GoalListener goalListener = new GoalListener() {
 
             @Override
-            public void sequentChanged(Goal source, SequentChangeInfo sci) {}
+            public void sequentChanged(Goal source, SequentChangeInfo sci) {
+            }
 
             @Override
-            public void goalReplaced(Goal source, Node parent, ImmutableList<Goal> newGoals) {}
+            public void goalReplaced(Goal source, Node parent, ImmutableList<Goal> newGoals) {
+            }
 
             @Override
             public void automaticStateChanged(Goal source, boolean oldAutomatic,
-                    boolean newAutomatic) {
+                                              boolean newAutomatic) {
                 if (!batchGoalStateChange
                         && ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS.isActive()) {
                     updateTree((TreeNode) null);
@@ -200,8 +202,8 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * Adds a listener for the TreeModelEvent posted after the tree changes. Such events are
      * generated whenever the underlying Proof changes.
      *
-     * @see #removeTreeModelListener
      * @param l the listener to add
+     * @see #removeTreeModelListener
      */
     @Override
     public void addTreeModelListener(TreeModelListener l) {
@@ -211,8 +213,8 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
     /**
      * Removes a listener previously added with <B>addTreeModelListener()</B>.
      *
-     * @see #addTreeModelListener
      * @param l the listener to remove
+     * @see #addTreeModelListener
      */
     @Override
     public void removeTreeModelListener(TreeModelListener l) {
@@ -220,7 +222,6 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
     }
 
     /**
-     *
      * @return whether or not {@link ProofTreeViewFilter#HIDE_CLOSED_SUBTREES} is active.
      */
     public boolean hideClosedSubtrees() {
@@ -229,7 +230,6 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
 
 
     /**
-     *
      * @return whether or not {@link ProofTreeViewFilter#HIDE_INTERACTIVE_GOALS} is active.
      */
     public boolean hideInteractiveGoals() {
@@ -237,7 +237,6 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
     }
 
     /**
-     *
      * @return whether or nor one of {@link ProofTreeViewFilter#ALL_GLOBAL_FILTERS} is active.
      */
     public boolean globalFilterActive() {
@@ -247,32 +246,21 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
 
     /**
      * Set filters active or inactive and update tree if necessary.
-     *
-     * @param filter
-     * @param active
-     */
-    public void setFilter(ProofTreeViewFilter filter, boolean active) {
-        if (active != filter.isActive()) {
-            setFilterImmediately(filter, active);
-        }
-    }
-
-    /**
-     * Set filters active or inactive and update tree if necessary.
      * Always updates the filter and the tree.
      *
      * @param filter the filter
      * @param active whether to activate the filter
      */
-    public void setFilterImmediately(ProofTreeViewFilter filter, boolean active) {
+    public void setFilter(ProofTreeViewFilter filter, boolean active) {
         if (filter == null) {
             activeNodeFilter = null;
             updateTree((TreeNode) null);
             return;
         }
         if (!filter.global()) {
-            if (activeNodeFilter != null)
+            if (activeNodeFilter != null) {
                 activeNodeFilter.setActive(false);
+            }
             activeNodeFilter = active ? (NodeFilter) filter : null;
         }
         filter.setActive(active);
@@ -323,7 +311,6 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * @param parent a node in the tree, obtained from this data source
      * @param child a child of parent, obtained from this data source
      * @return The index of child in parent
-     *
      */
     @Override
     public int getIndexOfChild(Object parent, Object child) {
@@ -390,7 +377,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
         if (trn == null || trn == getRoot()) { // bigger change, redraw whole tree
             proofTreeNodes = new WeakHashMap<>();
             branchNodes = new WeakHashMap<>();
-            fireTreeStructureChanged(new Object[] { getRoot() });
+            fireTreeStructureChanged(new Object[]{getRoot()});
             return;
         }
         // otherwise redraw only a certain subtree
@@ -474,7 +461,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
     // generated to represent the nodes resp. subtrees of the Proof.
 
     private WeakHashMap<Node, GUIAbstractTreeNode> proofTreeNodes =
-        new WeakHashMap<>();
+            new WeakHashMap<>();
     private WeakHashMap<Node, GUIBranchNode> branchNodes = new WeakHashMap<>();
 
     /**
@@ -519,7 +506,9 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
     }
 
 
-    /** stores exactly the paths that are expanded in the proof tree */
+    /**
+     * stores exactly the paths that are expanded in the proof tree
+     */
     private @Nonnull Collection<TreePath> expansionState = Collections.emptySet();
 
     public void setExpansionState(@Nonnull Collection<TreePath> c) {

@@ -32,6 +32,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.RuleApp;
 
 import org.key_project.util.collection.ImmutableList;
@@ -430,11 +431,14 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             // Redraw the tree in case the ProofTreeViewFilters have changed
             // since the last time the proof was loaded.
-            delegateModel.setFilterImmediately(filter, filter != null && filter.isActive());
+            delegateModel.setFilter(filter, filter != null && filter.isActive());
 
             // Expand previously visible rows.
             for (int i : rowsToExpand) {
                 delegateView.expandRow(i);
+            }
+            if (filter != null) {
+                delegateModel.setFilter(filter, true);
             }
 
             if (delegateModel.getSelection() != null) {
@@ -1008,9 +1012,17 @@ public class ProofTreeView extends JPanel implements TabPanel {
             String toolTipText;
 
             if (goal == null || leaf.isClosed()) {
+                ClosedBy c = leaf.lookup(ClosedBy.class);
+                if (c != null) {
+                    style.icon = IconFactory.BACKREFERENCE.get(iconHeight);
+                } else {
+                    style.icon = IconFactory.keyHoleClosed(iconHeight);
+                }
                 style.foreground = DARK_GREEN_COLOR.get();
-                style.icon = IconFactory.keyHoleClosed(iconHeight);
                 toolTipText = "A closed goal";
+                if (c != null) {
+                    toolTipText += " (by reference to other proof)";
+                }
             } else if (goal.isLinked()) {
                 style.foreground = PINK_COLOR.get();
                 style.icon = IconFactory.keyHoleLinked(20, 20);

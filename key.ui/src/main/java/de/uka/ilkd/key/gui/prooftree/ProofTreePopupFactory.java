@@ -22,6 +22,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
+import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Pair;
 
@@ -406,6 +408,26 @@ public class ProofTreePopupFactory {
             context.delegateModel.updateTree(null);
             context.delegateModel.setAttentive(true);
             context.proofTreeView.makeNodeVisible(context.invokedNode);
+        }
+    }
+
+    static class CloseByReference extends ProofTreeAction {
+        public CloseByReference(ProofTreeContext context) {
+            super(context);
+            setName("Close by reference to other proof");
+            setEnabled(context.invokedNode.leaf() && !context.invokedNode.isClosed());
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // search other proofs for matching nodes
+            ClosedBy c = ReferenceSearcher.findPreviousProof(context.mediator, context.invokedNode);
+            if (c != null) {
+                Node toClose = context.invokedNode;
+                Proof newProof = context.proof;
+                newProof.closeGoal(newProof.getGoal(toClose));
+                toClose.register(c, ClosedBy.class);
+            }
         }
     }
 
