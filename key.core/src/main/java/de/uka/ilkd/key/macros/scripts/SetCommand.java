@@ -45,6 +45,9 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
         } else if (args.proofSteps != null) {
             state.setMaxAutomaticSteps(args.proofSteps);
         } else if (args.key != null) {
+            if (!newProps.containsKey(args.key)) {
+                throw new ScriptException("Unknown setting key: " + args.key);
+            }
             newProps.setProperty(args.key, args.value);
             updateStrategySettings(newProps);
         } else if (args.stackAction != null) {

@@ -47,8 +47,13 @@ public class ExpandDefCommand extends AbstractCommand<ExpandDefCommand.Parameter
         if (completions == null || completions.isEmpty()) {
             throw new ScriptException("Cannot complete the rule app");
         }
+        TacletApp app = completions.head();
+        app = app.tryToInstantiate(g.proof().getServices().getOverlay(g.getLocalNamespaces()));
+        if (app == null || !app.complete()) {
+            throw new ScriptException("Cannot complete the rule app");
+        }
 
-        g.apply(completions.head());
+        g.apply(app);
     }
 
     private TacletApp makeRuleApp(Parameters p, EngineState state) throws ScriptException {
