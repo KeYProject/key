@@ -30,7 +30,6 @@ dependencies {
     runtimeOnly project(":keyext.action_history")
     runtimeOnly project(":keyext.exploration")
     runtimeOnly project(":keyext.slicing")
-    runtimeOnly project(":keyext.cacheproofs")
 }
 
 task createExamplesZip(type: Zip) {
