@@ -157,7 +157,7 @@ public class SimilarityCountFeature implements Feature {
             }
             for (int i = 0; i < fst.arity(); i++) {
                 if (fst.sub(i).equalsModRenaming(snd.sub(i))) {
-                    count += 10;
+                    count += 10 * (6/fst.arity());
                 }
             }
         }
