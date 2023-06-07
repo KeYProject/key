@@ -108,7 +108,7 @@ subprojects {
         // Setting UTF-8 as the java source encoding.
         options.encoding = "UTF-8"
         // Setting the release to Java 11
-        options.release = 11
+        options.release = 17
     }
 
     tasks.withType(Javadoc) {
@@ -449,7 +449,7 @@ task alldoc(type: Javadoc) {
         docTitle = "KeY JavaDoc ($project.version) -- ${getDate()}"
         bottom = "Copyright &copy; 2003-2022 <a href=\"http://key-project.org\">The KeY-Project</a>."
         use = true
-        links += "https://docs.oracle.com/en/java/javase/11/docs/api/"
+        links += "https://docs.oracle.com/en/java/javase/17/docs/api/"
         links += "http://www.antlr2.org/javadoc/"
         links += "http://www.antlr3.org/api/Java/"
         links += "https://www.antlr.org/api/Java/"
