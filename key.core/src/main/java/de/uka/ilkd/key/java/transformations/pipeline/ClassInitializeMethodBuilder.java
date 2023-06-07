@@ -13,11 +13,9 @@
 
 package de.uka.ilkd.key.java.transformations.pipeline;
 
-import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nonnull;
 
-import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
 
@@ -123,8 +121,11 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
     private NodeList<Statement> getInitializers(@Nonnull TypeDeclaration<?> typeDeclaration) {
         NodeList<Statement> result = new NodeList<>();
         for (Node childNode : typeDeclaration.getChildNodes()) {
-            if (childNode instanceof ConstructorDeclaration) {
-                result.add(((ConstructorDeclaration) childNode).getBody().clone());
+            if (childNode instanceof InitializerDeclaration) {
+                var init = (InitializerDeclaration) childNode;
+                if (init.isStatic()) {
+                    result.add(init.getBody().clone());
+                }
             } else if (childNode instanceof FieldDeclaration) {
                 result.addAll(fieldInitializersToAssignments((FieldDeclaration) childNode));
             }
