@@ -7,6 +7,8 @@ import de.uka.ilkd.key.util.Debug;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
+import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -208,8 +210,11 @@ public class KeYJPMapping {
         parsedSpecial = b;
     }
 
-    public Object toKeY(ResolvedDeclaration rm) {
-        // TODO weigl
-        return toKeY(rm.toAst().get());
+    public KeYJavaType toKeY(ResolvedReferenceTypeDeclaration rm) {
+        return toKeY(new ReferenceTypeImpl(rm));
+    }
+
+    public Optional<Object> toKeY(ResolvedDeclaration rm) {
+        return rm.toAst().map(this::toKeY);
     }
 }

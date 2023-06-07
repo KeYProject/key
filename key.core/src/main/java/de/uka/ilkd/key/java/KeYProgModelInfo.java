@@ -21,9 +21,11 @@ import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.resolution.declarations.*;
 import com.github.javaparser.resolution.logic.MethodResolutionCapability;
+import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedArrayType;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
+import com.github.javaparser.symbolsolver.javaparsermodel.declarations.DefaultConstructorDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserMethodDeclaration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,11 +125,10 @@ public class KeYProgModelInfo {
     }
 
     private Optional<CompilationUnit> getCompilationUnit(KeYJavaType kjt) {
-        var type = getJPType(kjt);
-        var rt = type.asReferenceType();
-        var td = rt.getTypeDeclaration().get();
-        var node = td.asClass().toAst().get();
-        return node.findCompilationUnit();
+        return getReferenceType(kjt)
+                .flatMap(ResolvedReferenceType::getTypeDeclaration)
+                .flatMap(AssociableToAST::toAst)
+                .flatMap(Node::findCompilationUnit);
     }
 
     private <T extends com.github.javaparser.ast.type.Type> T searchType(String shortName,
@@ -261,16 +262,20 @@ public class KeYProgModelInfo {
         return Collections.emptyList();
     }
 
-    private List<com.github.javaparser.ast.body.ConstructorDeclaration> getRecoderConstructors(
-            KeYJavaType ct) {
-        var type = getJPType(ct);
-        var rtype = type;
-        // TODO weigl return rtype.asReferenceType().;
-        return null;
+    private List<ResolvedConstructorDeclaration> getDeclaredConstructors(KeYJavaType ct) {
+        return getReferenceType(ct)
+                .flatMap(ResolvedReferenceType::getTypeDeclaration)
+                .map(ResolvedReferenceTypeDeclaration::getConstructors)
+                .orElse(Collections.emptyList());
     }
 
     private ResolvedType getJPType(KeYJavaType ct) {
         return rec2key().toRecoder(ct);
+    }
+
+    private Optional<ResolvedReferenceType> getReferenceType(KeYJavaType ct) {
+        var type = rec2key().toRecoder(ct);
+        return type.isReferenceType() ? Optional.of(type.asReferenceType()) : Optional.empty();
     }
 
     private List<ResolvedMethodDeclaration> getMethods(KeYJavaType ct, String name,
@@ -306,9 +311,9 @@ public class KeYProgModelInfo {
         for (int i = rml.size() - 1; i >= 0; i--) {
             var rm = rml.get(i);
             if (rm instanceof JavaParserMethodDeclaration) {
-                var element = (ProgramMethod) rec2key().toKeY(rm);
-                if (element != null) {
-                    result = result.prepend(element);
+                var element = rec2key().toKeY(rm);
+                if (element.isPresent()) {
+                    result = result.prepend((ProgramMethod) element.get());
                 }
             }
         }
@@ -324,13 +329,19 @@ public class KeYProgModelInfo {
      */
 
     public ImmutableList<IProgramMethod> getConstructors(KeYJavaType ct) {
-        var rcl = getRecoderConstructors(ct);
+        var rcl = getDeclaredConstructors(ct);
         ImmutableList<IProgramMethod> result = ImmutableSLList.nil();
         for (int i = rcl.size() - 1; i >= 0; i--) {
             var rm = rcl.get(i);
-            IProgramMethod m = (IProgramMethod) rec2key().toKeY(rm);
-            if (m != null) {
-                result = result.prepend(m);
+            if (rm instanceof DefaultConstructorDeclaration) {
+                // TODO javaparser this node is only returned by
+                // ResolvedReferenceTypeDeclaration::getConstructors
+                // and neither implements hashCode nor equals
+                continue;
+            }
+            var m = rec2key().toKeY(rm);
+            if (m.isPresent()) {
+                result = result.prepend((IProgramMethod) m.get());
             }
         }
         return result;
@@ -347,7 +358,7 @@ public class KeYProgModelInfo {
     public IProgramMethod getConstructor(KeYJavaType ct, ImmutableList<KeYJavaType> signature) {
         var constructors = getRecoderConstructors(ct, signature);
         if (constructors.size() == 1) {
-            return (IProgramMethod) rec2key().toKeY(constructors.get(0));
+            return (IProgramMethod) rec2key().toKeY(constructors.get(0)).orElse(null);
         }
         if (constructors.isEmpty()) {
             LOGGER.debug("javainfo: Constructor not found: {}", ct);
@@ -403,7 +414,7 @@ public class KeYProgModelInfo {
         var methodlist = getMethods(ct, m, signature, context);
 
         if (methodlist.size() == 1) {
-            return (IProgramMethod) rec2key().toKeY(methodlist.get(0));
+            return (IProgramMethod) rec2key().toKeY(methodlist.get(0)).orElse(null);
         } else if (methodlist.isEmpty()) {
             LOGGER.debug("javainfo: Program Method not found: {}", m);
             return null;
@@ -460,7 +471,9 @@ public class KeYProgModelInfo {
         if (ct.getJavaType() instanceof ArrayType) {
             return getVisibleArrayFields(ct);
         }
-        return asKeYFieldsR(getJPType(ct).asReferenceType().getDeclaredFields());
+        return getReferenceType(ct)
+                .map(r -> asKeYFieldsR(r.getDeclaredFields()))
+                .orElse(ImmutableSLList.nil());
     }
 
 
@@ -479,8 +492,9 @@ public class KeYProgModelInfo {
         if (ct.getJavaType() instanceof ArrayDeclaration) {
             return getVisibleArrayFields(ct);
         }
-        var t = getJPType(ct).asReferenceType();
-        return asKeYFieldsR(t.getAllFieldsVisibleToInheritors());
+        return getReferenceType(ct)
+                .map(r -> asKeYFieldsR(r.getAllFieldsVisibleToInheritors()))
+                .orElse(ImmutableSLList.nil());
     }
 
     /**
@@ -552,8 +566,16 @@ public class KeYProgModelInfo {
      *
      * @return
      */
-    private List<ResolvedReferenceType> getAllRecoderSupertypes(KeYJavaType ct) {
-        return getJPType(ct).asReferenceType().getAllAncestors();
+    private List<ResolvedReferenceType> getAllDeclaredSupertypes(KeYJavaType ct) {
+        return getReferenceType(ct)
+                .map(r -> {
+                    var ancestors = r.getAllAncestors();
+                    List<ResolvedReferenceType> res = new ArrayList<>(ancestors.size() + 1);
+                    res.add(r);
+                    res.addAll(ancestors);
+                    return res;
+                })
+                .orElse(Collections.emptyList());
     }
 
 
@@ -567,7 +589,8 @@ public class KeYProgModelInfo {
      */
     private ImmutableList<KeYJavaType> asKeYJavaTypes(
             final List<ResolvedReferenceTypeDeclaration> rctl) {
-        return rctl.stream().map(it -> (KeYJavaType) rec2key().toKeY(it))
+        return rctl.stream()
+                .map(it -> rec2key().toKeY(new ReferenceTypeImpl(it)))
                 .collect(ImmutableList.collector());
     }
 
@@ -579,11 +602,13 @@ public class KeYProgModelInfo {
      * @return the list of the known subtypes of the given class type.
      */
     public ImmutableList<KeYJavaType> getAllSupertypes(KeYJavaType ct) {
-        final var allRecoderSupertypes = getAllRecoderSupertypes(ct)
-                .stream().map(it -> it.asReferenceType().getTypeDeclaration().get())
+        final var superTypes = getAllDeclaredSupertypes(ct)
+                .stream().map(ResolvedReferenceType::asReferenceType)
+                .filter(it -> it.getTypeDeclaration().isPresent())
+                .map(it -> it.getTypeDeclaration().get())
                 .collect(Collectors.toList());
 
-        return asKeYJavaTypes(allRecoderSupertypes);
+        return asKeYJavaTypes(superTypes);
     }
 
     /**

@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.*;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
@@ -315,15 +316,20 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         Extends extending = new Extends(e);
         Implements implementing = new Implements(i);
 
+        var kjt = getKeYJavaType(new ReferenceTypeImpl(n.resolve()));
+
+        TypeDeclaration td;
         if (n.isInterface()) {
-            return new InterfaceDeclaration(
+            td = new InterfaceDeclaration(
                 pi, c, modArray, name, fullName, members,
                 parentIsInterface, isLibrary, extending);
         } else {
-            return new ClassDeclaration(pi, c, modArray, name, fullName, members, parentIsInterface,
+            td = new ClassDeclaration(pi, c, modArray, name, fullName, members, parentIsInterface,
                 isLibrary, extending, implementing, n.isInnerClass(), n.isLocalClassDeclaration(),
                 false);
         }
+        kjt.setJavaType(td);
+        return td;
     }
 
     /*
@@ -1665,6 +1671,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     @Override
     public Object visit(EnumDeclaration n, Void arg) {
         reportUnsupportedElement(n);
+        // Important: get the kjt of n.resolve() and setKeYJavaType with the resulting KeY
+        // declaration
         return super.visit(n, arg);
     }
 

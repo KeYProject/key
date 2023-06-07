@@ -36,12 +36,14 @@ public class TestJP2KeY {
 
     // some non sense java blocks with lots of statements and expressions
     private static final String[] jblocks = new String[] {
-        "{int j=7; int i;\n i=1; byte d=0; short f=1; long l=123; \n "
-            + "for (i=0, j=1; (i<42) && (i>0); i++, j--)\n" + " { i=13; j=1; } "
-            + "while ((-i<7) || (i++==7--) | (--i==++7) ||(!true && false) ||" + " ('a'=='d') "
-            + "|| (\"asd\"==\"as\"+\"d\") & (d==f) ^ (d/f+2>=f*d-f%d)|| (l<=~i)"
-            + " || !(this==null) || ((this!=null) ? (8<<j<8>>i) : (7&5>8>>>7L)"
-            + " || (7|5!=8^4)) && i+=j && i=j && i/=j && i%=j && i-=j && i*=j"
+        "{int j=7; int i;\n"
+            + "i=1; byte d=0; short f=1; long l=123;\n"
+            + "for (i=0, j=1; (i<42) && (i>0); i++, j--)\n"
+            + "{ i=13; j=1; }\n"
+            + "while ((-i<7) || (i++==7--) | (--i==++7) ||(!true && false) ||" + " ('a'=='d') \n"
+            + "|| (\"asd\"==\"as\"+\"d\") & (d==f) ^ (d/f+2>=f*d-f%d)|| (l<=~i) \n"
+            + " || !(this==null) || ((this!=null) ? (8<<j<8>>i) : (7&5>8>>>7L) \n"
+            + " || (7|5!=8^4)) && i+=j && i=j && i/=j && i%=j && i-=j && i*=j \n"
             + " && i<<=j && i>>=j && i>>>=j && i&=j && i^=j && i|=j) j=7;" + "}",
 
         "{" + "int j=7; int i;\n i=1;" + "do { j++; } while (i==1);"

@@ -258,6 +258,8 @@ public class JP2KeYTypeConverter {
         if (namespaces.sorts().lookup(sort.name()) == null) {
             namespaces.sorts().add(sort);
         }
+        // Important: javaType is null until being set by visiting the class/interface/enum
+        // declaration!
         storeInCache(type, new KeYJavaType(sort));
 
         // TODO javaparser has no default constructor

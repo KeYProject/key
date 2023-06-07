@@ -29,7 +29,7 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
     /**
      * reference to the type the elements of this array must subclass
      */
-    private final TypeReference basetype;
+    private final TypeReference baseType;
 
     /**
      * dimension of the array
@@ -44,7 +44,7 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
             KeYJavaType superType) {
         super(addLength(children, superType), name, name, false);
         assert name != null;
-        this.basetype = baseType;
+        this.baseType = baseType;
         this.dim = dimension();
         this.superType = superType;
     }
@@ -76,7 +76,7 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
         if (name != null) {
             result++;
         }
-        if (basetype != null) {
+        if (baseType != null) {
             result++;
         }
         if (members != null) {
@@ -111,9 +111,9 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
             }
             index--;
         }
-        if (basetype != null) {
+        if (baseType != null) {
             if (index == 0) {
-                return basetype;
+                return baseType;
             }
             index--;
         }
@@ -129,7 +129,7 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
      * @return refernce to the base type .
      */
     public TypeReference getBaseType() {
-        return basetype;
+        return baseType;
     }
 
     /**
@@ -180,7 +180,7 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
      * computes the dimension of this array
      */
     private int dimension() {
-        Type javaType = basetype.getKeYJavaType().getJavaType();
+        Type javaType = baseType.getKeYJavaType().getJavaType();
         if (javaType instanceof ArrayType) {
             return 1 + ((ArrayType) javaType).getDimension();
         } else {
@@ -212,7 +212,7 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
     public String getAlternativeNameRepresentation() {
         if (altNameRepresentation == null) {
             final StringBuilder alt = new StringBuilder();
-            Type baseType = basetype.getKeYJavaType().getJavaType();
+            Type baseType = this.baseType.getKeYJavaType().getJavaType();
 
             if (baseType instanceof ArrayType) {
                 alt.append(((ArrayType) baseType).getAlternativeNameRepresentation());
