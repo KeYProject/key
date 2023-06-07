@@ -887,7 +887,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(StringLiteralExpr n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        return new StringLiteral(pi, c, n.getValue());
+        return new StringLiteral(pi, c, '"'+n.getValue()+'"');
     }
 
     @Override

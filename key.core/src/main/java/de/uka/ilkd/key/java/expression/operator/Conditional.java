@@ -2,10 +2,7 @@ package de.uka.ilkd.key.java.expression.operator;
 
 import java.util.List;
 
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
@@ -13,6 +10,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /** The most weird ternary C operator ?: */
 
@@ -30,8 +28,8 @@ public class Conditional extends Operator {
         super(children);
     }
 
-    public Conditional(PositionInfo pi, List<Comment> c, Object accept, Object accept1,
-            Object accept2) {
+    public Conditional(PositionInfo pi, List<Comment> c, Expression accept, Expression  accept1, Expression  accept2) {
+        super(pi, c, new ImmutableArray<>(accept, accept1, accept2));
     }
 
 

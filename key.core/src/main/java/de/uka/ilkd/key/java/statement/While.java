@@ -12,13 +12,6 @@ import org.key_project.util.ExtList;
  */
 
 public class While extends LoopStatement {
-
-    /**
-     * While.
-     */
-
-    public While() {}
-
     /**
      * While.
      *
@@ -55,6 +48,7 @@ public class While extends LoopStatement {
     }
 
     public While(PositionInfo pi, List<Comment> c, Guard guard, Statement body) {
+        super(pi, c, null, null, guard, body);
     }
 
     public SourceElement getLastElement() {
