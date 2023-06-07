@@ -441,13 +441,15 @@ public class KeYProgModelInfo {
             return result;
         }
         for (var rf : rfl) {
-            Field f = (Field) rec2key().toKeY(rf);
-            if (f != null) {
-                result = result.prepend(f);
-            } else {
-                LOGGER.debug("Field has no KeY equivalent (recoder field): {}", rf);
-                LOGGER.debug("This happens currently as classes only available in byte code "
-                    + "are only partially converted ");
+            for (var decl : rf.getVariables()) {
+                Field f = (Field) rec2key().toKeY(decl);
+                if (f != null) {
+                    result = result.prepend(f);
+                } else {
+                    LOGGER.debug("Field has no KeY equivalent (recoder field): {}", rf);
+                    LOGGER.debug("This happens currently as classes only available in byte code "
+                            + "are only partially converted ");
+                }
             }
         }
         return result;

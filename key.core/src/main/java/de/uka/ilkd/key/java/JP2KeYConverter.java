@@ -579,12 +579,16 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var varsList = new ArrayList<FieldSpecification>(n.getVariables().size());
         for (VariableDeclarator v : n.getVariables()) {
             // TODO javaparser always model = false?
-            varsList.add(visitFieldSpecification(
-                new FullVariableDeclarator(v, n.isFinal(), n.isStatic(), false)));
+            final var fs = visitFieldSpecification(
+                    new FullVariableDeclarator(v, n.isFinal(), n.isStatic(), false));
+            varsList.add(fs);
+            mapping.put(v,fs);
         }
         var fieldSpecs = new ImmutableArray<>(varsList);
-        return new de.uka.ilkd.key.java.declaration.FieldDeclaration(pi, c, modArray, type,
-            isInInterface, fieldSpecs);
+        final var decl = new de.uka.ilkd.key.java.declaration.FieldDeclaration(pi, c, modArray, type,
+                isInInterface, fieldSpecs);
+        mapping.put(n,decl);
+        return decl;
     }
 
     @Override
