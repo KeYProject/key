@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.github.javaparser.ast.type.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
@@ -164,13 +165,13 @@ public class JavaService {
      * Each element of the array is treated as a filename to read in.
      *
      * @param filenames a list of strings, each element is interpreted as a file to be
-     *        read. not null.
-     * @param fileRepo the fileRepo which will store the files
+     *                  read. not null.
+     * @param fileRepo  the fileRepo which will store the files
      * @return a new list containing the recoder compilation units corresponding
-     *         to the given files.
+     * to the given files.
      */
     private List<CompilationUnit> recoderCompilationUnitsAsFiles(Collection<String> filenames,
-            FileRepo fileRepo)
+                                                                 FileRepo fileRepo)
             throws BuildingExceptions {
         List<CompilationUnit> cUnits = new ArrayList<>();
         parseSpecialClasses(fileRepo);
@@ -193,7 +194,7 @@ public class JavaService {
 
             // TODO A hack to remove false alarm caused by ModifiersVisitor check
             reportErrors(
-                result.getProblems().stream().filter(it -> !it.getMessage().contains("ghost")));
+                    result.getProblems().stream().filter(it -> !it.getMessage().contains("ghost")));
         }
     }
 
@@ -211,8 +212,8 @@ public class JavaService {
                     .map(b -> b.begin)
                     .orElse(new Position(-1, -1));
             return new BuildingIssue(it.getVerboseMessage(),
-                null, false,
-                de.uka.ilkd.key.java.Position.fromJPPosition(loc));
+                    null, false,
+                    de.uka.ilkd.key.java.Position.fromJPPosition(loc));
         }).collect(Collectors.toList());
         if (!be.isEmpty()) {
             throw new BuildingExceptions(be);
@@ -220,7 +221,7 @@ public class JavaService {
     }
 
     private ParseResult<CompilationUnit> parseCompilationUnit(String filename,
-            @Nullable FileRepo fileRepo) {
+                                                              @Nullable FileRepo fileRepo) {
         try {
             Reader is;
             if (fileRepo != null)
@@ -237,12 +238,12 @@ public class JavaService {
 
         } catch (FileNotFoundException e) {
             return new ParseResult<>(null,
-                Collections.singletonList(new Problem("Could not find " + filename, null, e)),
-                new CommentsCollection());
+                    Collections.singletonList(new Problem("Could not find " + filename, null, e)),
+                    new CommentsCollection());
         } catch (IOException e) {
             return new ParseResult<>(null,
-                Collections.singletonList(new Problem("I/O error reading: " + filename, null, e)),
-                new CommentsCollection());
+                    Collections.singletonList(new Problem("I/O error reading: " + filename, null, e)),
+                    new CommentsCollection());
         }
     }
 
@@ -262,7 +263,7 @@ public class JavaService {
      * read a number of compilation units, each given as a string.
      *
      * @param cUnitStrings an array of strings, each element represents a compilation
-     *        unit
+     *                     unit
      * @return a list of KeY structured compilation units.
      */
     List<CompilationUnit> recoderCompilationUnits(List<String> cUnitStrings) {
@@ -280,7 +281,7 @@ public class JavaService {
 
         // transform program
         final var collect =
-            cUnits.stream().map(it -> it.getResult().get()).collect(Collectors.toList());
+                cUnits.stream().map(it -> it.getResult().get()).collect(Collectors.toList());
         transformModel(collect);
         return collect;
     }
@@ -333,7 +334,7 @@ public class JavaService {
                 .map(it -> {
                     try {
                         final var inputStream =
-                            fileRepo == null ? it.openStream() : fileRepo.getInputStream(it);
+                                fileRepo == null ? it.openStream() : fileRepo.getInputStream(it);
                         try (Reader f = new BufferedReader(new InputStreamReader(inputStream))) {
                             final var result = getProgramFactory().parseCompilationUnit(f);
                             if (result.getResult().isPresent()) {
@@ -402,8 +403,8 @@ public class JavaService {
             while (walker.step()) {
                 var currentDataLocation = walker.getCurrentLocation();
                 try (InputStream is = walker.openCurrent(fileRepo);
-                        Reader isr = new InputStreamReader(is);
-                        Reader f = new BufferedReader(isr)) {
+                     Reader isr = new InputStreamReader(is);
+                     Reader f = new BufferedReader(isr)) {
                     var rcu = getProgramFactory().parseCompilationUnit(f);
                     reportErrors(rcu);
                     var cu = rcu.getResult().get();
@@ -420,8 +421,8 @@ public class JavaService {
             while (walker.step()) {
                 var currentDataLocation = walker.getCurrentLocation();
                 try (InputStream is = walker.openCurrent(fileRepo);
-                        Reader isr = new InputStreamReader(is);
-                        Reader f = new BufferedReader(isr)) {
+                     Reader isr = new InputStreamReader(is);
+                     Reader f = new BufferedReader(isr)) {
                     var rcu = getProgramFactory().parseCompilationUnit(f);
                     reportErrors(rcu);
                     var cu = rcu.getResult().get();
@@ -454,8 +455,8 @@ public class JavaService {
          */
 
         var rcu = getProgramFactory().parseCompilationUnit(
-            new StringReader("public class " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS +
-                " { public static void " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_METHOD + "() {}  }"));
+                new StringReader("public class " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS +
+                        " { public static void " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_METHOD + "() {}  }"));
         reportErrors(rcu);
         rcuList.add(rcu.getResult().get());
         return rcuList;
@@ -481,7 +482,7 @@ public class JavaService {
             public void visit(MethodDeclaration n, Void arg) {
                 if (!allowed && n.getBody().isPresent()) {
                     LOGGER.warn("Method body ({}) should not be allowed: {}", n.getNameAsString(),
-                        rcu.getStorage());
+                            rcu.getStorage());
                 }
                 n.setBody(null);
             }
@@ -578,7 +579,7 @@ public class JavaService {
         // These fragments are boring: No JML, no constructors, no initializer. And therefore
         // no need for pre-transformation.
         cUnits = cUnits.stream().filter(
-            it -> !it.getType(0).getNameAsString().equals(JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS))
+                        it -> !it.getType(0).getNameAsString().equals(JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS))
                 .collect(Collectors.toList());
         KeYJavaPipeline pipeline = KeYJavaPipeline.createDefault(createPipelineServices(cUnits));
         pipeline.apply();
@@ -598,7 +599,7 @@ public class JavaService {
      */
     protected MethodDeclaration embedBlock(BlockStmt block) {
         MethodDeclaration mdecl = new MethodDeclaration(new NodeList<>(), new VoidType(),
-            "$virtual_method_for_parsing");
+                "$virtual_method_for_parsing");
         mdecl.setBody(block);
         return mdecl;
     }
@@ -606,13 +607,13 @@ public class JavaService {
     /**
      * wraps a RECODER MethodDeclaration in a class
      *
-     * @param mdecl the declaration.MethodDeclaration to wrap
+     * @param mdecl   the declaration.MethodDeclaration to wrap
      * @param context the declaration.ClassDeclaration where the method
-     *        has to be embedded
+     *                has to be embedded
      * @return the enclosing declaration.ClassDeclaration
      */
     protected ClassOrInterfaceDeclaration embedMethod(MethodDeclaration mdecl,
-            TypeScope.JPContext context) {
+                                                      TypeScope.JPContext context) {
         ClassOrInterfaceDeclaration classContext = context.getClassDeclaration();
         classContext.addMember(mdecl);
         /*
@@ -660,10 +661,10 @@ public class JavaService {
      * add a list of variables to a context
      *
      * @param classContext context to add to
-     * @param vars vars to add
+     * @param vars         vars to add
      */
     private void addProgramVariablesToClassContext(ClassOrInterfaceDeclaration classContext,
-            ImmutableList<ProgramVariable> vars) {
+                                                   ImmutableList<ProgramVariable> vars) {
         Set<String> names = new HashSet<>();
 
         for (ProgramVariable var : vars) {
@@ -693,7 +694,7 @@ public class JavaService {
 
 
             FieldDeclaration recVar = new FieldDeclaration(new NodeList<>(),
-                new VariableDeclarator(name2typeReference(typeName), keyVarSpec.getName()));
+                    new VariableDeclarator(name2typeReference(typeName), keyVarSpec.getName()));
 
             classContext.addMember(recVar);
             insertToMap(recVar.getVariables().get(0), keyVarSpec);
@@ -722,7 +723,12 @@ public class JavaService {
      * @return a freshly created type reference to the given type.
      */
     private com.github.javaparser.ast.type.Type name2typeReference(String typeName) {
-        return new ClassOrInterfaceType(null, typeName);
+        try {
+            var p = PrimitiveType.Primitive.valueOf(typeName.toUpperCase());
+            return new PrimitiveType(p);
+        }catch (IllegalArgumentException e) {
+         return new ClassOrInterfaceType(null, typeName);
+        }
 
         /*
          * PackageReference pr = null;
