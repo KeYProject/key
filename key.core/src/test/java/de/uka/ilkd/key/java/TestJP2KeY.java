@@ -1,12 +1,5 @@
 package de.uka.ilkd.key.java;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -14,15 +7,20 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.TacletForTests;
-
+import org.junit.jupiter.api.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -31,11 +29,10 @@ public class TestJP2KeY {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestJP2KeY.class);
 
 
-
     private static JavaService c2k;
 
     // some non sense java blocks with lots of statements and expressions
-    private static final String[] jblocks = new String[] {
+    private static final String[] jblocks = new String[]{
             """
             {
                 int j = 7; 
@@ -48,8 +45,8 @@ public class TestJP2KeY {
                 while ((-i<7) || (i++==7--) | (--i==++7) ||(!true && false) || ('a'=='d')\s
                 || ("asd"=="as"+"d") & (d==f) ^ (d/f+2>=f*d-f%d)|| (l<=~i)\s
                 || !(this==null) || ((this!=null) ? (8<<j<8>>i) : (7&5>8>>>7L)\s
-                || (7|5!=8^4)) && i+=j && i=j && i/=j && i%=j && i-=j && i*=j\s
-                && i<<=j && i>>=j && i >>>= j && i &= j && i ^= j && i |= j) 
+                || (7|5!=8^4)) && (i+=j) && (i=j) && (i/=j) && (i%=j) && (i-=j) && (i*=j)\s
+                && (i<<=j) && (i>>=j) && (i >>>= j) && (i &= j) && (i ^= j) && (i |= j)) 
                     j=7;
              }
              """,
@@ -63,7 +60,8 @@ public class TestJP2KeY {
                 switch (j-i) {case 7: j=2; case 42: j=3; default: j=4; }
                 while (j==42) loop1:{ if (j==7) break; if (j==43) break loop1;
                 if (j==42) continue; if (j==41) continue loop1;}
-                if (j>42) return;synchronized(null) { j=7; }}
+                if (j>42) return;synchronized(null) { j=7; }
+            }
             """,
             "{ int x = 1; {java.util.List l;} }",
             "{int[] a; a=new int[3]; a=new int[]{2,3,4}; int j=a[2]; j=a.length;}"
@@ -72,7 +70,7 @@ public class TestJP2KeY {
 
     // This fails for an
     // cyclic references as method arguments
-    private static final String[] jclasses = new String[] {
+    private static final String[] jclasses = new String[]{
             "class A1 { public A1() { }} ",
             """
             package qwe.rty;
@@ -136,27 +134,25 @@ public class TestJP2KeY {
     @Test
     public void testReadBlockWithContext() {
         ProgramVariable pv = new LocationVariable(new ProgramElementName("i"),
-            TacletForTests.services().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT));
+                TacletForTests.services().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT));
         ImmutableList<ProgramVariable> list = ImmutableSLList.<ProgramVariable>nil().prepend(pv);
         JavaBlock block = c2k.readBlock("{ i = 2; }", c2k.createContext(list), null);
         ProgramVariable prgVarCmp =
-            (ProgramVariable) ((Operator) ((StatementBlock) block.program()).getStatementAt(0))
-                    .getChildAt(0);
+                (ProgramVariable) ((Operator) ((StatementBlock) block.program()).getStatementAt(0))
+                        .getChildAt(0);
         assertSame(prgVarCmp, pv, "ProgramVariables should be the same ones.");
     }
 
     /**
      * test compares the pretty print results from recoder and KeY modulo blanks and line feeds
      */
-    @Test
-    public void testJBlocks() {
-        for (int i = 0; i < jblocks.length; i++) {
-            String keyProg =
-                removeBlanks(c2k.readBlockWithEmptyContext(jblocks[i], null).toString());
-            String recoderProg =
-                removeBlanks(c2k.recoderBlock(jblocks[i], c2k.createEmptyContext()).toString());
-            assertEquals(recoderProg, keyProg, "Block " + i);
-        }
+    @TestFactory
+    public Stream<DynamicTest> testJBlocks() {
+        return Arrays.stream(jblocks).map(it -> DynamicTest.dynamicTest(it, () -> {
+            String keyProg = removeBlanks(c2k.readBlockWithEmptyContext(it, null).toString());
+            String recoderProg = removeBlanks(c2k.recoderBlock(it, c2k.createEmptyContext()).toString());
+            assertEquals(recoderProg, keyProg);
+        }));
     }
 
     private void testClass(String is) {
@@ -173,11 +169,9 @@ public class TestJP2KeY {
     /**
      * test compares the pretty print results from recoder and KeY modulo blanks and line feeds
      */
-    @Test
-    public void testJClasses() {
-        for (String jclass : jclasses) {
-            testClass(jclass);
-        }
+    @TestFactory
+    public Stream<DynamicTest> testJClasses() {
+        return Arrays.stream(jclasses).map(it -> DynamicTest.dynamicTest(it, () -> testClass(it)));
     }
 
 
@@ -191,7 +185,7 @@ public class TestJP2KeY {
         char[] ch = new char[100000];
         int n = 0;
         try (Reader fr = new BufferedReader(
-            new FileReader("de/uka/ilkd/key/java/Recoder2KeY.java", StandardCharsets.UTF_8))) {
+                new FileReader("de/uka/ilkd/key/java/Recoder2KeY.java", StandardCharsets.UTF_8))) {
             n = fr.read(ch);
         } catch (IOException e) {
             System.err.println("Recoder2KeY.java not found");
