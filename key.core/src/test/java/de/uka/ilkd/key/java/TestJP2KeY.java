@@ -126,8 +126,8 @@ public class TestJP2KeY {
     public void setUp() {
         if (c2k == null) {
             c2k = new JavaService(TacletForTests.services(), Collections.emptyList());
+            c2k.getProgramFactory().setUseSystemClassLoaderInResolution(true);
         }
-
     }
 
 
