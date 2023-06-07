@@ -1043,7 +1043,13 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             return new DoubleLiteral(lit.asDoubleLiteralExpr().getValue());
         } else if (lit.isIntegerLiteralExpr()) {
             // TODO javaparser there are only int literals in jp, not byte short int
-            return new IntLiteral(lit.asIntegerLiteralExpr().getValue());
+            var value = lit.asIntegerLiteralExpr().getValue();
+            // TODO weigl 1L is a javaparser int literal?
+            if (value.endsWith("L") || value.endsWith("l")) {
+                return new LongLiteral(value);
+            } else {
+                return new IntLiteral(value);
+            }
         } else if (lit.isLongLiteralExpr()) {
             return new LongLiteral(lit.asLongLiteralExpr().getValue());
         } else if (lit.isNullLiteralExpr()) {
