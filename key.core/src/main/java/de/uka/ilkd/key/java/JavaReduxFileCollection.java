@@ -1,11 +1,5 @@
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.io.consistency.FileRepo;
-import de.uka.ilkd.key.util.FileCollection;
-import de.uka.ilkd.key.util.KeYResourceManager;
-
-import javax.annotation.Nonnull;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -17,6 +11,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
+
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.util.FileCollection;
+import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
  * This is a special {@link FileCollection} which allows to retrieve the internally stored java boot
@@ -69,14 +69,14 @@ public class JavaReduxFileCollection implements FileCollection {
         String resourceString = resourceLocation + "/" + profile.getInternalClasslistFilename();
 
         URL jlURL =
-                KeYResourceManager.getManager().getResourceFile(JavaService.class, resourceString);
+            KeYResourceManager.getManager().getResourceFile(JavaService.class, resourceString);
 
         if (jlURL == null) {
             throw new FileNotFoundException("Resource " + resourceString + " cannot be opened.");
         }
 
         try (final BufferedReader r =
-                     new BufferedReader(new InputStreamReader(jlURL.openStream(), StandardCharsets.UTF_8))) {
+            new BufferedReader(new InputStreamReader(jlURL.openStream(), StandardCharsets.UTF_8))) {
             for (String jl = r.readLine(); (jl != null); jl = r.readLine()) {
                 // ignore comments and empty lines
                 if ((jl.length() == 0) || (jl.charAt(0) == '#')) {
@@ -118,7 +118,7 @@ public class JavaReduxFileCollection implements FileCollection {
     public Stream<URL> getResources() {
         return resources.stream()
                 .map(it -> KeYResourceManager.getManager().getResourceFile(
-                        JavaService.class, resourceLocation + "/" + it.replace('.', '/') + ".java"));
+                    JavaService.class, resourceLocation + "/" + it.replace('.', '/') + ".java"));
     }
 
     /*
@@ -212,7 +212,7 @@ public class JavaReduxFileCollection implements FileCollection {
 
             // may be null!
             currentURL = KeYResourceManager.getManager().getResourceFile(JavaService.class,
-                    resourceLocation + "/" + currentFileName);
+                resourceLocation + "/" + currentFileName);
 
             return true;
         }

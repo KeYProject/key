@@ -175,11 +175,11 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
             var cd = (ClassOrInterfaceDeclaration) td;
             var type = cd.resolve();
             final var ancestors = type.getAncestors();
-            if(!ancestors.isEmpty()) {
+            if (!ancestors.isEmpty()) {
                 final var superType = ancestors.get(0);
                 final var scope = new NameExpr(superType.getQualifiedName());
                 initializerExecutionBody.add(0,
-                        callPassively(scope, CLASS_INITIALIZE_IDENTIFIER));
+                    callPassively(scope, CLASS_INITIALIZE_IDENTIFIER));
             }
         }
 

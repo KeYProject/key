@@ -88,14 +88,15 @@ public class JP2KeYTypeConverter {
         this.namespaces = services.getNamespaces();
         this.objectSort = namespaces.sorts().lookup(new Name("java.lang.Object"));
         /*
-        this.objectType = getKeYJavaType("java.lang.Object");
-        this.cloneableType = getKeYJavaType("java.lang.Cloneable");
-        this.serializableType = getKeYJavaType("java.io.Serializable");
-        // I may not use JavaInfo here because the classes may not yet be cached!
-        if (objectType == null || cloneableType == null || serializableType == null) {
-            throw new RuntimeException(
-                "Missing core classes: java.lang.Object, java.lang.Cloneable, java.io.Serializable must always be present");
-        }
+         * this.objectType = getKeYJavaType("java.lang.Object");
+         * this.cloneableType = getKeYJavaType("java.lang.Cloneable");
+         * this.serializableType = getKeYJavaType("java.io.Serializable");
+         * // I may not use JavaInfo here because the classes may not yet be cached!
+         * if (objectType == null || cloneableType == null || serializableType == null) {
+         * throw new RuntimeException(
+         * "Missing core classes: java.lang.Object, java.lang.Cloneable, java.io.Serializable must always be present"
+         * );
+         * }
          */
     }
 
@@ -226,17 +227,20 @@ public class JP2KeYTypeConverter {
     }
 
     private KeYJavaType getSerializableType() {
-        if(__serializableType==null) __serializableType = getKeYJavaType("java.io.Serializable");
+        if (__serializableType == null)
+            __serializableType = getKeYJavaType("java.io.Serializable");
         return __serializableType;
     }
 
     private KeYJavaType getCloneableType() {
-        if(__cloneableType==null) __cloneableType = getKeYJavaType("java.lang.Cloneable");
+        if (__cloneableType == null)
+            __cloneableType = getKeYJavaType("java.lang.Cloneable");
         return __cloneableType;
     }
 
     private KeYJavaType getObjectType() {
-        if(__objectType==null) __objectType = getKeYJavaType("java.lang.Object");
+        if (__objectType == null)
+            __objectType = getKeYJavaType("java.lang.Object");
         return __objectType;
     }
 

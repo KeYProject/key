@@ -1,10 +1,20 @@
 package de.uka.ilkd.key.java;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import org.key_project.util.java.IOUtil;
+
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.key.sv.KeyContextStatementBlock;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.resolution.Navigator;
@@ -19,18 +29,8 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import org.key_project.util.java.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
 
 /**
  * @author Alexander Weigl
@@ -99,12 +99,12 @@ public class JavaParserFactory {
             for (Path existing : sourcePaths) {
                 if (path.startsWith(existing)) {
                     throw new IllegalStateException(
-                            "A parent of this path is already given in the classpath");
+                        "A parent of this path is already given in the classpath");
                 }
 
                 if (existing.startsWith(path)) {
                     throw new IllegalStateException(
-                            "A child folder of this path is already given in the classpath");
+                        "A child folder of this path is already given in the classpath");
                 }
             }
             sourcePaths.add(path);
@@ -252,8 +252,8 @@ public class JavaParserFactory {
             }
 
             LOGGER.error(
-                    "You gave me {} to add into the classpath. But I am not aware how to handle this path",
-                    sourcePath);
+                "You gave me {} to add into the classpath. But I am not aware how to handle this path",
+                sourcePath);
         }
 
         @Override
@@ -282,9 +282,9 @@ public class JavaParserFactory {
         private TypeSolver parent;
 
         private final Cache<String, SymbolReference<ResolvedReferenceTypeDeclaration>> foundTypes =
-                CacheBuilder.newBuilder().softValues()
-                        .maximumSize(1024)
-                        .build();
+            CacheBuilder.newBuilder().softValues()
+                    .maximumSize(1024)
+                    .build();
 
         @Override
         public TypeSolver getParent() {
@@ -298,7 +298,8 @@ public class JavaParserFactory {
 
         @Override
         public SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveType(String name) {
-            SymbolReference<ResolvedReferenceTypeDeclaration> cachedValue = foundTypes.getIfPresent(name);
+            SymbolReference<ResolvedReferenceTypeDeclaration> cachedValue =
+                foundTypes.getIfPresent(name);
             if (cachedValue != null) {
                 return cachedValue;
             }
@@ -309,22 +310,25 @@ public class JavaParserFactory {
             return result;
         }
 
-        private SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveTypeUncached(String name) {
+        private SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveTypeUncached(
+                String name) {
             for (CompilationUnit unit : javaBootClassCollection) {
 
                 final var primaryType = unit.getPrimaryType();
-                if(primaryType.isPresent()) {
+                if (primaryType.isPresent()) {
                     var cname = primaryType.get().getFullyQualifiedName();
                     if (cname.isPresent() && cname.get().equals(name)) {
                         return SymbolReference
-                                .solved(JavaParserFacade.get(this).getTypeDeclaration(primaryType.get()));
+                                .solved(JavaParserFacade.get(this)
+                                        .getTypeDeclaration(primaryType.get()));
                     }
                 }
 
                 var astTypeDeclaration = Navigator.findType(unit, name);
                 if (astTypeDeclaration.isPresent()) {
                     return SymbolReference
-                            .solved(JavaParserFacade.get(this).getTypeDeclaration(astTypeDeclaration.get()));
+                            .solved(JavaParserFacade.get(this)
+                                    .getTypeDeclaration(astTypeDeclaration.get()));
                 }
             }
             return SymbolReference.unsolved();
