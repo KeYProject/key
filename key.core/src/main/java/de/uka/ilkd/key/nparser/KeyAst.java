@@ -3,10 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
-import java.net.URL;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
@@ -14,14 +10,16 @@ import de.uka.ilkd.key.nparser.builder.IncludeFinder;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Triple;
-
-import org.key_project.util.java.StringUtil;
-
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
+import org.key_project.util.java.StringUtil;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.net.URL;
 
 /**
  * This is a monad around the parse tree. We use this class to hide the
@@ -60,7 +58,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
             if (ctx.preferences() != null) {
                 String text =
-                    StringUtil.trim(ctx.preferences().s.getText(), '"').replace("\\\\:", ":");
+                        StringUtil.trim(ctx.preferences().s.getText(), '"').replace("\\\\:", ":");
                 settings.loadSettingsFromString(text);
             }
             return settings;
@@ -71,7 +69,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                 KeYParser.ProofScriptContext pctx = ctx.problem().proofScript();
                 String text = pctx.ps.getText();
                 return new Triple<>(StringUtil.trim(text, '"'), pctx.ps.getLine(),
-                    pctx.ps.getCharPositionInLine());
+                        pctx.ps.getCharPositionInLine());
             }
             return null;
         }
@@ -136,6 +134,12 @@ public abstract class KeyAst<T extends ParserRuleContext> {
     public static class Seq extends KeyAst<KeYParser.SeqContext> {
         Seq(KeYParser.SeqContext ctx) {
             super(ctx);
+        }
+    }
+
+    public static class Taclet extends KeyAst<KeYParser.TacletContext> {
+        public Taclet(KeYParser.TacletContext taclet) {
+            super(taclet);
         }
     }
 }

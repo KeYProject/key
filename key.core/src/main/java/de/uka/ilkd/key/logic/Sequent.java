@@ -13,6 +13,8 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import javax.annotation.Nonnull;
+
 /**
  * This class represents a sequent. A sequent consists of an antecedent and succedent. As a sequent
  * is persistent there is no public constructor.
@@ -83,7 +85,7 @@ public class Sequent implements Iterable<SequentFormula> {
     }
 
     /** creates new Sequent with antecedence and succedence */
-    private Sequent(Semisequent antecedent, Semisequent succedent) {
+    private Sequent(@Nonnull Semisequent antecedent, @Nonnull Semisequent succedent) {
         assert !antecedent.isEmpty() || !succedent.isEmpty();
         this.antecedent = antecedent;
         this.succedent = succedent;

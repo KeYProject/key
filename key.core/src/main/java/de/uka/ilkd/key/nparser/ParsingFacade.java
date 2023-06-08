@@ -192,4 +192,15 @@ public final class ParsingFacade {
         String value = docComment.getText();
         return value.substring(3, value.length() - 2);// remove leading "/*!" and trailing "*/"
     }
+
+    public static KeyAst.Taclet parseTaclet(String source) {
+        return parseTaclet(CharStreams.fromString(source));
+    }
+
+    public static KeyAst.Taclet parseTaclet(CharStream source) {
+        KeYParser p = createParser(source);
+        var term = p.taclet();
+        p.getErrorReporter().throwException();
+        return new KeyAst.Taclet(term);
+    }
 }
