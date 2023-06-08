@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
@@ -42,6 +45,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
             throws Exception {
         Parameters args = new Parameters();
         ValueInjector.getInstance().inject(this, args, arguments);
+        args.originalArgs = arguments;
         return args;
     }
 
@@ -80,14 +84,15 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         // set model search if given
         StrategyProperties activeStrategyProperties =
             state.getProof().getSettings().getStrategySettings().getActiveStrategyProperties();
-        String oldModelSearchValue = "";
-        if (arguments.modelSearch != null) {
-            oldModelSearchValue =
-                activeStrategyProperties.getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY);
-            String newValue = arguments.modelSearch ? StrategyProperties.NON_LIN_ARITH_DEF_OPS
-                    : StrategyProperties.NON_LIN_ARITH_COMPLETION;
-            activeStrategyProperties.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
-                newValue);
+
+        Map<String, OriginalValue> orgValues = prepareOriginalValues();
+        for (Entry<String, String> entry : arguments.originalArgs.entrySet()) {
+            OriginalValue ov = orgValues.get(entry.getKey());
+            if(ov != null) {
+                ov.oldValue = activeStrategyProperties.getProperty(ov.settingName);
+                activeStrategyProperties.setProperty(ov.settingName,
+                        "true".equals(entry.getValue()) ? ov.trueValue : ov.falseValue);
+            }
         }
 
         // Give some feedback
@@ -106,11 +111,21 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
             }
         } finally {
             state.setMaxAutomaticSteps(oldNumberOfSteps);
-            if (arguments.modelSearch != null) {
-                activeStrategyProperties.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
-                    oldModelSearchValue);
+            for (OriginalValue ov : orgValues.values()) {
+                if (ov.oldValue != null) {
+                    activeStrategyProperties.setProperty(ov.settingName, ov.oldValue);
+                }
             }
         }
+    }
+
+    private Map<String, OriginalValue> prepareOriginalValues() {
+        var res = new HashMap<String, OriginalValue>();
+        res.put("modelSearch", new OriginalValue(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_COMPLETION, StrategyProperties.NON_LIN_ARITH_DEF_OPS));
+        res.put("expandQueries", new OriginalValue(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_ON, StrategyProperties.QUERYAXIOM_OFF));
+        res.put("classAxioms", new OriginalValue(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY, StrategyProperties.CLASS_AXIOM_FREE, StrategyProperties.CLASS_AXIOM_OFF));
+        res.put("dependencies", new OriginalValue(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_ON, StrategyProperties.DEP_OFF));
+        return res;
     }
 
     /**
@@ -163,9 +178,43 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         @Option(value = "modelsearch", required = false)
         public Boolean modelSearch;
 
+        @Option(value = "expandQueries", required = false)
+        public Boolean expandQueries;
+
+        @Option(value = "classAxioms", required = false)
+        public Boolean classAxioms;
+
+        @Option(value = "dependencies", required = false)
+        public Boolean dependencies;
+
         public int getSteps() {
             return maxSteps;
         }
 
+        public Map<String, String> originalArgs;
+
+    }
+
+    private static final class OriginalValue {
+        private final String settingName;
+        private final String trueValue;
+        private final String falseValue;
+        private String oldValue;
+
+        private OriginalValue( String settingName, String trueValue, String falseValue) {
+            this.settingName = settingName;
+            this.trueValue = trueValue;
+            this.falseValue = falseValue;
+        }
+
+        @Override
+        public String toString() {
+            return "OriginalValue{" +
+                    "settingName='" + settingName + '\'' +
+                    ", trueValue='" + trueValue + '\'' +
+                    ", falseValue='" + falseValue + '\'' +
+                    ", oldValue='" + oldValue + '\'' +
+                    '}';
+        }
     }
 }
