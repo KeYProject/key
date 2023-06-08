@@ -12,9 +12,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
-import de.uka.ilkd.key.scripts.meta.Documentation;
-import de.uka.ilkd.key.scripts.meta.Flag;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.*;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
@@ -49,11 +47,6 @@ public class AutoCommand extends AbstractCommand {
     }
 
     @Override
-    public String getDocumentation() {
-        return "The AutoCommand invokes the automatic strategy \"Auto\"";
-    }
-
-    @Override
     public void execute(ScriptCommandAst args) throws ScriptException, InterruptedException {
         var arguments = state().getValueInjector().inject(new AutoCommand.Parameters(), args);
         final Services services = state().getProof().getServices();
@@ -69,7 +62,7 @@ public class AutoCommand extends AbstractCommand {
             goals = state().getProof().openGoals();
         } else {
             final Goal goal = state().getFirstOpenAutomaticGoal();
-            goals = ImmutableSLList.<Goal>nil().prepend(goal);
+            goals = ImmutableList.of(goal);
 
             if (arguments.matches != null || arguments.breakpoint != null) {
                 setupFocussedBreakpointStrategy( //
@@ -79,8 +72,8 @@ public class AutoCommand extends AbstractCommand {
 
         // set the max number of steps if given
         int oldNumberOfSteps = state().getMaxAutomaticSteps();
-        if (arguments.getSteps() > 0) {
-            state().setMaxAutomaticSteps(arguments.getSteps());
+        if (arguments.maxSteps > 0) {
+            state().setMaxAutomaticSteps(arguments.maxSteps);
         }
 
         // set model search if given
@@ -134,7 +127,7 @@ public class AutoCommand extends AbstractCommand {
         res.put("classAxioms",
             new OriginalValue(CLASS_AXIOM_OPTIONS_KEY, CLASS_AXIOM_FREE, CLASS_AXIOM_OFF));
         res.put("dependencies", new OriginalValue(DEP_OPTIONS_KEY, DEP_ON, DEP_OFF));
-        // ... add further (boolean for the moment) setings here.
+        // ... add further (boolean for the moment) settings here.
         return res;
     }
 
@@ -171,7 +164,7 @@ public class AutoCommand extends AbstractCommand {
     @Documentation("""
             The AutoCommand is a command that invokes the automatic strategy "Auto" of KeY.
             It can be used to automatically prove a goal or a set of goals.
-            Use with care, as this command may leave the proof state in an unpredictable state
+            Use with care, as this command may leave the proof in a incomprehensible state
             with many open goals.
 
             Use the command with "close" to make sure the command succeeds for fails without
@@ -202,34 +195,30 @@ public class AutoCommand extends AbstractCommand {
 
         @Flag(value = "modelsearch")
         @Documentation("Enable model search. Better for some types of arithmetic problems. Sometimes a lot worse")
-        public boolean modelSearch;
+        public @Nullable Boolean modelSearch;
 
         @Flag(value = "expandQueries")
         @Documentation("Expand queries by modalities.")
-        public boolean expandQueries;
+        public @Nullable Boolean expandQueries;
 
         @Flag(value = "classAxioms")
         @Documentation("""
                 Enable class axioms. This expands model methods and fields and invariants quite eagerly. \
                 May lead to divergence.""")
-        public boolean classAxioms;
+        public @Nullable Boolean classAxioms;
 
         @Flag(value = "dependencies")
         @Documentation("""
                 Enable dependency reasoning. In modular reasoning, the value of symbols may stay the same, \
                 without that its definition is known. May be an enabler, may be a showstopper.""")
-        public boolean dependencies;
-
-        public int getSteps() {
-            return maxSteps;
-        }
+        public @Nullable Boolean dependencies;
     }
 
     private static final class OriginalValue {
         private final String settingName;
         private final String trueValue;
         private final String falseValue;
-        private String oldValue;
+        private @Nullable String oldValue;
 
         private OriginalValue(String settingName, String trueValue, String falseValue) {
             this.settingName = settingName;
