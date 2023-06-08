@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nparser;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.*;
 import javax.annotation.Nonnull;
@@ -47,10 +48,10 @@ public class ProofReplayer {
      * @param input a valid input stream
      * @param prl the proof replayer instance
      * @param source the source of the stream, used for producing exceptions with locations
-     * @see #run(CharStream, IProofFileParser, int, URL)
+     * @see #run(CharStream, IProofFileParser, int, URI)
      */
     public static void run(@Nonnull Token token, CharStream input, IProofFileParser prl,
-            URL source) {
+            URI source) {
         input.seek(1 + token.getStopIndex()); // ends now on \proof|
         run(input, prl, token.getLine(), source);
     }
@@ -68,7 +69,7 @@ public class ProofReplayer {
      * @param source the source of the stream, used for producing exceptions with locations
      */
     public static void run(CharStream input, IProofFileParser prl, final int startLine,
-            URL source) {
+            URI source) {
         KeYLexer lexer = ParsingFacade.createLexer(input);
         CommonTokenStream stream = new CommonTokenStream(lexer);
         ArrayDeque<IProofFileParser.ProofElementID> stack = new ArrayDeque<>(); // currently open

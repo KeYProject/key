@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -15,6 +18,7 @@ import de.uka.ilkd.key.nparser.*;
 import de.uka.ilkd.key.nparser.builder.ContractsAndInvariantsFinder;
 import de.uka.ilkd.key.nparser.builder.ProblemFinder;
 import de.uka.ilkd.key.nparser.builder.TacletPBuilder;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -401,8 +405,15 @@ public class KeYFile implements EnvInput {
      *         in <code>issues</code>
      */
     protected List<PositionedString> getPositionedStrings(List<BuildingIssue> issues) {
-        return issues.stream().map(w -> new PositionedString(w.getMessage(),
-            file != null ? file.getExternalForm() : "<unknown file>", w.getPosition()))
+        return issues.stream().map(w -> {
+            try {
+                return new PositionedString(w.getMessage(),
+                    new Location(file != null ? new URL(file.getExternalForm()).toURI() : null,
+                        w.getPosition()));
+            } catch (MalformedURLException | URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        })
                 .collect(Collectors.<PositionedString>toList());
     }
 

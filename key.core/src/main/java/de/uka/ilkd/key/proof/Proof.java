@@ -206,11 +206,15 @@ public class Proof implements Named {
                 (OriginTermLabel) formula.formula().getLabel(OriginTermLabel.NAME);
             if (originLabel != null) {
                 if (originLabel.getOrigin() instanceof FileOrigin) {
-                    sources.addRelevantFile(((FileOrigin) originLabel.getOrigin()).fileName);
+                    ((FileOrigin) originLabel.getOrigin())
+                            .getFileName()
+                            .ifPresent(sources::addRelevantFile);
                 }
 
-                originLabel.getSubtermOrigins().stream().filter(o -> o instanceof FileOrigin)
-                        .map(o -> (FileOrigin) o).forEach(o -> sources.addRelevantFile(o.fileName));
+                originLabel.getSubtermOrigins().stream()
+                        .filter(o -> o instanceof FileOrigin)
+                        .map(o -> (FileOrigin) o)
+                        .forEach(o -> o.getFileName().ifPresent(sources::addRelevantFile));
             }
         });
 

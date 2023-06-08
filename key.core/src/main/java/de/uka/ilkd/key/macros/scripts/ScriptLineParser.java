@@ -2,9 +2,10 @@ package de.uka.ilkd.key.macros.scripts;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.net.URL;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
@@ -45,7 +46,7 @@ class ScriptLineParser {
     /**
      * the file URL from which the script is taken.
      */
-    private URL fileURL;
+    private URI fileURI;
 
     /**
      * While within a string literal, this stores the character with which the string has started.
@@ -70,12 +71,16 @@ class ScriptLineParser {
         IN_COMMENT
     }
 
-    public ScriptLineParser(Reader reader, URL fileURL) {
+    public ScriptLineParser(Reader reader, @Nullable Location initialLocation) {
         this.reader = reader;
-        this.fileURL = fileURL;
+        if (initialLocation != null) {
+            this.fileURI = initialLocation.getFileURI().orElse(null);
+            this.line = initialLocation.getPosition().line();
+            this.col = initialLocation.getPosition().column();
+        }
     }
 
-    public Map<String, String> parseCommand() throws IOException, ScriptException {
+    public ParsedCommand parseCommand() throws IOException, ScriptException {
         Map<String, String> result = new HashMap<>();
 
         StringBuilder cmdBuilder = new StringBuilder();
@@ -84,6 +89,7 @@ class ScriptLineParser {
         State state = State.INIT;
         State stateBeforeComment = null;
         int impCounter = 1;
+        Location start = null;
 
         while (true) {
             int c = reader.read();
@@ -95,6 +101,10 @@ class ScriptLineParser {
                 col++;
             }
             pos++;
+
+            if (start == null && !Character.isWhitespace(c)) {
+                start = getLocation();
+            }
 
             switch (c) {
             case -1:
@@ -206,7 +216,8 @@ class ScriptLineParser {
                 }
                 if (state != State.IN_COMMENT && state != State.IN_QUOTE) {
                     result.put(LITERAL_KEY, cmdBuilder.toString().trim());
-                    return result;
+                    var end = getLocation();
+                    return new ParsedCommand(result, start, end);
                 }
                 break;
             default:
@@ -242,7 +253,7 @@ class ScriptLineParser {
         }
     }
 
-    private boolean isIDChar(int c) {
+    private static boolean isIDChar(int c) {
         return Character.isLetterOrDigit(c) || ADMISSIBLE_CHARS.indexOf((char) c) > -1;
     }
 
@@ -251,21 +262,22 @@ class ScriptLineParser {
             String.format("Unexpected char '%s' at %d:%d", (char) c, line, col), getLocation());
     }
 
-    public int getLine() {
-        return line;
-    }
-
-    public Location getLocation() {
-        return new Location(fileURL, Position.newOneBased(line, col));
+    private Location getLocation() {
+        return new Location(fileURI, Position.newOneBased(line, col));
     }
 
     public int getOffset() {
         return pos;
     }
 
-    public void setLocation(Location location) {
-        this.line = location.getPosition().line();
-        this.col = location.getPosition().column();
-        this.fileURL = location.getFileURL();
+    public static final class ParsedCommand {
+        public final Map<String, String> args;
+        public final Location start, end;
+
+        public ParsedCommand(Map<String, String> args, Location start, Location end) {
+            this.args = args;
+            this.start = start;
+            this.end = end;
+        }
     }
 }

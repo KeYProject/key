@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -30,7 +29,7 @@ public class FocusCommandTest {
         Proof p = env.getLoadedProof();
         ProofScriptEngine pse = new ProofScriptEngine(
             "macro 'nosplit-prop'; focus 'i=1 ==> i = 4';",
-            new Location((URL) null, Position.newOneBased(1, 1)));
+            new Location(null, Position.newOneBased(1, 1)));
         pse.execute(env.getUi(), p);
 
         assertEquals(1, p.openGoals().size());
@@ -51,7 +50,7 @@ public class FocusCommandTest {
         Proof p = env.getLoadedProof();
         ProofScriptEngine pse = new ProofScriptEngine(
             "macro 'nosplit-prop'; focus 'i=1 ==> i = 3';",
-            new Location((URL) null, Position.newOneBased(1, 1)));
+            new Location(null, Position.newOneBased(1, 1)));
         pse.execute(env.getUi(), p);
 
         assertEquals(1, p.openGoals().size());
