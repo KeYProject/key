@@ -18,6 +18,9 @@ import de.uka.ilkd.key.nparser.varexp.ArgumentType;
 import de.uka.ilkd.key.nparser.varexp.TacletBuilderCommand;
 import de.uka.ilkd.key.nparser.varexp.TacletBuilderManipulators;
 import de.uka.ilkd.key.parser.SchemaVariableModifierSet;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.conditions.TypeResolver;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
@@ -229,18 +232,20 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Object visitDatatype_decl(KeYParser.Datatype_declContext ctx) {
+        LogicPrinter lp = new LogicPrinter(new NotationInfo(), services, new PosTableLayouter(100, 4, true));
         var tbAx = createAxiomTaclet(ctx).getTaclet();
-        System.out.println(tbAx);
+        lp.printTaclet(tbAx);
         announceTaclet(ctx, tbAx);
 
         var tbInd = createInductionTaclet(ctx).getTaclet();
-        System.out.println(tbInd);
+        lp.printTaclet(tbInd);
         announceTaclet(ctx, tbInd);
 
         var tbSplit = createConstructorSplit(ctx).getTaclet();
-        System.out.println(tbSplit);
+        lp.printTaclet(tbSplit);
         announceTaclet(ctx, tbSplit);
 
+        System.out.println(lp.result());
         return null;
     }
 
