@@ -16,6 +16,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -95,6 +96,8 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
             }
         }
 
+        SetCommand.updateStrategySettings(state, activeStrategyProperties);
+
         // Give some feedback
         applyStrategy.addProverTaskObserver(uiControl);
 
@@ -116,6 +119,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
                     activeStrategyProperties.setProperty(ov.settingName, ov.oldValue);
                 }
             }
+            SetCommand.updateStrategySettings(state, activeStrategyProperties);
         }
     }
 

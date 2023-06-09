@@ -49,7 +49,7 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
                 throw new ScriptException("Unknown setting key: " + args.key);
             }
             newProps.setProperty(args.key, args.value);
-            updateStrategySettings(newProps);
+            updateStrategySettings(state, newProps);
         } else if (args.stackAction != null) {
             Stack<StrategyProperties> stack =
                 (Stack<StrategyProperties>) state.getUserData("settingsStack");
@@ -64,7 +64,7 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
             case "pop":
                 // TODO sensible error if empty
                 newProps = stack.pop();
-                updateStrategySettings(newProps);
+                updateStrategySettings(state, newProps);
                 break;
             default:
                 throw new IllegalArgumentException("stack must be either push or pop.");
@@ -82,9 +82,9 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
      * quite complicated implementation, which is inspired by StrategySelectionView.
      */
 
-    private void updateStrategySettings(StrategyProperties p) {
+    protected static void updateStrategySettings(EngineState state, StrategyProperties p) {
         final Proof proof = state.getProof();
-        final Strategy strategy = getStrategy(p);
+        final Strategy strategy = getStrategy(state, p);
 
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setStrategy(strategy.name());
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(p);
@@ -95,8 +95,9 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
         proof.setActiveStrategy(strategy);
     }
 
-    private Strategy getStrategy(StrategyProperties properties) {
+    private static Strategy getStrategy(EngineState state, StrategyProperties properties) {
         final Profile profile = state.getProof().getServices().getProfile();
+        final Proof proof = state.getProof();
 
         //
         for (StrategyFactory s : profile.supportedStrategies()) {
