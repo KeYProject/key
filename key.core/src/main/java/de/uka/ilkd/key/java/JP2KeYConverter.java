@@ -147,20 +147,40 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(ArrayCreationExpr n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        ImmutableArray<Expression> children = map(n.getLevels());
         TypeReference type = accept(n.getElementType());
-        ArrayInitializer ai = accepto(n.getInitializer());
+        // TODO javaparser how should int[5][4][][] be encoded in the key ast?
+        ArrayInitializer ai;
+        ImmutableArray<Expression> children;
+        if (n.getInitializer().isPresent()) {
+            ai = visitArrayInitializerExpr(n.getInitializer().get(), type.getKeYJavaType());
+            children = null;
+        } else {
+            ai = null;
+            children = map(n.getLevels());
+        }
+
+        int dimensions = n.getLevels().size();
         var rtype = n.calculateResolvedType();
-        return new NewArray(pi, c, children, type, getKeYJavaType(rtype), 0/* TODO */, ai);
+        return new NewArray(pi, c, children, type, getKeYJavaType(rtype), dimensions, ai);
     }
 
-    @Override
-    public Object visit(ArrayInitializerExpr n, Void arg) {
+    private ArrayInitializer visitArrayInitializerExpr(ArrayInitializerExpr n, KeYJavaType type) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        ImmutableArray<Expression> children = map(n.getValues());
-        var rtype = n.calculateResolvedType();
-        return new ArrayInitializer(pi, c, children, getKeYJavaType(rtype));
+        var list = new ArrayList<Expression>(n.getValues().size());
+        for (var node : n.getValues()) {
+            Expression expr;
+            if (node instanceof ArrayInitializerExpr) {
+                var array = ((de.uka.ilkd.key.java.abstraction.ArrayType) type.getJavaType());
+                expr = visitArrayInitializerExpr((ArrayInitializerExpr) node,
+                    array.getBaseType().getKeYJavaType());
+            } else {
+                expr = accept(node);
+            }
+            list.add(expr);
+        }
+        var children = new ImmutableArray<>(list);
+        return new ArrayInitializer(pi, c, children, type);
     }
 
     @Override
@@ -405,9 +425,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     private <T> ImmutableArray<T> map(NodeList<? extends Visitable> nodes) {
-        var seq = nodes.stream().map(it -> (T) Objects.requireNonNull(it.accept(this, null)))
-                .collect(Collectors.toList());
-        return new ImmutableArray<>(seq);
+        var list = new ArrayList<T>(nodes.size());
+        for (Node node : nodes) {
+            var res = node.accept(this, null);
+            list.add((T) Objects.requireNonNull(res));
+        }
+        return new ImmutableArray<>(list);
     }
 
     private <T> ImmutableArray<T> flatMap(NodeList<? extends Visitable> nodes) {
