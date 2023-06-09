@@ -204,12 +204,8 @@ public class TestTermLabelManager {
     public void testInstantiateLabels_updates_allRules() {
         LoggingTermLabelUpdate update =
             new LoggingTermLabelUpdate(new ParameterlessTermLabel(new Name("UPDATED")));
-        Services services = null;
-        try {
-            services = createTestServices(null, null, null, null, update, null).getServices();
-        } catch (ProblemLoaderException e) {
-            fail();
-        }
+        Services services = Assertions.assertDoesNotThrow(
+            () -> createTestServices(null, null, null, null, update, null).getServices());
         PosInOccurrence pos = createTestPosInOccurrence(services);
         Rule rule = new DummyRule("rule");
         Term taclet = services.getTermBuilder().tt();
@@ -235,12 +231,8 @@ public class TestTermLabelManager {
     public void testInstantiateLabels_updates_ruleSpecific() {
         LoggingTermLabelUpdate update =
             new LoggingTermLabelUpdate(new ParameterlessTermLabel(new Name("UPDATED")), "rule");
-        Services services = null;
-        try {
-            services = createTestServices(null, null, null, null, update, null).getServices();
-        } catch (ProblemLoaderException e) {
-            fail();
-        }
+        Services services = Assertions.assertDoesNotThrow(
+            () -> createTestServices(null, null, null, null, update, null).getServices());
         PosInOccurrence pos = createTestPosInOccurrence(services);
         Rule rule = new DummyRule("rule");
         Term taclet = services.getTermBuilder().tt();
@@ -264,12 +256,8 @@ public class TestTermLabelManager {
     @Test
     public void testInstantiateLabels_childAndGrandchildPolicies_allRules() {
         LoggingChildTermLabelPolicy policy = new LoggingChildTermLabelPolicy();
-        Services services = null;
-        try {
-            services = createTestServices(null, null, null, policy, null, null).getServices();
-        } catch (ProblemLoaderException e) {
-            fail();
-        }
+        Services services = Assertions.assertDoesNotThrow(
+            () -> createTestServices(null, null, null, policy, null, null).getServices());
         PosInOccurrence pos = createTestPosInOccurrence(services);
         Rule rule = new DummyRule("rule");
         Term taclet = services.getTermBuilder().tt();
@@ -316,12 +304,8 @@ public class TestTermLabelManager {
     @Test
     public void testInstantiateLabels_childAndGrandchildPolicies_ruleSpecific() {
         LoggingChildTermLabelPolicy policy = new LoggingChildTermLabelPolicy("rule");
-        Services services = null;
-        try {
-            services = createTestServices(null, null, null, policy, null, null).getServices();
-        } catch (ProblemLoaderException e) {
-            fail();
-        }
+        Services services = Assertions.assertDoesNotThrow(
+            () -> createTestServices(null, null, null, policy, null, null).getServices());
         PosInOccurrence pos = createTestPosInOccurrence(services);
         Rule rule = new DummyRule("rule");
         Term taclet = services.getTermBuilder().tt();
@@ -394,12 +378,8 @@ public class TestTermLabelManager {
     @Test
     public void testInstantiateLabels_directChildPolicies_ruleSpecific() {
         LoggingChildTermLabelPolicy policy = new LoggingChildTermLabelPolicy("rule");
-        Services services = null;
-        try {
-            services = createTestServices(null, null, policy, null, null, null).getServices();
-        } catch (ProblemLoaderException e) {
-            fail();
-        }
+        Services services = Assertions.assertDoesNotThrow(
+            () -> createTestServices(null, null, policy, null, null, null).getServices());
         PosInOccurrence pos = createTestPosInOccurrence(services);
         Rule rule = new DummyRule("rule");
         Term taclet = services.getTermBuilder().tt();
@@ -430,12 +410,8 @@ public class TestTermLabelManager {
     @Test
     public void testInstantiateLabels_modalityTermPolicies() {
         LoggingTermLabelPolicy policy = new LoggingTermLabelPolicy();
-        Services services = null;
-        try {
-            services = createTestServices(null, policy, null, null, null, null).getServices();
-        } catch (ProblemLoaderException e) {
-            fail();
-        }
+        Services services = Assertions.assertDoesNotThrow(
+            () -> createTestServices(null, policy, null, null, null, null).getServices());
         TermBuilder TB = services.getTermBuilder();
         Term modality = TB.label(
             TB.box(JavaBlock.EMPTY_JAVABLOCK,
@@ -467,12 +443,8 @@ public class TestTermLabelManager {
     @Test
     public void testInstantiateLabels_applicationTermPolicies() {
         LoggingTermLabelPolicy policy = new LoggingTermLabelPolicy();
-        Services services = null;
-        try {
-            services = createTestServices(policy, null, null, null, null, null).getServices();
-        } catch (ProblemLoaderException e) {
-            fail();
-        }
+        Services services = Assertions.assertDoesNotThrow(
+            () -> createTestServices(policy, null, null, null, null, null).getServices());
         PosInOccurrence pos = createTestPosInOccurrence(services);
         Term taclet = services.getTermBuilder().tt();
         Rule rule = new DummyRule("rule");
@@ -492,12 +464,8 @@ public class TestTermLabelManager {
     */
     @Test
     public void testInstantiateLabels_taclet() {
-        Services services = null;
-        try {
-            services = createTestServices(null, null, null, null, null, null).getServices();
-        } catch (ProblemLoaderException e) {
-            fail();
-        }
+        Services services = Assertions.assertDoesNotThrow(
+            () -> createTestServices(null, null, null, null, null, null).getServices());
         PosInOccurrence pos = createTestPosInOccurrence(services);
         Rule rule = new DummyRule("rule");
         Term taclet = services.getTermBuilder().label(services.getTermBuilder().tt(),
@@ -543,12 +511,8 @@ public class TestTermLabelManager {
 
     @Test
     public void testParseLabel() throws TermLabelException {
-        Services services = null;
-        try {
-            services = createTestServices(null, null, null, null, null, null).getServices();
-        } catch (ProblemLoaderException e1) {
-            fail();
-        }
+        Services services = Assertions.assertDoesNotThrow(
+            () -> createTestServices(null, null, null, null, null, null).getServices());
         TermLabelManager manager = TermLabelManager.getTermLabelManager(services);
         // Test null parameter
         TermLabel label = manager.parseLabel("ONE", null, services);
@@ -585,12 +549,8 @@ public class TestTermLabelManager {
         assertNotNull(names);
         assertTrue(names.isEmpty());
         // Test services
-        Services services = null;
-        try {
-            services = createTestServices(null, null, null, null, null, null).getServices();
-        } catch (ProblemLoaderException e) {
-            fail();
-        }
+        Services services = Assertions.assertDoesNotThrow(
+            () -> createTestServices(null, null, null, null, null, null).getServices());
         names = TermLabelManager.getSupportedTermLabelNames(services);
         assertNotNull(names);
         assertEquals(5, names.size());
