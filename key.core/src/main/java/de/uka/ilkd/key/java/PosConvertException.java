@@ -2,7 +2,7 @@ package de.uka.ilkd.key.java;
 
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.parser.Location;
@@ -20,7 +20,7 @@ public class PosConvertException extends ConvertException implements HasLocation
     /**
      * The file this error references. May be null.
      */
-    private URL file;
+    private URI file;
 
     /**
      * The position
@@ -46,7 +46,7 @@ public class PosConvertException extends ConvertException implements HasLocation
      * @param position the position
      * @param file the file that contains the error
      */
-    public PosConvertException(String message, Position position, URL file) {
+    public PosConvertException(String message, Position position, URI file) {
         super(message);
         this.position = position;
         this.file = file;

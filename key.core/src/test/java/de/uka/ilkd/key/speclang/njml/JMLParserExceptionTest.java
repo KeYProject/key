@@ -138,9 +138,8 @@ public class JMLParserExceptionTest {
 
                 String loc = props.getProperty("position");
                 if (loc != null) {
-                    Location actLoc = ExceptionTools.getLocation(e);
-                    assertNotNull(actLoc, "Exception location must not be null");
-                    assertEquals(file.toUri().toURL(), actLoc.getFileURL(),
+                    Location actLoc = ExceptionTools.getLocation(e).orElseThrow();
+                    assertEquals(file.toUri(), actLoc.getFileURI().orElseThrow(),
                         "Exception location must point to file under test");
                     assertEquals(loc, actLoc.getPosition().toString());
                 }

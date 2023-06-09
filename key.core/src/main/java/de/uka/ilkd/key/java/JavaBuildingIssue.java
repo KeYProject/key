@@ -4,8 +4,6 @@ package de.uka.ilkd.key.java;
 import java.net.URI;
 import javax.annotation.Nullable;
 
-import de.uka.ilkd.key.speclang.PositionedString;
-
 import com.github.javaparser.ast.Node;
 
 /**
@@ -19,10 +17,6 @@ public class JavaBuildingIssue {
     public JavaBuildingIssue(String message, Node node) {
         this.message = message;
         this.node = node;
-    }
-
-    public PositionedString getPositionedString() {
-        return new PositionedString(message, getPath().toString(), getPosition());
     }
 
     public String getMessage() {

@@ -16,7 +16,6 @@ import org.antlr.v4.runtime.IntStream;
 public class RecognitionException extends Exception implements HasLocation {
     public IntStream input;
     public Position position;
-    public int charPositionInLine;
 
     public RecognitionException(IntStream input, Position position) {
         this.input = input;
@@ -30,6 +29,6 @@ public class RecognitionException extends Exception implements HasLocation {
     @Nullable
     @Override
     public Location getLocation() throws MalformedURLException {
-        return new Location(input.getSourceName(), position);
+        return new Location(MiscTools.getURIFromTokenSource(input.getSourceName()), position);
     }
 }

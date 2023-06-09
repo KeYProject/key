@@ -1,16 +1,16 @@
 package de.uka.ilkd.key.util;
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
-import org.antlr.runtime.RecognitionException;
 
 /**
  * Various utility methods related to exceptions.
@@ -41,22 +41,25 @@ public final class ExceptionTools {
      *         given Throwable can not be successfully converted to a URL and thus no Location can
      *         be created
      */
-    public static @Nullable Location getLocation(@Nonnull Throwable exc)
+    public static Optional<Location> getLocation(@Nonnull Throwable exc)
             throws MalformedURLException {
-        Location location = null;
         if (exc instanceof HasLocation) {
-            return ((HasLocation) exc).getLocation();
+            return Optional.ofNullable(((HasLocation) exc).getLocation());
         }
 
-        if (location == null && exc.getCause() != null) {
-            location = getLocation(exc.getCause());
+        if (exc.getCause() != null) {
+            return getLocation(exc.getCause());
         }
 
-        return location;
+        return Optional.empty();
     }
 
-    private static URL parseFileName(String filename) throws MalformedURLException {
-        return filename == null ? null : MiscTools.parseURL(filename);
+    private static URI parseFileName(String filename) throws MalformedURLException {
+        try {
+            return filename == null ? null : MiscTools.parseURL(filename).toURI();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // TODO javaparser this was not unused
@@ -65,8 +68,7 @@ public final class ExceptionTools {
         // ANTLR 3 - Recognition Exception.
         if (exc.input != null) {
             // ANTLR has 0-based column numbers
-            return new Location(parseFileName(exc.input.getSourceName()),
-                Position.fromOneZeroBased(exc.line, exc.charPositionInLine));
+            return new Location(parseFileName(exc.input.getSourceName()), exc.position);
         }
         return null;
     }

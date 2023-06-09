@@ -448,7 +448,7 @@ public class KeYProgModelInfo {
                 } else {
                     LOGGER.debug("Field has no KeY equivalent (recoder field): {}", rf);
                     LOGGER.debug("This happens currently as classes only available in byte code "
-                            + "are only partially converted ");
+                        + "are only partially converted ");
                 }
             }
         }

@@ -28,7 +28,8 @@ public class Conditional extends Operator {
         super(children);
     }
 
-    public Conditional(PositionInfo pi, List<Comment> c, Expression accept, Expression  accept1, Expression  accept2) {
+    public Conditional(PositionInfo pi, List<Comment> c, Expression accept, Expression accept1,
+            Expression accept2) {
         super(pi, c, new ImmutableArray<>(accept, accept1, accept2));
     }
 

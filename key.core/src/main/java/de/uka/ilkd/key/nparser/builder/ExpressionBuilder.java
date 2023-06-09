@@ -681,7 +681,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         // }
 
         if (result == null && !("length".equals(attributeName))) {
-            throwEx(new NotDeclException(null, "Attribute ", attributeName));
+            throwEx(new NotDeclException("Attribute ", attributeName));
         }
         return result;
     }
@@ -925,7 +925,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         String sc = accept(ctx.name);
         Term a = abbrevMap.getTerm(sc);
         if (a == null) {
-            throwEx(new NotDeclException(null, "abbreviation", sc));
+            throwEx(new NotDeclException("abbreviation", sc));
         }
         return a;
     }

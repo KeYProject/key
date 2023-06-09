@@ -95,7 +95,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         this.heapLDT = services.getTypeConverter().getHeapLDT();
         this.locSetLDT = services.getTypeConverter().getLocSetLDT();
         this.booleanLDT = services.getTypeConverter().getBooleanLDT();
-        this.exc = new SLExceptionFactory("", 1, 0);
+        this.exc = new SLExceptionFactory(null, 1, 0);
 
         this.selfVar = self;
         this.paramVars = paramVars;

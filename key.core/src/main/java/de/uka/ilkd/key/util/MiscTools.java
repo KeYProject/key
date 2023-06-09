@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipFile;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
@@ -43,6 +44,8 @@ import org.key_project.util.Filenames;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.*;
 
+import org.antlr.v4.runtime.IntStream;
+import org.antlr.v4.runtime.TokenSource;
 
 /**
  * Collection of some common, stateless functionality. Stolen from the weissInvariants side branch.
@@ -716,25 +719,6 @@ public final class MiscTools {
     }
 
     /**
-     * Returns the path to the source file defined by the given {@link PositionInfo}.
-     *
-     * @param posInfo The {@link PositionInfo} to extract source file from.
-     * @return The source file name or {@code null} if not available.
-     */
-    public static String getSourcePath(PositionInfo posInfo) {
-        String result = null;
-        if (posInfo.getFileName() != null) {
-            result = posInfo.getFileName(); // posInfo.getFileName() is a path to a file
-        } else if (posInfo.getParentClass() != null) {
-            result = posInfo.getParentClass(); // posInfo.getParentClass() is a path to a file
-        }
-        if (result != null && result.startsWith("FILE:")) {
-            result = result.substring("FILE:".length());
-        }
-        return result;
-    }
-
-    /**
      * Creates a URI (that contains a URL) pointing to the entry with the given name inside the
      * given zip file. <br>
      * <br>
@@ -778,6 +762,24 @@ public final class MiscTools {
         // Path p = fs.getPath(entryName);
         // return p.toUri();
         // }
+    }
+
+    @Nullable
+    public static URI getURIFromTokenSource(TokenSource source) {
+        return getURIFromTokenSource(source.getSourceName());
+    }
+
+    @Nullable
+    public static URI getURIFromTokenSource(String source) {
+        if (IntStream.UNKNOWN_SOURCE_NAME.equals(source)) {
+            return null;
+        }
+
+        try {
+            return new URI(source);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

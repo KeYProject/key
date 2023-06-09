@@ -421,9 +421,7 @@ public final class SourceView extends JComponent {
      * @throws IOException if the file cannot be opened.
      */
     public void openFile(URI fileURI) throws IOException {
-        Set<URI> set = new HashSet<>();
-        set.add(fileURI);
-        openFiles(set);
+        openFiles(Collections.singleton(fileURI));
     }
 
     /**
@@ -433,7 +431,7 @@ public final class SourceView extends JComponent {
      *
      * @throws IOException if one of the files cannot be opened.
      */
-    public void openFiles(Set<URI> fileURIs) throws IOException {
+    public void openFiles(Iterable<URI> fileURIs) throws IOException {
         boolean updateNecessary = false;
 
         for (URI fileURI : fileURIs) {
@@ -629,7 +627,7 @@ public final class SourceView extends JComponent {
             // activate the tab with the most recent file
             PositionInfo p = lines.isEmpty() ? null : lines.getFirst().second;
             if (p != null) {
-                Tab t = tabs.get(p.getURI());
+                Tab t = tabs.get(p.getURI().orElse(null));
                 if (t != null) {
                     String s = t.simpleFileName;
                     for (int i = 0; i < tabPane.getTabCount(); i++) {
@@ -655,9 +653,10 @@ public final class SourceView extends JComponent {
     private void addPosToList(PositionInfo pos, LinkedList<Pair<Node, PositionInfo>> list,
             Node node) {
         if (pos != null && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
-                && pos.getURI() != null) {
+                && pos.getURI().isPresent()) {
             list.addLast(new Pair<>(node, pos));
-            node.proof().lookup(ProofJavaSourceCollection.class).addRelevantFile(pos.getURI());
+            node.proof().lookup(ProofJavaSourceCollection.class)
+                    .addRelevantFile(pos.getURI().get());
         }
     }
 
@@ -731,14 +730,13 @@ public final class SourceView extends JComponent {
                                                     posInf = pm.getPositionInfo();
                                                 }
                                             }
-                                            if (posInf != null && posInf.getURI() != null) {
+                                            if (posInf != null && posInf.getURI().isPresent()) {
                                                 // sometimes the useful file info is only stored in
                                                 // parentClassURI for some reason ...
-                                                if (!posInf.getURI()
-                                                        .equals(PositionInfo.UNKNOWN_URI)) {
+                                                if (posInf.getURI().isPresent()) {
                                                     node.proof()
                                                             .lookup(ProofJavaSourceCollection.class)
-                                                            .addRelevantFile(posInf.getURI());
+                                                            .addRelevantFile(posInf.getURI().get());
                                                 } else if (!posInf.getParentClassURI()
                                                         .equals(PositionInfo.UNKNOWN_URI)) {
                                                     node.proof()
@@ -1108,7 +1106,7 @@ public final class SourceView extends JComponent {
                 for (int i = 0; i < lines.size(); i++) {
                     Pair<Node, PositionInfo> l = lines.get(i);
 
-                    if (absoluteFileName.equals(l.second.getURI())) {
+                    if (absoluteFileName.equals(l.second.getURI().orElse(null))) {
                         int line = l.second.getStartPosition().line();
 
                         // use a different color for most recent

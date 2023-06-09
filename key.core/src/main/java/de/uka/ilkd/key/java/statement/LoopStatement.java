@@ -1,13 +1,12 @@
 package de.uka.ilkd.key.java.statement;
 
 import java.util.List;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.*;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import javax.annotation.Nullable;
 
 /**
  * Loop statement.
@@ -352,7 +351,8 @@ public abstract class LoopStatement extends JavaStatement
      */
     @Nullable
     public Expression getGuardExpression() {
-        if(guard == null) return null;
+        if (guard == null)
+            return null;
         return (Expression) guard.getChildAt(0);
     }
 

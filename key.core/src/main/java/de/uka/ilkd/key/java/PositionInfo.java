@@ -1,8 +1,12 @@
 package de.uka.ilkd.key.java;
 
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.nio.file.Paths;
+import java.util.Optional;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * represents a group of three Positions: relativePosition, startPosition, endPosition
@@ -14,6 +18,7 @@ public class PositionInfo {
      * Unknown URI (enables us to always have a non-null value for fileURI)
      */
     public static final URI UNKNOWN_URI = URI.create("UNKNOWN://unknown");
+    public static final URI UNKNOWN_URII = URI.create("urn:UNKNOWN:unknown");
 
     /**
      * PositionInfo with undefined positions.
@@ -33,9 +38,9 @@ public class PositionInfo {
     private final Position endPos;
 
     /**
-     * The URI of the resource this location refers to. Either a meaningful value or
-     * {@link #UNKNOWN_URI}, but never null.
+     * The URI of the resource this location refers to. Either a meaningful value or null.
      */
+    @Nullable
     private final URI fileURI;
 
     /**
@@ -47,7 +52,7 @@ public class PositionInfo {
     private PositionInfo() {
         this.startPos = Position.UNDEFINED;
         this.endPos = Position.UNDEFINED;
-        fileURI = UNKNOWN_URI;
+        fileURI = null;
     }
 
     /**
@@ -59,7 +64,7 @@ public class PositionInfo {
     public PositionInfo(Position startPos, Position endPos) {
         this.startPos = startPos;
         this.endPos = endPos;
-        fileURI = UNKNOWN_URI;
+        fileURI = null;
     }
 
     /**
@@ -73,8 +78,11 @@ public class PositionInfo {
         this.startPos = startPos;
         this.endPos = endPos;
         if (fileURI == null) {
-            this.fileURI = UNKNOWN_URI; // fileURI must not be null!
+            this.fileURI = null;
         } else {
+            if (fileURI.toString().contains("unknown")) {
+                int i = 0;
+            }
             this.fileURI = fileURI.normalize();
         }
     }
@@ -112,7 +120,7 @@ public class PositionInfo {
      */
     @Deprecated // only kept for compatibility reasons
     public String getFileName() {
-        if (fileURI.getScheme().equals("file")) {
+        if (fileURI != null && fileURI.getScheme().equals("file")) {
             return Paths.get(fileURI).toString();
         }
         return null;
@@ -122,8 +130,12 @@ public class PositionInfo {
         return parentClassURI;
     }
 
-    public URI getURI() {
-        return fileURI;
+    public Optional<URI> getURI() {
+        return Optional.ofNullable(fileURI);
+    }
+
+    public Optional<URL> getURL() throws MalformedURLException {
+        return fileURI == null ? Optional.empty() : Optional.of(fileURI.toURL());
     }
 
     public Position getStartPosition() {
@@ -174,7 +186,8 @@ public class PositionInfo {
         } else {
             end = p2.endPos;
         }
-        return new PositionInfo(start, end, p1.getURI());
+        return new PositionInfo(start, end,
+            p1.getURI().orElse(null));
     }
 
     /**
@@ -192,7 +205,7 @@ public class PositionInfo {
         if (this == PositionInfo.UNDEFINED) {
             return "UNDEFINED";
         } else {
-            return ((fileURI == UNKNOWN_URI ? "" : fileURI) + " start Pos: " + startPos
+            return ((fileURI == null ? "" : fileURI) + " start Pos: " + startPos
                 + " end Pos: " + endPos);
         }
     }

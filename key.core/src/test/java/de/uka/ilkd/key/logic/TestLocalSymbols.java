@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.logic;
 
 import java.io.File;
-import java.net.URL;
 import java.util.Set;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -128,7 +127,7 @@ public class TestLocalSymbols {
         String script = env.getProofScript().first;
 
         ProofScriptEngine pse =
-            new ProofScriptEngine(script, new Location((URL) null, Position.newOneBased(1, 1)));
+            new ProofScriptEngine(script, new Location(null, Position.newOneBased(1, 1)));
         pse.execute(null, proof);
 
         ImmutableList<Goal> openGoals = proof.openGoals();

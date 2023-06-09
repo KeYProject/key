@@ -117,11 +117,26 @@ public final class IOUtil {
      * @return The read content or {@code null} if the {@link URL} is {@code null}.
      * @throws IOException Occurred Exception.
      */
-    public static String readFrom(URL url) throws IOException {
+    public static Optional<String> readFrom(URL url) throws IOException {
         if (url != null) {
-            return readFrom(url.openStream());
+            return Optional.of(readFrom(url.openStream()));
         } else {
-            return null;
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Reads the complete content from the {@link URL}.
+     *
+     * @param url The {@link URL} to read from.
+     * @return The read content or {@code null} if the {@link URL} is {@code null}.
+     * @throws IOException Occurred Exception.
+     */
+    public static Optional<String> readFrom(URI url) throws IOException {
+        if (url != null) {
+            return Optional.of(readFrom(url.toURL().openStream()));
+        } else {
+            return Optional.empty();
         }
     }
 

@@ -6,8 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
@@ -689,12 +688,7 @@ public abstract class AbstractProblemLoader {
         KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
 
         Triple<String, Integer, Integer> script = kupf.readProofScript();
-        URL url;
-        try {
-            url = kupf.getInitialFile().toUri().toURL();
-        } catch (MalformedURLException e) {
-            throw new ProofInputException(e);
-        }
+        URI url = kupf.getInitialFile().toUri();
         Location location = new Location(url, Position.newOneBased(script.second, script.third));
 
         return new Pair<>(script.first, location);

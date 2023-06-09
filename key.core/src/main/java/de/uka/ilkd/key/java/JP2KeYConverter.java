@@ -580,14 +580,15 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         for (VariableDeclarator v : n.getVariables()) {
             // TODO javaparser always model = false?
             final var fs = visitFieldSpecification(
-                    new FullVariableDeclarator(v, n.isFinal(), n.isStatic(), false));
+                new FullVariableDeclarator(v, n.isFinal(), n.isStatic(), false));
             varsList.add(fs);
-            mapping.put(v,fs);
+            mapping.put(v, fs);
         }
         var fieldSpecs = new ImmutableArray<>(varsList);
-        final var decl = new de.uka.ilkd.key.java.declaration.FieldDeclaration(pi, c, modArray, type,
+        final var decl =
+            new de.uka.ilkd.key.java.declaration.FieldDeclaration(pi, c, modArray, type,
                 isInInterface, fieldSpecs);
-        mapping.put(n,decl);
+        mapping.put(n, decl);
         return decl;
     }
 
@@ -891,7 +892,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(StringLiteralExpr n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        return new StringLiteral(pi, c, '"'+n.getValue()+'"');
+        return new StringLiteral(pi, c, '"' + n.getValue() + '"');
     }
 
     @Override

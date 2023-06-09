@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import javax.annotation.Nonnull;
 
@@ -189,7 +190,11 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         if (token != null) {
             CharStream stream = file.getCharStream();
             // also pass the file to be able to produce exceptions with locations
-            ProofReplayer.run(token, stream, prl, file.url());
+            try {
+                ProofReplayer.run(token, stream, prl, file.url().toURI());
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
