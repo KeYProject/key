@@ -176,40 +176,4 @@ public class TestJP2KeY {
     public Stream<DynamicTest> testJClasses() {
         return Arrays.stream(jclasses).map(it -> DynamicTest.dynamicTest(it, () -> testClass(it)));
     }
-
-
-    /**
-     * test compares the pretty print results from recoder and KeY modulo blanks and line feeds.
-     * Input is the Recoder2KeY.java file. Not working: RECODER does not recognize imports
-     */
-    @Test
-    @Disabled
-    public void xtestFileInput() {
-        char[] ch = new char[100000];
-        int n = 0;
-        try (Reader fr = new BufferedReader(
-            new FileReader("de/uka/ilkd/key/java/Recoder2KeY.java", StandardCharsets.UTF_8))) {
-            n = fr.read(ch);
-        } catch (IOException e) {
-            System.err.println("Recoder2KeY.java not found");
-        }
-        String inputString = new String(ch, 0, n);
-        testClass(inputString);
-
-    }
-
-    // public static void main(String[] args) {
-    // Services services = new Services ();
-    // Recoder2KeY c2k = new Recoder2KeY(services, new NamespaceSet());
-    // recoder.java.StatementBlock
-    // jb = c2k.recoderBlock("{int len; int[] i = new int[] {0,1,2} ; len = i.length;}",
-    // c2k.createEmptyContext());
-    // System.out.println("Read: "+jb);
-    // recoder.java.StatementBlock block = (recoder.java.StatementBlock) jb;
-    // recoder.java.ProgramElement pe = block.getChildAt(2);
-    // System.out.println("Look at "+pe);
-    // // de.uka.ilkd.key.java.CopyAssignment ca = ;
-    //// System.out.println("Look at "+pe);
-    //
-    // }
 }
