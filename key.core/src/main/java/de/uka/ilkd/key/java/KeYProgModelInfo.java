@@ -495,7 +495,7 @@ public class KeYProgModelInfo {
             return getVisibleArrayFields(ct);
         }
         return getReferenceType(ct)
-                .map(r -> asKeYFieldsR(r.getAllFieldsVisibleToInheritors()))
+                .map(r -> asKeYFieldsR(r.getDeclaredFields()))
                 .orElse(ImmutableSLList.nil());
     }
 
