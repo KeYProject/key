@@ -170,7 +170,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             b.setAnnotations(tacletAnnotations);
             b.setOrigin(BuilderHelpers.getPosition(ctx));
             Taclet r = b.getTaclet();
-            announceTaclet(ctx, r);
+            registerTaclet(ctx, r);
             currentTBuilder.pop();
             return r;
         }
@@ -210,7 +210,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         b.setOrigin(BuilderHelpers.getPosition(ctx));
         try {
             Taclet r = peekTBuilder().getTaclet();
-            announceTaclet(ctx, r);
+            registerTaclet(ctx, r);
             setSchemaVariables(schemaVariables().parent());
             currentTBuilder.pop();
             return r;
@@ -219,7 +219,17 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
     }
 
-    private void announceTaclet(ParserRuleContext ctx, Taclet taclet) {
+    private void registerTaclet(KeYParser.Datatype_declContext ctx, TacletBuilder<?> tb) {
+        LogicPrinter lp = new LogicPrinter(new NotationInfo(), services, new PosTableLayouter(100, 4, true));
+        var taclet = tb.getTaclet();
+        taclet2Builder.put(taclet, peekTBuilder());
+        topLevelTaclets.add(taclet);
+        LOGGER.trace("Taclet announced: \"{}\" from {}:{}", taclet.name(),
+                ctx.start.getTokenSource().getSourceName(), ctx.start.getLine());
+        System.out.println(lp.result());
+    }
+
+    private void registerTaclet(ParserRuleContext ctx, Taclet taclet) {
         taclet2Builder.put(taclet, peekTBuilder());
         LOGGER.trace("Taclet announced: \"{}\" from {}:{}", taclet.name(),
                 ctx.start.getTokenSource().getSourceName(), ctx.start.getLine());
@@ -232,22 +242,18 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Object visitDatatype_decl(KeYParser.Datatype_declContext ctx) {
-        LogicPrinter lp = new LogicPrinter(new NotationInfo(), services, new PosTableLayouter(100, 4, true));
-        var tbAx = createAxiomTaclet(ctx).getTaclet();
-        lp.printTaclet(tbAx);
-        announceTaclet(ctx, tbAx);
+        var tbAx = createAxiomTaclet(ctx);
+        registerTaclet(ctx, tbAx);
 
-        var tbInd = createInductionTaclet(ctx).getTaclet();
-        lp.printTaclet(tbInd);
-        announceTaclet(ctx, tbInd);
+        var tbInd = createInductionTaclet(ctx);
+        registerTaclet(ctx, tbInd);
 
-        var tbSplit = createConstructorSplit(ctx).getTaclet();
-        lp.printTaclet(tbSplit);
-        announceTaclet(ctx, tbSplit);
+        var tbSplit = createConstructorSplit(ctx);
+        registerTaclet(ctx, tbSplit);
 
-        System.out.println(lp.result());
         return null;
     }
+
 
     private TacletBuilder<? extends Taclet> createInductionTaclet(KeYParser.Datatype_declContext ctx) {
         var tacletBuilder = new NoFindTacletBuilder();
