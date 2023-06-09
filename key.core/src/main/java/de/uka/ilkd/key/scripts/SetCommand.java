@@ -101,7 +101,7 @@ public class SetCommand extends AbstractCommand {
      * quite complicated implementation, which is inspired by StrategySelectionView.
      */
 
-    public static void updateStrategySettings(EngineState state, StrategyProperties p) {
+    protected static void updateStrategySettings(EngineState state, StrategyProperties p) {
         final Proof proof = state.getProof();
         final Strategy<Goal> strategy = getStrategy(state, p);
 
