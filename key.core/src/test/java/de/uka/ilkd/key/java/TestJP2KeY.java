@@ -6,9 +6,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
-import de.uka.ilkd.key.util.KeYResourceManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -20,11 +18,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -73,8 +68,6 @@ public class TestJP2KeY {
     };
 
 
-    // This fails for an
-    // cyclic references as method arguments
     private static final String[] jclasses = new String[]{
             "class A1 { public A1() { }} ",
             """
