@@ -40,7 +40,6 @@ public class KeYProgModelInfo {
     private final JP2KeYTypeConverter typeConverter;
     private final Map<KeYJavaType, Map<String, IProgramMethod>> implicits = new LinkedHashMap<>();
     // TODO javaparser what is this
-    private JavaService javaService;
 
     public KeYProgModelInfo(Services services, KeYJPMapping mapping,
             JP2KeYTypeConverter typeConverter) {
@@ -210,7 +209,7 @@ public class KeYProgModelInfo {
      * @return true iff name refers to a package
      */
     public boolean isPackage(String name) {
-        return !javaService.getProgramFactory().getTypeSolver().hasType(name);
+        return !services.getJavaService().getProgramFactory().getTypeSolver().hasType(name);
     }
 
     /**
@@ -524,7 +523,7 @@ public class KeYProgModelInfo {
 
         // fields of java.lang.Object visible in an array
         final ImmutableList<Field> javaLangObjectField = getAllVisibleFields((KeYJavaType) rec2key()
-                .toKeY(javaService.getProgramFactory().getTypeSolver().getSolvedJavaLangObject()));
+                .toKeY(services.getJavaService().getProgramFactory().getTypeSolver().getSolvedJavaLangObject()));
 
         for (Field aJavaLangObjectField : javaLangObjectField) {
             // TODO javaparser FieldDeclaration? was recoder.Field
@@ -547,7 +546,7 @@ public class KeYProgModelInfo {
 
         var types = rec2key().elemsRec().stream()
                 .filter(it -> it instanceof com.github.javaparser.ast.body.TypeDeclaration)
-                .collect(Collectors.toList());
+                .toList();
 
         List<ResolvedReferenceTypeDeclaration> res = new ArrayList<>(1024);
         for (Node decl : types) {
@@ -565,8 +564,6 @@ public class KeYProgModelInfo {
     /**
      * returns all supertypes of the given class type with the type itself as
      * first element
-     *
-     * @return
      */
     private List<ResolvedReferenceType> getAllDeclaredSupertypes(KeYJavaType ct) {
         return getReferenceType(ct)

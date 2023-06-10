@@ -40,7 +40,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 
     @BeforeEach
     public void setUp() throws IOException {
-        services = new Services(AbstractProfile.getDefaultProfile());
+        services = super.services;
         nss = services.getNamespaces();
         tf = services.getTermFactory();
         io = new KeyIO(services, nss);
@@ -48,7 +48,9 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         parseDecls(sorts);
         assertNotNull(nss.sorts().lookup("boolean"));
 
-        JavaService r2k = new JavaService(services, Collections.emptyList());
+        services.activateJava();
+        JavaService r2k = services.getJavaService();
+        assertNotNull(r2k);
         r2k.parseSpecialClasses();
 
         parseDecls(
@@ -154,6 +156,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 
     @Test
     public void testSubst() throws Exception {
+        assertNotNull(services.getJavaService());
+
         Term s = parseTerm("f(x)");
         Term t = parseTerm("g(v,x)");
         ClashFreeSubst cfs = new ClashFreeSubst(v, s, services.getTermBuilder());
