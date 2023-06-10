@@ -282,6 +282,7 @@ public class JavaService {
         // transform program
         final var collect =
             cUnits.stream().map(it -> it.getResult().get()).collect(Collectors.toList());
+        programFactory.appendToJavaRedux(collect);
         transformModel(collect);
         return collect;
     }

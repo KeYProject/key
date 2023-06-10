@@ -76,9 +76,6 @@ public class JavaParserFactory {
 
     public JavaParserFactory(Path bootClassPath, Collection<Path> sourcePaths) {
         this.bootClassPath = bootClassPath;
-        if (bootClassPath == null) {
-            useSystemClassLoaderInResolution = false;
-        }
         this.sourcePaths = new ArrayList<>(sourcePaths);
         typeSolver.lazyRebuild();
     }
@@ -179,6 +176,10 @@ public class JavaParserFactory {
 
     public Path getBootClassPath() {
         return bootClassPath;
+    }
+
+    public void appendToJavaRedux(List<CompilationUnit> collect) {
+        this.javaBootClassCollection.addAll(collect);
     }
 
     /**

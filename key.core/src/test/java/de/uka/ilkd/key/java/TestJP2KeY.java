@@ -1,28 +1,31 @@
 package de.uka.ilkd.key.java;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.stream.Stream;
-
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
-
+import de.uka.ilkd.key.util.KeYResourceManager;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -34,8 +37,8 @@ public class TestJP2KeY {
     private static JavaService c2k;
 
     // some non sense java blocks with lots of statements and expressions
-    private static final String[] jblocks = new String[] {
-        """
+    private static final String[] jblocks = new String[]{
+            """
                 {
                     int j = 7;
                     int i;
@@ -53,7 +56,7 @@ public class TestJP2KeY {
                  }
                  """,
 
-        """
+            """
                 {
                     int j=7; int i;
                     i=1;do { j++; } while (i==1);if (j==42) j=7; else {i=7; j=43;};
@@ -65,16 +68,16 @@ public class TestJP2KeY {
                     if (j>42) return;synchronized(null) { j=7; }
                 }
                 """,
-        "{ int x = 1; {java.util.List l;} }",
-        "{int[] a; a=new int[3]; a=new int[]{2,3,4}; int j=a[2]; j=a.length;}"
+            "{ int x = 1; {java.util.List l;} }",
+            "{int[] a; a=new int[3]; a=new int[]{2,3,4}; int j=a[2]; j=a.length;}"
     };
 
 
     // This fails for an
     // cyclic references as method arguments
-    private static final String[] jclasses = new String[] {
-        "class A1 { public A1() { }} ",
-        """
+    private static final String[] jclasses = new String[]{
+            "class A1 { public A1() { }} ",
+            """
                 package qwe.rty;
                 import qwe.rty.A;
                 import dfg.hjk.*;
@@ -103,12 +106,12 @@ public class TestJP2KeY {
                 }
                 """,
 
-        "public class B extends Object {class E  { public E(Object s) {super();} }}",
-        " class circ_A {   static int a = circ_B.b;   } class circ_B {   static int b = circ_A.a;   }",
-        " class circ2_A {   static final int a = circ2_B.b;   } " +
-            "class circ2_B {   static final int b = circ2_A.a;   }", // unpatched recoder library
-        "class Cycle1 { void m(Cycle2 c) {} } class Cycle2 { void m(Cycle1 c) {} }",
-        "class EmptyConstr { EmptyConstr(); } " // empty constructors for stubs
+            "public class B extends Object {class E  { public E(Object s) {super();} }}",
+            " class circ_A {   static int a = circ_B.b;   } class circ_B {   static int b = circ_A.a;   }",
+            " class circ2_A {   static final int a = circ2_B.b;   } " +
+                    "class circ2_B {   static final int b = circ2_A.a;   }", // unpatched recoder library
+            "class Cycle1 { void m(Cycle2 c) {} } class Cycle2 { void m(Cycle1 c) {} }",
+            "class EmptyConstr { EmptyConstr(); } " // empty constructors for stubs
     };
 
     /**
@@ -125,10 +128,11 @@ public class TestJP2KeY {
     }
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws URISyntaxException, IOException {
         if (c2k == null) {
-            c2k = new JavaService(TacletForTests.services(), Collections.emptyList());
-            c2k.getProgramFactory().setUseSystemClassLoaderInResolution(true);
+            c2k = new JavaService(TacletForTests.services(), new KeYJPMapping(),
+                    null, Collections.emptyList());
+            c2k.parseSpecialClasses(null);
         }
     }
 
@@ -136,12 +140,12 @@ public class TestJP2KeY {
     @Test
     public void testReadBlockWithContext() {
         ProgramVariable pv = new LocationVariable(new ProgramElementName("i"),
-            TacletForTests.services().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT));
+                TacletForTests.services().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT));
         ImmutableList<ProgramVariable> list = ImmutableSLList.<ProgramVariable>nil().prepend(pv);
         JavaBlock block = c2k.readBlock("{ i = 2; }", c2k.createContext(list), null);
         ProgramVariable prgVarCmp =
-            (ProgramVariable) ((Operator) ((StatementBlock) block.program()).getStatementAt(0))
-                    .getChildAt(0);
+                (ProgramVariable) ((Operator) ((StatementBlock) block.program()).getStatementAt(0))
+                        .getChildAt(0);
         assertSame(prgVarCmp, pv, "ProgramVariables should be the same ones.");
     }
 
@@ -153,7 +157,7 @@ public class TestJP2KeY {
         return Arrays.stream(jblocks).map(it -> DynamicTest.dynamicTest(it, () -> {
             String keyProg = removeBlanks(c2k.readBlockWithEmptyContext(it, null).toString());
             String recoderProg =
-                removeBlanks(c2k.recoderBlock(it, c2k.createEmptyContext()).toString());
+                    removeBlanks(c2k.recoderBlock(it, c2k.createEmptyContext()).toString());
             assertEquals(recoderProg, keyProg);
         }));
     }
