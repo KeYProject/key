@@ -213,6 +213,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
             return;
         }
         var time = System.nanoTime();
+        getHighlighter().removeAllHighlights();
 
         removeMouseListener(listener);
 
