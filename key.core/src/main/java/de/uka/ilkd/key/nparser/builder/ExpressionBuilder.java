@@ -1233,7 +1233,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 getTypeByClassName(javaPackage + (javaPackage.isEmpty() ? "" : ".") + javaClass);
 
             if (ctx.call() != null) {
-                addWarning("Call of package or class");
+                addWarning(ctx, "Call of package or class");
             }
 
             Term current = null;
@@ -1261,7 +1261,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                             semanticError(ctx, "Unknown java attribute: %s", attributeName);
                         }
                         // TODO If not last attribute:
-                        addWarning("");
+                        addWarning(ctx,"");
                         return current;
                     }
                 } else if (attrib instanceof KeYParser.Attribute_complexContext) {
