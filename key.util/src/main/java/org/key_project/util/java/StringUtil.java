@@ -400,7 +400,7 @@ public final class StringUtil {
         while (first <= last && predicate.test(value[last])) {
             --last;
         }
-        return (first < last) ? new String(Arrays.copyOfRange(value, first, last + 1)) : "";
+        return (first < last + 1) ? text.substring(first, last + 1) : "";
     }
 
     /**
