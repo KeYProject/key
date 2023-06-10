@@ -229,7 +229,8 @@ public class KeYResourceManager {
             visibleBranch() ? " [" + getBranch() + "]" : "");
     }
 
-    static {
+    /*TODO weigl throws exception.
+       static {
         // Needed to be able to use Path.of(jar:jarFile/bla)
         // see
         // https://docs.oracle.com/javase/7/docs/technotes/guides/io/fsp/zipfilesystemprovider.html
@@ -244,5 +245,5 @@ public class KeYResourceManager {
         } catch (URISyntaxException | IOException e) {
             throw new RuntimeException(e);
         }
-    }
+    }*/
 }

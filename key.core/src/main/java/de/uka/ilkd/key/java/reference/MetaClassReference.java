@@ -6,6 +6,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import java.util.List;
+
 /**
  * Meta class reference.
  *
@@ -32,6 +34,11 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
      * @param reference a type reference.
      */
     public MetaClassReference(TypeReference reference) {
+        typeReference = reference;
+    }
+
+    public MetaClassReference( PositionInfo pi, List<Comment> c,TypeReference reference) {
+        super(pi, c);
         typeReference = reference;
     }
 
