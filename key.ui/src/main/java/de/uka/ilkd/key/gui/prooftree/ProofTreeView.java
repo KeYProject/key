@@ -33,6 +33,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -940,6 +941,22 @@ public class ProofTreeView extends JPanel implements TabPanel {
         return result.toString();
     }
 
+    private static String cutIfTooLong(String str) {
+        return cutAfterNLines(str,
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getMaxTooltipLines());
+    }
+
+    private static String cutAfterNLines(final String str, final int maxLines) {
+        final String newLine = "\n";
+        int idx = 0;
+        int lines = 1;
+        while (lines <= maxLines && (idx = str.indexOf(newLine, idx)) != -1) {
+            lines++;
+            idx += newLine.length();
+        }
+        return idx == -1 ? str : str.substring(0, idx) + " ...";
+    }
+
     /**
      * Renderer responsible for showing a single node of the proof tree.
      */
@@ -1051,7 +1068,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             if (pio != null) {
                 String on = LogicPrinter.quickPrintTerm(
                     pio.subTerm(), node.proof().getServices());
-                style.tooltip.addAppliedOn(on);
+                style.tooltip.addAppliedOn(cutIfTooLong(on));
             }
 
             final String notes = node.getNodeInfo().getNotes();
@@ -1102,7 +1119,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                     printer.print(active);
                     info = printer.result();
                 }
-                info = info == null ? node.name() : info;
+                info = info == null ? node.name() : cutAfterNLines(info, 5);
                 style.tooltip.addAdditionalInfo("Active statement",
                     LogicPrinter.escapeHTML(info, true), true);
             }
@@ -1130,7 +1147,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             Services services = node.getNode().proof().getServices();
             String on = LogicPrinter.quickPrintTerm(app.posInOccurrence().subTerm(), services);
             style.tooltip.addRule(style.text);
-            style.tooltip.addAppliedOn(on);
+            style.tooltip.addAppliedOn(cutIfTooLong(on));
         }
 
         @Override
