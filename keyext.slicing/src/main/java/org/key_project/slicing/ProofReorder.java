@@ -15,7 +15,6 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.util.Pair;
@@ -28,7 +27,9 @@ public final class ProofReorder {
 
     }
 
-    public static void reorderProof(Proof proof, DependencyGraph depGraph) throws IOException, ProofInputException, ProblemLoaderException, IntermediateProofReplayer.BuiltInConstructionException {
+    public static void reorderProof(Proof proof, DependencyGraph depGraph)
+            throws IOException, ProofInputException, ProblemLoaderException,
+            IntermediateProofReplayer.BuiltInConstructionException {
         MainWindow.getInstance().getMediator().stopInterface(true);
 
         SortedMap<BranchLocation, List<Node>> steps = new TreeMap<>();
@@ -41,7 +42,6 @@ public final class ProofReorder {
             var t = todo.pop();
             var root = t.second;
             var loc = t.first;
-            System.out.println("copying " + loc);
             if (done.contains(loc)) {
                 continue;
             }
@@ -85,53 +85,15 @@ public final class ProofReorder {
                 });
             }
             for (int i = 0; i < newOrder.size(); i++) {
-                if (newOrder.get(i).childrenCount() == 0) {
-                    newOrder = newOrder.subList(0, i + 1);
+                if (newOrder.get(i).childrenCount() != 1
+                        || newOrder.get(i).child(0).childrenCount() == 0) {
+                    var last = newOrder.remove(i);
+                    newOrder.add(last);
                     break;
                 }
             }
             steps.put(loc, newOrder);
-            /*
-            var firstNode = newOrder.stream().min(Comparator.comparing(Node::serialNr)).get();
-            var lastNode = newOrder.stream().max(Comparator.comparing(Node::serialNr)).get();
-            newOrder.remove(lastNode);
-            Node closingNode = null;
-            for (int i = 0; i < newOrder.size(); i++) {
-                if (newOrder.get(i).childrenCount() == 0) {
-                    closingNode = newOrder.get(i);
-                }
-                newOrder.get(i).removeChildren();
-            }
-            // done, reorder proof steps now
-            Node last = firstNode.parent();
-            for (Node next : newOrder) {
-                if (last != null) {
-                    if (last.childrenCount() > 1) {
-                        for (int i = 0; i < last.childrenCount(); i++) {
-                            if (last.child(i).getBranchLocation() == loc) {
-                                last.replaceChild(i, next);
-                                break;
-                            }
-                        }
-                    } else {
-                        last.removeChildren();
-                        if (last == closingNode) {
-                            last = null;
-                            break;
-                        }
-                        last.add(next);
-                    }
-                }
-                last = next;
-            }
-            if (last != null) {
-                last.removeChildren();
-                last.add(lastNode);
-            }
-             */
         }
-
-        System.out.println("done!");
 
         ProblemLoaderControl control = new DefaultUserInterfaceControl();
         Path tmpFile = Files.createTempFile("proof", ".proof");
@@ -139,15 +101,15 @@ public final class ProofReorder {
 
         String bootClassPath = proof.getEnv().getJavaModel().getBootClassPath();
         AbstractProblemLoader problemLoader = new SingleThreadProblemLoader(
-                tmpFile.toFile(),
-                proof.getEnv().getJavaModel().getClassPathEntries(),
-                bootClassPath != null ? new File(bootClassPath) : null,
-                null,
-                proof.getEnv().getInitConfigForEnvironment().getProfile(),
-                false,
-                control, false, null);
+            tmpFile.toFile(),
+            proof.getEnv().getJavaModel().getClassPathEntries(),
+            bootClassPath != null ? new File(bootClassPath) : null,
+            null,
+            proof.getEnv().getInitConfigForEnvironment().getProfile(),
+            false,
+            control, false, null);
         problemLoader.load();
-        //Files.delete(tmpFile);
+        // Files.delete(tmpFile);
         Proof newProof = problemLoader.getProof();
         new ReorderingReplayer(proof, newProof, steps).copy();
         newProof.saveToFile(tmpFile.toFile());
@@ -155,7 +117,7 @@ public final class ProofReorder {
         mediator.startInterface(true);
 
         ProblemLoader problemLoader2 =
-                mediator.getUI().getProblemLoader(tmpFile.toFile(), null, null, null, mediator);
+            mediator.getUI().getProblemLoader(tmpFile.toFile(), null, null, null, mediator);
         // user already knows about any warnings
         problemLoader2.setIgnoreWarnings(true);
         problemLoader2.runAsynchronously();

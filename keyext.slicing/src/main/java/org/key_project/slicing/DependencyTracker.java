@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -152,6 +154,31 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                     new TrackedFormula(in.sequentFormula(), loc, in.isInAntec(),
                         proof.getServices());
                 input.add(new Pair<>(formula, removed.contains(in)));
+            }
+        }
+
+        // determine for each instantiated schema variable which node first introduced that variable
+        if (ruleApp instanceof TacletApp) {
+            TacletApp t = (TacletApp) ruleApp;
+            var it = t.instantiations().pairIterator();
+            while (it.hasNext()) {
+                var x = it.next();
+                var y = x.value();
+                var z = y.getInstantiation();
+                if (z instanceof Term) {
+                    z = ((Term) z).op();
+                }
+                if (z instanceof Function) {
+                    var a = ((Function) z).getIntroducedBy();
+                    if (a != null && a != n) {
+                        graph.outputsOf(a).forEach(i -> {
+                            input.add(new Pair<>(i, false));
+                            // TODO: not strictly necessary if the Function is used in one of the
+                            // previous inputs
+                            // e.g. applyEq
+                        });
+                    }
+                }
             }
         }
 

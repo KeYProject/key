@@ -89,6 +89,9 @@ public abstract class AbstractProofReplayer {
             throws IntermediateProofReplayer.BuiltInConstructionException {
         RuleApp ruleApp = node.getAppliedRuleApp();
         ImmutableList<Goal> nextGoals;
+        System.out.println(
+            "reapplying " + node.serialNr() + " " + node.getAppliedRuleApp().rule().displayName()
+                + " on node " + openGoal.node().serialNr());
         if (ruleApp.rule() instanceof BuiltInRule) {
             IBuiltInRuleApp builtInRuleApp = constructBuiltinApp(node, openGoal);
             if (!builtInRuleApp.complete()) {
@@ -312,6 +315,7 @@ public abstract class AbstractProofReplayer {
         }
 
         if (!ourApp.complete()) {
+            System.out.println("incomplete!");
             ourApp = ourApp.tryToInstantiate(proof.getServices());
         }
 

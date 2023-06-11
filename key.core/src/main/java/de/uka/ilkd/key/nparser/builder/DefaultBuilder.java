@@ -3,7 +3,6 @@ package de.uka.ilkd.key.nparser.builder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -34,9 +33,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class DefaultBuilder extends AbstractBuilder<Object> {
     public static final String LIMIT_SUFFIX = "$lmtd";
-
-    private static final ResourceBundle bundle =
-        ResourceBundle.getBundle("de.uka.ilkd.key.nparser.builder.resources");
 
     protected final Services services;
     protected final NamespaceSet nss;
@@ -119,11 +115,6 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             return accept(ctx.sortId());
         }
     }
-
-    /*
-     * @Override public Sort visitAny_sortId(KeYParser.Any_sortIdContext ctx) { Pair<Sort, Type> p =
-     * accept(ctx.any_sortId_help()); return toArraySort(p, ctx.EMPTYBRACKETS().size()); }
-     */
 
     /**
      * looks up a function, (program) variable or static query of the given name varfunc_id and the

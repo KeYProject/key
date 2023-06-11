@@ -11,7 +11,8 @@ import javax.annotation.Nonnull;
 /**
  * List interface to be implemented by non-destructive lists
  */
-public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable, Comparable<ImmutableList<T>> {
+public interface ImmutableList<T>
+        extends Iterable<T>, java.io.Serializable, Comparable<ImmutableList<T>> {
 
     /**
      * Returns a Collector that accumulates the input elements into a new ImmutableList.
@@ -360,7 +361,8 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable, Com
         } else if (other.isEmpty()) {
             return 1;
         } else if (this.head().getClass() != other.head().getClass()) {
-            throw new IllegalStateException("tried to compare lists with elements of different classes");
+            throw new IllegalStateException(
+                "tried to compare lists with elements of different classes");
         } else if (!(this.head() instanceof Comparable)) {
             throw new IllegalStateException("tried to compare list with incomparable elements");
         } else {

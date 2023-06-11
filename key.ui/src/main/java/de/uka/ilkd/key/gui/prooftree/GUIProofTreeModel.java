@@ -76,7 +76,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
 
             @Override
             public void automaticStateChanged(Goal source, boolean oldAutomatic,
-                                              boolean newAutomatic) {
+                    boolean newAutomatic) {
                 if (!batchGoalStateChange
                         && ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS.isActive()) {
                     updateTree((TreeNode) null);
@@ -377,7 +377,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
         if (trn == null || trn == getRoot()) { // bigger change, redraw whole tree
             proofTreeNodes = new WeakHashMap<>();
             branchNodes = new WeakHashMap<>();
-            fireTreeStructureChanged(new Object[]{getRoot()});
+            fireTreeStructureChanged(new Object[] { getRoot() });
             return;
         }
         // otherwise redraw only a certain subtree
@@ -461,7 +461,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
     // generated to represent the nodes resp. subtrees of the Proof.
 
     private WeakHashMap<Node, GUIAbstractTreeNode> proofTreeNodes =
-            new WeakHashMap<>();
+        new WeakHashMap<>();
     private WeakHashMap<Node, GUIBranchNode> branchNodes = new WeakHashMap<>();
 
     /**

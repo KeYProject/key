@@ -187,7 +187,7 @@ public class SlicingExtension implements KeYGuiExtension,
             KeYMediator m = MainWindow.getInstance().getMediator();
             try {
                 ProofReorder.reorderProof(m.getSelectedProof(),
-                        trackers.get(m.getSelectedProof()).getDependencyGraph());
+                    trackers.get(m.getSelectedProof()).getDependencyGraph());
             } catch (Exception exc) {
                 exc.printStackTrace();
             }

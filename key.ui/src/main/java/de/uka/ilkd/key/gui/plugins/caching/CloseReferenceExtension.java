@@ -89,7 +89,8 @@ public class CloseReferenceExtension
             return;
         }
         for (Goal goal : newGoals) {
-            ClosedBy c = ReferenceSearcher.findPreviousProof(mediator, goal.node());
+            ClosedBy c = ReferenceSearcher.findPreviousProof(mediator.getCurrentlyOpenedProofs(),
+                goal.node());
             if (c != null) {
                 // p.closeGoal(goal);
                 goal.setEnabled(false);
@@ -227,7 +228,8 @@ public class CloseReferenceExtension
         @Override
         public void actionPerformed(ActionEvent e) {
             // search other proofs for matching nodes
-            ClosedBy c = ReferenceSearcher.findPreviousProof(mediator, node);
+            ClosedBy c =
+                ReferenceSearcher.findPreviousProof(mediator.getCurrentlyOpenedProofs(), node);
             if (c != null) {
                 node.register(c, ClosedBy.class);
             } else {

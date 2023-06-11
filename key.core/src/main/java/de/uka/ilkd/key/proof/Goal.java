@@ -665,6 +665,9 @@ public final class Goal {
         boolean first = true;
         for (Goal goal : goalList) {
             goal.node().addLocalProgVars(newProgVars);
+            for (Function f : newFunctions) {
+                f.setIntroducedBy(goal.node().parent());
+            }
             goal.node().addLocalFunctions(newFunctions);
 
             if (first) {
