@@ -193,6 +193,32 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 }
             }
         };
+        var renderer = delegateView.getCellRenderer() instanceof DefaultTreeCellRenderer
+                ? (DefaultTreeCellRenderer) delegateView.getCellRenderer()
+                : null;
+
+        // Create a cell editor that denies editing on all nodes except for branch nodes
+        delegateView.setCellEditor(new DefaultTreeCellEditor(delegateView, renderer) {
+            @Override
+            public boolean isCellEditable(EventObject event) {
+                if (event == null || event.getSource() != delegateView
+                        || !(event instanceof MouseEvent)) {
+                    // This pass through is needed and somehow correct
+                    return super.isCellEditable(event);
+                }
+                TreePath path = tree.getPathForLocation(
+                    ((MouseEvent) event).getX(),
+                    ((MouseEvent) event).getY());
+                if (path == null) {
+                    return false;
+                }
+                var last = path.getLastPathComponent();
+                var isValidNode = last instanceof GUIBranchNode &&
+                        ((GUIBranchNode) last).getNode().parent() != null;
+                return isValidNode && super.isCellEditable(event);
+            }
+        });
+        delegateView.setEditable(true);
         iconHeight = delegateView.getFontMetrics(delegateView.getFont()).getHeight();
         delegateView.setUI(new CacheLessMetalTreeUI());
 
@@ -899,10 +925,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
                     mediator.nonGoalNodeChosen(node);
                 }
             }
-
-            // catching NullPointerException occurring when renaming root node
-            delegateView.setEditable(
-                treeNode instanceof GUIBranchNode && treeNode.getNode().parent() != null);
         }
     }
 
