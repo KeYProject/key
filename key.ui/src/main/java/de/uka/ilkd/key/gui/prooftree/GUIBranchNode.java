@@ -54,7 +54,10 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         while (true) {
             childrenCache[count] = getProofTreeModel().getProofTreeNode(n);
             count++;
-            final Node nextN = findChild(n);
+            Node nextN = findChild(n);
+            while (nextN != null && nextN.isHideInProofTree()) {
+                nextN = findChild(nextN);
+            }
             if (nextN == null) {
                 break;
             }
@@ -62,7 +65,8 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         }
 
         for (int i = 0; i != n.childrenCount(); ++i) {
-            if (!ProofTreeViewFilter.hiddenByGlobalFilters(n.child(i))) {
+            if (!ProofTreeViewFilter.hiddenByGlobalFilters(n.child(i))
+                    && !n.child(i).isHideInProofTree()) {
                 childrenCache[count] = findBranch(n.child(i));
                 count++;
             }
@@ -97,7 +101,10 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
 
         while (true) {
             count++;
-            final Node nextN = findChild(n);
+            Node nextN = findChild(n);
+            while (nextN != null && nextN.isHideInProofTree()) {
+                nextN = findChild(nextN);
+            }
             if (nextN == null) {
                 break;
             }
@@ -105,7 +112,8 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         }
 
         for (int i = 0; i != n.childrenCount(); ++i) {
-            if (!ProofTreeViewFilter.hiddenByGlobalFilters(n.child(i))) {
+            if (!ProofTreeViewFilter.hiddenByGlobalFilters(n.child(i))
+                    && !n.child(i).isHideInProofTree()) {
                 count++;
             }
         }

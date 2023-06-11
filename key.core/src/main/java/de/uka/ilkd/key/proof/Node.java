@@ -109,6 +109,9 @@ public class Node implements Iterable<Node>, Comparable<Node> {
     @Nullable
     private Lookup userData = null;
 
+    private List<Node> group = null;
+    private boolean hideInProofTree = false;
+
 
     /**
      * If the rule base has been extended e.g. by loading a new taclet as lemma or by applying a
@@ -844,6 +847,22 @@ public class Node implements Iterable<Node>, Comparable<Node> {
             candidate = candidate.parent;
         }
         return candidate;
+    }
+
+    public List<Node> getGroup() {
+        return group;
+    }
+
+    public void setGroup(List<Node> group) {
+        this.group = group;
+    }
+
+    public boolean isHideInProofTree() {
+        return hideInProofTree;
+    }
+
+    public void setHideInProofTree(boolean hideInProofTree) {
+        this.hideInProofTree = hideInProofTree;
     }
 
     @Override
