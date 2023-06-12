@@ -698,23 +698,24 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var c = createComments(n);
         // We currently only support Class names as scope
 
-        MethodName name;
+        // TODO javaparser this is a mess
+        String name = n.getNameAsString();
+        String qualifier;
         if (n.getScope().isPresent()) {
             var scope = n.getScope().get();
             if (scope.isNameExpr()) {
-                var qualifier = scope.asNameExpr().getName().asString();
-                name = new ProgramElementName(n.getNameAsString(), qualifier);
+                qualifier = scope.asNameExpr().getName().asString();
             } else {
-                reportUnsupportedElement(n);
-                return null;
+                qualifier = null;
             }
         } else {
-            // TODO javaparser is this correct? should the scope be the containing class?
-            name = new ProgramElementName(n.getNameAsString());
+            qualifier = null;
         }
+        var methodName = qualifier == null ? new ProgramElementName(n.getNameAsString())
+                : new ProgramElementName(n.getNameAsString(), qualifier);
         ReferencePrefix prefix = accepto(n.getScope());
         ImmutableArray<Expression> args = map(n.getArguments());
-        return new MethodReference(pi, c, prefix, name, args);
+        return new MethodReference(pi, c, prefix, methodName, args);
     }
 
     @Override

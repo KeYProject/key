@@ -75,7 +75,6 @@ public class JP2KeYTypeConverter {
      */
     private final KeYJPMapping jp2KeY;
     private final TypeSolver typeSolver;
-    private final Sort objectSort;
 
     private KeYJavaType __objectType;
     private KeYJavaType __cloneableType;
@@ -86,18 +85,6 @@ public class JP2KeYTypeConverter {
         this.typeSolver = typeSolver;
         this.typeConverter = services.getTypeConverter();
         this.namespaces = services.getNamespaces();
-        this.objectSort = namespaces.sorts().lookup(new Name("java.lang.Object"));
-        /*
-         * this.objectType = getKeYJavaType("java.lang.Object");
-         * this.cloneableType = getKeYJavaType("java.lang.Cloneable");
-         * this.serializableType = getKeYJavaType("java.io.Serializable");
-         * // I may not use JavaInfo here because the classes may not yet be cached!
-         * if (objectType == null || cloneableType == null || serializableType == null) {
-         * throw new RuntimeException(
-         * "Missing core classes: java.lang.Object, java.lang.Cloneable, java.io.Serializable must always be present"
-         * );
-         * }
-         */
     }
 
     public TypeConverter getTypeConverter() {
@@ -195,7 +182,7 @@ public class JP2KeYTypeConverter {
     private void addNullType(ResolvedType type) {
         var sort = namespaces.sorts().lookup(NullSort.NAME);
         if (sort == null) {
-            sort = new NullSort(objectSort);
+            sort = new NullSort(getObjectType().getSort());
         }
         if (namespaces.sorts().lookup(sort.name()) == null) {
             namespaces.sorts().add(sort);
@@ -285,7 +272,7 @@ public class JP2KeYTypeConverter {
         }
 
         if (ss.isEmpty() && !classType.isJavaLangObject()) {
-            ss = ss.add(objectSort);
+            ss = ss.add(getObjectType().getSort());
         }
         return ss;
     }

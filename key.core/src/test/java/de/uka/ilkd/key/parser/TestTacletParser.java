@@ -19,6 +19,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
+import org.junit.jupiter.api.Assertions;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -366,15 +367,9 @@ public class TestTacletParser {
         // buggy { find(==>b) replacewith(==>b,z=z) }
 
         String brokenTacletString = "buggy { \\find(==>b)" + "\\replacewith(==>b,z=z) }";
-        try {
+        Assertions.assertThrows(BuildingException.class, () -> {
             parseTaclet(brokenTacletString);
-            // p.setSchemaVariablesNamespace(schemaVariableNS);
-            fail("Expected the taclet builder to throw an exception "
-                + "because of free variables in replacewith");
-        } catch (Exception e) {
-            assertTrue(e instanceof BuildingException,
-                "Expected BuildingException, but got " + e.getClass());
-        }
+        });
     }
 
 
