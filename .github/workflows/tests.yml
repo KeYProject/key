@@ -108,4 +108,5 @@ jobs:
           name: test-results
           path: |
             **/build/test-results/*/*.xml
+            key.core/build/reports/runallproofs/*
             **/build/reports/
