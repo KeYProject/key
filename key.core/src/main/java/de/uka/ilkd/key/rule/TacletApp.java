@@ -439,7 +439,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
 
         if (newMC == null) {
             throw new IllegalInstantiationException(
-                "Instantiation " + term + " of " + sv + "does not satisfy the variable conditions");
+                "Instantiation " + term + " of " + sv
+                    + " does not satisfy the variable conditions");
         }
 
         SVInstantiations svInst = newMC.getInstantiations();

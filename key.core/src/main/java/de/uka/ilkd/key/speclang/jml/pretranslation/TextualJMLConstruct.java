@@ -8,6 +8,7 @@ import javax.annotation.Nonnull;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
@@ -23,8 +24,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 public abstract class TextualJMLConstruct {
 
     protected final ImmutableList<JMLModifier> mods;
-    private Position approxPos = Position.UNDEFINED;
-    private String sourceFile = null;
+    private Location location = new Location(null, Position.UNDEFINED);
     private boolean loopContract;
 
     /**
@@ -63,19 +63,12 @@ public abstract class TextualJMLConstruct {
     }
 
     /**
-     * Return the approximate position of this construct. This is usually the position of the
+     * Return the approximate location of this construct. This is usually the position of the
      * specification line parsed first. Implementations can set it using <code>setPosition</code> or
      * <code>addGeneric</code>.
      */
-    public Position getApproxPosition() {
-        return approxPos;
-    }
-
-    /**
-     * Return the source file name where this construct appears.
-     */
-    public String getSourceFileName() {
-        return sourceFile;
+    public Location getLocation() {
+        return location;
     }
 
     /**
@@ -86,15 +79,13 @@ public abstract class TextualJMLConstruct {
      * @param ps set position of the construct
      */
     protected void setPosition(PositionedString ps) {
-        if (sourceFile == null) {
-            approxPos = ps.pos;
-            sourceFile = ps.fileName;
+        if (location == null) {
+            location = ps.location;
         }
     }
 
     protected void setPosition(ParserRuleContext ps) {
-        sourceFile = ps.start.getTokenSource().getSourceName();
-        approxPos = Position.fromToken(ps.start);
+        location = Location.fromToken(ps.start);
     }
 
     protected void setPosition(LabeledParserRuleContext ps) {

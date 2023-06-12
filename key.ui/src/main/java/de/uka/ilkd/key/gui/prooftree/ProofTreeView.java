@@ -82,7 +82,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
     private static final long serialVersionUID = 3732875161168302809L;
 
-    /** Whether to expand oss nodes when using expand all */
+    /**
+     * Whether to expand oss nodes when using expand all
+     */
     private boolean expandOSSNodes = false;
 
     /**
@@ -473,6 +475,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
             expansionState = null;
         }
         proofTreeSearchPanel.reset();
+
+        for (ProofTreeViewFilter f : ProofTreeViewFilter.ALL) {
+            if (f.isActive()) {
+                setFilter(f, true);
+            }
+        }
     }
 
     public void removeProofs(Proof[] ps) {

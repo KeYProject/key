@@ -41,13 +41,13 @@ public class ParseExceptionInFile extends ParseException implements HasLocation 
         // This kind of exception has a filename but no line/col information
         // Retrieve the latter from the cause. location remains null if
         // no line/col is available in cause.
-        Location location = null;
         if (getCause() != null) {
-            location = ExceptionTools.getLocation(getCause());
-            if (location != null) {
-                location = new Location(getFilename(), location.getPosition());
+            var location = ExceptionTools.getLocation(getCause());
+            if (location.isEmpty()) {
+                return null;
             }
+            return Location.fromFileName(getFilename(), location.get().getPosition());
         }
-        return location;
+        return null;
     }
 }
