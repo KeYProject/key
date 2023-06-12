@@ -50,6 +50,7 @@ public class Do extends LoopStatement {
     }
 
     public Do(PositionInfo pi, List<Comment> c, Guard guard, Statement body) {
+        super(pi, c, null, null, guard, body);
     }
 
     public SourceElement getLastElement() {

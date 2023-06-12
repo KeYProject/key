@@ -33,7 +33,7 @@ public class TestJP2KeY {
 
     private static JavaService c2k;
 
-    // some non sense java blocks with lots of statements and expressions
+    // some nonsense java blocks with lots of statements and expressions
     private static final String[] jblocks = new String[] {
         """
                 {
@@ -115,7 +115,7 @@ public class TestJP2KeY {
     private static String removeBlanks(String s) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
-            if (!(s.charAt(i) == (' ')) && !(s.charAt(i) == ('\n'))) {
+            if (!(s.charAt(i) == (' ')) && !(s.charAt(i) == ('\n')) && !(s.charAt(i) == ('\r'))) {
                 sb.append(s.charAt(i));
             }
         }
@@ -152,7 +152,7 @@ public class TestJP2KeY {
         return Arrays.stream(jblocks).map(it -> DynamicTest.dynamicTest(it, () -> {
             String keyProg = removeBlanks(c2k.readBlockWithEmptyContext(it, null).toString());
             String recoderProg =
-                removeBlanks(c2k.recoderBlock(it, c2k.createEmptyContext()).toString());
+                removeBlanks(c2k.parseBlock(it, c2k.createEmptyContext()).toString());
             assertEquals(recoderProg, keyProg);
         }));
     }
@@ -164,9 +164,7 @@ public class TestJP2KeY {
             LOGGER.error("An error occured while parsing:", e);
             throw e;
         }
-
     }
-
 
     /**
      * test compares the pretty print results from recoder and KeY modulo blanks and line feeds

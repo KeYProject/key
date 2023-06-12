@@ -1,7 +1,8 @@
 package de.uka.ilkd.key.java.statement;
 
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Statement;
+import java.util.List;
+
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
@@ -44,6 +45,11 @@ public class Default extends BranchImp {
     public Default(ExtList children) {
         super(children);
         this.body = new ImmutableArray<>(children.collect(Statement.class));
+    }
+
+    public Default(ImmutableArray<Statement> body, PositionInfo pi, List<Comment> comments) {
+        super(pi, comments);
+        this.body = body;
     }
 
     /**

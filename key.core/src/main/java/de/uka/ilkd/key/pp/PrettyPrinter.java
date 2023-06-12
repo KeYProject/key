@@ -1263,8 +1263,6 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnVariableSpecification(VariableSpecification x) {
-        performActionOnType(x.getType());
-        l.brk();
         x.getProgramVariable().visit(this);
         for (int i = 0; i < x.getDimensions(); i += 1) {
             l.print("[]");

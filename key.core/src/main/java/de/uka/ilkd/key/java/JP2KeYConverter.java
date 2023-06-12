@@ -218,9 +218,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         case LEFT_SHIFT:
             return new ShiftLeftAssignment(pi, c, target, expr);
         case SIGNED_RIGHT_SHIFT:
-            return new UnsignedShiftRightAssignment(pi, c, target, expr);
-        case UNSIGNED_RIGHT_SHIFT:
             return new ShiftRightAssignment(pi, c, target, expr);
+        case UNSIGNED_RIGHT_SHIFT:
+            return new UnsignedShiftRightAssignment(pi, c, target, expr);
         }
         return null;
     }
@@ -806,26 +806,29 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new PackageReference(pen, inner);
     }
 
+    private static ReferencePrefix convertScopeToReferencePrefix(ClassOrInterfaceType scope) {
+        var name = scope.getName();
+        var inner = scope.getScope().map(JP2KeYVisitor::convertScopeToReferencePrefix).orElse(null);
+        return new PackageReference(new ProgramElementName(name.asString()), inner);
+    }
+
     @Nonnull
-    Object getKeYJavaType(Type type) {
-        if (type.isKeyTypeSV() || type.asString().startsWith("#")) {
+    private Object getKeYJavaType(ClassOrInterfaceType type) {
+        if (type.getName().asString().startsWith("#")) {
             return lookupSchemaVariable(type.asString(), type);
         }
-
-        if (type.isClassOrInterfaceType()) {
-            var cls = type.asClassOrInterfaceType();
-            if (cls.getName().toString().startsWith("#")) {
-                return lookupSchemaVariable(cls.getName());
-            }
-        }
-        return new TypeRef(getKeYJavaType(type.resolve()));
+        ReferencePrefix prefix =
+            type.getScope().map(JP2KeYVisitor::convertScopeToReferencePrefix).orElse(null);
+        var name = new ProgramElementName(type.getName().asString());
+        var resolvedType = getKeYJavaType(type.resolve());
+        return new TypeRef(name, 0, prefix, resolvedType);
     }
 
     @Override
     public Object visit(Parameter n, Void arg) {
         ImmutableArray<de.uka.ilkd.key.java.declaration.Modifier> modifiers = map(n.getModifiers());
         var va = n.isVarArgs();
-        var type = (TypeReference) getKeYJavaType(n.getType());
+        TypeRef type = accept(n.getType());
         var pi = createPositionInfo(n);
         var c = createComments(n);
         IProgramVariable pv;
@@ -935,13 +938,18 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         ImmutableArray<Statement> body = map(n.getStatements());
-        // TODO javaparser we currently multiply the branches
-        var result = new ArrayList<Case>(n.getLabels().size());
-        for (var label : n.getLabels()) {
-            Expression expr = accept(label);
-            result.add(new Case(expr, body, pi, c));
+        if (n.getLabels().isEmpty()) {
+            // Default branch
+            return List.of(new Default(body, pi, c));
+        } else {
+            // TODO javaparser we currently multiply the branches
+            var result = new ArrayList<Case>(n.getLabels().size());
+            for (var label : n.getLabels()) {
+                Expression expr = accept(label);
+                result.add(new Case(expr, body, pi, c));
+            }
+            return result;
         }
-        return result;
     }
 
     @Override

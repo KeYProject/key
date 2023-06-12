@@ -42,6 +42,7 @@ public class Continue extends LabelJumpStatement {
     }
 
     public Continue(PositionInfo pi, List<Comment> c, Label name) {
+        super(pi, c, name);
     }
 
     /**

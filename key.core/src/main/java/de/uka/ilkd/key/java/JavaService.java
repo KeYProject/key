@@ -766,7 +766,7 @@ public class JavaService {
      *        interpreted
      * @return the parsed and resolved recoder statement block
      */
-    BlockStmt recoderBlock(String block, TypeScope.JPContext context) {
+    BlockStmt parseBlock(String block, TypeScope.JPContext context) {
         parseSpecialClasses();
         // TODO javaparser change grammar of the parser to allow blocks without context information
         // Context-block
@@ -817,7 +817,7 @@ public class JavaService {
      */
     public JavaBlock readBlock(String block, TypeScope.JPContext context,
             Namespace<SchemaVariable> allowSchemaJava) {
-        var sb = recoderBlock(block, context);
+        var sb = parseBlock(block, context);
         if (allowSchemaJava == null && containsSchemaJava(sb)) {
             throw new RuntimeException("SchemaJava unexpected in the given block");
         }
