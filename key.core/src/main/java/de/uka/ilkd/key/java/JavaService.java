@@ -318,17 +318,21 @@ public class JavaService {
             var bootCollection = new JavaReduxFileCollection(services.getProfile());
             paths = bootCollection.getResources().collect(Collectors.toList());
         } else {
-            paths = Files.walk(programFactory.getBootClassPath())
-                    .filter(it -> it.getFileName().endsWith(".java")
-                            || it.getFileName().endsWith(".jml"))
-                    .map(it -> {
-                        try {
-                            return it.toUri().toURL();
-                        } catch (MalformedURLException e) {
-                            LOGGER.error("Could not get URL for {}", it, e);
-                        }
-                        return null;
-                    }).collect(Collectors.toList());
+            try (var stream = Files.walk(programFactory.getBootClassPath())) {
+                paths = stream.filter(
+                    it -> {
+                        var name = it.getFileName().toString();
+                        return name.endsWith(".java") || name.endsWith(".jml");
+                    })
+                        .map(it -> {
+                            try {
+                                return it.toUri().toURL();
+                            } catch (MalformedURLException e) {
+                                LOGGER.error("Could not get URL for {}", it, e);
+                            }
+                            return null;
+                        }).collect(Collectors.toList());
+            }
         }
 
         var seq = paths.parallelStream()
@@ -558,7 +562,7 @@ public class JavaService {
              */
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         // tell the mapping that we have parsed the special classes

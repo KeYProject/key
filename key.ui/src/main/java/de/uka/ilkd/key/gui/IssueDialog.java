@@ -670,7 +670,7 @@ public final class IssueDialog extends JDialog {
                         }
                     }), "\n");
 
-                if (isJava(uri.getPath())) {
+                if (uri.toString().endsWith(".java")) {
                     showJavaSourceCode(source);
                 } else {
                     txtSource.setText(source);
@@ -729,10 +729,6 @@ public final class IssueDialog extends JDialog {
         } catch (BadLocationException ignore) {
             // ignore
         }
-    }
-
-    private boolean isJava(String fileName) {
-        return fileName.endsWith(".java");
     }
 
     public static int getOffsetFromLineColumn(String source, Position pos) {
