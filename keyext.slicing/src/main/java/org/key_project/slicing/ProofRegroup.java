@@ -7,9 +7,12 @@ import java.util.List;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.PosRuleApp;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
+
+import org.key_project.slicing.graph.DependencyGraph;
 
 public final class ProofRegroup {
     private static final List<List<String>> GROUPS =
@@ -18,7 +21,7 @@ public final class ProofRegroup {
                 "polySimp_pullOutGcd", "polySimp_applyEq", "polySimp_applyEqRigid",
                 "simplify_literals"));
 
-    public static void regroupProof(Proof proof) {
+    public static void regroupProof(Proof proof, DependencyGraph graph) {
         /*
          * alpha, delta
          * negationNormalForm, conjNormalForm
@@ -57,8 +60,17 @@ public final class ProofRegroup {
                             break;
                         }
                         var n2 = n.child(0);
-                        var rule2 = n2.getAppliedRuleApp().rule();
-                        if (rule2 instanceof Taclet) {
+                        var r2 = n2.getAppliedRuleApp();
+                        var rule2 = r2.rule();
+                        if (r2 instanceof PosRuleApp && rule2 instanceof Taclet) {
+                            var p2 = (PosRuleApp) r2;
+                            var graphNode = graph.getGraphNode(proof, n2.getBranchLocation(),
+                                p2.posInOccurrence());
+                            Node finalN = n;
+                            if (graph.edgesProducing(graphNode)
+                                    .noneMatch(a -> a.getProofStep() == finalN)) {
+                                break;
+                            }
                             var ruleSets2 = ((Taclet) rule2).getRuleSets();
                             var found = false;
                             for (var name : ruleSets2) {

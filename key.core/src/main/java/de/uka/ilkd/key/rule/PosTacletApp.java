@@ -24,7 +24,7 @@ import org.key_project.util.collection.ImmutableSet;
  * ({@link de.uka.ilkd.key.rule.NoPosTacletApp}) is used to keep track of the (partial)
  * instantiation information.
  */
-public class PosTacletApp extends TacletApp {
+public class PosTacletApp extends TacletApp implements PosRuleApp {
 
     /**
      * stores the information where the Taclet is to be applied. This means where the find section
@@ -66,18 +66,6 @@ public class PosTacletApp extends TacletApp {
     public static PosTacletApp createPosTacletApp(FindTaclet taclet, MatchConditions matchCond,
             PosInOccurrence pos, Services services) {
         return createPosTacletApp(taclet, matchCond.getInstantiations(), null, pos, services);
-    }
-
-
-    /**
-     * creates a PosTacletApp for the given taclet and a position information
-     *
-     * @param taclet the FindTaclet
-     * @param pos the PosInOccurrence storing the position where to apply the Taclet
-     */
-    private PosTacletApp(FindTaclet taclet, PosInOccurrence pos) {
-        super(taclet);
-        this.pos = pos;
     }
 
     /**

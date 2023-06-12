@@ -13,7 +13,7 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
+public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp, PosRuleApp {
     public static final AtomicLong PERF_EXECUTE = new AtomicLong();
     public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();
 

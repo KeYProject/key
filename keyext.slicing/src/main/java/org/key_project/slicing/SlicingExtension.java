@@ -194,11 +194,12 @@ public class SlicingExtension implements KeYGuiExtension,
         });
         bar.add(b);
         JButton b2 = new JButton();
-        b2.setText("Reorder");
+        b2.setText("Regroup");
         b2.addActionListener(e -> {
             KeYMediator m = MainWindow.getInstance().getMediator();
             try {
-                ProofRegroup.regroupProof(m.getSelectedProof());
+                ProofRegroup.regroupProof(m.getSelectedProof(),
+                    trackers.get(m.getSelectedProof()).getDependencyGraph());
             } catch (Exception exc) {
                 exc.printStackTrace();
             }

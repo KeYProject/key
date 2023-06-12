@@ -90,7 +90,6 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
                     return;
                 }
             } else if (node != null && node.getGroup() != null) {
-                System.out.println("setting up children array of grouped node");
                 List<Node> group = node.getGroup();
                 children = new GUIAbstractTreeNode[group.size()];
                 for (int i = 0; i < group.size(); i++) {
