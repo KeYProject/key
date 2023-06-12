@@ -228,4 +228,23 @@ public class KeYResourceManager {
         return String.format("KeY %s%s", this.getVersion(),
             visibleBranch() ? " [" + getBranch() + "]" : "");
     }
+
+    static {
+        // Needed to be able to use Path.of(jar:jarFile/bla)
+        // see
+        // https://docs.oracle.com/javase/7/docs/technotes/guides/io/fsp/zipfilesystemprovider.html
+        try {
+            var jarFile = "jar:" + KeYResourceManager.class
+                    .getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .toURI().toString();
+            var uri = new URI(jarFile);
+            FileSystems.newFileSystem(uri, Map.of("create", "true"));
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        } catch (IOException ignored) {
+
+        }
+    }
 }
