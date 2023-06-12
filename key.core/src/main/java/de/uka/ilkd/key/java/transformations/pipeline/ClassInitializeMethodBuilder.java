@@ -216,7 +216,7 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
 
         var s = PipelineConstants.IMPLICIT_CLASS_PREPARED;
         clInitNotInProgressBody.add(
-            ifthen(negate(fieldAccessPassively(mkThis(), s)),
+            ifthen(negate(namePassively(s)),
                 block(clNotPreparedBody)));
 
 

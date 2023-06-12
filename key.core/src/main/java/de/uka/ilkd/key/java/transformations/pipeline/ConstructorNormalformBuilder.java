@@ -247,6 +247,9 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
     public void apply(TypeDeclaration<?> td) {
         if (td instanceof ClassOrInterfaceDeclaration) {
             var cd = (ClassOrInterfaceDeclaration) td;
+            if (cd.isInterface()) {
+                return;
+            }
             var constructors = td.getConstructors();
             ConstructorDeclaration anonConstr = null;
             if (cd.getName() == null) {
@@ -258,6 +261,7 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
                 normalform(cd, constructor);
             }
 
+            // TODO weigl why add all methods as members?
             var mdl = td.getMethods();
             for (MethodDeclaration md : mdl) {
                 cd.addMember(md);

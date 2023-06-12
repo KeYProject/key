@@ -15,6 +15,7 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.BooleanLiteralExpr;
@@ -84,6 +85,11 @@ public class CreateBuilder extends JavaTransformer {
      * @param td the TypeDeclaration
      */
     public void apply(TypeDeclaration<?> td) {
+        if (td instanceof ClassOrInterfaceDeclaration
+                && ((ClassOrInterfaceDeclaration) td).isInterface()) {
+            // Interfaces can't have fields, so nothing to set
+            return;
+        }
         td.addMember(createMethod(td));
     }
 

@@ -64,12 +64,12 @@ public class ImplicitFieldAdder extends JavaTransformer {
      *        created as static (class) field
      * @return the new created field declaration
      */
-    public static FieldDeclaration createImplicitRecoderField(
+    public static FieldDeclaration createImplicitField(
             Type typeName, String fieldName, boolean isStatic, boolean isPrivate) {
-        return createImplicitRecoderField(typeName, fieldName, isStatic, isPrivate, false);
+        return createImplicitField(typeName, fieldName, isStatic, isPrivate, false);
     }
 
-    public static FieldDeclaration createImplicitRecoderField(
+    public static FieldDeclaration createImplicitField(
             Type type, String fieldName, boolean isStatic, boolean isPrivate, boolean isFinal) {
         NodeList<Modifier> modifiers = new NodeList<>();
         if (isStatic) {
@@ -97,15 +97,15 @@ public class ImplicitFieldAdder extends JavaTransformer {
      * declared just in java.lang.Object and type specific one declared
      * in each reference type. This method adds the global ones.
      */
-    private void addGlobalImplicitRecoderFields(TypeDeclaration<?> td) {
+    private void addGlobalImplicitFields(TypeDeclaration<?> td) {
         // instance
-        td.addMember(createImplicitRecoderField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
+        td.addMember(createImplicitField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
             PipelineConstants.IMPLICIT_INITIALIZED, false, false));
-        td.addMember(createImplicitRecoderField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
+        td.addMember(createImplicitField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
             PipelineConstants.IMPLICIT_CREATED, false, false));
-        td.addMember(createImplicitRecoderField(new PrimitiveType(PrimitiveType.Primitive.INT),
+        td.addMember(createImplicitField(new PrimitiveType(PrimitiveType.Primitive.INT),
             PipelineConstants.IMPLICIT_TRANSIENT, false, false));
-        td.addMember(createImplicitRecoderField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
+        td.addMember(createImplicitField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
             PipelineConstants.IMPLICIT_TRANSACTION_UPDATED, false, false));
     }
 
@@ -116,14 +116,14 @@ public class ImplicitFieldAdder extends JavaTransformer {
      * @param td the recoder.java.TypeDeclaration to be enriched with
      *        implicit fields
      */
-    private void addImplicitRecoderFields(TypeDeclaration<?> td) {
-        td.addMember(createImplicitRecoderField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
+    private void addImplicitFields(TypeDeclaration<?> td) {
+        td.addMember(createImplicitField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
             PipelineConstants.IMPLICIT_CLASS_INIT_IN_PROGRESS, true, true));
-        td.addMember(createImplicitRecoderField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
+        td.addMember(createImplicitField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
             PipelineConstants.IMPLICIT_CLASS_ERRONEOUS, true, true));
-        td.addMember(createImplicitRecoderField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
+        td.addMember(createImplicitField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
             PipelineConstants.IMPLICIT_CLASS_INITIALIZED, true, true));
-        td.addMember(createImplicitRecoderField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
+        td.addMember(createImplicitField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
             PipelineConstants.IMPLICIT_CLASS_PREPARED, true, true));
 
         if (td instanceof ClassOrInterfaceDeclaration
@@ -134,6 +134,7 @@ public class ImplicitFieldAdder extends JavaTransformer {
                 // td.getContainingReferenceType() != null) &&
                 // (services.containingMethod(td) == null ||
                 // !services.containingMethod(td).isStatic()) &&
+                && !((ClassOrInterfaceDeclaration) td).isInterface()
                 && td.isNestedType()
                 && !td.isStatic()) {
             TypeDeclaration<?> container = (TypeDeclaration<?>) td.getParentNode().get();
@@ -144,13 +145,13 @@ public class ImplicitFieldAdder extends JavaTransformer {
     }
 
     protected void addClassInitializerStatusFields(TypeDeclaration<?> td) {
-        td.addMember(createImplicitRecoderField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
+        td.addMember(createImplicitField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
             PipelineConstants.IMPLICIT_CLASS_INIT_IN_PROGRESS, true, true));
-        td.addMember(createImplicitRecoderField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
+        td.addMember(createImplicitField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
             PipelineConstants.IMPLICIT_CLASS_ERRONEOUS, true, true));
-        td.addMember(createImplicitRecoderField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
+        td.addMember(createImplicitField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
             PipelineConstants.IMPLICIT_CLASS_INITIALIZED, true, true));
-        td.addMember(createImplicitRecoderField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
+        td.addMember(createImplicitField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
             PipelineConstants.IMPLICIT_CLASS_PREPARED, true, true));
     }
 
@@ -162,7 +163,7 @@ public class ImplicitFieldAdder extends JavaTransformer {
             // strangely, the effect is not measureable for e.g. the class init. fields...
             for (final var v : vars) {
                 Type type = services.getType(v.getType());
-                td.addMember(createImplicitRecoderField(
+                td.addMember(createImplicitField(
                     type, // TODO weigl check for arrays&co.
                     PipelineConstants.FINAL_VAR_PREFIX + v.getName(), false, true));
             }
@@ -171,11 +172,11 @@ public class ImplicitFieldAdder extends JavaTransformer {
 
     public void apply(TypeDeclaration<?> td) {
         if (!transformedObject && td.resolve().isJavaLangObject()) {
-            addGlobalImplicitRecoderFields(td);
+            addGlobalImplicitFields(td);
             transformedObject = true;
         }
 
-        addImplicitRecoderFields(td);
+        addImplicitFields(td);
         addFieldsForFinalVars(td);
     }
 
