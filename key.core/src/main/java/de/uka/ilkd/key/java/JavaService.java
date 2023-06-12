@@ -175,6 +175,7 @@ public class JavaService {
             throws BuildingExceptions {
         List<CompilationUnit> cUnits = new ArrayList<>();
         parseSpecialClasses(fileRepo);
+        // TODO javaparser there is no way JavaService is thread safe :o
         var result = filenames.stream().parallel().map(it -> parseCompilationUnit(it, fileRepo))
                 .collect(Collectors.toList());
 

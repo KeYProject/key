@@ -2,12 +2,12 @@ package de.uka.ilkd.key.proof.io;
 
 import java.nio.file.Path;
 import java.util.List;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-
 
 
 /**
@@ -83,6 +83,7 @@ public abstract class AbstractEnvInput implements EnvInput {
     }
 
 
+    @Nonnull
     @Override
     public final List<Path> readClassPath() throws ProofInputException {
         return classPath;

@@ -121,7 +121,8 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
     }
 
     protected <T> List<T> mapOf(Collection<? extends ParserRuleContext> argument) {
-        return argument.stream().map(it -> (T) it.accept(this)).collect(Collectors.toList());
+        return argument.stream().map(it -> (T) it.accept(this)).filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     protected void each(RuleContext... ctx) {

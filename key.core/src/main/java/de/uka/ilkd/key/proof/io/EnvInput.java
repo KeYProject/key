@@ -2,7 +2,6 @@ package de.uka.ilkd.key.proof.io;
 
 import java.nio.file.Path;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.proof.init.Includes;
@@ -59,7 +58,6 @@ public interface EnvInput {
     /**
      * gets the classpath elements to be considered here.
      */
-    @Nonnull
     List<Path> readClassPath() throws ProofInputException;
 
     /**

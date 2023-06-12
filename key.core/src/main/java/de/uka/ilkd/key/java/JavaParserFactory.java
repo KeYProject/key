@@ -92,6 +92,9 @@ public class JavaParserFactory {
     }
 
     public void addSourcePaths(Collection<Path> files) {
+        if (files == null) {
+            return;
+        }
         sourcePaths.ensureCapacity(sourcePaths.size() + files.size());
         for (Path path : files) {
             if (sourcePaths.contains(path)) {

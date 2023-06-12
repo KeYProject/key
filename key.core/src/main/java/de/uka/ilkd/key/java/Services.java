@@ -231,7 +231,7 @@ public class Services implements TermServices {
     public Services copy(Profile profile, boolean shareCaches) {
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
         Services s = new Services(profile,
-            getJavaInfo().getKeYProgModelInfo().rec2key().copy(),
+            javainfo == null ? null : javainfo.getKeYProgModelInfo().rec2key().copy(),
             copyCounters(), newCaches);
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));

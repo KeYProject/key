@@ -2,6 +2,7 @@ package de.uka.ilkd.key.proof.io;
 
 import java.nio.file.Path;
 import java.util.List;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -87,6 +88,7 @@ public class LDTInput implements EnvInput {
 
 
     // no class path elements here
+    @Nonnull
     @Override
     public List<Path> readClassPath() {
         return null;
