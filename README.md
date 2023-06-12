@@ -5,22 +5,22 @@
 This repository contains the interactive theorem prover "KeY" for the verification of Java programs.
 
 You can find more information about KeY on https://key-project.org or use the
-documentation in the companion repository [key-docs](https://git.key-project.org/key/key-docs).
+documentation in the companion repository [key-docs](https://github.com/KeYProject/key-docs).
 The content of the latter is also available as HTML version under https://key-project.org/docs.
 
 The current version of KeY is 2.10.0, licensed under GPL v2.
 
 
-## Requirements:
+## Requirements
 
 * Hardware: >=2 GB RAM
 * Operating System: Linux/Unix, MacOSX, Windows
-* Java SE 8 or newer
+* Java SE 11 or newer
 * Optionally, KeY can make use of the following binaries:
   * SMT Solvers:
-	* [Z3](https://github.com/Z3Prover/z3)
+    * [Z3](https://github.com/Z3Prover/z3)
     * [cvc5](https://cvc5.github.io/)
-	* [CVC4](http://cvc4.cs.stanford.edu/web/)
+    * [CVC4](http://cvc4.cs.stanford.edu/web/)
     * [Princess](http://www.philipp.ruemmer.org/princess.shtml)
 
 ## Content of the KeY folder
@@ -87,9 +87,7 @@ Assuming you are in the directory of this README file, you can create a runnable
 
 # Issues and Bug Reports
 
-If you encounter problems, please send a message to
-
-		<support@key-project.org>
+If you encounter problems, please send a message to support@key-project.org
 
 
 
@@ -100,7 +98,7 @@ This is the KeY project - Integrated Deductive Software Design
 Copyright (C) 2001-2011 Universität Karlsruhe, Germany
 						Universität Koblenz-Landau, Germany
 						and Chalmers University of Technology, Sweden
-Copyright (C) 2011-2022 Karlsruhe Institute of Technology, Germany
+Copyright (C) 2011-2023 Karlsruhe Institute of Technology, Germany
 						Technical University Darmstadt, Germany
 						Chalmers University of Technology, Sweden
 
