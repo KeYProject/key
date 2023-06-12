@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.logic;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Stack;
 
 import de.uka.ilkd.key.java.JavaService;
@@ -10,7 +9,6 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.AbstractTestTermParser;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.util.collection.ImmutableSLList;

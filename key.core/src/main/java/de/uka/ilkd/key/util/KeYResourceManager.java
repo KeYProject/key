@@ -12,6 +12,8 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
 
@@ -234,17 +236,17 @@ public class KeYResourceManager {
         // see
         // https://docs.oracle.com/javase/7/docs/technotes/guides/io/fsp/zipfilesystemprovider.html
         try {
-            var jarFile = "jar:" + KeYResourceManager.class
+            var jar = KeYResourceManager.class
                     .getProtectionDomain()
                     .getCodeSource()
                     .getLocation()
-                    .toURI().toString();
-            var uri = new URI(jarFile);
-            FileSystems.newFileSystem(uri, Map.of("create", "true"));
-        } catch (URISyntaxException e) {
+                    .toURI();
+            if (Files.isRegularFile(Path.of(jar))) {
+                var uri = new URI("jar:" + jar.toString());
+                FileSystems.newFileSystem(uri, Map.of("create", "true"));
+            }
+        } catch (URISyntaxException | IOException e) {
             throw new RuntimeException(e);
-        } catch (IOException ignored) {
-
         }
     }
 }
