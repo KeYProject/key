@@ -26,8 +26,8 @@ import java.util.List;
 
 public class RuleApplication {
 
-	private static final int TIME_OUT = -1;
-	private static final int MAX_RULE_APP = 40000;//40000;
+	private static final int TIME_OUT = 5000;
+	private static final int MAX_RULE_APP = 5000;//40000;
 	private final Sequent seq;
 	final Services services;
 	private ProofStarter ps;

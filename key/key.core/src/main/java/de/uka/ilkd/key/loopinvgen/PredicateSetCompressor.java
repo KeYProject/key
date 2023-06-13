@@ -43,7 +43,7 @@ public class PredicateSetCompressor {
 		geq = intLDT.getGreaterOrEquals();
 		comparisonPredicateSymbols.add(geq);
 
-		sProof = new SideProof(services, seq, 75000);
+		sProof = new SideProof(services, seq, 5000);//75000
 		ailias = ailiasing;
 		allPreds = preds;
 		locSetLDT = new LocSetLDT(services);

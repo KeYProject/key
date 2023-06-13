@@ -51,7 +51,7 @@ public class SideProof {
 	}
 
 	public SideProof(Services s, Sequent sequent) {
-		this(s, sequent, 30000);
+		this(s, sequent, 5000);//30000
 	}//100000
 
 	/**
@@ -77,7 +77,7 @@ public class SideProof {
 													 int maxRuleApp, boolean simplifyOnly,
 													 boolean stopAtFirstUncloseableGoal,
 													 Services services) throws ProofInputException {
-		return isProvableHelper(seq2prove,maxRuleApp,-1, simplifyOnly,stopAtFirstUncloseableGoal,services);
+		return isProvableHelper(seq2prove,maxRuleApp,5000, simplifyOnly,stopAtFirstUncloseableGoal,services);
 	}
 		public static ApplyStrategyInfo isProvableHelper(Sequent seq2prove,
 													 int maxRuleApp, int timeout, boolean simplifyOnly,
@@ -157,6 +157,9 @@ public class SideProof {
 			new ProofSaver(info.getProof(), new java.io.File("C:\\Users\\Asma\\Unprovable"+COUNTER+".key")).save();
 
 			System.out.println(COUNTER + "   " +info.getProof().closed() + " in " + time + " ms");
+			if(time > 1000){
+				System.out.println("This proof takes long!");
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

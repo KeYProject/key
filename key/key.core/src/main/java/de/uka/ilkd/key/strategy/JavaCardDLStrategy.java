@@ -759,7 +759,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                           // get their cost computed
 
 
-
         bindRuleSet(d, "dep_pred_known",
             add(ScaleFeature.createScaled(FocusTermDepthFeature.INSTANCE, 3000),
             longConst(5000)));//+100
@@ -1245,8 +1244,30 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 PolynomialValuesCmpFeature.leq(
                         instOf("colStart"),
                         instOf("colEnd")));
+        Feature matrixRangeloc1OutSideLoc2 = ifZero(
+                or(
+                PolynomialValuesCmpFeature.lt(
+                        sub(instOf("loc2"), 3),
+                        sub(instOf("loc1"), 2)),
+                PolynomialValuesCmpFeature.lt(
+                        sub(instOf("loc1"), 3),
+                        sub(instOf("loc2"), 2)),
+                PolynomialValuesCmpFeature.lt(
+                        sub(instOf("loc2"), 5),
+                        sub(instOf("loc1"), 4)),
+                PolynomialValuesCmpFeature.lt(
+                        sub(instOf("loc1"), 5),
+                        sub(instOf("loc2"), 4))
+                ), inftyConst(), longConst(0));
 
-
+        Function matrixRange = getServices().getTypeConverter().getLocSetLDT().getMatrixRange();
+     /*   bindRuleSet(d, "preventDisjointLocationSets",
+                ifZero(MatchedIfFeature.INSTANCE,
+                    ifZero(add(applyTF("loc1", op(matrixRange)),
+                                    applyTF("loc2", op(matrixRange))),
+                            matrixRangeloc1OutSideLoc2, longConst(0)),
+                        longConst(1000)));
+*/
 //        Feature rowEndGeqRowStart = geq("rowEnd", "rowStart");
 //        Feature colEndGeqColStart = geq("colEnd", "colStart");
 
