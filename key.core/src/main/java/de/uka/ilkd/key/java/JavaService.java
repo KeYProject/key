@@ -1,16 +1,13 @@
 package de.uka.ilkd.key.java;
 
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -29,6 +26,7 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.DirectoryFileCollection;
 import de.uka.ilkd.key.util.FileCollection;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ZipFileCollection;
 import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
@@ -47,7 +45,6 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.comments.CommentsCollection;
 import com.github.javaparser.ast.key.sv.KeyContextStatementBlock;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
@@ -129,179 +126,88 @@ public class JavaService {
         }
     }
 
+    private static BuildingIssue buildingIssueFromProblem(Problem problem) {
+        LOGGER.error(problem.toString(), problem.getCause().orElse(null));
+        var loc = problem.getLocation()
+                .flatMap(TokenRange::toRange)
+                .map(b -> b.begin)
+                .orElse(new Position(-1, -1));
+        return new BuildingIssue(problem.getVerboseMessage(),
+            problem.getCause().orElse(null), false,
+            de.uka.ilkd.key.java.Position.fromJPPosition(loc));
+    }
+
     // region parsing of compilation units
-
-    /**
-     * parse a list of java files and transform it to the corresponding KeY
-     * entities.
-     *
-     * @param units files to read
-     * @param fileRepo the fileRepo which will store the files
-     * @return a new list containing the recoder compilation units corresponding
-     *         to the given files.
-     * @throws JavaBuildingExceptions any exception occurring while treating the file is wrapped
-     *         into a parse exception that contains the filename.
-     */
-    public List<de.uka.ilkd.key.java.CompilationUnit> readCompilationUnits(
-            Collection<Path> units, FileRepo fileRepo)
-            throws JavaBuildingExceptions {
-
-        List<CompilationUnit> cUnits = parseCompilationUnits(units, fileRepo);
-        var result = new ArrayList<de.uka.ilkd.key.java.CompilationUnit>(cUnits.size());
-        for (CompilationUnit cu : cUnits) {
-            result.add(converter.processCompilationUnit(cu));
-        }
-        return result;
-    }
-
-
-    /**
-     * parse a list of java files.
-     * <p>
-     * Each element of the array is treated as a filename to read in.
-     *
-     * @param filenames a list of strings, each element is interpreted as a file to be
-     *        read. not null.
-     * @param fileRepo the fileRepo which will store the files
-     * @return a new list containing the recoder compilation units corresponding
-     *         to the given files.
-     */
-    private List<CompilationUnit> parseCompilationUnits(Collection<Path> filenames,
-            FileRepo fileRepo)
-            throws BuildingExceptions {
-        List<CompilationUnit> cUnits = new ArrayList<>();
-        parseSpecialClasses(fileRepo);
-        // TODO javaparser there is no way JavaService is thread safe :o
-        var result = filenames.stream().parallel().map(it -> parseCompilationUnit(it, fileRepo))
-                .toList();
-
-        if (result.stream().anyMatch(it -> !it.isSuccessful())) {
-            var problems = result.stream().flatMap(it -> it.getProblems().stream());
-            reportErrors(problems);
-        }
-        // transform program
-        transformModel(cUnits);
-        return result.stream().map(it -> it.getResult().get()).collect(Collectors.toList());
-    }
-
     private <T> T unwrapParseResult(ParseResult<T> result) {
         if (result.isSuccessful()) {
+            assert result.getResult().isPresent();
             return result.getResult().get();
         }
         if (result.getProblems().isEmpty()) {
             throw new UnsupportedOperationException("Parser returned null value and no errors");
         }
+
         var errors = new ArrayList<BuildingIssue>(result.getProblems().size());
         for (Problem problem : result.getProblems()) {
-            LOGGER.error(problem.toString(), problem.getCause().orElse(null));
-            var loc = problem.getLocation()
-                    .flatMap(TokenRange::toRange)
-                    .map(b -> b.begin)
-                    .orElse(new Position(-1, -1));
-            errors.add(new BuildingIssue(problem.getVerboseMessage(),
-                problem.getCause().orElse(null), false,
-                de.uka.ilkd.key.java.Position.fromJPPosition(loc)));
+            if (problem.getMessage().contains("ghost")) {
+                // TODO javaparser A hack to remove false alarm caused by ModifiersVisitor check
+                continue;
+            }
+
+            errors.add(buildingIssueFromProblem(problem));
         }
 
-        // TODO A hack to remove false alarm caused by ModifiersVisitor check
-        return reportErrors(
-            result.getProblems().stream().filter(it -> !it.getMessage().contains("ghost")));
-    }
-
-    private <T> void reportErrors(ParseResult<T> result) {
-        if (!result.isSuccessful()) {
-            result.getProblems()
-                    .forEach(it -> LOGGER.error("Error in {}", it, it.getCause().orElse(null)));
-
-            // TODO A hack to remove false alarm caused by ModifiersVisitor check
-            reportErrors(
-                result.getProblems().stream().filter(it -> !it.getMessage().contains("ghost")));
-        }
-    }
-
-
-    private <T> T reportErrors(Stream<Problem> problems) {
-        var be = problems.map(it -> {
-            var loc = it.getLocation()
-                    .flatMap(TokenRange::toRange)
-                    .map(b -> b.begin)
-                    .orElse(new Position(-1, -1));
-            return new BuildingIssue(it.getVerboseMessage(),
-                null, false,
-                de.uka.ilkd.key.java.Position.fromJPPosition(loc));
-        }).collect(Collectors.toList());
-        if (!be.isEmpty()) {
-            throw new BuildingExceptions(be);
-        }
-        return null;
+        throw new BuildingExceptions(errors);
     }
 
     private ParseResult<CompilationUnit> parseCompilationUnit(Path filename,
-            @Nullable FileRepo fileRepo) {
-        try {
-            Reader is;
-            if (fileRepo != null)
-                is = new InputStreamReader(
-                    new BufferedInputStream(fileRepo.getInputStream(filename)));
-            else
-                is = Files.newBufferedReader(filename);
-            try (BufferedReader br = new BufferedReader(is)) {
-                ParseResult<CompilationUnit> cu = getProgramFactory().parseCompilationUnit(br);
-                if (cu.getResult().isPresent()) {
-                    cu.getResult().get().setStorage(filename);
-                }
-                return cu;
+            @Nullable FileRepo fileRepo) throws IOException {
+        Reader is;
+        if (fileRepo != null) {
+            is = new InputStreamReader(fileRepo.getInputStream(filename));
+        } else {
+            is = Files.newBufferedReader(filename);
+        }
+        try (BufferedReader br = new BufferedReader(is)) {
+            ParseResult<CompilationUnit> cu = programFactory.parseCompilationUnit(br);
+            if (cu.getResult().isPresent()) {
+                cu.getResult().get().setStorage(filename);
             }
-
-        } catch (FileNotFoundException e) {
-            return new ParseResult<>(null,
-                Collections.singletonList(new Problem("Could not find " + filename, null, e)),
-                new CommentsCollection());
-        } catch (IOException e) {
-            return new ParseResult<>(null,
-                Collections.singletonList(new Problem("I/O error reading: " + filename, null, e)),
-                new CommentsCollection());
+            return cu;
         }
     }
 
     /**
      * read a compilation unit, given as a string.
      *
-     * @param cUnitString a string represents a compilation unit
+     * @param file where to read from
+     * @param repo the repo to use for reading
      * @return a KeY structured compilation unit.
      */
-    public de.uka.ilkd.key.java.CompilationUnit readCompilationUnit(String cUnitString) {
-        var cc = recoderCompilationUnits(Collections.singletonList(cUnitString));
-        var cu = cc.get(0);
-        return (de.uka.ilkd.key.java.CompilationUnit) converter.process(cu);
+    public de.uka.ilkd.key.java.CompilationUnit readCompilationUnit(Path file, FileRepo repo)
+            throws IOException {
+        parseSpecialClasses();
+        var cc = parseCompilationUnit(file, repo);
+        return converter.processCompilationUnit(unwrapParseResult(cc));
     }
 
     /**
-     * read a number of compilation units, each given as a string.
+     * read a compilation unit, given as a string.
      *
-     * @param cUnitStrings an array of strings, each element represents a compilation
-     *        unit
-     * @return a list of KeY structured compilation units.
+     * @param text a string represents a compilation unit
+     * @return a KeY structured compilation unit.
      */
-    List<CompilationUnit> recoderCompilationUnits(List<String> cUnitStrings) {
+    public de.uka.ilkd.key.java.CompilationUnit readCompilationUnit(String text) {
         parseSpecialClasses();
-        var cUnits = cUnitStrings.parallelStream()
-                .map(it -> {
-                    LOGGER.debug("Reading {}", trim(it));
-                    var sr = new StringReader(it);
-                    return getProgramFactory().parseCompilationUnit(sr);
-                }).toList();
+        LOGGER.debug("Reading {}", trim(text));
+        var reader = new StringReader(text);
+        var cu = unwrapParseResult(programFactory.parseCompilationUnit(reader));
 
-        if (cUnits.stream().anyMatch(it -> !it.isSuccessful())) {
-            reportErrors(cUnits.stream().flatMap(it -> it.getProblems().stream()));
-        }
-
+        // TODO javaparser why? this method is used in tests only
+        programFactory.appendToJavaRedux(Collections.singletonList(cu));
         // transform program
-        final var collect =
-            cUnits.stream().map(it -> it.getResult().get()).collect(Collectors.toList());
-        programFactory.appendToJavaRedux(collect);
-        transformModel(collect);
-        return collect;
+        transformModel(Collections.singletonList(cu));
+        return converter.processCompilationUnit(cu);
     }
 
     // ----- parsing libraries
@@ -325,60 +231,46 @@ public class JavaService {
      * {@link DirectoryFileCollection}.
      *
      * @param fileRepo the FileRepo that provides the InputStream to resources
-     * @return
+     * @return the compilation units
      */
     private List<CompilationUnit> parseInternalClasses(FileRepo fileRepo) throws IOException {
-        List<URL> paths;
+        List<URI> paths;
 
         if (programFactory.getBootClassPath() == null) {
             var bootCollection = new JavaReduxFileCollection(services.getProfile());
             paths = bootCollection.getResources().collect(Collectors.toList());
         } else {
             try (var stream = Files.walk(programFactory.getBootClassPath())) {
-                paths = stream.filter(
-                    it -> {
-                        var name = it.getFileName().toString();
-                        return name.endsWith(".java") || name.endsWith(".jml");
-                    })
-                        .map(it -> {
-                            try {
-                                return it.toUri().toURL();
-                            } catch (MalformedURLException e) {
-                                LOGGER.error("Could not get URL for {}", it, e);
-                            }
-                            return null;
-                        }).collect(Collectors.toList());
+                paths = stream.filter(it -> {
+                    var name = it.getFileName().toString();
+                    return name.endsWith(".java") || name.endsWith(".jml");
+                }).map(Path::toUri).collect(Collectors.toList());
             }
         }
 
-        var seq = paths.parallelStream()
+        List<Pair<Path, ParseResult<CompilationUnit>>> compilationUnits = paths.parallelStream()
                 .filter(Objects::nonNull)
                 .map(it -> {
                     try {
-                        final var inputStream =
-                            fileRepo == null ? it.openStream() : fileRepo.getInputStream(it);
-                        try (Reader f = new BufferedReader(new InputStreamReader(inputStream))) {
-                            final var result = getProgramFactory().parseCompilationUnit(f);
-                            if (result.getResult().isPresent()) {
-                                var unit = result.getResult().get();
-                                unit.setStorage(Paths.get(it.toURI()));
-                            }
-                            return result;
-                        } catch (URISyntaxException e) {
-                            throw new RuntimeException(e);
-                        }
+                        var path = Paths.get(it);
+                        return new Pair<>(path, parseCompilationUnit(path, fileRepo));
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        throw new RuntimeException(e);
                     }
-                    return null;
                 }).toList();
 
-        if (seq.stream().anyMatch(it -> !it.isSuccessful())) {
-            reportErrors(seq.stream().flatMap(it -> it.getProblems().stream()));
+        if (compilationUnits.stream().allMatch(it -> it.second.isSuccessful())) {
+            return compilationUnits.stream().map(it -> it.second.getResult().get()).toList();
         }
-        // programFactory.setJavaRedux(specialClasses);
 
-        return seq.stream().map(it -> it.getResult().get()).collect(Collectors.toList());
+        var errors = compilationUnits.stream()
+                .filter(c -> c.second.isSuccessful())
+                .map(c -> new LibraryFileParsingIssue(
+                    c.first,
+                    c.second.getProblems().stream().map(JavaService::buildingIssueFromProblem)
+                            .toList()))
+                .toList();
+        throw new LibraryParsingException(errors);
     }
 
     /**
@@ -398,7 +290,7 @@ public class JavaService {
      * </ol>
      *
      * @param fileRepo the FileRepo for obtaining InputStreams
-     * @throws IOException
+     * @throws IOException an exception
      * @author mulbrich
      */
     private List<CompilationUnit> parseLibs(FileRepo fileRepo) throws IOException {
@@ -427,7 +319,7 @@ public class JavaService {
                 try (InputStream is = walker.openCurrent(fileRepo);
                         Reader isr = new InputStreamReader(is);
                         Reader f = new BufferedReader(isr)) {
-                    var cu = unwrapParseResult(getProgramFactory().parseCompilationUnit(f));
+                    var cu = unwrapParseResult(programFactory.parseCompilationUnit(f));
                     cu.setStorage(currentDataLocation);
                     removeCodeFromClasses(cu, false);
                     rcuList.add(cu);
@@ -443,7 +335,7 @@ public class JavaService {
                 try (InputStream is = walker.openCurrent(fileRepo);
                         Reader isr = new InputStreamReader(is);
                         Reader f = new BufferedReader(isr)) {
-                    var cu = unwrapParseResult(getProgramFactory().parseCompilationUnit(f));
+                    var cu = unwrapParseResult(programFactory.parseCompilationUnit(f));
                     cu.setStorage(currentDataLocation);
                     removeCodeFromClasses(cu, true);
                     rcuList.add(cu);
@@ -472,7 +364,7 @@ public class JavaService {
          * rcuList.addAll(manager.getCompilationUnits());
          */
 
-        var cu = unwrapParseResult(getProgramFactory().parseCompilationUnit(
+        var cu = unwrapParseResult(programFactory.parseCompilationUnit(
             new StringReader("public class " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS +
                 " { public static void " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_METHOD
                 + "() {}  }")));
@@ -516,7 +408,7 @@ public class JavaService {
      * This method throws only runtime exceptions for historical reasons.
      */
     public void parseSpecialClasses() {
-        parseLibraryClasses0(null);
+        parseSpecialClasses(null);
     }
 
     /**
@@ -529,10 +421,6 @@ public class JavaService {
      * @param fileRepo the fileRepo which will store the files
      */
     public void parseSpecialClasses(FileRepo fileRepo) {
-        parseLibraryClasses0(fileRepo);
-    }
-
-    private void parseLibraryClasses0(FileRepo fileRepo) {
         if (mapping.parsedSpecial()) {
             return;
         }
@@ -791,11 +679,12 @@ public class JavaService {
         if (input.contains("..") || input.contains("...")) {
             // TODO weigl further eloborate the situation, how to work with contexts provided?
             KeyContextStatementBlock blockStmt =
-                unwrapParseResult(getProgramFactory().parseContextBlock(input));
+                unwrapParseResult(programFactory.parseContextBlock(input));
             block = new BlockStmt(blockStmt.getStatements());
         } else { // Simple Java-block
-            block = unwrapParseResult(getProgramFactory().parseStatementBlock(input));
+            block = unwrapParseResult(programFactory.parseStatementBlock(input));
         }
+        // TODO javaparser result unused
         embedMethod(embedBlock(block), context);
         // normalise constant string expressions
         new ConstantStringExpressionEvaluator(createPipelineServices())
@@ -843,7 +732,7 @@ public class JavaService {
      * A SchemaJava node is a node that represents a schema variable,e.g., {@code #s}.
      * We exploit the naming convention inside key-javaparser.
      *
-     * @param node
+     * @param node the node
      * @return true if type name of the node matches "Key*SV".
      */
     private boolean isSchemaJavaNode(@Nonnull Node node) {
@@ -905,15 +794,8 @@ public class JavaService {
      * ellipses [...]
      */
     private static String trim(String s) {
-        return trim(s, 150);
-    }
-
-    /**
-     * reduce the size of a string to a maximum of length.
-     */
-    private static String trim(String s, int length) {
-        if (s.length() > length)
-            return s.substring(0, length - 5) + "[...]";
+        if (s.length() > 150)
+            return s.substring(0, 150 - 5) + "[...]";
         return s;
     }
 
@@ -942,5 +824,21 @@ public class JavaService {
     @Nonnull
     private JavaSymbolSolver getSymbolResolver() {
         return programFactory.getSymbolSolver();
+    }
+
+    public record LibraryFileParsingIssue(Path path, List<BuildingIssue> issues) {
+    }
+
+    public static final class LibraryParsingException extends RuntimeException {
+        private final List<LibraryFileParsingIssue> issues;
+
+        public LibraryParsingException(List<LibraryFileParsingIssue> issues) {
+            super("Parsing library classes failed");
+            this.issues = issues;
+        }
+
+        public List<LibraryFileParsingIssue> getIssues() {
+            return issues;
+        }
     }
 }

@@ -260,7 +260,13 @@ public final class ProblemInitializer {
                 }
             }
             // support for single file loading
-            r2k.readCompilationUnits(classes, fileRepo);
+            for (var cls : classes) {
+                try {
+                    r2k.readCompilationUnit(cls, fileRepo);
+                } catch (IOException e) {
+                    throw new ProofInputException("Failed to read file " + cls, e);
+                }
+            }
         } else {
             reportStatus("Reading Java libraries");
             r2k.parseSpecialClasses(fileRepo);

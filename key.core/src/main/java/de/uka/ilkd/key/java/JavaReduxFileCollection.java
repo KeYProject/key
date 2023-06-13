@@ -115,10 +115,17 @@ public class JavaReduxFileCollection implements FileCollection {
 
     }
 
-    public Stream<URL> getResources() {
+    public Stream<URI> getResources() {
         return resources.stream()
-                .map(it -> KeYResourceManager.getManager().getResourceFile(
-                    JavaService.class, resourceLocation + "/" + it.replace('.', '/') + ".java"));
+                .map(it -> {
+                    try {
+                        return KeYResourceManager.getManager().getResourceFile(
+                            JavaService.class,
+                            resourceLocation + "/" + it.replace('.', '/') + ".java").toURI();
+                    } catch (URISyntaxException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
     }
 
     /*
