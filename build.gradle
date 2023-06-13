@@ -1,4 +1,6 @@
 import groovy.transform.Memoized
+import com.github.jk1.license.render.*
+import com.github.jk1.license.importer.*
 
 plugins {
     //Support for IntelliJ IDEA
@@ -22,7 +24,65 @@ plugins {
 
     // Code formatting
     id "com.diffplug.spotless" version "6.16.0"
+
+
+    id 'com.github.jk1.dependency-license-report' version '2.4'
 }
+
+
+licenseReport {
+    // By default this plugin will collect the union of all licenses from
+    // the immediate pom and the parent poms. If your legal team thinks this
+    // is too liberal, you can restrict collected licenses to only include the
+    // those found in the immediate pom file
+    // Defaults to: true
+    unionParentPomLicenses = false
+
+    // Set output directory for the report data.
+    // Defaults to ${project.buildDir}/reports/dependency-license.
+    outputDir = "$projectDir/build/licenses"
+
+    // Select projects to examine for dependencies.
+    // Defaults to current project and all its subprojects
+    projects = [project] + project.subprojects
+
+    // Adjust the configurations to fetch dependencies. Default is 'runtimeClasspath'
+    // For Android projects use 'releaseRuntimeClasspath' or 'yourFlavorNameReleaseRuntimeClasspath'
+    // Use 'ALL' to dynamically resolve all configurations:
+    // configurations = ALL
+    configurations = ['runtimeClasspath']
+
+    /*
+    // List the groups ids to exclude from dependency report. Supports regular expressions.
+    // For finer granularity, see: excludes.
+    excludeGroups = ['do.not.want']
+
+    // List the ids (in module:name format) to exclude from dependency report. Supports regular expressions.
+    // By default excludes is empty.
+    excludes = ['moduleGroup:moduleName']
+
+    // Don't include artifacts of project's own group into the report
+    excludeOwnGroup = true
+
+    // Don't exclude bom dependencies.
+    // If set to true, then all boms will be excluded from the report
+    excludeBoms = false
+
+    // Set custom report renderer, implementing ReportRenderer.
+    // Yes, you can write your own to support any format necessary.
+    renderers = [new XmlReportRenderer('third-party-libs.xml', 'Back-End Libraries')]
+
+    // Set importers to import any external dependency information, i.e. from npm.
+    // Custom importer should implement DependencyDataImporter interface.
+    importers = [new XmlReportImporter('Frontend dependencies', file(frontend_libs.xml))]
+
+    // This is for the allowed-licenses-file in checkLicense Task
+    // Accepts File, URL or String path to local or remote file
+    allowedLicensesFile = new File("$projectDir/config/allowed-licenses.json")
+    */
+}
+
+
 
 // Configure this project for use inside IntelliJ:
 idea {
