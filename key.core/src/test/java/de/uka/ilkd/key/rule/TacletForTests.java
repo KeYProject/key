@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.rule;
 
 import java.io.File;
-import java.util.Collections;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaService;
@@ -211,7 +210,7 @@ public class TacletForTests {
     }
 
     public static ProgramElement parsePrg(String prgString) {
-        JavaService r2k = new JavaService(services(), Collections.emptyList());
+        JavaService r2k = services().getJavaService();
         return r2k.readBlockWithEmptyContext(prgString, null).program();
     }
 }

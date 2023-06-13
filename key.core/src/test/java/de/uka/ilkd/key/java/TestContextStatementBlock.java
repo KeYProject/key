@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.java;
 
-import java.util.Collections;
 
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.operator.PostIncrement;
@@ -25,7 +24,7 @@ public class TestContextStatementBlock {
     @BeforeEach
     public void setUp() {
         Services services = TacletForTests.services();
-        JavaService c2k = new JavaService(services, Collections.emptyList());
+        JavaService c2k = services.getJavaService();
         blockOne = c2k.readBlock("{int a=1; {int b=3; b++;} a++;}", c2k.createEmptyContext(), null);
     }
 

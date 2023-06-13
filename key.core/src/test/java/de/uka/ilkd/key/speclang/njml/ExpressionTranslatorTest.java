@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.speclang.njml;
 
-import java.util.Collections;
 import java.util.HashMap;
 
 import de.uka.ilkd.key.java.JavaService;
@@ -36,7 +35,7 @@ public class ExpressionTranslatorTest {
             return;
         }
         services = TacletForTests.services();
-        JavaService r2k = new JavaService(services, Collections.emptyList());
+        JavaService r2k = services.getJavaService();
         r2k.parseSpecialClasses();
     }
 

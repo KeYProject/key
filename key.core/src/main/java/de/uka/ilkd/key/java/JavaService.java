@@ -22,7 +22,6 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.DirectoryFileCollection;
 import de.uka.ilkd.key.util.FileCollection;
@@ -248,7 +247,7 @@ public class JavaService {
             }
         }
 
-        List<Pair<Path, ParseResult<CompilationUnit>>> compilationUnits = paths.parallelStream()
+        List<Pair<Path, ParseResult<CompilationUnit>>> compilationUnits = paths.stream()
                 .filter(Objects::nonNull)
                 .map(it -> {
                     try {
@@ -800,13 +799,6 @@ public class JavaService {
     }
 
     // ----- error handling
-
-    public JavaService(Services services, Collection<Path> sourcePaths) {
-        // TODO javaparser this is only called from tests, what is sourcePaths there?
-        this(services, new KeYJPMapping(),
-            Paths.get(JavaProfile.getDefaultProfile().getInternalClassDirectory()), sourcePaths);
-    }
-
     public JavaService(Services services, KeYJPMapping mapping, Path bootClassPath,
             Collection<Path> sourcePaths) {
         this.services = services;

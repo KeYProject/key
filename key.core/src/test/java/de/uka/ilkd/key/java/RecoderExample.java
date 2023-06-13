@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java;
 
 
-import java.util.Collections;
 
 import de.uka.ilkd.key.java.statement.Guard;
 import de.uka.ilkd.key.java.statement.If;
@@ -76,7 +75,7 @@ public class RecoderExample {
     public static void main(String[] args) {
         System.out.println("Starting...");
         RecoderExample ex = new RecoderExample();
-        JavaService c2k = new JavaService(TacletForTests.services(), Collections.emptyList());
+        JavaService c2k = TacletForTests.services().getJavaService();
         String prg = "{ int i=0; while (i<5) { i++;} }";
         JavaBlock block = c2k.readBlock(prg, c2k.createEmptyContext(), null);
         System.out.println("Read Original:\n" + block);

@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,7 +45,7 @@ public class TestDeclarationProgramVariableCollector {
         if (down != 0) {
             return;
         }
-        final JavaService r2k = new JavaService(TacletForTests.services(), Collections.emptyList());
+        final JavaService r2k = TacletForTests.services().getJavaService();
         for (int i = 0; i < jblocks.length; i++) {
             test_block[i] = r2k.readBlockWithEmptyContext(jblocks[i], null);
         }

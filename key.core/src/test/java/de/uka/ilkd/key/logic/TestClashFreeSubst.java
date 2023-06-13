@@ -46,7 +46,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         parseDecls(sorts);
         assertNotNull(nss.sorts().lookup("boolean"));
 
-        services.activateJava();
+        services.activateJava(null);
         JavaService r2k = services.getJavaService();
         assertNotNull(r2k);
         r2k.parseSpecialClasses();

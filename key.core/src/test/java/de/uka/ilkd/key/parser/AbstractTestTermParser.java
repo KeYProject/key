@@ -2,9 +2,7 @@ package de.uka.ilkd.key.parser;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 
-import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
@@ -36,7 +34,7 @@ public class AbstractTestTermParser {
         tb = services.getTermBuilder();
         tf = tb.tf();
         nss = services.getNamespaces();
-        services.activateJava();
+        services.activateJava(null);
         io = new KeyIO(services, nss);
     }
 
@@ -60,7 +58,7 @@ public class AbstractTestTermParser {
 
     public Term parseProblem(String s) {
         try {
-            new JavaService(TacletForTests.services(), Collections.emptyList())
+            TacletForTests.services().getJavaService()
                     .parseSpecialClasses();
             KeyIO io = new KeyIO(TacletForTests.services(), nss);
             KeyIO.Loader loader = io.load(s);

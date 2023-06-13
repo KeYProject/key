@@ -1,8 +1,6 @@
 package de.uka.ilkd.key.parser;
 
-import java.util.Collections;
 
-import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
@@ -50,8 +48,8 @@ public class TestDeclParser {
         assertNotNull(nss.sorts().lookup("boolean"));
         assertNotNull(nss.sorts().lookup("int"));
         assertNotNull(nss.sorts().lookup("boolean"));
-        JavaService r2k = new JavaService(serv, Collections.emptyList());
-        r2k.parseSpecialClasses();
+        serv.activateJava(null);
+        serv.getJavaService().parseSpecialClasses();
     }
 
     private void evaluateDeclarations(String s) {

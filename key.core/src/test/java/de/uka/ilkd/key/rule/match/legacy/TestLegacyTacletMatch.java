@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.rule.match.legacy;
 
 import java.io.File;
-import java.util.Collections;
 
 import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
@@ -201,8 +200,7 @@ public class TestLegacyTacletMatch {
     @Test
     public void testProgramMatch1() {
         Services services = TacletForTests.services();
-        JavaService c2k =
-            new JavaService(services, Collections.emptyList());
+        JavaService c2k = services.getJavaService();
         JavaBlock jb = c2k.readBlock("{ int i; int j; i=++j;" + " while(true) {break;}}",
             c2k.createEmptyContext(), null);
 

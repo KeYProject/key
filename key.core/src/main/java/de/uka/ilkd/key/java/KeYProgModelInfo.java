@@ -415,10 +415,10 @@ public class KeYProgModelInfo {
         if (methodlist.size() == 1) {
             return (IProgramMethod) rec2key().toKeY(methodlist.get(0)).orElse(null);
         } else if (methodlist.isEmpty()) {
-            LOGGER.debug("javainfo: Program Method not found: {}", m);
+            LOGGER.debug("Program Method not found: {}", m);
             return null;
         } else {
-            Debug.fail();
+            LOGGER.debug("More than one method matching: {}", m);
             return null;
         }
     }

@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.java;
 
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -16,6 +17,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 
+import de.uka.ilkd.key.util.KeYResourceManager;
 import org.key_project.util.lookup.Lookup;
 
 /**
@@ -422,7 +424,7 @@ public class Services implements TermServices {
         return javaService;
     }
 
-    public void activateJava(Path bootClassPath) {
+    private void activateJavaPath(Path bootClassPath) {
         var m = mapping == null ? new KeYJPMapping() : mapping;
         javaService = new JavaService(this, m, bootClassPath, Collections.emptyList());
         var jpTypoConv = javaService.getTypeConverter();
@@ -430,11 +432,23 @@ public class Services implements TermServices {
         javainfo = new JavaInfo(kpmi, this);
     }
 
-    public void activateJava() {
-        var classDir = getProfile().getInternalClassDirectory();
-        if (classDir != null && !classDir.isBlank()) {
-            activateJava(Paths.get(classDir));
+    public void activateJava(@Nullable Path bootClassPath) {
+        Path path;
+        if (bootClassPath != null) {
+            path = bootClassPath;
+        } else {
+            // TODO weigl: where to put this code. The implementation of services.getProfile() is
+            // stupid.
+            var resourcePath = "JavaRedux/JAVALANG.TXT";
+            var url =
+                    KeYResourceManager.getManager().getResourceFile(JavaService.class, resourcePath);
+            try {
+                path = Paths.get(url.toURI()).getParent();
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
         }
+        activateJavaPath(path);
     }
 
     public Lookup createLookup() {

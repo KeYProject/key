@@ -246,7 +246,8 @@ public final class ProblemInitializer {
         final JavaService r2k = initConfig.getServices().getJavaService();
         r2k.setClassPath(bootClassPath, classPath);
 
-        // read Java (at least the library classes)
+        reportStatus("Reading Java libraries");
+        r2k.parseSpecialClasses(fileRepo);
         if (javaPath != null) {
             reportStatus("Reading Java source");
             var javaService = initConfig.getServices().getJavaService();
@@ -267,9 +268,6 @@ public final class ProblemInitializer {
                     throw new ProofInputException("Failed to read file " + cls, e);
                 }
             }
-        } else {
-            reportStatus("Reading Java libraries");
-            r2k.parseSpecialClasses(fileRepo);
         }
         Path initialFile = envInput.getInitialFile();
         initConfig.getServices().setJavaModel(
@@ -405,23 +403,7 @@ public final class ProblemInitializer {
 
     private void activateInitConfigJava(InitConfig config, EnvInput envInput) {
         final Path bootClassPath = envInput.readBootClassPath();
-        var services = config.getServices();
-        Path path;
-        if (bootClassPath != null) {
-            path = bootClassPath;
-        } else {
-            // TODO weigl: where to put this code. The implementation of services.getProfile() is
-            // stupid.
-            var resourcePath = "JavaRedux/JAVALANG.TXT";
-            var url =
-                KeYResourceManager.getManager().getResourceFile(JavaService.class, resourcePath);
-            try {
-                path = Paths.get(url.toURI()).getParent();
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        services.activateJava(path);
+        config.getServices().activateJava(bootClassPath);
     }
 
     /**
