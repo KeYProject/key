@@ -844,7 +844,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(Parameter n, Void arg) {
         ImmutableArray<de.uka.ilkd.key.java.declaration.Modifier> modifiers = map(n.getModifiers());
         var va = n.isVarArgs();
-        TypeRef type = accept(n.getType());
+        TypeReference type = accept(n.getType());
         var pi = createPositionInfo(n);
         var c = createComments(n);
         IProgramVariable pv;

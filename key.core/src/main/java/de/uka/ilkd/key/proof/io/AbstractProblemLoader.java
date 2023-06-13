@@ -443,14 +443,15 @@ public abstract class AbstractProblemLoader {
 
         if (filename.endsWith(".java")) {
             // java file, probably enriched by specifications
-            SLEnvInput ret = null;
+            SLEnvInput ret;
             if (file.getParent() == null) {
-                ret = new SLEnvInput(".", classPath, bootClassPath, profileOfNewProofs, includes);
+                ret = new SLEnvInput(new File(".").getAbsoluteFile().toPath(), classPath,
+                    bootClassPath, profileOfNewProofs, includes);
             } else {
-                ret = new SLEnvInput(file.getParent().toAbsolutePath().toString(), classPath,
+                ret = new SLEnvInput(file.getParent().toAbsolutePath(), classPath,
                     bootClassPath, profileOfNewProofs, includes);
             }
-            ret.setJavaFile(file.toAbsolutePath().toString());
+            ret.setJavaFile(file.toAbsolutePath());
             ret.setIgnoreOtherJavaFiles(loadSingleJavaFile);
             return ret;
         } else if (filename.endsWith(".zproof")) { // zipped proof package
@@ -518,7 +519,7 @@ public abstract class AbstractProblemLoader {
         } else if (file.toFile().isDirectory()) {
             // directory containing java sources, probably enriched
             // by specifications
-            return new SLEnvInput(file.toString(), classPath, bootClassPath, profileOfNewProofs,
+            return new SLEnvInput(file, classPath, bootClassPath, profileOfNewProofs,
                 includes);
         } else {
             if (filename.toString().lastIndexOf('.') != -1) {

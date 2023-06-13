@@ -94,7 +94,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @param javaPath the java path to set (the method does nothing if null is given)
      * @throws IllegalStateException if the java path is already set
      */
-    void setJavaPath(String javaPath) throws IllegalStateException;
+    void setJavaPath(Path javaPath) throws IllegalStateException;
 
     /**
      * Sets the base directory of the proof, i.e. the main directory where the proof is loaded from.

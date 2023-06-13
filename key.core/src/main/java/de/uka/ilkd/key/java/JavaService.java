@@ -28,7 +28,6 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.DirectoryFileCollection;
-import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.FileCollection;
 import de.uka.ilkd.key.util.ZipFileCollection;
 import de.uka.ilkd.key.util.parsing.BuildingExceptions;
@@ -135,22 +134,19 @@ public class JavaService {
     /**
      * parse a list of java files and transform it to the corresponding KeY
      * entities.
-     * <p>
-     * Each element of the array is treated as a filename to read in.
      *
-     * @param cUnitStrings a list of strings, each element is interpreted as a file to be
-     *        read. not null.
+     * @param units files to read
      * @param fileRepo the fileRepo which will store the files
      * @return a new list containing the recoder compilation units corresponding
      *         to the given files.
      * @throws JavaBuildingExceptions any exception occurring while treating the file is wrapped
      *         into a parse exception that contains the filename.
      */
-    public List<de.uka.ilkd.key.java.CompilationUnit> readCompilationUnitsAsFiles(
-            Collection<String> cUnitStrings, FileRepo fileRepo)
+    public List<de.uka.ilkd.key.java.CompilationUnit> readCompilationUnits(
+            Collection<Path> units, FileRepo fileRepo)
             throws JavaBuildingExceptions {
 
-        List<CompilationUnit> cUnits = recoderCompilationUnitsAsFiles(cUnitStrings, fileRepo);
+        List<CompilationUnit> cUnits = parseCompilationUnits(units, fileRepo);
         var result = new ArrayList<de.uka.ilkd.key.java.CompilationUnit>(cUnits.size());
         for (CompilationUnit cu : cUnits) {
             result.add(converter.processCompilationUnit(cu));
@@ -170,14 +166,14 @@ public class JavaService {
      * @return a new list containing the recoder compilation units corresponding
      *         to the given files.
      */
-    private List<CompilationUnit> recoderCompilationUnitsAsFiles(Collection<String> filenames,
+    private List<CompilationUnit> parseCompilationUnits(Collection<Path> filenames,
             FileRepo fileRepo)
             throws BuildingExceptions {
         List<CompilationUnit> cUnits = new ArrayList<>();
         parseSpecialClasses(fileRepo);
         // TODO javaparser there is no way JavaService is thread safe :o
         var result = filenames.stream().parallel().map(it -> parseCompilationUnit(it, fileRepo))
-                .collect(Collectors.toList());
+                .toList();
 
         if (result.stream().anyMatch(it -> !it.isSuccessful())) {
             var problems = result.stream().flatMap(it -> it.getProblems().stream());
@@ -188,10 +184,34 @@ public class JavaService {
         return result.stream().map(it -> it.getResult().get()).collect(Collectors.toList());
     }
 
+    private <T> T unwrapParseResult(ParseResult<T> result) {
+        if (result.isSuccessful()) {
+            return result.getResult().get();
+        }
+        if (result.getProblems().isEmpty()) {
+            throw new UnsupportedOperationException("Parser returned null value and no errors");
+        }
+        var errors = new ArrayList<BuildingIssue>(result.getProblems().size());
+        for (Problem problem : result.getProblems()) {
+            LOGGER.error(problem.toString(), problem.getCause().orElse(null));
+            var loc = problem.getLocation()
+                    .flatMap(TokenRange::toRange)
+                    .map(b -> b.begin)
+                    .orElse(new Position(-1, -1));
+            errors.add(new BuildingIssue(problem.getVerboseMessage(),
+                problem.getCause().orElse(null), false,
+                de.uka.ilkd.key.java.Position.fromJPPosition(loc)));
+        }
+
+        // TODO A hack to remove false alarm caused by ModifiersVisitor check
+        return reportErrors(
+            result.getProblems().stream().filter(it -> !it.getMessage().contains("ghost")));
+    }
+
     private <T> void reportErrors(ParseResult<T> result) {
         if (!result.isSuccessful()) {
             result.getProblems()
-                    .forEach(it -> LOGGER.error("Error in {}.", it, it.getCause().orElse(null)));
+                    .forEach(it -> LOGGER.error("Error in {}", it, it.getCause().orElse(null)));
 
             // TODO A hack to remove false alarm caused by ModifiersVisitor check
             reportErrors(
@@ -199,14 +219,8 @@ public class JavaService {
         }
     }
 
-    private <T> void reportErrors(List<ParseResult<T>> result) {
-        if (result.stream().anyMatch(it -> !it.isSuccessful())) {
-            reportErrors(result.stream().flatMap(it -> it.getProblems().stream()));
-        }
-    }
 
-
-    private void reportErrors(Stream<Problem> problems) {
+    private <T> T reportErrors(Stream<Problem> problems) {
         var be = problems.map(it -> {
             var loc = it.getLocation()
                     .flatMap(TokenRange::toRange)
@@ -219,20 +233,22 @@ public class JavaService {
         if (!be.isEmpty()) {
             throw new BuildingExceptions(be);
         }
+        return null;
     }
 
-    private ParseResult<CompilationUnit> parseCompilationUnit(String filename,
+    private ParseResult<CompilationUnit> parseCompilationUnit(Path filename,
             @Nullable FileRepo fileRepo) {
         try {
             Reader is;
             if (fileRepo != null)
-                is = new InputStreamReader(fileRepo.getInputStream(Paths.get(filename)));
+                is = new InputStreamReader(
+                    new BufferedInputStream(fileRepo.getInputStream(filename)));
             else
-                is = new FileReader(filename);
+                is = Files.newBufferedReader(filename);
             try (BufferedReader br = new BufferedReader(is)) {
                 ParseResult<CompilationUnit> cu = getProgramFactory().parseCompilationUnit(br);
                 if (cu.getResult().isPresent()) {
-                    cu.getResult().get().setStorage(Paths.get(filename));
+                    cu.getResult().get().setStorage(filename);
                 }
                 return cu;
             }
@@ -274,7 +290,7 @@ public class JavaService {
                     LOGGER.debug("Reading {}", trim(it));
                     var sr = new StringReader(it);
                     return getProgramFactory().parseCompilationUnit(sr);
-                }).collect(Collectors.toList());
+                }).toList();
 
         if (cUnits.stream().anyMatch(it -> !it.isSuccessful())) {
             reportErrors(cUnits.stream().flatMap(it -> it.getProblems().stream()));
@@ -355,7 +371,7 @@ public class JavaService {
                         e.printStackTrace();
                     }
                     return null;
-                }).collect(Collectors.toList());
+                }).toList();
 
         if (seq.stream().anyMatch(it -> !it.isSuccessful())) {
             reportErrors(seq.stream().flatMap(it -> it.getProblems().stream()));
@@ -411,9 +427,7 @@ public class JavaService {
                 try (InputStream is = walker.openCurrent(fileRepo);
                         Reader isr = new InputStreamReader(is);
                         Reader f = new BufferedReader(isr)) {
-                    var rcu = getProgramFactory().parseCompilationUnit(f);
-                    reportErrors(rcu);
-                    var cu = rcu.getResult().get();
+                    var cu = unwrapParseResult(getProgramFactory().parseCompilationUnit(f));
                     cu.setStorage(currentDataLocation);
                     removeCodeFromClasses(cu, false);
                     rcuList.add(cu);
@@ -429,9 +443,7 @@ public class JavaService {
                 try (InputStream is = walker.openCurrent(fileRepo);
                         Reader isr = new InputStreamReader(is);
                         Reader f = new BufferedReader(isr)) {
-                    var rcu = getProgramFactory().parseCompilationUnit(f);
-                    reportErrors(rcu);
-                    var cu = rcu.getResult().get();
+                    var cu = unwrapParseResult(getProgramFactory().parseCompilationUnit(f));
                     cu.setStorage(currentDataLocation);
                     removeCodeFromClasses(cu, true);
                     rcuList.add(cu);
@@ -460,11 +472,11 @@ public class JavaService {
          * rcuList.addAll(manager.getCompilationUnits());
          */
 
-        var rcu = getProgramFactory().parseCompilationUnit(
+        var cu = unwrapParseResult(getProgramFactory().parseCompilationUnit(
             new StringReader("public class " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS +
-                " { public static void " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_METHOD + "() {}  }"));
-        reportErrors(rcu);
-        rcuList.add(rcu.getResult().get());
+                " { public static void " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_METHOD
+                + "() {}  }")));
+        rcuList.add(cu);
         return rcuList;
     }
 
@@ -766,36 +778,29 @@ public class JavaService {
      * parses a given JavaBlock using the context to determine the right
      * references and returns a statement block of recoder.
      *
-     * @param block a String describing a java block
+     * @param input a String describing a java block
      * @param context CompilationUnit in which the block has to be
      *        interpreted
      * @return the parsed and resolved recoder statement block
      */
-    BlockStmt parseBlock(String block, TypeScope.JPContext context) {
+    BlockStmt parseBlock(String input, TypeScope.JPContext context) {
         parseSpecialClasses();
         // TODO javaparser change grammar of the parser to allow blocks without context information
         // Context-block
-        BlockStmt block1;
-        if (block.contains("..") || block.contains("...")) {
-            var bl = getProgramFactory().parseContextBlock(block);
-            if (!bl.isSuccessful()) {
-                reportErrors(bl);
-            }
+        BlockStmt block;
+        if (input.contains("..") || input.contains("...")) {
             // TODO weigl further eloborate the situation, how to work with contexts provided?
-            final KeyContextStatementBlock blockStmt = bl.getResult().get();
-            block1 = new BlockStmt(blockStmt.getStatements());
+            KeyContextStatementBlock blockStmt =
+                unwrapParseResult(getProgramFactory().parseContextBlock(input));
+            block = new BlockStmt(blockStmt.getStatements());
         } else { // Simple Java-block
-            var bl = getProgramFactory().parseStatementBlock(block);
-            if (!bl.isSuccessful()) {
-                reportErrors(bl);
-            }
-            block1 = bl.getResult().get();
+            block = unwrapParseResult(getProgramFactory().parseStatementBlock(input));
         }
-        embedMethod(embedBlock(block1), context);
+        embedMethod(embedBlock(block), context);
         // normalise constant string expressions
         new ConstantStringExpressionEvaluator(createPipelineServices())
                 .apply(context.getClassDeclaration());
-        return block1;
+        return block;
     }
 
     private TransformationPipelineServices createPipelineServices() {
@@ -913,62 +918,6 @@ public class JavaService {
     }
 
     // ----- error handling
-
-    /**
-     * tries to parse recoders exception position information
-     */
-    private static int[] extractPositionInfo(String errorMessage) {
-        if (errorMessage == null || errorMessage.indexOf('@') == -1) {
-            return new int[0];
-        }
-        int line = -1;
-        int column = -1;
-        try {
-            String pos = errorMessage.substring(errorMessage.indexOf("@") + 1);
-            pos = pos.substring(0, pos.indexOf(" "));
-            line = Integer.parseInt(pos.substring(0, pos.indexOf('/')));
-            column = Integer.parseInt(pos.substring(pos.indexOf('/') + 1));
-        } catch (NumberFormatException nfe) {
-            LOGGER.debug(
-                "recoder2key:unresolved reference at " + "line:" + line + " column:" + column);
-            return new int[0];
-        } catch (StringIndexOutOfBoundsException siexc) {
-            return new int[0];
-        }
-        return new int[] { line, column };
-    }
-
-    /**
-     * report an error in form of a ConvertException. The cause is always
-     * attached to the resulting exception.
-     *
-     * @param message message to be used.
-     * @param t the cause of the exceptional case
-     * @throws ConvertException always
-     */
-    public static void reportError(String message, Throwable t) {
-        // Attention: this highly depends on Recoders exception messages!
-        Throwable cause = t;
-        if (t instanceof ExceptionHandlerException && t.getCause() != null) {
-            cause = t.getCause();
-        }
-
-        if (cause instanceof PosConvertException) {
-            throw (PosConvertException) cause;
-        }
-
-        int[] pos = extractPositionInfo(cause.toString());
-        final RuntimeException rte;
-        if (pos.length > 0) {
-            rte = new PosConvertException(message,
-                de.uka.ilkd.key.java.Position.newOneBased(pos[0], pos[1]));
-            rte.initCause(cause);
-        } else {
-            rte = new ConvertException(message, cause);
-        }
-
-        throw rte;
-    }
 
     public JavaService(Services services, Collection<Path> sourcePaths) {
         // TODO javaparser this is only called from tests, what is sourcePaths there?

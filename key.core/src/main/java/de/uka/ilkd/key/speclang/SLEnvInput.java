@@ -47,7 +47,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     // constructors
     // -------------------------------------------------------------------------
 
-    public SLEnvInput(String javaPath, List<Path> classPath, Path bootClassPath, Profile profile,
+    public SLEnvInput(Path javaPath, List<Path> classPath, Path bootClassPath, Profile profile,
             List<Path> includes) {
         super(getLanguage() + " specifications", javaPath, classPath, bootClassPath, profile,
             includes);

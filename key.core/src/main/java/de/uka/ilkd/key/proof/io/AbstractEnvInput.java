@@ -2,12 +2,12 @@ package de.uka.ilkd.key.proof.io;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 
 
 /**
@@ -16,7 +16,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 public abstract class AbstractEnvInput implements EnvInput {
 
     protected final String name;
-    protected final String javaPath;
+    protected final Path javaPath;
     protected final List<Path> classPath;
     protected final Path bootClassPath;
     protected final Includes includes;
@@ -24,14 +24,14 @@ public abstract class AbstractEnvInput implements EnvInput {
 
     protected InitConfig initConfig;
     private boolean ignoreOtherJavaFiles;
-    private String javaFile;
+    private Path javaFile;
 
 
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
 
-    public AbstractEnvInput(String name, String javaPath, List<Path> classPath, Path bootClassPath,
+    public AbstractEnvInput(String name, Path javaPath, List<Path> classPath, Path bootClassPath,
             Profile profile, List<Path> includes) {
         assert profile != null;
         this.name = name;
@@ -71,21 +71,21 @@ public abstract class AbstractEnvInput implements EnvInput {
 
 
     @Override
-    public final Includes readIncludes() throws ProofInputException {
+    public final Includes readIncludes() {
         assert initConfig != null;
         return includes;
     }
 
 
     @Override
-    public final String readJavaPath() throws ProofInputException {
-        return javaPath;
+    public final @Nonnull Optional<Path> readJavaPath() {
+        return Optional.ofNullable(javaPath);
     }
 
 
     @Nonnull
     @Override
-    public final List<Path> readClassPath() throws ProofInputException {
+    public final List<Path> readClassPath() {
         return classPath;
     }
 
@@ -110,11 +110,11 @@ public abstract class AbstractEnvInput implements EnvInput {
     }
 
     @Override
-    public String getJavaFile() {
+    public Path getJavaFile() {
         return javaFile;
     }
 
-    public void setJavaFile(String javaFile) {
+    public void setJavaFile(Path javaFile) {
         this.javaFile = javaFile;
     }
 }

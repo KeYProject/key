@@ -2,6 +2,8 @@ package de.uka.ilkd.key.proof.io;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.proof.init.Includes;
@@ -43,14 +45,15 @@ public interface EnvInput {
     /**
      * Reads the Java path.
      */
-    String readJavaPath() throws ProofInputException;
+    @Nonnull
+    Optional<Path> readJavaPath() throws ProofInputException;
 
     /**
      * Returns the file path to specific requested Java file.
      *
      * @see #isIgnoreOtherJavaFiles()
      */
-    default @Nullable String getJavaFile() throws ProofInputException {
+    default @Nullable Path getJavaFile() {
         return null;
     }
 

@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.proof;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.text.DateFormat;
 import java.util.Date;
@@ -29,7 +28,7 @@ public final class JavaModel {
     /**
      *
      */
-    public static JavaModel createJavaModel(String javaPath, List<Path> classPath,
+    public static JavaModel createJavaModel(Path javaPath, List<Path> classPath,
             Path bootClassPath, Includes includes, Path initialFile) {
         JavaModel result;
         if (javaPath == null) {
@@ -52,11 +51,11 @@ public final class JavaModel {
         initialFile = null;
     }
 
-    private JavaModel(String modelDir, List<Path> classPathEntries, Path bootClassPath,
+    private JavaModel(Path modelDir, List<Path> classPathEntries, Path bootClassPath,
             Includes includes, Path initialFile) {
-        this.modelDir = Path.of(modelDir).toAbsolutePath();
+        this.modelDir = modelDir;
         this.modelTag = "KeY_" + (new Date()).getTime();
-        this.descr = "model " + (new File(modelDir)).getName() + "@"
+        this.descr = "model " + modelDir.toFile().getName() + "@"
             + DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date());
         StringBuilder sb = new StringBuilder();
         if (classPathEntries != null && !classPathEntries.isEmpty()) {

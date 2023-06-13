@@ -70,7 +70,7 @@ public class TestTestgen extends TestCommons {
         File file = new File(testFile, "middle.key");
         assertTrue(file.exists(), "File " + file + " does not exists!");
         KeYEnvironment<DefaultUserInterfaceControl> env =
-            KeYEnvironment.load(file, null, null, null);
+            KeYEnvironment.load(file.toPath(), null, null, null);
         try {
             Proof proof = env.getLoadedProof();
             assertNotNull(proof);

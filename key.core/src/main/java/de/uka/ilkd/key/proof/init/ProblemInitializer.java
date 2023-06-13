@@ -3,6 +3,7 @@ package de.uka.ilkd.key.proof.init;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -197,29 +198,13 @@ public final class ProblemInitializer {
      * get a vector of Strings containing all .java file names in the cfile directory. Helper for
      * readJava().
      */
-    private List<String> getClasses(String f) throws ProofInputException {
-        File cfile = new File(f);
-        List<String> v = new ArrayList<>();
-        if (cfile.isDirectory()) {
-            String[] list = cfile.list();
-            // mu(2008-jan-28): if the directory is not readable for the current user
-            // list is set to null, which results in a NullPointerException.
-            if (list != null) {
-                for (String s : list) {
-                    String fullName = cfile.getPath() + File.separator + s;
-                    File n = new File(fullName);
-                    if (n.isDirectory()) {
-                        v.addAll(getClasses(fullName));
-                    } else if (s.endsWith(".java")) {
-                        v.add(fullName);
-                    }
-                }
-            }
-            return v;
-        } else {
-            throw new ProofInputException("Java model path " + f + " not found.");
+    private List<Path> getClasses(Path folder) throws ProofInputException {
+        try (var files = Files.walk(folder)) {
+            return files.filter(f -> f.toFile().isDirectory() && f.toString().endsWith(".java"))
+                    .toList();
+        } catch (IOException e) {
+            throw new ProofInputException("Failed to list classes folder", e);
         }
-
     }
 
 
@@ -235,7 +220,8 @@ public final class ProblemInitializer {
 
         // read Java source and classpath settings
         envInput.setInitConfig(initConfig);
-        final String javaPath = envInput.readJavaPath();
+        final Path javaPath =
+            envInput.readJavaPath().map(p -> p.toAbsolutePath().normalize()).orElse(null);
         final List<Path> classPath = envInput.readClassPath();
         final Path bootClassPath = envInput.readBootClassPath();
         final Includes includes = envInput.readIncludes();
@@ -265,16 +251,16 @@ public final class ProblemInitializer {
             reportStatus("Reading Java source");
             var javaService = initConfig.getServices().getJavaService();
             javaService.getProgramFactory().addSourcePaths(
-                Collections.singletonList(Paths.get(javaPath).toAbsolutePath()));
-            Collection<String> var = getClasses(javaPath);
+                Collections.singletonList(javaPath));
+            List<Path> classes = getClasses(javaPath);
             if (envInput.isIgnoreOtherJavaFiles()) {
-                String file = envInput.getJavaFile();
-                if (var.contains(file)) {
-                    var = Collections.singletonList(file);
+                Path file = envInput.getJavaFile();
+                if (classes.contains(file)) {
+                    classes = Collections.singletonList(file);
                 }
             }
             // support for single file loading
-            r2k.readCompilationUnitsAsFiles(var, fileRepo);
+            r2k.readCompilationUnits(classes, fileRepo);
         } else {
             reportStatus("Reading Java libraries");
             r2k.parseSpecialClasses(fileRepo);

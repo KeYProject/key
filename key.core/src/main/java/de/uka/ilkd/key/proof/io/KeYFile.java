@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -268,7 +269,7 @@ public class KeYFile implements EnvInput {
     }
 
     @Override
-    public String readJavaPath() throws ProofInputException {
+    public @Nonnull Optional<Path> readJavaPath() throws ProofInputException {
         @Nonnull
         ProblemInformation pi = getProblemInformation();
         String javaPath = pi.getJavaSource();
@@ -283,9 +284,9 @@ public class KeYFile implements EnvInput {
                 throw new ProofInputException(
                     String.format("Declared Java source %s not found.", javaPath));
             }
-            return absFile.toAbsolutePath().toString();
+            return Optional.of(absFile.toAbsolutePath());
         }
-        return javaPath;
+        return Optional.empty();
     }
 
 

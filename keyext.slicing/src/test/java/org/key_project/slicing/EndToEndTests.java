@@ -251,7 +251,8 @@ class EndToEndTests {
         AtomicReference<DependencyTracker> tracker = new AtomicReference<>();
         LOGGER.info("Loading " + proofFile.getAbsolutePath());
         KeYEnvironment<?> environment =
-            KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null,
+            KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile.toPath(), null, null,
+                null, null,
                 null, proof -> {
                     tracker.set(new DependencyTracker(proof));
                 }, true);
@@ -271,7 +272,7 @@ class EndToEndTests {
                 proof, results, control);
             File tempFile = slicer.slice();
             KeYEnvironment<?> loadedEnvironment =
-                KeYEnvironment.load(JavaProfile.getDefaultInstance(), tempFile, null, null,
+                KeYEnvironment.load(JavaProfile.getDefaultInstance(), tempFile.toPath(), null, null,
                     null, null, null, DependencyTracker::new, true);
             Proof slicedProof = loadedEnvironment.getLoadedProof();
 

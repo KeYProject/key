@@ -50,7 +50,7 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
             throw e;
         } catch (Exception e) {
             LoggerFactory.getLogger(AbstractBuilder.class).error("", e);
-            if (!(e instanceof BuildingException) && ctx instanceof ParserRuleContext) {
+            if (ctx instanceof ParserRuleContext) {
                 throw new BuildingException((ParserRuleContext) ctx, e);
             }
             // otherwise we rethrow

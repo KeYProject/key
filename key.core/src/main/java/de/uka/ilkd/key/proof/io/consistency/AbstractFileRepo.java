@@ -409,12 +409,12 @@ public abstract class AbstractFileRepo implements FileRepo {
     }
 
     @Override
-    public void setJavaPath(String path) throws IllegalStateException {
+    public void setJavaPath(Path path) throws IllegalStateException {
         if (javaPath != null) {
             throw new IllegalStateException("JavaPath is already set!");
         }
         if (path != null) {
-            javaPath = Paths.get(path).toAbsolutePath().normalize();
+            javaPath = path;
         }
     }
 

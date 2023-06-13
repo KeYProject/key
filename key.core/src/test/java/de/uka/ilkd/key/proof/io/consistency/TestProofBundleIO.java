@@ -134,7 +134,7 @@ public class TestProofBundleIO {
         Path base = testDir.resolve("simpleBundleGeneration");
 
         simple.setBaseDir(base);
-        simple.setJavaPath(base.resolve("src").toString());
+        simple.setJavaPath(base.resolve("src"));
 
         Path src = base.resolve("src");
         InputStream is1 = simple.getInputStream(base.resolve("test.key"));
