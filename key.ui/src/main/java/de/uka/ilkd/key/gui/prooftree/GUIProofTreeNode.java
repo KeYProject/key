@@ -16,7 +16,15 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
     private GUIAbstractTreeNode[] children;
     private boolean leaf;
 
-    public GUIProofTreeNode(GUIProofTreeModel tree, Node node, boolean leaf) {
+    /**
+     * This constructor should only be called by the {@link GUIProofTreeModel}!
+     * Use {@link GUIProofTreeModel#getProofTreeNode(Node)} to get the nodes.
+     *
+     * @param tree the proof tree
+     * @param node the node
+     * @param leaf whether the node is a leaf
+     */
+    GUIProofTreeNode(GUIProofTreeModel tree, Node node, boolean leaf) {
         super(tree, node);
         this.leaf = leaf;
     }
@@ -41,7 +49,7 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
             while (n.parent() != null && n.getGroup() == null) {
                 n = n.parent();
             }
-            return findBranch(n);
+            return getProofTreeModel().getProofTreeNode(n);
         }
         while (n.parent() != null && findChild(n.parent()) != null) {
             n = n.parent();
@@ -91,9 +99,9 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
                 }
             } else if (node != null && node.getGroup() != null) {
                 List<Node> group = node.getGroup();
-                children = new GUIAbstractTreeNode[group.size()];
-                for (int i = 0; i < group.size(); i++) {
-                    children[i] = new GUIProofTreeNode(getProofTreeModel(), group.get(i), true);
+                children = new GUIAbstractTreeNode[group.size() - 1];
+                for (int i = 1; i < group.size(); i++) {
+                    children[i - 1] = getProofTreeModel().getProofTreeNode(group.get(i));
                 }
                 return;
             }

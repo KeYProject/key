@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.PosRuleApp;
@@ -89,7 +90,6 @@ public final class ProofRegroup {
                         }
                     }
                     if (group.size() > 1) {
-                        System.out.println("found group ending @ " + n.serialNr());
                         group.get(0).setGroup(group);
                         for (int i = 1; i < group.size(); i++) {
                             group.get(i).setHideInProofTree(true);
@@ -101,5 +101,7 @@ public final class ProofRegroup {
                 q.add(n.child(i));
             }
         }
+        // make sure the changed structure is visible
+        MainWindow.getInstance().getProofTreeView().getDelegateModel().updateTree(null);
     }
 }
