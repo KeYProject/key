@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.slicing.graph.AnnotatedEdge;
 import org.key_project.slicing.graph.DependencyGraph;
 import org.key_project.slicing.graph.GraphNode;
 
@@ -73,6 +74,15 @@ public final class ProofReorder {
                                     .allMatch(edge -> newOrderSorted.contains(edge.getProofStep())
                                             || !edge.getProofStep().getBranchLocation()
                                                     .equals(loc)))) {
+                        q.addLast(nextNode);
+                        return;
+                    }
+                    // check that all consumed inputs were already used by all other steps
+                    if (!depGraph.inputsConsumedBy(node)
+                            .allMatch(
+                                input -> depGraph.edgesUsing(input).map(AnnotatedEdge::getProofStep)
+                                        .allMatch(x -> node == x || newOrderSorted.contains(x)
+                                                || !x.getBranchLocation().equals(loc)))) {
                         q.addLast(nextNode);
                         return;
                     }

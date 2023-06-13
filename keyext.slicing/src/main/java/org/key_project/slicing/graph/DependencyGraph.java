@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -332,6 +333,33 @@ public class DependencyGraph {
             locationGuess = locationGuess.removeLast();
         }
         return null;
+    }
+
+    public TrackedFunction getFunctionNode(Function function, BranchLocation loc) {
+        TrackedFunction candidate = new TrackedFunction(function, loc);
+        if (graph.containsVertex(candidate)) {
+            return candidate;
+        }
+        graph.addVertex(candidate);
+        var edges = edgeDataReversed.get(function.getIntroducedBy());
+        var sourcesDone = new HashSet<>();
+        Collection<AnnotatedEdge> newEdges = new ArrayList<>();
+        for (var x : edges) {
+            GraphNode g = x.getSource();
+            if (sourcesDone.contains(g)) {
+                continue;
+            }
+            sourcesDone.add(g);
+            AnnotatedEdge e = new AnnotatedEdge(function.getIntroducedBy(), false);
+            graph.addEdge(g, candidate, e);
+            newEdges.add(e);
+        }
+        edgeDataReversed.get(function.getIntroducedBy()).addAll(newEdges);
+        DependencyNodeData n = function.getIntroducedBy().lookup(DependencyNodeData.class);
+        if (n != null) {
+            n.outputs.add(candidate);
+        }
+        return candidate;
     }
 
     /**

@@ -8,9 +8,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -169,14 +171,25 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                     z = ((Term) z).op();
                 }
                 if (z instanceof Function) {
+                    // skip if z is contained in any of the other inputs
+                    Operator finalZ = (Function) z;
+                    if (input.stream().anyMatch(form -> {
+                        var graphNode = form.first;
+                        if (graphNode instanceof TrackedFormula) {
+                            TrackedFormula tf = (TrackedFormula) graphNode;
+                            OpCollector op = new OpCollector();
+                            tf.formula.formula().execPreOrder(op);
+                            return op.contains(finalZ);
+                        }
+                        return false;
+                    })) {
+                        continue;
+                    }
+
                     var a = ((Function) z).getIntroducedBy();
                     if (a != null && a != n) {
-                        graph.outputsOf(a).forEach(i -> {
-                            input.add(new Pair<>(i, false));
-                            // TODO: not strictly necessary if the Function is used in one of the
-                            // previous inputs
-                            // e.g. applyEq
-                        });
+                        input.add(new Pair<>(
+                            graph.getFunctionNode((Function) z, a.getBranchLocation()), false));
                     }
                 }
             }
