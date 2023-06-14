@@ -250,6 +250,7 @@ public final class ProblemInitializer {
 
         // create Recoder2KeY, set classpath
         final JavaService r2k = initConfig.getServices().getJavaService();
+        classPath.add(javaPath);
         r2k.setClassPath(bootClassPath, classPath);
 
         reportStatus("Reading Java libraries");
