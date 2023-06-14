@@ -1261,13 +1261,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 ), inftyConst(), longConst(0));
 
         Function matrixRange = getServices().getTypeConverter().getLocSetLDT().getMatrixRange();
-     /*   bindRuleSet(d, "preventDisjointLocationSets",
+        bindRuleSet(d, "preventDisjointLocationSets",
                 ifZero(MatchedIfFeature.INSTANCE,
                     ifZero(add(applyTF("loc1", op(matrixRange)),
                                     applyTF("loc2", op(matrixRange))),
                             matrixRangeloc1OutSideLoc2, longConst(0)),
-                        longConst(1000)));
-*/
+                        longConst(-3000)));
 //        Feature rowEndGeqRowStart = geq("rowEnd", "rowStart");
 //        Feature colEndGeqColStart = geq("colEnd", "colStart");
 
