@@ -1518,9 +1518,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(KeyMethodCallStatement n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        IProgramVariable resultVar = null;
-        StatementBlock body = null;
-        IExecutionContext execContext = null;
+        IProgramVariable resultVar = accepto(n.getName());
+        StatementBlock body = accept(n.getBlock());
+        IExecutionContext execContext = accept(n.getContext());
         PosInProgram firstActiveChildPos = null;
         // TODO weigl
         return new MethodFrame(pi, c, resultVar, body, execContext, firstActiveChildPos,
