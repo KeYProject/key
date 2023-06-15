@@ -367,7 +367,7 @@ public class TestMatchTaclet {
     }
 
     @Test
-        public void testPrefixMatching() {
+    public void testPrefixMatching() {
         Term match = TacletForTests.parseTerm("\\<{return;}\\>true ");
         StatementBlock prg = (StatementBlock) match.javaBlock().program();
         ExecutionContext ec = new ExecutionContext(

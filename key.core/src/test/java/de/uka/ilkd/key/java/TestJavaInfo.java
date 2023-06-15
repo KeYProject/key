@@ -30,8 +30,7 @@ public class TestJavaInfo {
     @BeforeAll
     static void setUp() {
         if (services == null || javaInfo == null) {
-            HelperClassForTests helper = new HelperClassForTests();
-            final ProofAggregate agg = helper.parse(new File(testfile));
+            final ProofAggregate agg = HelperClassForTests.parse(new File(testfile));
             services = agg.getFirstProof().getServices();
             javaInfo = services.getJavaInfo();
         }

@@ -16,8 +16,8 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-
 import de.uka.ilkd.key.util.KeYResourceManager;
+
 import org.key_project.util.lookup.Lookup;
 
 /**
@@ -441,7 +441,7 @@ public class Services implements TermServices {
             // stupid.
             var resourcePath = "JavaRedux/JAVALANG.TXT";
             var url =
-                    KeYResourceManager.getManager().getResourceFile(JavaService.class, resourcePath);
+                KeYResourceManager.getManager().getResourceFile(JavaService.class, resourcePath);
             try {
                 path = Paths.get(url.toURI()).getParent();
             } catch (URISyntaxException e) {

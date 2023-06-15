@@ -54,7 +54,7 @@ public class ContractFactoryTest {
     public synchronized void setUp() {
         if (javaInfo == null) {
             javaInfo =
-                new HelperClassForTests().parse(new File(TEST_FILE)).getFirstProof().getJavaInfo();
+                HelperClassForTests.parse(new File(TEST_FILE)).getFirstProof().getJavaInfo();
             services = javaInfo.getServices();
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         }

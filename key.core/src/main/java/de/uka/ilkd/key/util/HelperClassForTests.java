@@ -58,37 +58,24 @@ public class HelperClassForTests {
         }
     };
 
-    public HelperClassForTests() {
-
-    }
-
-    public ProofAggregate parse(File file) {
+    public static ProofAggregate parse(File file) {
         return parse(file, profile);
     }
 
-    public ProofAggregate parse(File file, Profile profile) {
-        ProblemInitializer pi = null;
-        ProofAggregate result = null;
-
+    public static ProofAggregate parse(File file, Profile profile) {
         try {
-            KeYUserProblemFile po =
-                new KeYUserProblemFile("UpdatetermTest", file.toPath(), null, profile);
-            pi = new ProblemInitializer(profile);
-
-            result = pi.startProver(po, po);
-
+            return parseThrowException(file, profile);
         } catch (ProofInputException e) {
             throw new RuntimeException(e);
         }
-        return result;
     }
 
-    public ProofAggregate parseThrowException(File file) throws ProofInputException {
+    public static ProofAggregate parseThrowException(File file) throws ProofInputException {
         return parseThrowException(file, profile);
     }
 
 
-    public ProofAggregate parseThrowException(File file, Profile profile)
+    public static ProofAggregate parseThrowException(File file, Profile profile)
             throws ProofInputException {
         KeYUserProblemFile po =
             new KeYUserProblemFile("UpdatetermTest", file.toPath(), null, profile);
@@ -300,7 +287,7 @@ public class HelperClassForTests {
     }
 
     public static Services createServices(File keyFile) {
-        JavaInfo javaInfo = new HelperClassForTests().parse(keyFile).getFirstProof().getJavaInfo();
+        JavaInfo javaInfo = HelperClassForTests.parse(keyFile).getFirstProof().getJavaInfo();
         return javaInfo.getServices();
     }
 

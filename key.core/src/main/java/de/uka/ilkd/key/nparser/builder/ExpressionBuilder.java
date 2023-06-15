@@ -1261,7 +1261,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                             semanticError(ctx, "Unknown java attribute: %s", attributeName);
                         }
                         // TODO If not last attribute:
-                        addWarning(ctx,"");
+                        addWarning(ctx, "");
                         return current;
                     }
                 } else if (attrib instanceof KeYParser.Attribute_complexContext) {

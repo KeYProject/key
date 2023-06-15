@@ -23,8 +23,7 @@ public class TestTermBuilder {
 
     @BeforeEach
     public void setUp() {
-        HelperClassForTests helper = new HelperClassForTests();
-        final ProofAggregate agg = helper.parse(new File(TestJavaInfo.testfile));
+        final ProofAggregate agg = HelperClassForTests.parse(new File(TestJavaInfo.testfile));
         services = agg.getFirstProof().getServices();
         tb = services.getTermBuilder();
     }

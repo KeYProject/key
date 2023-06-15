@@ -73,7 +73,7 @@ public final class IOUtil {
      * Returns the file name without file extension for the given file name with extension.
      *
      * @param fileName The file name with extension for that the file name without extension is
-     *                 needed.
+     *        needed.
      * @return The file name without extension or {@code null} if it was not possible to compute it.
      */
     public static String getFileNameWithoutExtension(String fileName) {
@@ -143,7 +143,7 @@ public final class IOUtil {
      *
      * @param file The {@link File} to read from.
      * @return The read content or {@code null} if the {@link File} is {@code null} or not an
-     * existing file.
+     *         existing file.
      * @throws IOException Occurred Exception.
      */
     public static String readFrom(File file) throws IOException {
@@ -181,7 +181,7 @@ public final class IOUtil {
      * Writes the given content into the given {@link OutputStream} and closes it. Nothing will be
      * written if the content is {@code null}, but the stream will be closed.
      *
-     * @param out     The {@link OutputStream} to write to.
+     * @param out The {@link OutputStream} to write to.
      * @param content The content to write.
      * @throws IOException Occurred Exception.
      */
@@ -193,7 +193,7 @@ public final class IOUtil {
      * Writes the given content into the given {@link OutputStream} and closes it. Nothing will be
      * written if the content is {@code null}, but the stream will be closed.
      *
-     * @param out     The {@link OutputStream} to write to.
+     * @param out The {@link OutputStream} to write to.
      * @param content The content to write.
      * @throws IOException Occurred Exception.
      */
@@ -206,8 +206,8 @@ public final class IOUtil {
      * Writes the given content into the given {@link OutputStream} and closes it. Nothing will be
      * written if the content is {@code null}, but the stream will be closed.
      *
-     * @param out      The {@link OutputStream} to write to.
-     * @param content  The content to write.
+     * @param out The {@link OutputStream} to write to.
+     * @param content The content to write.
      * @param encoding The encoding to use.
      * @throws IOException Occurred Exception.
      */
@@ -218,8 +218,8 @@ public final class IOUtil {
         }
 
         try (PrintStream printStream =
-                     encoding != null ? new PrintStream(out, false, encoding)
-                             : new PrintStream(out, false, DEFAULT_CHARSET)) {
+            encoding != null ? new PrintStream(out, false, encoding)
+                    : new PrintStream(out, false, DEFAULT_CHARSET)) {
             printStream.print(content);
         }
     }
@@ -432,7 +432,7 @@ public final class IOUtil {
         /**
          * Constructor.
          *
-         * @param offset     The offset of the line from beginning of the file.
+         * @param offset The offset of the line from beginning of the file.
          * @param tabIndices The indices of all tabs in the line.
          */
         public LineInformation(int offset, List<Integer> tabIndices) {
@@ -509,10 +509,10 @@ public final class IOUtil {
          * </pre>
          * </p>
          *
-         * @param column   The column where tabs represents multiple characters. If the column is
-         *                 negative this value is returned.
+         * @param column The column where tabs represents multiple characters. If the column is
+         *        negative this value is returned.
          * @param tabWidth The tab width which must be greater as {@code 1}, otherwise the column
-         *                 index is returned.
+         *        index is returned.
          * @return The normalized column where tabs represents only one character.
          */
         public int normalizeColumn(int column, int tabWidth) {
@@ -544,9 +544,9 @@ public final class IOUtil {
      * Creates a temporary directory with help of {@link File#createTempFile(String, String)}.
      *
      * @param prefix The prefix string to be used in generating the file's name; must be at least
-     *               three characters long.
+     *        three characters long.
      * @param suffix The suffix string to be used in generating the file's name; may be null, in
-     *               which case the suffix ".tmp" will be used.
+     *        which case the suffix ".tmp" will be used.
      * @return Created temporary directory.
      * @throws IOException Occurred Exception.
      */
@@ -565,9 +565,9 @@ public final class IOUtil {
      * Searches recursive in the given {@link File} all {@link File}s accepted by the given
      * {@link IFilter}.
      *
-     * @param file   The {@link File} to start search in.
+     * @param file The {@link File} to start search in.
      * @param filter An optional {@link Predicate} used to accept files. Without a filter all
-     *               {@link File}s are accepted.
+     *        {@link File}s are accepted.
      * @return The accepted {@link File}s.
      * @throws IOException Occurred Exception
      */
@@ -586,7 +586,7 @@ public final class IOUtil {
     /**
      * Visits recursive all files and folders.
      *
-     * @param file    The {@link File} to start in.
+     * @param file The {@link File} to start in.
      * @param visitor The {@link IFileVisitor} which does something with the visited files
      * @throws IOException Occurred Exception
      */
@@ -639,9 +639,9 @@ public final class IOUtil {
      * Checks if at least one given parent {@link File} contains (recursive) the child {@link File}.
      *
      * @param parents The parent {@link File}.
-     * @param child   The child {@link File} to check for containment in parents.
+     * @param child The child {@link File} to check for containment in parents.
      * @return {@code true} child is contained (recursive) in at least one parent, {@code false}
-     * child is not contained in any parent.
+     *         child is not contained in any parent.
      */
     public static boolean contains(Iterable<File> parents, File child) {
         boolean contains = false;
@@ -658,9 +658,9 @@ public final class IOUtil {
      * Checks if the given parent {@link File} contains (recursive) the child {@link File}.
      *
      * @param parent The parent {@link File}.
-     * @param child  The child {@link File} to check for containment in parent.
+     * @param child The child {@link File} to check for containment in parent.
      * @return {@code true} child is contained (recursive) in parent, {@code false} child is not
-     * contained in parent.
+     *         contained in parent.
      */
     public static boolean contains(File parent, File child) {
         boolean contains = false;
@@ -787,11 +787,11 @@ public final class IOUtil {
                 String query = url.getQuery();
                 String ref = url.getRef();
                 return new URI(!StringUtil.isEmpty(protocol) ? protocol : null,
-                        !StringUtil.isEmpty(userInfo) ? userInfo : null,
-                        !StringUtil.isEmpty(host) ? host : null, url.getPort(),
-                        !StringUtil.isEmpty(path) ? path : null,
-                        !StringUtil.isEmpty(query) ? query : null,
-                        !StringUtil.isEmpty(ref) ? ref : null);
+                    !StringUtil.isEmpty(userInfo) ? userInfo : null,
+                    !StringUtil.isEmpty(host) ? host : null, url.getPort(),
+                    !StringUtil.isEmpty(path) ? path : null,
+                    !StringUtil.isEmpty(query) ? query : null,
+                    !StringUtil.isEmpty(ref) ? ref : null);
             } else {
                 return null;
             }
@@ -836,8 +836,8 @@ public final class IOUtil {
                         && Arrays.binarySearch(latinSmall, content[i]) < 0
                         && Arrays.binarySearch(numerals, content[i]) < 0
                         && Arrays.binarySearch(
-                        StringUtil.ADDITIONAL_ALLOWED_FILE_NAME_SYSTEM_CHARACTERS,
-                        content[i]) < 0) {
+                            StringUtil.ADDITIONAL_ALLOWED_FILE_NAME_SYSTEM_CHARACTERS,
+                            content[i]) < 0) {
                     content[i] = '_';
                 }
             }
@@ -850,10 +850,10 @@ public final class IOUtil {
     /**
      * Extracts a ZIP archive to the given target directory.
      *
-     * @param in        the ZIP archive to extract
+     * @param in the ZIP archive to extract
      * @param targetDir the directory the extracted files will be located in
      * @throws ZipException if a ZIP format error occurs
-     * @throws IOException  if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     public static void extractZip(InputStream in, Path targetDir) throws IOException {
         try (ZipInputStream zin = new ZipInputStream(in)) {
@@ -881,10 +881,10 @@ public final class IOUtil {
     /**
      * Extracts a ZIP archive to the given target directory.
      *
-     * @param archive   the ZIP archive to extract
+     * @param archive the ZIP archive to extract
      * @param targetDir the directory the extracted files will be located in
      * @throws ZipException if a ZIP format error occurs
-     * @throws IOException  if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     public static void extractZip(Path archive, Path targetDir) throws IOException {
         if (archive == null || targetDir == null) {

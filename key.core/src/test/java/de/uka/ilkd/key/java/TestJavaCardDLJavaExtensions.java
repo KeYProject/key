@@ -11,8 +11,6 @@ import org.junit.jupiter.api.Test;
 
 public class TestJavaCardDLJavaExtensions {
 
-    private final HelperClassForTests helper = new HelperClassForTests();
-
     public static final String testpath = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
         + "javacardDLExtensions" + File.separator;
 
@@ -27,13 +25,14 @@ public class TestJavaCardDLJavaExtensions {
             + "The type Test should not be found in the default scope as it is "
             + "declared inside package test.";
         Assertions.assertThrows(BuildingException.class,
-            () -> helper
+            () -> HelperClassForTests
                     .parseThrowException(new File(testpath + "typeResolutionInMethodFrame.key")),
             message);
     }
 
     @Test
     public void testMethodFrameRedirectsScope() throws ProofInputException {
-        helper.parseThrowException(new File(testpath + "typeResolutionInMethodFrame2.key"));
+        HelperClassForTests
+                .parseThrowException(new File(testpath + "typeResolutionInMethodFrame2.key"));
     }
 }

@@ -125,15 +125,13 @@ public class TestTacletBuild {
             + "occurs more than once in the Taclets if and find");
     }
 
-    private final HelperClassForTests helper = new HelperClassForTests();
-
     public static final String testRules =
         HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "tacletprefix";
 
     @Test
     public void testSchemavariablesInAddrulesRespectPrefix() {
         try {
-            helper.parseThrowException(
+            HelperClassForTests.parseThrowException(
                 new File(testRules + File.separator + "schemaVarInAddruleRespectPrefix.key"));
         } catch (BuildingException e) {
             assertTrue(e.toString().contains("schemaVarInAddruleRespectPrefix.key:9:3"),

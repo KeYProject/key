@@ -41,7 +41,7 @@ public class TestJMLTranslator {
     public synchronized void setUp() {
         if (javaInfo == null) {
             javaInfo =
-                new HelperClassForTests().parse(new File(testFile)).getFirstProof().getJavaInfo();
+                HelperClassForTests.parse(new File(testFile)).getFirstProof().getJavaInfo();
             services = javaInfo.getServices();
             TB = services.getTermBuilder();
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");

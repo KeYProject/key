@@ -31,7 +31,7 @@ public class NJmlTranslatorTests {
 
     public NJmlTranslatorTests() {
         JavaInfo javaInfo =
-            new HelperClassForTests().parse(new File(testFile)).getFirstProof().getJavaInfo();
+            HelperClassForTests.parse(new File(testFile)).getFirstProof().getJavaInfo();
         Services services = javaInfo.getServices();
         KeYJavaType testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         preParser = new PreParser();
