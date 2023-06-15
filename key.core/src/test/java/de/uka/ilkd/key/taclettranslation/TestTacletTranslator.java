@@ -39,6 +39,7 @@ public class TestTacletTranslator {
     public void setUp() throws Exception {
         nss = new NamespaceSet();
         services = new Services(AbstractProfile.getDefaultProfile());
+        services.activateJava(null);
         io = new KeyIO(services, nss);
     }
 
