@@ -1266,7 +1266,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     ifZero(add(applyTF("loc1", op(matrixRange)),
                                     applyTF("loc2", op(matrixRange))),
                             matrixRangeloc1OutSideLoc2, longConst(0)),
-                        longConst(-3000)));
+                        longConst(100)));
 //        Feature rowEndGeqRowStart = geq("rowEnd", "rowStart");
 //        Feature colEndGeqColStart = geq("colEnd", "colStart");
 
