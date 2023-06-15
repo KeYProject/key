@@ -931,11 +931,10 @@ public final class JavaInfo {
                 return res;
             } else {
                 final ImmutableList<Field> list = kpmi.getAllFieldsLocallyDeclaredIn(classType);
-                for (Field aList : list) {
-                    final Field f = aList;
-                    if (f != null
-                            && (f.getName().equals(name) || f.getProgramName().equals(name))) {
-                        return (ProgramVariable) f.getProgramVariable();
+                for (Field field : list) {
+                    if (field != null
+                            && (field.getName().equals(name) || field.getProgramName().equals(name))) {
+                        return (ProgramVariable) field.getProgramVariable();
                     }
                 }
             }

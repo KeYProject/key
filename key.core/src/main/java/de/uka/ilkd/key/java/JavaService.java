@@ -186,8 +186,12 @@ public class JavaService {
     public de.uka.ilkd.key.java.CompilationUnit readCompilationUnit(Path file, FileRepo repo)
             throws IOException {
         parseSpecialClasses();
-        var cc = parseCompilationUnit(file, repo);
-        return converter.processCompilationUnit(unwrapParseResult(cc));
+        // TODO javaparser problem: method used in foreach loop, pipeline should be used with all
+        // files at once
+        // However, unwrapParseResult does not contain any file related info
+        var cu = unwrapParseResult(parseCompilationUnit(file, repo));
+        transformModel(Collections.singletonList(cu));
+        return converter.processCompilationUnit(cu);
     }
 
     /**
