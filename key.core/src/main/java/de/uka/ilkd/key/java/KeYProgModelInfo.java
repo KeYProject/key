@@ -8,7 +8,6 @@ import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -21,6 +20,7 @@ import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.resolution.declarations.*;
 import com.github.javaparser.resolution.logic.MethodResolutionCapability;
+import com.github.javaparser.resolution.logic.MethodResolutionLogic;
 import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedArrayType;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
@@ -254,7 +254,7 @@ public class KeYProgModelInfo {
     }
 
     private List<ResolvedMethodDeclaration> getMethods(KeYJavaType kjt) {
-        var type = getJPType(kjt);
+        var type = getJavaParserType(kjt);
         if (type.isReferenceType()) {
             return type.asReferenceType().getAllMethods();
         }
@@ -268,23 +268,13 @@ public class KeYProgModelInfo {
                 .orElse(Collections.emptyList());
     }
 
-    private ResolvedType getJPType(KeYJavaType ct) {
+    private ResolvedType getJavaParserType(KeYJavaType ct) {
         return rec2key().toRecoder(ct);
     }
 
     private Optional<ResolvedReferenceType> getReferenceType(KeYJavaType ct) {
         var type = rec2key().toRecoder(ct);
         return type.isReferenceType() ? Optional.of(type.asReferenceType()) : Optional.empty();
-    }
-
-    private List<ResolvedMethodDeclaration> getMethods(KeYJavaType ct, String name,
-            ImmutableList<? extends Type> signature, KeYJavaType context) {
-        var rct = getJPType(ct);
-        var rcontext = getJPType(context);
-
-        var methods = rct.asReferenceType().getAllMethods();
-        // TODO weigl filter out invisible methods in given context
-        return methods;
     }
 
 
@@ -355,16 +345,17 @@ public class KeYProgModelInfo {
      * @return the most specific constructor declared in the given type
      */
     public IProgramMethod getConstructor(KeYJavaType ct, ImmutableList<KeYJavaType> signature) {
-        var constructors = getRecoderConstructors(ct, signature);
-        if (constructors.size() == 1) {
-            return (IProgramMethod) rec2key().toKeY(constructors.get(0)).orElse(null);
-        }
-        if (constructors.isEmpty()) {
-            LOGGER.debug("javainfo: Constructor not found: {}", ct);
-            return null;
-        }
-        Debug.fail();
-        return null;
+        throw new UnsupportedOperationException();
+        // var constructors = getRecoderConstructors(ct, signature);
+        // if (constructors.size() == 1) {
+        // return (IProgramMethod) rec2key().toKeY(constructors.get(0)).orElse(null);
+        // }
+        // if (constructors.isEmpty()) {
+        // LOGGER.debug("javainfo: Constructor not found: {}", ct);
+        // return null;
+        // }
+        // Debug.fail();
+        // return null;
     }
 
     /**
@@ -391,6 +382,31 @@ public class KeYProgModelInfo {
         return null;
     }
 
+    /**
+     * Returns the IProgramMethods with the given name that is defined
+     * in the given type or in a supertype where it is visible for the
+     * given type, and has a signature that is compatible to the given one.
+     *
+     * @param ct the class type to get methods from.
+     * @param name the name of the methods in question.
+     * @param signature the statical type signature of a callee.
+     * @return the IProgramMethods, if one is found,
+     *         null if none or more than one IProgramMethod is found (in this case
+     *         a debug output is written to console).
+     */
+    public IProgramMethod getProgramMethod(@Nonnull KeYJavaType ct, String name,
+            ImmutableList<KeYJavaType> signature) {
+        if (ct.getJavaType() instanceof ArrayType) {
+            return getImplicitMethod(ct, name);
+        }
+
+        var type = getJavaParserType(ct);
+        var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
+        List<ResolvedType> jpSignature = signature.map(this::getJavaParserType).toList();
+        var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);
+        return (IProgramMethod) rec2key().toKeY(method.getDeclaration().orElseThrow())
+                .orElseThrow();
+    }
 
     /**
      * Returns the IProgramMethods with the given name that is defined
@@ -398,29 +414,20 @@ public class KeYProgModelInfo {
      * given type, and has a signature that is compatible to the given one.
      *
      * @param ct the class type to get methods from.
-     * @param m the name of the methods in question.
+     * @param name the name of the methods in question.
      * @param signature the statical type signature of a callee.
      * @return the IProgramMethods, if one is found,
      *         null if none or more than one IProgramMethod is found (in this case
      *         a debug output is written to console).
      */
-    public IProgramMethod getProgramMethod(KeYJavaType ct, String m,
+    public IProgramMethod getProgramMethod(
+            @Nonnull KeYJavaType ct, String name,
             ImmutableList<? extends Type> signature, KeYJavaType context) {
         if (ct.getJavaType() instanceof ArrayType || context.getJavaType() instanceof ArrayType) {
-            return getImplicitMethod(ct, m);
+            return getImplicitMethod(ct, name);
         }
 
-        var methodlist = getMethods(ct, m, signature, context);
-
-        if (methodlist.size() == 1) {
-            return (IProgramMethod) rec2key().toKeY(methodlist.get(0)).orElse(null);
-        } else if (methodlist.isEmpty()) {
-            LOGGER.debug("Program Method not found: {}", m);
-            return null;
-        } else {
-            LOGGER.debug("More than one method matching: {}", m);
-            return null;
-        }
+        throw new UnsupportedOperationException();
     }
 
 
@@ -541,7 +548,7 @@ public class KeYProgModelInfo {
      * returns all proper subtypes of class <code>ct</code> (i.e. without <code>ct</code> itself)
      */
     private List<ResolvedReferenceTypeDeclaration> getAllRecoderSubtypes(KeYJavaType ct) {
-        var rt = getJPType(ct);
+        var rt = getJavaParserType(ct);
         // TODO javaparser get all known java types in classpath
         // best approximation is to use the recoder2key mapping
 
@@ -621,23 +628,21 @@ public class KeYProgModelInfo {
         return asKeYJavaTypes(getAllRecoderSubtypes(ct));
     }
 
-    public ImmutableList<KeYJavaType> findImplementations(Type ct, String name,
+    public ImmutableList<KeYJavaType> findImplementations(KeYJavaType ct, String name,
             ImmutableList<KeYJavaType> signature) {
-        // set up recoder inputs
-        // TODO weigl does not compile, no idea what this should be
-        // var rct = (ResolvedTypeDeclaration) ((com.github.javaparser.ast.type.Type)
-        // rec2key().toRecoder(ct)).resolve();
-        // List<ResolvedType> jpSignature = signature.map(it -> (ResolvedType)
-        // getJPType(it)).toList();
-        // var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);
-        //
-        // // If ct is an interface, but does not declare the method, we
-        // // need to start the search "upstairs"
+        var type = rec2key().toRecoder(ct);
+        var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
+        List<ResolvedType> jpSignature = signature.map(this::getJavaParserType).toList();
+        var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);
+        // TODO javaparser
+
+        // If ct is an interface, but does not declare the method, we
+        // need to start the search "upstairs"
         // while (rct.toAst(ClassOrInterfaceDeclaration.class).get().isInterface()
         // && !isDeclaringInterface(rct, name, rsignature)) {
         // rct = rct.getAllSupertypes().get(1);
         // }
-
+        //
         ImmutableList<KeYJavaType> classList = ImmutableSLList.nil();
         // classList = recFindImplementations(rct, name, rsignature, classList);
         //

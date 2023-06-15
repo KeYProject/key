@@ -293,6 +293,7 @@ public class JavaService {
      * @author mulbrich
      */
     private List<CompilationUnit> parseLibs(FileRepo fileRepo) throws IOException {
+        LOGGER.debug("Parsing libs");
         var internal = parseInternalClasses(fileRepo);
         List<FileCollection> sources = new ArrayList<>();
         List<CompilationUnit> rcuList = new ArrayList<>(internal);

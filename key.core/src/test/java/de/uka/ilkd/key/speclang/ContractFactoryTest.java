@@ -128,7 +128,7 @@ public class ContractFactoryTest {
 
         ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
         signature = signature.append(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT));
-        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature, testClassType);
+        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature);
 
         ImmutableSet<Contract> contractSet = ImmutableSet.empty();
         for (TextualJMLConstruct c : constructs) {

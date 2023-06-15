@@ -487,6 +487,20 @@ public final class JavaInfo {
      * @param classType the KeYJavaType of the class where to look for the method
      * @param methodName the name of the method
      * @param signature a IList<Type> with the arguments types
+     * @return a matching program method
+     */
+    public IProgramMethod getProgramMethod(KeYJavaType classType, String methodName,
+            ImmutableList<KeYJavaType> signature) {
+        return kpmi.getProgramMethod(classType, methodName, signature);
+    }
+
+    /**
+     * returns the program methods defined in the given KeYJavaType with name m and the list of
+     * types as signature of the method
+     *
+     * @param classType the KeYJavaType of the class where to look for the method
+     * @param methodName the name of the method
+     * @param signature a IList<Type> with the arguments types
      * @param context the KeYJavaType of the class context from <em>where</em> the method is called
      * @return a matching program method
      */

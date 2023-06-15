@@ -250,8 +250,8 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
                 types = types.prepend(implementing.getTypeReferenceAt(i).getKeYJavaType());
             }
         }
-        if (extending != null) {
-            types = types.prepend(extending.getTypeReferenceAt(0).getKeYJavaType());
+        if (extending != null && !extending.getSupertypes().isEmpty()) {
+            types = types.prepend(extending.getSupertypes().get(0).getKeYJavaType());
         }
         return types;
     }

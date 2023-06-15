@@ -260,8 +260,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
 
     private void resolveMethod(Services services) {
         method = services.getJavaInfo().getProgramMethod(getBodySource(), methodReference.getName(),
-            services.getJavaInfo().createSignature(methodReference.getArguments()),
-            getBodySource());
+            services.getJavaInfo().createSignature(methodReference.getArguments()));
     }
 
     public String reuseSignature(Services services, ExecutionContext ec) {

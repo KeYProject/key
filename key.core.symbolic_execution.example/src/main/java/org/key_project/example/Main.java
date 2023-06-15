@@ -9,7 +9,6 @@ import java.util.Map;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
@@ -78,7 +77,7 @@ public class Main {
                 // Find method to symbolically execute
                 KeYJavaType classType = env.getJavaInfo().getKeYJavaType("Number");
                 IProgramMethod pm = env.getJavaInfo().getProgramMethod(classType, "equals",
-                    ImmutableSLList.<Type>nil().append(classType), classType);
+                    ImmutableSLList.<KeYJavaType>nil().append(classType));
                 // Instantiate proof for symbolic execution of the program method (Java semantics)
                 AbstractOperationPO po = new ProgramMethodPO(env.getInitConfig(),
                     "Symbolic Execution of: " + pm, pm, null, // An optional precondition

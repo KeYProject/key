@@ -357,7 +357,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
             }
             parameterTypes = parameterTypes.append(paramType);
         }
-        IProgramMethod pm = javaInfo.getProgramMethod(type, name.trim(), parameterTypes, type);
+        IProgramMethod pm = javaInfo.getProgramMethod(type, name.trim(), parameterTypes);
         if (pm == null) {
             pm = javaInfo.getConstructor(type, parameterTypes);
             if (pm == null) {
