@@ -885,9 +885,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(Name n, Void arg) {
-        // TODO
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        if (n.getIdentifier().startsWith("#")) {
+            return lookupSchemaVariable(n.getIdentifier(), n);
+        }
+
+        // TODO javaparser Is this the correct translation for an arbitrary fqdn?
+        return new LocationVariable(new ProgramElementName(n.getIdentifier()), (Sort) null);
     }
 
     @Override
@@ -1518,9 +1521,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(KeyMethodCallStatement n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        IProgramVariable resultVar = null;
-        StatementBlock body = null;
-        IExecutionContext execContext = null;
+        IProgramVariable resultVar = accepto(n.getName());
+        StatementBlock body = accept(n.getBlock());
+        IExecutionContext execContext = accept(n.getContext());
         PosInProgram firstActiveChildPos = null;
         // TODO weigl
         return new MethodFrame(pi, c, resultVar, body, execContext, firstActiveChildPos,

@@ -367,7 +367,7 @@ public class TestMatchTaclet {
     }
 
     @Test
-    public void testPrefixMatching() {
+        public void testPrefixMatching() {
         Term match = TacletForTests.parseTerm("\\<{return;}\\>true ");
         StatementBlock prg = (StatementBlock) match.javaBlock().program();
         ExecutionContext ec = new ExecutionContext(
@@ -378,6 +378,7 @@ public class TestMatchTaclet {
         match = TB.dia(JavaBlock.createJavaBlock(new StatementBlock(mframe)), match.sub(0));
         FindTaclet taclet =
             (FindTaclet) TacletForTests.getTaclet("TestMatchTaclet_methodframe").taclet();
+        System.out.println(taclet.toString());
         MatchConditions mc =
             (taclet.getMatcher().matchFind(match, MatchConditions.EMPTY_MATCHCONDITIONS, services));
         assertNotNull(mc, "Method-Frame should match");
