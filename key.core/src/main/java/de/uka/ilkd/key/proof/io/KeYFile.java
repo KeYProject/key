@@ -249,7 +249,7 @@ public class KeYFile implements EnvInput {
 
     @Nonnull
     @Override
-    public List<Path> readClassPath() {
+    public Optional<List<Path>> readClassPath() {
         @Nonnull
         ProblemInformation pi = getProblemInformation();
         var parentDirectory = file.file().getParent();
@@ -265,7 +265,7 @@ public class KeYFile implements EnvInput {
                 fileList.add(f);
             }
         }
-        return fileList;
+        return Optional.of(fileList);
     }
 
     @Override

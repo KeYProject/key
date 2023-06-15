@@ -219,14 +219,14 @@ public final class ProblemInitializer {
         envInput.setInitConfig(initConfig);
         final Path javaPath =
             envInput.readJavaPath().map(p -> p.toAbsolutePath().normalize()).orElse(null);
-        final List<Path> classPath = envInput.readClassPath();
+        final Optional<List<Path>> classPath = envInput.readClassPath();
         final Path bootClassPath = envInput.readBootClassPath();
         final Includes includes = envInput.readIncludes();
 
         if (fileRepo != null) {
             // set the paths in the FileRepo (all three methods can deal with null parameters)
             fileRepo.setJavaPath(javaPath);
-            fileRepo.setClassPath(classPath);
+            fileRepo.setClassPath(classPath.orElse(null));
             fileRepo.setBootClassPath(bootClassPath);
         }
 
@@ -241,8 +241,12 @@ public final class ProblemInitializer {
 
         // create Recoder2KeY, set classpath
         final JavaService r2k = initConfig.getServices().getJavaService();
-        classPath.add(javaPath);
-        r2k.setClassPath(bootClassPath, classPath);
+        var classPathWithJava = javaPath == null ? classPath.orElse(null) : classPath.map(p -> {
+            var r = new ArrayList<>(p);
+            r.add(javaPath);
+            return (List<Path>) r;
+        }).orElse(Collections.singletonList(javaPath));
+        r2k.setClassPath(bootClassPath, classPathWithJava);
 
         reportStatus("Reading Java libraries");
         r2k.parseSpecialClasses(fileRepo);
@@ -269,7 +273,8 @@ public final class ProblemInitializer {
         }
         Path initialFile = envInput.getInitialFile();
         initConfig.getServices().setJavaModel(
-            JavaModel.createJavaModel(javaPath, classPath, bootClassPath, includes, initialFile));
+            JavaModel.createJavaModel(javaPath, classPath.orElse(null), bootClassPath, includes,
+                initialFile));
     }
 
     /**

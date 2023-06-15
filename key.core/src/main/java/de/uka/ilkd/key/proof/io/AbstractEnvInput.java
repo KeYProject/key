@@ -85,8 +85,8 @@ public abstract class AbstractEnvInput implements EnvInput {
 
     @Nonnull
     @Override
-    public final List<Path> readClassPath() {
-        return classPath;
+    public final Optional<List<Path>> readClassPath() {
+        return Optional.ofNullable(classPath);
     }
 
 

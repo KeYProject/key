@@ -106,7 +106,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
         // read in-code specifications
         SLEnvInput slEnvInput =
-            new SLEnvInput(readJavaPath().orElse(null), readClassPath(), readBootClassPath(),
+            new SLEnvInput(readJavaPath().orElse(null), readClassPath().orElse(null),
+                readBootClassPath(),
                 getProfile(), null);
         slEnvInput.setInitConfig(initConfig);
         warnings = warnings.union(slEnvInput.read());

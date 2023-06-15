@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.proof.io;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nonnull;
@@ -92,8 +91,8 @@ public class LDTInput implements EnvInput {
     // no class path elements here
     @Nonnull
     @Override
-    public List<Path> readClassPath() {
-        return Collections.emptyList();
+    public Optional<List<Path>> readClassPath() {
+        return Optional.empty();
     }
 
 

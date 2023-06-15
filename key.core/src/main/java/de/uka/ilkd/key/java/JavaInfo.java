@@ -933,7 +933,8 @@ public final class JavaInfo {
                 final ImmutableList<Field> list = kpmi.getAllFieldsLocallyDeclaredIn(classType);
                 for (Field field : list) {
                     if (field != null
-                            && (field.getName().equals(name) || field.getProgramName().equals(name))) {
+                            && (field.getName().equals(name)
+                                    || field.getProgramName().equals(name))) {
                         return (ProgramVariable) field.getProgramVariable();
                     }
                 }
