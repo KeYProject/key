@@ -335,6 +335,15 @@ public class DependencyGraph {
         return null;
     }
 
+    /**
+     * Get the graph node for a given function and branch location.
+     * If the function is not registered in the graph yet, a new graph node is created.
+     * The function has to be a skolem constant!
+     *
+     * @param function function
+     * @param loc branch location
+     * @return graph node representing the function
+     */
     public TrackedFunction getFunctionNode(Function function, BranchLocation loc) {
         TrackedFunction candidate = new TrackedFunction(function, loc);
         if (graph.containsVertex(candidate)) {

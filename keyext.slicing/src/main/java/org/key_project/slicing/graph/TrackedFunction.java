@@ -5,8 +5,13 @@ import java.util.Objects;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.BranchLocation;
 
+/**
+ * A skolem constant tracked in the dependency graph.
+ *
+ * @author Arne Keller
+ */
 public class TrackedFunction extends GraphNode {
-    private Function function;
+    private final Function function;
 
     public TrackedFunction(Function f, BranchLocation loc) {
         super(loc);

@@ -15,7 +15,16 @@ import de.uka.ilkd.key.rule.Taclet;
 
 import org.key_project.slicing.graph.DependencyGraph;
 
+/**
+ * Proof step regrouping functionality.
+ *
+ * @author Arne Keller
+ */
 public final class ProofRegroup {
+    private ProofRegroup() {
+
+    }
+
     private static final List<List<String>> GROUPS =
         List.of(List.of("alpha", "delta"), List.of("negationNormalForm", "conjNormalForm"),
             List.of("polySimp_expand", "polySimp_normalise", "polySimp_newSym",
