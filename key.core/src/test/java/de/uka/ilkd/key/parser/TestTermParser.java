@@ -32,7 +32,6 @@ public class TestTermParser extends AbstractTestTermParser {
 
     public TestTermParser() {
         r2k = services.getJavaService();
-        r2k.parseSpecialClasses();
         r2k.readCompilationUnit(COMPILATION_UNIT);
     }
 
@@ -342,9 +341,14 @@ public class TestTermParser extends AbstractTestTermParser {
     @Test
     public void testAmbigiousFuncVarPred() {
         // tests bug id 216
-        String s = "\\functions {} \\predicates{mypred(int, int);}"
-            + "\n\\problem {\\forall int x; mypred(x, 0)}\n \\proof {\n" + "(branch \"dummy ID\""
-            + "(opengoal \"  ==> true  -> true \") ) }";
+        String s = """
+                \\functions {}
+                \\predicates{mypred(int, int);}
+                \\problem {\\forall int x; mypred(x, 0)}
+                \\proof {
+                    (branch "dummy ID"(opengoal "  ==> true  -> true ") )
+                }
+                """;
         try {
             parseProblem(s);
         } catch (Exception re) {
@@ -353,10 +357,21 @@ public class TestTermParser extends AbstractTestTermParser {
         }
     }
 
-    static final String COMPILATION_UNIT = "public class T extends " + "java.lang.Object{ "
-        + "private T a;" + "private static T b;" + "T c;" + "static T d;" + "public T e;"
-        + "public static T f;" + "protected T g;" + "protected T h;" + "public T query(){} "
-        + "public static T staticQ(T p){} " + "public static T staticQ() {}}";
+    static final String COMPILATION_UNIT = """
+            public class T extends java.lang.Object {
+                private T a;
+                private static T b;
+                T c;
+                static T d;
+                public T e;
+                
+                public static T f;
+                protected T g; protected T h;
+                public T query()             {  }
+                public static T staticQ(T p) {  }
+                public static T staticQ()    {  }
+            }
+            """;
 
 
     public Term testParseQueriesAndAttributes(String expr) throws Exception {
