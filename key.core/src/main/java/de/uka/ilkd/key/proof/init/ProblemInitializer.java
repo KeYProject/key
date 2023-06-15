@@ -197,7 +197,7 @@ public final class ProblemInitializer {
      */
     private List<Path> getClasses(Path folder) throws ProofInputException {
         try (var files = Files.walk(folder)) {
-            return files.filter(f -> f.toFile().isDirectory() && f.toString().endsWith(".java"))
+            return files.filter(f -> !f.toFile().isDirectory() && f.toString().endsWith(".java"))
                     .toList();
         } catch (IOException e) {
             throw new ProofInputException("Failed to list classes folder", e);
