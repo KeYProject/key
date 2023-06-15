@@ -332,6 +332,9 @@ public class Services implements TermServices {
      * Only use this method if the proof is empty!
      */
     public void resetCounters() {
+        if (proof.root().childrenCount() > 0) {
+            throw new IllegalStateException("tried to reset counters on non-empty proof");
+        }
         counters.clear();
     }
 
