@@ -7,8 +7,6 @@ import de.uka.ilkd.key.util.Debug;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
-import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
-import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +27,7 @@ public class KeYJPMapping {
      * maps a recoder programelement (or something similar, e.g. Type)
      * to the KeY-equivalent
      */
-    private final HashMap<Node, Object> map;
+    private final Map<Node, Object> map;
 
     /**
      * maps a recoder programelement (or something similar, e.g. Type)
@@ -50,9 +48,9 @@ public class KeYJPMapping {
 
 
     public KeYJPMapping() {
-        this.map = new LinkedHashMap<>(4096);
+        this.map = new IdentityHashMap<>(4096);
         this.typeMap = new LinkedHashMap<>(4096);
-        this.revMap = new LinkedHashMap<>(4096);
+        this.revMap = new IdentityHashMap<>(4096);
     }
 
 
@@ -60,20 +58,14 @@ public class KeYJPMapping {
      * creates a KeYRecoderMapping object.
      * Used for cloning and testing.
      *
-     * @param map a HashMap mapping ProgramElements in Recoder to
-     *        ProgramElements in KeY
-     * @param revMap the reverse map (KeY->Recoder)
-     * @param parsedSpecial boolean indicating if the special classes have been parsed in
+     * @param o what to clone
      */
-    KeYJPMapping(HashMap<Node, Object> map, HashMap<ResolvedType, KeYJavaType> typeMap,
-            Map<Object, Node> revMap,
-            KeYJavaType superArrayType,
-            boolean parsedSpecial) {
-        this.map = map;
-        this.typeMap = typeMap;
-        this.revMap = revMap;
-        this.superArrayType = superArrayType;
-        this.parsedSpecial = parsedSpecial;
+    KeYJPMapping(KeYJPMapping o) {
+        this.map = new LinkedHashMap<>(o.map);
+        this.typeMap = new LinkedHashMap<>(o.typeMap);
+        this.revMap = new LinkedHashMap<>(o.revMap);
+        this.superArrayType = o.superArrayType;
+        this.parsedSpecial = o.parsedSpecial;
     }
 
     /**
@@ -81,7 +73,7 @@ public class KeYJPMapping {
      *
      * @param pe a recoder.ModelElement
      */
-    public Object toKeY(Node pe) {
+    public Object typeToKeY(Node pe) {
         return map.get(pe);
     }
 
@@ -90,52 +82,31 @@ public class KeYJPMapping {
      *
      * @param pe a recoder.ModelElement
      */
-    public KeYJavaType toKeY(ResolvedType pe) {
-        return typeMap.get(pe);
+    public Optional<KeYJavaType> resolvedTypeToKeY(ResolvedType pe) {
+        return Optional.ofNullable(typeMap.get(pe));
     }
 
-
-    /**
-     * returns the Recoder-equivalent to a given ProgramElement (KeY).
-     * If there's no RecodeR equivalent to program element pe, an
-     * assertion failure "Program Element <pe> not known" is emitted.
-     *
-     * @param pe a JavaProgramElement
-     */
-    public Node toRecoder(ProgramElement pe) {
-        Node res = revMap.get(pe);
-        Debug.assertTrue(res != null, "Program Element not known", pe);
-        return res;
-    }
-
-
-    /**
-     * returns the Recoder-equivalent to a given ModelElement (KeY).
-     * If there's no Recoder-equivalent to the ModelElement pe a
-     * debug message "Model Element <pe> not known" is printed.
-     *
-     * @param pe a ModelElement
-     */
-    public Node toRecoder(Object pe) {
-        Node res = revMap.get(pe);
-        Debug.assertTrue(res != null, "Model Element not known", pe);
-        return res;
-    }
-
-    public ResolvedType toRecoder(KeYJavaType pe) {
+    public ResolvedType resolveType(KeYJavaType pe) {
         var res = typeMapRev.get(pe);
         Debug.assertTrue(res != null, "Model Element not known", pe);
         return res;
     }
 
+    public Optional<Object> nodeToKeY(Node rm) {
+        return Optional.ofNullable(map.get(rm));
+    }
+
+    public Optional<Object> resolvedDeclarationToKeY(ResolvedDeclaration rm) {
+        return rm.toAst().flatMap(this::nodeToKeY);
+    }
 
     public void put(Node node, Object value) {
         Object formerValue = map.putIfAbsent(node, value);
         var formerNode = revMap.putIfAbsent(value, node);
-        if (formerValue != null && !Objects.equals(formerValue, value))
+        if (formerValue != null && formerValue != value)
             LOGGER.error("Duplicate registration of value: {}, formerValue: {}", value,
                 formerValue);
-        if (formerNode != null && !Objects.equals(formerNode, node))
+        if (formerNode != null && formerNode != node)
             LOGGER.error("Duplicate registration of node: {}, formerNode: {}", node, formerNode);
     }
 
@@ -174,8 +145,7 @@ public class KeYJPMapping {
     }
 
     public KeYJPMapping copy() {
-        return new KeYJPMapping(new LinkedHashMap<>(map), new LinkedHashMap<>(typeMap),
-            new LinkedHashMap<>(revMap), superArrayType, parsedSpecial);
+        return new KeYJPMapping(this);
     }
 
     /**
@@ -208,13 +178,5 @@ public class KeYJPMapping {
      */
     public void parsedSpecial(boolean b) {
         parsedSpecial = b;
-    }
-
-    public KeYJavaType toKeY(ResolvedReferenceTypeDeclaration rm) {
-        return toKeY(new ReferenceTypeImpl(rm));
-    }
-
-    public Optional<Object> toKeY(ResolvedDeclaration rm) {
-        return rm.toAst().map(this::toKeY);
     }
 }

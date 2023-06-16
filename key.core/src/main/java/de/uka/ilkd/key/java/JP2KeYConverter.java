@@ -133,6 +133,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return res;
     }
 
+    private <O> O addToMapping(Node value, O o) {
+        mapping.put(value, o);
+        return o;
+    }
+
     @Override
     public Object visit(ArrayAccessExpr n, Void arg) {
         var pi = createPositionInfo(n);
@@ -349,33 +354,13 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 false);
         }
         kjt.setJavaType(td);
-        return td;
+        return addToMapping(n, td);
     }
-
-    /*
-     * private ExtList visitChildren(Node node) {
-     * ExtList seq = new ExtList(node.getChildNodes().size());
-     * for (Node childNode : node.getChildNodes()) {
-     * var element = childNode.accept(this, null);
-     * if (element != null) {
-     * seq.add(element);
-     * }
-     * }
-     * seq.add(createPositionInfo(node));
-     * return seq;
-     * }
-     */
-
 
     @Nonnull
     private <T> T accept(@Nonnull Node check) {
-        Object value = mapping.toKeY(check);
-        if (value == null) {
-            value = check.accept(this, null);
-            mapping.put(check, value);
-        }
         // noinspection unchecked
-        return Objects.requireNonNull((T) value);
+        return Objects.requireNonNull((T) check.accept(this, null));
     }
 
     private boolean parentIsInterface(@Nonnull Node n) {
@@ -476,8 +461,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         final HeapLDT heapLDT = typeConverter.getTypeConverter().getHeapLDT();
         Sort heapSort = heapLDT == null ? Sort.ANY : heapLDT.targetSort();
         final KeYJavaType containerKJT = getKeYJavaType(new ReferenceTypeImpl(containing));
-        return new ProgramMethod(cd, containerKJT, KeYJavaType.VOID_TYPE, PositionInfo.UNDEFINED,
-            heapSort, heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
+        var method =
+            new ProgramMethod(cd, containerKJT, KeYJavaType.VOID_TYPE, PositionInfo.UNDEFINED,
+                heapSort, heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
+        return addToMapping(n, method);
     }
 
     @Override
@@ -611,8 +598,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         final var decl =
             new de.uka.ilkd.key.java.declaration.FieldDeclaration(pi, c, modArray, type,
                 isInInterface, fieldSpecs);
-        mapping.put(n, decl);
-        return decl;
+        return addToMapping(n, decl);
     }
 
     @Override
@@ -744,8 +730,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         final KeYJavaType containerType = getKeYJavaType(new ReferenceTypeImpl(containing));
         assert containerType != null;
         // may be null for a void method
-        return new ProgramMethod(md, containerType, returnType.getKeYJavaType(), pi,
+        var method = new ProgramMethod(md, containerType, returnType.getKeYJavaType(), pi,
             heapSort, heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
+        return addToMapping(n, method);
     }
 
     @Override
@@ -840,8 +827,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new TypeRef(name, 0, prefix, resolvedType);
     }
 
-    @Override
-    public Object visit(Parameter n, Void arg) {
+    private ParameterDeclaration visitNoMap(Parameter n) {
         ImmutableArray<de.uka.ilkd.key.java.declaration.Modifier> modifiers = map(n.getModifiers());
         var va = n.isVarArgs();
         TypeReference type = accept(n.getType());
@@ -858,6 +844,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var isInInterface = parentIsInterface(n);
         return new ParameterDeclaration(new ImmutableArray<>(spec), pi, c, modifiers,
             type, isInInterface, va);
+    }
+
+    @Override
+    public Object visit(Parameter n, Void arg) {
+        var param = visitNoMap(n);
+        return addToMapping(n, param);
     }
 
     @Override
@@ -1091,7 +1083,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             var name = VariableNamer.parseName(v.getNameAsString());
             pv = new LocationVariable(name, kjt, modifiers.hasModifier(Modifier.Keyword.FINAL));
         }
-        return new VariableSpecification(pi, c, init, pv, 0, kjt);
+
+        return addToMapping(v, new VariableSpecification(pi, c, init, pv, 0, kjt));
     }
 
     /**
@@ -1165,8 +1158,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             return pv;
         }
         var spec = decl.decl;
-        VariableSpecification varSpec = (VariableSpecification) mapping.toKeY(spec);
-        if (varSpec == null) {
+        var varSpec = mapping.nodeToKeY(spec);
+        if (varSpec.isEmpty()) {
             var t = spec.getType().resolve();
             var classNode = findContainingClass(spec).orElseThrow();
             var classType = new ReferenceTypeImpl(classNode.resolve());
@@ -1186,7 +1179,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                     compileTimeConstant);
             }
         } else {
-            pv = (ProgramVariable) varSpec.getProgramVariable();
+            pv = (ProgramVariable) ((VariableSpecification) varSpec.get()).getProgramVariable();
         }
         fieldSpecificationMapping.put(decl, pv);
 

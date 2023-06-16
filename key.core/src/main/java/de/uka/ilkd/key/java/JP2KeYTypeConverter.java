@@ -91,10 +91,6 @@ public class JP2KeYTypeConverter {
         return typeConverter;
     }
 
-    private KeYJavaType lookupInCache(ResolvedType t) {
-        return jp2KeY.toKeY(t);
-    }
-
     private void storeInCache(ResolvedType t, KeYJavaType kjt) {
         jp2KeY.put(t, kjt);
     }
@@ -134,9 +130,9 @@ public class JP2KeYTypeConverter {
 
         {
             // lookup in the cache
-            var kjt = lookupInCache(type);
-            if (kjt != null) {
-                return kjt;
+            var kjt = jp2KeY.resolvedTypeToKeY(type);
+            if (kjt.isPresent()) {
+                return kjt.get();
             }
         }
 
@@ -160,9 +156,7 @@ public class JP2KeYTypeConverter {
         // usually this equals what was just added in the methods above
         // sometimes however, there is a 'legacy' type in the mapping,
         // which has priority
-        var kjt = lookupInCache(type);
-        assert kjt != null : "The type may not be null here";
-        return kjt;
+        return jp2KeY.resolvedTypeToKeY(type).orElseThrow();
     }
 
     private void addPrimitiveType(ResolvedType type) {
@@ -209,7 +203,8 @@ public class JP2KeYTypeConverter {
         storeInCache(type, result);
 
         // delayed creation of virtual array declarations to avoid cycles
-        var arrayType = createArrayType(getKeYJavaType(componentType), lookupInCache(type));
+        var arrayKJT = jp2KeY.resolvedTypeToKeY(type).orElseThrow();
+        var arrayType = createArrayType(getKeYJavaType(componentType), arrayKJT);
         result.setJavaType(arrayType);
     }
 

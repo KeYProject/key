@@ -79,7 +79,7 @@ public class JavaService {
     /**
      * Counter used to enumerate the anonymous implicit classes used in parsing of Java Fragments
      */
-    private static AtomicInteger interactCounter = new AtomicInteger();
+    private static final AtomicInteger INTERACT_COUNTER = new AtomicInteger();
 
     /**
      * the object that handles the transformation from recoder AST to KeY AST
@@ -111,18 +111,6 @@ public class JavaService {
      */
     public JP2KeYTypeConverter getTypeConverter() {
         return typeConverter;
-    }
-
-    public KeYJPMapping rec2key() {
-        return mapping;
-    }
-
-    private void insertToMap(Node r, ModelElement k) {
-        if (r != null && k != null) {
-            rec2key().put(r, k);
-        } else {
-            LOGGER.debug("Rec2Key.insertToMap: Omitting entry  (r = {}  -> k =  {})", r, k);
-        }
     }
 
     private static BuildingIssue buildingIssueFromProblem(Problem problem) {
@@ -470,7 +458,7 @@ public class JavaService {
         }
 
         // tell the mapping that we have parsed the special classes
-        rec2key().parsedSpecial(true);
+        mapping.parsedSpecial(true);
     }
 
     /**
@@ -581,11 +569,7 @@ public class JavaService {
             if (names.contains(var.name().toString())) {
                 continue;
             }
-            VariableSpecification keyVarSpec = lookupVarSpec(var);
             names.add(var.name().toString());
-            if (keyVarSpec == null) {
-                keyVarSpec = new FieldSpecification(var);
-            }
 
             if (var.getKeYJavaType() == null) {
                 /// The program variable "variant" introduced to prove loop termination has sort
@@ -597,17 +581,19 @@ public class JavaService {
                 continue;
             }
 
+            VariableSpecification keyVarSpec =
+                lookupVarSpec(var).orElseGet(() -> new FieldSpecification(var));
+
             Type javaType = var.getKeYJavaType().getJavaType();
             if (javaType == null)
                 continue;
             String typeName = javaType.getFullName();
 
 
-            FieldDeclaration recVar = new FieldDeclaration(new NodeList<>(),
-                new VariableDeclarator(name2typeReference(typeName), keyVarSpec.getName()));
+            var decl = new VariableDeclarator(name2typeReference(typeName), keyVarSpec.getName());
+            var field = new FieldDeclaration(new NodeList<>(), decl);
 
-            classContext.addMember(recVar);
-            insertToMap(recVar.getVariables().get(0), keyVarSpec);
+            classContext.addMember(field);
         }
     }
 
@@ -616,14 +602,14 @@ public class JavaService {
      * <p>
      * used by addProgramVariablesToClassContext
      */
-    private VariableSpecification lookupVarSpec(ProgramVariable pv) {
+    private Optional<VariableSpecification> lookupVarSpec(ProgramVariable pv) {
         for (final Object o : mapping.elemsKeY()) {
             if ((o instanceof VariableSpecification)
                     && ((VariableSpecification) o).getProgramVariable() == pv) {
-                return (VariableSpecification) o;
+                return Optional.of((VariableSpecification) o);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -639,31 +625,6 @@ public class JavaService {
         } catch (IllegalArgumentException e) {
             return new ClassOrInterfaceType(null, typeName);
         }
-
-        /*
-         * PackageReference pr = null;
-         * String baseType = TypeNameTranslator.getBaseType(typeName);
-         * int idx = baseType.indexOf('.');
-         * int lastIndex = 0;
-         * String anonType = "";
-         * while (idx != -1 && baseType.charAt(lastIndex) >= 'a'
-         * && baseType.charAt(lastIndex) <= 'z') {
-         * String s = baseType.substring(lastIndex, idx);
-         * pr = new PackageReference(pr, new Identifier(s));
-         * lastIndex = idx + 1;
-         * idx = baseType.indexOf('.', lastIndex);
-         * }
-         * baseType = anonType + baseType;
-         * Identifier typeId;
-         * if (baseType.charAt(0) == '<') {
-         * typeId = new ImplicitIdentifier(baseType.substring(lastIndex));
-         * } else {
-         * typeId = new ObjectTypeIdentifier(baseType.substring(lastIndex));
-         * }
-         * TypeReference result = new TypeReference(pr, typeId);
-         * result.setDimensions(TypeNameTranslator.getDimensions(typeName));
-         * return result;
-         */
     }
 
     /**
@@ -787,8 +748,8 @@ public class JavaService {
      * @return a newly created recoder ClassDeclaration with a unique name
      */
     private ClassOrInterfaceDeclaration interactClassDecl() {
-        return new ClassOrInterfaceDeclaration(new NodeList<>(), false,
-            "$virtual_class_for_parsing" + interactCounter.incrementAndGet());
+        return new CompilationUnit("$virtual_package_for_parsing")
+                .addClass("$virtual_class_for_parsing" + INTERACT_COUNTER.incrementAndGet());
     }
 
     // ----- helpers
