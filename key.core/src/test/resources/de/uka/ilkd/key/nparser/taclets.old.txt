@@ -1032,7 +1032,7 @@ apply_eq_pseudo_eq {
 \assumes ([equals(mul(aePseudoLeft,aePseudoLeftCoeff),aePseudoRight)]==>[]) 
 \find(equals(aePseudoTargetLeft,aePseudoTargetRight))
 \sameUpdateLevel\replacewith(if-then-else(and(equals(aePseudoTargetLeft,mul(aePseudoLeft,aePseudoTargetFactor)),not(equals(aePseudoLeftCoeff,Z(0(#))))),equals(mul(aePseudoRight,aePseudoTargetFactor),mul(aePseudoTargetRight,aePseudoLeftCoeff)),equals(aePseudoTargetLeft,aePseudoTargetRight))) 
-\heuristics(notHumanReadable, notHumanReadable, polySimp_applyEqPseudo, polySimp_leftNonUnit)
+\heuristics(notHumanReadable, polySimp_applyEqPseudo, polySimp_leftNonUnit)
 Choices: true}
 -----------------------------------------------------
 == apply_eq_pseudo_geq (apply_eq_pseudo_geq) =========================================

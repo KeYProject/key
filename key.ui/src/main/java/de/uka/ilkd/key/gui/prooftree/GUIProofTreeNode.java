@@ -66,6 +66,9 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
         // the proof tree in ProofTreeView.java
         Node n = getNode();
         if (n != null) {
+            if (n.getExtraNodeLabel() != null) {
+                return n.serialNr() + ":" + n.getExtraNodeLabel();
+            }
             return n.serialNr() + ":" + n.name();
         } else {
             return "Invalid WeakReference";

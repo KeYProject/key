@@ -25,12 +25,6 @@ public final class ProofRegroup {
 
     }
 
-    private static final List<List<String>> GROUPS =
-        List.of(List.of("alpha", "delta"), List.of("negationNormalForm", "conjNormalForm"),
-            List.of("polySimp_expand", "polySimp_normalise", "polySimp_newSym",
-                "polySimp_pullOutGcd", "polySimp_applyEq", "polySimp_applyEqRigid",
-                "simplify_literals"));
-
     public static void regroupProof(Proof proof, DependencyGraph graph) {
         /*
          * alpha, delta
@@ -39,6 +33,7 @@ public final class ProofRegroup {
          *
          * simplify_enlarging, simplify, simplify_select
          */
+        var GROUPS = ProofRegroupSettingsProvider.getSettings().getGroups();
         Deque<Node> q = new ArrayDeque<>();
         q.add(proof.root());
         while (!q.isEmpty()) {
@@ -53,16 +48,16 @@ public final class ProofRegroup {
             Rule rule = r.rule();
             if (rule instanceof Taclet) {
                 var ruleSets = ((Taclet) rule).getRuleSets();
-                int matchingGroup = -1;
+                String matchingGroup = null;
                 for (var name : ruleSets) {
-                    for (int i = 0; i < GROUPS.size(); i++) {
+                    for (String i : GROUPS.keySet()) {
                         if (GROUPS.get(i).contains(name.toString())) {
                             matchingGroup = i;
                             break;
                         }
                     }
                 }
-                if (matchingGroup != -1) {
+                if (matchingGroup != null) {
                     List<Node> group = new ArrayList<>();
                     group.add(n);
                     while (true) {
@@ -100,6 +95,7 @@ public final class ProofRegroup {
                     }
                     if (group.size() > 1) {
                         group.get(0).setGroup(group);
+                        group.get(0).setExtraNodeLabel(matchingGroup);
                         for (int i = 1; i < group.size(); i++) {
                             group.get(i).setHideInProofTree(true);
                         }

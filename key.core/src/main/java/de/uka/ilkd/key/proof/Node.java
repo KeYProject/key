@@ -111,6 +111,7 @@ public class Node implements Iterable<Node>, Comparable<Node> {
 
     private List<Node> group = null;
     private boolean hideInProofTree = false;
+    private String extraNodeLabel = null;
 
 
     /**
@@ -398,16 +399,6 @@ public class Node implements Iterable<Node>, Comparable<Node> {
         if (parent != null) {
             parent.remove(this);
         }
-    }
-
-    public void removeChildren() {
-        children.clear();
-    }
-
-    public void replaceChild(int i, Node newChild) {
-        children.set(i, newChild);
-        newChild.parent = this;
-        newChild.siblingNr = i;
     }
 
     /**
@@ -855,6 +846,14 @@ public class Node implements Iterable<Node>, Comparable<Node> {
 
     public void setGroup(List<Node> group) {
         this.group = group;
+    }
+
+    public String getExtraNodeLabel() {
+        return extraNodeLabel;
+    }
+
+    public void setExtraNodeLabel(String extraNodeLabel) {
+        this.extraNodeLabel = extraNodeLabel;
     }
 
     public boolean isHideInProofTree() {
