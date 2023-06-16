@@ -3,10 +3,9 @@ package de.uka.ilkd.key.parser;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Optional;
 
-import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.PosConvertException;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.KeyIO;
@@ -16,6 +15,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import de.uka.ilkd.key.util.parsing.HasLocation;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.jupiter.api.Test;
@@ -70,15 +70,14 @@ public class TestParser {
     @Test
     public void testIssue1566() throws ProblemLoaderException {
         File file = new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/1566/a.key");
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file.toPath());
+        KeYEnvironment.load(file.toPath());
     }
 
     @Test()
     public void testIssue39() {
         assertThrows(ProblemLoaderException.class, () -> {
             File file = new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/39/A.java");
-            KeYEnvironment<DefaultUserInterfaceControl> env =
-                KeYEnvironment.load(file.toPath(), null, null, null);
+            KeYEnvironment.load(file.toPath(), null, null, null);
         });
 
     }
@@ -88,13 +87,12 @@ public class TestParser {
         var file =
             new File(HelperClassForTests.TESTCASE_DIRECTORY, "parserErrorTest/AssignToArray.java");
         var problemLoaderException = assertThrows(ProblemLoaderException.class, () -> {
-            KeYEnvironment<DefaultUserInterfaceControl> env =
-                KeYEnvironment.load(file.toPath(), null, null, null);
+            KeYEnvironment.load(file.toPath(), null, null, null);
         });
-        var error = (PosConvertException) problemLoaderException.getCause();
-        assertEquals(4, error.getPosition().line());
-        assertEquals(9, error.getPosition().column());
-        assertEquals(file.toURI(), error.getLocation().getFileURI().orElseThrow());
-
+        var error = (HasLocation) problemLoaderException.getCause();
+        var location = error.getLocation();
+        assertEquals(4, location.getPosition().line());
+        assertEquals(9, location.getPosition().column());
+        assertEquals(Optional.of(file.toURI()), location.getFileURI());
     }
 }

@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.util;
 
-import java.net.MalformedURLException;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Position;
@@ -28,7 +27,7 @@ public class RecognitionException extends Exception implements HasLocation {
 
     @Nullable
     @Override
-    public Location getLocation() throws MalformedURLException {
+    public Location getLocation() {
         return new Location(MiscTools.getURIFromTokenSource(input.getSourceName()), position);
     }
 }

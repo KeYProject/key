@@ -8,7 +8,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
-import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -29,6 +28,7 @@ import de.uka.ilkd.key.parser.NotDeclException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.parsing.BuildingException;
+import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -569,7 +569,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         } catch (Exception e) {
             try {
                 sjb.javaBlock = jr.readBlockWithEmptyContext(cleanJava, schema);
-            } catch (ConvertException e1) {
+            } catch (BuildingExceptions e1) {
                 throw new BuildingException(t, "Could not parse java: '" + cleanJava + "'", e1);
             }
         }

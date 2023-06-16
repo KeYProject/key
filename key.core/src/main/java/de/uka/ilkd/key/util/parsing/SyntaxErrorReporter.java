@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.util.parsing;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -166,10 +165,19 @@ public class SyntaxErrorReporter extends BaseErrorListener {
 
     public static class ParserException extends RuntimeException implements HasLocation {
         private final List<SyntaxError> errors;
+        private final Location location;
 
         public ParserException(String msg, List<SyntaxError> errors) {
             super(msg);
             this.errors = errors;
+            if (errors.isEmpty()) {
+                location = Location.UNDEFINED;
+            } else {
+                SyntaxError e = errors.get(0);
+                // e.charPositionInLine is 0 based!
+                location =
+                    new Location(e.source, Position.fromOneZeroBased(e.line, e.charPositionInLine));
+            }
         }
 
         public String print(String[] lines, CharSequence delimter) {
@@ -189,14 +197,8 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         }
 
         @Override
-        public Location getLocation() throws MalformedURLException {
-            if (!errors.isEmpty()) {
-                SyntaxError e = errors.get(0);
-                // e.charPositionInLine is 0 based!
-                return new Location(e.source,
-                    Position.fromOneZeroBased(e.line, e.charPositionInLine));
-            }
-            return null;
+        public Location getLocation() {
+            return location;
         }
     }
 }

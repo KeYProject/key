@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.util.parsing;
 
-import java.net.MalformedURLException;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.parser.Location;
@@ -41,7 +40,7 @@ public class LocatableException extends RuntimeException implements HasLocation 
 
     @Nullable
     @Override
-    public Location getLocation() throws MalformedURLException {
+    public Location getLocation() {
         return location;
     }
 }

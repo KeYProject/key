@@ -114,7 +114,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         this.evaluator = new ConstantExpressionEvaluator();
     }
 
-    private void reportError(Node n, String message) {
+    private <T> T reportError(Node n, String message) {
         JavaBuildingIssue problem = new JavaBuildingIssue(message, n);
         throw new JavaBuildingExceptions(Collections.singletonList(problem));
     }
@@ -373,9 +373,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return false;
     }
 
+    @Nonnull
     private PositionInfo createPositionInfo(Node node) {
         if (node.getRange().isEmpty()) {
-            return null;
+            return PositionInfo.UNDEFINED;
         }
         var r = node.getRange().get();
 
@@ -1380,14 +1381,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             String sortName = name.substring(PREFIX.length()).trim();
             Sort sort = services.getNamespaces().sorts().lookup(sortName);
             if (sort == null) {
-                reportError(n, format(
+                return reportError(n, format(
                     "Requested to find the default value of an unknown sort '%s'.", sortName));
             }
 
             var doc = sort.getDocumentation();
 
             if (doc == null) {
-                reportError(n,
+                return reportError(n,
                     format("Requested to find the default value for the sort '%s', " +
                         "which does not have a documentary comment. The sort is defined at %s. ",
                         sortName, sort.getOrigin()));
@@ -1399,7 +1400,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 int closing = doc.indexOf(')', pos);
 
                 if (closing < 0) {
-                    throw new ConvertException(
+                    return reportError(n,
                         format(
                             "Forgotten closing parenthesis on @defaultValue annotation for sort '%s' in '%s'",
                             sortName, sort.getOrigin()));
@@ -1408,11 +1409,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 // set this as the function name, as the user had written \dl_XXX
                 name = doc.substring(start, closing);
             } else {
-                throw new ConvertException(
+                return reportError(n,
                     format("Could not infer the default value for the given sort '%s'. " +
                         "The sort found was as '%s' and the sort's documentation is '%s'. " +
-                        "Did you forget @defaultValue(XXX) in the documentation? Line/Col: %s",
-                        sortName, sort, doc, null));
+                        "Did you forget @defaultValue(XXX) in the documentation?",
+                        sortName, sort, doc));
             }
         }
 
@@ -1451,7 +1452,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             services.getNamespaces().functions().lookup(new de.uka.ilkd.key.logic.Name(name));
 
         if (named == null) {
-            reportError(n,
+            return reportError(n,
                 format("In an embedded DL expression, %s is not a known DL function name.", name));
         }
 

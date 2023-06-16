@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.util.parsing;
 
-import java.net.MalformedURLException;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.parser.Location;
 
@@ -16,8 +14,6 @@ public interface HasLocation {
      * This method can be used to obtain the Location (1-based line and column!) of the exception.
      *
      * @return the location of the exception
-     * @throws MalformedURLException if the URL for the location can not be created
      */
-    @Nullable
-    Location getLocation() throws MalformedURLException;
+    Location getLocation();
 }

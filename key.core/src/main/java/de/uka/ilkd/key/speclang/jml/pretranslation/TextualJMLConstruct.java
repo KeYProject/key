@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nonnull;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.parser.Location;
@@ -24,7 +23,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 public abstract class TextualJMLConstruct {
 
     protected final ImmutableList<JMLModifier> mods;
-    private Location location = new Location(null, Position.UNDEFINED);
+    private Location location = Location.UNDEFINED;
     private boolean loopContract;
 
     /**

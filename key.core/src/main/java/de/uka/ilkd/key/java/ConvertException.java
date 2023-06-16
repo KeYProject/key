@@ -10,21 +10,7 @@ package de.uka.ilkd.key.java;
  *
  */
 public class ConvertException extends RuntimeException {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 7112945712992241455L;
-
-    public ConvertException(String errmsg) {
-        super(errmsg);
-    }
-
-    public ConvertException(Throwable pe) {
-        super(pe);
-    }
-
-    public ConvertException(String errmsg, Throwable cause) {
-        super(errmsg, cause);
+    public ConvertException(String message) {
+        super(message);
     }
 }

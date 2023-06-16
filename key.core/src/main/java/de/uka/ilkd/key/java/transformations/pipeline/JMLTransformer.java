@@ -207,6 +207,17 @@ public final class JMLTransformer extends JavaTransformer {
         return new Comment[] { var };
     }
 
+    private static void insertAtSourceNodeOffsetInParent(Statement node, Comment[] comments) {
+        assert comments.length > 0;
+
+        // determine parent, child index
+        BlockStmt astParent =
+            (BlockStmt) comments[0].getParentNode().orElseThrow().getParentNode().orElseThrow();
+        int childIndex =
+            astParent.getChildNodes().indexOf(comments[0].getParentNode().get());
+        astParent.addStatement(childIndex, node);
+    }
+
     private void transformFieldDecl(TextualJMLFieldDecl decl, Comment[] originalComments)
             throws SLTranslationException {
         assert originalComments.length > 0;
@@ -375,15 +386,6 @@ public final class JMLTransformer extends JavaTransformer {
 
     private void transformAssertStatement(TextualJMLAssertStatement stat,
             Comment[] originalComments) throws SLTranslationException {
-        if (originalComments.length <= 0)
-            throw new IllegalArgumentException();
-
-        // determine parent, child index
-        BlockStmt astParent = (BlockStmt) originalComments[0]
-                .getParentNode().get().getParentNode().get();
-        int childIndex =
-            astParent.getChildNodes().indexOf(originalComments[0].getParentNode().get());
-
         ParserRuleContext ctx = stat.getContext().first;
 
         // Convert to block with block contract, attach to AST.
@@ -402,7 +404,7 @@ public final class JMLTransformer extends JavaTransformer {
             BlockStmt block = new BlockStmt();
             block.setAssociatedSpecificationComments(new NodeList<>(new BlockComment(comment)));
             updatePositionInformation(block, location.getPosition());
-            astParent.addStatement(childIndex, block);
+            insertAtSourceNodeOffsetInParent(block, originalComments);
         } catch (Throwable e) {
             throw new SLTranslationException(
                 format("%s (%s)", e.getMessage(), e.getClass().getName()), location, e);
@@ -411,14 +413,6 @@ public final class JMLTransformer extends JavaTransformer {
 
     private void transformSetStatement(TextualJMLSetStatement stat,
             Comment[] originalComments) throws SLTranslationException {
-        assert originalComments.length > 0;
-
-        // determine parent, child index
-        BlockStmt astParent =
-            (BlockStmt) originalComments[0].getParentNode().get().getParentNode().get();
-        int childIndex =
-            astParent.getChildNodes().indexOf(originalComments[0].getParentNode().get());
-
         // parse statement, attach to AST
         var location = Location.fromToken(stat.getAssignment().start);
         try {
@@ -430,7 +424,8 @@ public final class JMLTransformer extends JavaTransformer {
             var assignStmt = stmtList.get(0);
             shiftPosition(assignStmt, location.getPosition());
             // updatePositionInformation(assignStmt, pos);
-            astParent.addStatement(childIndex, assignStmt);
+
+            insertAtSourceNodeOffsetInParent(assignStmt, originalComments);
         } catch (Throwable e) {
             throw new SLTranslationException(e.getMessage() + " (" + e.getClass().getName() + ")",
                 location, e);
@@ -492,6 +487,11 @@ public final class JMLTransformer extends JavaTransformer {
             // collect comments
             // (last position are comments of type declaration itself)
             Comment[] comments = null;
+
+            if (children[i] instanceof Comment) {
+                // Line comments can be orphan comments!
+
+            }
             if (i < children.length) {
                 comments = getCommentsAndSetParent(children[i]);
             } else if (td.getAssociatedSpecificationComments().isPresent()) {

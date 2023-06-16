@@ -38,6 +38,8 @@ public final class Location implements Comparable<Location> {
      */
     private final Position position;
 
+    public static final Location UNDEFINED = Location.UNDEFINED;
+
     /**
      * Creates a new Location with the given resource location, line and column numbers.
      *

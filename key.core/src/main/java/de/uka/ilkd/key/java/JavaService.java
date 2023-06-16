@@ -114,7 +114,6 @@ public class JavaService {
     }
 
     private static BuildingIssue buildingIssueFromProblem(Problem problem) {
-        LOGGER.error(problem.toString(), problem.getCause().orElse(null));
         var loc = problem.getLocation()
                 .flatMap(TokenRange::toRange)
                 .map(b -> b.begin)
@@ -136,11 +135,6 @@ public class JavaService {
 
         var errors = new ArrayList<BuildingIssue>(result.getProblems().size());
         for (Problem problem : result.getProblems()) {
-            if (problem.getMessage().contains("ghost")) {
-                // TODO javaparser A hack to remove false alarm caused by ModifiersVisitor check
-                continue;
-            }
-
             errors.add(buildingIssueFromProblem(problem));
         }
 
@@ -285,11 +279,13 @@ public class JavaService {
      * @author mulbrich
      */
     private List<CompilationUnit> parseLibs(FileRepo fileRepo) throws IOException {
-        LOGGER.debug("Parsing libs");
+        LOGGER.debug("Parsing internal classes");
         var internal = parseInternalClasses(fileRepo);
+        LOGGER.debug("Finished internal classes");
         List<FileCollection> sources = new ArrayList<>();
         List<CompilationUnit> rcuList = new ArrayList<>(internal);
 
+        LOGGER.debug("Parsing library classes");
         for (var cp : programFactory.getSourcePaths()) {
             if (Files.isDirectory(cp)) {
                 sources.add(new DirectoryFileCollection(cp.toFile()));
