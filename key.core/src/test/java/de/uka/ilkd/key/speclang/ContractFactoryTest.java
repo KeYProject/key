@@ -68,11 +68,20 @@ public class ContractFactoryTest {
      */
     @Test
     public void testCombineEqualAssignable() throws SLTranslationException {
-        String contract = "/*@ normal_behavior\n" + "@  requires a != 5;\n"
-            + "@  ensures \\result == 3;\n" + "@  assignable \\nothing;\n" + "@\n" + "@ also\n"
-            + "@\n" + "@ exceptional_behavior\n" + "@  requires a == 5;\n"
-            + "@  assignable \\nothing;\n" + "@  signals (RuntimeException e) true;\n"
-            + "@  signals_only RuntimeException;\n" + "@*/";
+        String contract = """
+                /*@ normal_behavior
+                @  requires a != 5;
+                @  ensures \\result == 3;
+                @  assignable \\nothing;
+                @
+                @ also
+                @
+                @ exceptional_behavior
+                @  requires a == 5;
+                @  assignable \\nothing;
+                @  signals (RuntimeException e) true;
+                @  signals_only RuntimeException;
+                @*/""";
         Term woLabels = calculateCombinedModWOLabels(contract);
         assertEquals("empty", woLabels.toString());
     }
@@ -85,11 +94,20 @@ public class ContractFactoryTest {
      */
     @Test
     public void testCombineEmptyAssignable() throws SLTranslationException {
-        String contract = "/*@ normal_behavior\n" + "@  requires a != 5;\n"
-            + "@  ensures \\result == 3;\n" + "@  assignable \\strictly_nothing;\n" + "@\n"
-            + "@ also\n" + "@\n" + "@ exceptional_behavior\n" + "@  requires a == 5;\n"
-            + "@  assignable \\nothing;\n" + "@  signals (RuntimeException e) true;\n"
-            + "@  signals_only RuntimeException;\n" + "@*/";
+        String contract = """
+                /*@ normal_behavior
+                @  requires a != 5;
+                @  ensures \\result == 3;
+                @  assignable \\strictly_nothing;
+                @
+                @ also
+                @
+                @ exceptional_behavior
+                @  requires a == 5;
+                @  assignable \\nothing;
+                @  signals (RuntimeException e) true;
+                @  signals_only RuntimeException;
+                @*/""";
         Term woLabels = calculateCombinedModWOLabels(contract);
         assertEquals("empty<<impl>>", woLabels.toString());
     }
@@ -102,11 +120,20 @@ public class ContractFactoryTest {
      */
     @Test
     public void testCombineDifferentAssignable() throws SLTranslationException {
-        String contract = "/*@ normal_behavior\n" + "@  requires a != 5;\n"
-            + "@  ensures \\result == 3;\n" + "@  assignable l;\n" + "@\n" + "@ also\n" + "@\n"
-            + "@ exceptional_behavior\n" + "@  requires a == 5;\n" + "@  assignable \\nothing;\n"
-            + "@  signals (RuntimeException e) true;\n" + "@  signals_only RuntimeException;\n"
-            + "@*/";
+        String contract = """
+                /*@ normal_behavior
+                @  requires a != 5;
+                @  ensures \\result == 3;
+                @  assignable l;
+                @
+                @ also
+                @
+                @ exceptional_behavior
+                @  requires a == 5;
+                @  assignable \\nothing;
+                @  signals (RuntimeException e) true;
+                @  signals_only RuntimeException;
+                @*/""";
         Term woLabels = calculateCombinedModWOLabels(contract);
         assertEquals("intersect(if-then-else(equals(a,Z(5(#))),empty,allLocs),"
             + "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::$l),"

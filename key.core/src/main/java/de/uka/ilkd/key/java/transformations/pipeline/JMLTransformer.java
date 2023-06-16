@@ -55,6 +55,8 @@ import com.github.javaparser.ast.visitor.VoidVisitorWithDefaults;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
 
+import javax.annotation.Nonnull;
+
 import static java.lang.String.format;
 
 /**
@@ -198,8 +200,7 @@ public final class JMLTransformer extends JavaTransformer {
         return pe.getChildNodes().toArray(new Node[0]);
     }
 
-    private Comment[] getCommentsAndSetParent(Node pe) {
-        assert pe != null;
+    private Comment[] getCommentsAndSetParent(@Nonnull Node pe) {
         if (pe.getAssociatedSpecificationComments().isEmpty()) {
             return new Comment[0];
         }
@@ -379,7 +380,6 @@ public final class JMLTransformer extends JavaTransformer {
         jmlComment.setParentNode(methodDecl);
         newComments.add(jmlComment);
         methodDecl.setAssociatedSpecificationComments(newComments);
-
     }
 
     private void transformAssertStatement(TextualJMLAssertStatement stat,
@@ -400,15 +400,16 @@ public final class JMLTransformer extends JavaTransformer {
 
         try {
             String comment = format(
-                "/*@ normal_behavior\n"
-                    + "  @ %s %s\n"
-                    + "  @ assignable \\strictly_nothing;\n"
-                    + "  @*/",
+                    """
+                    /*@ normal_behavior
+                      @ %s %s
+                      @ assignable \\strictly_nothing;
+                      @*/
+                    """,
                 stat.getKind() == Kind.ASSERT ? "ensures" : "ensures_free", stat.getClauseText());
 
-            BlockStmt block =
-                services.getParser().parseBlock(format("{%n%s%n{;;}}", comment)).getResult().get();
-
+            BlockStmt block = new BlockStmt();
+            block.setAssociatedSpecificationComments(new NodeList<>(new BlockComment(comment)));
             updatePositionInformation(block, location.getPosition());
             astParent.addStatement(childIndex, block);
         } catch (Throwable e) {
@@ -686,8 +687,7 @@ public final class JMLTransformer extends JavaTransformer {
                      * This may cause a MalformedURLException later if a parsing error occurs,
                      * but at least show the error message of the parser.
                      */
-                    URI resource = unit.getStorage().map(it -> it.getPath().toUri())
-                            .orElse(null);
+                    URI resource = unit.getStorage().map(it -> it.getPath().toUri()).orElse(null);
 
                     transformClassLevelComments(td, resource);
 
