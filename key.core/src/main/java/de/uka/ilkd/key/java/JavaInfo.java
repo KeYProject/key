@@ -542,7 +542,8 @@ public final class JavaInfo {
     public IProgramMethod getProgramMethod(KeYJavaType classType, String methodName,
             List<List<KeYJavaType>> signature) {
         ImmutableList<KeYJavaType> partialSignature = ImmutableSLList.nil();
-        return getProgramMethodFromPartialSignature(classType, methodName, signature, partialSignature);
+        return getProgramMethodFromPartialSignature(classType, methodName, signature,
+            partialSignature);
     }
 
     /**
@@ -566,22 +567,22 @@ public final class JavaInfo {
 
     public IProgramMethod getToplevelPM(KeYJavaType kjt, String methodName,
             ImmutableList<KeYJavaType> sig) {
-        return findToplevelPM(kjt, methodName, sig, kjt);
+        return findToplevelPM(kjt, methodName, sig);
     }
 
     /* This method has been introduced as bugfix to #1487 */
     private IProgramMethod findToplevelPM(KeYJavaType kjt, String methodName,
-            ImmutableList<KeYJavaType> sig, KeYJavaType context) {
+            ImmutableList<KeYJavaType> sig) {
 
-        ImmutableList<KeYJavaType> allSupertypes = getAllSupertypes(kjt);
-        ImmutableList<KeYJavaType> removed = allSupertypes.removeAll(kjt);
-        for (KeYJavaType sup : removed) {
-            final IProgramMethod result = findToplevelPM(sup, methodName, sig, context);
-            if (result != null) {
-                return result;
-            }
-        }
-        return getProgramMethod(kjt, methodName, sig, context);
+        // ImmutableList<KeYJavaType> allSupertypes = getAllSupertypes(kjt);
+        // ImmutableList<KeYJavaType> removed = allSupertypes.removeAll(kjt);
+        // for (KeYJavaType sup : removed) {
+        // final IProgramMethod result = findToplevelPM(sup, methodName, sig);
+        // if (result != null) {
+        // return result;
+        // }
+        // }
+        return getProgramMethod(kjt, methodName, sig);
     }
 
 

@@ -13,6 +13,27 @@
 
 package de.uka.ilkd.key.java.transformations.pipeline;
 
+import java.net.URI;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.LinkedList;
+import java.util.List;
+import javax.annotation.Nonnull;
+
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.pretranslation.*;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
+import de.uka.ilkd.key.speclang.njml.JmlIO;
+import de.uka.ilkd.key.speclang.njml.PreParser;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.StringUtil;
+
 import com.github.javaparser.Position;
 import com.github.javaparser.Range;
 import com.github.javaparser.ast.CompilationUnit;
@@ -32,27 +53,8 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.EmptyStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.visitor.VoidVisitorWithDefaults;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.pretranslation.*;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
-import de.uka.ilkd.key.speclang.njml.JmlIO;
-import de.uka.ilkd.key.speclang.njml.PreParser;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.StringUtil;
-
-import javax.annotation.Nonnull;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.LinkedList;
-import java.util.List;
 
 import static java.lang.String.format;
 
@@ -65,9 +67,9 @@ import static java.lang.String.format;
  */
 public final class JMLTransformer extends JavaTransformer {
     public static final EnumSet<JMLModifier> JAVA_MODS =
-            EnumSet.of(JMLModifier.ABSTRACT, JMLModifier.FINAL, JMLModifier.PRIVATE,
-                    JMLModifier.PROTECTED,
-                    JMLModifier.PUBLIC, JMLModifier.STATIC);
+        EnumSet.of(JMLModifier.ABSTRACT, JMLModifier.FINAL, JMLModifier.PRIVATE,
+            JMLModifier.PROTECTED,
+            JMLModifier.PUBLIC, JMLModifier.STATIC);
 
 
     /**
@@ -82,7 +84,7 @@ public final class JMLTransformer extends JavaTransformer {
      * ghost fields and model method declarations.
      *
      * @param services the CrossReferenceServiceConfiguration to access model
-     *                 information
+     *        information
      */
     public JMLTransformer(TransformationPipelineServices services) {
         super(services);
@@ -134,7 +136,7 @@ public final class JMLTransformer extends JavaTransformer {
      * (in order to preserve position information).
      */
     private PositionedString convertToString(ImmutableList<JMLModifier> mods,
-                                             ParserRuleContext ctx) {
+            ParserRuleContext ctx) {
         StringBuilder sb = new StringBuilder();
         for (var mod : mods) {
             if (JAVA_MODS.contains(mod)) {
@@ -151,7 +153,7 @@ public final class JMLTransformer extends JavaTransformer {
         }
         var pos = de.uka.ilkd.key.java.Position.newOneBased(ctx.start.getLine(), column);
         var location = new Location(
-                MiscTools.getURIFromTokenSource(ctx.start.getTokenSource().getSourceName()), pos);
+            MiscTools.getURIFromTokenSource(ctx.start.getTokenSource().getSourceName()), pos);
         return new PositionedString(sb.toString(), location);
     }
 
@@ -221,23 +223,24 @@ public final class JMLTransformer extends JavaTransformer {
         if (decl.getMods().contains(JMLModifier.MODEL)) {
             isModel = true;
             if (isGhost) {
-                throw new SLTranslationException("JML field declaration cannot be both ghost and model!", declWithMods.location);
+                throw new SLTranslationException(
+                    "JML field declaration cannot be both ghost and model!", declWithMods.location);
             }
         }
         if (!(isGhost || isModel)) {
             String s = declWithMods.text;
             s = s.substring(0, s.indexOf(' '));
             throw new SLTranslationException(
-                    format("Could not translate JML specification. You have either tried to use an" +
-                                    " unsupported keyword (%s) or a JML field declaration without a ghost or model modifier.",
-                            s),
-                    declWithMods.location);
+                format("Could not translate JML specification. You have either tried to use an" +
+                    " unsupported keyword (%s) or a JML field declaration without a ghost or model modifier.",
+                    s),
+                declWithMods.location);
         }
 
         // determine parent, child index
         Node astParent = originalComments[0].getParentNode().flatMap(Node::getParentNode).get();
         int childIndex =
-                astParent.getChildNodes().indexOf(originalComments[0].getParentNode().get());
+            astParent.getChildNodes().indexOf(originalComments[0].getParentNode().get());
 
         // parse declaration, attach to AST
         FieldDeclaration fieldDecl;
@@ -245,8 +248,8 @@ public final class JMLTransformer extends JavaTransformer {
             if (astParent instanceof TypeDeclaration) {
                 var result = services.getParser()
                         .parseBodyDeclaration(
-                                fillWithWhitespaces(declWithMods.location.getPosition(),
-                                        declWithMods.text));
+                            fillWithWhitespaces(declWithMods.location.getPosition(),
+                                declWithMods.text));
                 // TODO weigl add parseFieldDeclaration(declWithMods.text); ?
 
                 if (result.isSuccessful()) {
@@ -278,24 +281,24 @@ public final class JMLTransformer extends JavaTransformer {
                         mods = new NodeList<>();
                     }
                     mods.add(
-                            new Modifier(isGhost ? Modifier.Keyword.GHOST : Modifier.Keyword.MODEL));
+                        new Modifier(isGhost ? Modifier.Keyword.GHOST : Modifier.Keyword.MODEL));
                     fieldDecl.setModifiers(mods);
 
                 } else {
                     throw new SLTranslationException("Could not parse " + declWithMods.text,
-                            declWithMods.location);
+                        declWithMods.location);
                 }
             } else {
                 assert astParent instanceof BlockStmt;
                 if (isModel) {
                     throw new SLTranslationException(
-                            "JML model fields cannot be declared within a method!",
-                            declWithMods.location);
+                        "JML model fields cannot be declared within a method!",
+                        declWithMods.location);
                 }
 
                 var block = services.getParser().parseBlock(
-                        fillWithWhitespaces(declWithMods.location.getPosition(),
-                                "{" + declWithMods.text + "}"));
+                    fillWithWhitespaces(declWithMods.location.getPosition(),
+                        "{" + declWithMods.text + "}"));
                 if (!block.isSuccessful()) {
                     throw new SLTranslationException("", declWithMods.location);
                 }
@@ -310,8 +313,8 @@ public final class JMLTransformer extends JavaTransformer {
             }
         } catch (Throwable e) {
             throw new SLTranslationException(
-                    e.getMessage() + " (" + e.getClass().getName() + ")",
-                    declWithMods.location, e);
+                e.getMessage() + " (" + e.getClass().getName() + ")",
+                declWithMods.location, e);
         }
     }
 
@@ -326,17 +329,17 @@ public final class JMLTransformer extends JavaTransformer {
 
         // prepend Java modifiers
         PositionedString declWithMods =
-                new PositionedString(decl.getParsableDeclaration());
+            new PositionedString(decl.getParsableDeclaration());
 
         // only handle model methods
         if (!decl.getMods().contains(JMLModifier.MODEL)) {
             throw new SLTranslationException("JML method declaration has to be model!",
-                    declWithMods.location);
+                declWithMods.location);
         }
 
         // determine parent
         TypeDeclaration<?> astParent =
-                (TypeDeclaration<?>) originalComments[0].getParentNode().get();
+            (TypeDeclaration<?>) originalComments[0].getParentNode().get();
 
         // parse declaration, attach to AST
         MethodDeclaration methodDecl;
@@ -349,7 +352,7 @@ public final class JMLTransformer extends JavaTransformer {
             // about the 0 see the comment in transformFieldDecl() above
         } else {
             throw new SLTranslationException(
-                    "could not parse", declWithMods.location);
+                "could not parse", declWithMods.location);
         }
 
         // add model modifier
@@ -371,7 +374,7 @@ public final class JMLTransformer extends JavaTransformer {
     }
 
     private void transformAssertStatement(TextualJMLAssertStatement stat,
-                                          Comment[] originalComments) throws SLTranslationException {
+            Comment[] originalComments) throws SLTranslationException {
         if (originalComments.length <= 0)
             throw new IllegalArgumentException();
 
@@ -379,7 +382,7 @@ public final class JMLTransformer extends JavaTransformer {
         BlockStmt astParent = (BlockStmt) originalComments[0]
                 .getParentNode().get().getParentNode().get();
         int childIndex =
-                astParent.getChildNodes().indexOf(originalComments[0].getParentNode().get());
+            astParent.getChildNodes().indexOf(originalComments[0].getParentNode().get());
 
         ParserRuleContext ctx = stat.getContext().first;
 
@@ -388,13 +391,13 @@ public final class JMLTransformer extends JavaTransformer {
 
         try {
             String comment = format(
-                    """
-                    /*@ normal_behavior
-                      @ %s %s
-                      @ assignable \\strictly_nothing;
-                      @*/
-                    """,
-                    stat.getKind() == Kind.ASSERT ? "ensures" : "ensures_free", stat.getClauseText());
+                """
+                        /*@ normal_behavior
+                          @ %s %s
+                          @ assignable \\strictly_nothing;
+                          @*/
+                        """,
+                stat.getKind() == Kind.ASSERT ? "ensures" : "ensures_free", stat.getClauseText());
 
             BlockStmt block = new BlockStmt();
             block.setAssociatedSpecificationComments(new NodeList<>(new BlockComment(comment)));
@@ -402,17 +405,19 @@ public final class JMLTransformer extends JavaTransformer {
             astParent.addStatement(childIndex, block);
         } catch (Throwable e) {
             throw new SLTranslationException(
-                    format("%s (%s)", e.getMessage(), e.getClass().getName()), location, e);
+                format("%s (%s)", e.getMessage(), e.getClass().getName()), location, e);
         }
     }
 
     private void transformSetStatement(TextualJMLSetStatement stat,
-                                       Comment[] originalComments) throws SLTranslationException {
+            Comment[] originalComments) throws SLTranslationException {
         assert originalComments.length > 0;
 
         // determine parent, child index
-        BlockStmt astParent = (BlockStmt) originalComments[0].getParentNode().get().getParentNode().get();
-        int childIndex = astParent.getChildNodes().indexOf(originalComments[0].getParentNode().get());
+        BlockStmt astParent =
+            (BlockStmt) originalComments[0].getParentNode().get().getParentNode().get();
+        int childIndex =
+            astParent.getChildNodes().indexOf(originalComments[0].getParentNode().get());
 
         // parse statement, attach to AST
         var location = Location.fromToken(stat.getAssignment().start);
@@ -427,7 +432,7 @@ public final class JMLTransformer extends JavaTransformer {
             astParent.addStatement(childIndex, assignStmt);
         } catch (Throwable e) {
             throw new SLTranslationException(e.getMessage() + " (" + e.getClass().getName() + ")",
-                    location, e);
+                location, e);
         }
     }
 
@@ -443,24 +448,24 @@ public final class JMLTransformer extends JavaTransformer {
                 if (it.getRange().isPresent()) {
                     var range = it.getRange().get();
                     it.setRange(
-                            Range.range(range.begin.line + line,
-                                    range.begin.column + column,
-                                    range.end.line + line,
-                                    range.end.column + column));
+                        Range.range(range.begin.line + line,
+                            range.begin.column + column,
+                            range.end.line + line,
+                            range.end.column + column));
                 }
             });
         }
     }
 
     private void transformMergePointDecl(TextualJMLMergePointDecl stat,
-                                         Comment[] originalComments) throws SLTranslationException {
+            Comment[] originalComments) throws SLTranslationException {
         assert originalComments.length > 0;
 
         // determine parent, child index
         BlockStmt astParent =
-                (BlockStmt) originalComments[0].getParentNode().get().getParentNode().get();
+            (BlockStmt) originalComments[0].getParentNode().get().getParentNode().get();
         int childIndex =
-                astParent.getChildNodes().indexOf(originalComments[0].getParentNode().get());
+            astParent.getChildNodes().indexOf(originalComments[0].getParentNode().get());
 
         // create MPS, attach to AST
         try {
@@ -468,13 +473,13 @@ public final class JMLTransformer extends JavaTransformer {
             mps.setAssociatedSpecificationComments(new NodeList<>(Arrays.asList(originalComments)));
 
             Position startPosition =
-                    astParent.getChildNodes().get(childIndex).getRange().get().begin;
+                astParent.getChildNodes().get(childIndex).getRange().get().begin;
             shiftPosition(mps, startPosition.line, startPosition.column);
             astParent.addStatement(childIndex, mps);
         } catch (Throwable e) {
             throw new SLTranslationException(
-                    format("%s (%s)", e.getMessage(), e.getClass().getName()),
-                    stat.getLocation(), e);
+                format("%s (%s)", e.getMessage(), e.getClass().getName()),
+                stat.getLocation(), e);
         }
     }
 
@@ -505,13 +510,13 @@ public final class JMLTransformer extends JavaTransformer {
             String concatenatedComment = concatenate(comments);
             Position recoderPos = comments[0].getRange().get().begin;
             de.uka.ilkd.key.java.Position pos = de.uka.ilkd.key.java.Position.newOneBased(
-                    recoderPos.line, recoderPos.column);
+                recoderPos.line, recoderPos.column);
 
             // call preparser
             JmlIO io = new JmlIO();
             PreParser pp = new PreParser();
             ImmutableList<TextualJMLConstruct> constructs =
-                    pp.parseClassLevel(concatenatedComment, fileName, pos);
+                pp.parseClassLevel(concatenatedComment, fileName, pos);
             warnings = warnings.append(io.getWarnings());
 
             // handle model and ghost declarations in textual constructs
@@ -525,8 +530,8 @@ public final class JMLTransformer extends JavaTransformer {
                 } else if (c instanceof TextualJMLSetStatement) {
                     if (i == 0 || !(children[i - 1] instanceof MethodDeclaration)) {
                         throw new SLTranslationException(
-                                "A set assignment only allowed inside of a method body.",
-                                new Location(fileName, pos));
+                            "A set assignment only allowed inside of a method body.",
+                            new Location(fileName, pos));
                     }
                     Statement emptyStmt = new EmptyStmt();
                     Comment emptyStmtComment = new BlockComment();
@@ -534,7 +539,7 @@ public final class JMLTransformer extends JavaTransformer {
                     BlockStmt methodBody = ((MethodDeclaration) children[i - 1]).getBody().get();
                     methodBody.addStatement(emptyStmt);
                     transformSetStatement((TextualJMLSetStatement) c,
-                            new Comment[]{emptyStmtComment});
+                        new Comment[] { emptyStmtComment });
                 }
             }
         }
@@ -561,12 +566,12 @@ public final class JMLTransformer extends JavaTransformer {
         String concatenatedComment = concatenate(comments);
         Position recoderPos = comments[0].getRange().get().begin;
         de.uka.ilkd.key.java.Position pos = de.uka.ilkd.key.java.Position.newOneBased(
-                recoderPos.line, recoderPos.column);
+            recoderPos.line, recoderPos.column);
 
         // call preparser
         var io = new PreParser();
         ImmutableList<TextualJMLConstruct> constructs =
-                io.parseMethodLevel(concatenatedComment, fileName, pos);
+            io.parseMethodLevel(concatenatedComment, fileName, pos);
         warnings = warnings.append(io.getWarnings());
 
         // handle ghost declarations and set assignments in textual constructs
@@ -600,7 +605,7 @@ public final class JMLTransformer extends JavaTransformer {
                 TypeDeclaration<?> td1 = unit.getType(j - 1);
                 TypeDeclaration<?> td2 = unit.getType(j);
                 td1.setAssociatedSpecificationComments(
-                        td2.getAssociatedSpecificationComments().get());
+                    td2.getAssociatedSpecificationComments().get());
             }
 
             // copy comments of compilation unit to last type declaration
@@ -617,7 +622,7 @@ public final class JMLTransformer extends JavaTransformer {
                 NodeList<Comment> tdComments = new NodeList<>();
                 if (unit.getComments() != null) {
                     tdComments.addAll(TransformationPipelineServices.cloneList(
-                            unit.getAssociatedSpecificationComments().get()));
+                        unit.getAssociatedSpecificationComments().get()));
                 }
                 td.setAssociatedSpecificationComments(tdComments);
             }
@@ -683,7 +688,7 @@ public final class JMLTransformer extends JavaTransformer {
                 // might be ImplicitEnumMethod
                 if (aMethodList.getBody().isPresent()) {
                     transformMethodLevelCommentsHelper(aMethodList.getBody().get(),
-                            resource);
+                        resource);
                 }
             }
         } catch (SLTranslationException e) {

@@ -918,9 +918,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
     private SLExpression lookupIdentifier(String lookupName, SLExpression receiver,
             SLParameters params, ParserRuleContext ctx) {
         exc.updatePosition(ctx.start);
-        if (lookupName.startsWith("getOne")) {
-            int i = 0;
-        }
 
         SLExpression result = null;
         try {
