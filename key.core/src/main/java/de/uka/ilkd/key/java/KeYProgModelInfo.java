@@ -3,6 +3,7 @@ package de.uka.ilkd.key.java;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.abstraction.*;
@@ -390,14 +391,15 @@ public class KeYProgModelInfo {
      *         a debug output is written to console).
      */
     public IProgramMethod getProgramMethod(@Nonnull KeYJavaType ct, String name,
-            ImmutableList<KeYJavaType> signature) {
+            Iterable<KeYJavaType> signature) {
         if (ct.getJavaType() instanceof ArrayType) {
             return getImplicitMethod(ct, name);
         }
 
         var type = getJavaParserType(ct);
         var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
-        List<ResolvedType> jpSignature = signature.map(this::getJavaParserType).toList();
+        List<ResolvedType> jpSignature = StreamSupport.stream(signature.spliterator(), false)
+                .map(this::getJavaParserType).toList();
         var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);
         return (IProgramMethod) mapping
                 .resolvedDeclarationToKeY(method.getDeclaration().orElseThrow())
