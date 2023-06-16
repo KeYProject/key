@@ -405,8 +405,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     private List<Comment> createComments(Node n) {
-        // TODO weigl
-        return Collections.emptyList();
+        // TODO javaparser this is always empty?
+        return n.getAssociatedSpecificationComments()
+                .map(l -> l.stream().map(c -> new Comment(c.asString(), createPositionInfo(c))).toList())
+                .orElse(Collections.emptyList());
     }
 
     private <T> ImmutableArray<T> map(NodeList<? extends Visitable> nodes) {
