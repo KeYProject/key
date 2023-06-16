@@ -12,6 +12,7 @@ import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 @SuppressWarnings("unchecked")
 abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractBuilder.class);
     @Nullable
     private List<BuildingIssue> buildingIssues = null;
     @Nullable
@@ -35,21 +37,17 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
 
     /**
      * Helper function for avoiding cast.
-     *
-     * @param ctx
-     * @param <T>
-     * @return
      */
-    public <T> @Nullable T accept(@Nullable RuleContext ctx) {
+    public <U> @Nullable U accept(@Nullable RuleContext ctx) {
         if (ctx == null) {
             return null;
         }
         try {
-            return (T) ctx.accept(this);
+            return (U) ctx.accept(this);
         } catch (BuildingExceptions | BuildingException e) {
             throw e;
         } catch (Exception e) {
-            LoggerFactory.getLogger(AbstractBuilder.class).error("", e);
+            LOGGER.error("", e);
             if (ctx instanceof ParserRuleContext) {
                 throw new BuildingException((ParserRuleContext) ctx, e);
             }
@@ -66,26 +64,22 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
         return aggregate;
     }
 
-    /**
-     * @param <T>
-     * @return
-     */
-    protected <T> T peek() {
-        return (T) (parameters.size() == 0 ? null : parameters.peek());
+    protected <U> U peek() {
+        return (U) (parameters == null || parameters.isEmpty() ? null : parameters.peek());
     }
 
-    protected <T> T acceptFirst(Collection<? extends RuleContext> seq) {
+    protected <U> U acceptFirst(Collection<? extends RuleContext> seq) {
         if (seq.isEmpty()) {
             return null;
         }
         return accept(seq.iterator().next());
     }
 
-    protected <T> T pop() {
+    protected <U> U pop() {
         if (parameters == null) {
             throw new IllegalStateException("Stack is empty");
         }
-        return (T) parameters.pop();
+        return (U) parameters.pop();
     }
 
     protected void push(Object... obj) {
@@ -97,13 +91,13 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
         }
     }
 
-    protected <T> @Nullable T accept(@Nullable RuleContext ctx, Object... args) {
+    protected <U> @Nullable U accept(@Nullable RuleContext ctx, Object... args) {
         if (parameters == null) {
             parameters = new Stack<>();
         }
         int stackSize = parameters.size();
         push(args);
-        T t = accept(ctx);
+        U t = accept(ctx);
         // Stack hygiene
         while (parameters.size() > stackSize) {
             parameters.pop();
@@ -111,17 +105,17 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
         return t;
     }
 
-    protected <T> T oneOf(ParserRuleContext... ctxs) {
+    protected <U> U oneOf(ParserRuleContext... ctxs) {
         for (ParserRuleContext ctx : ctxs) {
             if (ctx != null) {
-                return (T) ctx.accept(this);
+                return (U) ctx.accept(this);
             }
         }
         return null;
     }
 
-    protected <T> List<T> mapOf(Collection<? extends ParserRuleContext> argument) {
-        return argument.stream().map(it -> (T) it.accept(this)).filter(Objects::nonNull)
+    protected <U> List<U> mapOf(Collection<? extends ParserRuleContext> argument) {
+        return argument.stream().map(it -> (U) it.accept(this)).filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
@@ -150,20 +144,18 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
         return buildingIssues;
     }
 
-    protected BuildingIssue addWarning(ParserRuleContext ctx, Exception e, String message) {
+    protected void addWarning(ParserRuleContext ctx, Exception e, String message) {
         BuildingIssue be = BuildingIssue.createWarning(message, ctx, e);
         getBuildingIssues().add(be);
-        return be;
     }
 
-    protected BuildingIssue addWarning(ParserRuleContext node, String description) {
-        return addWarning(node, null, description);
+    protected void addWarning(ParserRuleContext node, String description) {
+        addWarning(node, null, description);
     }
 
-    protected BuildingIssue addWarning(String description) {
+    protected void addWarning(String description) {
         BuildingIssue be = BuildingIssue.createWarning(description, (ParserRuleContext) null, null);
         getBuildingIssues().add(be);
-        return be;
     }
     // endregion
 
@@ -171,10 +163,6 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
 
     /**
      * Throws a semanticError for the given ast node and message.
-     *
-     * @param ctx
-     * @param format
-     * @param args
      */
     protected void semanticError(ParserRuleContext ctx, String format, Object... args) {
         throw new BuildingException(ctx, String.format(format, args));
@@ -182,8 +170,6 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
 
     /**
      * Wraps an exception into a {@link BuildingException}
-     *
-     * @param e
      */
     protected void throwEx(Throwable e) {
         throw new BuildingException(e);

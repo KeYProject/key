@@ -364,7 +364,7 @@ public class TestTermParser extends AbstractTestTermParser {
                 T c;
                 static T d;
                 public T e;
-                
+
                 public static T f;
                 protected T g; protected T h;
                 public T query()             {  }

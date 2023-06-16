@@ -144,7 +144,7 @@ public class JavaParserFactory {
 
     /**
      * If set to true the symbol solver do not use the {@link ClassLoaderTypeSolver} with the system
-     * class class loader.
+     * class loader.
      * This means, that classes defined by the JRE are not found, if they are not given in the class
      * path.
      * In particular, only JavaRedux and Red classes (if added) are
