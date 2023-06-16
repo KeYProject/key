@@ -260,12 +260,6 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
             for (ConstructorDeclaration constructor : constructors) {
                 normalform(cd, constructor);
             }
-
-            // TODO weigl why add all methods as members?
-            var mdl = td.getMethods();
-            for (MethodDeclaration md : mdl) {
-                cd.addMember(md);
-            }
         }
     }
 }
