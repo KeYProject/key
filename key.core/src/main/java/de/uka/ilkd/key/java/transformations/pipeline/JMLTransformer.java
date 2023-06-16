@@ -25,7 +25,6 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
-import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
@@ -204,6 +203,7 @@ public final class JMLTransformer extends JavaTransformer {
             return new Comment[0];
         }
         Comment var = pe.getComment().get();
+        var.setParentNode(pe);
         return new Comment[] { var };
     }
 
@@ -424,7 +424,8 @@ public final class JMLTransformer extends JavaTransformer {
         try {
             String assignment = getFullText(stat.getAssignment()).substring(3);
             var result = services.getParser().parseBlock("{" + assignment + "}");
-            var stmtList = result.getResult().get().getStatements();
+            // TODO javaparser error handling!
+            var stmtList = result.getResult().orElseThrow().getStatements();
             assert stmtList.size() == 1;
             var assignStmt = stmtList.get(0);
             shiftPosition(assignStmt, location.getPosition());
@@ -473,7 +474,7 @@ public final class JMLTransformer extends JavaTransformer {
             mps.setAssociatedSpecificationComments(new NodeList<>(Arrays.asList(originalComments)));
 
             Position startPosition =
-                astParent.getChildNodes().get(childIndex).getRange().get().begin;
+                astParent.getChildNodes().get(childIndex).getRange().orElseThrow().begin;
             shiftPosition(mps, startPosition.line, startPosition.column);
             astParent.addStatement(childIndex, mps);
         } catch (Throwable e) {
@@ -513,11 +514,10 @@ public final class JMLTransformer extends JavaTransformer {
                 recoderPos.line, recoderPos.column);
 
             // call preparser
-            JmlIO io = new JmlIO();
             PreParser pp = new PreParser();
             ImmutableList<TextualJMLConstruct> constructs =
                 pp.parseClassLevel(concatenatedComment, fileName, pos);
-            warnings = warnings.append(io.getWarnings());
+            warnings = warnings.append(pp.getWarnings());
 
             // handle model and ghost declarations in textual constructs
             // (and set assignments which RecodeR evilly left hanging *behind*

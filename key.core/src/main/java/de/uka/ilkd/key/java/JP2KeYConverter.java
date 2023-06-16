@@ -702,7 +702,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         }
         var methodName = qualifier == null ? new ProgramElementName(n.getNameAsString())
                 : new ProgramElementName(n.getNameAsString(), qualifier);
-        ReferencePrefix prefix = accepto(n.getScope());
+        // TODO javaparser this can be a nameexpr (see above) e.g. in Class.staticMethod()
+        ReferencePrefix prefix = null;
         ImmutableArray<Expression> args = map(n.getArguments());
         return new MethodReference(pi, c, prefix, methodName, args);
     }
