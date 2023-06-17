@@ -129,9 +129,11 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         ImmutableList<TacletApp> assumesCandidates = theApp
                 .findIfFormulaInstantiations(state.getFirstOpenAutomaticGoal().sequent(), services);
 
-        assumesCandidates = ImmutableList.fromList(filterList(p, assumesCandidates));
+        assumesCandidates = ImmutableList.fromList(filterList(services, p, assumesCandidates));
 
-        if (assumesCandidates.size() != 1) {
+        if (assumesCandidates.size() == 0) {
+            throw new ScriptException("No \\assumes instantiation");
+        } else if (assumesCandidates.size() != 1) {
             throw new ScriptException("Not a unique \\assumes instantiation");
         }
 
@@ -230,7 +232,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     private TacletApp findTacletApp(Parameters p, EngineState state) throws ScriptException {
 
         ImmutableList<TacletApp> allApps = findAllTacletApps(p, state);
-        List<TacletApp> matchingApps = filterList(p, allApps);
+        List<TacletApp> matchingApps = filterList(state.getProof().getServices(), p, allApps);
 
         if (matchingApps.isEmpty()) {
             throw new ScriptException("No matching applications.");
@@ -348,7 +350,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     /*
      * Filter those apps from a list that are according to the parameters.
      */
-    private List<TacletApp> filterList(Parameters p, ImmutableList<TacletApp> list) {
+    private List<TacletApp> filterList(Services services, Parameters p, ImmutableList<TacletApp> list) {
         List<TacletApp> matchingApps = new ArrayList<>();
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp) {

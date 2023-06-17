@@ -161,9 +161,9 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
             sb.append(";\n");
 
         } else if (ctx.assertion != null) {
-            sb.append("cut ").append(ctx.assertion).append(";\n");
+            sb.append("cut ").append(ctx.assertion.getText()).append(";\n");
             sb.append("branches \"push\";\n");
-            sb.append("branches \"select\" child=0;\n");
+            sb.append("branches \"select\" child=1;\n");
             if (ctx.proofCmd().isEmpty()) {
                 sb.append("auto;\n");
             } else {
@@ -171,7 +171,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                     renderProofCmd(proofCmdContext, sb);
                 }
             }
-            sb.append("branches \"select\" child=1;\n");
+            sb.append("branches \"select\" child=0;\n");
             sb.append("branches \"pop\";\n");
 
         } else if (!ctx.proofCmdCase().isEmpty()) {
