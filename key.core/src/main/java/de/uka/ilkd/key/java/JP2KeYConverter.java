@@ -101,7 +101,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
      * Access to this map is performed via the method
      * <code>getProgramVariableForFieldSpecification</code>
      */
-    private final HashMap<FullVariableDeclarator, ProgramVariable> fieldSpecificationMapping =
+    private final Map<FullVariableDeclarator, ProgramVariable> fieldSpecificationMapping =
         new LinkedHashMap<>();
 
     JP2KeYVisitor(@Nonnull Services services,
@@ -1950,12 +1950,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 return false;
             FullVariableDeclarator that = (FullVariableDeclarator) o;
             return isFinal == that.isFinal && isStatic == that.isStatic && isModel == that.isModel
-                    && decl.equals(that.decl);
+                    && decl == that.decl;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(decl, isFinal, isStatic, isModel);
+            return Objects.hash(System.identityHashCode(decl), isFinal, isStatic, isModel);
         }
     }
 }

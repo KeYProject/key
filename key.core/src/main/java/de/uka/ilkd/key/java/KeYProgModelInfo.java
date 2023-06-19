@@ -203,7 +203,9 @@ public class KeYProgModelInfo {
      * @return true iff name refers to a package
      */
     public boolean isPackage(String name) {
-        return !services.getJavaService().getProgramFactory().getTypeSolver().hasType(name);
+        // TODO javaparser
+        // var t = !services.getJavaService().getProgramFactory().getTypeSolver().hasType(name);
+        return false;
     }
 
     /**
@@ -278,7 +280,7 @@ public class KeYProgModelInfo {
         // return rct.getProgramModelInfo().getConstructors(rct, getRecoderTypes(signature));
         // return cd;
         // TODO weigl
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**

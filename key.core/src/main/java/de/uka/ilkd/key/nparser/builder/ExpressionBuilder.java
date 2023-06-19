@@ -1186,112 +1186,113 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     private Term visitAccesstermAsJava(KeYParser.AccesstermContext ctx) {
         String firstName = accept(ctx.firstName);
-        if (isPackage(firstName) || isClass(firstName)) {
-            // consume suffix as long as it is part of a java class or package
-            String javaPackage = isPackage(firstName) ? firstName : "";
-            boolean startWithPackage = isPackage(firstName);
-            String javaClass = isClass(firstName) ? firstName : "";
+        if (!(isPackage(firstName) || isClass(firstName))) {
+            return null;
+        }
+        // consume suffix as long as it is part of a java class or package
+        String javaPackage = isPackage(firstName) ? firstName : "";
+        boolean startWithPackage = isPackage(firstName);
+        String javaClass = isClass(firstName) ? firstName : "";
 
-            int currentSuffix = 0;
+        int currentSuffix = 0;
 
-            // region split up package and class name
-            while (startWithPackage
-                    && ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext) {
-                KeYParser.Attribute_simpleContext a =
+        // region split up package and class name
+        while (startWithPackage
+                && ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext) {
+            KeYParser.Attribute_simpleContext a =
                     (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
-                if (a.heap != null) {
-                    break; // No heap on java package allowed
-                }
-                @Nullable
-                Object cur = accept(a.id);
-                if (isPackage(javaPackage + "." + cur)) {
-                    javaPackage += "." + cur;
-                    currentSuffix++;
-                } else {
-                    break;
-                }
+            if (a.heap != null) {
+                break; // No heap on java package allowed
             }
+            @Nullable
+            Object cur = accept(a.id);
+            if (isPackage(javaPackage + "." + cur)) {
+                javaPackage += "." + cur;
+                currentSuffix++;
+            } else {
+                break;
+            }
+        }
 
-            while (ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext) {
-                KeYParser.Attribute_simpleContext a =
+        while (ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext) {
+            KeYParser.Attribute_simpleContext a =
                     (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
-                if (a.heap != null) {
-                    break; // No heap on java Class name allowed
-                }
-                String cur = accept(a.id);
-                String candidate = javaClass.isEmpty() ? cur : (javaClass + "." + cur);
-                if (isClass(javaPackage + (javaPackage.isEmpty() ? "" : ".") + candidate)) {
-                    javaClass = candidate;
-                    currentSuffix++;
-                } else {
-                    break;
-                }
+            if (a.heap != null) {
+                break; // No heap on java Class name allowed
             }
-            // endregion
+            String cur = accept(a.id);
+            String candidate = javaClass.isEmpty() ? cur : (javaClass + "." + cur);
+            if (isClass(javaPackage + (javaPackage.isEmpty() ? "" : ".") + candidate)) {
+                javaClass = candidate;
+                currentSuffix++;
+            } else {
+                break;
+            }
+        }
+        // endregion
 
-            KeYJavaType kjt =
+        KeYJavaType kjt =
                 getTypeByClassName(javaPackage + (javaPackage.isEmpty() ? "" : ".") + javaClass);
 
-            if (ctx.call() != null) {
-                addWarning(ctx, "Call of package or class");
-            }
-
-            Term current = null;
-            for (int i = currentSuffix; i < ctx.attribute().size(); i++) {
-                KeYParser.AttributeContext attrib = ctx.attribute(i);
-                boolean isLast = i == ctx.attribute().size() - 1;
-
-                if (attrib instanceof KeYParser.Attribute_simpleContext) {
-                    KeYParser.Attribute_simpleContext simpleContext =
-                        (KeYParser.Attribute_simpleContext) attrib;
-                    boolean isCall = simpleContext.call() != null;
-                    ParserRuleContext heap = simpleContext.heap; // TODO?
-                    String attributeName = accept(simpleContext.id);
-                    ProgramVariable maybeAttr = getJavaInfo().getAttribute(attributeName, kjt);
-                    if (maybeAttr != null) {
-                        Operator op = getAttributeInPrefixSort(kjt.getSort(), attributeName);
-                        current = createAttributeTerm(current, op, ctx);
-                    } else {
-                        IProgramMethod pm = getStaticQuery(kjt, attributeName);
-                        if (pm != null) {
-                            Term[] args = visitArguments(simpleContext.call().argument_list());
-                            current = getJavaInfo().getStaticProgramMethodTerm(attributeName, args,
-                                kjt.getFullName());
-                        } else {
-                            semanticError(ctx, "Unknown java attribute: %s", attributeName);
-                        }
-                        // TODO If not last attribute:
-                        addWarning(ctx, "");
-                        return current;
-                    }
-                } else if (attrib instanceof KeYParser.Attribute_complexContext) {
-                    KeYParser.Attribute_complexContext attrid =
-                        (KeYParser.Attribute_complexContext) attrib;
-                    String className = attrid.sort.getText();
-                    String attributeName = attrid.id.getText();
-                    Term[] args = visitArguments(attrid.call().argument_list());
-                    current = getServices().getJavaInfo().getStaticProgramMethodTerm(attributeName,
-                        args, className);
-                    if (current == null) {
-                        final Sort sort = lookupSort(className);
-                        if (sort == null) {
-                            semanticError(ctx, "Could not find matching sort for " + className);
-                        }
-                        kjt = getServices().getJavaInfo().getKeYJavaType(sort);
-                        if (kjt == null) {
-                            semanticError(ctx, "Found logic sort for " + className
-                                + " but no corresponding java type!");
-                        }
-                    }
-                    return current;
-                } else if (attrib instanceof KeYParser.Attribute_starContext) {
-                    // TODO
-                }
-            }
-            return current;
+        if (ctx.call() != null) {
+            addWarning("Call of package or class");
         }
-        return null;
+
+        Term current = null;
+        for (int i = currentSuffix; i < ctx.attribute().size(); i++) {
+            KeYParser.AttributeContext attrib = ctx.attribute(i);
+            boolean isLast = i == ctx.attribute().size() - 1;
+
+            if (attrib instanceof KeYParser.Attribute_simpleContext) {
+                KeYParser.Attribute_simpleContext simpleContext =
+                        (KeYParser.Attribute_simpleContext) attrib;
+                boolean isCall = simpleContext.call() != null;
+                ParserRuleContext heap = simpleContext.heap; // TODO?
+                String attributeName = accept(simpleContext.id);
+                ProgramVariable maybeAttr = getJavaInfo().getAttribute(attributeName, kjt);
+                if (maybeAttr != null) {
+                    Operator op = getAttributeInPrefixSort(kjt.getSort(), attributeName);
+                    current = createAttributeTerm(current, op, ctx);
+                } else {
+                    IProgramMethod pm = getStaticQuery(kjt, attributeName);
+                    if (pm != null) {
+                        Term[] args = visitArguments(simpleContext.call().argument_list());
+                        current = getJavaInfo().getStaticProgramMethodTerm(attributeName, args,
+                                kjt.getFullName());
+                    } else {
+                        semanticError(ctx, "Unknown java attribute: %s", attributeName);
+                    }
+                    // TODO If not last attribute:
+                    addWarning("");
+                    return current;
+                }
+            } else if (attrib instanceof KeYParser.Attribute_complexContext) {
+                KeYParser.Attribute_complexContext attrid =
+                        (KeYParser.Attribute_complexContext) attrib;
+                String className = attrid.sort.getText();
+                String attributeName = attrid.id.getText();
+                Term[] args = visitArguments(attrid.call().argument_list());
+                current = getServices().getJavaInfo().getStaticProgramMethodTerm(attributeName,
+                        args, className);
+                if (current == null) {
+                    final Sort sort = lookupSort(className);
+                    if (sort == null) {
+                        semanticError(ctx, "Could not find matching sort for " + className);
+                    }
+                    kjt = getServices().getJavaInfo().getKeYJavaType(sort);
+                    if (kjt == null) {
+                        semanticError(ctx, "Found logic sort for " + className
+                                + " but no corresponding java type!");
+                    }
+                }
+                return current;
+            } else if (attrib instanceof KeYParser.Attribute_starContext) {
+                // TODO
+            }
+        }
+        return current;
     }
+
 
     @Override
     public Object visitTermParen(KeYParser.TermParenContext ctx) {
