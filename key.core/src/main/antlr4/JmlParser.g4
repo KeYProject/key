@@ -194,7 +194,7 @@ assert_statement: (ASSERT expression | UNREACHABLE) (assertionProof SEMI? | SEMI
 
 // --- proofs in JML -- could be file on its own.
 
-assertionProof: BY ((SC_LBRACE ( proofCmd )+ SC_RBRACE) | proofCmd);
+assertionProof: BY ((SC_LBRACE ( proofCmd )+ SC_RBRACE SEMI_TOPLEVEL?) | proofCmd);
 proofCmd:
     cmd=SC_IDENT ( proofArg )* SC_SEMI
   | SC_ASSERT assertion=STRING_LITERAL (SC_SEMI | SC_BY (proofCmd | SC_LBRACE ( proofCmd )+ SC_RBRACE) )?

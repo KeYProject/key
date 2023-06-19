@@ -504,7 +504,7 @@ SC_ASSERT: 'assert';
 SC_STRING: '"' -> pushMode(string), more;
 SC_CASE: 'case';
 SC_DEFAULT: 'default';
-SC_COLON: ';';
+SC_COLON: ':';
 SC_EQUAL_SINGLE: '=';
 SC_IDENT: LETTER (LETTERORDIGIT)*;
 SC_DECLITERAL: DECDIGIT+;
