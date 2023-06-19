@@ -45,9 +45,35 @@ public class ValueInjectorTest {
     }
 
     @Test
+    public void testUnknownArguments() {
+        PP pp = new PP();
+        Map<String, String> args = new HashMap<>();
+        args.put("i", "42");
+        args.put("b", "true");
+        args.put("unknownParameter", "unknownValue");
+        assertThrows(UnknownArgumentException.class,
+                () -> ValueInjector.injection(new PPCommand(), pp, args));
+    }
+
+    @Test
+    public void testVarargs() throws Exception {
+        PP pp = new PP();
+        Map<String, String> args = new HashMap<>();
+        args.put("#literal", "here goes the entire string...");
+        args.put("i", "42");
+        args.put("b", "true");
+        args.put("var_21", "21");
+        args.put("var_other", "otherString");
+        ValueInjector.injection(new PPCommand(), pp, args);
+        assertEquals("21", pp.varargs.get("21"));
+        assertEquals("otherString", pp.varargs.get("other"));
+        assertEquals(2, pp.varargs.size());
+    }
+
+    @Test
     public void testInferScriptArguments() throws NoSuchFieldException {
         List<ProofScriptArgument<PP>> meta = ArgumentsLifter.inferScriptArguments(PP.class, null);
-        assertEquals(3, meta.size());
+        assertEquals(4, meta.size());
 
         {
             ProofScriptArgument<PP> b = meta.get(0);
@@ -82,6 +108,8 @@ public class ValueInjectorTest {
         int i;
         @Option(value = "s", required = false)
         String s;
+        @Varargs(as = String.class, prefix = "var_")
+        Map<String, String> varargs;
     }
 
     private static class PPCommand extends AbstractCommand<PP> {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 
@@ -46,7 +47,7 @@ public class ValueInjector {
      */
     public static <T> T injection(ProofScriptCommand<T> command, T obj,
             Map<String, String> arguments) throws ArgumentRequiredException,
-            InjectionReflectionException, NoSpecifiedConverterException, ConversionException {
+            InjectionReflectionException, NoSpecifiedConverterException, ConversionException, UnknownArgumentException {
         return getInstance().inject(command, obj, arguments);
     }
 
@@ -104,7 +105,7 @@ public class ValueInjector {
      */
     public <T> T inject(ProofScriptCommand<T> command, T obj, Map<String, String> arguments)
             throws ConversionException, InjectionReflectionException, NoSpecifiedConverterException,
-            ArgumentRequiredException {
+            ArgumentRequiredException, UnknownArgumentException {
         List<ProofScriptArgument<T>> meta =
             ArgumentsLifter.inferScriptArguments(obj.getClass(), command);
         List<ProofScriptArgument<T>> varArgs = new ArrayList<>(meta.size());
@@ -131,6 +132,14 @@ public class ValueInjector {
                     usedKeys.add(k);
                 }
             }
+        }
+
+        Optional<String> unused = arguments.keySet().stream()
+                .filter(it -> !usedKeys.contains(it) && !"#literal".equals(it))
+                .findAny();
+        if (unused.isPresent()) {
+//            throw new UnknownArgumentException("Unknown argument '" + unused.get() +
+//                    "' for command of class " + command.getClass().getSimpleName());
         }
 
         return obj;
