@@ -12,6 +12,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.scripts.meta.OptionalVarargs;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -75,6 +76,15 @@ public class SetCommand extends AbstractCommand {
                 default:
                     throw new IllegalArgumentException("stack must be either push or pop.");
             }
+        } else if(args.userKey != null) {
+            String[] kv = args.userKey.split(":", 2);
+            if(kv.length != 2) {
+                throw new IllegalArgumentException("userData must be of the form key:value. Use userData:\"myKey:myValue\".");
+            }
+            state.putUserData("user." + kv[0], kv[1]);
+        } else {
+            throw new IllegalArgumentException(
+                "You have to set oss, steps, stack, or key(s) and value(s).");
         }
 
         if (args.proofSteps != null) {
@@ -137,23 +147,26 @@ public class SetCommand extends AbstractCommand {
     }
 
     public static class Parameters {
-        /**
-         * One Step Simplification parameter
-         */
+
+        @Documentation("Enable/disable one-step simplification")
         @Option(value = "oss")
         public @Nullable Boolean oneStepSimplification;
 
-        /**
-         * Maximum number of proof steps parameter
-         */
+        @Documentation("Maximum number of proof steps")
         @Option(value = "steps")
         public @Nullable Integer proofSteps;
 
-        /** key-value pairs to set */
+        @Documentation("key-value pairs to set")
         @OptionalVarargs
         public Map<String, String> settings = HashMap.newHashMap(0);
 
+        @Documentation("Push or pop the current settings to/from a stack of settings (mostly used internally)")
         @Option(value = "stack")
         public @Nullable String stackAction;
+
+        @Documentation("Set user-defined key-value pair (Syntax: userData:\"key:value\")")
+        @Option(value = "userData")
+        public @Nullable String userKey;
+
     }
 }
