@@ -788,6 +788,9 @@ public final class IssueDialog extends JDialog {
         }
         String source = txtSource.getText();
         int offset = getOffsetFromLineColumn(source, pos);
+        while(offset < source.length() && Character.isWhitespace(source.charAt(offset))) {
+            offset ++;
+        }
         int end = offset;
         while (end < source.length() && !Character.isWhitespace(source.charAt(end))) {
             end++;
