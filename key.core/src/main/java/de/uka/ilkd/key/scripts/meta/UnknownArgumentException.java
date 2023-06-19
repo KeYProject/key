@@ -9,6 +9,12 @@ package de.uka.ilkd.key.scripts.meta;
  * @author Mattias Ulbrich
  */
 public class UnknownArgumentException extends InjectionException {
+
+    /**
+     * An argument required exception with no cause (to display).
+     *
+     * @param message the respective String message to be passed.
+     */
     public UnknownArgumentException(String message) {
         super(message);
     }
