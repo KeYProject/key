@@ -445,7 +445,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             // Redraw the tree in case the ProofTreeViewFilters have changed
             // since the last time the proof was loaded.
-            delegateModel.setFilterImmediately(filter, filter != null && filter.isActive());
+            delegateModel.setFilter(filter, filter != null && filter.isActive());
 
             // Expand previously visible rows.
             for (int i : rowsToExpand) {
@@ -473,6 +473,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
             expansionState = null;
         }
         proofTreeSearchPanel.reset();
+
+        for (ProofTreeViewFilter f : ProofTreeViewFilter.ALL) {
+            if (f.isActive()) {
+                setFilter(f, true);
+            }
+        }
     }
 
     public void removeProofs(Proof[] ps) {

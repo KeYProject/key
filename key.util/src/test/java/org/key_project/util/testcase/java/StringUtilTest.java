@@ -289,5 +289,9 @@ public class StringUtilTest {
             "   \n\t\fa234231hsdafhvnyxcksdaökfhsdaöfhsahövcln231847231 42310897423187sdfsdafbc\n",
             it -> true));
         assertEquals("", trim("", 'c'));
+
+        assertEquals(".", trim("\".\"", '"'));
+        assertEquals(".", trim(".", '"'));
+        assertEquals(".", trim(".", it -> false));
     }
 }

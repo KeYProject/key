@@ -141,6 +141,7 @@ public class Semisequent implements Iterable<SequentFormula> {
      */
     private SemisequentChangeInfo insertAndRemoveRedundancyHelper(int idx,
             SequentFormula sequentFormula, SemisequentChangeInfo semiCI, FormulaChangeInfo fci) {
+        assert idx >= 0;
 
         // Search for equivalent formulas and weakest constraint
         ImmutableList<SequentFormula> searchList = semiCI.getFormulaList();
@@ -256,6 +257,7 @@ public class Semisequent implements Iterable<SequentFormula> {
      */
     public SemisequentChangeInfo replace(PosInOccurrence pos, SequentFormula sequentFormula) {
         final int idx = indexOf(pos.sequentFormula());
+        assert idx >= 0;
         final FormulaChangeInfo fci = new FormulaChangeInfo(pos, sequentFormula);
         return insertAndRemoveRedundancyHelper(idx, sequentFormula, remove(idx), fci);
     }
@@ -419,6 +421,9 @@ public class Semisequent implements Iterable<SequentFormula> {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
         if (!(o instanceof Semisequent)) {
             return false;
         }

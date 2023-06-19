@@ -17,6 +17,7 @@ import javax.tools.*;
 
 import de.uka.ilkd.key.gui.PositionedIssueString;
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 
 import org.slf4j.Logger;
@@ -119,8 +120,10 @@ public class JavaCompilerCheckFacade {
             return diagnostics.getDiagnostics().stream().map(
                 it -> new PositionedIssueString(
                     it.getMessage(Locale.ENGLISH),
-                    fileManager.asPath(it.getSource()).toFile().getAbsolutePath(),
-                    Position.newOneBased((int) it.getLineNumber(), (int) it.getColumnNumber()),
+                    new Location(
+                        fileManager.asPath(it.getSource()).toFile().toPath().toUri(),
+                        Position.newOneBased((int) it.getLineNumber(),
+                            (int) it.getColumnNumber())),
                     it.getCode() + " " + it.getKind()))
                     .collect(Collectors.toList());
         });

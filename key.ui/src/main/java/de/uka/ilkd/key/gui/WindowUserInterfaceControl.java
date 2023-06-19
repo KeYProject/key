@@ -578,7 +578,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     public void showIssueDialog(Collection<PositionedString> issues) {
         final var set = issues.stream()
                 .map(it -> new PositionedIssueString(
-                    it.text, it.fileName, it.pos, ""))
+                    it.text, it.location, ""))
                 .collect(Collectors.toSet());
         var dialog = new IssueDialog(mainWindow, "Issues", set, true, null);
         dialog.setVisible(true);

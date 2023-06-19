@@ -3,11 +3,13 @@ package de.uka.ilkd.key.speclang.njml;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.net.URI;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.util.MiscTools;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -49,7 +51,7 @@ public class LabeledParserRuleContext {
 
     private static TermLabel constructTermLabel(ParserRuleContext ctx,
             OriginTermLabel.SpecType specType) {
-        String filename = ctx.start.getTokenSource().getSourceName();
+        URI filename = MiscTools.getURIFromTokenSource(ctx.start.getTokenSource());
         int line = ctx.start.getLine();
         OriginTermLabel.Origin origin = new OriginTermLabel.FileOrigin(specType, filename, line);
         return new OriginTermLabel(origin);

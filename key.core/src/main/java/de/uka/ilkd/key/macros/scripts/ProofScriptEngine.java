@@ -3,11 +3,11 @@ package de.uka.ilkd.key.macros.scripts;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Consumer;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Position;
@@ -39,10 +39,10 @@ public class ProofScriptEngine {
     /** The engine state map. */
     private EngineState stateMap;
 
-    private Observer commandMonitor;
+    private Consumer<Message> commandMonitor;
 
     public ProofScriptEngine(File file) throws IOException {
-        this.initialLocation = new Location(file.toURI().toURL(), Position.newOneBased(1, 1));
+        this.initialLocation = new Location(file.toURI(), Position.newOneBased(1, 1));
         this.script = Files.readString(file.toPath());
         this.initiallySelectedGoal = null;
     }
@@ -79,9 +79,7 @@ public class ProofScriptEngine {
     public void execute(AbstractUserInterfaceControl uiControl, Proof proof)
             throws IOException, InterruptedException, ScriptException {
 
-        ScriptLineParser mlp =
-            new ScriptLineParser(new StringReader(script), initialLocation.getFileURL());
-        mlp.setLocation(initialLocation);
+        ScriptLineParser mlp = new ScriptLineParser(new StringReader(script), initialLocation);
 
         stateMap = new EngineState(proof);
 
@@ -90,13 +88,9 @@ public class ProofScriptEngine {
         }
 
         // add the filename (if available) to the statemap.
-        URL url = initialLocation.getFileURL();
-        if (url != null) {
-            try {
-                stateMap.setBaseFileName(Paths.get(url.toURI()).toFile());
-            } catch (URISyntaxException e) {
-                throw new IOException(e);
-            }
+        Optional<URI> uri = initialLocation.getFileURI();
+        if (uri.isPresent()) {
+            stateMap.setBaseFileName(Paths.get(uri.get()).toFile());
         }
 
         // add the observer (if installed) to the state map
@@ -110,21 +104,25 @@ public class ProofScriptEngine {
                 throw new InterruptedException();
             }
 
-            Map<String, String> argMap = mlp.parseCommand();
-            if (argMap == null) {
+            ScriptLineParser.ParsedCommand parsed = mlp.parseCommand();
+            if (parsed == null) {
                 // EOF reached
                 break;
             }
+            final Map<String, String> argMap = parsed.args;
+            final Location start = parsed.start;
 
             String cmd = "'" + argMap.get(ScriptLineParser.LITERAL_KEY) + "'";
             if (cmd.length() > MAX_CHARS_PER_COMMAND) {
                 cmd = cmd.substring(0, MAX_CHARS_PER_COMMAND) + " ...'";
             }
 
+            final Node firstNode = stateMap.getFirstOpenAutomaticGoal().node();
             if (commandMonitor != null && stateMap.isEchoOn()
                     && !Optional.ofNullable(argMap.get(ScriptLineParser.COMMAND_KEY)).orElse("")
                             .startsWith(SYSTEM_COMMAND_PREFIX)) {
-                commandMonitor.update(null, cmd);
+                commandMonitor
+                        .accept(new ExecuteInfo(cmd, start, firstNode.serialNr()));
             }
 
             try {
@@ -139,12 +137,11 @@ public class ProofScriptEngine {
                     throw new ScriptException("Unknown command " + name);
                 }
 
-                if (!name.startsWith(SYSTEM_COMMAND_PREFIX) && stateMap.isEchoOn()) {
-                    LOGGER.debug("{}: {}", ++cnt, cmd);
-                }
-
                 Object o = command.evaluateArguments(stateMap, argMap);
-                final Node firstNode = stateMap.getFirstOpenAutomaticGoal().node();
+                if (!name.startsWith(SYSTEM_COMMAND_PREFIX) && stateMap.isEchoOn()) {
+                    LOGGER.debug("[{}] goal: {}, source line: {}, command: {}", ++cnt,
+                        firstNode.serialNr(), parsed.start.getPosition().line(), cmd);
+                }
                 command.execute(uiControl, o, stateMap);
                 firstNode.getNodeInfo().setScriptRuleApplication(true);
             } catch (InterruptedException ie) {
@@ -156,12 +153,12 @@ public class ProofScriptEngine {
                             "Proof already closed while trying to fetch next goal.\n"
                                 + "This error can be suppressed by setting '@failonclosed off'.\n\n"
                                 + "Command: %s\nLine:%d\n",
-                            argMap.get(ScriptLineParser.LITERAL_KEY), mlp.getLine()),
-                        mlp.getLocation(), e);
+                            argMap.get(ScriptLineParser.LITERAL_KEY), start.getPosition().line()),
+                        start, e);
                 } else {
                     LOGGER.info(
                         "Proof already closed at command \"{}\" at line %d, terminating in line {}",
-                        argMap.get(ScriptLineParser.LITERAL_KEY), mlp.getLine());
+                        argMap.get(ScriptLineParser.LITERAL_KEY), start.getPosition().line());
                     break;
                 }
             } catch (Exception e) {
@@ -171,7 +168,7 @@ public class ProofScriptEngine {
                 throw new ScriptException(
                     String.format("Error while executing script: %s\n\nCommand: %s", e.getMessage(),
                         argMap.get(ScriptLineParser.LITERAL_KEY)),
-                    mlp.getLocation(), e);
+                    start, e);
             }
         }
     }
@@ -185,11 +182,34 @@ public class ProofScriptEngine {
      *
      * @param monitor the monitor to set
      */
-    public void setCommandMonitor(Observer monitor) {
+    public void setCommandMonitor(Consumer<Message> monitor) {
         this.commandMonitor = monitor;
     }
 
-    public static ProofScriptCommand getCommand(String commandName) {
+    public static ProofScriptCommand<?> getCommand(String commandName) {
         return COMMANDS.get(commandName);
+    }
+
+    public interface Message {
+    }
+
+    public static final class EchoMessage implements Message {
+        public final String message;
+
+        public EchoMessage(String message) {
+            this.message = message;
+        }
+    }
+
+    public static final class ExecuteInfo implements Message {
+        public final String command;
+        public final Location location;
+        public final int nodeSerial;
+
+        public ExecuteInfo(String command, Location location, int nodeSerial) {
+            this.command = command;
+            this.location = location;
+            this.nodeSerial = nodeSerial;
+        }
     }
 }
