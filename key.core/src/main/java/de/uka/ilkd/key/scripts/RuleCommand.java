@@ -391,7 +391,7 @@ public class RuleCommand extends AbstractCommand {
         return matchingApps;
     }
 
-    @Documentation("Command that applies a calculus rule.")
+    @Documentation("This command can be used to apply a calculus rule to the currently active open goal.")
     public static class Parameters {
         @Argument
         @Documentation("Name of the rule to be applied.")
