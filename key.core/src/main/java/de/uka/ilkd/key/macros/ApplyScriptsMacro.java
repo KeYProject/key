@@ -119,10 +119,13 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
             try {
                 pse.execute((AbstractUserInterfaceControl) uic, proof);
             } catch (ScriptException e) {
-                int line = e.getLocation() == null ? 0 : e.getLocation().getPosition().line();
-                throw new ScriptException(
-                    "Failed to run the following script in line " + line + ":\n" + renderedProof,
-                    Location.fromPositionInfo(ass.getPositionInfo()), e);
+                Position sourcePos = getSourcePos(pse);
+                if(sourcePos != null) {
+                    Location sloc = new Location(ass.getPositionInfo().getURI().toURL(), sourcePos);
+                    throw new ScriptException(e.getMessage(), sloc, e);
+                } else {
+                    throw e;
+                }
             }
         }
         listener.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Other,
@@ -140,6 +143,20 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
         return new ProofMacroFinishedInfo(this, proof);
     }
 
+    private Position getSourcePos(ProofScriptEngine pse) {
+        Object entry = pse.getStateMap().getUserData("user.sourcePos");
+        if(entry == null) {
+            return null;
+        }
+        String[] parts = entry.toString().split(" *, *");
+        try {
+            return Position.newOneBased(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
+        } catch (RuntimeException ex) {
+            LOGGER.info("Cannot read sourcePos information", ex);
+            return null;
+        }
+    }
+
     private static String renderProof(AssertionProofContext ctx, Term assertion,
             Services services) {
         StringBuilder sb = new StringBuilder();
@@ -154,6 +171,8 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
     }
 
     private static void renderProofCmd(ProofCmdContext ctx, StringBuilder sb) {
+        sb.append("set userKey=\"sourcePos\" value=\"" + ctx.start.getLine() + "," +
+                ctx.start.getCharPositionInLine() + "\";\n");
         if (ctx.cmd != null) {
             sb.append(ctx.cmd.getText()).append(" ");
             for (ProofArgContext arg : ctx.proofArg()) {

@@ -32,15 +32,17 @@ import org.key_project.util.collection.ImmutableSLList;
  * <li>inst_= instantiation</li>
  * </ol>
  *
- * <scriptDoc command="rule" getNodeRec>
+ * [scriptDoc "rule"]
  * This command can be used to apply a calculus rule to the currently active
  * open goal. Its general syntax is
  * ```
  * rule "ruleName" on="term" formula="toplevelFormula" occ="occ_number"
  * ```
- * The parameter
  *
- * </scriptDoc>
+ * ### Parameters:
+ * [parameter "on" Term optional]
+ *
+ * [/scriptDoc]
  *
  */
 public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {

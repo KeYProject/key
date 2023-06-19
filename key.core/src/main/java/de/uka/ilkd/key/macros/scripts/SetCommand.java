@@ -26,9 +26,9 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
 
     @Override
     public void execute(Parameters args) throws ScriptException, InterruptedException {
-        if (args.key == null ^ args.value == null) {
+        if ((args.key == null && args.userKey == null) ^ args.value == null) {
             throw new IllegalArgumentException(
-                "When using key or value in a set command, you have to use both.");
+                "When using key/userKey or value in a set command, you have to use both.");
         }
 
         final Proof proof = state.getProof();
@@ -69,6 +69,8 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
             default:
                 throw new IllegalArgumentException("stack must be either push or pop.");
             }
+        } else if(args.userKey != null) {
+            state.putUserData("user." + args.userKey, args.value);
         } else {
             throw new IllegalArgumentException(
                 "You have to set oss, steps, stack, or key and value.");
@@ -129,6 +131,10 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
         /** Normal key-value setting -- key */
         @Option(value = "key", required = false)
         public String key;
+
+        /** User settings -- key */
+        @Option(value = "userKey", required = false)
+        public String userKey;
 
         /** Normal key-value setting -- value */
         @Option(value = "value", required = false)

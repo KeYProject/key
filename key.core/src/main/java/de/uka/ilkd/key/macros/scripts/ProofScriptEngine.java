@@ -174,7 +174,7 @@ public class ProofScriptEngine {
                 proof.getSubtreeGoals(stateMap.getProof().root())
                         .forEach(g -> LOGGER.debug("{}", g.sequent()));
                 throw new ScriptException(
-                    String.format("Error while executing script: %s\n\nCommand: %s", e.getMessage(),
+                    String.format("Error while executing script: %s\nCommand: %s", e.getMessage(),
                         argMap.get(ScriptLineParser.LITERAL_KEY)),
                     mlp.getLocation(), e);
             }
