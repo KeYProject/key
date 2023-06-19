@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.util.Pair;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -176,13 +177,20 @@ public class PredicateSetCompressor {
 		return fDepPredList;
 	}
 
+	private boolean isEqualityProvable(Term left, Term right) {
+		return left.equalsModRenaming(right) || sProof.proofEquality(left, right);
+	}
+
 	private Set<Term> finalCompPredListCompression(Set<Term> fCompPredList) {
 		Set<Term> toDelete = new HashSet<>();
 		Set<Term> toAdd = new HashSet<>();
+		HashMap<Pair<Term,Term>, Boolean> cache = new HashMap<>();
 		for (Term compPred1 : fCompPredList) {
 			for (Term compPred2 : fCompPredList) {
-				if (sProof.proofEquality(compPred1.sub(0), compPred2.sub(0))
-						&& sProof.proofEquality(compPred1.sub(1), compPred2.sub(1))) { // a X b
+				final boolean leftSidesEqualityProvable = isEqualityProvable(cache, compPred1.sub(0), compPred2.sub(0));
+				final boolean rightSidesEqualityProvable = isEqualityProvable(cache, compPred1.sub(1), compPred2.sub(1));
+
+				if (leftSidesEqualityProvable && rightSidesEqualityProvable) { // a X b
 					// && a
 					// Y b
 					if (compPred1.op().equals(geq) && compPred2.op().equals(gt)) {
@@ -212,8 +220,8 @@ public class PredicateSetCompressor {
 						toAdd.add(tb.equals(compPred1.sub(0), compPred1.sub(1)));
 					}
 
-				} else if (sProof.proofEquality(compPred1.sub(0), compPred2.sub(1))
-						&& sProof.proofEquality(compPred1.sub(1), compPred2.sub(0))) { // a
+				} else if (isEqualityProvable(compPred1.sub(0), compPred2.sub(1))
+						&& isEqualityProvable(compPred1.sub(1), compPred2.sub(0))) { // a
 					// X
 					// b
 					// &&
@@ -245,8 +253,7 @@ public class PredicateSetCompressor {
 							toDelete.add(compPred1);
 						}
 					}
-				} else if (sProof.proofEquality(compPred1.sub(0), compPred2.sub(0))
-						&& !sProof.proofEquality(compPred1.sub(1), compPred2.sub(1))) {
+				} else if (leftSidesEqualityProvable && !rightSidesEqualityProvable) {
 					if ((compPred1.op() == lt && compPred2.op() == lt)
 							|| (compPred1.op() == lt && compPred2.op() == leq)) {
 						if (sProof.proofLT(compPred1.sub(1), compPred2.sub(1))) {
@@ -293,8 +300,7 @@ public class PredicateSetCompressor {
 						}
 					}
 
-				} else if (compPred1.op() == compPred2.op() && sProof.proofEquality(compPred1.sub(1), compPred2.sub(1))
-						&& !sProof.proofEquality(compPred1.sub(0), compPred2.sub(0))) {
+				} else if (compPred1.op() == compPred2.op() && rightSidesEqualityProvable && !leftSidesEqualityProvable) {
 					if (compPred1.op() == lt) {
 						if (sProof.proofLT(compPred1.sub(0), compPred2.sub(0))) {
 							if (!toDelete.contains(compPred2)) {
@@ -342,5 +348,24 @@ public class PredicateSetCompressor {
 		fCompPredList.removeAll(toDelete);
 //		System.out.println("deleted by compression: " + toDelete);
 		return fCompPredList;
+	}
+
+	private boolean isEqualityProvable(HashMap<Pair<Term, Term>, Boolean> cache, Term left, Term right) {
+		final boolean isEqualityProvable;
+		Pair<Term,Term> key = new Pair<>(left, right);
+		Boolean result = cache.get(key);
+		if (result != null) {
+			isEqualityProvable = result;
+		} else {
+			key = new Pair<>(right, left);
+			result = cache.get(key);
+			if (result != null) {
+				isEqualityProvable = result;
+			} else {
+				isEqualityProvable = isEqualityProvable(left, right);
+				cache.put(key, isEqualityProvable);
+			}
+		}
+		return isEqualityProvable;
 	}
 }

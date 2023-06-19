@@ -26,8 +26,8 @@ import java.util.List;
 
 public class RuleApplication {
 
-	private static final int TIME_OUT = 5000;
-	private static final int MAX_RULE_APP = 5000;//40000;
+	private static final int TIME_OUT = -1;
+	private static final int MAX_RULE_APP = 40000;
 	private final Sequent seq;
 	final Services services;
 	private ProofStarter ps;
@@ -92,25 +92,25 @@ public class RuleApplication {
 
 //			System.out.println("Number of Open Goals after applying NestedLoopUsecase: " + currentGoal.proof().openGoals().size());
 //			System.out.println("After NestedLoopUsecase:" + ProofSaver.printAnything(currentGoal.sequent(), services));
-			try {
-//				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
-
-				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\NestedLoopUsecaseRuleApplication.key")).save();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+//			try {
+////				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
+//
+////				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\NestedLoopUsecaseRuleApplication.key")).save();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
 			ps.start(goals);
 //			for(Goal g: goals){
 ////				System.out.println("After Start:"+g.sequent());
 //			}
-			try {
-//				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
-
-				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\testAfterSEAfterShift.key")).save();
-			} catch (IOException e) {
-			// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//			try {
+////				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
+//
+//				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\testAfterSEAfterShift.key")).save();
+//			} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 			return ps.getProof().getSubtreeGoals(subtreeRoot);
 			// return currentGoal.proof().openGoals();
 //			return services.getProof().openEnabledGoals();
@@ -167,11 +167,11 @@ public class RuleApplication {
 
 			final ImmutableList<Goal> goals = currentGoal.apply(app);
 
-			try {
-				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\afterShiftUpdate.key")).save();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+//			try {
+//				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\afterShiftUpdate.key")).save();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
 
 			ApplyStrategyInfo info = ps.start(goals);
 			//System.out.println("info after shift: "+info);
@@ -231,11 +231,11 @@ public class RuleApplication {
 			app = app.tryToInstantiate(services);
 			ImmutableList<Goal> goals = currentGoal.apply(app);
 
-			try {
-				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\afterLoopUnwind.key")).save();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+//			try {
+//				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\afterLoopUnwind.key")).save();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
 
 //			ApplyStrategyInfo info =
 					ps.start(goals);
@@ -291,11 +291,11 @@ public class RuleApplication {
 			app = app.tryToInstantiate(services);
 			ImmutableList<Goal> goals = currentGoal.apply(app);
 
-			try {
-				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\afterLoopScopeLoopUnwind.key")).save();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+//			try {
+//				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\afterLoopScopeLoopUnwind.key")).save();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
 
 //			ApplyStrategyInfo info =
 					ps.start(goals);

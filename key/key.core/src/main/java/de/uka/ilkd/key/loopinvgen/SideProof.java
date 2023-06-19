@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.loopinvgen;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.DependenciesLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -35,7 +36,9 @@ import java.util.stream.Collectors;
 public class SideProof {
 
 	//0: off, 1: save proof files and print short proof info, 2: verbose output
-	private static final int DEBUG_VERBOSITY = 1;
+	private static final int DEBUG_VERBOSITY = 0;
+
+	private static final boolean AGGRESSIVE_FILTER = true;
 
 	static LRUCache<CacheKey, CacheValue> cache = new LRUCache<>(200);
 	private final Services services;
@@ -200,9 +203,22 @@ public class SideProof {
 
 	public boolean proofEquality(Term left, Term right) {
 		if(left!=null && right!=null){
-			Term fml = tb.equals(left, right);
-			Sequent sideSeq = prepareSideProof(left, right,
-					sf->false);//services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op())
+			final Sort nullSort = services.getJavaInfo().nullSort();
+			final Sort leftSort = left.sort();
+			final Sort rightSort = right.sort();
+			if (leftSort != rightSort && (!leftSort.extendsTrans(rightSort) &&
+					!rightSort.extendsTrans(leftSort) && !nullSort.extendsTrans(leftSort)
+					&& !nullSort.extendsTrans(rightSort))) {
+				return false;
+			}
+
+			final Term fml = tb.equals(left, right);
+			final Sort locSet = services.getTypeConverter().getLocSetLDT().targetSort();
+			final DependenciesLDT depLDT = services.getTypeConverter().getDependenciesLDT();
+			final Predicate<SequentFormula> filter = // sf -> false;
+					(AGGRESSIVE_FILTER || (leftSort !=locSet && rightSort != locSet) ?
+							sf -> depLDT.isDependencePredicate(sf.formula().op()) : sf -> false);
+			Sequent sideSeq = prepareSideProof(left, right, filter);//services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op())
 			sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
 			boolean closed = isProvable(sideSeq, services);
 			// true: Holds, false: Unknown
@@ -226,7 +242,7 @@ public class SideProof {
 		if(left!=null && right!=null){
 			Term fml = tb.subset(left, right);
 			Sequent sideSeq = prepareSideProof(left, right,
-					sf->false);//services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op())
+					AGGRESSIVE_FILTER ? sf-> services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()) : sf->false);
 			sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
 			boolean closed = isProvable(sideSeq, services);
 			// true: Holds, false: Unknown
