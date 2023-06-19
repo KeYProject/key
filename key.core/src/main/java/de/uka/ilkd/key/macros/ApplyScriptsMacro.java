@@ -50,7 +50,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplyScriptsMacro.class);
 
-    private final ProofMacro fallBackMacro;
+    private final @Nullable ProofMacro fallBackMacro;
 
     public ApplyScriptsMacro(ProofMacro fallBackMacro) {
         this.fallBackMacro = fallBackMacro;
@@ -74,7 +74,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<@NonNull Goal> goals,
             PosInOccurrence posInOcc) {
-        return fallBackMacro.canApplyTo(proof, goals, posInOcc)
+        return fallBackMacro != null && fallBackMacro.canApplyTo(proof, goals, posInOcc)
                 || goals.exists(g -> getJmlAssert(g.node()) != null);
     }
 
@@ -137,7 +137,9 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
             if (Thread.interrupted()) {
                 throw new InterruptedException();
             }
-            fallBackMacro.applyTo(uic, proof, ImmutableList.of(goal), posInOcc, listener);
+            if(fallBackMacro != null) {
+                fallBackMacro.applyTo(uic, proof, ImmutableList.of(goal), posInOcc, listener);
+            }
 
         }
 

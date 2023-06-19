@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
@@ -17,7 +14,7 @@
 package de.uka.ilkd.key.macros;
 
 /**
- * This class captures a proof macro which is meant to fully automise KeY proof
+ * This class captures a proof macro which is meant to automise KeY proof
  * workflow if scripts are present in the JML code.
  *
  * It is experimental.
@@ -26,25 +23,25 @@ package de.uka.ilkd.key.macros;
  * <ol>
  * <li>Finish symbolic execution
  * <li>Apply macros
- * <li>Try to close provable goals
+ * <li>It does not try to close provable goals
  * </ol>
  *
  * @author mattias ulbrich
- * @see ScriptAwarePrepMacro
+ * @see ScriptAwareMacro
  */
-public class ScriptAwareMacro extends SequentialProofMacro {
+public class ScriptAwarePrepMacro extends SequentialProofMacro {
 
     private final ProofMacro autoMacro = new FinishSymbolicExecutionMacro();
-    private final ApplyScriptsMacro applyMacro = new ApplyScriptsMacro(new TryCloseMacro());
+    private final ApplyScriptsMacro applyMacro = new ApplyScriptsMacro(null);
 
     @Override
     public String getScriptCommandName() {
-        return "script-auto";
+        return "script-prep-auto";
     }
 
     @Override
     public String getName() {
-        return "Script-aware Auto";
+        return "Script-aware Prep Auto";
     }
 
     @Override
