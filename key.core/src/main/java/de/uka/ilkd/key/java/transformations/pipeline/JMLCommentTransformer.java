@@ -56,7 +56,8 @@ public class JMLCommentTransformer extends JavaTransformer {
                 }
                 n.setData(BEFORE_COMMENTS, specs);
                 specs.add(c);
-                // TODO javaparser this is useless, the list is an accumulation returned by javaparser
+                // TODO javaparser this is useless, the list is an accumulation returned by
+                // javaparser
                 allComments.remove(c);
                 commentIdx++;
             }
