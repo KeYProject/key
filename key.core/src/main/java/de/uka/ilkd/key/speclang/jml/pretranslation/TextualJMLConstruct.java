@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -158,7 +159,7 @@ public abstract class TextualJMLConstruct {
         if (start != null && type != null) {
             String filename = start.getTokenSource().getSourceName();
             int line = start.getLine();
-            label.add(new OriginTermLabel(new OriginTermLabel.FileOrigin(type, filename, line)));
+            label.add(new OriginTermLabel(new OriginTermLabel.FileOrigin(type, URI.create("file://"+filename), line)));
         } else if (type != null) {
             label.add(new OriginTermLabel(new OriginTermLabel.Origin(type)));
         }
