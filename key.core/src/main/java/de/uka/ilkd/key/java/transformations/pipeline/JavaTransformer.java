@@ -71,7 +71,13 @@ public abstract class JavaTransformer {
      * descend in inner classes you have to implement the recursion by
      * yourself.
      */
-    public abstract void apply(TypeDeclaration<?> td);
+    public void apply(TypeDeclaration<?> td) {}
+
+    public void apply(CompilationUnit cu) {
+        for (TypeDeclaration<?> type : cu.getTypes()) {
+            apply(type);
+        }
+    }
 
     public static RuntimeException reportError(Node node, String message, Object... args) {
         var path = node.findCompilationUnit().flatMap(CompilationUnit::getStorage)
@@ -82,52 +88,4 @@ public abstract class JavaTransformer {
         var pos = " at " + path + ":" + line + ":" + col;
         return new IllegalStateException(String.format(message + pos, args));
     }
-
-
-    /*
-     * protected class FinalOuterVarsCollector extends SourceVisitorExtended {
-     *
-     * private final HashMap<ReferenceType, List<Variable>> lc2fv;
-     *
-     * public FinalOuterVarsCollector() {
-     * super();
-     * lc2fv = cache.getLocalClass2FinalVarMapping();
-     * }
-     *
-     * public void walk(SourceElement s) {
-     * s.accept(this);
-     * if (s instanceof Node) {
-     * final Node pe = (Node) s;
-     * for (int i = 0, sz = pe.getChildCount(); i < sz; i++) {
-     * walk(pe.getChildAt(i));
-     * }
-     * }
-     * }
-     *
-     * public void visitVariableReference(VariableReference vr) {
-     * final DefaultCrossReferenceSourceInfo si = (DefaultCrossReferenceSourceInfo)
-     * services.getSourceInfo();
-     * final Variable v = si.getVariable(vr.getName(), vr);
-     *
-     * final ReferenceType containingReferenceTypeOfProgVarV = si.getContainingReferenceType((Node)
-     * v);
-     * ReferenceType ct = si.getContainingReferenceType(vr);
-     * if (containingReferenceTypeOfProgVarV != ct &&
-     * v instanceof VariableSpecification && !(v instanceof FieldSpecification)) {
-     *
-     * while (ct instanceof TypeDeclaration<?> && ct != containingReferenceTypeOfProgVarV) {
-     * List<Variable> vars = lc2fv.get(ct);
-     * if (vars == null) {
-     * vars = new LinkedList<Variable>();
-     * }
-     * if (!vars.contains(v)) {
-     * vars.add(v);
-     * }
-     * lc2fv.put(ct, vars);
-     * ct = si.getContainingReferenceType(ct);
-     * }
-     * }
-     * }
-     * }
-     */
 }

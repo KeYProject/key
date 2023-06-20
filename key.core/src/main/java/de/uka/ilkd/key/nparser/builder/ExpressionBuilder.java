@@ -1200,7 +1200,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         while (startWithPackage
                 && ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext) {
             KeYParser.Attribute_simpleContext a =
-                    (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
+                (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
             if (a.heap != null) {
                 break; // No heap on java package allowed
             }
@@ -1216,7 +1216,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
         while (ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext) {
             KeYParser.Attribute_simpleContext a =
-                    (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
+                (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
             if (a.heap != null) {
                 break; // No heap on java Class name allowed
             }
@@ -1232,7 +1232,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         // endregion
 
         KeYJavaType kjt =
-                getTypeByClassName(javaPackage + (javaPackage.isEmpty() ? "" : ".") + javaClass);
+            getTypeByClassName(javaPackage + (javaPackage.isEmpty() ? "" : ".") + javaClass);
 
         if (ctx.call() != null) {
             addWarning("Call of package or class");
@@ -1245,7 +1245,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
             if (attrib instanceof KeYParser.Attribute_simpleContext) {
                 KeYParser.Attribute_simpleContext simpleContext =
-                        (KeYParser.Attribute_simpleContext) attrib;
+                    (KeYParser.Attribute_simpleContext) attrib;
                 boolean isCall = simpleContext.call() != null;
                 ParserRuleContext heap = simpleContext.heap; // TODO?
                 String attributeName = accept(simpleContext.id);
@@ -1258,7 +1258,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     if (pm != null) {
                         Term[] args = visitArguments(simpleContext.call().argument_list());
                         current = getJavaInfo().getStaticProgramMethodTerm(attributeName, args,
-                                kjt.getFullName());
+                            kjt.getFullName());
                     } else {
                         semanticError(ctx, "Unknown java attribute: %s", attributeName);
                     }
@@ -1268,12 +1268,12 @@ public class ExpressionBuilder extends DefaultBuilder {
                 }
             } else if (attrib instanceof KeYParser.Attribute_complexContext) {
                 KeYParser.Attribute_complexContext attrid =
-                        (KeYParser.Attribute_complexContext) attrib;
+                    (KeYParser.Attribute_complexContext) attrib;
                 String className = attrid.sort.getText();
                 String attributeName = attrid.id.getText();
                 Term[] args = visitArguments(attrid.call().argument_list());
                 current = getServices().getJavaInfo().getStaticProgramMethodTerm(attributeName,
-                        args, className);
+                    args, className);
                 if (current == null) {
                     final Sort sort = lookupSort(className);
                     if (sort == null) {
@@ -1282,7 +1282,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     kjt = getServices().getJavaInfo().getKeYJavaType(sort);
                     if (kjt == null) {
                         semanticError(ctx, "Found logic sort for " + className
-                                + " but no corresponding java type!");
+                            + " but no corresponding java type!");
                     }
                 }
                 return current;
