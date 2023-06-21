@@ -418,7 +418,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitClass_invariant(JmlParser.Class_invariantContext ctx) {
-        TextualJMLClassInv inv = new TextualJMLClassInv(mods, ctx);
+        final boolean isFree = ctx.INVARIANT().getText().endsWith("_free");
+        TextualJMLClassInv inv = new TextualJMLClassInv(mods, ctx, isFree);
         constructs = constructs.append(inv);
         return null;
     }
