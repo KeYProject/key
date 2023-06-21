@@ -104,17 +104,40 @@ public final class JMLTransformer extends JavaTransformer {
      */
     private String concatenate(Iterable<Comment> comments) {
         StringBuilder sb = new StringBuilder();
-
-        for (Comment comment : comments) {
-            Position relativePos = comment.getRange().get().begin;
-            sb.append("\n".repeat(Math.max(0, relativePos.line)));
-            sb.append(" ".repeat(Math.max(0, relativePos.column)));
+        var iter = comments.iterator();
+        if (!iter.hasNext()) {
+            return sb.toString();
+        }
+        var first = iter.next();
+        if (first instanceof BlockComment) {
+            sb.append("/*").append(first.getContent()).append("*/");
+        } else {
+            sb.append("//").append(first.getContent());
+        }
+        var last = first.getRange().get().end;
+        while (iter.hasNext()) {
+            var comment = iter.next();
+            int line;
+            int column;
+            var pos = comment.getRange().get().begin;
+            if (last.line == pos.line) {
+                line = 0;
+                column = pos.column - last.column;
+            } else {
+                line = pos.line - last.line;
+                column = pos.column;
+            }
+            sb.append("\n".repeat(Math.max(0, line)));
+            sb.append(" ".repeat(Math.max(0, column)));
             if (comment instanceof BlockComment) {
                 sb.append("/*").append(comment.getContent()).append("*/");
             } else {
                 sb.append("//").append(comment.getContent());
             }
         }
+        iter.forEachRemaining(comment -> {
+
+        });
         return sb.toString();
     }
 
@@ -456,8 +479,7 @@ public final class JMLTransformer extends JavaTransformer {
         // concatenate comments of child, determine position
         String concatenatedComment = concatenate(comments);
         Position astPos = comments.get(0).getRange().get().begin;
-        de.uka.ilkd.key.java.Position pos = de.uka.ilkd.key.java.Position.newOneBased(
-            astPos.line, astPos.column);
+        de.uka.ilkd.key.java.Position pos = de.uka.ilkd.key.java.Position.fromJPPosition(astPos);
 
         // call preparser
         PreParser pp = new PreParser();
@@ -471,8 +493,8 @@ public final class JMLTransformer extends JavaTransformer {
         for (TextualJMLConstruct c : constructs) {
             BodyDeclaration<?> body;
             if (c instanceof TextualJMLFieldDecl) {
-                body = transformClassFieldDecl((TextualJMLFieldDecl) c, comments);
-                td.addMember(body);
+                // body = transformClassFieldDecl((TextualJMLFieldDecl) c, comments);
+                // td.addMember(body);
             } else if (c instanceof TextualJMLMethodDecl) {
                 body = transformMethodDecl((TextualJMLMethodDecl) c, comments, td);
                 td.addMember(body);
@@ -514,8 +536,8 @@ public final class JMLTransformer extends JavaTransformer {
             int offset) throws SLTranslationException {
         // concatenate comments, determine position
         Position astPos = comments.get(0).getRange().get().begin;
-        de.uka.ilkd.key.java.Position pos = de.uka.ilkd.key.java.Position.newOneBased(
-            astPos.line, astPos.column);
+        de.uka.ilkd.key.java.Position pos = de.uka.ilkd.key.java.Position.fromJPPosition(
+            astPos);
 
         // call preparser
         var io = new PreParser();
@@ -531,6 +553,7 @@ public final class JMLTransformer extends JavaTransformer {
                 statement = transformVariableDecl((TextualJMLFieldDecl) c);
             } else if (c instanceof TextualJMLSetStatement) {
                 statement = transformSetStatement((TextualJMLSetStatement) c);
+                continue;
             } else if (c instanceof TextualJMLMergePointDecl) {
                 statement = transformMergePointDecl((TextualJMLMergePointDecl) c, comments);
             } else if (c instanceof TextualJMLAssertStatement) {

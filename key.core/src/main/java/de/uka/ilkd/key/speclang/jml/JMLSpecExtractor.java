@@ -89,15 +89,23 @@ public final class JMLSpecExtractor implements SpecExtractor {
         }
         StringBuilder sb = new StringBuilder(comments[0].getText());
 
-        // TODO javaparser: startPosition was relativePosition before migration to JavaParser
-        // test for accuracy of JML annotation errors.
-        int curLine = 0;
+        Position last = comments[0].getEndPosition();
         for (int i = 1; i < comments.length; i++) {
-            var relativePos = comments[i].getStartPosition();
-            sb.append("\n".repeat(Math.max(0, relativePos.line() - curLine)));
-            sb.append(" ".repeat(Math.max(0, relativePos.column())));
-            sb.append(comments[i].getText());
-            curLine = comments[i].getEndPosition().line();
+            var comment = comments[i];
+            int lineOffset;
+            int columnOffset;
+            var pos = comment.getPositionInfo().getStartPosition();
+            if (last.line() == pos.line()) {
+                lineOffset = 0;
+                columnOffset = pos.column() - last.column();
+            } else {
+                lineOffset = pos.line() - last.line();
+                columnOffset = pos.column();
+            }
+            sb.append("\n".repeat(Math.max(0, lineOffset)));
+            sb.append(" ".repeat(Math.max(0, columnOffset)));
+            sb.append(comment.getText());
+            last = comment.getEndPosition();
         }
         return sb.toString();
     }
