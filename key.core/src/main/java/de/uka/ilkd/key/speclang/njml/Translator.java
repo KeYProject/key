@@ -34,6 +34,7 @@ import de.uka.ilkd.key.speclang.translation.SLExceptionFactory;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLParameters;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.util.AssertionFailure;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
@@ -967,6 +968,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
             fullyQualifiedName = fullyQualifiedName + "." + id;
             try {
                 return lookupIdentifier(lookupName, receiver, params, ctx);
+            } catch (AssertionFailure e) {
+                throw e;
             } catch (Exception e) {
                 return lookupIdentifier(fullyQualifiedName, null, null, ctx);
             }
@@ -1343,6 +1346,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 fullyQualifiedName = fullyQualifiedName + "." + id;
                 try {
                     return lookupIdentifier(lookupName, base, null, ctx);
+                } catch (AssertionFailure e) {
+                    throw e;
                 } catch (Exception e) {
                     return lookupIdentifier(fullyQualifiedName, null, null, ctx);
                 }
