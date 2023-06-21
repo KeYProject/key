@@ -59,9 +59,7 @@ public class LIGNewRelaxed extends AbstractLoopInvariantGenerator {
 		}
 
 //		System.out.println("Initial comp Predicate Set: " + allCompPreds);
-//		for (Term term : allPreds) {
-//			System.out.println(term);
-//		}
+
 		int itrNumber = -1;
 		PredicateRefiner pr0 = new LoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(), allDepPreds, allCompPreds, indexOuter,
 				index, itrNumber, services);
@@ -119,9 +117,9 @@ public class LIGNewRelaxed extends AbstractLoopInvariantGenerator {
 
 		allDepPreds.addAll(allCompPreds);
 
-//		final PredicateSetCompressor compressor =
-//				new PredicateSetCompressor(allDepPreds, currentGoal.sequent(), false, services);
-//		allDepPreds = compressor.compress();
+		final PredicateSetCompressor compressor =
+				new PredicateSetCompressor(allDepPreds, currentGoal.sequent(), false, services);
+		allDepPreds = compressor.compress();
 		LoopInvariantGenerationResult result = new LoopInvariantGenerationResult(allDepPreds, itrNumber);
 		System.out.println("Loop Invariant is: " + result);
 		return result;

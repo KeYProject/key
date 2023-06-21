@@ -1244,6 +1244,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 PolynomialValuesCmpFeature.leq(
                         instOf("colStart"),
                         instOf("colEnd")));
+
         Feature matrixRangeloc1OutSideLoc2 = ifZero(
                 or(
                 PolynomialValuesCmpFeature.lt(
@@ -1260,12 +1261,28 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                         sub(instOf("loc2"), 4))
                 ), inftyConst(), longConst(0));
 
+        Feature arrayRangeloc1OutSideLoc2 = ifZero(
+                or(
+                        PolynomialValuesCmpFeature.lt(
+                                sub(instOf("loc2"), 2),
+                                sub(instOf("loc1"), 1)),
+                        PolynomialValuesCmpFeature.lt(
+                                sub(instOf("loc1"), 2),
+                                sub(instOf("loc2"), 1))
+                ), inftyConst(), longConst(0));
+
+
         Function matrixRange = getServices().getTypeConverter().getLocSetLDT().getMatrixRange();
+        Function arrayRange = getServices().getTypeConverter().getLocSetLDT().getArrayRange();
         bindRuleSet(d, "preventDisjointLocationSets",
                 ifZero(MatchedIfFeature.INSTANCE,
                     ifZero(add(applyTF("loc1", op(matrixRange)),
                                     applyTF("loc2", op(matrixRange))),
-                            matrixRangeloc1OutSideLoc2, longConst(0)),
+                            matrixRangeloc1OutSideLoc2,
+                            ifZero(add(applyTF("loc1", op(arrayRange)),
+                                    applyTF("loc2", op(arrayRange))),
+                                    arrayRangeloc1OutSideLoc2,
+                                    longConst(0))),
                         longConst(-110)));
 //        Feature rowEndGeqRowStart = geq("rowEnd", "rowStart");
 //        Feature colEndGeqColStart = geq("colEnd", "colStart");

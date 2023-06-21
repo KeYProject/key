@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 public class SideProof {
 
 	//0: off, 1: save proof files and print short proof info, 2: verbose output
-	private static final int DEBUG_VERBOSITY = 0;
+	private static final int DEBUG_VERBOSITY = 1;
 
 	private static final boolean AGGRESSIVE_FILTER = true;
 
@@ -143,7 +143,7 @@ public class SideProof {
 		static long COUNTER=0; // only used for saving - unique filenames
 	private static void printDebugAndSaveProof(ApplyStrategyInfo info, long time) {
 		if (DEBUG_VERBOSITY == 0) return;
-//		System.out.println("Proof Status: " + (info.getProof().closed() ? "closed" : "open"));
+		System.out.println("Proof Status: " + (info.getProof().closed() ? "closed" : "open"));
 
 		if (DEBUG_VERBOSITY > 1) {
 //			System.out.println(info.getAppliedRuleApps() + ":" + info.toString());

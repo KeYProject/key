@@ -1242,7 +1242,7 @@ public LoopInvariantGenerationResult correlation_init_array() {//Change length o
 //		result = tpc.conditionDifferentNumberOfEvents();//Precise Result. Relaxed works.
 //		result = tpc.conditionWithDifferentEvents(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once. Relaxed works.
 //		result = tpc.withFunc(); //Relaxed works.
-//		result = tpc.withoutFunc(); //Relaxed works.
+		result = tpc.withoutFunc(); //Relaxed works.
 //		result = tpc.stencil(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once. Relaxed works.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //		result = tpc.basicEx0();//Precise Result
@@ -1251,7 +1251,7 @@ public LoopInvariantGenerationResult correlation_init_array() {//Change length o
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //		result = tpc.correlation_init_array();// 00:31
 //		result = tpc.correlation_print_array();// 26min
-		result = tpc.gem_ver_scope_1();// 1:07
+//		result = tpc.gem_ver_scope_1();// 1:07
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation took " + (end - start) + " ms");
 	}

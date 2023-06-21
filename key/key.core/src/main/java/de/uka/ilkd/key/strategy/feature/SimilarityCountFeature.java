@@ -110,43 +110,75 @@ public class SimilarityCountFeature implements Feature {
         }
 
         if (fst.op() == snd.op() && fst.op() == locSetLDT.getMatrixRange()) {
-            final Term matrixSucc = snd;
+                final Term matrixSucc = snd;
 
-            Feature startRowIncl = PolynomialValuesCmpFeature.leq((app, pos, goal) -> fst.sub(2),
-                    (app, pos, goal) -> matrixSucc.sub(2));
-            Feature endRowIncl = PolynomialValuesCmpFeature.leq((app, pos, goal) -> matrixSucc.sub(3),
-                    (app, pos, goal) -> fst.sub(3));
+                Feature startRowIncl = PolynomialValuesCmpFeature.leq((app, pos, goal) -> fst.sub(2),
+                        (app, pos, goal) -> matrixSucc.sub(2));
+                Feature endRowIncl = PolynomialValuesCmpFeature.leq((app, pos, goal) -> matrixSucc.sub(3),
+                        (app, pos, goal) -> fst.sub(3));
 
-            Feature startColIncl = PolynomialValuesCmpFeature.leq((app, pos, goal) -> fst.sub(4),
-                    (app, pos, goal) -> matrixSucc.sub(4));
-            Feature endColIncl = PolynomialValuesCmpFeature.leq((app, pos, goal) -> matrixSucc.sub(5),
-                    (app, pos, goal) -> fst.sub(5));
+                Feature startColIncl = PolynomialValuesCmpFeature.leq((app, pos, goal) -> fst.sub(4),
+                        (app, pos, goal) -> matrixSucc.sub(4));
+                Feature endColIncl = PolynomialValuesCmpFeature.leq((app, pos, goal) -> matrixSucc.sub(5),
+                        (app, pos, goal) -> fst.sub(5));
 
-            Feature crossColumns1 = PolynomialValuesCmpFeature.leq((app, pos, goal) -> matrixSucc.sub(4),
-                    (app, pos, goal) -> fst.sub(5));
-            Feature crossColumns2 = PolynomialValuesCmpFeature.leq((app, pos, goal) -> fst.sub(4),
-                    (app, pos, goal) -> matrixSucc.sub(5));
+                Feature crossColumns1 = PolynomialValuesCmpFeature.leq((app, pos, goal) -> matrixSucc.sub(4),
+                        (app, pos, goal) -> fst.sub(5));
+                Feature crossColumns2 = PolynomialValuesCmpFeature.leq((app, pos, goal) -> fst.sub(4),
+                        (app, pos, goal) -> matrixSucc.sub(5));
 
-            RuleAppCost costs[] = new RuleAppCost[4];
-            costs[0] = startRowIncl.computeCost(p_app, p_pos, p_goal);
-            costs[1] = endRowIncl.computeCost(p_app, p_pos, p_goal);
-            costs[2] = startColIncl.computeCost(p_app, p_pos, p_goal);
-            costs[3] = endColIncl.computeCost(p_app, p_pos, p_goal);
-            for (RuleAppCost cost : costs) {
-                if (cost.equals(NumberRuleAppCost.getZeroCost())) {
-                    count += 10;
+                RuleAppCost costs[] = new RuleAppCost[4];
+                costs[0] = startRowIncl.computeCost(p_app, p_pos, p_goal);
+                costs[1] = endRowIncl.computeCost(p_app, p_pos, p_goal);
+                costs[2] = startColIncl.computeCost(p_app, p_pos, p_goal);
+                costs[3] = endColIncl.computeCost(p_app, p_pos, p_goal);
+                for (RuleAppCost cost : costs) {
+                    if (cost.equals(NumberRuleAppCost.getZeroCost())) {
+                        count += 10;
+                    }
                 }
-            }
 
+                RuleAppCost crossCosts[] = new RuleAppCost[2];
+                crossCosts[0] = crossColumns1.computeCost(p_app, p_pos, p_goal);
+                crossCosts[1] = crossColumns2.computeCost(p_app, p_pos, p_goal);
+                for (RuleAppCost cost : crossCosts) {
+                    if (cost.equals(NumberRuleAppCost.getZeroCost())) {
+                        count += 5;
+                    }
+                }
+                for (int idx = 2; idx < 6; idx++) {
+                    if (fst.sub(idx).op() == services.getTypeConverter().getIntegerLDT().getNumberSymbol()) {
+                        count += 2;
+                    }
+                }
+            } else if (fst.op() == snd.op() && fst.op() == locSetLDT.getArrayRange()) {
+                final Term arraySucc = snd;
+                Feature startRowIncl = PolynomialValuesCmpFeature.leq((app, pos, goal) -> fst.sub(1),
+                        (app, pos, goal) -> arraySucc.sub(1));
+                Feature endRowIncl = PolynomialValuesCmpFeature.leq((app, pos, goal) -> arraySucc.sub(2),
+                        (app, pos, goal) -> fst.sub(2));
+                Feature crossRow1 = PolynomialValuesCmpFeature.leq((app, pos, goal) -> arraySucc.sub(1),
+                        (app, pos, goal) -> fst.sub(2));
+                Feature crossRow2 = PolynomialValuesCmpFeature.leq((app, pos, goal) -> fst.sub(1),
+                    (app, pos, goal) -> arraySucc.sub(2));
+
+                RuleAppCost costs[] = new RuleAppCost[2];
+                costs[0] = startRowIncl.computeCost(p_app, p_pos, p_goal);
+                costs[1] = endRowIncl.computeCost(p_app, p_pos, p_goal);
+                for (RuleAppCost cost : costs) {
+                    if (cost.equals(NumberRuleAppCost.getZeroCost())) {
+                        count += 10;
+                    }
+                }
             RuleAppCost crossCosts[] = new RuleAppCost[2];
-            crossCosts[0] = crossColumns1.computeCost(p_app, p_pos, p_goal);
-            crossCosts[1] = crossColumns2.computeCost(p_app, p_pos, p_goal);
+            crossCosts[0] = crossRow1.computeCost(p_app, p_pos, p_goal);
+            crossCosts[1] = crossRow2.computeCost(p_app, p_pos, p_goal);
             for (RuleAppCost cost : crossCosts) {
                 if (cost.equals(NumberRuleAppCost.getZeroCost())) {
                     count += 5;
                 }
             }
-            for (int idx = 2; idx < 6; idx++) {
+            for (int idx = 1; idx < 3; idx++) {
                 if (fst.sub(idx).op() == services.getTypeConverter().getIntegerLDT().getNumberSymbol()) {
                     count += 2;
                 }

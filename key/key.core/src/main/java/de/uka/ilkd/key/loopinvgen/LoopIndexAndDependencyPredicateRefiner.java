@@ -436,18 +436,20 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 			Term array = locSet.sub(0);
 			Term low = locSet.sub(1);
 			Term high = locSet.sub(2);
-			Term lowToI;
-			Term iToHigh;
+			Term lowToI = tb.empty();
+			Term iToHigh = tb.empty();
+			Term lowToIPlusOne = tb.empty();
+			Term iPlusOneToHigh = tb.empty();
 //			System.out.println("low: "+ low + ", index: "+ index + ", high: " + high);
 			if (array != null && low != null && high != null && index != null) {
 				if (!sProof.proofEquality(low, index)) {
 					if (!sProof.proofEquality(index, high)) {
 						lowToI = tb.arrayRange(array, low, index);
 						iToHigh = tb.arrayRange(array, index, high);
-//					if(sProof.proofLT(low, tb.subtract(index, tb.one())) && sProof.proofLT(tb.add(index, tb.one()), high)) {
-//						lowToI = tb.arrayRange(array, low, tb.subtract(index, tb.one()));
-//						iToHigh = tb.arrayRange(array, tb.add(index, tb.one()), high);
-//					}
+						if(sProof.proofLT(tb.add(index, tb.one()), high)) {
+							lowToIPlusOne = tb.arrayRange(array, low, tb.add(index, tb.one()));
+							iPlusOneToHigh = tb.arrayRange(array, tb.add(index, tb.one()), high);
+						}
 					} else {
 						lowToI = tb.arrayRange(array, low, index);
 						iToHigh = tb.singleton(array, tb.arr(index));
@@ -456,28 +458,39 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 					if (!sProof.proofEquality(index, high)) {
 						iToHigh = tb.arrayRange(array, index, high);
 						lowToI = tb.singleton(array, tb.arr(index));
+
+						if(sProof.proofLT(tb.add(index, tb.one()), high)) {
+							lowToIPlusOne = tb.arrayRange(array, low, tb.add(index, tb.one()));
+							iPlusOneToHigh = tb.arrayRange(array, tb.add(index, tb.one()), high);
+						}
 					} else {
 						lowToI = tb.singleton(array, tb.arr(index));
 						iToHigh = tb.singleton(array, tb.arr(index));
 					}
 				}
-				if (lowToI != null && iToHigh != null) {
+//				if (lowToI != null && iToHigh != null) {
 					if (depLDT.isDependencePredicate(pred.op())) {
 						final Function dependencyOp = (Function) pred.op();
 						if(dependencyOp==depLDT.getRelaxedNoRaW() || dependencyOp == depLDT.getRelaxedNoWaR()){
 							result.add(tb.func(dependencyOp, lowToI, tb.empty(), tb.empty(), tb.empty()));
 							result.add(tb.func(dependencyOp, iToHigh, tb.empty(), tb.empty(), tb.empty()));
+							result.add(tb.func(dependencyOp, lowToIPlusOne, tb.empty(), tb.empty(), tb.empty()));
+							result.add(tb.func(dependencyOp, iPlusOneToHigh, tb.empty(), tb.empty(), tb.empty()));
 						} else if(dependencyOp == depLDT.getRelaxedNoWaW()){
 							result.add(tb.func(dependencyOp, lowToI, tb.empty(), tb.empty()));
 							result.add(tb.func(dependencyOp, iToHigh, tb.empty(), tb.empty()));
+							result.add(tb.func(dependencyOp, lowToIPlusOne, tb.empty(), tb.empty()));
+							result.add(tb.func(dependencyOp, iPlusOneToHigh, tb.empty(), tb.empty()));
 						}
 						else{
 							result.add(tb.func(dependencyOp, lowToI));
 							result.add(tb.func(dependencyOp, iToHigh));
+							result.add(tb.func(dependencyOp, lowToIPlusOne));
+							result.add(tb.func(dependencyOp, iPlusOneToHigh));
 						}
 
 					}
-				}
+//				}
 			}
 //		System.out.println(result);
 		}
@@ -626,7 +639,9 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 	private Set<Term> compPredWeakeningByPredicates(Term pred) {
 		Set<Term> result = new HashSet<>();
 		if(pred!=null){
-			Term low = pred.sub(0);
+			Term low = null;
+			if (pred.arity() > 0)
+				low = pred.sub(0);
 			Term high = null;
 			if (pred.arity() > 1)
 				high = pred.sub(1);

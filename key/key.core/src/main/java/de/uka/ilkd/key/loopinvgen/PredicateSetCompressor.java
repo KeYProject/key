@@ -151,6 +151,9 @@ public class PredicateSetCompressor {
 					// deleted terms also from being considered for depPred1
 					continue;
 				}
+				if(depPred1.sub(0)==locSetLDT.getEmpty())
+					toDelete.add(depPred1);
+
 				if (depPred1.op().equals(depLDT.getNoR())) {
 					if (depPred2.op().equals(depLDT.getNoRaW()) || depPred2.op().equals(depLDT.getNoWaR())) {
 						if (sProof.proofSubSet(depPred2.sub(0), depPred1.sub(0))) {
@@ -164,14 +167,31 @@ public class PredicateSetCompressor {
 							toDelete.add(depPred2);
 						}
 					}
+				} else if (depPred1.op().equals(depLDT.getRelaxedNoR())) {
+					if (depPred2.op().equals(depLDT.getRelaxedNoRaW()) || depPred2.op().equals(depLDT.getRelaxedNoWaR())) {
+						if (sProof.proofSubSet(depPred2.sub(0), depPred1.sub(0))) {
+							toDelete.add(depPred2);
+						}
+					}
+				} else if (depPred1.op().equals(depLDT.getRelaxedNoW())) {
+					if (depPred2.op().equals(depLDT.getRelaxedNoRaW()) || depPred2.op().equals(depLDT.getRelaxedNoWaR())
+							|| depPred2.op().equals(depLDT.getRelaxedNoWaW())) {
+						if (sProof.proofSubSet(depPred2.sub(0), depPred1.sub(0))) {
+							toDelete.add(depPred2);
+						}
+					}
 				}
+
 				if(depPred1.op()==depPred2.op() && !sProof.proofEquality(depPred2.sub(0), depPred1.sub(0))){
 					if (sProof.proofSubSet(depPred2.sub(0), depPred1.sub(0))) {
 						toDelete.add(depPred2);
 					}
 				}
+
+
 			}
 		}
+
 		fDepPredList.removeAll(toDelete);
 		System.out.println("Deleted: "+toDelete);
 		return fDepPredList;
