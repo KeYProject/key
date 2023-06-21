@@ -493,8 +493,8 @@ public final class JMLTransformer extends JavaTransformer {
         for (TextualJMLConstruct c : constructs) {
             BodyDeclaration<?> body;
             if (c instanceof TextualJMLFieldDecl) {
-                // body = transformClassFieldDecl((TextualJMLFieldDecl) c, comments);
-                // td.addMember(body);
+                 body = transformClassFieldDecl((TextualJMLFieldDecl) c, comments);
+                 td.addMember(body);
             } else if (c instanceof TextualJMLMethodDecl) {
                 body = transformMethodDecl((TextualJMLMethodDecl) c, comments, td);
                 td.addMember(body);
@@ -553,7 +553,6 @@ public final class JMLTransformer extends JavaTransformer {
                 statement = transformVariableDecl((TextualJMLFieldDecl) c);
             } else if (c instanceof TextualJMLSetStatement) {
                 statement = transformSetStatement((TextualJMLSetStatement) c);
-                continue;
             } else if (c instanceof TextualJMLMergePointDecl) {
                 statement = transformMergePointDecl((TextualJMLMergePointDecl) c, comments);
             } else if (c instanceof TextualJMLAssertStatement) {
