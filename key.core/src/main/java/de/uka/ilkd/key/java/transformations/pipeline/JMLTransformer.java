@@ -127,8 +127,8 @@ public final class JMLTransformer extends JavaTransformer {
                 line = pos.line - last.line;
                 column = pos.column;
             }
-            sb.append("\n".repeat(Math.max(0, line)));
-            sb.append(" ".repeat(Math.max(0, column)));
+            StringUtil.appendRepeated(sb, '\n', Math.max(0, line));
+            StringUtil.appendRepeated(sb, ' ', Math.max(0, column));
             if (comment instanceof BlockComment) {
                 sb.append("/*").append(comment.getContent()).append("*/");
             } else {

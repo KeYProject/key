@@ -32,6 +32,7 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
 
 import org.key_project.util.collection.*;
+import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -102,7 +103,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 lineOffset = pos.line() - last.line();
                 columnOffset = pos.column();
             }
-            sb.append("\n".repeat(Math.max(0, lineOffset)));
+            StringUtil.appendRepeated(sb, '\n', Math.max(0, lineOffset));
+            StringUtil.appendRepeated(sb, ' ', Math.max(0, columnOffset));
             sb.append(" ".repeat(Math.max(0, columnOffset)));
             sb.append(comment.getText());
             last = comment.getEndPosition();
