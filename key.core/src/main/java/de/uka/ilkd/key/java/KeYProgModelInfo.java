@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.java;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -198,31 +196,8 @@ public class KeYProgModelInfo {
          */
     }
 
-    /**
-     * checks if name refers to a package
-     *
-     * @param name a String with the name to be checked
-     * @return true iff name refers to a package
-     */
-    private final Map<String, Boolean> cachePackage = new WeakHashMap<>(32);
-
     public boolean isPackage(String name) {
-        return cachePackage.computeIfAbsent(name, this::isPackageInternal);
-    }
-
-    @Nonnull
-    private Boolean isPackageInternal(String s) {
-        final var factory = services.getJavaService().getProgramFactory();
-        var paths = new ArrayList<>(factory.getSourcePaths());
-        factory.getBootClassPath().ifPresent(paths::add);
-        var relPath = s.replace('.', '/');
-        for (Path path : paths) {
-            var r = path.resolve(relPath);
-            if (Files.isDirectory(r)) {
-                return true;
-            }
-        }
-        return false;
+        return mapping.isPackageName(name);
     }
 
     /**

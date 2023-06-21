@@ -787,6 +787,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         if (n.getAnnotations().isNonEmpty())
             reportUnsupportedElement(n);
 
+        mapping.registerPackageName(n.getName().asString());
         var ref = translatePackageReference(n.getName());
         return new PackageSpecification(ref);
     }

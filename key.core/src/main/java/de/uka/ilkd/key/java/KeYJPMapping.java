@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.java;
 
 import java.util.*;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.util.Debug;
@@ -46,11 +47,14 @@ public class KeYJPMapping {
      */
     private KeYJavaType superArrayType = null;
 
+    private final Set<String> packageNames;
+
 
     public KeYJPMapping() {
         this.map = new IdentityHashMap<>(4096);
         this.typeMap = new LinkedHashMap<>(4096);
         this.revMap = new IdentityHashMap<>(4096);
+        this.packageNames = new LinkedHashSet<>(4096);
     }
 
 
@@ -64,6 +68,7 @@ public class KeYJPMapping {
         this.map = new LinkedHashMap<>(o.map);
         this.typeMap = new LinkedHashMap<>(o.typeMap);
         this.revMap = new LinkedHashMap<>(o.revMap);
+        this.packageNames = new LinkedHashSet<>(o.packageNames);
         this.superArrayType = o.superArrayType;
         this.parsedSpecial = o.parsedSpecial;
     }
@@ -142,6 +147,23 @@ public class KeYJPMapping {
 
     public KeYJavaType getSuperArrayType() {
         return this.superArrayType;
+    }
+
+    public boolean isPackageName(@Nonnull String name) {
+        return packageNames.contains(name);
+    }
+
+    public void registerPackageName(@Nonnull String name) {
+        int onePastLastDot = 0;
+        while (true) {
+            int dot = name.indexOf('.', onePastLastDot);
+            int end = dot == -1 ? name.length() : dot;
+            packageNames.add(name.substring(0, end));
+            onePastLastDot = dot + 1;
+            if (dot == -1) {
+                break;
+            }
+        }
     }
 
     public KeYJPMapping copy() {
