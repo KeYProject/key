@@ -88,14 +88,14 @@ rule impLeft;
 tryclose branch;
 rule andLeft;
 rule andLeft;
-rule castAdd formula='s_0[jv_0] = v_x_0' occ=0;
+rule castAdd formula='s_0[jv_0] = v_x_0' occ=0;
 # 5. set of equations
 instantiate hide var=iv with='jv_1' occ=1;
 rule impLeft;
 tryclose branch;
 rule andLeft;
 rule andLeft;
-rule castAdd formula='s_0[jv_1] = v_y_0' occ=0;
+rule castAdd formula='s_0[jv_1] = v_y_0' occ=0;
 # 6. set of equations
 instantiate var=iv  with='v_x_0';
 rule impLeft;
@@ -165,7 +165,7 @@ tryclose branch;
 tryclose branch;
 # established: r fixes v_y_0
 # from now on v_x_0 != v_y_0
-cut '(int)s_0[v_x_0] = (int)s_0[v_y_0]';
+cut '(int)s_0[v_x_0] = (int)s_0[v_y_0]';
 rule seqNPermInjective;
 instantiate hide var=iv with='v_x_0';
 instantiate hide var=jv with='v_y_0';
@@ -284,7 +284,7 @@ instantiate hide var=iv with='jv_0';
 instantiate hide var=jv with='v_x_0';
 rule impLeft;
 tryclose branch;
-rule seqNPermSwapNPerm formula='seqNPerm(seqSwap(s_0, jv_0, v_x_0))';
+rule seqNPermSwapNPerm formula='seqNPerm(seqSwap(s_0, jv_0, v_x_0))';
 instantiate hide var=iv with='jv_0';
 instantiate hide var=jv with='v_y_0';
 rule impLeft;
@@ -371,7 +371,7 @@ tryclose branch;
 # established: r3 fixes v_y_0
 # from now on  v_x_0 != v_y_0 and s_0[v_x_0]!= v_x_0 and  
 # s_0[v_y_0]!= v_y_0  and s_0[v_x_0]!= v_y_0
-cut 'int::seqGet(s_0, v_y_0)=v_x_0';
+cut 'int::seqGet(s_0, v_y_0)=v_x_0';
 # This corresponds to case B4ii  in the Notes.
 # in the following r4 refers to this instantion
 tryclose branch;
@@ -403,7 +403,7 @@ tryclose branch;
 rule seqNPermSwapNPerm formula='seqNPerm(seqSwap(s_0,v_x_0,jv_0))';
 instantiate hide var=iv with='v_y_0';
 instantiate hide var=jv with='jv_1';
-instantiate hide var=v_r with='seqSwap(seqSwap(s_0, v_x_0, jv_0), v_y_0, jv_1)';
+instantiate hide var=v_r with='seqSwap(seqSwap(s_0, v_x_0, jv_0), v_y_0, jv_1)';
 tryclose branch;
 "
 

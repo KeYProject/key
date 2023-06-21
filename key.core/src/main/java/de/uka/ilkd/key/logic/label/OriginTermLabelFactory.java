@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.logic.label;
 
+import java.nio.file.Paths;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -92,7 +93,7 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
                     int line = Integer.parseInt(tokenizer.nextToken());
                     matchEnd(tokenizer, str);
 
-                    return new FileOrigin(specType, filename, line);
+                    return new FileOrigin(specType, Paths.get(filename).toUri(), line);
                 } else if (token.equals("node")) {
                     int number = Integer.parseInt(tokenizer.nextToken());
 

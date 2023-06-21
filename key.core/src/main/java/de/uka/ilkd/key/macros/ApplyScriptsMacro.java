@@ -112,7 +112,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
             Path script = Files.createTempFile("key.script", "key");
             Files.writeString(script, renderedProof);
             script.toFile().deleteOnExit();
-            Location loc = new Location(script.toUri().toURL(), Position.UNDEFINED);
+            Location loc = new Location(script.toUri(), Position.UNDEFINED);
             ProofScriptEngine pse = new ProofScriptEngine(renderedProof, loc, goal);
             LOGGER.info("Running script");
             LOGGER.info(renderedProof);
@@ -121,7 +121,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
             } catch (ScriptException e) {
                 Position sourcePos = getSourcePos(pse);
                 if(sourcePos != null) {
-                    Location sloc = new Location(ass.getPositionInfo().getURI().toURL(), sourcePos);
+                    Location sloc = new Location(ass.getPositionInfo().getURI().get(), sourcePos);
                     throw new ScriptException(e.getMessage(), sloc, e);
                 } else {
                     throw e;

@@ -76,6 +76,6 @@ public class PosConvertException extends ConvertException implements HasLocation
                 this.file = dataloc.substring(dataloc.indexOf(':') + 1);
             }
         }
-        return new Location(file, position);
+        return Location.fromFileName(file, position);
     }
 }

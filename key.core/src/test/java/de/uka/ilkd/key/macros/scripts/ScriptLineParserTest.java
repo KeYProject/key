@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import java.io.StringReader;
-import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -22,9 +21,9 @@ public class ScriptLineParserTest {
             + "select formula=\"a;b\"; \n" + "hyphened-command;\n";
 
         ScriptLineParser mlp = new ScriptLineParser(new StringReader(arg), null);
-        Map<String, String> str;
-        while ((str = mlp.parseCommand()) != null) {
-            LOGGER.info(String.valueOf(str));
+        ScriptLineParser.ParsedCommand command;
+        while ((command = mlp.parseCommand()) != null) {
+            LOGGER.info(String.valueOf(command.args));
         }
     }
 }

@@ -7,10 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.CodeSource;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -118,11 +115,26 @@ public final class IOUtil {
      * @return The read content or {@code null} if the {@link URL} is {@code null}.
      * @throws IOException Occurred Exception.
      */
-    public static String readFrom(URL url) throws IOException {
+    public static Optional<String> readFrom(URL url) throws IOException {
         if (url != null) {
-            return readFrom(url.openStream());
+            return Optional.of(readFrom(url.openStream()));
         } else {
-            return null;
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Reads the complete content from the {@link URL}.
+     *
+     * @param url The {@link URL} to read from.
+     * @return The read content or {@code null} if the {@link URL} is {@code null}.
+     * @throws IOException Occurred Exception.
+     */
+    public static Optional<String> readFrom(URI url) throws IOException {
+        if (url != null) {
+            return Optional.of(readFrom(url.toURL().openStream()));
+        } else {
+            return Optional.empty();
         }
     }
 

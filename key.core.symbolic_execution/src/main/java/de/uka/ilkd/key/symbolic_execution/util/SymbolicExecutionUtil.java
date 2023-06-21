@@ -3781,16 +3781,6 @@ public final class SymbolicExecutionUtil {
     }
 
     /**
-     * Returns the path to the source file defined by the given {@link PositionInfo}.
-     *
-     * @param posInfo The {@link PositionInfo} to extract source file from.
-     * @return The source file name or {@code null} if not available.
-     */
-    public static String getSourcePath(PositionInfo posInfo) {
-        return MiscTools.getSourcePath(posInfo);
-    }
-
-    /**
      * Checks if the given {@link Term} is a select on a heap.
      *
      * @param services The {@link Services} to use.

@@ -4,15 +4,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.swing.*;
@@ -264,29 +262,31 @@ public class SendFeedbackAction extends AbstractAction {
         @Override
         boolean isEnabled() {
             if (throwable != null) {
-                Location location = null;
                 try {
-                    location = ExceptionTools.getLocation(throwable);
+                    var location = ExceptionTools.getLocation(throwable);
+                    return location.isPresent() && location.get().getFileURI().isPresent();
                 } catch (MalformedURLException e) {
                     // no valid location could be extracted
                     LOGGER.warn("Failed to extract location", e);
                     return false;
                 }
-                return Location.isValidLocation(location);
             }
             return false;
         }
 
         @Override
         byte[] retrieveFileData() throws IOException {
-            Location location = ExceptionTools.getLocation(throwable);
             /*
              * Certainly there are more efficient methods than reading to string with IOUtil (using
              * default charset) and then writing back to byte[] (using default charset again).
              * However, this way it is a very concise and easy to read.
              */
-            String source = IOUtil.readFrom(location.getFileURL());
-            return source.getBytes(Charset.defaultCharset());
+            URI url = ExceptionTools.getLocation(throwable)
+                    .flatMap(Location::getFileURI)
+                    .orElse(null);
+            Optional<String> content = IOUtil.readFrom(url);
+            return content.map(s -> s.getBytes(Charset.defaultCharset()))
+                    .orElse(new byte[0]);
         }
     }
 

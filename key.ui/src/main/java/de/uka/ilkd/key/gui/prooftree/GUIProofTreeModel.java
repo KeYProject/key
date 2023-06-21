@@ -247,24 +247,12 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
 
     /**
      * Set filters active or inactive and update tree if necessary.
-     *
-     * @param filter
-     * @param active
-     */
-    public void setFilter(ProofTreeViewFilter filter, boolean active) {
-        if (active != filter.isActive()) {
-            setFilterImmediately(filter, active);
-        }
-    }
-
-    /**
-     * Set filters active or inactive and update tree if necessary.
      * Always updates the filter and the tree.
      *
      * @param filter the filter
      * @param active whether to activate the filter
      */
-    public void setFilterImmediately(ProofTreeViewFilter filter, boolean active) {
+    public void setFilter(ProofTreeViewFilter filter, boolean active) {
         if (filter == null) {
             activeNodeFilter = null;
             updateTree((TreeNode) null);
