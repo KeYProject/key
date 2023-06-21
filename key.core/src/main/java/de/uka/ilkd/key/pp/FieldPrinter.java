@@ -125,7 +125,7 @@ class FieldPrinter {
 
     /*
      * Determine whether the field constant is a generic object property. Those are surrounded by
-     * angle brackets, e.g. o.<created>
+     * angle brackets, e.g. o.$created
      */
     protected boolean isBuiltinObjectProperty(Term fieldTerm) {
         return fieldTerm.op().name().toString().contains("::<")

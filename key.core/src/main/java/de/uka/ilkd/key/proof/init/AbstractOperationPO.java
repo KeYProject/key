@@ -595,14 +595,14 @@ public abstract class AbstractOperationPO extends AbstractPO {
         // "self != null"
         final Term selfNotNull = generateSelfNotNull(getProgramMethod(), selfVar);
 
-        // "self.<created> = TRUE"
+        // "self.$created = TRUE"
         final Term selfCreated = generateSelfCreated(heaps, getProgramMethod(), selfVar, services);
 
         // "MyClass::exactInstance(self) = TRUE"
         final Term selfExactType = generateSelfExactType(getProgramMethod(), selfVar, selfKJT);
 
         // conjunction of...
-        // - "p_i = null | p_i.<created> = TRUE" for object parameters, and
+        // - "p_i = null | p_i.$created = TRUE" for object parameters, and
         // - "inBounds(p_i)" for integer parameters
         Term paramsOK = generateParamsOK(paramVars);
 

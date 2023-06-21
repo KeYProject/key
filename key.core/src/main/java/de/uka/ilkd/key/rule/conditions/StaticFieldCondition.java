@@ -49,7 +49,7 @@ public class StaticFieldCondition extends VariableConditionAdapter {
 
 
             if (endOfClassName < 0) {
-                // not a normal attribute, maybe an implicit attribute like <created>?
+                // not a normal attribute, maybe an implicit attribute like $created?
                 endOfClassName = name.indexOf("::<");
                 startAttributeName = endOfClassName + 2;
             }

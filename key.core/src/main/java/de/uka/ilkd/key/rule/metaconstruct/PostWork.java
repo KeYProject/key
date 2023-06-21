@@ -11,7 +11,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * creates an assignment instantiationOf(#newObjectsV).<initialized> = true
+ * creates an assignment instantiationOf(#newObjectsV).$initialized = true
  */
 public class PostWork extends ProgramTransformer {
 

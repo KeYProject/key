@@ -979,7 +979,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             if (receiver == null) {
                 raiseError("Unknown reference to " + fullyQualifiedName, ctx);
             }
-            return lookupIdentifier("<transient>", receiver, null, ctx);
+            return lookupIdentifier("$transient", receiver, null, ctx);
         }
         if (ctx.THIS() != null) {
             assert !methodCall;
@@ -1353,7 +1353,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 }
             }
             if (ctx.TRANSIENT() != null) {
-                return lookupIdentifier("<transient>", base, null, ctx);
+                return lookupIdentifier("$transient", base, null, ctx);
             }
             if (ctx.this_() != null) {
                 return new SLExpression(

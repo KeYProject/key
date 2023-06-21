@@ -261,11 +261,11 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *     <code>
      *  {
      *    this.<nextToCreate> = this.<nextToCreate>.;
-     *    this.<initialized> = false;
-     *    this.<created>     = true;
-     *    this.<prepare>();
-     *    this.<transient> = transientType;
-     *    this.<initialized> = true;
+     *    this.$initialized = false;
+     *    this.$created     = true;
+     *    this.$prepare();
+     *    this.$transient = transientType;
+     *    this.$initialized = true;
      *    return this;
      *   }
      *   </code>

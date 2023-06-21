@@ -40,7 +40,7 @@ public class SMTObjTranslator implements SMTTranslator {
     private static final String EMPTY_CONSTANT = "empty";
     public static final String ELEMENTOF = "elementOf";
     private static final String SELECT = "select";
-    private static final String CREATED_FIELD_NAME = "java.lang.Object::<created>";
+    private static final String CREATED_FIELD_NAME = "java.lang.Object::$created";
     private static final String ARR_FUNCTION_NAME = "arr";
     private static final String SEQ_EMPTY = "seqEmpty";
     private static final String SEQ_OUTSIDE = "seqGetOutside";

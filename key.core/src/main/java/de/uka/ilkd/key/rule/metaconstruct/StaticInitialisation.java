@@ -62,7 +62,7 @@ public class StaticInitialisation extends ProgramTransformer {
 
         } else {
             // at the moment the 'new' case is catched via static method
-            // call of <createObject>
+            // call of $createObject
             Debug.fail("static initialisation: Unexpected case in static initialisation.");
         }
 

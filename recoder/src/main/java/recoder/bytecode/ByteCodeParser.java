@@ -563,7 +563,7 @@ public class ByteCodeParser {
     MethodInfo readMethodInfo() throws IOException, ByteCodeFormatException {
         int methAccessFlags = in.readUnsignedShort();
         String name = pool[in.readUnsignedShort()];
-        boolean isConstructor = "<init>".equals(name);
+        boolean isConstructor = "$init".equals(name);
         boolean isInitializer = false;
         if (isConstructor) {
             name = shortName;

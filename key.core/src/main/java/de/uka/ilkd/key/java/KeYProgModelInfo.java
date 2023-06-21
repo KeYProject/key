@@ -395,9 +395,10 @@ public class KeYProgModelInfo {
         List<ResolvedType> jpSignature = StreamSupport.stream(signature.spliterator(), false)
                 .map(this::getJavaParserType).toList();
         var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);
-        return (IProgramMethod) mapping
-                .resolvedDeclarationToKeY(method.getDeclaration().orElseThrow())
-                .orElseThrow();
+        var declaration = method.getDeclaration()
+                .orElseThrow(() -> new NoSuchElementException(
+                    "Unresolved method " + name + " in type " + ct.getJavaType()));
+        return (IProgramMethod) mapping.resolvedDeclarationToKeY(declaration).orElseThrow();
     }
 
     /**

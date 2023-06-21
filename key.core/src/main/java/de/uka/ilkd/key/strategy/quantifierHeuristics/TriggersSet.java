@@ -288,7 +288,7 @@ public class TriggersSet {
         private boolean isAcceptableTrigger(Term term, Services services) {
             final Operator op = term.op();
 
-            // we do not want to match on expressions a.<created>
+            // we do not want to match on expressions a.$created
 
             if (term.op() == services.getTypeConverter().getHeapLDT().getSelect(term.sort(),
                 services)) {

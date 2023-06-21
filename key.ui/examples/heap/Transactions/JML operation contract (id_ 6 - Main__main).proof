@@ -413,7 +413,7 @@
                               (rule "variableDeclaration" (formula "53") (term "1") (newnames "e_1"))
                               (rule "staticMethodCallStaticWithAssignmentViaTypereference" (formula "53") (term "1") (inst "#v0=e_2"))
                               (rule "variableDeclaration" (formula "53") (term "1") (newnames "e_2"))
-                              (rule "methodBodyExpand" (formula "53") (term "1") (newnames "heapBefore_<createObject>"))
+                              (rule "methodBodyExpand" (formula "53") (term "1") (newnames "heapBefore_$createObject"))
                               (builtin "One Step Simplification" (formula "53"))
                               (rule "variableDeclaration" (formula "53") (term "1") (newnames "__NEW__"))
                               (rule "staticMethodCallStaticWithAssignmentViaTypereference" (formula "53") (term "1") (inst "#v0=e_3"))
@@ -439,13 +439,13 @@
                               (rule "assignment" (formula "56") (term "1"))
                               (builtin "One Step Simplification" (formula "56"))
                               (rule "methodCallWithinClass" (formula "56") (term "1"))
-                              (rule "methodBodyExpand" (formula "56") (term "1") (newnames "heapBefore_<prepareEnter>"))
+                              (rule "methodBodyExpand" (formula "56") (term "1") (newnames "heapBefore_$prepareEnter"))
                               (builtin "One Step Simplification" (formula "56"))
                               (rule "methodCallSuper" (formula "56") (term "1"))
-                              (rule "methodBodyExpand" (formula "56") (term "1") (newnames "heapBefore_<prepare>"))
+                              (rule "methodBodyExpand" (formula "56") (term "1") (newnames "heapBefore_$prepare"))
                               (builtin "One Step Simplification" (formula "56"))
                               (rule "methodCallSuper" (formula "56") (term "1"))
-                              (rule "methodBodyExpand" (formula "56") (term "1") (newnames "heapBefore_<prepare>_0"))
+                              (rule "methodBodyExpand" (formula "56") (term "1") (newnames "heapBefore_$prepare_0"))
                               (builtin "One Step Simplification" (formula "56"))
                               (rule "methodCallEmpty" (formula "56") (term "1"))
                               (rule "blockEmpty" (formula "56") (term "1"))
@@ -464,13 +464,13 @@
                               (rule "blockEmpty" (formula "56") (term "1"))
                               (rule "assignment" (formula "56") (term "1"))
                               (builtin "One Step Simplification" (formula "56"))
-                              (rule "methodBodyExpand" (formula "56") (term "1") (newnames "heapBefore_<init>"))
+                              (rule "methodBodyExpand" (formula "56") (term "1") (newnames "heapBefore_$init"))
                               (builtin "One Step Simplification" (formula "56"))
                               (rule "methodCallSuper" (formula "56") (term "1"))
-                              (rule "methodBodyExpand" (formula "56") (term "1") (newnames "heapBefore_<init>_0"))
+                              (rule "methodBodyExpand" (formula "56") (term "1") (newnames "heapBefore_$init_0"))
                               (builtin "One Step Simplification" (formula "56"))
                               (rule "methodCallSuper" (formula "56") (term "1"))
-                              (rule "methodBodyExpand" (formula "56") (term "1") (newnames "heapBefore_<init>_1"))
+                              (rule "methodBodyExpand" (formula "56") (term "1") (newnames "heapBefore_$init_1"))
                               (builtin "One Step Simplification" (formula "56"))
                               (rule "methodCallEmpty" (formula "56") (term "1"))
                               (rule "blockEmpty" (formula "56") (term "1"))
@@ -512,53 +512,53 @@
                                     (builtin "One Step Simplification" (formula "56"))
                                     (rule "false_right" (formula "56"))
                                     (rule "ifthenelse_split" (formula "51") (term "0"))
-                                    (branch "   if (self_1.<created> = TRUE)
+                                    (branch "   if (self_1.$created = TRUE)
       then (TRUE)
       else (boolean::select(anonHeap_Account,
                              self_1,
-                             <created>))
+                             $created))
 = TRUE TRUE"
                                        (builtin "One Step Simplification" (formula "52"))
                                        (rule "closeTrue" (formula "52"))
                                     )
-                                    (branch "   if (self_1.<created> = TRUE)
+                                    (branch "   if (self_1.$created = TRUE)
       then (TRUE)
       else (boolean::select(anonHeap_Account,
                              self_1,
-                             <created>))
+                             $created))
 = TRUE FALSE"
                                        (rule "ifthenelse_split" (formula "1") (term "0,0,1"))
-                                       (branch "   if (  if (  if (  if (  if (  if (  e_3.<created>
+                                       (branch "   if (  if (  if (  if (  if (  if (  e_3.$created
                                           = TRUE)
                                          then (TRUE)
                                          else (boolean::select(anonHeap_Account,
                                                                 e_3,
-                                                                <created>))
+                                                                $created))
                                    = TRUE)
                                   then (TRUE)
                                   else (boolean::select(anonHeap_deposit,
                                                          e_3,
-                                                         <created>))
+                                                         $created))
                             = TRUE)
                            then (TRUE)
                            else (boolean::select(anonHeap_Account_0,
                                                   e_3,
-                                                  <created>))
+                                                  $created))
                      = TRUE)
                     then (TRUE)
                     else (boolean::select(anonHeap_deposit_0,
                                            e_3,
-                                           <created>))
+                                           $created))
               = TRUE)
              then (TRUE)
              else (boolean::select(anonHeap_transfer,
                                     e_3,
-                                    <created>))
+                                    $created))
        = TRUE)
       then (TRUE)
       else (boolean::select(anonHeap_getTotal,
                              e_3,
-                             <created>))
+                             $created))
 = TRUE TRUE"
                                           (builtin "One Step Simplification" (formula "2"))
                                           (rule "notLeft" (formula "2"))
@@ -585,37 +585,37 @@
                                           (builtin "One Step Simplification" (formula "49") (ifInst ""  (formula "3")))
                                           (rule "closeTrue" (formula "49"))
                                        )
-                                       (branch "   if (  if (  if (  if (  if (  if (  e_3.<created>
+                                       (branch "   if (  if (  if (  if (  if (  if (  e_3.$created
                                           = TRUE)
                                          then (TRUE)
                                          else (boolean::select(anonHeap_Account,
                                                                 e_3,
-                                                                <created>))
+                                                                $created))
                                    = TRUE)
                                   then (TRUE)
                                   else (boolean::select(anonHeap_deposit,
                                                          e_3,
-                                                         <created>))
+                                                         $created))
                             = TRUE)
                            then (TRUE)
                            else (boolean::select(anonHeap_Account_0,
                                                   e_3,
-                                                  <created>))
+                                                  $created))
                      = TRUE)
                     then (TRUE)
                     else (boolean::select(anonHeap_deposit_0,
                                            e_3,
-                                           <created>))
+                                           $created))
               = TRUE)
              then (TRUE)
              else (boolean::select(anonHeap_transfer,
                                     e_3,
-                                    <created>))
+                                    $created))
        = TRUE)
       then (TRUE)
       else (boolean::select(anonHeap_getTotal,
                              e_3,
-                             <created>))
+                             $created))
 = TRUE FALSE"
                                           (rule "ifthenelse_split" (formula "35") (term "0"))
                                           (branch " self_1 = self_0 TRUE"
@@ -694,11 +694,11 @@
                      (branch " Pre"
                         (builtin "One Step Simplification" (formula "47"))
                         (rule "ifthenelse_split" (formula "43") (term "0,0,0"))
-                        (branch " self_1.<created> = TRUE TRUE"
+                        (branch " self_1.$created = TRUE TRUE"
                            (builtin "One Step Simplification" (formula "44"))
                            (rule "closeTrue" (formula "44"))
                         )
-                        (branch " self_1.<created> = TRUE FALSE"
+                        (branch " self_1.$created = TRUE FALSE"
                            (rule "ifthenelse_split" (formula "33") (term "0"))
                            (branch " self_1 = self_0 TRUE"
                               (rule "polySimp_homoEq" (formula "34"))
@@ -719,12 +719,12 @@
                               (rule "polySimp_sepPosMonomial" (formula "33"))
                               (rule "mul_literals" (formula "33") (term "1"))
                               (rule "ifthenelse_split" (formula "45") (term "0"))
-                              (branch "   boolean::select(anonHeap_Account, self_1, <created>)
+                              (branch "   boolean::select(anonHeap_Account, self_1, $created)
 = TRUE TRUE"
                                  (builtin "One Step Simplification" (formula "46"))
                                  (rule "closeTrue" (formula "46"))
                               )
-                              (branch "   boolean::select(anonHeap_Account, self_1, <created>)
+                              (branch "   boolean::select(anonHeap_Account, self_1, $created)
 = TRUE FALSE"
                                  (rule "cut_direct" (formula "50") (term "1"))
                                  (branch " CUT: wellFormed(heapAfter_getTotal) TRUE"
@@ -3645,20 +3645,20 @@
                   (builtin "One Step Simplification" (formula "35"))
                   (rule "applyEq" (formula "35") (term "2,0,0,0,0") (ifseqformula "15"))
                   (rule "ifthenelse_split" (formula "31") (term "0"))
-                  (branch "   if (self_1.<created> = TRUE)
+                  (branch "   if (self_1.$created = TRUE)
       then (TRUE)
       else (boolean::select(anonHeap_Account,
                              self_1,
-                             <created>))
+                             $created))
 = TRUE TRUE"
                      (builtin "One Step Simplification" (formula "32"))
                      (rule "closeTrue" (formula "32"))
                   )
-                  (branch "   if (self_1.<created> = TRUE)
+                  (branch "   if (self_1.$created = TRUE)
       then (TRUE)
       else (boolean::select(anonHeap_Account,
                              self_1,
-                             <created>))
+                             $created))
 = TRUE FALSE"
                      (rule "ifthenelse_split" (formula "36") (term "0,0,0,0"))
                      (branch " self_1 = self_0 TRUE"
@@ -3684,11 +3684,11 @@
                         (rule "qeq_literals" (formula "37") (term "0,0,0"))
                         (builtin "One Step Simplification" (formula "37") (ifInst ""  (formula "36")))
                         (rule "ifthenelse_split" (formula "31") (term "0"))
-                        (branch " self_1.<created> = TRUE TRUE"
+                        (branch " self_1.$created = TRUE TRUE"
                            (builtin "One Step Simplification" (formula "32"))
                            (rule "closeTrue" (formula "32"))
                         )
-                        (branch " self_1.<created> = TRUE FALSE"
+                        (branch " self_1.$created = TRUE FALSE"
                            (rule "cut_direct" (formula "38") (term "1"))
                            (branch " CUT: wellFormed(heapAfter_deposit_0) TRUE"
                               (builtin "One Step Simplification" (formula "39"))

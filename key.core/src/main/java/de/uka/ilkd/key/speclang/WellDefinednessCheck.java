@@ -576,14 +576,14 @@ public abstract class WellDefinednessCheck implements Contract {
         // "self != null"
         final Term selfNotNull = generateSelfNotNull(self);
 
-        // "self.<created> = TRUE"
+        // "self.$created = TRUE"
         final Term selfCreated = generateSelfCreated(self, heap);
 
         // "MyClass::exactInstance(self) = TRUE"
         final Term selfExactType = generateSelfExactType(self);
 
         // conjunction of...
-        // - "p_i = null | p_i.<created> = TRUE" for object parameters, and
+        // - "p_i = null | p_i.$created = TRUE" for object parameters, and
         // - "inBounds(p_i)" for integer parameters
         final Term paramsOK = generateParamsOK(params);
 

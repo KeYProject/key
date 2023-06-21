@@ -64,7 +64,7 @@ class SelectPrinter extends FieldPrinter {
                     printAnySelect(lp, heapTerm, objectTerm, fieldTerm, tacitHeap);
                 }
             } else if (isBuiltinObjectProperty(fieldTerm)) {
-                // object properties denoted like o.<created>
+                // object properties denoted like o.$created
                 printBuiltinObjectProperty(lp, t, heapTerm, objectTerm, fieldTerm, tacitHeap);
             } else if (isStaticFieldConstant(objectTerm, fieldTerm)
                     && getFieldSort(fieldTerm).equals(t.sort())) {
@@ -220,7 +220,7 @@ class SelectPrinter extends FieldPrinter {
 
     /*
      * Print a select-term of the following form: T::select( ... , ... , java.lang.Object::<...>)
-     * For example: boolean::select(heap, object, java.lang.Object::<created>)
+     * For example: boolean::select(heap, object, java.lang.Object::$created)
      */
     private void printBuiltinObjectProperty(LogicPrinter lp, Term t, Term heapTerm, Term objectTerm,
             Term fieldTerm,

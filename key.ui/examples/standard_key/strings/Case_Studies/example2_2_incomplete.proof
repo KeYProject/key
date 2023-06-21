@@ -46,8 +46,8 @@
    inReachableState
 -> \forall java.lang.String s; 
      \forall java.lang.String t; 
-       (     s.<created>@(java.lang.Object) = TRUE
-           & t.<created>@(java.lang.Object) = TRUE
+       (     s.$created@(java.lang.Object) = TRUE
+           & t.$created@(java.lang.Object) = TRUE
         ->   StringDistance.distance(s, t)
            = StringDistance.distance(t, s))
 
@@ -8613,7 +8613,7 @@
                                                 (rule "variableDeclaration" (formula "19") (term "2") (newnames "b_39") (userinteraction))
                                                 (rule "equality_comparison_new" (formula "19") (term "2") (userinteraction))
                                                 (builtin "Update Simplification" (formula "19"))
-                                                (opengoal "   inReachableState -> \\forall java.lang.String s;       \\forall java.lang.String t;         (     s.<created>@(java.lang.Object) = TRUE            & t.<created>@(java.lang.Object) = TRUE         ->   StringDistance.distance(s, t)            = StringDistance.distance(t, s)) ")
+                                                (opengoal "   inReachableState -> \\forall java.lang.String s;       \\forall java.lang.String t;         (     s.$created@(java.lang.Object) = TRUE            & t.$created@(java.lang.Object) = TRUE         ->   StringDistance.distance(s, t)            = StringDistance.distance(t, s)) ")
                                              )
                                           )
                                           (branch " Exceptional Post"

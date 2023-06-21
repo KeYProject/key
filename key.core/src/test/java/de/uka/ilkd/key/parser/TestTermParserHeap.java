@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.parser;
 
 import java.io.IOException;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.logic.Term;
@@ -43,7 +44,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     private Term getSelectTerm(String sort, Term heap, Term object, Term field) {
-        Operator op = lookup_func(sort + "::select");
+        Operator op = Objects.requireNonNull(lookup_func(sort + "::select"));
         Term[] params = new Term[] { heap, object, field };
         return tf.createTerm(op, params);
     }
@@ -240,15 +241,15 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     @Test
     public void testGenericObjectProperties() throws Exception {
         // test pretty syntax
-        comparePrettySyntaxAgainstVerboseSyntax("a.<created>",
-            "boolean::select(heap,a,java.lang.Object::<created>)");
-        comparePrettySyntaxAgainstVerboseSyntax("a.<initialized>",
-            "boolean::select(heap,a,java.lang.Object::<initialized>)");
-        comparePrettySyntaxAgainstVerboseSyntax("a.<transient>",
-            "int::select(heap,a,java.lang.Object::<transient>)");
+        comparePrettySyntaxAgainstVerboseSyntax("a.$created",
+            "boolean::select(heap,a,java.lang.Object::$created)");
+        comparePrettySyntaxAgainstVerboseSyntax("a.$initialized",
+            "boolean::select(heap,a,java.lang.Object::$initialized)");
+        comparePrettySyntaxAgainstVerboseSyntax("a.$transient",
+            "int::select(heap,a,java.lang.Object::$transient)");
 
         // test fallback mode in case non-default select-type is used
-        parseAndPrint("int::select(heap,a,java.lang.Object::<created>)");
+        parseAndPrint("int::select(heap,a,java.lang.Object::$created)");
 
     }
 
@@ -453,8 +454,8 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         comparePrettySyntaxAgainstVerboseSyntax(pretty, verbose);
 
         // object property
-        pretty = "heap[create(a)][a.<initialized> := FALSE]";
-        verbose = "store(create(heap,a),a,java.lang.Object::<initialized>,FALSE)";
+        pretty = "heap[create(a)][a.$initialized := FALSE]";
+        verbose = "store(create(heap,a),a,java.lang.Object::$initialized,FALSE)";
         comparePrettySyntaxAgainstVerboseSyntax(pretty, verbose);
 
     }

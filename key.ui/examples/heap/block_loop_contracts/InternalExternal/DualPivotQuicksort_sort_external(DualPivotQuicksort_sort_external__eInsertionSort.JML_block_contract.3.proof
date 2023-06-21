@@ -589,7 +589,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalBlockContractPO
                            (builtin "One Step Simplification" (formula "14"))
                            (rule "true_left" (formula "14"))
                            (rule "cut_direct" (formula "27") (term "0"))
-                           (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+                           (branch "CUT: anonIn_a.$created = TRUE TRUE"
                               (builtin "One Step Simplification" (formula "28"))
                               (rule "true_left" (formula "28"))
                               (rule "allLeft" (formula "24") (inst "t=i_0"))
@@ -1287,7 +1287,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalBlockContractPO
                                  )
                               )
                            )
-                           (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+                           (branch "CUT: anonIn_a.$created = TRUE FALSE"
                               (builtin "One Step Simplification" (formula "27"))
                               (rule "allLeft" (formula "24") (inst "t=i_0"))
                               (rule "replaceKnownSelect_taclet000000000_15" (formula "24") (term "1,1,0"))
@@ -2083,7 +2083,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalBlockContractPO
                            (rule "applyEqReverse" (formula "6") (term "2,0") (ifseqformula "5"))
                            (rule "hideAuxiliaryEq" (formula "5"))
                            (rule "cut_direct" (formula "27") (term "0"))
-                           (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+                           (branch "CUT: anonIn_a.$created = TRUE TRUE"
                               (builtin "One Step Simplification" (formula "28"))
                               (rule "true_left" (formula "28"))
                               (rule "allLeft" (formula "25") (inst "t=i_0"))
@@ -2750,7 +2750,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalBlockContractPO
                                  )
                               )
                            )
-                           (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+                           (branch "CUT: anonIn_a.$created = TRUE FALSE"
                               (builtin "One Step Simplification" (formula "27"))
                               (rule "allLeft" (formula "25") (inst "t=i_0"))
                               (rule "replaceKnownSelect_taclet100000000_15" (formula "25") (term "1,1,0"))
@@ -3557,7 +3557,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalBlockContractPO
                   (rule "mul_literals" (formula "1") (term "1,1"))
                   (rule "commute_or" (formula "1"))
                   (rule "cut_direct" (formula "17") (term "0"))
-                  (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+                  (branch "CUT: anonIn_a.$created = TRUE TRUE"
                      (builtin "One Step Simplification" (formula "18"))
                      (rule "true_left" (formula "18"))
                      (rule "cut_direct" (formula "1") (term "1"))
@@ -3641,7 +3641,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalBlockContractPO
                         (rule "closeFalse" (formula "11"))
                      )
                   )
-                  (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+                  (branch "CUT: anonIn_a.$created = TRUE FALSE"
                      (builtin "One Step Simplification" (formula "17"))
                      (rule "cut_direct" (formula "1") (term "1"))
                      (branch "CUT: anonIn_a.length ≤ anonIn_e2 TRUE"
@@ -3826,7 +3826,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalBlockContractPO
             (rule "mul_literals" (formula "1") (term "1,1"))
             (rule "commute_or" (formula "1"))
             (rule "cut_direct" (formula "17") (term "0"))
-            (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+            (branch "CUT: anonIn_a.$created = TRUE TRUE"
                (builtin "One Step Simplification" (formula "18"))
                (rule "true_left" (formula "18"))
                (rule "cut_direct" (formula "1") (term "1"))
@@ -3910,7 +3910,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalBlockContractPO
                   (rule "closeFalse" (formula "5"))
                )
             )
-            (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+            (branch "CUT: anonIn_a.$created = TRUE FALSE"
                (builtin "One Step Simplification" (formula "17"))
                (rule "cut_direct" (formula "1") (term "1"))
                (branch "CUT: anonIn_a.length ≤ anonIn_e2 TRUE"
@@ -4119,7 +4119,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalBlockContractPO
             (builtin "One Step Simplification" (formula "11"))
             (rule "true_left" (formula "11"))
             (rule "cut_direct" (formula "24") (term "0"))
-            (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+            (branch "CUT: anonIn_a.$created = TRUE TRUE"
                (builtin "One Step Simplification" (formula "25"))
                (rule "true_left" (formula "25"))
                (rule "allLeft" (formula "21") (inst "t=i_0"))
@@ -4180,7 +4180,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalBlockContractPO
                (rule "leq_literals" (formula "1"))
                (rule "closeFalse" (formula "1"))
             )
-            (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+            (branch "CUT: anonIn_a.$created = TRUE FALSE"
                (builtin "One Step Simplification" (formula "24"))
                (rule "allLeft" (formula "21") (inst "t=i_0"))
                (rule "replaceKnownSelect_taclet0100_6" (formula "21") (term "1,1,0"))
@@ -4331,7 +4331,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalBlockContractPO
             (rule "polySimp_mulLiterals" (formula "3") (term "1,1"))
             (rule "polySimp_elimOne" (formula "3") (term "1,1"))
             (rule "cut_direct" (formula "23") (term "0"))
-            (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+            (branch "CUT: anonIn_a.$created = TRUE TRUE"
                (builtin "One Step Simplification" (formula "24"))
                (rule "true_left" (formula "24"))
                (rule "allLeft" (formula "21") (inst "t=i_0"))
@@ -4402,7 +4402,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalBlockContractPO
                (rule "leq_literals" (formula "21"))
                (rule "closeFalse" (formula "21"))
             )
-            (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+            (branch "CUT: anonIn_a.$created = TRUE FALSE"
                (builtin "One Step Simplification" (formula "23"))
                (rule "allLeft" (formula "21") (inst "t=i_0"))
                (rule "replaceKnownSelect_taclet1100_6" (formula "21") (term "1,1,0"))
@@ -4574,7 +4574,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalBlockContractPO
    (rule "mul_literals" (formula "1") (term "1,1"))
    (rule "commute_or" (formula "1"))
    (rule "cut_direct" (formula "16") (term "0"))
-   (branch "CUT: anonIn_a.<created> = TRUE TRUE"
+   (branch "CUT: anonIn_a.$created = TRUE TRUE"
       (builtin "One Step Simplification" (formula "17"))
       (rule "true_left" (formula "17"))
       (rule "cut_direct" (formula "1") (term "1"))
@@ -4658,7 +4658,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalBlockContractPO
          (rule "closeFalse" (formula "10"))
       )
    )
-   (branch "CUT: anonIn_a.<created> = TRUE FALSE"
+   (branch "CUT: anonIn_a.$created = TRUE FALSE"
       (builtin "One Step Simplification" (formula "16"))
       (rule "cut_direct" (formula "1") (term "1"))
       (branch "CUT: anonIn_a.length ≤ anonIn_e2 TRUE"

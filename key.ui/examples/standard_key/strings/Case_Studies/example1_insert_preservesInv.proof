@@ -55,11 +55,11 @@ boolean result;
 \problem {
      inReachableState
    & \forall StringSet s_0; 
-       (     s_0.<created>@(java.lang.Object) = TRUE
+       (     s_0.$created@(java.lang.Object) = TRUE
            & !s_0 = null
         -> s_0.size@(StringSet) >  (jint)(0))
    & \forall StringSet s_0; 
-       (     s_0.<created>@(java.lang.Object) = TRUE
+       (     s_0.$created@(java.lang.Object) = TRUE
            & !s_0 = null
         ->   !s_0.elements@(StringSet) = null
            &   s_0.elements@(StringSet).length
@@ -73,9 +73,9 @@ boolean result;
       & !  self.elements@(StringSet)[(jint)(javaMod(s.hashCode@(java.lang.String)(),
                                                     self.size@(StringSet)))]
          = null)
-   & (  self.<created>@(java.lang.Object) = TRUE
+   & (  self.$created@(java.lang.Object) = TRUE
       & !self = null)
-   & (s.<created>@(java.lang.Object) = TRUE | s = null)
+   & (s.$created@(java.lang.Object) = TRUE | s = null)
 -> {_s:=s}
      \[{
          exc=null;try {
@@ -84,12 +84,12 @@ boolean result;
            exc=e;
          }
        }\] (  \forall StringSet s_0; 
-                (       s_0.<created>@(java.lang.Object)
+                (       s_0.$created@(java.lang.Object)
                       = TRUE
                     & !s_0 = null
                  -> s_0.size@(StringSet) >  (jint)(0))
             & \forall StringSet s_0; 
-                (       s_0.<created>@(java.lang.Object)
+                (       s_0.$created@(java.lang.Object)
                       = TRUE
                     & !s_0 = null
                  ->   !s_0.elements@(StringSet) = null

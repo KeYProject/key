@@ -5,7 +5,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
 /**
- * Generate conjunction of... - "p_i.<created> = TRUE | p_i = null" for object parameters, and -
+ * Generate conjunction of... - "p_i.$created = TRUE | p_i = null" for object parameters, and -
  * "inBounds(p_i)" for integer parameters
  *
  * @author christoph

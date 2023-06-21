@@ -233,7 +233,7 @@ public abstract class ProgramVariable extends AbstractSortedOperator
 
 
     public boolean isImplicit() {
-        return getProgramElementName().getProgramName().startsWith("<");
+        return getProgramElementName().getProgramName().startsWith("$");
     }
 
 

@@ -19,14 +19,14 @@ public class BasicFreeInvSnippet implements FactoryMethod {
         // "self != null"
         final Term selfNotNull = f.create(BasicPOSnippetFactoryImpl.Snippet.SELF_NOT_NULL);
 
-        // "self.<created> = TRUE"
+        // "self.$created = TRUE"
         final Term selfCreated = f.create(BasicPOSnippetFactoryImpl.Snippet.SELF_CREATED);
 
         // "MyClass::exactInstance(self) = TRUE"
         final Term selfExactType = f.create(BasicPOSnippetFactoryImpl.Snippet.SELF_EXACT_TYPE);
 
         // conjunction of...
-        // - "p_i.<created> = TRUE | p_i = null" for object parameters, and
+        // - "p_i.$created = TRUE | p_i = null" for object parameters, and
         // - "inBounds(p_i)" for integer parameters
         Term paramsOK = f.create(BasicPOSnippetFactoryImpl.Snippet.PARAMS_OK);
 

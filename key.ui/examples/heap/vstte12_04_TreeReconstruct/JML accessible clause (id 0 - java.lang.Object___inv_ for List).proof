@@ -323,7 +323,7 @@
          (rule "polySimp_elimOne" (formula "1") (term "0"))
          (rule "arrayLengthNotNegative" (formula "10") (term "1"))
          (rule "ifthenelse_split" (formula "3") (term "0"))
-         (branch "self_1.a.<created> = TRUE TRUE"
+         (branch "self_1.a.$created = TRUE TRUE"
             (rule "allLeft" (formula "13") (inst "t=_var2_0"))
             (rule "inEqSimp_commuteGeq" (formula "13") (term "1,0"))
             (rule "inEqSimp_contradInEq1" (formula "13") (term "0,0") (ifseqformula "2"))
@@ -360,7 +360,7 @@
             (rule "leq_literals" (formula "1"))
             (rule "closeFalse" (formula "1"))
          )
-         (branch "self_1.a.<created> = TRUE FALSE"
+         (branch "self_1.a.$created = TRUE FALSE"
             (rule "referencedObjectIsCreatedRight" (formula "13") (ifseqformula "14"))
             (rule "close" (formula "13") (ifseqformula "4"))
          )
@@ -386,7 +386,7 @@
          (rule "polySimp_elimOne" (formula "1") (term "0"))
          (rule "arrayLengthNotNegative" (formula "10") (term "1"))
          (rule "ifthenelse_split" (formula "3") (term "0"))
-         (branch "self_1.a.<created> = TRUE TRUE"
+         (branch "self_1.a.$created = TRUE TRUE"
             (rule "allLeft" (formula "13") (inst "t=_var3_0"))
             (rule "inEqSimp_commuteGeq" (formula "13") (term "1,0"))
             (rule "inEqSimp_contradInEq1" (formula "13") (term "0,0") (ifseqformula "2"))
@@ -405,7 +405,7 @@
             (builtin "One Step Simplification" (formula "13"))
             (rule "closeFalse" (formula "13"))
          )
-         (branch "self_1.a.<created> = TRUE FALSE"
+         (branch "self_1.a.$created = TRUE FALSE"
             (rule "referencedObjectIsCreatedRight" (formula "13") (ifseqformula "14"))
             (rule "close" (formula "13") (ifseqformula "4"))
          )

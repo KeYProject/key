@@ -80,13 +80,13 @@ method=my.packageName.TheClass.TheInnerClass\\#complicatedInnerMethod(my.package
 (rule "emptyModality" (formula "9") (term "1"))
 (builtin "One Step Simplification" (formula "9"))
 (rule "orLeft" (formula "7"))
-(branch "ac.<created> = TRUE"
+(branch "ac.$created = TRUE"
    (rule "orLeft" (formula "6"))
-   (branch "o.<created> = TRUE"
+   (branch "o.$created = TRUE"
       (rule "orLeft" (formula "4"))
-      (branch "z.<created> = TRUE"
+      (branch "z.$created = TRUE"
          (rule "orLeft" (formula "5"))
-         (branch "x.<created> = TRUE"
+         (branch "x.$created = TRUE"
             (opengoal " ")
          )
          (branch "x = null"
@@ -97,7 +97,7 @@ method=my.packageName.TheClass.TheInnerClass\\#complicatedInnerMethod(my.package
       (branch "z = null"
          (rule "applyEq" (formula "9") (term "2") (ifseqformula "4"))
          (rule "orLeft" (formula "5"))
-         (branch "x.<created> = TRUE"
+         (branch "x.$created = TRUE"
             (opengoal " ")
          )
          (branch "x = null"
@@ -109,9 +109,9 @@ method=my.packageName.TheClass.TheInnerClass\\#complicatedInnerMethod(my.package
    (branch "o = null"
       (rule "applyEq" (formula "9") (term "6") (ifseqformula "6"))
       (rule "orLeft" (formula "4"))
-      (branch "z.<created> = TRUE"
+      (branch "z.$created = TRUE"
          (rule "orLeft" (formula "5"))
-         (branch "x.<created> = TRUE"
+         (branch "x.$created = TRUE"
             (opengoal " ")
          )
          (branch "x = null"
@@ -122,7 +122,7 @@ method=my.packageName.TheClass.TheInnerClass\\#complicatedInnerMethod(my.package
       (branch "z = null"
          (rule "applyEq" (formula "9") (term "2") (ifseqformula "4"))
          (rule "orLeft" (formula "5"))
-         (branch "x.<created> = TRUE"
+         (branch "x.$created = TRUE"
             (opengoal " ")
          )
          (branch "x = null"
@@ -135,11 +135,11 @@ method=my.packageName.TheClass.TheInnerClass\\#complicatedInnerMethod(my.package
 (branch "ac = null"
    (rule "applyEq" (formula "9") (term "7") (ifseqformula "7"))
    (rule "orLeft" (formula "6"))
-   (branch "o.<created> = TRUE"
+   (branch "o.$created = TRUE"
       (rule "orLeft" (formula "4"))
-      (branch "z.<created> = TRUE"
+      (branch "z.$created = TRUE"
          (rule "orLeft" (formula "5"))
-         (branch "x.<created> = TRUE"
+         (branch "x.$created = TRUE"
             (opengoal " ")
          )
          (branch "x = null"
@@ -150,7 +150,7 @@ method=my.packageName.TheClass.TheInnerClass\\#complicatedInnerMethod(my.package
       (branch "z = null"
          (rule "applyEq" (formula "9") (term "2") (ifseqformula "4"))
          (rule "orLeft" (formula "5"))
-         (branch "x.<created> = TRUE"
+         (branch "x.$created = TRUE"
             (opengoal " ")
          )
          (branch "x = null"
@@ -162,9 +162,9 @@ method=my.packageName.TheClass.TheInnerClass\\#complicatedInnerMethod(my.package
    (branch "o = null"
       (rule "applyEq" (formula "9") (term "6") (ifseqformula "6"))
       (rule "orLeft" (formula "4"))
-      (branch "z.<created> = TRUE"
+      (branch "z.$created = TRUE"
          (rule "orLeft" (formula "5"))
-         (branch "x.<created> = TRUE"
+         (branch "x.$created = TRUE"
             (opengoal " ")
          )
          (branch "x = null"
@@ -175,7 +175,7 @@ method=my.packageName.TheClass.TheInnerClass\\#complicatedInnerMethod(my.package
       (branch "z = null"
          (rule "applyEq" (formula "9") (term "2") (ifseqformula "4"))
          (rule "orLeft" (formula "5"))
-         (branch "x.<created> = TRUE"
+         (branch "x.$created = TRUE"
             (opengoal " ")
          )
          (branch "x = null"

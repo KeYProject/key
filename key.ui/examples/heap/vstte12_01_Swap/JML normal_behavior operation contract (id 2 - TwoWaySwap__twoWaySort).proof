@@ -1755,11 +1755,11 @@
                                                             (rule "replace_known_right" (formula "29") (term "1,0,2,0") (ifseqformula "28"))
                                                             (builtin "One Step Simplification" (formula "29") (ifInst ""  (formula "27")) (ifInst ""  (formula "27")) (ifInst ""  (formula "27")))
                                                             (rule "ifthenelse_split" (formula "29") (term "0,0,1,0,0"))
-                                                            (branch "o_2.<created> = TRUE TRUE"
+                                                            (branch "o_2.$created = TRUE TRUE"
                                                                (builtin "One Step Simplification" (formula "30"))
                                                                (rule "closeTrue" (formula "30"))
                                                             )
-                                                            (branch "o_2.<created> = TRUE FALSE"
+                                                            (branch "o_2.$created = TRUE FALSE"
                                                                (rule "replace_known_right" (formula "28") (term "0,1") (ifseqformula "29"))
                                                                (builtin "One Step Simplification" (formula "28"))
                                                                (rule "notRight" (formula "28"))

@@ -70,7 +70,7 @@ public class ConstructorCall extends ProgramTransformer {
 
     /*
      * The method is optimized in the sense that instead of returning
-     * <code>newObject.<init>(args);</code> a statementblock is returned which evaluates the
+     * <code>newObject.$init(args);</code> a statementblock is returned which evaluates the
      * constructor's arguments and inserts a method body statement rather than the method call which
      * avoids unneccessary proof branches. As <code>newObject</code> can never be <code>null</code>
      * no null pointer check is necessary.
