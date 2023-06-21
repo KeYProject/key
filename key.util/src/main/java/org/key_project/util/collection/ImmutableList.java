@@ -374,8 +374,8 @@ public interface ImmutableList<T>
                 } else if (l2.isEmpty()) {
                     return 1;
                 }
-                var a = (Comparable<T>) this.head();
-                var b = (T) other.head();
+                var a = (Comparable<T>) l1.head();
+                var b = (T) l2.head();
                 var value = a.compareTo(b);
                 if (value != 0) {
                     return value;

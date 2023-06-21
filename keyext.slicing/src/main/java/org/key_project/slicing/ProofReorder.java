@@ -41,12 +41,13 @@ public final class ProofReorder {
         todo.add(new Pair<>(BranchLocation.ROOT, proof.root()));
         while (!todo.isEmpty()) {
             var t = todo.pop();
-            var root = t.second;
             var loc = t.first;
+            var root = t.second;
             if (done.contains(loc)) {
                 continue;
             }
             done.add(loc);
+            System.out.println("doing branch " + loc);
 
             Deque<GraphNode> q = new ArrayDeque<>();
             for (int i = 1; i <= root.sequent().size(); i++) {
@@ -60,8 +61,14 @@ public final class ProofReorder {
                 var nextNode = q.pop();
                 List<Node> finalNewOrder = newOrder;
                 depGraph.outgoingEdgesOf(nextNode).forEach(node -> {
-                    if (!node.getBranchLocation().equals(loc)) {
-                        todo.add(new Pair<>(node.getBranchLocation(), node.getFirstInBranch()));
+                    var newLoc = node.getBranchLocation();
+                    if (!newLoc.equals(loc)) {
+                        /*
+                         * if (!todo.containsKey(newLoc) && !done.contains(newLoc)) {
+                         * System.out.println("adding branch " + newLoc);
+                         * todo.put(newLoc, node.getFirstInBranch());
+                         * }
+                         */
                         return;
                     }
 
@@ -94,10 +101,28 @@ public final class ProofReorder {
                     outputs.forEach(q::addFirst);
                 });
             }
+            List<Node> nextQ = new ArrayList<>();
+            newOrder.forEach(node -> node.childrenIterator().forEachRemaining(node2 -> {
+                if (newOrderSorted.contains(node2) || node2.getAppliedRuleApp() == null
+                        || node2.getBranchLocation() != node.getBranchLocation()) {
+                    return;
+                }
+                nextQ.add(node2);
+            }));
+            Collections.sort(nextQ);
+            // this works because there are no taclets in KeY that have no inputs and add a formula
+            // to the sequent
+            newOrder.addAll(nextQ);
             for (int i = 0; i < newOrder.size(); i++) {
                 if (newOrder.get(i).childrenCount() != 1
                         || newOrder.get(i).child(0).childrenCount() == 0) {
                     var last = newOrder.remove(i);
+                    var c = last.childrenCount();
+                    c--;
+                    while (c >= 0) {
+                        todo.addFirst(new Pair<>(last.child(c).getBranchLocation(), last.child(c)));
+                        c--;
+                    }
                     newOrder.add(last);
                     break;
                 }

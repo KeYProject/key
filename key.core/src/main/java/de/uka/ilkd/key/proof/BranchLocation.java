@@ -80,6 +80,9 @@ public class BranchLocation implements Comparable<BranchLocation> {
      * @return the remaining suffix
      */
     public BranchLocation stripPrefix(BranchLocation prefix) {
+        if (prefix.size() == location.size()) {
+            return BranchLocation.ROOT;
+        }
         return new BranchLocation(location.stripPrefix(prefix.location));
     }
 
@@ -101,6 +104,9 @@ public class BranchLocation implements Comparable<BranchLocation> {
     public BranchLocation removeLast() {
         List<Pair<Node, Integer>> list = location.toList();
         list.remove(list.size() - 1);
+        if (list.isEmpty()) {
+            return BranchLocation.ROOT;
+        }
         return new BranchLocation(ImmutableList.fromList(list));
     }
 
@@ -171,7 +177,9 @@ public class BranchLocation implements Comparable<BranchLocation> {
 
     @Override
     public int compareTo(BranchLocation other) {
-        if (this == BranchLocation.ROOT) {
+        if (this == other) {
+            return 0;
+        } else if (this == BranchLocation.ROOT) {
             return -1;
         } else if (other == BranchLocation.ROOT) {
             return 1;
