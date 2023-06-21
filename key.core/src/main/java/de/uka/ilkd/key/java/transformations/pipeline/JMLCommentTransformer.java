@@ -10,6 +10,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.DataKey;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.BodyDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.stmt.BlockStmt;
@@ -36,7 +37,9 @@ public class JMLCommentTransformer extends JavaTransformer {
             return;
         }
 
+        var orphan = cu.getOrphanComments();
         var filterComments = filterToplevel(allComments, cu);
+        filterComments.addAll(orphan);
         if (filterComments.isEmpty()) {
             return;
         }
@@ -67,7 +70,7 @@ public class JMLCommentTransformer extends JavaTransformer {
             if (n != null) {
                 List<Comment> specs = new ArrayList<>();
                 n.setData(AFTER_COMMENTS, specs);
-                specs.addAll(filterComments.subList(commentIdx, filterComments.size() - 1));
+                specs.addAll(filterComments.subList(commentIdx, filterComments.size()));
             }
         }
     }
@@ -80,6 +83,8 @@ public class JMLCommentTransformer extends JavaTransformer {
         if (cu instanceof BodyDeclaration<?>)
             return true;
         if (cu instanceof BlockStmt)
+            return true;
+        if (cu instanceof MethodDeclaration)
             return true;
         return false;
     }

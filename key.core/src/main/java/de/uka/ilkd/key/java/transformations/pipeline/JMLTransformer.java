@@ -14,10 +14,7 @@
 package de.uka.ilkd.key.java.transformations.pipeline;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.parser.Location;
@@ -138,9 +135,10 @@ public final class JMLTransformer extends JavaTransformer {
             sb.append(" ");
         }
         sb.append(getFullText(ctx));
+        // TODO this is garbage, see Throwable::cause, protected is not contained in ctx
         int column = ctx.start.getCharPositionInLine() - sb.toString().length();
-        if (column < 0) {
-            column = 0;
+        if (column <= 0) {
+            column = 1;
         }
         var pos = de.uka.ilkd.key.java.Position.newOneBased(ctx.start.getLine(), column);
         var location = new Location(
@@ -357,8 +355,8 @@ public final class JMLTransformer extends JavaTransformer {
         return methodDecl;
     }
 
-    private void transformAssertStatement(TextualJMLAssertStatement stat,
-            List<Comment> originalComments) throws SLTranslationException {
+    private Statement transformAssertStatement(TextualJMLAssertStatement stat)
+            throws SLTranslationException {
         ParserRuleContext ctx = stat.getContext().first;
 
         // Convert to block with block contract, attach to AST.
@@ -378,15 +376,15 @@ public final class JMLTransformer extends JavaTransformer {
             BlockStmt block = new BlockStmt();
             block.setAssociatedSpecificationComments(new NodeList<>(new BlockComment(comment)));
             updatePositionInformation(block, location.getPosition());
-            insertAtSourceNodeOffsetInParent(block, originalComments);
+            return block;
         } catch (Throwable e) {
             throw new SLTranslationException(
                 format("%s (%s)", e.getMessage(), e.getClass().getName()), location, e);
         }
     }
 
-    private void transformSetStatement(TextualJMLSetStatement stat,
-            List<Comment> originalComments) throws SLTranslationException {
+    private Statement transformSetStatement(TextualJMLSetStatement stat)
+            throws SLTranslationException {
         // parse statement, attach to AST
         var location = Location.fromToken(stat.getAssignment().start);
         try {
@@ -398,8 +396,7 @@ public final class JMLTransformer extends JavaTransformer {
             var assignStmt = stmtList.get(0);
             shiftPosition(assignStmt, location.getPosition());
             // updatePositionInformation(assignStmt, pos);
-
-            insertAtSourceNodeOffsetInParent(assignStmt, originalComments);
+            return assignStmt;
         } catch (Throwable e) {
             throw new SLTranslationException(e.getMessage() + " (" + e.getClass().getName() + ")",
                 location, e);
@@ -437,49 +434,55 @@ public final class JMLTransformer extends JavaTransformer {
         return mps;
     }
 
-    private void transformClassLevelComments(TypeDeclaration<?> td, URI fileName)
+    private static <T> Optional<T> extractData(Node node, DataKey<T> key) {
+        try {
+            var result = node.getData(key);
+            node.removeData(key);
+            return Optional.of(result);
+        } catch (IllegalStateException ignored) {
+            return Optional.empty();
+        }
+    }
+
+    private void transformClassLevelComments(TypeDeclaration<?> td, Node child, URI fileName)
             throws SLTranslationException {
-        // iterate over all pre-existing children
-        var children = getChildren(td);
-        for (Node child : children) {
-            List<Comment> comments;
-            try {
-                comments = child.getData(JMLCommentTransformer.BEFORE_COMMENTS);
-                child.removeData(JMLCommentTransformer.BEFORE_COMMENTS);
-            } catch (IllegalStateException e) {
-                continue;
-            }
-            // concatenate comments of child, determine position
-            String concatenatedComment = concatenate(comments);
-            Position astPos = comments.get(0).getRange().get().begin;
-            de.uka.ilkd.key.java.Position pos = de.uka.ilkd.key.java.Position.newOneBased(
-                astPos.line, astPos.column);
+        List<Comment> comments = extractData(child, JMLCommentTransformer.BEFORE_COMMENTS)
+                .orElse(new ArrayList<>());
+        comments.addAll(extractData(child, JMLCommentTransformer.AFTER_COMMENTS)
+                .orElse(Collections.emptyList()));
+        if (comments.isEmpty()) {
+            return;
+        }
+        // concatenate comments of child, determine position
+        String concatenatedComment = concatenate(comments);
+        Position astPos = comments.get(0).getRange().get().begin;
+        de.uka.ilkd.key.java.Position pos = de.uka.ilkd.key.java.Position.newOneBased(
+            astPos.line, astPos.column);
 
-            // call preparser
-            PreParser pp = new PreParser();
-            ImmutableList<TextualJMLConstruct> constructs =
-                pp.parseClassLevel(concatenatedComment, fileName, pos);
-            warnings = warnings.append(pp.getWarnings());
+        // call preparser
+        PreParser pp = new PreParser();
+        ImmutableList<TextualJMLConstruct> constructs =
+            pp.parseClassLevel(concatenatedComment, fileName, pos);
+        warnings = warnings.append(pp.getWarnings());
 
-            // handle model and ghost declarations in textual constructs
-            // (and set assignments which RecodeR evilly left hanging *behind*
-            // the method to which they belong)
-            for (TextualJMLConstruct c : constructs) {
-                BodyDeclaration<?> body;
-                if (c instanceof TextualJMLFieldDecl) {
-                    body = transformClassFieldDecl((TextualJMLFieldDecl) c, comments);
-                    td.addMember(body);
-                } else if (c instanceof TextualJMLMethodDecl) {
-                    body = transformMethodDecl((TextualJMLMethodDecl) c, comments, td);
-                    td.addMember(body);
-                } else if (c instanceof TextualJMLSpecCase) {
-                    // TODO javaparser what to do with an TextualJMLSpecCase
-                    // for the moment we attach it to the method!
-                    attachContract(child, (TextualJMLSpecCase) c);
-                } else {
-                    throw new SLTranslationException("Unexpected jml statement " + c);
-                }
-
+        // handle model and ghost declarations in textual constructs
+        // (and set assignments which RecodeR evilly left hanging *behind*
+        // the method to which they belong)
+        for (TextualJMLConstruct c : constructs) {
+            BodyDeclaration<?> body;
+            if (c instanceof TextualJMLFieldDecl) {
+                body = transformClassFieldDecl((TextualJMLFieldDecl) c, comments);
+                td.addMember(body);
+            } else if (c instanceof TextualJMLMethodDecl) {
+                body = transformMethodDecl((TextualJMLMethodDecl) c, comments, td);
+                td.addMember(body);
+            } else if (c instanceof TextualJMLSpecCase) {
+                // TODO javaparser what to do with an TextualJMLSpecCase
+                // for the moment we attach it to the method!
+                attachContract(child, (TextualJMLSpecCase) c);
+            } else {
+                // throw new SLTranslationException("Unexpected jml statement " + c.getClass() + "@"
+                // + c.getLocation());
             }
         }
     }
@@ -495,40 +498,30 @@ public final class JMLTransformer extends JavaTransformer {
         }
     }
 
-    private void transformMethodLevelCommentsHelper(Node pe, URI fileName)
-            throws SLTranslationException {
-        // recurse to all pre-existing children
-        var children = getChildren(pe);
-        for (Node aChildren : children) {
-            transformMethodLevelCommentsHelper(aChildren, fileName);
+    private static Optional<BlockStmt> findInnermostBlock(Node node) {
+        while (true) {
+            if (node instanceof BlockStmt) {
+                return Optional.of((BlockStmt) node);
+            }
+            if (node.getParentNode().isEmpty()) {
+                return Optional.empty();
+            }
+            node = node.getParentNode().get();
         }
+    }
 
-        if (pe instanceof MethodDeclaration) {
-            return;
-        }
-
-        // get comments
-        List<Comment> comments;
-        try {
-            comments = pe.getData(JMLCommentTransformer.BEFORE_COMMENTS);
-            pe.removeData(JMLCommentTransformer.BEFORE_COMMENTS);
-        } catch (IllegalStateException e) {
-            return;
-        }
-        assert !comments.isEmpty();
-
+    private int transformMethodLevelCommentsAt(Node pe, List<Comment> comments, URI fileName,
+            int offset) throws SLTranslationException {
         // concatenate comments, determine position
-        String concatenatedComment = concatenate(comments);
         Position astPos = comments.get(0).getRange().get().begin;
         de.uka.ilkd.key.java.Position pos = de.uka.ilkd.key.java.Position.newOneBased(
             astPos.line, astPos.column);
-        var parent = pe.getParentNode().get();
-        var parentOffset = parent.getChildNodes().indexOf(parent);
 
         // call preparser
         var io = new PreParser();
+        String concat = concatenate(comments);
         ImmutableList<TextualJMLConstruct> constructs =
-            io.parseMethodLevel(concatenatedComment, fileName, pos);
+            io.parseMethodLevel(concat, fileName, pos);
         warnings = warnings.append(io.getWarnings());
 
         // handle ghost declarations and set assignments in textual constructs
@@ -537,20 +530,49 @@ public final class JMLTransformer extends JavaTransformer {
             if (c instanceof TextualJMLFieldDecl) {
                 statement = transformVariableDecl((TextualJMLFieldDecl) c);
             } else if (c instanceof TextualJMLSetStatement) {
-                transformSetStatement((TextualJMLSetStatement) c, comments);
-                continue;
+                statement = transformSetStatement((TextualJMLSetStatement) c);
             } else if (c instanceof TextualJMLMergePointDecl) {
                 statement = transformMergePointDecl((TextualJMLMergePointDecl) c, comments);
             } else if (c instanceof TextualJMLAssertStatement) {
-                transformAssertStatement((TextualJMLAssertStatement) c, comments);
-                continue;
+                statement = transformAssertStatement((TextualJMLAssertStatement) c);
             } else {
-                continue;
+                throw new SLTranslationException("Unexpected statement " + c);
+                // continue;
             }
-            var target = (BlockStmt) pe;
-            target.addStatement(parentOffset, statement);
-            parentOffset += 1;
+            var target = findInnermostBlock(pe).orElseThrow();
+            target.addStatement(offset, statement);
+            offset += 1;
         }
+        return offset;
+    }
+
+    private void transformMethodLevelCommentsHelper(Node pe, URI fileName)
+            throws SLTranslationException {
+        // recurse to all pre-existing children
+        var children = getChildren(pe).toArray(new Node[0]);
+        for (Node aChildren : children) {
+            transformMethodLevelCommentsHelper(aChildren, fileName);
+        }
+
+        if (pe instanceof MethodDeclaration || pe instanceof Comment
+                || pe.getParentNode().isEmpty()) {
+            return;
+        }
+
+        var parent = findInnermostBlock(pe);
+        var parentOffset = parent.filter(p -> pe instanceof Statement)
+                .map(p -> p.getStatements().indexOf(pe)).orElse(-1);
+
+        // get comments
+        var before = extractData(pe, JMLCommentTransformer.BEFORE_COMMENTS);
+        if (before.isPresent()) {
+            parentOffset = transformMethodLevelCommentsAt(pe, before.get(), fileName, parentOffset);
+        }
+        var after = extractData(pe, JMLCommentTransformer.AFTER_COMMENTS);
+        if (after.isPresent()) {
+            transformMethodLevelCommentsAt(pe, after.get(), fileName, parentOffset + 1);
+        }
+
     }
 
     public void analyze() {
@@ -616,31 +638,34 @@ public final class JMLTransformer extends JavaTransformer {
     }
 
     @Override
-    public void apply(TypeDeclaration<?> td) {
+    public void apply(CompilationUnit cu) {
         // abort if JML is disabled
         if (!ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isUseJML()) {
             return;
         }
 
         try {
-            URI resource = td.findCompilationUnit()
-                    .flatMap(CompilationUnit::getStorage)
+            URI resource = cu.getStorage()
                     .map(it -> it.getPath().toUri())
                     .orElse(null);
 
-            transformClassLevelComments(td, resource);
+            for (var td : cu.getTypes()) {
+                for (Node child : td.getChildNodes().toArray(new Node[0])) {
+                    transformClassLevelComments(td, child, resource);
+                }
 
-            // iterate over all pre-existing constructors
-            for (var constructor : td.getConstructors()) {
-                transformMethodLevelCommentsHelper(constructor.getBody(), resource);
-            }
+                // iterate over all pre-existing constructors
+                for (var constructor : td.getConstructors()) {
+                    transformMethodLevelCommentsHelper(constructor.getBody(), resource);
+                }
 
-            // iterate over all pre-existing methods
-            for (var method : td.getMethods()) {
-                // might be ImplicitEnumMethod
-                if (method.getBody().isPresent()) {
-                    transformMethodLevelCommentsHelper(method.getBody().get(),
-                        resource);
+                // iterate over all pre-existing methods
+                for (var method : td.getMethods()) {
+                    // might be ImplicitEnumMethod
+                    if (method.getBody().isPresent()) {
+                        transformMethodLevelCommentsHelper(method.getBody().get(),
+                            resource);
+                    }
                 }
             }
         } catch (SLTranslationException e) {

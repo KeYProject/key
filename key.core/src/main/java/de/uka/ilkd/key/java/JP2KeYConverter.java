@@ -383,8 +383,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         URI uri = node.findCompilationUnit()
                 .flatMap(com.github.javaparser.ast.CompilationUnit::getStorage)
                 .map(it -> it.getPath().toUri()).orElse(null);
-        Position startPos = Position.newOneBased(r.begin.line, r.begin.column);
-        Position endPos = Position.newOneBased(r.end.line, r.end.column);
+        Position startPos = Position.fromJPPosition(r.begin);
+        Position endPos = Position.fromJPPosition(r.end);
         return new PositionInfo(startPos, endPos, uri);
     }
 
