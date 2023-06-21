@@ -214,7 +214,7 @@ public class KeYProgModelInfo {
     private Boolean isPackageInternal(String s) {
         final var factory = services.getJavaService().getProgramFactory();
         var paths = new ArrayList<>(factory.getSourcePaths());
-        paths.add(factory.getBootClassPath());
+        factory.getBootClassPath().ifPresent(paths::add);
         var relPath = s.replace('.', '/');
         for (Path path : paths) {
             var r = path.resolve(relPath);

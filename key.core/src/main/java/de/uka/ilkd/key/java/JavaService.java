@@ -221,11 +221,11 @@ public class JavaService {
     private List<CompilationUnit> parseInternalClasses(FileRepo fileRepo) throws IOException {
         List<URI> paths;
 
-        if (programFactory.getBootClassPath() == null) {
+        if (programFactory.getBootClassPath().isEmpty()) {
             var bootCollection = new JavaReduxFileCollection(services.getProfile());
             paths = bootCollection.getResources().collect(Collectors.toList());
         } else {
-            try (var stream = Files.walk(programFactory.getBootClassPath())) {
+            try (var stream = Files.walk(programFactory.getBootClassPath().get())) {
                 paths = stream.filter(it -> {
                     var name = it.getFileName().toString();
                     return name.endsWith(".java") || name.endsWith(".jml");

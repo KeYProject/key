@@ -220,7 +220,10 @@ public final class ProblemInitializer {
         final Path javaPath =
             envInput.readJavaPath().map(p -> p.toAbsolutePath().normalize()).orElse(null);
         final Optional<List<Path>> classPath = envInput.readClassPath();
-        final Path bootClassPath = envInput.readBootClassPath();
+        final JavaService r2k = initConfig.getServices().getJavaService();
+        final Path bootClassPath = Optional.ofNullable(envInput.readBootClassPath())
+                .or(() -> r2k.getProgramFactory().getBootClassPath())
+                .orElse(null);
         final Includes includes = envInput.readIncludes();
 
         if (fileRepo != null) {
@@ -240,7 +243,6 @@ public final class ProblemInitializer {
         }
 
         // create Recoder2KeY, set classpath
-        final JavaService r2k = initConfig.getServices().getJavaService();
         var classPathWithJava = javaPath == null ? classPath.orElse(null) : classPath.map(p -> {
             var r = new ArrayList<>(p);
             r.add(javaPath);

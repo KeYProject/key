@@ -5,10 +5,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -177,8 +174,8 @@ public class JavaParserFactory {
         this.typeSolver.rebuild();
     }
 
-    public Path getBootClassPath() {
-        return bootClassPath;
+    public Optional<Path> getBootClassPath() {
+        return Optional.ofNullable(bootClassPath);
     }
 
     public void appendToJavaRedux(List<CompilationUnit> collect) {
