@@ -249,7 +249,7 @@ class EndToEndTests {
         // load proof
         Assertions.assertTrue(proofFile.exists());
         AtomicReference<DependencyTracker> tracker = new AtomicReference<>();
-        LOGGER.info("Loading " + proofFile.getAbsolutePath());
+        LOGGER.trace("Loading " + proofFile.getAbsolutePath());
         KeYEnvironment<?> environment =
             KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null,
                 null, proof -> {

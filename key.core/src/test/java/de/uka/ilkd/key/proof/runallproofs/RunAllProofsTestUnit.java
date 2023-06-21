@@ -8,10 +8,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkMode;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkedTestFileRunner;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +20,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class RunAllProofsTestUnit implements Serializable {
     private static final long serialVersionUID = -2406881153415390252L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(RunAllProofsTestUnit.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StatisticsFile.class);
 
     /**
      * The name of this test.
@@ -62,8 +59,9 @@ public final class RunAllProofsTestUnit implements Serializable {
      * {@link ProofCollectionSettings#getForkMode() forkmode}.
      *
      * @return either a single test result or an aggregated test result, not <code>null</code>.
+     * @param xml
      */
-    public TestResult runTest() throws Exception {
+    public TestResult runTest(JunitXmlWriter xml) throws Exception {
         /*
          * List of test results containing one test result for each test file contained in this
          * group.
@@ -125,7 +123,16 @@ public final class RunAllProofsTestUnit implements Serializable {
 
         boolean success = true;
         StringBuilder message = new StringBuilder("group " + testName + ":\n");
-        for (TestResult testResult : testResults) {
+        for (int i = 0; i < testResults.size(); i++) {
+            var start = System.currentTimeMillis();
+            TestFile file = testFiles.get(i);
+            var time = System.currentTimeMillis() - start;
+            TestResult testResult = testResults.get(i);
+            xml.addTestcase(file.getKeYFile().getName(), this.testName,
+                (testResult.success ? JunitXmlWriter.TestCaseState.SUCCESS
+                        : JunitXmlWriter.TestCaseState.FAILED),
+                "",
+                !testResult.success ? "error" : "", testResult.message, "", time / 1000.0);
             success &= testResult.success;
             message.append(testResult.message).append("\n");
         }
@@ -159,5 +166,9 @@ public final class RunAllProofsTestUnit implements Serializable {
 
     public ProofCollectionSettings getSettings() {
         return settings;
+    }
+
+    public int getTotalNumTests() {
+        return this.testFiles.size();
     }
 }
