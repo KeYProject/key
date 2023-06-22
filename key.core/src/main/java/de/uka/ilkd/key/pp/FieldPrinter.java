@@ -5,6 +5,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.UnknownJavaTypeException;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -52,7 +54,7 @@ class FieldPrinter {
              *
              * Example syntax: object.(package.class::field)
              */
-            return "(" + fieldTerm.op().toString().replace("::$", "::") + ")";
+            return "(" + JavaDLFieldNames.toJava(fieldTerm.op().name()) + ")";
         }
     }
 
@@ -105,9 +107,9 @@ class FieldPrinter {
      */
     protected static boolean isJavaFieldConstant(Term fieldTerm, HeapLDT heapLDT,
             Services services) {
-        String name = fieldTerm.op().name().toString();
-        if (name.contains("::$") && isFieldConstant(fieldTerm, heapLDT)) {
-            String pvName = name.replace("::$", "::");
+        Name name = fieldTerm.op().name();
+        if (JavaDLFieldNames.isField(name) && isFieldConstant(fieldTerm, heapLDT)) {
+            String pvName = JavaDLFieldNames.toJava(name);
             try {
                 return services.getJavaInfo().getAttribute(pvName) != null;
             } catch (UnknownJavaTypeException e) {

@@ -227,7 +227,7 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
                     services.getType("java", "lang", "NoClassDefFoundError"),
                     new NodeList<>())));
 
-        // IF <classErroneous> : clErroneousBody : null
+        // IF $classErroneous : clErroneousBody : null
         clInitNotInProgressBody.add(
             ifthen(namePassively(PipelineConstants.IMPLICIT_CLASS_ERRONEOUS),
                 block(clErroneousBody)));

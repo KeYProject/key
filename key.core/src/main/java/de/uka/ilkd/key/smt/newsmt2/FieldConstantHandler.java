@@ -5,6 +5,7 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -54,7 +55,7 @@ public class FieldConstantHandler implements SMTHandler {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         return op.arity() == 0 && op.sort(NO_ARGS) == heapLDT.getFieldSort()
                 && op instanceof Function && ((Function) op).isUnique()
-                && (op.name().toString().contains("::$") || op.name().toString().contains("::<"))
+                && (JavaDLFieldNames.isField(op.name()) || op.name().toString().contains("::<"))
                 || op == heapLDT.getArr();
     }
 

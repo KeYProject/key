@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
@@ -1437,7 +1438,7 @@ public class SMTObjTranslator implements SMTTranslator {
         String name = fun.name().toString();
         // handle sort constants
         if (fun.sort().equals(fieldSort) && subs.isEmpty()) {
-            name = name.replace("$", "");
+            name = JavaDLFieldNames.toJava(name);
             JavaInfo info = services.getJavaInfo();
             Sort sort = info.getAttribute(name).getKeYJavaType().getSort();
             fieldSorts.put(name, sort);

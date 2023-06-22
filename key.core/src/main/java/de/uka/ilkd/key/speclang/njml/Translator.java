@@ -843,7 +843,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitTransactionUpdated(JmlParser.TransactionUpdatedContext ctx) {
-        String fieldName = "<transactionConditionallyUpdated>";
+        String fieldName = "$transactionConditionallyUpdated";
         return lookupIdentifier(fieldName, accept(ctx.expression()), null, ctx);
     }
 

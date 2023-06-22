@@ -8,11 +8,7 @@ import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -103,11 +99,11 @@ public final class HeapLDT extends LDT {
         arr = addFunction(services, "arr");
         created = addFunction(services, "java.lang.Object::$created");
         initialized = addFunction(services, "java.lang.Object::$initialized");
-        classPrepared = addSortDependingFunction(services, "<classPrepared>");
-        classInitialized = addSortDependingFunction(services, "<classInitialized>");
+        classPrepared = addSortDependingFunction(services, "$classPrepared");
+        classInitialized = addSortDependingFunction(services, "$classInitialized");
         classInitializationInProgress =
-            addSortDependingFunction(services, "<classInitializationInProgress>");
-        classErroneous = addSortDependingFunction(services, "<classErroneous>");
+            addSortDependingFunction(services, "$classInitializationInProgress");
+        classErroneous = addSortDependingFunction(services, "$classErroneous");
         length = addFunction(services, "length");
         nullFunc = addFunction(services, "null");
         acc = addFunction(services, "acc");
@@ -135,10 +131,7 @@ public final class HeapLDT extends LDT {
         if (fieldPV.isImplicit()) {
             return fieldPV.name().toString();
         } else {
-            String fieldPVName = fieldPV.name().toString();
-            int index = fieldPV.toString().indexOf("::");
-            assert index > 0;
-            return fieldPVName.substring(0, index) + "::$" + fieldPVName.substring(index + 2);
+            return JavaDLFieldNames.toJavaDL(fieldPV.name());
         }
     }
 

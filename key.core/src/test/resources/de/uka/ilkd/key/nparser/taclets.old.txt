@@ -17,7 +17,7 @@ abortJavaCardTransactionBox {
 \find(==>box_transaction\[{ ..
   #abortJavaCardTransaction;
 ... }\] (post))
-\replacewith([]==>[update-application(elem-update(heap)(anon(savedHeap,allObjects(java.lang.Object::<transactionConditionallyUpdated>),heap)),box(post))]) 
+\replacewith([]==>[update-application(elem-update(heap)(anon(savedHeap,allObjects(java.lang.Object::$transactionConditionallyUpdated),heap)),box(post))])
 \heuristics(simplify_prog)
 Choices: (programRules:Java & JavaCard:on)}
 -----------------------------------------------------
@@ -26,7 +26,7 @@ abortJavaCardTransactionDiamond {
 \find(==>diamond_transaction\[{ ..
   #abortJavaCardTransaction;
 ... }\] (post))
-\replacewith([]==>[update-application(elem-update(heap)(anon(savedHeap,allObjects(java.lang.Object::<transactionConditionallyUpdated>),heap)),diamond(post))]) 
+\replacewith([]==>[update-application(elem-update(heap)(anon(savedHeap,allObjects(java.lang.Object::$transactionConditionallyUpdated),heap)),diamond(post))])
 \heuristics(simplify_prog)
 Choices: (programRules:Java & JavaCard:on)}
 -----------------------------------------------------
@@ -689,7 +689,7 @@ allocateInstanceWithLength {
   #lhs = #t.#allocate(#len)@#t;
 ... }\] (post))
 \varcond(\hasSort(#t2 (program Type), alphaObj), )
-\add [and(and(not(equals(#lhs,null)),imp(wellFormed(heap),and(equals(boolean::select(heap,#lhs,java.lang.Object::$created),FALSE),equals(length(#lhs),#len)))),equals(alphaObj::exactInstance(#lhs),TRUE))]==>[] \replacewith([]==>[update-application(elem-update(heap)(store(store(create(heap,#lhs),#lhs,java.lang.Object::$transient,Z(0(#))),#lhs,java.lang.Object::<transactionConditionallyUpdated>,FALSE)),#allmodal(post))])
+\add [and(and(not(equals(#lhs,null)),imp(wellFormed(heap),and(equals(boolean::select(heap,#lhs,java.lang.Object::$created),FALSE),equals(length(#lhs),#len)))),equals(alphaObj::exactInstance(#lhs),TRUE))]==>[] \replacewith([]==>[update-application(elem-update(heap)(store(store(create(heap,#lhs),#lhs,java.lang.Object::$transient,Z(0(#))),#lhs,java.lang.Object::$transactionConditionallyUpdated,FALSE)),#allmodal(post))])
 \heuristics(method_expand)
 Choices: (programRules:Java & permissions:off)}
 -----------------------------------------------------
@@ -1909,7 +1909,7 @@ assignment_to_primitive_array_component_transaction {
 \varcond( \not \isReferenceArray(#v (program Variable)), )
 \add [and(not(equals(#v,null)),or(leq(length(#v),#se),lt(#se,Z(0(#)))))]==>[] \replacewith([]==>[false]) ;
 \add [equals(#v,null)]==>[] \replacewith([]==>[false]) ;
-\replacewith([]==>[update-application(elem-update(heap)(store(heap,#v,arr(#se),#se0)),update-application(elem-update(savedHeap)(if-then-else(equals(int::select(heap,#v,java.lang.Object::$transient),Z(0(#))),store(savedHeap,#v,java.lang.Object::<transactionConditionallyUpdated>,TRUE),if-then-else(equals(boolean::select(savedHeap,#v,java.lang.Object::<transactionConditionallyUpdated>),FALSE),store(savedHeap,#v,arr(#se),#se0),savedHeap))),#transaction(post)))])
+\replacewith([]==>[update-application(elem-update(heap)(store(heap,#v,arr(#se),#se0)),update-application(elem-update(savedHeap)(if-then-else(equals(int::select(heap,#v,java.lang.Object::$transient),Z(0(#))),store(savedHeap,#v,java.lang.Object::$transactionConditionallyUpdated,TRUE),if-then-else(equals(boolean::select(savedHeap,#v,java.lang.Object::$transactionConditionallyUpdated),FALSE),store(savedHeap,#v,arr(#se),#se0),savedHeap))),#transaction(post)))])
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: ((programRules:Java & runtimeExceptions:ban) & JavaCard:on)}
 -----------------------------------------------------
@@ -1935,7 +1935,7 @@ assignment_to_reference_array_component_transaction {
 \add [and(and(and(not(equals(#v,null)),lt(#se,length(#v))),geq(#se,Z(0(#)))),not(arrayStoreValid(#v,#se0)))]==>[] \replacewith([]==>[false]) ;
 \add [and(not(equals(#v,null)),or(leq(length(#v),#se),lt(#se,Z(0(#)))))]==>[] \replacewith([]==>[false]) ;
 \add [equals(#v,null)]==>[] \replacewith([]==>[false]) ;
-\replacewith([]==>[update-application(elem-update(heap)(store(heap,#v,arr(#se),#se0)),update-application(elem-update(savedHeap)(if-then-else(equals(int::select(heap,#v,java.lang.Object::$transient),Z(0(#))),store(savedHeap,#v,java.lang.Object::<transactionConditionallyUpdated>,TRUE),if-then-else(equals(boolean::select(savedHeap,#v,java.lang.Object::<transactionConditionallyUpdated>),FALSE),store(savedHeap,#v,arr(#se),#se0),savedHeap))),#transaction(post)))])
+\replacewith([]==>[update-application(elem-update(heap)(store(heap,#v,arr(#se),#se0)),update-application(elem-update(savedHeap)(if-then-else(equals(int::select(heap,#v,java.lang.Object::$transient),Z(0(#))),store(savedHeap,#v,java.lang.Object::$transactionConditionallyUpdated,TRUE),if-then-else(equals(boolean::select(savedHeap,#v,java.lang.Object::$transactionConditionallyUpdated),FALSE),store(savedHeap,#v,arr(#se),#se0),savedHeap))),#transaction(post)))])
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: ((programRules:Java & runtimeExceptions:ban) & JavaCard:on)}
 -----------------------------------------------------

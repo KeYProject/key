@@ -130,7 +130,6 @@ public class ProblemTypeInformation {
             for (Field f : info.getAllFields(c)) {
 
                 String name = f.getFullName();
-                // name = name.replace("::", "::$");
                 name = Util.processName(name);
                 result.add(name);
 

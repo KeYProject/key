@@ -6,6 +6,7 @@ import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -115,7 +116,7 @@ class SelectPrinter extends FieldPrinter {
      * Get sort of selected field.
      */
     private Sort getFieldSort(Term fieldTerm) {
-        String lookup = fieldTerm.op().toString().replace("$", "");
+        String lookup = JavaDLFieldNames.toJava(fieldTerm.op().name());
         ProgramVariable progVar = services.getJavaInfo().getAttribute(lookup);
         return progVar.sort();
     }
