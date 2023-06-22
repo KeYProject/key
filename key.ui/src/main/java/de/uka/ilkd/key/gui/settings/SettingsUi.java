@@ -46,16 +46,16 @@ public class SettingsUi extends JPanel {
                 SettingsProvider panel = node.provider;
                 JLabel lbl;
                 if (panel == null) {
-                    lbl = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded,
-                        leaf, row, hasFocus);
+                    // root entry
+                    lbl = (JLabel) super.getTreeCellRendererComponent(tree, "KeY Settings", sel,
+                        expanded, leaf, row, hasFocus);
+                    lbl.setFont(lbl.getFont().deriveFont(16f));
                 } else {
                     lbl = (JLabel) super.getTreeCellRendererComponent(tree, panel.getDescription(),
                         sel, expanded, leaf, row, hasFocus);
                     lbl.setFont(lbl.getFont().deriveFont(16f));
 
-                    if (!node.isLeaf()) {
-                        lbl.setIcon(expanded ? ICON_TREE_NODE_EXPANDED : ICON_TREE_NODE_RETRACTED);
-                    } else {
+                    if (node.isLeaf()) {
                         lbl.setIcon(panel.getIcon());
                     }
                     lbl.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
@@ -94,7 +94,6 @@ public class SettingsUi extends JPanel {
             }
         });
 
-        treeSettingsPanels.setRootVisible(false);
         setLayout(new BorderLayout(5, 5));
         root.setLeftComponent(createWestPanel());
         root.setRightComponent(new JLabel("empty"));
