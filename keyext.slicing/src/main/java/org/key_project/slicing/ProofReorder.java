@@ -101,18 +101,21 @@ public final class ProofReorder {
                     outputs.forEach(q::addFirst);
                 });
             }
+            // Finally, get all nodes that do not directly connect to the dependency graph of the
+            // previous branch. These are taclets that do not have any formulas as direct inputs,
+            // e.g. sign_case_distinction
             List<Node> nextQ = new ArrayList<>();
             newOrder.forEach(node -> node.childrenIterator().forEachRemaining(node2 -> {
-                if (newOrderSorted.contains(node2) || node2.getAppliedRuleApp() == null
-                        || node2.getBranchLocation() != node.getBranchLocation()) {
-                    return;
+                while (node2 != null && !newOrderSorted.contains(node2)
+                        && node2.getAppliedRuleApp() != null
+                        && node2.getBranchLocation() == node.getBranchLocation()) {
+                    nextQ.add(node2);
+                    node2 = node2.childrenCount() > 0 ? node2.child(0) : null;
                 }
-                nextQ.add(node2);
             }));
             Collections.sort(nextQ);
-            // this works because there are no taclets in KeY that have no inputs and add a formula
-            // to the sequent
             newOrder.addAll(nextQ);
+            // add the next branches to the queue
             for (int i = 0; i < newOrder.size(); i++) {
                 if (newOrder.get(i).childrenCount() != 1
                         || newOrder.get(i).child(0).childrenCount() == 0) {

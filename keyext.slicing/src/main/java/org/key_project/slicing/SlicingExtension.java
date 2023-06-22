@@ -12,6 +12,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuAdapter;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
@@ -29,6 +30,9 @@ import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.ui.ShowCreatedByAction;
 import org.key_project.slicing.ui.ShowGraphAction;
 import org.key_project.slicing.ui.SlicingLeftPanel;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Proof slicing extension.
@@ -50,6 +54,8 @@ public class SlicingExtension implements KeYGuiExtension,
         KeYGuiExtension.Toolbar,
         KeYSelectionListener,
         ProofDisposedListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SlicingExtension.class);
+
     /**
      * Collection of dependency trackers attached to proofs.
      */
@@ -189,7 +195,9 @@ public class SlicingExtension implements KeYGuiExtension,
                 ProofReorder.reorderProof(m.getSelectedProof(),
                     trackers.get(m.getSelectedProof()).getDependencyGraph());
             } catch (Exception exc) {
-                exc.printStackTrace();
+                LOGGER.error("failed to reorder proof ", exc);
+                MainWindow.getInstance().getMediator().startInterface(true);
+                IssueDialog.showExceptionDialog(MainWindow.getInstance(), exc);
             }
         });
         bar.add(b);

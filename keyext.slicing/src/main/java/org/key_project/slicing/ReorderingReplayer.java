@@ -12,6 +12,11 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 
 import org.key_project.util.collection.ImmutableList;
 
+/**
+ * Replayer that will reorder a proof based on the provided sorting of the steps.
+ *
+ * @author Arne Keller
+ */
 public class ReorderingReplayer extends AbstractProofReplayer {
 
     private final SortedMap<BranchLocation, List<Node>> steps;
