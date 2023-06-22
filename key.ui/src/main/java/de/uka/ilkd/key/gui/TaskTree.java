@@ -73,10 +73,31 @@ public class TaskTree extends JPanel {
         delegateView.setShowsRootHandles(false);
         delegateView.setRootVisible(false);
         delegateView.putClientProperty("JTree.lineStyle", "Horizontal");
-    }
 
-    JTree jtree() {
-        return delegateView;
+        MouseListener ml = new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    TreePath selPath = delegateView.getPathForLocation(e.getX(), e.getY());
+                    if (selPath != null && selPath.getLastPathComponent() instanceof BasicTask) {
+                        delegateView.setSelectionPath(selPath);
+                        JPopupMenu popup = new JPopupMenu();
+                        for (Component comp : MainWindow.getInstance().createProofMenu()
+                                .getMenuComponents()) {
+                            popup.add(comp);
+                        }
+                        popup.show(e.getComponent(), e.getX(), e.getY());
+                    }
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                mousePressed(e);
+            }
+        };
+
+        delegateView.addMouseListener(ml);
     }
 
     public void addProof(de.uka.ilkd.key.proof.ProofAggregate plist) {
@@ -349,7 +370,7 @@ public class TaskTree extends JPanel {
                 return;
             }
             TaskTreeNode ttn = model.getTaskForProof(e.getSource().getSelectedProof());
-            jtree().setSelectionPath(new TreePath(ttn.getPath()));
+            delegateView.setSelectionPath(new TreePath(ttn.getPath()));
             validate();
         }
 
