@@ -58,7 +58,10 @@ public class PredicateSetCompressor {
 		for (Term term : allPreds) {
 			if (term.op().equals(depLDT.getNoR()) || term.op().equals(depLDT.getNoW())
 					|| term.op().equals(depLDT.getNoRaW()) || term.op().equals(depLDT.getNoWaR())
-					|| term.op().equals(depLDT.getNoWaW())) {
+					|| term.op().equals(depLDT.getNoWaW()) ||
+					term.op().equals(depLDT.getRelaxedNoR()) || term.op().equals(depLDT.getRelaxedNoW())
+					|| term.op().equals(depLDT.getRelaxedNoRaW()) || term.op().equals(depLDT.getRelaxedNoWaR())
+					|| term.op().equals(depLDT.getRelaxedNoWaW())) {
 				depPredsList.add(term);
 			} else if (term.op().equals(lt) || term.op().equals(leq) || term.op().equals(gt) || term.op().equals(geq)
 					|| term.op().equals(Equality.EQUALS)) {
@@ -151,8 +154,6 @@ public class PredicateSetCompressor {
 					// deleted terms also from being considered for depPred1
 					continue;
 				}
-				if(depPred1.sub(0)==locSetLDT.getEmpty())
-					toDelete.add(depPred1);
 
 				if (depPred1.op().equals(depLDT.getNoR())) {
 					if (depPred2.op().equals(depLDT.getNoRaW()) || depPred2.op().equals(depLDT.getNoWaR())) {
