@@ -532,7 +532,7 @@ public final class DependencyAnalyzer {
                             canMergeStepsInto(apps, idxA, stepA, stepB, locA, locB, mergeBase);
                         if (canMerge) {
                             // merge step B into step A
-                            LOGGER.info("merging {} and {}", stepA.serialNr(), stepB.serialNr());
+                            LOGGER.trace("merging {} and {}", stepA.serialNr(), stepB.serialNr());
                             locs.set(idxA, mergeBase);
                             alreadyRebasedSerialNrs.add(stepA.serialNr());
                             apps.set(idxB, null);
