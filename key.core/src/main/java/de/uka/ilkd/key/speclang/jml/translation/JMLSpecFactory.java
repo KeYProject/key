@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
@@ -588,7 +589,7 @@ public class JMLSpecFactory {
                     throw new SLTranslationException(
                         "\"assignable \\less_than_nothing\" does not go with other "
                             + "assignable clauses (even if they declare the same).",
-                        expr);
+                        Location.fromToken(expr.first.start));
                 }
                 return tb.empty();
             }
@@ -1016,7 +1017,8 @@ public class JMLSpecFactory {
         for (Pair<KeYJavaType, IObserverFunction> p : modelFields) {
             if (p.first.equals(kjt) && p.second.equals(rep.first)) {
                 throw new SLTranslationException(
-                    "JML represents clauses must occur uniquely per type and target.", originalRep);
+                    "JML represents clauses must occur uniquely per type and target.",
+                    Location.fromToken(originalRep.first.start));
             }
         }
         modelFields.add(new Pair<>(kjt, rep.first));
@@ -1043,8 +1045,7 @@ public class JMLSpecFactory {
             throw new SLWarningException(
                 "JML represents clauses must occur uniquely per " + "type and target."
                     + "\nAll but one are ignored.",
-                start.getTokenSource().getSourceName(),
-                Position.fromToken(start));
+                Location.fromToken(start));
         }
         // create class axiom
         String name = "JML represents clause for " + rep.first.name();
@@ -1171,7 +1172,7 @@ public class JMLSpecFactory {
         if (mergeProc == null) {
             throw new SLTranslationException(
                 format("Unknown merge procedure: \"%s\"", mergeProcStr),
-                mergePointDecl.getSourceFileName(), mergePointDecl.getApproxPosition());
+                mergePointDecl.getLocation());
         }
         ImmutableSet<MergeContract> result = DefaultImmutableSet.nil();
 
@@ -1639,8 +1640,7 @@ public class JMLSpecFactory {
                     JMLSpecExtractor.createNonNullPositionedString(
                         p.getVariableSpecification().getName(),
                         p.getVariableSpecification().getProgramVariable().getKeYJavaType(), false,
-                        originalSpec.first.start.getTokenSource().getSourceName(),
-                        Position.fromToken(originalSpec.first.start),
+                        Location.fromToken(originalSpec.first.start),
                         services);
                 res = res.append(nonNullPositionedString);
             }

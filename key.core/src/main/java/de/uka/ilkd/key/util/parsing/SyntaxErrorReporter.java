@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.util.parsing;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -61,7 +62,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
                 "offendedSymbol is null. Use SyntaxErrorReporter only in Parsers");
         }
         SyntaxError se = new SyntaxError(recognizer, line, tok, charPositionInLine, msg,
-            tok.getTokenSource().getSourceName(), stack);
+            MiscTools.getURIFromTokenSource(tok.getTokenSource()), stack);
 
         if (logger != null) {
             logger.warn("[syntax-error] {}:{}:{}: {} {} ({})", se.source, line, charPositionInLine,
@@ -133,11 +134,11 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         final Token offendingSymbol;
         final int charPositionInLine;
         final String msg;
-        final String source;
+        final URI source;
         final String stack;
 
         public SyntaxError(Recognizer<?, ?> recognizer, int line, Token offendingSymbol,
-                int charPositionInLine, String msg, String source, String stack) {
+                int charPositionInLine, String msg, URI source, String stack) {
             this.recognizer = recognizer;
             this.line = line;
             this.offendingSymbol = offendingSymbol;
@@ -192,7 +193,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
             if (!errors.isEmpty()) {
                 SyntaxError e = errors.get(0);
                 // e.charPositionInLine is 0 based!
-                return new Location(MiscTools.parseURL(e.source),
+                return new Location(e.source,
                     Position.fromOneZeroBased(e.line, e.charPositionInLine));
             }
             return null;

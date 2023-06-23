@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
-import java.util.Map;
 
 public class ScriptTreeParser {
 
@@ -20,14 +19,14 @@ public class ScriptTreeParser {
         while (true) {
 
             int from = lineParser.getOffset();
-            Map<String, String> command = lineParser.parseCommand();
+            var command = lineParser.parseCommand();
             int to = lineParser.getOffset();
 
             if (command == null) {
                 return root;
             }
 
-            switch (command.get(ScriptLineParser.COMMAND_KEY)) {
+            switch (command.args.get(ScriptLineParser.COMMAND_KEY)) {
             case "branches":
                 branchStack.push(last);
                 break;
@@ -39,7 +38,7 @@ public class ScriptTreeParser {
                 branchStack.pop();
                 break;
             default:
-                ScriptNode node = new ScriptNode(last, command, from, to);
+                ScriptNode node = new ScriptNode(last, command.args, from, to);
                 if (root == null) {
                     root = node;
                 } else if (last == null) {
