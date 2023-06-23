@@ -15,9 +15,11 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.Flag;
 import de.uka.ilkd.key.scripts.meta.Option;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
@@ -229,26 +231,31 @@ public class InstantiateCommand extends AbstractCommand {
                 """;
     }
 
-    /**
-     *
-     */
+    @Documentation("Instantiate a universally quantified formula (or an existentially quantified formula in succedent) by a term."
+        + "One of 'var' or 'formula' must be specified. If 'var' is given, the formula is determined by looking for a particular occurrence of a quantifier over that variable name.\n"
+        + "'with' must be specified.")
     public static class Parameters {
+        @Documentation("The toplevel quantified formula to instantiate. Either this or 'var' must be given.")
         @Option(value = "formula")
         @Nullable
         public JTerm formula;
 
+        @Documentation("The name of the bound variable to instantiate. Either this or 'formula' must be given.")
         @Option(value = "var")
         @Nullable
         public String var;
 
+        @Documentation("The occurrence number of the quantifier over 'var' in the sequent. Default is 1 (the first).")
         @Option(value = "occ")
         public @Nullable int occ = 1;
 
+        @Documentation("If given, the rule used for instantiation is the one that hides the instantiated formula.")
         @Flag("hide")
         public boolean hide;
 
+        @Documentation("The term to instantiate the bound variable with. Must be given.")
         @Option(value = "with")
-        public @Nullable JTerm with;
+        public @MonotonicNonNull JTerm with;
     }
 
     private static class TacletNameFilter extends TacletFilter {
