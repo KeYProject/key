@@ -8,6 +8,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
 import org.key_project.util.helper.FindResources;
@@ -39,6 +40,11 @@ class TestReferenceSearcher {
 
         DefaultListModel<Proof> previousProofs = new DefaultListModel<>();
         previousProofs.addElement(p2);
+        DefaultListModel<Proof> newProof = new DefaultListModel<>();
+        newProof.addElement(p);
+
+        Node foundReference = null;
+        ClosedBy close = null;
 
         // close by reference only works if there are no branching steps left
         // -> only check the first node in each closed branch
@@ -50,8 +56,25 @@ class TestReferenceSearcher {
             if (ReferenceSearcher.suitableForCloseByReference(n)) {
                 ClosedBy c = ReferenceSearcher.findPreviousProof(previousProofs, n);
                 assertEquals(n.serialNr(), c.getNode().serialNr());
+                close = c;
+                foundReference = n;
+            } else {
+                // verify that incompatible nodes return null
+                assertNull(ReferenceSearcher.findPreviousProof(previousProofs, n));
             }
+            // verify that the reference searcher ignores the current proof
+            assertNull(ReferenceSearcher.findPreviousProof(newProof, n));
+            // verify that no match can be found
+            assertNull(ReferenceSearcher.findPreviousProof(new DefaultListModel<>(), n));
         }
+
+        // test that copying works
+        foundReference.register(close, ClosedBy.class);
+        p.pruneProof(foundReference);
+        assertFalse(p.closed());
+        foundReference.proof().copyCachedGoals(p2, null, null);
+        assertTrue(p.closed());
+
         GeneralSettings.noPruningClosed = true;
         p.dispose();
         p2.dispose();
