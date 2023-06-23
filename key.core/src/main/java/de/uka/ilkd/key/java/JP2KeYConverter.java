@@ -51,6 +51,7 @@ import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.*;
 import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 import com.github.javaparser.ast.visitor.Visitable;
+import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.resolution.types.ResolvedVoidType;
@@ -733,7 +734,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         final HeapLDT heapLDT = typeConverter.getTypeConverter().getHeapLDT();
         Sort heapSort = heapLDT == null ? Sort.ANY : heapLDT.targetSort();
         final KeYJavaType containerType = getKeYJavaType(new ReferenceTypeImpl(containing));
-        assert containerType != null;
         // may be null for a void method
         var method = new ProgramMethod(md, containerType, returnType.getKeYJavaType(), pi,
             heapSort, heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
@@ -746,10 +746,15 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             return lookupSchemaVariable(n.getName());
         }
 
-        ResolvedType rtype = n.calculateResolvedType();
-        var type = getKeYJavaType(rtype);
-        // TODO weigl find declaraton with n.resolve()
-        return new LocationVariable(new ProgramElementName(n.getNameAsString()), type);
+        try {
+            ResolvedType rtype = n.calculateResolvedType();
+
+            var type = getKeYJavaType(rtype);
+            // TODO weigl find declaraton with n.resolve()
+            return new LocationVariable(new ProgramElementName(n.getNameAsString()), type);
+        } catch (UnsolvedSymbolException e) {
+            throw e; //debugging purpose
+        }
     }
 
     @Override

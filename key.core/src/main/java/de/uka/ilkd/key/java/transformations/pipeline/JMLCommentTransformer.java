@@ -40,6 +40,7 @@ public class JMLCommentTransformer extends JavaTransformer {
         var orphan = cu.getOrphanComments();
         var filterComments = filterToplevel(allComments, cu);
         filterComments.addAll(orphan);
+        PositionUtils.sortByBeginPosition(filterComments);
         if (filterComments.isEmpty()) {
             return;
         }
@@ -95,7 +96,6 @@ public class JMLCommentTransformer extends JavaTransformer {
                 .filter(it -> n.getChildNodes().stream()
                         .noneMatch(child -> PositionUtils.nodeContains(child, it, true)))
                 .collect(Collectors.toList());
-        PositionUtils.sortByBeginPosition(seq);
         return seq;
     }
 

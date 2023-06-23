@@ -44,6 +44,8 @@ import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.visitor.VoidVisitorWithDefaults;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.lang.String.format;
 
@@ -69,6 +71,7 @@ public final class JMLTransformer extends JavaTransformer {
     private static final DataKey<List<TextualJMLSpecCase>> KEY_CONTRACTS = new DataKey<>() {
     };
     private static ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
+    private static final Logger LOGGER = LoggerFactory.getLogger(JMLTransformer.class);
 
     /**
      * Creates a transformation that adds JML specific elements, for example
@@ -240,7 +243,6 @@ public final class JMLTransformer extends JavaTransformer {
             List<Comment> originalComments)
             throws SLTranslationException {
         assert !originalComments.isEmpty();
-        var mod = getModifier(decl);
 
         // prepend Java modifiers
         PositionedString declWithMods = convertToString(decl.getMods(), decl.getDecl());
@@ -279,13 +281,11 @@ public final class JMLTransformer extends JavaTransformer {
          * position, which should be a safe choice in any case.
          */
 
+        var mod = getModifier(decl);
+
         // add ghost or model modifier
-        NodeList<Modifier> mods = fieldDecl.getModifiers();
-        if (mods == null) {
-            mods = new NodeList<>();
-        }
-        mods.add(new Modifier(mod));
-        fieldDecl.setModifiers(mods);
+        fieldDecl.addModifier(mod);
+
         return fieldDecl;
     }
 
@@ -321,14 +321,9 @@ public final class JMLTransformer extends JavaTransformer {
     private String fillWithWhitespaces(de.uka.ilkd.key.java.Position pos, String s) {
         var line = Math.max(0, pos.line() - 1);
         var column = Math.max(0, pos.column() - 1);
-        StringBuilder res = new StringBuilder(line + column + s.length());
-        for (int i = 0; i < line; i++) {
-            res.append("\n");
-        }
-        for (int i = 0; i < column; i++) {
-            res.append(" ");
-        }
-        return res.append(s).toString();
+        return "\n".repeat(line) +
+                " ".repeat(column) +
+                s;
     }
 
     @Nonnull
@@ -360,7 +355,7 @@ public final class JMLTransformer extends JavaTransformer {
         // about the 0 see the comment in transformFieldDecl() above
 
         // add model modifier
-        methodDecl.setModifiers(Modifier.Keyword.MODEL);
+        methodDecl.addModifier(Modifier.Keyword.MODEL);
         if (decl.getMods().contains(JMLModifier.TWO_STATE)) {
             methodDecl.addModifier(Modifier.Keyword.TWO_STATE);
         }
@@ -450,7 +445,6 @@ public final class JMLTransformer extends JavaTransformer {
     private Statement transformMergePointDecl(TextualJMLMergePointDecl stat,
             List<Comment> originalComments) {
         assert !originalComments.isEmpty();
-
         // create MPS
         KeyMergePointStatement mps = new KeyMergePointStatement(new BooleanLiteralExpr(true));
         mps.setAssociatedSpecificationComments(new NodeList<>(originalComments));
@@ -493,8 +487,8 @@ public final class JMLTransformer extends JavaTransformer {
         for (TextualJMLConstruct c : constructs) {
             BodyDeclaration<?> body;
             if (c instanceof TextualJMLFieldDecl) {
-                 body = transformClassFieldDecl((TextualJMLFieldDecl) c, comments);
-                 td.addMember(body);
+                body = transformClassFieldDecl((TextualJMLFieldDecl) c, comments);
+                td.addMember(body);
             } else if (c instanceof TextualJMLMethodDecl) {
                 body = transformMethodDecl((TextualJMLMethodDecl) c, comments, td);
                 td.addMember(body);
@@ -503,6 +497,7 @@ public final class JMLTransformer extends JavaTransformer {
                 // for the moment we attach it to the method!
                 attachContract(child, (TextualJMLSpecCase) c);
             } else {
+                LOGGER.trace("Jml element unhandled: {}", c.getClass());
                 // throw new SLTranslationException("Unexpected jml statement " + c.getClass() + "@"
                 // + c.getLocation());
             }
