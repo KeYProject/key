@@ -11,5 +11,5 @@ public interface ISymbolicElement {
      *
      * @return The {@link IModelSettings} to use.
      */
-    public IModelSettings getSettings();
+    IModelSettings getSettings();
 }

@@ -1,13 +1,16 @@
 package de.uka.ilkd.key.speclang.njml;
 
+import java.net.URI;
+import javax.annotation.Nonnull;
+
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
+
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
-
-import javax.annotation.Nonnull;
 
 /**
  * This facade provides facilities for the creation of lexer and parser of JML. It is the
@@ -38,11 +41,13 @@ public final class JmlFacade {
      * is changed accordingly.
      */
     public static @Nonnull JmlLexer createLexer(@Nonnull PositionedString ps) {
-        CharStream result = CharStreams.fromString(ps.text, ps.fileName);
+        CharStream result = CharStreams.fromString(ps.text,
+            ps.getLocation().getFileURI().map(URI::toString).orElse(null));
         JmlLexer lexer = createLexer(result);
-        if (!ps.pos.isNegative()) {
-            lexer.getInterpreter().setCharPositionInLine(ps.pos.getColumn() - 1);
-            lexer.getInterpreter().setLine(ps.pos.getLine());
+        Position pos = ps.getLocation().getPosition();
+        if (!pos.isNegative()) {
+            lexer.getInterpreter().setCharPositionInLine(pos.column() - 1);
+            lexer.getInterpreter().setLine(pos.line());
         }
         return lexer;
     }
@@ -79,8 +84,9 @@ public final class JmlFacade {
         } else {
             c = ctx.storeref();
         }
-        if (c == null)
+        if (c == null) {
             throw new NullPointerException();
+        }
         return c;
     }
 
@@ -106,4 +112,3 @@ public final class JmlFacade {
         return ctx;
     }
 }
-

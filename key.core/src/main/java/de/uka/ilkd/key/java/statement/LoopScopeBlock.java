@@ -6,6 +6,7 @@ import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -147,10 +148,12 @@ public class LoopScopeBlock extends JavaStatement
     @Override
     public int getChildCount() {
         int result = 0;
-        if (indexPV != null)
+        if (indexPV != null) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -164,13 +167,15 @@ public class LoopScopeBlock extends JavaStatement
     @Override
     public ProgramElement getChildAt(int index) {
         if (indexPV != null) {
-            if (index == 0)
+            if (index == 0) {
                 return indexPV;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

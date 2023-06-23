@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.java;
 
 
+import java.net.MalformedURLException;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
+
 import recoder.java.CompilationUnit;
 import recoder.kit.UnitKit;
 import recoder.service.UnresolvedReferenceException;
-
-import javax.annotation.Nullable;
-import java.net.MalformedURLException;
 
 /**
  * A convert exception enriched with a location within a file/source.
@@ -75,6 +76,6 @@ public class PosConvertException extends ConvertException implements HasLocation
                 this.file = dataloc.substring(dataloc.indexOf(':') + 1);
             }
         }
-        return new Location(file, position);
+        return Location.fromFileName(file, position);
     }
 }

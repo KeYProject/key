@@ -1,17 +1,14 @@
 package org.key_project.util.collection;
 
-import javax.annotation.Nonnull;
-
 import java.lang.reflect.Array;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import javax.annotation.Nonnull;
 
 public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Serializable {
 
@@ -149,8 +146,9 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
         sb.append("[");
         for (int i = 0, sz = size(); i < sz; i++) {
             sb.append(content[i]);
-            if (i < sz - 1)
+            if (i < sz - 1) {
                 sb.append(",");
+            }
         }
         sb.append("]");
         return sb.toString();
@@ -158,7 +156,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 
     @Override
     public Iterator<S> iterator() {
-        return new ArrayIterator<S>(this);
+        return new ArrayIterator<>(this);
     }
 
     private static class ArrayIterator<T> implements Iterator<T> {
@@ -193,10 +191,9 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
      * @return This element converted to an {@link ImmutableList}.
      */
     public ImmutableList<S> toImmutableList() {
-        ImmutableList<S> ret = ImmutableSLList.<S>nil();
-        Iterator<S> it = iterator();
-        while (it.hasNext()) {
-            ret = ret.prepend(it.next());
+        ImmutableList<S> ret = ImmutableSLList.nil();
+        for (S s : this) {
+            ret = ret.prepend(s);
         }
         return ret.reverse();
     }
@@ -208,9 +205,8 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
      */
     public List<S> toList() {
         List<S> result = new ArrayList<>();
-        Iterator<S> it = iterator();
-        while (it.hasNext()) {
-            result.add(it.next());
+        for (S s : this) {
+            result.add(s);
         }
         return result;
     }

@@ -1,30 +1,15 @@
 package de.uka.ilkd.key.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
+import java.awt.*;
 import java.awt.Dialog.ModalityType;
-import java.awt.FlowLayout;
-import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.Files;
 import java.util.List;
-import java.util.Observer;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingWorker;
+import java.util.concurrent.*;
+import java.util.function.Consumer;
+import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
@@ -35,12 +20,12 @@ import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.util.Debug;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ProofScriptWorker extends SwingWorker<Object, Object> implements InterruptListener {
+public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Message>
+        implements InterruptListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofScriptWorker.class);
 
     private final KeYMediator mediator;
@@ -55,11 +40,11 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
     private JDialog monitor;
     private JTextArea logArea;
 
-    private final Observer observer = (o, arg) -> publish(arg);
+    private final Consumer<ProofScriptEngine.Message> observer = this::publish;
 
     public ProofScriptWorker(KeYMediator mediator, File file) throws IOException {
-        this.initialLocation = new Location(file.toURI().toURL(), new Position(1, 1));
-        this.script = new String(Files.readAllBytes(file.toPath()));
+        this.initialLocation = new Location(file.toURI(), Position.newOneBased(1, 1));
+        this.script = Files.readString(file.toPath());
         this.mediator = mediator;
         this.initiallySelectedGoal = null;
     }
@@ -104,10 +89,10 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
     }
 
     private void makeDialog() {
-        URL url = initialLocation.getFileURL();
+        URI uri = initialLocation.getFileURI().orElse(null);
 
         if (monitor != null) {
-            logArea.setText("Running script from URL '" + url + "':\n");
+            logArea.setText("Running script from URL '" + uri + "':\n");
             return;
         }
 
@@ -117,7 +102,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
         logArea = new JTextArea();
         logArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         logArea.setEditable(false);
-        logArea.setText("Running script from URL '" + url + "':\n");
+        logArea.setText("Running script from URL '" + uri + "':\n");
         cp.add(new JScrollPane(logArea), BorderLayout.CENTER);
 
         JButton cancelButton = new JButton("Cancel");
@@ -133,19 +118,29 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
     }
 
     @Override
-    protected void process(List<Object> chunks) {
+    protected void process(List<ProofScriptEngine.Message> chunks) {
         Document doc = logArea.getDocument();
-        for (Object chunk : chunks) {
-            assert chunk instanceof String;
-
-            try {
-                if (!((String) chunk).startsWith("'")) {
-                    doc.insertString(doc.getLength(), "\n---\n" + chunk, null);
-                } else if (!((String) chunk).startsWith("'echo ")) {
-                    doc.insertString(doc.getLength(), "\n---\nExecuting: " + chunk, null);
+        for (ProofScriptEngine.Message info : chunks) {
+            var message = new StringBuilder("\n---\n");
+            if (info instanceof ProofScriptEngine.EchoMessage) {
+                var echo = (ProofScriptEngine.EchoMessage) info;
+                message.append(echo.message);
+            } else {
+                var exec = (ProofScriptEngine.ExecuteInfo) info;
+                if (exec.command.startsWith("'echo ")) {
+                    continue;
                 }
+                if (exec.location.getFileURI().isPresent()) {
+                    message.append(exec.location.getFileURI().get()).append(":");
+                }
+                message.append(exec.location.getPosition().line())
+                        .append(": Executing on goal ").append(exec.nodeSerial).append('\n')
+                        .append(exec.command);
+            }
+            try {
+                doc.insertString(doc.getLength(), message.toString(), null);
             } catch (BadLocationException e) {
-                e.printStackTrace();
+                LOGGER.warn("Failed to insert string", e);
             }
         }
     }
@@ -173,18 +168,14 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
         try {
             get();
         } catch (CancellationException ex) {
-            LOGGER.info("Scripting was cancelled.", ex);
+            LOGGER.info("Scripting was cancelled.");
         } catch (Throwable ex) {
             IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
         }
 
         mediator.removeInterruptedListener(this);
-        runWithDeadline(() -> {
-            mediator.startInterface(true);
-        }, 1000);
-        runWithDeadline(() -> {
-            mediator.getUI().getProofControl().stopAndWaitAutoMode();
-        }, 1000);
+        runWithDeadline(() -> mediator.startInterface(true), 1000);
+        runWithDeadline(() -> mediator.getUI().getProofControl().stopAndWaitAutoMode(), 1000);
 
         try {
             if (!mediator.getSelectedProof().closed()) {

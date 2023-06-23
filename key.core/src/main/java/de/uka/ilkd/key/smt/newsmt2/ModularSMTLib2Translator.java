@@ -1,5 +1,14 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -8,16 +17,9 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.SMTTranslator;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * This class provides a translation from a KeY sequent to the SMT-LIB 2 language, a common input
@@ -44,6 +46,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      * Once <a href="https://github.com/cvc5/cvc5/pull/9353">the fix</a> is included in a release,
      * add this handler option to the .props file.
      * </p>
+     * Make sure to also send (get-unsat-core) in the respective socket class when adding this
+     * option.
      */
     private static final String GET_UNSAT_CORE = "getUnsatCore";
 
@@ -134,7 +138,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         boolean getUnsatCore = Arrays.asList(handlerOptions).contains(GET_UNSAT_CORE);
         sb.append("\n; --- Sequent\n");
-        int i = 0;
+        int i = 1;
         for (SExpr ass : sequentSMTAsserts) {
             if (getUnsatCore) {
                 String label = "L_" + i;
@@ -147,9 +151,6 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
 
         sb.append("\n(check-sat)");
-        if (getUnsatCore) {
-            sb.append("\n(get-unsat-core)");
-        }
 
         if (!master.getUnknownValues().isEmpty()) {
             sb.append("\n\n; --- Translation of unknown values\n");
@@ -163,7 +164,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         List<Throwable> exceptions = master.getExceptions();
         for (Throwable t : exceptions) {
             sb.append("\n; ").append(t.toString().replace("\n", "\n;"));
-            t.printStackTrace();
+            LOGGER.warn("Exception", t);
         }
 
         // TODO Find a concept for exceptions here
@@ -201,7 +202,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
     private static String readResource(String s) {
         BufferedReader r = new BufferedReader(
-            new InputStreamReader(ModularSMTLib2Translator.class.getResourceAsStream(s)));
+            new InputStreamReader(ModularSMTLib2Translator.class.getResourceAsStream(s),
+                StandardCharsets.UTF_8));
 
         try {
             String line;

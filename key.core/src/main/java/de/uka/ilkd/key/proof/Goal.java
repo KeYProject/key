@@ -1,5 +1,12 @@
 package de.uka.ilkd.key.proof;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
@@ -19,13 +26,9 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.properties.MapProperties;
 import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * A proof is represented as a tree of nodes containing sequents. The initial proof consists of just
@@ -41,6 +44,12 @@ import java.util.List;
  */
 public final class Goal {
 
+    public static final AtomicLong PERF_APP_EXECUTE = new AtomicLong();
+    public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();
+    public static final AtomicLong PERF_UPDATE_TAG_MANAGER = new AtomicLong();
+    public static final AtomicLong PERF_UPDATE_RULE_APP_INDEX = new AtomicLong();
+    public static final AtomicLong PERF_UPDATE_LISTENERS = new AtomicLong();
+
     /**
      * If an application of a rule added some information for the strategy, then this information is
      * stored in this map.
@@ -50,11 +59,11 @@ public final class Goal {
     /**
      * all possible rule applications at this node are managed with this index
      */
-    private RuleAppIndex ruleAppIndex;
+    private final RuleAppIndex ruleAppIndex;
     /**
      * list of all applied rule applications at this branch
      */
-    private ImmutableList<RuleApp> appliedRuleApps = ImmutableSLList.<RuleApp>nil();
+    private ImmutableList<RuleApp> appliedRuleApps = ImmutableSLList.nil();
     /**
      * this object manages the tags for all formulas of the sequent
      */
@@ -70,7 +79,7 @@ public final class Goal {
     /**
      * goal listeners
      */
-    private List<GoalListener> listeners = new ArrayList<GoalListener>(10);
+    private List<GoalListener> listeners = new ArrayList<>(10);
     /**
      * a goal has been excluded from automatic rule application iff automatic == false
      */
@@ -84,47 +93,36 @@ public final class Goal {
      */
     private NamespaceSet localNamespaces;
 
-    /*
-     * creates a new goal referencing the given node.
+    /**
+     * copy constructor
      */
     private Goal(Node node, RuleAppIndex ruleAppIndex, ImmutableList<RuleApp> appliedRuleApps,
             FormulaTagManager tagManager, AutomatedRuleApplicationManager ruleAppManager,
             Properties strategyInfos, NamespaceSet localNamespace) {
         this.node = node;
-        this.ruleAppIndex = ruleAppIndex;
+        this.ruleAppIndex = ruleAppIndex.copy(this);
         this.appliedRuleApps = appliedRuleApps;
-        this.tagManager = tagManager;
+        this.tagManager = tagManager == null ? new FormulaTagManager(this) : tagManager;
         this.goalStrategy = null;
-        this.ruleAppIndex.setup(this);
         this.strategyInfos = strategyInfos;
         setRuleAppManager(ruleAppManager);
-        this.localNamespaces = localNamespace;
-    }
-
-    private Goal(Node node, RuleAppIndex ruleAppIndex, ImmutableList<RuleApp> appliedRuleApps,
-            AutomatedRuleApplicationManager ruleAppManager, Properties strategyInfos,
-            NamespaceSet localNamespace) {
-        this.node = node;
-        this.ruleAppIndex = ruleAppIndex;
-        this.appliedRuleApps = appliedRuleApps;
-        this.goalStrategy = null;
-        this.ruleAppIndex.setup(this);
-        this.strategyInfos = strategyInfos;
-        setRuleAppManager(ruleAppManager);
-        this.tagManager = new FormulaTagManager(this);
         this.localNamespaces = localNamespace;
     }
 
     /**
      * creates a new goal referencing the given node
-     *
-     * @param namespaceSet
      */
-    public Goal(Node node, RuleAppIndex ruleAppIndex) {
-        this(node, ruleAppIndex, ImmutableSLList.<RuleApp>nil(), null,
-            new QueueRuleApplicationManager(), new MapProperties(),
-            node.proof().getServices().getNamespaces().copyWithParent().copyWithParent());
-        tagManager = new FormulaTagManager(this);
+    public Goal(Node node, TacletIndex tacletIndex, BuiltInRuleAppIndex builtInRuleAppIndex,
+            Services services) {
+        this.node = node;
+        this.ruleAppIndex = new RuleAppIndex(tacletIndex, builtInRuleAppIndex, this, services);
+        this.appliedRuleApps = ImmutableSLList.nil();
+        this.goalStrategy = null;
+        this.strategyInfos = new MapProperties();
+        this.tagManager = new FormulaTagManager(this);
+        setRuleAppManager(new QueueRuleApplicationManager());
+        this.localNamespaces =
+            node.proof().getServices().getNamespaces().copyWithParent().copyWithParent();
     }
 
     /**
@@ -148,8 +146,9 @@ public final class Goal {
      * @return the strategy that determines automated rule applications for this goal
      */
     public Strategy getGoalStrategy() {
-        if (goalStrategy == null)
+        if (goalStrategy == null) {
             goalStrategy = proof().getActiveStrategy();
+        }
         return goalStrategy;
     }
 
@@ -164,14 +163,14 @@ public final class Goal {
 
     public void setRuleAppManager(AutomatedRuleApplicationManager manager) {
         if (ruleAppManager != null) {
-            ruleAppIndex().removeNewRuleListener(ruleAppManager);
+            ruleAppIndex.setNewRuleListener(null);
             ruleAppManager.setGoal(null);
         }
 
         ruleAppManager = manager;
 
         if (ruleAppManager != null) {
-            ruleAppIndex().addNewRuleListener(ruleAppManager);
+            ruleAppIndex.setNewRuleListener(ruleAppManager);
             ruleAppManager.setGoal(this);
         }
     }
@@ -186,7 +185,7 @@ public final class Goal {
     /**
      * returns the namespaces for this goal.
      *
-     * @returns an up-to-date non-null namespaces-set.
+     * @return an up-to-date non-null namespaces-set.
      */
     public NamespaceSet getLocalNamespaces() {
         return localNamespaces;
@@ -218,21 +217,27 @@ public final class Goal {
      * creation the necessary information is passed to the listener as parameters and not through an
      * event object.
      */
-    protected void fireSequentChanged(SequentChangeInfo sci) {
+    private void fireSequentChanged(SequentChangeInfo sci) {
+        var time = System.nanoTime();
         getFormulaTagManager().sequentChanged(this, sci);
-        ruleAppIndex().sequentChanged(this, sci);
+        var time1 = System.nanoTime();
+        PERF_UPDATE_TAG_MANAGER.getAndAdd(time1 - time);
+        ruleAppIndex.sequentChanged(sci);
+        var time2 = System.nanoTime();
+        PERF_UPDATE_RULE_APP_INDEX.getAndAdd(time2 - time1);
         for (GoalListener listener : listeners) {
             listener.sequentChanged(this, sci);
         }
+        PERF_UPDATE_LISTENERS.getAndAdd(System.nanoTime() - time2);
     }
 
-    protected void fireGoalReplaced(Goal goal, Node parent, ImmutableList<Goal> newGoals) {
+    private void fireGoalReplaced(Goal goal, Node parent, ImmutableList<Goal> newGoals) {
         for (GoalListener listener : listeners) {
             listener.goalReplaced(goal, parent, newGoals);
         }
     }
 
-    protected void fireAautomaticStateChanged(boolean oldAutomatic, boolean newAutomatic) {
+    private void fireAutomaticStateChanged(boolean oldAutomatic, boolean newAutomatic) {
         for (GoalListener listener : listeners) {
             listener.automaticStateChanged(this, oldAutomatic, newAutomatic);
         }
@@ -250,7 +255,6 @@ public final class Goal {
         } else {
             node = p_node;
         }
-        ruleAppIndex.setup(this);
     }
 
     /**
@@ -322,7 +326,7 @@ public final class Goal {
         boolean oldAutomatic = automatic;
         automatic = t;
         node().clearNameCache();
-        fireAautomaticStateChanged(oldAutomatic, automatic);
+        fireAutomaticStateChanged(oldAutomatic, automatic);
     }
 
     /**
@@ -332,15 +336,6 @@ public final class Goal {
      */
     public boolean isLinked() {
         return this.linkedGoal != null;
-    }
-
-    /**
-     * Returns the goal that this goal is linked to.
-     *
-     * @return The goal that this goal is linked to (or null if there is no such one).
-     */
-    public Goal getLinkedGoal() {
-        return this.linkedGoal;
     }
 
     /**
@@ -358,14 +353,27 @@ public final class Goal {
     /**
      * sets the sequent of the node
      *
-     * @param sci SequentChangeInfo containing the sequent to be set and desribing the applied
-     *        changes to the sequent of the parent node
+     * @param sci SequentChangeInfo containing the sequent to be set and describing the applied
+     *        changes to the sequent of the node currently pointed to by this goal
      */
     public void setSequent(SequentChangeInfo sci) {
+        assert sci.getOriginalSequent() == node().sequent();
+        if (!sci.hasChanged()) {
+            assert sci.sequent().equals(sci.getOriginalSequent());
+            return;
+        }
+        // sci.hasChanged() can be true for added: f, removed: f
+        // This afaik only ever happens in TestApplyTaclet.testBugBrokenApply
+        // Since SequentChangeInfo does not filter this we have to
+        // work with maybe sci.original.equals(sci.sequent)
+        // Checking this is probably too expensive for what it's worth
+        assert sci.sequent() != sci.getOriginalSequent();
         node().setSequent(sci.sequent());
         node().getNodeInfo().setSequentChangeInfo(sci);
-        // VK reminder: now update the index
+        var time = System.nanoTime();
+        // updates the index
         fireSequentChanged(sci);
+        PERF_SET_SEQUENT.getAndAdd(System.nanoTime() - time);
     }
 
     /**
@@ -447,14 +455,6 @@ public final class Goal {
     /**
      * Rebuild all rule caches
      */
-    public void updateRuleAppIndex() {
-        getRuleAppManager().clearCache();
-        ruleAppIndex.clearIndexes();
-    }
-
-    /**
-     * Rebuild all rule caches
-     */
     public void clearAndDetachRuleAppIndex() {
         getRuleAppManager().clearCache();
         ruleAppIndex.clearAndDetachCache();
@@ -488,11 +488,11 @@ public final class Goal {
     public Goal clone(Node node) {
         Goal clone;
         if (node.sequent() != this.node.sequent()) {
-            clone = new Goal(node, ruleAppIndex.copy(), appliedRuleApps, ruleAppManager.copy(),
+            clone = new Goal(node, ruleAppIndex, appliedRuleApps, null, ruleAppManager.copy(),
                 strategyInfos.clone(), localNamespaces);
         } else {
             clone =
-                new Goal(node, ruleAppIndex.copy(), appliedRuleApps, getFormulaTagManager().copy(),
+                new Goal(node, ruleAppIndex, appliedRuleApps, getFormulaTagManager().copy(),
                     ruleAppManager.copy(), strategyInfos.clone(), localNamespaces);
         }
         clone.listeners = (List<GoalListener>) ((ArrayList<GoalListener>) listeners).clone();
@@ -536,8 +536,9 @@ public final class Goal {
      *
      * @return the list of new created goals.
      */
+    @Nonnull
     public ImmutableList<Goal> split(int n) {
-        ImmutableList<Goal> goalList = ImmutableSLList.<Goal>nil();
+        ImmutableList<Goal> goalList = ImmutableSLList.nil();
 
         final Node parent = node; // has to be stored because the node
         // of this goal will be replaced
@@ -617,29 +618,33 @@ public final class Goal {
          */
         NamespaceSet originalNamespaces = getLocalNamespaces();
         Services overlayServices = proof.getServices().getOverlay(originalNamespaces);
-        final ImmutableList<Goal> goalList = ruleApp.execute(this, overlayServices);
+        final ImmutableList<Goal> goalList;
+        var time = System.nanoTime();
+        try {
+            goalList = ruleApp.execute(this, overlayServices);
+        } finally {
+            PERF_APP_EXECUTE.getAndAdd(System.nanoTime() - time);
+        }
+        // can be null when the taclet failed to apply (RuleAbortException)
+        if (goalList == null) {
+            return null;
+        }
 
         proof.getServices().saveNameRecorder(n);
 
-        if (goalList != null) { // TODO: can goalList be null?
-            if (goalList.isEmpty()) {
-                proof.closeGoal(this);
-            } else {
-                proof.replace(this, goalList);
-                if (ruleApp instanceof TacletApp && ((TacletApp) ruleApp).taclet().closeGoal()) {
-                    // the first new goal is the one to be closed
-                    proof.closeGoal(goalList.head());
-                }
+        if (goalList.isEmpty()) {
+            proof.closeGoal(this);
+        } else {
+            proof.replace(this, goalList);
+            if (ruleApp instanceof TacletApp && ((TacletApp) ruleApp).taclet().closeGoal()) {
+                // the first new goal is the one to be closed
+                proof.closeGoal(goalList.head());
             }
         }
 
         adaptNamespacesNewGoals(goalList);
-
         final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(ruleApp);
-
-        if (goalList != null) {
-            proof.fireRuleApplied(new ProofEvent(proof, ruleAppInfo, goalList));
-        }
+        proof.fireRuleApplied(new ProofEvent(proof, ruleAppInfo, goalList));
         return goalList;
     }
 

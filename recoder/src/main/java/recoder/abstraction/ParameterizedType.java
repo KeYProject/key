@@ -6,10 +6,10 @@
  */
 package recoder.abstraction;
 
+import java.util.List;
+
 import recoder.ModelException;
 import recoder.service.ProgramModelInfo;
-
-import java.util.List;
 
 /**
  * A parameterized type, meaning a generic type plus actual type arguments. All query calls are
@@ -27,10 +27,12 @@ public class ParameterizedType implements ClassType {
      */
     public ParameterizedType(ClassType genericType, List<? extends TypeArgument> typeArgs) {
         super();
-        if (genericType == null)
+        if (genericType == null) {
             throw new NullPointerException();
-        if (typeArgs == null)
+        }
+        if (typeArgs == null) {
             throw new NullPointerException();
+        }
         this.genericType = genericType;
         this.typeArgs = typeArgs;
     }

@@ -135,10 +135,12 @@ public class PackageReference extends JavaNonTerminalProgramElement
 
     public int getChildCount() {
         int result = 0;
-        if (prefix != null)
+        if (prefix != null) {
             result++;
-        if (name != null)
+        }
+        if (name != null) {
             result++;
+        }
         return result;
     }
 
@@ -152,13 +154,15 @@ public class PackageReference extends JavaNonTerminalProgramElement
 
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0)
+            if (index == 0) {
                 return prefix;
+            }
             index--;
         }
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

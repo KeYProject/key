@@ -1,12 +1,11 @@
 package de.uka.ilkd.key.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
-
 import javax.swing.SwingUtilities;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class ThreadUtilities {
     private static final Logger LOGGER = LoggerFactory.getLogger(ThreadUtilities.class);
@@ -20,9 +19,9 @@ public final class ThreadUtilities {
      * @param runner Runnable capturing code to execute on the awt thread.
      */
     public static void invokeAndWait(Runnable runner) {
-        if (SwingUtilities.isEventDispatchThread())
+        if (SwingUtilities.isEventDispatchThread()) {
             runner.run();
-        else {
+        } else {
             try {
                 SwingUtilities.invokeAndWait(runner);
             } catch (InterruptedException e) {

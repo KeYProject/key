@@ -98,7 +98,7 @@ public class MissingProofsChecker implements Checker {
             if (type instanceof TypeDeclaration) {
                 TypeDeclaration td = (TypeDeclaration) type;
                 PositionInfo positionInfo = td.getPositionInfo();
-                URI uri = positionInfo.getURI().normalize();
+                URI uri = positionInfo.getURI().orElseThrow().normalize();
                 URI srcURI = data.getPbh().getPath("src").toAbsolutePath().normalize().toUri();
 
 

@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
@@ -35,7 +36,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
      * @param settings The {@link IModelSettings} to use.
      */
     public SymbolicEquivalenceClass(Services services, IModelSettings settings) {
-        this(services, ImmutableSLList.<Term>nil(), settings);
+        this(services, ImmutableSLList.nil(), settings);
     }
 
     /**

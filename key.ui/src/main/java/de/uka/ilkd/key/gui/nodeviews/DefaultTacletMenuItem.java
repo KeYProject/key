@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -9,9 +11,8 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import org.key_project.util.collection.ImmutableList;
 
-import javax.swing.*;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * this class extends JMenuItem. The objective is to store the Taclet of each item in the item for

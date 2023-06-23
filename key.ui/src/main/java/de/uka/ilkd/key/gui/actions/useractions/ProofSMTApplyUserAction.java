@@ -1,18 +1,24 @@
 package de.uka.ilkd.key.gui.actions.useractions;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Optional;
+
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.smt.SolverListener;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.smt.SMTFocusResults;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * User action to apply the results of running SMT solvers.
@@ -24,23 +30,24 @@ public class ProofSMTApplyUserAction extends UserAction {
     /**
      * Results of running the SMT solvers (one entry for each open goal).
      */
-    private final Collection<SMTProblem> smtProblems;
+    private final Collection<SolverListener.InternSMTProblem> smtProblems;
     /**
      * The nodes closed by applying this action.
      * Populated in {@link #apply()}.
      */
-    private final Collection<Node> goalsClosed = new ArrayList<>();
+    private final Collection<Goal> goalsClosed = new HashSet<>();
     /**
      * The number of goals that will be closed by this action.
      */
     private final int numberOfGoalsClosed;
 
     public ProofSMTApplyUserAction(KeYMediator mediator, Proof proof,
-            Collection<SMTProblem> smtProblems) {
+            Collection<SolverListener.InternSMTProblem> smtProblems) {
         super(mediator, proof);
         this.smtProblems = smtProblems;
         this.numberOfGoalsClosed = (int) smtProblems.stream()
-                .filter(p -> p.getFinalResult().isValid() == SMTSolverResult.ThreeValuedTruth.VALID)
+                .filter(p -> p.getProblem().getFinalResult()
+                        .isValid() == SMTSolverResult.ThreeValuedTruth.VALID)
                 .count();
     }
 
@@ -51,19 +58,31 @@ public class ProofSMTApplyUserAction extends UserAction {
 
     @Override
     protected void apply() {
-        for (SMTProblem problem : smtProblems) {
-            if (problem.getFinalResult().isValid() == SMTSolverResult.ThreeValuedTruth.VALID) {
-                IBuiltInRuleApp app =
-                    RuleAppSMT.rule.createApp(null).setTitle(getTitle(problem));
-                goalsClosed.add(problem.getGoal().node());
-                problem.getGoal().apply(app);
+        // only close each solved goal once
+        for (SolverListener.InternSMTProblem problem : smtProblems) {
+            Goal goal = problem.getProblem().getGoal();
+            if (goalsClosed.contains(goal)
+                    || problem.getSolver().getFinalResult()
+                            .isValid() != SMTSolverResult.ThreeValuedTruth.VALID) {
+                continue;
             }
+            goalsClosed.add(goal);
+            Optional<ImmutableList<PosInOccurrence>> unsatCore =
+                SMTFocusResults.getUnsatCore(problem.getProblem());
+            IBuiltInRuleApp app;
+            if (unsatCore.isPresent()) {
+                app = RuleAppSMT.RULE.createApp(problem.getSolver().name(), unsatCore.get());
+            } else {
+                app = RuleAppSMT.RULE.createApp(problem.getSolver().name());
+            }
+            goal.apply(app);
         }
     }
 
     @Override
     public void undo() {
-        for (Node n : goalsClosed) {
+        for (Goal g : goalsClosed) {
+            Node n = g.node();
             n.setAppliedRuleApp(null);
             // re-open the goal
             Goal firstGoal = proof.getClosedGoal(n);
@@ -74,7 +93,7 @@ public class ProofSMTApplyUserAction extends UserAction {
 
     @Override
     public boolean canUndo() {
-        return goalsClosed.stream().allMatch(proof::find);
+        return goalsClosed.stream().allMatch(g -> proof.find(g.node()));
     }
 
     private String getTitle(SMTProblem p) {

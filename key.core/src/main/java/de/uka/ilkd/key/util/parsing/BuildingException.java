@@ -1,15 +1,15 @@
 package de.uka.ilkd.key.util.parsing;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.MiscTools;
-import org.antlr.v4.runtime.IntStream;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-
-import javax.annotation.Nullable;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * @author Alexander Weigl
@@ -39,9 +39,10 @@ public class BuildingException extends RuntimeException implements HasLocation {
     private static String getPosition(Token t) {
         if (t != null) {
             var p = Position.fromToken(t);
-            return t.getTokenSource().getSourceName() + ":" + p.getLine() + ":" + p.getColumn();
-        } else
+            return t.getTokenSource().getSourceName() + ":" + p.line() + ":" + p.column();
+        } else {
             return "";
+        }
     }
 
     public BuildingException(ParserRuleContext ctx, Throwable ex) {
@@ -57,12 +58,8 @@ public class BuildingException extends RuntimeException implements HasLocation {
     @Override
     public Location getLocation() throws MalformedURLException {
         if (offendingSymbol != null) {
-            var source = offendingSymbol.getTokenSource().getSourceName();
-            URL url = null;
-            if (!IntStream.UNKNOWN_SOURCE_NAME.equals(source)) {
-                url = MiscTools.parseURL(source);
-            }
-            return new Location(url, Position.fromToken(offendingSymbol));
+            URI uri = MiscTools.getURIFromTokenSource(offendingSymbol.getTokenSource());
+            return new Location(uri, Position.fromToken(offendingSymbol));
         }
         return null;
     }

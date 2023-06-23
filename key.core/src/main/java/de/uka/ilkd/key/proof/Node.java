@@ -9,12 +9,8 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-
-import de.uka.ilkd.key.util.Pair;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
@@ -24,10 +20,13 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import org.key_project.util.lookup.Lookup;
+import de.uka.ilkd.key.util.Pair;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.lookup.Lookup;
 
 public class Node implements Iterable<Node> {
     private static final String RULE_WITHOUT_NAME = "rule without name";
@@ -66,13 +65,13 @@ public class Node implements Iterable<Node> {
      * a linked list of the locally generated program variables. It extends the list of the parent
      * node.
      */
-    private ImmutableList<IProgramVariable> localProgVars = ImmutableSLList.<IProgramVariable>nil();
+    private ImmutableList<IProgramVariable> localProgVars = ImmutableSLList.nil();
 
     /**
      * a linked list of the locally generated function symbols. It extends the list of the parent
      * node.
      */
-    private ImmutableList<Function> localFunctions = ImmutableSLList.<Function>nil();
+    private ImmutableList<Function> localFunctions = ImmutableSLList.nil();
 
     private boolean closed = false;
 
@@ -114,7 +113,7 @@ public class Node implements Iterable<Node> {
      * taclet with an addrule section on this node, then these taclets are stored in this list
      */
     private ImmutableSet<NoPosTacletApp> localIntroducedRules =
-        DefaultImmutableSet.<NoPosTacletApp>nil();
+        DefaultImmutableSet.nil();
 
     /**
      * Holds the undo methods for the information added by rules to the {@link Goal#strategyInfos}.
@@ -557,7 +556,8 @@ public class Node implements Iterable<Node> {
             tree.append(connectNode);
         }
 
-        tree.append("(" + newEnumeration + newPostNr + ") " + sequent().toString() + "\n");
+        tree.append("(").append(newEnumeration).append(newPostNr).append(") ")
+                .append(sequent().toString()).append("\n");
 
         // create new prefix
         if (ownNr < maxNr) {
@@ -617,7 +617,7 @@ public class Node implements Iterable<Node> {
                 return nodeInfo.getFirstStatementString();
             }
 
-            cachedName = rap.rule().displayName();
+            cachedName = rap.displayName();
             if (cachedName == null) {
                 cachedName = RULE_WITHOUT_NAME;
             }
@@ -798,8 +798,9 @@ public class Node implements Iterable<Node> {
      * @return
      */
     public @Nonnull Lookup getUserData() {
-        if (userData == null)
+        if (userData == null) {
             userData = new Lookup();
+        }
         return userData;
     }
 

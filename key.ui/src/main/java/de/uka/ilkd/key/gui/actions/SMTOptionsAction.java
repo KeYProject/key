@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.settings.SettingsManager;
-
 import java.awt.event.ActionEvent;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.settings.SettingsManager;
 
 
 /**

@@ -1,22 +1,14 @@
 package org.key_project.slicing.ui;
 
-import org.key_project.slicing.util.GraphvizDotExecutor;
-import org.key_project.slicing.util.GraphvizResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+
+import org.key_project.slicing.util.GraphvizDotExecutor;
+import org.key_project.slicing.util.GraphvizResult;
 
 /**
  * Dialog that displays a rendering of the dependency graph.

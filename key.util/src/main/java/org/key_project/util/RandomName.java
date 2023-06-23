@@ -7,9 +7,10 @@ import java.util.Random;
  * @version 1 (06.12.18)
  */
 public class RandomName {
-    private static Random random = new Random();
+    private static final Random random = new Random();
 
-    private static String[] ADJECTIVES = new String[] { "French", "Spanish", "abandoned", "able",
+    private static final String[] ADJECTIVES = new String[] { "French", "Spanish", "abandoned",
+        "able",
         "absolute", "academic", "acceptable", "acclaimed", "accomplished", "accurate", "aching",
         "acidic", "acrobatic", "active", "actual", "adept", "admirable", "admired", "adolescent",
         "adorable", "adorable", "adored", "advanced", "adventurous", "affectionate", "afraid",
@@ -181,7 +182,8 @@ public class RandomName {
         "yearly", "yellow", "yellowish", "young", "youthful", "yummy", "zany", "zealous", "zesty",
         "zigzag" };
 
-    private static String[] ANIMALS = new String[] { "cat", "caterpillar", "cattle", "chamois",
+    private static final String[] ANIMALS = new String[] { "cat", "caterpillar", "cattle",
+        "chamois",
         "cheetah", "chicken", "chimpanzee", "chinchilla", "chough", "coati", "cobra", "cockroach",
         "cod", "cormorant", "coyote", "crab", "crane", "crocodile", "crow", "curlew", "deer",
         "dinosaur", "dog", "dogfish", "shark", "dolphin", "donkey", "dotterel", "dove", "dragonfly",

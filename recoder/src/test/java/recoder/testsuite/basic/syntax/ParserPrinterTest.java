@@ -1,5 +1,7 @@
 package recoder.testsuite.basic.syntax;
 
+import java.util.List;
+
 import org.junit.Test;
 import recoder.ParserException;
 import recoder.ProgramFactory;
@@ -8,8 +10,6 @@ import recoder.io.SourceFileRepository;
 import recoder.java.CompilationUnit;
 import recoder.java.ProgramElement;
 import recoder.testsuite.basic.BasicTestsSuite;
-
-import java.util.List;
 
 import static org.junit.Assert.fail;
 

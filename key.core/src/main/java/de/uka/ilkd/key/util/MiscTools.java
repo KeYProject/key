@@ -6,30 +6,16 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipFile;
+import javax.annotation.Nullable;
 
-import org.key_project.util.Filenames;
-import org.key_project.util.Strings;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.KeYCollections;
-
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.recoderext.URLDataLocation;
@@ -40,11 +26,7 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.RenamingTable;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -58,6 +40,13 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+
+import org.key_project.util.Filenames;
+import org.key_project.util.Strings;
+import org.key_project.util.collection.*;
+
+import org.antlr.v4.runtime.IntStream;
+import org.antlr.v4.runtime.TokenSource;
 import recoder.io.ArchiveDataLocation;
 import recoder.io.DataFileLocation;
 import recoder.io.DataLocation;
@@ -86,7 +75,6 @@ public final class MiscTools {
      * otherwise results in undefined behavior in that case.
      *
      * @param loopTerm The term for which to return the {@link LoopSpecification}.
-     * @param localSpecRepo TODO
      * @return The {@link LoopSpecification} for the loop statement in the given term or an empty
      *         optional if there is no specified invariant for the loop.
      */
@@ -98,10 +86,10 @@ public final class MiscTools {
         final ProgramElement pe = loopTerm.javaBlock().program();
         assert pe != null;
         assert pe instanceof StatementBlock;
-        assert ((StatementBlock) pe).getFirstElement() instanceof LoopStatement;
+        assert pe.getFirstElement() instanceof LoopStatement;
 
         final LoopStatement loop = //
-            (LoopStatement) ((StatementBlock) pe).getFirstElement();
+            (LoopStatement) pe.getFirstElement();
 
         return Optional.ofNullable(services.getSpecificationRepository().getLoopSpec(loop));
     }
@@ -249,7 +237,7 @@ public final class MiscTools {
         if (t.op() instanceof IObserverFunction) {
             final IObserverFunction obs = (IObserverFunction) t.op();
             final Sort s = obs.isStatic() ? obs.getContainerType().getSort() : t.sub(1).sort();
-            result = result.add(new Pair<Sort, IObserverFunction>(s, obs));
+            result = result.add(new Pair<>(s, obs));
         }
         for (Term sub : t.subs()) {
             result = result.union(collectObservers(sub));
@@ -350,10 +338,18 @@ public final class MiscTools {
     }
 
     public static String toValidFileName(String s) {
-        s = s.replace("\\", "_").replace("$", "_").replace("?", "_").replace("|", "_")
-                .replace("<", "_").replace(">", "_").replace(":", "_").replace("*", "+")
-                .replace("\"", "'").replace("/", "-").replace("[", "(").replace("]", ")");
-        return s;
+        return s.replace("\\", "_")
+                .replace("$", "_")
+                .replace("?", "_")
+                .replace("|", "_")
+                .replace("<", "_")
+                .replace(">", "_")
+                .replace(":", "_")
+                .replace("*", "+")
+                .replace("\"", "'")
+                .replace("/", "-")
+                .replace("[", "(")
+                .replace("]", ")");
     }
 
     public static Name toValidVariableName(String s) {
@@ -579,13 +575,13 @@ public final class MiscTools {
         /**
          * The list of resulting (i.e., read) program variables.
          */
-        private ImmutableSet<ProgramVariable> result = DefaultImmutableSet.<ProgramVariable>nil();
+        private ImmutableSet<ProgramVariable> result = DefaultImmutableSet.nil();
 
         /**
          * The declared program variables.
          */
         private ImmutableSet<ProgramVariable> declaredPVs =
-            DefaultImmutableSet.<ProgramVariable>nil();
+            DefaultImmutableSet.nil();
 
         public ReadPVCollector(ProgramElement root, Services services) {
             super(root, services);
@@ -619,13 +615,13 @@ public final class MiscTools {
          * The written program variables.
          */
         private ImmutableSet<ProgramVariable> writtenPVs =
-            DefaultImmutableSet.<ProgramVariable>nil();
+            DefaultImmutableSet.nil();
 
         /**
          * The declared program variables.
          */
         private ImmutableSet<ProgramVariable> declaredPVs =
-            DefaultImmutableSet.<ProgramVariable>nil();
+            DefaultImmutableSet.nil();
 
         public WrittenAndDeclaredPVCollector(ProgramElement root, Services services) {
             super(root, services);
@@ -662,7 +658,7 @@ public final class MiscTools {
     }
 
     public static ImmutableList<Term> toTermList(Iterable<ProgramVariable> list, TermBuilder tb) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = ImmutableSLList.nil();
         for (ProgramVariable pv : list) {
             if (pv != null) {
                 Term t = tb.var(pv);
@@ -684,14 +680,14 @@ public final class MiscTools {
         byte[] buffer = new byte[2048];
         int read;
         while ((read = is.read(buffer)) > 0) {
-            sb.append(new String(buffer, 0, read));
+            sb.append(new String(buffer, 0, read, StandardCharsets.UTF_8));
         }
         return sb.toString();
     }
 
     public static ImmutableList<Term> filterOutDuplicates(ImmutableList<Term> localIns,
             ImmutableList<Term> localOuts) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = ImmutableSLList.nil();
         for (Term localIn : localIns) {
             if (!localOuts.contains(localIn)) {
                 result = result.append(localIn);
@@ -706,7 +702,7 @@ public final class MiscTools {
      * @return The default taclet options.
      */
     public static HashMap<String, String> getDefaultTacletOptions() {
-        HashMap<String, String> result = new HashMap<String, String>();
+        HashMap<String, String> result = new HashMap<>();
         result.put("Strings", "Strings:on");
         result.put("reach", "reach:on");
         result.put("JavaCard", "JavaCard:off");
@@ -727,31 +723,12 @@ public final class MiscTools {
     }
 
     /**
-     * Returns the path to the source file defined by the given {@link PositionInfo}.
-     *
-     * @param posInfo The {@link PositionInfo} to extract source file from.
-     * @return The source file name or {@code null} if not available.
-     */
-    public static String getSourcePath(PositionInfo posInfo) {
-        String result = null;
-        if (posInfo.getFileName() != null) {
-            result = posInfo.getFileName(); // posInfo.getFileName() is a path to a file
-        } else if (posInfo.getParentClass() != null) {
-            result = posInfo.getParentClass(); // posInfo.getParentClass() is a path to a file
-        }
-        if (result != null && result.startsWith("FILE:")) {
-            result = result.substring("FILE:".length());
-        }
-        return result;
-    }
-
-    /**
      * Tries to extract a valid URI from the given DataLocation.
      *
      * @param loc the given DataLocation
      * @return an URI identifying the resource of the DataLocation
      */
-    public static URI extractURI(DataLocation loc) {
+    public static Optional<URI> extractURI(DataLocation loc) {
         if (loc == null) {
             throw new IllegalArgumentException("The given DataLocation is null!");
         }
@@ -759,7 +736,7 @@ public final class MiscTools {
         try {
             switch (loc.getType()) {
             case "URL": // URLDataLocation
-                return ((URLDataLocation) loc).getUrl().toURI();
+                return Optional.of(((URLDataLocation) loc).getUrl().toURI());
             case "ARCHIVE": // ArchiveDataLocation
                 // format: "ARCHIVE:<filename>?<itemname>"
                 ArchiveDataLocation adl = (ArchiveDataLocation) loc;
@@ -770,20 +747,19 @@ public final class MiscTools {
                 ZipFile zip = adl.getFile();
 
                 // use special method to ensure that path separators are correct
-                return getZipEntryURI(zip, itemName);
+                return Optional.of(getZipEntryURI(zip, itemName));
             case "FILE": // DataFileLocation
                 // format: "FILE:<path>"
-                return ((DataFileLocation) loc).getFile().toURI();
+                return Optional.of(((DataFileLocation) loc).getFile().toURI());
             default: // SpecDataLocation
                 // format "<type>://<location>"
                 // wrap into URN to ensure URI encoding is correct (no spaces!)
-                return new URI("urn", loc.toString(), null);
+                return Optional.empty();
             }
         } catch (URISyntaxException | IOException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException(
+                "The given DataLocation can not be converted into a valid URI: " + loc, e);
         }
-        throw new IllegalArgumentException(
-            "The given DataLocation can not be converted" + " into a valid URI: " + loc);
     }
 
     /**
@@ -830,6 +806,24 @@ public final class MiscTools {
         // Path p = fs.getPath(entryName);
         // return p.toUri();
         // }
+    }
+
+    @Nullable
+    public static URI getURIFromTokenSource(TokenSource source) {
+        return getURIFromTokenSource(source.getSourceName());
+    }
+
+    @Nullable
+    public static URI getURIFromTokenSource(String source) {
+        if (IntStream.UNKNOWN_SOURCE_NAME.equals(source)) {
+            return null;
+        }
+
+        try {
+            return new URI(source);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

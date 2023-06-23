@@ -2,11 +2,11 @@
 
 package recoder.service;
 
-import recoder.Service;
-import recoder.abstraction.Package;
-import recoder.abstraction.*;
-
 import java.util.List;
+
+import recoder.Service;
+import recoder.abstraction.*;
+import recoder.abstraction.Package;
 
 /**
  * The program model info computes predicates for program model elements contained in

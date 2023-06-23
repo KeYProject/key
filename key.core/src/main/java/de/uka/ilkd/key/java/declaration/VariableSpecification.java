@@ -7,7 +7,9 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
+
 import org.key_project.util.ExtList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,10 +99,12 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int result = 0;
-        if (var != null)
+        if (var != null) {
             result++;
-        if (initializer != null)
+        }
+        if (initializer != null) {
             result++;
+        }
         return result;
     }
 
@@ -113,8 +117,9 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (var != null) {
-            if (index == 0)
+            if (index == 0) {
                 return var;
+            }
             index--;
         }
         if (initializer != null && index == 0) {
@@ -289,9 +294,6 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
         final ProgramElement pe = source.getSource();
         matchCond = super.match(source, matchCond);
         if (matchCond != null && getDimensions() != ((VariableSpecification) pe).getDimensions()) {
-            LOGGER.debug(
-                "Program match. Variables have different dimension " + "(template {}, source {})",
-                this, pe);
             return null;
         }
         return matchCond;

@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.settings;
 
+import java.util.Objects;
+import java.util.Properties;
+
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.prover.GoalChooser;
@@ -8,30 +11,30 @@ import de.uka.ilkd.key.prover.impl.AppliedRuleStopCondition;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.EventObject;
-import java.util.LinkedList;
-import java.util.Objects;
-import java.util.Properties;
 
-
-public class StrategySettings implements Settings, Cloneable {
+public class StrategySettings extends AbstractSettings {
     public static final Logger LOGGER = LoggerFactory.getLogger(StrategySettings.class);
 
-    private static final String STRATEGY_KEY = "[Strategy]ActiveStrategy";
-    private static final String STEPS_KEY = "[Strategy]MaximumNumberOfAutomaticApplications";
-    private static final String TIMEOUT_KEY = "[Strategy]Timeout";
+    public static final String STRATEGY_KEY = "[Strategy]ActiveStrategy";
+    public static final String STEPS_KEY = "[Strategy]MaximumNumberOfAutomaticApplications";
+    public static final String TIMEOUT_KEY = "[Strategy]Timeout";
+    private static final String PROP_STRATEGY_PROPERTIES = "strategyProperties";
 
-    private final LinkedList<SettingsListener> listenerList = new LinkedList<>();
 
     private Name activeStrategy;
 
-    /** maximal number of automatic rule applications before an interaction is required */
+    /**
+     * maximal number of automatic rule applications before an interaction is required
+     */
     private int maxSteps = -1;
 
-    /** maximal time in ms after which automatic rule application is aborted */
+    /**
+     * maximal time in ms after which automatic rule application is aborted
+     */
     private long timeout = -1;
 
     private StrategyProperties strategyProperties = new StrategyProperties();
@@ -64,10 +67,9 @@ public class StrategySettings implements Settings, Cloneable {
      * @param mSteps maximal amount of heuristic steps
      */
     public void setMaxSteps(int mSteps) {
-        if (maxSteps != mSteps) {
-            maxSteps = mSteps;
-            fireSettingsChanged();
-        }
+        var old = maxSteps;
+        maxSteps = mSteps;
+        firePropertyChange(STEPS_KEY, old, maxSteps);
     }
 
     /**
@@ -85,10 +87,9 @@ public class StrategySettings implements Settings, Cloneable {
      * @param name
      */
     public void setStrategy(Name name) {
-        if (!name.equals(activeStrategy)) {
-            activeStrategy = name;
-            fireSettingsChanged();
-        }
+        var old = this.activeStrategy;
+        activeStrategy = name;
+        firePropertyChange(STRATEGY_KEY, old, activeStrategy);
     }
 
     /*
@@ -131,13 +132,19 @@ public class StrategySettings implements Settings, Cloneable {
         }
 
         // set strategy options
-        strategyProperties = StrategyProperties.read(props);
+        setStrategyProperties(StrategyProperties.read(props));
 
         // set max steps
-        maxSteps = numSteps;
+        setMaxSteps(numSteps);
 
         // set time out
-        this.timeout = localTimeout;
+        setTimeout(localTimeout);
+    }
+
+    private void setStrategyProperties(StrategyProperties props) {
+        var old = strategyProperties;
+        strategyProperties = props;
+        firePropertyChange(PROP_STRATEGY_PROPERTIES, old, strategyProperties);
     }
 
     /*
@@ -147,9 +154,10 @@ public class StrategySettings implements Settings, Cloneable {
      */
     public void writeSettings(Properties props) {
         if (getStrategy() == null) {
-            // It would be bedder to return the name of the default factory defined by the profile
+            // It would be better to return the name of the default factory defined by the profile
             // used by the proof
-            // in which this strategysettings is used or just not to save the strategy because it is
+            // in which this strategy settings is used or just not to save the strategy because it
+            // is
             // not defined.
             setStrategy(JavaCardDLStrategyFactory.NAME);
         }
@@ -164,29 +172,6 @@ public class StrategySettings implements Settings, Cloneable {
     }
 
     /**
-     * sends the message that the state of this setting has been changed to its registered listeners
-     * (not thread-safe)
-     */
-    protected void fireSettingsChanged() {
-        for (SettingsListener aListenerList : listenerList) {
-            aListenerList.settingsChanged(new EventObject(this));
-        }
-    }
-
-    /**
-     * adds a listener to the settings object
-     *
-     * @param l the listener
-     */
-    public void addSettingsListener(SettingsListener l) {
-        listenerList.add(l);
-    }
-
-    public void removeSettingsListener(SettingsListener l) {
-        listenerList.remove(l);
-    }
-
-    /**
      * returns a shallow copy of the strategy properties
      */
     public StrategyProperties getActiveStrategyProperties() {
@@ -197,10 +182,9 @@ public class StrategySettings implements Settings, Cloneable {
      * sets the strategy properties if different from current ones
      */
     public void setActiveStrategyProperties(StrategyProperties p) {
-        if (!p.equals(strategyProperties)) {
-            this.strategyProperties = (StrategyProperties) p.clone();
-            fireSettingsChanged();
-        }
+        var old = this.strategyProperties;
+        this.strategyProperties = (StrategyProperties) p.clone();
+        firePropertyChange(PROP_STRATEGY_PROPERTIES, old, this.strategyProperties);
     }
 
     /**
@@ -219,10 +203,9 @@ public class StrategySettings implements Settings, Cloneable {
      * @param timeout a long specifying the timeout in ms
      */
     public void setTimeout(long timeout) {
-        if (timeout != this.timeout) {
-            this.timeout = timeout;
-            fireSettingsChanged();
-        }
+        var old = this.timeout;
+        this.timeout = timeout;
+        firePropertyChange(TIMEOUT_KEY, old, timeout);
     }
 
     /**

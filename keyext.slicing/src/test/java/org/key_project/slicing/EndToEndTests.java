@@ -1,5 +1,9 @@
 package org.key_project.slicing;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.util.concurrent.atomic.AtomicReference;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.core.Main;
@@ -12,15 +16,15 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.util.Pair;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.analysis.DependencyAnalyzer;
 import org.key_project.util.helper.FindResources;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.util.concurrent.atomic.AtomicReference;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -30,6 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Arne Keller
  */
 class EndToEndTests {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EndToEndTests.class);
+
     public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
 
     /**
@@ -243,7 +249,7 @@ class EndToEndTests {
         // load proof
         Assertions.assertTrue(proofFile.exists());
         AtomicReference<DependencyTracker> tracker = new AtomicReference<>();
-        System.out.println("loading " + proofFile.getAbsolutePath());
+        LOGGER.trace("Loading " + proofFile.getAbsolutePath());
         KeYEnvironment<?> environment =
             KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null,
                 null, proof -> {

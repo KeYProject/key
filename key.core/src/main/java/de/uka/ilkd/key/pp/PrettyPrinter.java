@@ -4,8 +4,8 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.*;
+import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
@@ -24,7 +24,9 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
+
 import org.key_project.util.collection.ImmutableArray;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -507,20 +509,20 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnForUpdates(ForUpdates x) {
-        // handled by loop methods
-        throw new UnsupportedOperationException();
+        writeCommaList(x.getUpdates());
     }
 
     @Override
     public void performActionOnGuard(Guard x) {
-        // handled by loop methods
-        throw new UnsupportedOperationException();
+        var child = x.getChildAt(0);
+        if (child != null) {
+            child.visit(this);
+        }
     }
 
     @Override
     public void performActionOnLoopInit(LoopInit x) {
-        // handled by loop methods
-        throw new UnsupportedOperationException();
+        writeCommaList(x.getInits());
     }
 
     @Override
@@ -945,8 +947,8 @@ public class PrettyPrinter implements Visitor {
         l.keyWord("while");
         l.print(" ");
         beginMultilineBracket();
-        if (x.getGuardExpression() != null) {
-            x.getGuardExpression().visit(this);
+        if (x.getGuard() != null) {
+            x.getGuard().visit(this);
         }
         endMultilineBracket();
         l.print(";");
@@ -991,13 +993,10 @@ public class PrettyPrinter implements Visitor {
 
         // there is no "getLoopInit" method
         // so get the first child of the for loop
+
         ILoopInit init = x.getILoopInit();
         if (init != null) {
-            if (init instanceof ProgramSV) {
-                init.visit(this);
-            } else {
-                writeCommaList(x.getInitializers());
-            }
+            init.visit(this);
         }
         l.print(";").brk();
         if (x.getGuardExpression() != null) {
@@ -1007,10 +1006,10 @@ public class PrettyPrinter implements Visitor {
 
         IForUpdates upd = x.getIForUpdates();
         if (upd != null) {
+            upd.visit(this);
             if (upd instanceof ProgramSV) {
-                upd.visit(this);
+
             } else {
-                writeCommaList(x.getUpdates());
             }
         }
         endMultilineBracket();
@@ -1132,16 +1131,23 @@ public class PrettyPrinter implements Visitor {
         beginMultilineBracket();
 
         IProgramVariable var = x.getProgramVariable();
+        var exec = x.getExecutionContext();
         if (var != null) {
             l.beginRelativeC().print("result->");
             var.visit(this);
-            l.print(",").end().brk();
+            if (exec != null) {
+                l.print(",");
+            }
+            l.end();
+            if (exec != null) {
+                l.brk();
+            }
         }
 
-        if (x.getExecutionContext() instanceof ExecutionContext) {
-            performActionOnExecutionContext((ExecutionContext) x.getExecutionContext());
-        } else {
-            performActionOnSchemaVariable((SchemaVariable) x.getExecutionContext());
+        if (exec instanceof ExecutionContext) {
+            performActionOnExecutionContext((ExecutionContext) exec);
+        } else if (exec != null) {
+            performActionOnSchemaVariable((SchemaVariable) exec);
         }
 
         endMultilineBracket();
@@ -1666,8 +1672,7 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnThen(Then x) {
-        // Handled by if
-        throw new UnsupportedOperationException();
+        handleBlockOrSingleStatement(x.getBody());
     }
 
     @Override

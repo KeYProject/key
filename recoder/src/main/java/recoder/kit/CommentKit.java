@@ -2,6 +2,8 @@
 
 package recoder.kit;
 
+import java.util.List;
+
 import recoder.ProgramFactory;
 import recoder.java.DocComment;
 import recoder.java.declaration.*;
@@ -9,8 +11,6 @@ import recoder.java.reference.TypeReference;
 import recoder.service.NameInfo;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
-
-import java.util.List;
 
 public class CommentKit {
 
@@ -29,7 +29,7 @@ public class CommentKit {
     public static DocComment createDoc(MethodDeclaration method, boolean dummy) {
 
         Debug.assertNonnull(method);
-        StringBuffer text = new StringBuffer("/**\n");
+        StringBuilder text = new StringBuilder("/**\n");
         if (dummy) {
             text.append("  ");
             text.append(guessDocumentation(method.getName(), true));
@@ -38,7 +38,7 @@ public class CommentKit {
         int c = method.getParameterDeclarationCount();
         for (int i = 0; i < c; i += 1) {
             ParameterDeclaration param = method.getParameterDeclarationAt(i);
-            text.append("  @param " + param.getVariables().get(0).getName() + ' ');
+            text.append("  @param ").append(param.getVariables().get(0).getName()).append(' ');
             if (dummy) {
                 text.append(guessDocumentation(param.getTypeReference(), false));
             }
@@ -55,9 +55,8 @@ public class CommentKit {
         Throws th = method.getThrown();
         if (th != null) {
             List<TypeReference> excepts = th.getExceptions();
-            for (int i = 0; i < excepts.size(); i += 1) {
-                TypeReference tr = excepts.get(i);
-                text.append("  @exception " + tr.getName());
+            for (TypeReference tr : excepts) {
+                text.append("  @exception ").append(tr.getName());
                 if (dummy) {
                     text.append(" occasionally thrown.\n");
                 }
@@ -189,7 +188,7 @@ public class CommentKit {
         // to do: enable '_' as separator, check if parts are completely
         // capitalized (e.g. for constants)
         int len = name.length();
-        StringBuffer res = new StringBuffer(len + 6);
+        StringBuilder res = new StringBuilder(len + 6);
         for (int i = 0; i < len; i += 1) {
             char ch = name.charAt(i);
             if (Character.isUpperCase(ch)) {

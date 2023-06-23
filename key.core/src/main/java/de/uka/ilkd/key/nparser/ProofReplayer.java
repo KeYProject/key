@@ -1,16 +1,18 @@
 package de.uka.ilkd.key.nparser;
 
+import java.net.URI;
+import java.net.URL;
+import java.util.*;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.util.parsing.LocatableException;
+
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
-
-import javax.annotation.Nonnull;
-import java.net.URL;
-import java.util.*;
 
 /**
  * A short little hack, but completely working and fast, for replaying proofs inside KeY files.
@@ -46,10 +48,10 @@ public class ProofReplayer {
      * @param input a valid input stream
      * @param prl the proof replayer instance
      * @param source the source of the stream, used for producing exceptions with locations
-     * @see #run(CharStream, IProofFileParser, int, URL)
+     * @see #run(CharStream, IProofFileParser, int, URI)
      */
     public static void run(@Nonnull Token token, CharStream input, IProofFileParser prl,
-            URL source) {
+            URI source) {
         input.seek(1 + token.getStopIndex()); // ends now on \proof|
         run(input, prl, token.getLine(), source);
     }
@@ -67,11 +69,12 @@ public class ProofReplayer {
      * @param source the source of the stream, used for producing exceptions with locations
      */
     public static void run(CharStream input, IProofFileParser prl, final int startLine,
-            URL source) {
+            URI source) {
         KeYLexer lexer = ParsingFacade.createLexer(input);
         CommonTokenStream stream = new CommonTokenStream(lexer);
-        Stack<IProofFileParser.ProofElementID> stack = new Stack<>(); // currently open proof
-                                                                      // elements
+        ArrayDeque<IProofFileParser.ProofElementID> stack = new ArrayDeque<>(); // currently open
+                                                                                // proof
+        // elements
         Deque<Integer> posStack = new ArrayDeque<>(); // stack of opened commands position
         while (true) {
             int type = stream.LA(1); // current token type

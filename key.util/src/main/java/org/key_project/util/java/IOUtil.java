@@ -1,19 +1,13 @@
 package org.key_project.util.java;
 
 import java.io.*;
-import java.math.BigInteger;
 import java.net.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.CodeSource;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -31,7 +25,7 @@ public final class IOUtil {
     public static final int BUFFER_SIZE = 1024 * 10;
 
     /**
-     * The default charset to use. The value is independent from the current operating system.
+     * The default charset to use. The value is independent of the current operating system.
      */
     public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
@@ -39,53 +33,6 @@ public final class IOUtil {
      * Forbid instances by this private constructor.
      */
     private IOUtil() {
-    }
-
-    /**
-     * Computes the MD5 checksum of the given {@link File}.
-     *
-     * @param file The {@link File} to compute its MD5 checksum.
-     * @return The computed MD5 checksum.
-     * @throws IOException Occurred Exception.
-     */
-    public static String computeMD5(File file) throws IOException {
-        if (file == null) {
-            throw new IOException("Can't compute MD5 without a File.");
-        }
-        if (!file.isFile()) {
-            throw new IOException(
-                "Can't compute MD5, because \"" + file + "\" is not an existing file.");
-        }
-        return computeMD5(new FileInputStream(file));
-    }
-
-    /**
-     * Computes the MD5 checksum of the given {@link InputStream} and closes it.
-     *
-     * @param in The {@link InputStream} which provides the content to compute its MD5 checksum. The
-     *        {@link InputStream} will be closed.
-     * @return The computed MD5 checksum.
-     * @throws IOException Occurred Exception.
-     */
-    public static String computeMD5(InputStream in) throws IOException {
-        if (in == null) {
-            throw new IOException("Can't compute MD5 without an InputStream.");
-        }
-        try {
-            MessageDigest digest = MessageDigest.getInstance("MD5");
-            byte[] buffer = new byte[8192];
-            int read;
-            while ((read = in.read(buffer)) > 0) {
-                digest.update(buffer, 0, read);
-            }
-            byte[] md5sum = digest.digest();
-            BigInteger bigInt = new BigInteger(1, md5sum);
-            return bigInt.toString(16);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IOException("Algorithm MD5 is not available.");
-        } finally {
-            in.close();
-        }
     }
 
     /**
@@ -111,13 +58,9 @@ public final class IOUtil {
     public static String getFileExtension(File file) {
         if (file != null) {
             String name = file.getName();
-            if (name != null) {
-                int dotIndex = name.lastIndexOf(".");
-                if (dotIndex >= 0) {
-                    return name.substring(dotIndex + 1);
-                } else {
-                    return null;
-                }
+            int dotIndex = name.lastIndexOf('.');
+            if (dotIndex >= 0) {
+                return name.substring(dotIndex + 1);
             } else {
                 return null;
             }
@@ -172,11 +115,26 @@ public final class IOUtil {
      * @return The read content or {@code null} if the {@link URL} is {@code null}.
      * @throws IOException Occurred Exception.
      */
-    public static String readFrom(URL url) throws IOException {
+    public static Optional<String> readFrom(URL url) throws IOException {
         if (url != null) {
-            return readFrom(url.openStream());
+            return Optional.of(readFrom(url.openStream()));
         } else {
-            return null;
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Reads the complete content from the {@link URL}.
+     *
+     * @param url The {@link URL} to read from.
+     * @return The read content or {@code null} if the {@link URL} is {@code null}.
+     * @throws IOException Occurred Exception.
+     */
+    public static Optional<String> readFrom(URI url) throws IOException {
+        if (url != null) {
+            return Optional.of(readFrom(url.toURL().openStream()));
+        } else {
+            return Optional.empty();
         }
     }
 
@@ -208,7 +166,7 @@ public final class IOUtil {
             return null;
         }
 
-        try (InputStreamReader reader = new InputStreamReader(in)) {
+        try (InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
             StringBuilder sb = new StringBuilder();
             char[] buffer = new char[BUFFER_SIZE];
             int read;
@@ -255,11 +213,13 @@ public final class IOUtil {
      */
     public static void writeTo(OutputStream out, String content, String encoding)
             throws IOException {
-        if (out == null || content == null)
+        if (out == null || content == null) {
             return;
+        }
 
         try (PrintStream printStream =
-            encoding != null ? new PrintStream(out, false, encoding) : new PrintStream(out)) {
+            encoding != null ? new PrintStream(out, false, encoding)
+                    : new PrintStream(out, false, DEFAULT_CHARSET)) {
             printStream.print(content);
         }
     }
@@ -337,10 +297,11 @@ public final class IOUtil {
      * @throws IOException Occurred Exception.
      */
     public static LineInformation[] computeLineInformation(InputStream in) throws IOException {
-        if (in == null)
+        if (in == null) {
             return new LineInformation[0];
+        }
 
-        try (InputStreamReader reader = new InputStreamReader(in)) {
+        try (InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
             List<LineInformation> result = new LinkedList<>();
             char[] buffer = new char[BUFFER_SIZE]; // Buffer with the read signs
 
@@ -576,7 +537,7 @@ public final class IOUtil {
      * @throws IOException Occurred Exception
      */
     public static List<File> search(File file, final Predicate<File> filter) throws IOException {
-        final List<File> result = new LinkedList<File>();
+        final List<File> result = new LinkedList<>();
         if (file != null) {
             visit(file, visitedFile -> {
                 if (filter == null || filter.test(visitedFile)) {
@@ -611,14 +572,14 @@ public final class IOUtil {
      *
      * @author Martin Hentschel
      */
-    public static interface IFileVisitor {
+    public interface IFileVisitor {
         /**
          * Do something with the visited {@link File}.
          *
          * @param file The visited {@link File}.
          * @throws IOException Occurred Exception
          */
-        public void visit(File file) throws IOException;
+        void visit(File file) throws IOException;
     }
 
     /**
@@ -633,7 +594,7 @@ public final class IOUtil {
             String text = IOUtil.readFrom(in);
             text = text.replace("\r\n", "\n");
             text = text.replace("\r", "\n");
-            return new ByteArrayInputStream(text.getBytes());
+            return new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
         } else {
             return null;
         }
@@ -787,7 +748,7 @@ public final class IOUtil {
                 String host = url.getHost();
                 // A '+' in file names is not supported, since it is converted
                 // into a space ('%20') according to the URI standard.
-                String path = URLDecoder.decode(url.getPath(), "UTF-8");
+                String path = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8);
                 String query = url.getQuery();
                 String ref = url.getRef();
                 return new URI(!StringUtil.isEmpty(protocol) ? protocol : null,
@@ -799,7 +760,7 @@ public final class IOUtil {
             } else {
                 return null;
             }
-        } catch (URISyntaxException | UnsupportedEncodingException e) {
+        } catch (URISyntaxException e) {
             return null;
         }
     }

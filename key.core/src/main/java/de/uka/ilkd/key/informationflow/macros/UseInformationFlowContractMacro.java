@@ -5,10 +5,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.StrategyProofMacro;
@@ -23,6 +19,10 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.FocusIsSubFormulaOfInfFlowContractAppFeature;
 import de.uka.ilkd.key.strategy.feature.InfFlowContractAppFeature;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**
@@ -60,7 +60,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
     private static final Set<String> ADMITTED_RULENAME_SET = asSet(ADMITTED_RULENAMES);
 
-    private static ImmutableSet<String> appliedInfFlowRules = DefaultImmutableSet.<String>nil();
+    private static ImmutableSet<String> appliedInfFlowRules = DefaultImmutableSet.nil();
 
     /**
      * Gets the set of admitted rule names.
@@ -77,7 +77,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
 
     protected static Set<String> asSet(String[] strings) {
-        return Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(strings)));
+        return Collections.unmodifiableSet(new HashSet<>(Arrays.asList(strings)));
     }
 
 

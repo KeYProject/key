@@ -2,9 +2,6 @@ package de.uka.ilkd.key.rule;
 
 import java.util.List;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -16,6 +13,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**
@@ -61,8 +61,9 @@ public class ContractRuleApp extends AbstractContractRuleApp {
             UseOperationContractRule.getApplicableContracts(UseOperationContractRule
                     .computeInstantiation(posInOccurrence().subTerm(), services),
                 services);
-        if (contracts.size() != 1)
+        if (contracts.size() != 1) {
             return this; // incomplete app;
+        }
         Modality m = (Modality) programTerm().op();
         boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION);
         heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);

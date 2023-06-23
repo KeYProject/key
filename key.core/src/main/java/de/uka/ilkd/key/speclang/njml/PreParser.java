@@ -1,15 +1,19 @@
 package de.uka.ilkd.key.speclang.njml;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import org.antlr.v4.runtime.ParserRuleContext;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 public class PreParser {
     /** warnings */
@@ -78,8 +82,9 @@ public class PreParser {
      * Parse and interpret class level comments.
      */
     public ImmutableList<TextualJMLConstruct> parseClassLevel(String concatenatedComment,
-            String fileName, Position pos) {
-        return parseClassLevel(new PositionedString(concatenatedComment, fileName, pos));
+            URI fileName, Position pos) {
+        return parseClassLevel(
+            new PositionedString(concatenatedComment, new Location(fileName, pos)));
     }
 
     /**
@@ -94,8 +99,9 @@ public class PreParser {
      * Parse and interpret the given string as a method level construct.
      */
     public ImmutableList<TextualJMLConstruct> parseMethodLevel(String concatenatedComment,
-            String fileName, Position position) {
-        return parseMethodLevel(new PositionedString(concatenatedComment, fileName, position));
+            URI fileName, Position position) {
+        return parseMethodLevel(
+            new PositionedString(concatenatedComment, new Location(fileName, position)));
     }
 
     /**

@@ -1,5 +1,14 @@
 package org.key_project.slicing;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.BranchLocation;
@@ -23,10 +32,9 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
-import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.util.Pair;
+
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.analysis.DependencyAnalyzer;
 import org.key_project.slicing.graph.AddedRule;
@@ -38,17 +46,9 @@ import org.key_project.slicing.graph.PseudoInput;
 import org.key_project.slicing.graph.PseudoOutput;
 import org.key_project.slicing.graph.TrackedFormula;
 import org.key_project.util.collection.ImmutableList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * Tracks proof steps as they are applied on the proof.
@@ -81,6 +81,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @see DependencyAnalyzer
      */
     private AnalysisResults analysisResults = null;
+    private boolean proofUsedStateMerging = false;
 
     /**
      * Construct a new tracker for a proof.
@@ -149,9 +150,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         // (-> if more formulas are present after slicing, a different result will be produced!)
 
         // SMT application: add all formulas as inputs
-        if (ruleApp instanceof MergeRuleBuiltInRuleApp
-                || ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp
-                || ruleApp instanceof RuleAppSMT) {
+        // (unless the unsat core has been recorded in the ifinsts)
+        if (ruleApp instanceof RuleAppSMT && ((RuleAppSMT) ruleApp).ifInsts().size() > 0) {
             node.sequent().antecedent().iterator().forEachRemaining(
                 it -> inputs.add(new PosInOccurrence(it, PosInTerm.getTopLevel(), true)));
             node.sequent().succedent().iterator().forEachRemaining(

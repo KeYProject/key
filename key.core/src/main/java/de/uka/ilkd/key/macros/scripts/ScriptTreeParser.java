@@ -3,8 +3,8 @@ package de.uka.ilkd.key.macros.scripts;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.Map;
-import java.util.Stack;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayDeque;
 
 public class ScriptTreeParser {
 
@@ -12,21 +12,21 @@ public class ScriptTreeParser {
 
         ScriptNode root = null;
         ScriptNode last = null;
-        Stack<ScriptNode> branchStack = new Stack<>();
+        ArrayDeque<ScriptNode> branchStack = new ArrayDeque<>();
 
         ScriptLineParser lineParser = new ScriptLineParser(reader, null);
 
         while (true) {
 
             int from = lineParser.getOffset();
-            Map<String, String> command = lineParser.parseCommand();
+            var command = lineParser.parseCommand();
             int to = lineParser.getOffset();
 
             if (command == null) {
                 return root;
             }
 
-            switch (command.get(ScriptLineParser.COMMAND_KEY)) {
+            switch (command.args.get(ScriptLineParser.COMMAND_KEY)) {
             case "branches":
                 branchStack.push(last);
                 break;
@@ -38,7 +38,7 @@ public class ScriptTreeParser {
                 branchStack.pop();
                 break;
             default:
-                ScriptNode node = new ScriptNode(last, command, from, to);
+                ScriptNode node = new ScriptNode(last, command.args, from, to);
                 if (root == null) {
                     root = node;
                 } else if (last == null) {
@@ -55,7 +55,8 @@ public class ScriptTreeParser {
 
     public static void main(String[] args) throws IOException, ScriptException {
 
-        ScriptNode root = ScriptTreeParser.parse(new InputStreamReader(System.in));
+        ScriptNode root =
+            ScriptTreeParser.parse(new InputStreamReader(System.in, StandardCharsets.UTF_8));
 
         root.dump(0);
 

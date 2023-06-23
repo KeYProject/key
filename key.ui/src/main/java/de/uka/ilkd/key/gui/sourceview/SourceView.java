@@ -1,9 +1,31 @@
 package de.uka.ilkd.key.gui.sourceview;
 
+import java.awt.*;
+import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseMotionListener;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
+import javax.swing.text.Document;
+import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.HighlightPainter;
+import javax.swing.text.SimpleAttributeSet;
+
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.TaskTree;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
@@ -25,33 +47,13 @@ import de.uka.ilkd.key.proof.ProofJavaSourceCollection;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.Pair;
+
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.LineInformation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
-import javax.swing.text.Document;
-import javax.swing.text.Highlighter;
-import javax.swing.text.Highlighter.HighlightPainter;
-import javax.swing.text.SimpleAttributeSet;
-import java.awt.Dimension;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import java.awt.event.MouseMotionListener;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.*;
 
 /**
  * This class is responsible for showing the source code and visualizing the symbolic execution path
@@ -419,9 +421,7 @@ public final class SourceView extends JComponent {
      * @throws IOException if the file cannot be opened.
      */
     public void openFile(URI fileURI) throws IOException {
-        Set<URI> set = new HashSet<>();
-        set.add(fileURI);
-        openFiles(set);
+        openFiles(Collections.singleton(fileURI));
     }
 
     /**
@@ -431,7 +431,7 @@ public final class SourceView extends JComponent {
      *
      * @throws IOException if one of the files cannot be opened.
      */
-    public void openFiles(Set<URI> fileURIs) throws IOException {
+    public void openFiles(Iterable<URI> fileURIs) throws IOException {
         boolean updateNecessary = false;
 
         for (URI fileURI : fileURIs) {
@@ -627,7 +627,7 @@ public final class SourceView extends JComponent {
             // activate the tab with the most recent file
             PositionInfo p = lines.isEmpty() ? null : lines.getFirst().second;
             if (p != null) {
-                Tab t = tabs.get(p.getURI());
+                Tab t = tabs.get(p.getURI().orElse(null));
                 if (t != null) {
                     String s = t.simpleFileName;
                     for (int i = 0; i < tabPane.getTabCount(); i++) {
@@ -635,7 +635,7 @@ public final class SourceView extends JComponent {
                             tabPane.setSelectedIndex(i);
 
                             // scroll to most recent highlight
-                            int line = lines.getFirst().second.getEndPosition().getLine();
+                            int line = lines.getFirst().second.getEndPosition().line();
                             t.scrollToLine(line);
                         }
                     }
@@ -653,9 +653,10 @@ public final class SourceView extends JComponent {
     private void addPosToList(PositionInfo pos, LinkedList<Pair<Node, PositionInfo>> list,
             Node node) {
         if (pos != null && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
-                && pos.getURI() != null) {
+                && pos.getURI().isPresent()) {
             list.addLast(new Pair<>(node, pos));
-            node.proof().lookup(ProofJavaSourceCollection.class).addRelevantFile(pos.getURI());
+            node.proof().lookup(ProofJavaSourceCollection.class)
+                    .addRelevantFile(pos.getURI().get());
         }
     }
 
@@ -729,14 +730,13 @@ public final class SourceView extends JComponent {
                                                     posInf = pm.getPositionInfo();
                                                 }
                                             }
-                                            if (posInf != null && posInf.getURI() != null) {
+                                            if (posInf != null && posInf.getURI().isPresent()) {
                                                 // sometimes the useful file info is only stored in
                                                 // parentClassURI for some reason ...
-                                                if (!posInf.getURI()
-                                                        .equals(PositionInfo.UNKNOWN_URI)) {
+                                                if (posInf.getURI().isPresent()) {
                                                     node.proof()
                                                             .lookup(ProofJavaSourceCollection.class)
-                                                            .addRelevantFile(posInf.getURI());
+                                                            .addRelevantFile(posInf.getURI().get());
                                                 } else if (!posInf.getParentClassURI()
                                                         .equals(PositionInfo.UNKNOWN_URI)) {
                                                     node.proof()
@@ -929,12 +929,13 @@ public final class SourceView extends JComponent {
 
             // add Line numbers to each Scrollview
             TextLineNumber tln = new TextLineNumber(textPane, 1);
+            tln.setUpdateFont(true);
             setRowHeaderView(tln);
         }
 
         private String extractFileName(URI uri) {
             String s = uri.toString();
-            int index = s.lastIndexOf("/");
+            int index = s.lastIndexOf('/');
             if (index < 0) {
                 return s; // fallback: return whole URI
             } else {
@@ -944,7 +945,8 @@ public final class SourceView extends JComponent {
 
         private void initLineInfo() {
             try {
-                InputStream inStream = new ByteArrayInputStream(source.getBytes());
+                InputStream inStream =
+                    new ByteArrayInputStream(source.getBytes(StandardCharsets.UTF_8));
                 lineInformation = IOUtil.computeLineInformation(inStream);
             } catch (IOException e) {
                 LOGGER.debug("Error while computing line information from {}", absoluteFileName, e);
@@ -1104,8 +1106,8 @@ public final class SourceView extends JComponent {
                 for (int i = 0; i < lines.size(); i++) {
                     Pair<Node, PositionInfo> l = lines.get(i);
 
-                    if (absoluteFileName.equals(l.second.getURI())) {
-                        int line = l.second.getStartPosition().getLine();
+                    if (absoluteFileName.equals(l.second.getURI().orElse(null))) {
+                        int line = l.second.getStartPosition().line();
 
                         // use a different color for most recent
                         if (i == 0) {
@@ -1366,7 +1368,7 @@ public final class SourceView extends JComponent {
                 // jump in proof tree (get corresponding node from list)
                 Node n = null;
                 for (Pair<Node, PositionInfo> p : lines) {
-                    if (p.second.getStartPosition().getLine() == line + 1
+                    if (p.second.getStartPosition().line() == line + 1
                             && p.second.getURI().equals(fileURI)) {
                         n = p.first;
                         break;

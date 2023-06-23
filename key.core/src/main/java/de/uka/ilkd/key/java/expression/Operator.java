@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.java.expression;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ExpressionContainer;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
@@ -11,6 +8,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Operator base class.
@@ -47,7 +47,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      * @param rhs an expression.
      */
     public Operator(Expression lhs, Expression rhs) {
-        this.children = new ImmutableArray<Expression>(lhs, rhs);
+        this.children = new ImmutableArray<>(lhs, rhs);
     }
 
     /**
@@ -60,7 +60,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
     public Operator(ExtList children) {
         super(children);
-        this.children = new ImmutableArray<Expression>(children.collect(Expression.class));
+        this.children = new ImmutableArray<>(children.collect(Expression.class));
     }
 
     /**
@@ -70,7 +70,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
 
     public Operator(Expression unaryChild) {
-        this.children = new ImmutableArray<Expression>(unaryChild);
+        this.children = new ImmutableArray<>(unaryChild);
     }
 
     /**
@@ -80,7 +80,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
 
     public Operator(Expression[] arguments) {
-        this.children = new ImmutableArray<Expression>(arguments);
+        this.children = new ImmutableArray<>(arguments);
     }
 
 

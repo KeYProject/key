@@ -326,7 +326,7 @@ public class JavaCharStream
         }
         catch(java.io.IOException e)
         {
-           throw new LocatableException("Invalid unicode escape character", new Location((URL) null, Position.newOneZeroBased(line, column)));
+           throw new LocatableException("Invalid unicode escape character", new Location(null, Position.fromOneZeroBased(line, column)));
         }
 
         if (backSlashCnt == 1)

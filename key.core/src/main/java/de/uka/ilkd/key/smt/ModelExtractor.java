@@ -1,14 +1,14 @@
 package de.uka.ilkd.key.smt;
 
+import java.io.IOException;
+import java.util.*;
+
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.communication.Pipe;
 import de.uka.ilkd.key.smt.lang.SMTFunction;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.lang.Util;
 import de.uka.ilkd.key.smt.model.*;
-
-import java.io.IOException;
-import java.util.*;
 
 /**
  * Represents a query directed to towards the z3 solver.
@@ -786,8 +786,9 @@ public class ModelExtractor {
 
         for (String objectID : getAllIDs((int) types.getSettings().getObjectBound())) {
 
-            if (objectID.equals("#o0"))
+            if (objectID.equals("#o0")) {
                 continue;
+            }
 
 
             Sort s = objectSorts.get(objectID);

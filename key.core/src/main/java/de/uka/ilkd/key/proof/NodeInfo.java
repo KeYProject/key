@@ -1,8 +1,12 @@
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.java.JavaSourceElement;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -22,17 +26,11 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.ImmutableList;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -42,7 +40,7 @@ import java.util.regex.Pattern;
 public class NodeInfo {
     private static final Logger LOGGER = LoggerFactory.getLogger(NodeInfo.class);
 
-    private static Set<Name> symbolicExecNames = new HashSet<>(9);
+    private static final Set<Name> symbolicExecNames = new HashSet<>(9);
 
     /** firstStatement stripped of method frames */
     private SourceElement activeStatement = null;
@@ -268,26 +266,6 @@ public class NodeInfo {
     }
 
     /**
-     * returns the name of the source file where the active statement occurs or the string
-     * <tt>NONE</tt> if the statement does not originate from a source file (e.g. created by a
-     * taclet application or part of a generated implicit method)
-     *
-     * @return name of source file as described above
-     */
-    public String getExecStatementParentClass() {
-        determineFirstAndActiveStatement();
-        if (activeStatement instanceof JavaSourceElement) {
-            PositionInfo posInf = activeStatement.getPositionInfo();
-            // extract the file path as a string if possible
-            String pathStr = MiscTools.getSourcePath(posInf);
-            if (pathStr != null) {
-                return pathStr;
-            }
-        }
-        return "<NONE>";
-    }
-
-    /**
      * returns the position of the executed statement in its source code or Position.UNDEFINED
      *
      * @return statement position as described above
@@ -306,9 +284,9 @@ public class NodeInfo {
         determineFirstAndActiveStatement();
         if (firstStatement != null) {
             if (firstStatementString == null) {
-                firstStatementString = "" + firstStatement;
+                firstStatementString = String.valueOf(firstStatement);
             }
-            firstStatementString = "" + activeStatement;
+            firstStatementString = String.valueOf(activeStatement);
             return firstStatementString;
         }
         return null;

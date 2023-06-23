@@ -8,7 +8,7 @@ public class TestName {
     @Test
     public void testEquals() {
         Name n = new Name("test");
-        Name m = new Name(new String("test"));
+        Name m = new Name("test");
         assertEquals(n, m);
     }
 }

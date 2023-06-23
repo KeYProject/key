@@ -27,9 +27,9 @@ public class MethodBodyExpandProofReferencesAnalyst implements IProofReferencesA
                 MethodBodyStatement mbs = (MethodBodyStatement) info.getActiveStatement();
                 IProgramMethod pm = mbs.getProgramMethod(services);
                 DefaultProofReference<IProgramMethod> reference =
-                    new DefaultProofReference<IProgramMethod>(IProofReference.INLINE_METHOD, node,
+                    new DefaultProofReference<>(IProofReference.INLINE_METHOD, node,
                         pm);
-                LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
+                LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<>();
                 result.add(reference);
                 return result;
             } else {

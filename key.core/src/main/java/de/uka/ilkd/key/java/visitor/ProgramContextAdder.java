@@ -2,8 +2,6 @@ package de.uka.ilkd.key.java.visitor;
 
 import java.rmi.UnexpectedException;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
@@ -18,6 +16,8 @@ import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.IntIterator;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A context given as {@link ContextStatementBlockInstantiation} is wrapped around a given
@@ -135,7 +135,7 @@ public class ProgramContextAdder {
          * __{putIn;....}__ }moreStmnts;}</code> Attention: we have not yet added the enclosing
          * braces or even the <code>moreStmnts</code>
          */
-        return new StatementBlock(new ImmutableArray<Statement>(body));
+        return new StatementBlock(new ImmutableArray<>(body));
     }
 
     /**
@@ -159,7 +159,7 @@ public class ProgramContextAdder {
             if (childrenCount - 1 > 0) {
                 wrapper.getBody().arraycopy(1, body, 1, childrenCount - 1);
             }
-            return new StatementBlock(new ImmutableArray<Statement>(body));
+            return new StatementBlock(new ImmutableArray<>(body));
         }
     }
 

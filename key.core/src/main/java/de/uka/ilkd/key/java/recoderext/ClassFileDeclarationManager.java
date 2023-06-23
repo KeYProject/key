@@ -3,12 +3,19 @@ package de.uka.ilkd.key.java.recoderext;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import de.uka.ilkd.key.java.ConvertException;
+import de.uka.ilkd.key.util.DirectoryFileCollection;
+import de.uka.ilkd.key.util.FileCollection;
+import de.uka.ilkd.key.util.FileCollection.Walker;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,11 +27,6 @@ import recoder.io.DataLocation;
 import recoder.java.CompilationUnit;
 import recoder.java.JavaProgramFactory;
 import recoder.service.KeYCrossReferenceSourceInfo;
-import de.uka.ilkd.key.java.ConvertException;
-import de.uka.ilkd.key.util.DirectoryFileCollection;
-import de.uka.ilkd.key.util.FileCollection;
-import de.uka.ilkd.key.util.FileCollection.Walker;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 /**
  * This class provides an infrastructure to read in multiple class files and to manufacture
@@ -46,13 +48,13 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 public class ClassFileDeclarationManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClassFileDeclarationManager.class);
 
-    private List<CompilationUnit> compUnits = new ArrayList<>();
+    private final List<CompilationUnit> compUnits = new ArrayList<>();
 
-    private List<ClassFileDeclarationBuilder> builderList = new ArrayList<>();
+    private final List<ClassFileDeclarationBuilder> builderList = new ArrayList<>();
 
-    private ProgramFactory programFactory;
+    private final ProgramFactory programFactory;
 
-    private Map<String, ClassFileDeclarationBuilder> classBuilders = new LinkedHashMap<>();
+    private final Map<String, ClassFileDeclarationBuilder> classBuilders = new LinkedHashMap<>();
 
     /**
      * create a new ClassFileDeclarationManager
@@ -190,14 +192,16 @@ public class ClassFileDeclarationManager {
         for (CompilationUnit cu : manager.getCompilationUnits()) {
             String name = cu.getPrimaryTypeDeclaration().getFullName();
             LOGGER.info("Generating {}", name);
-            FileWriter fw = new FileWriter(new File(args[1], name + ".jstub"));
+            FileWriter fw =
+                new FileWriter(new File(args[1], name + ".jstub"), StandardCharsets.UTF_8);
             fw.write(cu.toSource());
             fw.close();
         }
         for (CompilationUnit cu : sourceInfo.getCreatedStubClasses()) {
             String name = cu.getPrimaryTypeDeclaration().getFullName();
             LOGGER.info("Generating empty stub {}", name);
-            FileWriter fw = new FileWriter(new File(args[1], name + ".jstub"));
+            FileWriter fw =
+                new FileWriter(new File(args[1], name + ".jstub"), StandardCharsets.UTF_8);
             fw.write(cu.toSource());
             fw.close();
         }

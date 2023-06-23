@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.proof;
 
+import java.util.Optional;
+
 import de.uka.ilkd.key.java.Position;
 
 public class SVInstantiationParserException extends SVInstantiationExceptionWithPosition {
@@ -18,27 +20,31 @@ public class SVInstantiationParserException extends SVInstantiationExceptionWith
         this.detail = (detail == null) ? "" : detail;
     }
 
-    private String space(int i) {
-        StringBuilder res = new StringBuilder();
-        for (int j = 0; j < i; j++) {
-            res.append(" ");
+    private Optional<String> getInstantiationRow() {
+        if (getPosition().column() <= 0) {
+            return Optional.empty();
         }
-        return res.toString();
+        String[] rows = instantiation.split("\n");
+        var line = getPosition().line() - 1;
+        if (!(line < rows.length)) {
+            return Optional.empty();
+        }
+        return Optional.of(rows[line]);
     }
 
     public String getMessage() {
-        int column = getPosition().getColumn();
+        int column = getPosition().column();
 
         String msg = super.getMessage();
         // needs non-prop font: msg +="\n"+inst;
-        if (column > 0) {
+        Optional<String> row = getInstantiationRow();
+        if (row.isPresent()) {
             // needs non-prop font: msg +="\n"+space(column-1)+"^";
-            String[] rows = instantiation.split("\n");
-            StringBuilder sb = new StringBuilder(rows[getPosition().getLine() - 1]);
+            var sb = new StringBuilder(row.get());
             sb.insert(column - 1, " ~~> ");
             msg += "\noccurred at: " + sb;
         } else {
-            msg += "\noccurred in:" + instantiation;
+            msg += "\noccurred in: " + instantiation;
         }
 
         msg += "\nDetail:\n" + detail;

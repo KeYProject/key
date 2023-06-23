@@ -168,10 +168,12 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
 
     public int getChildCount() {
         int result = 0;
-        if (name != null)
+        if (name != null) {
             result++;
-        if (initializer != null)
+        }
+        if (initializer != null) {
             result++;
+        }
         return result;
     }
 
@@ -185,13 +187,15 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
 
     public ProgramElement getChildAt(int index) {
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (initializer != null) {
-            if (index == 0)
+            if (index == 0) {
                 return initializer;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

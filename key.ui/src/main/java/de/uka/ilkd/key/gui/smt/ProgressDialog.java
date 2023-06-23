@@ -1,10 +1,6 @@
 package de.uka.ilkd.key.gui.smt;
 
-import de.uka.ilkd.key.gui.IssueDialog;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
-import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
-
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.plaf.basic.BasicProgressBarUI;
@@ -13,7 +9,11 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import java.awt.*;
+import de.uka.ilkd.key.gui.IssueDialog;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
+import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
+import de.uka.ilkd.key.smt.SMTFocusResults;
 
 /**
  * Dialog showing launched SMT processes and results.
@@ -66,14 +66,14 @@ public class ProgressDialog extends JDialog {
      */
     private Modus modus = Modus.SOLVERS_RUNNING;
 
-    public static interface ProgressDialogListener extends ProgressTableListener {
-        public void applyButtonClicked();
+    public interface ProgressDialogListener extends ProgressTableListener {
+        void applyButtonClicked();
 
-        public void stopButtonClicked();
+        void stopButtonClicked();
 
-        public void discardButtonClicked();
+        void discardButtonClicked();
 
-        public void additionalInformationChosen(Object obj);
+        void additionalInformationChosen(Object obj);
 
         void focusButtonClicked();
     }
@@ -105,8 +105,9 @@ public class ProgressDialog extends JDialog {
         buttonBox.add(getStopButton());
         buttonBox.add(Box.createHorizontalStrut(5));
         if (!counterexample) {
-            buttonBox.add(getApplyButton());
             buttonBox.add(getFocusButton());
+            buttonBox.add(Box.createHorizontalStrut(5));
+            buttonBox.add(getApplyButton());
             buttonBox.add(Box.createHorizontalStrut(5));
         }
 
@@ -118,8 +119,8 @@ public class ProgressDialog extends JDialog {
         constraints.gridy++;
         constraints.weighty = 2.0;
         contentPane.add(getScrollPane(), constraints);
-        constraints.gridy++;
-        constraints.weighty = 1.0;
+        constraints.gridy += 2;
+        constraints.weighty = 0.0;
         constraints.insets.bottom = 5;
         contentPane.add(buttonBox, constraints);
         this.pack();
@@ -218,8 +219,9 @@ public class ProgressDialog extends JDialog {
             break;
         case SOLVERS_RUNNING:
             stopButton.setText("Stop");
-            if (applyButton != null)
+            if (applyButton != null) {
                 applyButton.setEnabled(false);
+            }
             break;
 
         }
@@ -259,7 +261,7 @@ class ProgressTable extends JTable {
     private static final int NUMBER_OF_VISIBLE_ROWS = 8;
 
     public interface ProgressTableListener {
-        public void infoButtonClicked(int column, int row);
+        void infoButtonClicked(int column, int row);
     }
 
 
@@ -386,7 +388,7 @@ class ProgressTable extends JTable {
 
 
     private final TableCellEditor editor = new ProgressCellEditor();
-    private Point currentEditorCell = new Point();
+    private final Point currentEditorCell = new Point();
 
 
 

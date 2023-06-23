@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.smt;
 
-import de.uka.ilkd.key.smt.lang.*;
-
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import de.uka.ilkd.key.smt.lang.*;
 
 public class OverflowChecker {
     private final SMTSort intsort;
@@ -479,8 +479,9 @@ public class OverflowChecker {
         } else if (term instanceof SMTTermUnaryOp) {
             SMTTermUnaryOp tu = (SMTTermUnaryOp) term;
             return containsVars(tu.getSub());
-        } else
+        } else {
             return term instanceof SMTTermVariable;
+        }
 
     }
 
@@ -508,9 +509,7 @@ public class OverflowChecker {
                     return true;
                 }
             }
-            return false;
-        } else {
-            return false;
         }
+        return false;
     }
 }

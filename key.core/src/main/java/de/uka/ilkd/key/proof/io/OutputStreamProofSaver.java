@@ -1,11 +1,14 @@
 package de.uka.ilkd.key.proof.io;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.informationflow.po.AbstractInfFlowPO;
 import de.uka.ilkd.key.informationflow.po.InfFlowCompositePO;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
-import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -15,6 +18,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -35,16 +39,16 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithLatticeAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
+import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.util.*;
 
 /**
  * Saves a proof to a given {@link OutputStream}.
@@ -122,18 +126,18 @@ public class OutputStreamProofSaver {
         final StringBuffer logstr = new StringBuffer();
         // Advance the Log entries
         if (proof.userLog == null) {
-            proof.userLog = new Vector<>();
+            proof.userLog = new ArrayList<>();
         }
         if (proof.keyVersionLog == null) {
-            proof.keyVersionLog = new Vector<>();
+            proof.keyVersionLog = new ArrayList<>();
         }
         proof.userLog.add(System.getProperty("user.name"));
         proof.keyVersionLog.add(internalVersion);
         final int s = proof.userLog.size();
         for (int i = 0; i < s; i++) {
             logstr.append("(keyLog \"").append(i).append("\" (keyUser \"")
-                    .append(proof.userLog.elementAt(i)).append("\" ) (keyVersion \"")
-                    .append(proof.keyVersionLog.elementAt(i)).append("\"))\n");
+                    .append(proof.userLog.get(i)).append("\" ) (keyVersion \"")
+                    .append(proof.keyVersionLog.get(i)).append("\"))\n");
         }
         return logstr;
     }
@@ -147,7 +151,7 @@ public class OutputStreamProofSaver {
     }
 
     public void save(OutputStream out) throws IOException {
-        try (var ps = new PrintWriter(out, true)) {
+        try (var ps = new PrintWriter(out, true, StandardCharsets.UTF_8)) {
             final ProofOblInput po =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
             LogicPrinter printer = createLogicPrinter(proof.getServices(), false);
@@ -259,17 +263,17 @@ public class OutputStreamProofSaver {
                 String tmp2 = tmp.substring(0, i);
                 StringBuilder relPathString = new StringBuilder();
                 i += s.length();
-                final int l = tmp.indexOf(";", i);
+                final int l = tmp.indexOf(';', i);
 
                 // there may be more than one path
-                while (0 <= tmp.indexOf("\"", i) && tmp.indexOf("\"", i) < l) {
+                while (0 <= tmp.indexOf('"', i) && tmp.indexOf('"', i) < l) {
                     if (relPathString.length() > 0) {
                         relPathString.append(", ");
                     }
 
                     // path is always put in quotation marks
-                    final int k = tmp.indexOf("\"", i) + 1;
-                    final int j = tmp.indexOf("\"", k);
+                    final int k = tmp.indexOf('"', i) + 1;
+                    final int j = tmp.indexOf('"', k);
 
                     // add new relative path
                     final String absPath = tmp.substring(k, j);
@@ -285,7 +289,7 @@ public class OutputStreamProofSaver {
                 tmp = tmp2 + (i < tmp.length() ? tmp.substring(l + 1) : "");
             }
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to make relative", e);
         }
         return tmp;
     }
@@ -487,6 +491,12 @@ public class OutputStreamProofSaver {
         output.append("\")");
     }
 
+    private void printSingleSMTRuleApp(RuleAppSMT smtApp, Node node, String prefix,
+            Appendable output) throws IOException {
+        output.append(" (").append(ProofElementID.SOLVERTYPE.getRawName())
+                .append(" \"").append(smtApp.getSuccessfulSolverName()).append("\")");
+    }
+
     /**
      * Print rule justification for applied built-in rule application into the passed writer.
      *
@@ -550,6 +560,8 @@ public class OutputStreamProofSaver {
         if (appliedRuleApp instanceof CloseAfterMergeRuleBuiltInRuleApp) {
             printSingleCloseAfterMergeRuleApp((CloseAfterMergeRuleBuiltInRuleApp) appliedRuleApp,
                 node, prefix, output);
+        } else if (appliedRuleApp instanceof RuleAppSMT) {
+            printSingleSMTRuleApp((RuleAppSMT) appliedRuleApp, node, prefix, output);
         }
 
         output.append("");
@@ -582,9 +594,7 @@ public class OutputStreamProofSaver {
 
         if (appliedRuleApp instanceof TacletApp) {
             printSingleTacletApp((TacletApp) appliedRuleApp, node, prefix, output);
-        }
-
-        if (appliedRuleApp instanceof IBuiltInRuleApp) {
+        } else if (appliedRuleApp instanceof IBuiltInRuleApp) {
             printSingleBuiltInRuleApp((IBuiltInRuleApp) appliedRuleApp, node, prefix, output);
         }
     }

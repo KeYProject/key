@@ -1,14 +1,12 @@
 package org.key_project.slicing.ui;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.util.Pair;
-
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.function.Consumer;
+import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+
+import de.uka.ilkd.key.gui.MainWindow;
 
 /**
  * Dialog that displays an HTML document.

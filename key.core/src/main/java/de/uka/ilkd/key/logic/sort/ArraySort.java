@@ -1,13 +1,14 @@
 package de.uka.ilkd.key.logic.sort;
 
+import java.lang.ref.WeakReference;
+import java.util.WeakHashMap;
+
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.Name;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.lang.ref.WeakReference;
-import java.util.WeakHashMap;
 
 /**
  * The objects of this class represent array sorts (in the sense of *Java* arrays). There can be one
@@ -22,7 +23,7 @@ import java.util.WeakHashMap;
 public final class ArraySort extends AbstractSort {
 
     private static final WeakHashMap<SortKey, WeakReference<ArraySort>> aSH =
-        new WeakHashMap<SortKey, WeakReference<ArraySort>>();
+        new WeakHashMap<>();
 
     /**
      * keeping this key is important to prevent for too early hashmap removal
@@ -63,12 +64,15 @@ public final class ArraySort extends AbstractSort {
 
         if (elemDirectSuperSorts.size() == 1
                 && elemDirectSuperSorts.iterator().next().equals(Sort.ANY)) {
-            if (objectSort != null)
+            if (objectSort != null) {
                 result = result.add(objectSort);
-            if (cloneableSort != null)
+            }
+            if (cloneableSort != null) {
                 result = result.add(cloneableSort);
-            if (serializableSort != null)
+            }
+            if (serializableSort != null) {
                 result = result.add(serializableSort);
+            }
         } else {
             for (Sort s : elemDirectSuperSorts) {
                 result = result.add(getArraySort(s, objectSort, cloneableSort, serializableSort));
@@ -105,7 +109,7 @@ public final class ArraySort extends AbstractSort {
             ImmutableSet<Sort> localExtendsSorts =
                 getArraySuperSorts(elemSort, objectSort, cloneableSort, serializableSort);
             as = new ArraySort(localExtendsSorts, sortKey);
-            aSH.put(sortKey, new WeakReference<ArraySort>(as));
+            aSH.put(sortKey, new WeakReference<>(as));
         }
         return as;
     }

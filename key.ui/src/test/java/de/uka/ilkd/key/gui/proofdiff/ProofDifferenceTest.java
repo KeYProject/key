@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.gui.proofdiff;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static de.uka.ilkd.key.gui.proofdiff.ProofDifference.Levensthein.calculate;
 import static java.util.Arrays.asList;

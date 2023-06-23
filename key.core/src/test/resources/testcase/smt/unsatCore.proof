@@ -1,0 +1,32 @@
+\sorts {
+	s;
+}
+
+\predicates {
+	a;
+	b;
+	c;
+	d;
+	p;
+	q;
+}
+\problem {
+a & (a -> b) & (b -> c) & (d -> b) & p & !q -> c
+}
+
+\proof {
+(keyLog "0" (keyUser "arne" ) (keyVersion "1577310329ed94660ac6902fb1aa41135c3d2311"))
+(keyLog "1" (keyUser "arne" ) (keyVersion "1577310329ed94660ac6902fb1aa41135c3d2311"))
+
+(autoModeTime "25")
+
+(branch "dummy ID"
+(rule "impRight" (formula "1") (userinteraction))
+(rule "andLeft" (formula "1") (userinteraction))
+(rule "andLeft" (formula "1") (userinteraction))
+(rule "andLeft" (formula "1") (userinteraction))
+(rule "andLeft" (formula "1") (userinteraction))
+(rule "andLeft" (formula "1") (userinteraction))
+ (builtin "SMTRule" (ifInst ""  (formula "7")) (ifInst ""  (formula "3")) (ifInst ""  (formula "2")) (ifInst ""  (formula "1")) (solverType "Z3"))
+)
+}

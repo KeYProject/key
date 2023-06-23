@@ -132,12 +132,15 @@ public class Ccatch extends Branch implements ParameterContainer, VariableScope 
     @Override
     public int getChildCount() {
         int result = 0;
-        if (hasParameterDeclaration())
+        if (hasParameterDeclaration()) {
             result++;
-        if (hasNonStdParameterDeclaration())
+        }
+        if (hasNonStdParameterDeclaration()) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -151,18 +154,21 @@ public class Ccatch extends Branch implements ParameterContainer, VariableScope 
     @Override
     public ProgramElement getChildAt(int index) {
         if (hasParameterDeclaration()) {
-            if (index == 0)
+            if (index == 0) {
                 return parameter.get();
+            }
             index--;
         }
         if (hasNonStdParameterDeclaration()) {
-            if (index == 0)
+            if (index == 0) {
                 return nonStdParameter.get();
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();

@@ -44,7 +44,7 @@ public abstract class SLExpressionResolver {
             return ref;
         }
 
-        int i = ref.lastIndexOf(".");
+        int i = ref.lastIndexOf('.');
         if (i < 0) {
             return null;
         } else {

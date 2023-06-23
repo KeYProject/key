@@ -3,12 +3,15 @@
  */
 package de.uka.ilkd.key.rule;
 
-import org.key_project.util.EqualsModProofIrrelevancy;
-import org.key_project.util.collection.ImmutableList;
+
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+
+import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.collection.ImmutableList;
 
 public interface RuleApp extends EqualsModProofIrrelevancy {
 
@@ -31,6 +34,7 @@ public interface RuleApp extends EqualsModProofIrrelevancy {
      * @param services the Services encapsulating all java information
      * @return list of new created goals
      */
+    @Nullable
     ImmutableList<Goal> execute(Goal goal, Services services);
 
     /**
@@ -39,5 +43,12 @@ public interface RuleApp extends EqualsModProofIrrelevancy {
      * @return true if all variables are instantiated
      */
     boolean complete();
+
+    /**
+     * @return user-friendly name for this rule-application
+     */
+    default String displayName() {
+        return rule().displayName();
+    }
 
 }

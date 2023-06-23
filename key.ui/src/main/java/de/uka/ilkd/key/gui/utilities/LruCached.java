@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.gui.utilities;
 
-import org.key_project.util.LRUCache;
-
 import java.util.function.Function;
+
+import org.key_project.util.LRUCache;
 
 /**
  * Caches a computation using a lru cache

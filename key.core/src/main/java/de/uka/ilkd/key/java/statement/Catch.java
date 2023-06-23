@@ -3,6 +3,7 @@ package de.uka.ilkd.key.java.statement;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
 import org.key_project.util.ExtList;
 
 /**
@@ -68,10 +69,12 @@ public class Catch extends BranchImp implements ParameterContainer, VariableScop
      */
     public int getChildCount() {
         int result = 0;
-        if (parameter != null)
+        if (parameter != null) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -84,13 +87,15 @@ public class Catch extends BranchImp implements ParameterContainer, VariableScop
      */
     public ProgramElement getChildAt(int index) {
         if (parameter != null) {
-            if (index == 0)
+            if (index == 0) {
                 return parameter;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();

@@ -43,12 +43,9 @@ public final class JavaTypeToSortCondition implements VariableCondition {
 
     public static boolean checkSortedSV(final SchemaVariable exprOrTypeSV) {
         final Sort svSort = exprOrTypeSV.sort();
-        if (svSort == ProgramSVSort.EXPRESSION || svSort == ProgramSVSort.SIMPLEEXPRESSION
+        return svSort == ProgramSVSort.EXPRESSION || svSort == ProgramSVSort.SIMPLEEXPRESSION
                 || svSort == ProgramSVSort.NONSIMPLEEXPRESSION || svSort == ProgramSVSort.TYPE
-                || exprOrTypeSV.arity() == 0) {
-            return true;
-        }
-        return false;
+                || exprOrTypeSV.arity() == 0;
     }
 
 

@@ -1,5 +1,17 @@
 package de.uka.ilkd.key.gui.mergerule;
 
+import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.text.html.HTMLDocument;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.utilities.WrapLayout;
 import de.uka.ilkd.key.java.Services;
@@ -12,20 +24,9 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.text.html.HTMLDocument;
-import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * JDialog for selecting a subset of candidate goals as partners for a {@link MergeRule}
@@ -61,15 +62,15 @@ public class MergePartnerSelectionDialog extends JDialog {
     private final static MainWindow MAIN_WINDOW_INSTANCE = MainWindow.getInstance();
 
     /** Comparator for goals; sorts by serial nr. of the node */
-    private static Comparator<MergePartner> GOAL_COMPARATOR =
-        (o1, o2) -> o1.getGoal().node().serialNr() - o2.getGoal().node().serialNr();
+    private static final Comparator<MergePartner> GOAL_COMPARATOR =
+        Comparator.comparingInt(o -> o.getGoal().node().serialNr());
 
     private LinkedList<MergePartner> candidates = null;
     private Services services = null;
     private Pair<Goal, PosInOccurrence> mergeGoalPio = null;
 
     /** The chosen goals. */
-    private SortedSet<MergePartner> chosenGoals = new TreeSet<MergePartner>(GOAL_COMPARATOR);
+    private SortedSet<MergePartner> chosenGoals = new TreeSet<>(GOAL_COMPARATOR);
 
     /** The chosen merge method. */
     private MergeProcedure chosenRule = MergeProcedure.getMergeProcedures().head();
@@ -110,7 +111,7 @@ public class MergePartnerSelectionDialog extends JDialog {
         scrpPartner2 = new JScrollPane(txtPartner2);
 
         // Goal selection dropdown field and checkbox
-        cmbCandidates = new JComboBox<String>();
+        cmbCandidates = new JComboBox<>();
         cmbCandidates.setMaximumSize(new Dimension(Integer.MAX_VALUE, 20));
         cmbCandidates.addItemListener(e -> {
             MergePartner selectedCandidate = getSelectedCandidate();
@@ -118,11 +119,7 @@ public class MergePartnerSelectionDialog extends JDialog {
             setHighlightedSequentForArea(selectedCandidate.getGoal(),
                 selectedCandidate.getPio(), txtPartner2);
 
-            if (chosenGoals.contains(selectedCandidate)) {
-                cbSelectCandidate.setSelected(true);
-            } else {
-                cbSelectCandidate.setSelected(false);
-            }
+            cbSelectCandidate.setSelected(chosenGoals.contains(selectedCandidate));
         });
 
         addComponentListener(new ComponentAdapter() {
@@ -254,9 +251,7 @@ public class MergePartnerSelectionDialog extends JDialog {
         });
 
         chooseAllButton.addActionListener(e -> {
-            for (MergePartner candidate : candidates) {
-                chosenGoals.add(candidate);
-            }
+            chosenGoals.addAll(candidates);
             setVisible(false);
         });
 
@@ -307,8 +302,8 @@ public class MergePartnerSelectionDialog extends JDialog {
         this();
         this.services = services;
 
-        this.candidates = new LinkedList<MergePartner>();
-        this.mergeGoalPio = new Pair<Goal, PosInOccurrence>(mergeGoal, pio);
+        this.candidates = new LinkedList<>();
+        this.mergeGoalPio = new Pair<>(mergeGoal, pio);
 
         for (MergePartner candidate : candidates) {
             int insPos = Collections.binarySearch(this.candidates, candidate, GOAL_COMPARATOR);
@@ -441,13 +436,9 @@ public class MergePartnerSelectionDialog extends JDialog {
             }
         }
 
-        if (!MergeRuleUtils.isProvable(
+        return MergeRuleUtils.isProvable(
             Sequent.createSequent(antecedent, new Semisequent(new SequentFormula(formulaToProve))),
-            services, 1000)) {
-            return false;
-        }
-
-        return true;
+            services, 1000);
     }
 
     /**

@@ -19,7 +19,7 @@ public interface IProofFileParser {
      *
      * @author Richard Bubel
      */
-    static enum ProofElementID {
+    enum ProofElementID {
         BRANCH("branch"), RULE("rule"), TERM("term"), FORMULA("formula"), INSTANTIATION("inst"),
         ASSUMES_FORMULA_IN_SEQUENT("ifseqformula"), ASSUMES_FORMULA_DIRECT("ifdirectformula"),
         RULESET("heur"), BUILT_IN_RULE("builtin"), CONTRACT("contract"),
@@ -30,11 +30,11 @@ public interface IProofFileParser {
         USER_INTERACTION("userinteraction"), PROOF_SCRIPT("proofscript"), NEW_NAMES("newnames"),
         AUTOMODE_TIME("autoModeTime"), KeY_LOG("keyLog"), KeY_USER("keyUser"),
         KeY_VERSION("keyVersion"), KeY_SETTINGS("keySettings"), OPEN_GOAL("opengoal"),
-        NOTES("notes"), MODALITY("modality");
+        NOTES("notes"), SOLVERTYPE("solverType"), MODALITY("modality");
 
-        private String rawName;
+        private final String rawName;
 
-        private ProofElementID(String rawName) {
+        ProofElementID(String rawName) {
             this.rawName = rawName;
         }
 

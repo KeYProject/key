@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.nparser;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.net.URL;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
 
 public class ParseLDTsTests {
     @Test

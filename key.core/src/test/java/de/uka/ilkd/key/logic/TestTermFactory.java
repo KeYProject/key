@@ -6,12 +6,14 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,25 +33,26 @@ public class TestTermFactory {
     private final Sort osort4 = new SortImpl(new Name("os4"),
         DefaultImmutableSet.<Sort>nil().add(osort2).add(osort3), false);
 
-    Function p = new Function(new Name("p"), Sort.FORMULA, sort1);
+    final Function p = new Function(new Name("p"), Sort.FORMULA, sort1);
     // p(:S1):BOOL
-    LogicVariable x = new LogicVariable(new Name("x"), sort1); // x:S1
-    Function q = new Function(new Name("q"), Sort.FORMULA, new SortImpl(new Name("Whatever")));
+    final LogicVariable x = new LogicVariable(new Name("x"), sort1); // x:S1
+    final Function q =
+        new Function(new Name("q"), Sort.FORMULA, new SortImpl(new Name("Whatever")));
     // q(:Whatever):BOOL
-    LogicVariable z = new LogicVariable(new Name("z"), sort1); // z:S1
-    Function r = new Function(new Name("r"), Sort.FORMULA, sort1, sort2);
+    final LogicVariable z = new LogicVariable(new Name("z"), sort1); // z:S1
+    final Function r = new Function(new Name("r"), Sort.FORMULA, sort1, sort2);
     // r(:S1, :S2):BOOL
-    LogicVariable y = new LogicVariable(new Name("y"), sort3); // y:S3
-    LogicVariable w = new LogicVariable(new Name("w"), sort2); // w:S2
-    Function f = new Function(new Name("f"), sort1, sort3);
+    final LogicVariable y = new LogicVariable(new Name("y"), sort3); // y:S3
+    final LogicVariable w = new LogicVariable(new Name("w"), sort2); // w:S2
+    final Function f = new Function(new Name("f"), sort1, sort3);
     // f(:S3):S1
 
-    LogicVariable v1 = new LogicVariable(new Name("v1"), osort1);
-    LogicVariable v2 = new LogicVariable(new Name("v2"), osort2);
-    LogicVariable v3 = new LogicVariable(new Name("v3"), osort3);
-    LogicVariable v4 = new LogicVariable(new Name("v4"), osort4);
+    final LogicVariable v1 = new LogicVariable(new Name("v1"), osort1);
+    final LogicVariable v2 = new LogicVariable(new Name("v2"), osort2);
+    final LogicVariable v3 = new LogicVariable(new Name("v3"), osort3);
+    final LogicVariable v4 = new LogicVariable(new Name("v4"), osort4);
 
-    Function g = new Function(new Name("g"), osort3, osort2, osort1);
+    final Function g = new Function(new Name("g"), osort3, osort2, osort1);
     private TermBuilder TB;
     private TermFactory tf;
 

@@ -1,15 +1,15 @@
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * this class contains the goals of the schematic theory specific rules (Taclet). There are new
@@ -22,10 +22,10 @@ public class TacletGoalTemplate {
     private Sequent addedSeq = Sequent.EMPTY_SEQUENT;
 
     /** stores list of Taclet which are introduced */
-    private ImmutableList<Taclet> addedRules = ImmutableSLList.<Taclet>nil();
+    private ImmutableList<Taclet> addedRules = ImmutableSLList.nil();
 
     /** program variables added by this taclet to the namespace */
-    private ImmutableSet<SchemaVariable> addedProgVars = DefaultImmutableSet.<SchemaVariable>nil();
+    private ImmutableSet<SchemaVariable> addedProgVars = DefaultImmutableSet.nil();
 
     private String name = null;
 
@@ -58,7 +58,7 @@ public class TacletGoalTemplate {
      * @param addedRules IList<Taclet> contains the new allowed rules at this branch
      */
     public TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules) {
-        this(addedSeq, addedRules, DefaultImmutableSet.<SchemaVariable>nil());
+        this(addedSeq, addedRules, DefaultImmutableSet.nil());
     }
 
 
@@ -106,7 +106,7 @@ public class TacletGoalTemplate {
      * @return all variables that occur bound in this goal template
      */
     public ImmutableSet<QuantifiableVariable> getBoundVariables() {
-        ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet.<QuantifiableVariable>nil();
+        ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet.nil();
 
         for (Taclet taclet : rules()) {
             result = result.union(taclet.getBoundVariables());
@@ -132,10 +132,12 @@ public class TacletGoalTemplate {
     @Override
     public boolean equals(Object o) {
 
-        if (o == null)
+        if (o == null) {
             return false;
-        if (o == this)
+        }
+        if (o == this) {
             return true;
+        }
 
         if (getClass() != this.getClass()) {
             return false;
@@ -159,12 +161,15 @@ public class TacletGoalTemplate {
     @Override
     public String toString() {
         String result = "";
-        if (!sequent().isEmpty())
+        if (!sequent().isEmpty()) {
             result += "\\add " + sequent() + " ";
-        if (!rules().isEmpty())
+        }
+        if (!rules().isEmpty()) {
             result += "\\addrules " + rules() + " ";
-        if (!addedProgVars().isEmpty())
+        }
+        if (!addedProgVars().isEmpty()) {
             result += "\\addprogvars " + addedProgVars() + " ";
+        }
         return result;
     }
 }

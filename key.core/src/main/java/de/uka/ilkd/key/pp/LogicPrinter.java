@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.pp;
 
+import java.util.Iterator;
+import java.util.Set;
+
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -25,14 +28,13 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.UnicodeHelper;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Iterator;
-import java.util.Set;
 
 import static de.uka.ilkd.key.pp.PosTableLayouter.DEFAULT_LINE_WIDTH;
 
@@ -902,7 +904,7 @@ public class LogicPrinter {
             // Hide package prefix when printing field constants.
             layouter.startTerm(0);
             String name = t.op().name().toString();
-            int index = name.lastIndexOf(".");
+            int index = name.lastIndexOf('.');
             String prettyFieldName = name.substring(index + 1);
             if (isKeyword) {
                 layouter.markStartKeyword();

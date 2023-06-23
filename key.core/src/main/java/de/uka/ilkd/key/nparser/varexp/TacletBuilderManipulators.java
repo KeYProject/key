@@ -1,5 +1,12 @@
 package de.uka.ilkd.key.nparser.varexp;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.ServiceLoader;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -9,13 +16,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.conditions.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
-import javax.annotation.Nonnull;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.ServiceLoader;
-import java.util.stream.Collectors;
 
 import static de.uka.ilkd.key.nparser.varexp.ArgumentType.SORT;
 import static de.uka.ilkd.key.nparser.varexp.ArgumentType.TYPE_RESOLVER;
@@ -85,16 +85,18 @@ public class TacletBuilderManipulators {
         new AbstractConditionBuilder("scrictSub", TR, TR) {
             @Override
             public boolean isSuitableFor(@Nonnull String name) {
-                if (super.isSuitableFor(name))
+                if (super.isSuitableFor(name)) {
                     return true;
+                }
                 return "\\strict\\sub".equalsIgnoreCase(name);
             }
 
             @Override
             public TypeComparisonCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
-                if (negated)
+                if (negated) {
                     throw new IllegalArgumentException("Negation is not supported");
+                }
                 return new TypeComparisonCondition((TypeResolver) arguments[0],
                     (TypeResolver) arguments[1], STRICT_SUBTYPE);
             }
@@ -109,8 +111,9 @@ public class TacletBuilderManipulators {
             @Override
             public TypeComparisonCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
-                if (negated)
+                if (negated) {
                     throw new IllegalArgumentException("Negation is not supported");
+                }
                 return new TypeComparisonCondition((TypeResolver) arguments[0],
                     (TypeResolver) arguments[1], DISJOINTMODULONULL);
             }
@@ -130,8 +133,9 @@ public class TacletBuilderManipulators {
             @Override
             public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments,
                     List<String> parameters, boolean negated) {
-                if (negated)
+                if (negated) {
                     throw new IllegalArgumentException("Negation is not supported");
+                }
                 KeYJavaType kjt = (KeYJavaType) arguments[1];
                 tacletBuilder.addVarsNew((SchemaVariable) arguments[0], kjt);
             }
@@ -142,8 +146,9 @@ public class TacletBuilderManipulators {
             @Override
             public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments,
                     List<String> parameters, boolean negated) {
-                if (negated)
+                if (negated) {
                     throw new IllegalArgumentException("Negation is not supported");
+                }
                 SchemaVariable sv = (SchemaVariable) arguments[0];
                 Sort sort = (Sort) arguments[1];
                 // TODO weigl tacletBuilder.addVarsNew(sv, sort);
@@ -184,8 +189,9 @@ public class TacletBuilderManipulators {
             @Override
             public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments,
                     List<String> parameters, boolean negated) {
-                if (negated)
+                if (negated) {
                     throw new IllegalArgumentException("Negation is not supported");
+                }
                 tacletBuilder.addVarsNew((SchemaVariable) arguments[0],
                     (SchemaVariable) arguments[1]);
 
@@ -196,8 +202,9 @@ public class TacletBuilderManipulators {
             @Override
             public void apply(TacletBuilder<?> tb, Object[] arguments, List<String> parameters,
                     boolean negated) {
-                if (negated)
+                if (negated) {
                     throw new IllegalArgumentException("Negation is not supported");
+                }
                 tb.addVarsNewDependingOn((SchemaVariable) arguments[0],
                     (SchemaVariable) arguments[1]);
             }
@@ -254,7 +261,7 @@ public class TacletBuilderManipulators {
         new ConstructorBasedBuilder("differentFields", DifferentFields.class, SV, SV);
     public static final AbstractConditionBuilder SAME_OBSERVER =
         new ConstructorBasedBuilder("sameObserver", SameObserverCondition.class, PV, PV);
-    public static AbstractConditionBuilder applyUpdateOnRigid = new ConstructorBasedBuilder(
+    public static final AbstractConditionBuilder applyUpdateOnRigid = new ConstructorBasedBuilder(
         "applyUpdateOnRigid", ApplyUpdateOnRigidCondition.class, USV, SV, SV);
     public static final AbstractConditionBuilder DROP_EFFECTLESS_ELEMENTARIES =
         new ConstructorBasedBuilder("dropEffectlessElementaries",

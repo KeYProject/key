@@ -1,20 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.core.Log;
-import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
-import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
-import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
-import net.miginfocom.layout.CC;
-import net.miginfocom.swing.MigLayout;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,6 +9,22 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.Collections;
 import java.util.List;
+import javax.swing.*;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+
+import de.uka.ilkd.key.core.Log;
+import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
+import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
+
+import net.miginfocom.layout.CC;
+import net.miginfocom.swing.MigLayout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Alexander Weigl
@@ -31,6 +32,8 @@ import java.util.List;
  */
 @KeYGuiExtension.Info(experimental = false, name = "Log View")
 public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LogView.class);
+
     /** font to be used for log view */
     private static final IconFontProvider BOOK =
         new IconFontProvider(FontAwesomeSolid.BOOK);
@@ -210,8 +213,9 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
 
 
         public void refresh() {
-            if (pause)
+            if (pause) {
                 return;
+            }
             txtView.setText("");
 
             String pkgFilter = txtPackageSearch.getText().trim();
@@ -230,7 +234,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
                     if (line.isEmpty() || line.charAt(0) == '#') {
                         continue;
                     }
-                    String[] fields = line.split("[|]");
+                    String[] fields = line.split("[|]", STYLES.length);
                     boolean skipByMsgFilter = msgFilterApply && !fields[5].contains(msgFilter);
                     boolean skipByPkgFilter = pkgFilterApply && !fields[4].startsWith(pkgFilter);
                     boolean skipErrorLevel = !levelError && "ERROR".equals(fields[1]);
@@ -244,7 +248,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("Exception while reading", e);
             }
         }
 
@@ -264,7 +268,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
             try {
                 txtView.getDocument().insertString(pos, txt, set);
             } catch (BadLocationException e) {
-                e.printStackTrace();
+                LOGGER.warn("Exception inserting string");
             }
         }
 

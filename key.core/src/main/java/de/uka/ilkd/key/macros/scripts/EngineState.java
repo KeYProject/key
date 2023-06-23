@@ -4,10 +4,9 @@ import java.io.File;
 import java.io.StringReader;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.Observer;
 import java.util.Optional;
-
-import org.key_project.util.collection.ImmutableList;
+import java.util.function.Consumer;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
@@ -22,7 +21,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
 
-import javax.annotation.Nonnull;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * @author Alexander Weigl
@@ -32,13 +31,13 @@ public class EngineState {
     private final static DefaultTermParser PARSER = new DefaultTermParser();
     // private final Map<String, Object> arbitraryVariables = new HashMap<>();
     private final Proof proof;
-    private AbbrevMap abbrevMap = new AbbrevMap();
+    private final AbbrevMap abbrevMap = new AbbrevMap();
     /**
      * nullable
      */
-    private Observer observer;
+    private Consumer<ProofScriptEngine.Message> observer;
     private File baseFileName = new File(".");
-    private ValueInjector valueInjector = ValueInjector.createDefault();
+    private final ValueInjector valueInjector = ValueInjector.createDefault();
     private Goal goal;
     private Node lastSetGoalNode;
 
@@ -111,11 +110,11 @@ public class EngineState {
         }
 
         newGoal = findGoalFromRoot(rootNodeForSearch, checkAutomatic);
-        lastSetGoalNode = newGoal.node();
-
         if (newGoal == null) {
             throw new ScriptException("There must be an open goal at this point");
         }
+
+        lastSetGoalNode = newGoal.node();
 
         return newGoal;
     }
@@ -144,7 +143,7 @@ public class EngineState {
     }
 
     private Goal findGoalFromRoot(final Node rootNode, boolean checkAutomatic) {
-        final Deque<Node> choices = new LinkedList<Node>();
+        final Deque<Node> choices = new LinkedList<>();
 
         Goal result = null;
         Node node = rootNode;
@@ -194,9 +193,8 @@ public class EngineState {
     public Term toTerm(String string, Sort sort) throws ParserException, ScriptException {
         StringReader reader = new StringReader(string);
         Services services = proof.getServices();
-        Term formula = PARSER.parse(reader, sort, services,
+        return PARSER.parse(reader, sort, services,
             getFirstOpenAutomaticGoal().getLocalNamespaces(), abbrevMap);
-        return formula;
     }
 
     public Sort toSort(String sortName) throws ParserException, ScriptException {
@@ -208,9 +206,8 @@ public class EngineState {
         StringReader reader = new StringReader(sequent);
         Services services = proof.getServices();
 
-        Sequent seq = PARSER.parseSeq(reader, services,
+        return PARSER.parseSeq(reader, services,
             getFirstOpenAutomaticGoal().getLocalNamespaces(), getAbbreviations());
-        return seq;
     }
 
     public int getMaxAutomaticSteps() {
@@ -228,11 +225,11 @@ public class EngineState {
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(steps);
     }
 
-    public Observer getObserver() {
+    public Consumer<ProofScriptEngine.Message> getObserver() {
         return observer;
     }
 
-    public void setObserver(Observer observer) {
+    public void setObserver(Consumer<ProofScriptEngine.Message> observer) {
         this.observer = observer;
     }
 

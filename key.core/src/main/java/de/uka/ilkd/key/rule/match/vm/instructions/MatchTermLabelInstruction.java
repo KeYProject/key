@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -10,6 +8,8 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.TermLabelInstantiationEntry;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * This match instruction implements the matching logic for term labels.
@@ -33,8 +33,8 @@ public class MatchTermLabelInstruction implements MatchInstruction {
             return matchCond.setInstantiations(
                 svInsts.add(sv, instantiationCandidate.getLabels(), services));
         } else {
-            for (Object o : (ImmutableArray<?>) inst.getInstantiation()) {
-                if (!instantiationCandidate.containsLabel((TermLabel) o)) {
+            for (TermLabel o : inst.getInstantiation()) {
+                if (!instantiationCandidate.containsLabel(o)) {
                     return null;
                 }
             }

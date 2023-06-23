@@ -1,10 +1,24 @@
 package de.uka.ilkd.key.proof.io;
 
-import de.uka.ilkd.key.java.Position;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.nparser.*;
 import de.uka.ilkd.key.nparser.builder.ContractsAndInvariantsFinder;
 import de.uka.ilkd.key.nparser.builder.ProblemFinder;
 import de.uka.ilkd.key.nparser.builder.TacletPBuilder;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -16,21 +30,12 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 
 /**
@@ -149,7 +154,7 @@ public class KeYFile implements EnvInput {
                 input = file.getNewStream();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to open new stream", e);
         }
         return input;
     }
@@ -157,6 +162,7 @@ public class KeYFile implements EnvInput {
     protected KeyAst.File getParseContext() {
         if (fileCtx == null) {
             try {
+                LOGGER.trace("Reading KeY file {}", file);
                 fileCtx = ParsingFacade.parseFile(file.getCharStream());
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -219,8 +225,9 @@ public class KeYFile implements EnvInput {
         @Nonnull
         ProblemInformation pi = getProblemInformation();
         String bootClassPath = pi.getBootClassPath();
-        if (bootClassPath == null)
+        if (bootClassPath == null) {
             return null;
+        }
         File bootClassPathFile = new File(bootClassPath);
         if (!bootClassPathFile.isAbsolute()) {
             // convert to absolute by resolving against the parent path of the parsed file
@@ -302,14 +309,13 @@ public class KeYFile implements EnvInput {
             throw new IllegalStateException("KeYFile: InitConfig not set.");
         }
         // read .key file
-        LOGGER.debug("Reading KeY file {}", file);
         ChoiceInformation ci = getParseContext().getChoices();
         initConfig.addCategory2DefaultChoices(ci.getDefaultOptions());
 
         readSorts();
         readFuncAndPred();
 
-        return DefaultImmutableSet.<PositionedString>nil();
+        return DefaultImmutableSet.nil();
     }
 
     /**
@@ -318,9 +324,6 @@ public class KeYFile implements EnvInput {
      * @return list of parser warnings
      */
     public ImmutableSet<PositionedString> readContracts() {
-        LOGGER.debug("Read specifications obtained when parsing the Java files " +
-            "(usually JML and Strings.key) from {}", file);
-
         SpecificationRepository specRepos = initConfig.getServices().getSpecificationRepository();
         ContractsAndInvariantsFinder cinvs =
             new ContractsAndInvariantsFinder(initConfig.getServices(), initConfig.namespaces());
@@ -328,7 +331,7 @@ public class KeYFile implements EnvInput {
         specRepos.addContracts(ImmutableSet.fromCollection(cinvs.getContracts()));
         specRepos.addClassInvariants(ImmutableSet.fromCollection(cinvs.getInvariants()));
 
-        return DefaultImmutableSet.<PositionedString>nil();
+        return DefaultImmutableSet.nil();
     }
 
     @Nonnull
@@ -360,8 +363,9 @@ public class KeYFile implements EnvInput {
      * namespaces of the respective taclet options.
      */
     public void readFuncAndPred() {
-        if (file == null)
+        if (file == null) {
             return;
+        }
         KeyAst.File ctx = getParseContext();
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
         io.evalFuncAndPred(ctx);
@@ -401,8 +405,15 @@ public class KeYFile implements EnvInput {
      *         in <code>issues</code>
      */
     protected List<PositionedString> getPositionedStrings(List<BuildingIssue> issues) {
-        return issues.stream().map(w -> new PositionedString(w.getMessage(),
-            file != null ? file.getExternalForm() : "<unknown file>", w.getPosition()))
+        return issues.stream().map(w -> {
+            try {
+                return new PositionedString(w.getMessage(),
+                    new Location(file != null ? new URL(file.getExternalForm()).toURI() : null,
+                        w.getPosition()));
+            } catch (MalformedURLException | URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        })
                 .collect(Collectors.<PositionedString>toList());
     }
 

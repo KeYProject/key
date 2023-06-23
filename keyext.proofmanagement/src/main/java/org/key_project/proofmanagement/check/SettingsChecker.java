@@ -98,12 +98,12 @@ public class SettingsChecker implements Checker {
 
         // store reference settings in data with id 0
         ChoiceSettings reference = choiceSettings.get(0);
-        HashMap<String, String> refChoices = reference.getDefaultChoices();
+        Map<String, String> refChoices = reference.getDefaultChoices();
         data.addReferenceChoices(refChoices);
         data.print(LogLevel.DEBUG, "Reference settings (id 0) are: " + refChoices);
 
         for (int i = 1; i < choiceSettings.size(); i++) {
-            HashMap<String, String> cs = choiceSettings.get(i).getDefaultChoices();
+            Map<String, String> cs = choiceSettings.get(i).getDefaultChoices();
 
             // settings are only added (with fresh id) if they are unique currently
             if (!data.getChoices2Id().containsKey(cs)) {

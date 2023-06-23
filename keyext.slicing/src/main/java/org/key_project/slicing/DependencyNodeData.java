@@ -1,10 +1,11 @@
 package org.key_project.slicing;
 
-import de.uka.ilkd.key.util.Pair;
-import org.key_project.slicing.graph.GraphNode;
-
 import java.util.Collections;
 import java.util.List;
+
+import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.slicing.graph.GraphNode;
 
 /**
  * Stores the dependency graph nodes touched by a proof step.

@@ -4,12 +4,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -22,7 +16,6 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -38,6 +31,12 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.PredictCostProver;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Substitution;
 
+import org.key_project.util.collection.DefaultImmutableMap;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
 public class TriggeredInstantiations implements TermGenerator {
 
     public static TermGenerator create(boolean skipConditions) {
@@ -45,10 +44,10 @@ public class TriggeredInstantiations implements TermGenerator {
     }
 
     private Sequent last = Sequent.EMPTY_SEQUENT;
-    private Set<Term> lastCandidates = new HashSet<Term>();
-    private ImmutableSet<Term> lastAxioms = DefaultImmutableSet.<Term>nil();
+    private Set<Term> lastCandidates = new HashSet<>();
+    private ImmutableSet<Term> lastAxioms = DefaultImmutableSet.nil();
 
-    private boolean checkConditions;
+    private final boolean checkConditions;
 
     /**
      *
@@ -71,13 +70,13 @@ public class TriggeredInstantiations implements TermGenerator {
 
             final Set<Term> terms;
             final Set<Term> axiomSet;
-            ImmutableSet<Term> axioms = DefaultImmutableSet.<Term>nil();
+            ImmutableSet<Term> axioms = DefaultImmutableSet.nil();
 
 
             final Sequent seq = goal.sequent();
             if (seq != last) {
-                terms = new HashSet<Term>();
-                axiomSet = new HashSet<Term>();
+                terms = new HashSet<>();
+                axiomSet = new HashSet<>();
                 computeAxiomAndCandidateSets(seq, terms, axiomSet, services);
                 for (Term axiom : axiomSet) {
                     axioms = axioms.add(axiom);
@@ -166,7 +165,7 @@ public class TriggeredInstantiations implements TermGenerator {
             Services services) {
 
         long cost = PredictCostProver.computerInstanceCost(
-            new Substitution(DefaultImmutableMap.<QuantifiableVariable, Term>nilMap()), cond,
+            new Substitution(DefaultImmutableMap.nilMap()), cond,
             axioms, services);
         return cost == -1;
     }
@@ -175,8 +174,8 @@ public class TriggeredInstantiations implements TermGenerator {
             final Metavariable mv, final Term trigger, Set<Term> terms, ImmutableSet<Term> axioms,
             TacletApp app) {
 
-        final HashSet<Term> instances = new HashSet<Term>();
-        final HashSet<Term> alreadyChecked = new HashSet<Term>();
+        final HashSet<Term> instances = new HashSet<>();
+        final HashSet<Term> alreadyChecked = new HashSet<>();
 
         for (final Term t : terms) {
             boolean addToInstances = true;
@@ -207,7 +206,7 @@ public class TriggeredInstantiations implements TermGenerator {
     private ImmutableList<Term> instantiateConditions(Services services, TacletApp app,
             final Term middle) {
         ImmutableList<Term> conditions;
-        conditions = ImmutableSLList.<Term>nil();
+        conditions = ImmutableSLList.nil();
         for (Term singleAvoidCond : app.taclet().getTrigger().getAvoidConditions()) {
             conditions =
                 conditions.append(instantiateTerm(singleAvoidCond, services, app.instantiations()

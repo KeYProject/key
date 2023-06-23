@@ -7,7 +7,7 @@ plugins {
     // Used to create a single executable jar file with all dependencies
     // see task "shadowJar" below
     // https://imperceptiblethoughts.com/shadow/
-    id 'com.github.johnrengelman.shadow' version "7.1.1"
+    id 'com.github.johnrengelman.shadow' version "8.1.1"
 }
 
 dependencies {
@@ -18,10 +18,10 @@ dependencies {
     implementation project(":key.core.symbolic_execution")
     implementation project(":key.removegenerics")
 
-    api 'com.miglayout:miglayout-swing:11.0'
+    api 'com.miglayout:miglayout-swing:11.1'
 
     //logging implementation used by the slf4j
-    implementation 'ch.qos.logback:logback-classic:1.4.6'
+    implementation 'ch.qos.logback:logback-classic:1.4.7'
 
     api 'org.dockingframes:docking-frames-common:1.1.3p1'
     api 'org.dockingframes:docking-frames-core:1.1.3p1'
@@ -60,6 +60,7 @@ application {
 
 run {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
+    //systemProperties["slf4j.detectLoggerNameMismatch"] = true
     //systemProperties["KeyDebugFlag"] = "on"
     //args "--experimental"
 
@@ -102,7 +103,7 @@ List<String> scanReadmeFiles() {
     for (String line : Files.readAllLines(examplesIndex)) {
         line = line.trim()
         if (line.isEmpty() || line.startsWith("#")) {
-            continue;
+            continue
         }
 
         def readme = Paths.get(projectDir.toString(), "examples",
@@ -113,9 +114,9 @@ List<String> scanReadmeFiles() {
         // default file.
         result.add(dir + "project.key")
         for (String rmLine : Files.readAllLines(readme)) {
-            if(rmLine.startsWith("#")) continue;
+            if(rmLine.startsWith("#")) continue
             def parts = rmLine.split("=", 2)
-            if (parts.length < 2) break;
+            if (parts.length < 2) break
             def key = parts[0].trim()
             if(key.containsIgnoreCase("file")) {
                 def filename = parts[1].trim()

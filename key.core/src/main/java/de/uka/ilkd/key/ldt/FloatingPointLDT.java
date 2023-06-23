@@ -4,55 +4,55 @@ import de.uka.ilkd.key.logic.op.Function;
 
 public interface FloatingPointLDT {
 
-    public Function getLessThan();
+    Function getLessThan();
 
-    public Function getGreaterThan();
+    Function getGreaterThan();
 
-    public Function getLessOrEquals();
+    Function getLessOrEquals();
 
-    public Function getGreaterOrEquals();
+    Function getGreaterOrEquals();
 
-    public Function getEquals();
+    Function getEquals();
 
-    public Function getJavaUnaryMinus();
+    Function getJavaUnaryMinus();
 
-    public Function getJavaAdd();
+    Function getJavaAdd();
 
-    public Function getJavaSub();
+    Function getJavaSub();
 
-    public Function getJavaMul();
+    Function getJavaMul();
 
-    public Function getJavaDiv();
+    Function getJavaDiv();
 
-    public Function getJavaMod();
+    Function getJavaMod();
 
-    public Function getJavaMin();
+    Function getJavaMin();
 
-    public Function getJavaMax();
+    Function getJavaMax();
 
-    public Function getIsNormal();
+    Function getIsNormal();
 
-    public Function getIsSubnormal();
+    Function getIsSubnormal();
 
-    public Function getIsNaN();
+    Function getIsNaN();
 
-    public Function getIsZero();
+    Function getIsZero();
 
-    public Function getIsNice();
+    Function getIsNice();
 
-    public Function getIsInfinite();
+    Function getIsInfinite();
 
-    public Function getIsPositive();
+    Function getIsPositive();
 
-    public Function getIsNegative();
+    Function getIsNegative();
 
-    public Function getAdd();
+    Function getAdd();
 
-    public Function getSub();
+    Function getSub();
 
-    public Function getMul();
+    Function getMul();
 
-    public Function getDiv();
+    Function getDiv();
 
-    public Function getAbs();
+    Function getAbs();
 }

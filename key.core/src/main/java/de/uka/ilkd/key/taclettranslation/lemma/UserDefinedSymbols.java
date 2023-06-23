@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
+import java.util.*;
+
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -11,13 +13,12 @@ import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
-import org.key_project.util.collection.ImmutableSet;
 
-import java.util.*;
+import org.key_project.util.collection.ImmutableSet;
 
 public class UserDefinedSymbols {
     static class NamedComparator implements Comparator<Named> {
-        static NamedComparator INSTANCE = new NamedComparator();
+        static final NamedComparator INSTANCE = new NamedComparator();
 
         @Override
         public int compare(Named o1, Named o2) {
@@ -26,12 +27,12 @@ public class UserDefinedSymbols {
     }
 
     final UserDefinedSymbols parent;
-    final Set<Function> usedExtraFunctions = new TreeSet<Function>(NamedComparator.INSTANCE);
-    final Set<Function> usedExtraPredicates = new TreeSet<Function>(NamedComparator.INSTANCE);
-    final Set<Sort> usedExtraSorts = new TreeSet<Sort>(NamedComparator.INSTANCE);
+    final Set<Function> usedExtraFunctions = new TreeSet<>(NamedComparator.INSTANCE);
+    final Set<Function> usedExtraPredicates = new TreeSet<>(NamedComparator.INSTANCE);
+    final Set<Sort> usedExtraSorts = new TreeSet<>(NamedComparator.INSTANCE);
     final Set<QuantifiableVariable> usedExtraVariables =
-        new TreeSet<QuantifiableVariable>(NamedComparator.INSTANCE);
-    final Set<Named> usedSchemaVariables = new TreeSet<Named>(NamedComparator.INSTANCE);
+        new TreeSet<>(NamedComparator.INSTANCE);
+    final Set<Named> usedSchemaVariables = new TreeSet<>(NamedComparator.INSTANCE);
     final ImmutableSet<Taclet> axioms;
     private final NamespaceSet referenceNamespaces;
 
@@ -114,7 +115,7 @@ public class UserDefinedSymbols {
     }
 
     public void replaceGenericByProxySorts() {
-        Set<Sort> result = new HashSet<Sort>();
+        Set<Sort> result = new HashSet<>();
         for (Sort sort : usedExtraSorts) {
             if (sort instanceof GenericSort) {
                 GenericSort genSort = (GenericSort) sort;
@@ -146,7 +147,7 @@ public class UserDefinedSymbols {
         for (Named named : usedSchemaVariables) {
             symbols.append(named.name()).append(", ");
         }
-        symbols.append(parent != null ? "\n\n Parent: " + parent.toString() : "");
+        symbols.append(parent != null ? "\n\n Parent: " + parent : "");
         return symbols.toString();
     }
 }

@@ -218,7 +218,7 @@ public final class KeYFassade {
         Type type = contract.getTarget().getContainerType().getJavaType();
         if (type instanceof JavaSourceElement) {
             JavaSourceElement jse = (JavaSourceElement) type;
-            line.sourceFile = jse.getPositionInfo().getURI().toURL();
+            line.sourceFile = jse.getPositionInfo().getURL().orElseThrow();
             String str = line.sourceFile.toString();
             line.shortSrc = str.substring(str.lastIndexOf('/') + 1);
         }

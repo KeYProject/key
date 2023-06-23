@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.rule;
 
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.ImmutableList;
 
 
 public class IfMatchResult {
@@ -11,8 +11,8 @@ public class IfMatchResult {
     /**
      * List of matching formulas and list of corresponding match conditions.
      */
-    private ImmutableList<IfFormulaInstantiation> candidates;
-    private ImmutableList<MatchConditions> mcCandidates;
+    private final ImmutableList<IfFormulaInstantiation> candidates;
+    private final ImmutableList<MatchConditions> mcCandidates;
 
     /**
      * PRECONDITION: p_candidates.size () == p_mcCandidates.size ()

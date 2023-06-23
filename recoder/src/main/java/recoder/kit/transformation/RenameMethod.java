@@ -2,6 +2,9 @@
 
 package recoder.kit.transformation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
 import recoder.abstraction.Method;
@@ -10,9 +13,6 @@ import recoder.java.reference.MemberReference;
 import recoder.java.reference.MethodReference;
 import recoder.kit.*;
 import recoder.service.CrossReferenceSourceInfo;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Transformation that renames a method and all known references to that method. The new name should
@@ -70,7 +70,7 @@ public class RenameMethod extends TwoPassTransformation {
         }
         CrossReferenceSourceInfo xr = getCrossReferenceSourceInfo();
 
-        methods = new ArrayList<MethodDeclaration>();
+        methods = new ArrayList<>();
         List<Method> relatedMethods = MethodKit.getAllRelatedMethods(xr, methodToRename);
         List<Method> problems = null;
         for (int i = relatedMethods.size() - 1; i >= 0; i -= 1) {
@@ -79,7 +79,7 @@ public class RenameMethod extends TwoPassTransformation {
                 methods.add((MethodDeclaration) m);
             } else {
                 if (problems == null) {
-                    problems = new ArrayList<Method>();
+                    problems = new ArrayList<>();
                 }
                 problems.add(m);
             }
@@ -87,12 +87,11 @@ public class RenameMethod extends TwoPassTransformation {
         if (problems != null) {
             return setProblemReport(new MissingMethodDeclarations(problems));
         }
-        refs = new ArrayList<MethodReference>();
+        refs = new ArrayList<>();
         for (int j = methods.size() - 1; j >= 0; j -= 1) {
             MethodDeclaration mdecl = methods.get(j);
             List<MemberReference> mrefs = xr.getReferences(mdecl);
-            for (int i = 0, s = mrefs.size(); i < s; i += 1) {
-                MemberReference mr = mrefs.get(i);
+            for (MemberReference mr : mrefs) {
                 if (mr instanceof MethodReference) {
                     refs.add((MethodReference) mr);
                 }

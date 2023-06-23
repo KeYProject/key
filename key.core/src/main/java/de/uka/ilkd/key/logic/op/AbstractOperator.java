@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.TermCreationException;
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermCreationException;
+
+import org.key_project.util.collection.ImmutableArray;
 
 
 /**
@@ -31,7 +31,7 @@ abstract class AbstractOperator implements Operator {
 
 
     protected AbstractOperator(Name name, int arity, Boolean[] whereToBind, boolean isRigid) {
-        this(name, arity, new ImmutableArray<Boolean>(whereToBind), isRigid);
+        this(name, arity, new ImmutableArray<>(whereToBind), isRigid);
     }
 
 

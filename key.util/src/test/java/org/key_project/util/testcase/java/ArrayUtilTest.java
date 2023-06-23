@@ -1,10 +1,11 @@
 package org.key_project.util.testcase.java;
 
-import org.junit.jupiter.api.Test;
+import java.util.function.Predicate;
+
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.StringUtil;
 
-import java.util.function.Predicate;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -339,7 +340,7 @@ public class ArrayUtilTest {
         assertEquals("A", result[0]);
         assertEquals("B", result[1]);
         assertEquals("C", result[2]);
-        assertEquals(null, result[3]);
+        assertNull(result[3]);
         // Test null new element on null array
         try {
             ArrayUtil.add(null, null);

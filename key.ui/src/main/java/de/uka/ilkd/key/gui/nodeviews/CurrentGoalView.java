@@ -1,20 +1,5 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.ApplyTacletDialog;
-import de.uka.ilkd.key.gui.GUIListener;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.pp.*;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.util.Debug;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.dnd.Autoscroll;
 import java.awt.dnd.DnDConstants;
@@ -22,6 +7,23 @@ import java.awt.dnd.DragSource;
 import java.awt.dnd.DropTarget;
 import java.util.EventObject;
 import java.util.LinkedList;
+import javax.swing.*;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.ApplyTacletDialog;
+import de.uka.ilkd.key.gui.GUIListener;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.pp.InitialPositionTable;
+import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.pp.Range;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.util.Debug;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This sequent view displays the sequent of an open goal and allows selection of formulas as well
@@ -171,20 +173,6 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
         }
     }
 
-
-    /**
-     * given a node and a sequent formula, returns the first node among the node's parents that
-     * contains the sequent formula @form.
-     */
-    public Node jumpToIntroduction(Node node, SequentFormula form) {
-        while (node.parent() != null && node.sequent().contains(form)) {
-            node = node.parent();
-        }
-        return node;
-    }
-
-
-
     DragSource getDragSource() {
         return dragSource;
     }
@@ -212,6 +200,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
             return;
         }
         var time = System.nanoTime();
+        getHighlighter().removeAllHighlights();
 
         removeMouseListener(listener);
 
@@ -279,30 +268,6 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
         Goal goal = r.getSelectedGoal();
         Debug.assertTrue(goal != null);
         r.getUI().getProofControl().selectedTaclet(taclet.taclet(), goal, pos.getPosInOccurrence());
-    }
-
-    /**
-     * Enables drag'n'drop of highlighted subterms in the sequent window.
-     *
-     * @param allowDragNDrop enables drag'n'drop iff set to true.
-     */
-    public synchronized void setModalDragNDropEnabled(boolean allowDragNDrop) {
-        listener.setModalDragNDropEnabled(allowDragNDrop);
-    }
-
-    /**
-     * Checks whether drag'n'drop of highlighted subterms in the sequent window currently is
-     * enabled..
-     *
-     * @return true iff drag'n'drop is enabled.
-     */
-    public synchronized boolean modalDragNDropEnabled() {
-        return listener.modalDragNDropEnabled();
-    }
-
-    @Override
-    public String getHighlightedText() {
-        return getHighlightedText(getPosInSequent(getMousePosition()));
     }
 
     public PosInSequent getMousePosInSequent() {

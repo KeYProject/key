@@ -2,6 +2,8 @@
 
 package recoder.service;
 
+import java.util.Stack;
+
 import recoder.AbstractService;
 import recoder.ModelException;
 import recoder.ServiceConfiguration;
@@ -19,8 +21,6 @@ import recoder.java.expression.ParenthesizedExpression;
 import recoder.java.expression.literal.*;
 import recoder.java.expression.operator.*;
 import recoder.java.reference.*;
-
-import java.util.Stack;
 
 /**
  * Easy constant folder to evaluate Java compile-time constants.
@@ -693,22 +693,30 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
      * Map primitive type objects to internal integral encoding.
      */
     static int translateType(PrimitiveType t, NameInfo ni) {
-        if (t == ni.getIntType())
+        if (t == ni.getIntType()) {
             return INT_TYPE;
-        if (t == ni.getBooleanType())
+        }
+        if (t == ni.getBooleanType()) {
             return BOOLEAN_TYPE;
-        if (t == ni.getLongType())
+        }
+        if (t == ni.getLongType()) {
             return LONG_TYPE;
-        if (t == ni.getFloatType())
+        }
+        if (t == ni.getFloatType()) {
             return FLOAT_TYPE;
-        if (t == ni.getDoubleType())
+        }
+        if (t == ni.getDoubleType()) {
             return DOUBLE_TYPE;
-        if (t == ni.getByteType())
+        }
+        if (t == ni.getByteType()) {
             return BYTE_TYPE;
-        if (t == ni.getCharType())
+        }
+        if (t == ni.getCharType()) {
             return CHAR_TYPE;
-        if (t == ni.getShortType())
+        }
+        if (t == ni.getShortType()) {
             return SHORT_TYPE;
+        }
         return -1;
     }
 
@@ -957,7 +965,7 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
 
     static String parseJavaString(String text) {
         int len = text.length();
-        StringBuffer buf = new StringBuffer(len);
+        StringBuilder buf = new StringBuilder(len);
         for (int i = 1; i < len - 1; i += 1) {
             char c = text.charAt(i);
             if (c != '\\') {
@@ -1024,8 +1032,9 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
 
     static void doPrimitiveTypeCast(int newType, ConstantEvaluator.EvaluationResult res) {
         int oldType = res.getTypeCode();
-        if (oldType == newType)
+        if (oldType == newType) {
             return;
+        }
         if (oldType == BOOLEAN_TYPE || newType == BOOLEAN_TYPE) {
             throw new ModelException("Cast not allowed");
         }
@@ -1257,11 +1266,11 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
                 return true;
             } else if (expr instanceof FloatLiteral) {
                 String v = ((FloatLiteral) expr).getValue();
-                res.setFloat(Float.valueOf(v).floatValue());
+                res.setFloat(Float.valueOf(v));
                 return true;
             } else if (expr instanceof DoubleLiteral) {
                 String v = ((DoubleLiteral) expr).getValue();
-                res.setDouble(Double.valueOf(v).doubleValue());
+                res.setDouble(Double.valueOf(v));
                 return true;
             }
             throw new ModelException("Unknown literal type");
@@ -1594,8 +1603,9 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
             if (vtype == -1) {
                 return false;
             }
-            if (visitedVariableReferences.contains(expr))
+            if (visitedVariableReferences.contains(expr)) {
                 return false;
+            }
             visitedVariableReferences.push(expr);
             try {
                 ProgramModelInfo qs = v.getProgramModelInfo();
@@ -1641,7 +1651,7 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
                             // may occur in byte code?!
                             res.setFloat(Float.NaN);
                         } else {
-                            res.setFloat(Float.valueOf(val).floatValue());
+                            res.setFloat(Float.valueOf(val));
                         }
                         break;
                     case DOUBLE_TYPE:
@@ -1649,7 +1659,7 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
                             // may occur in byte code?!
                             res.setDouble(Double.NaN);
                         } else {
-                            res.setDouble(Double.valueOf(val).doubleValue());
+                            res.setDouble(Double.valueOf(val));
                         }
                         break;
                     case STRING_TYPE:

@@ -1,33 +1,5 @@
 package org.key_project.slicing.analysis;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.proof.BranchLocation;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.NodeInfo;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
-import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
-import de.uka.ilkd.key.settings.GeneralSettings;
-import de.uka.ilkd.key.smt.RuleAppSMT;
-import org.key_project.slicing.DependencyNodeData;
-import org.key_project.slicing.RuleStatistics;
-import org.key_project.slicing.SlicingSettingsProvider;
-import org.key_project.util.EqualsModProofIrrelevancyWrapper;
-import de.uka.ilkd.key.util.Pair;
-import org.key_project.slicing.graph.AnnotatedEdge;
-import org.key_project.slicing.graph.ClosedGoal;
-import org.key_project.slicing.graph.DependencyGraph;
-import org.key_project.slicing.graph.GraphNode;
-import org.key_project.slicing.graph.TrackedFormula;
-import org.key_project.slicing.util.ExecutionTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,6 +17,36 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.proof.BranchLocation;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.NodeInfo;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.slicing.DependencyNodeData;
+import org.key_project.slicing.RuleStatistics;
+import org.key_project.slicing.SlicingSettingsProvider;
+import org.key_project.slicing.graph.AnnotatedEdge;
+import org.key_project.slicing.graph.ClosedGoal;
+import org.key_project.slicing.graph.DependencyGraph;
+import org.key_project.slicing.graph.GraphNode;
+import org.key_project.slicing.graph.TrackedFormula;
+import org.key_project.slicing.util.ExecutionTime;
+import org.key_project.util.EqualsModProofIrrelevancyWrapper;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of both proof analysis algorithms.
@@ -530,7 +532,7 @@ public final class DependencyAnalyzer {
                             canMergeStepsInto(apps, idxA, stepA, stepB, locA, locB, mergeBase);
                         if (canMerge) {
                             // merge step B into step A
-                            LOGGER.info("merging {} and {}", stepA.serialNr(), stepB.serialNr());
+                            LOGGER.trace("merging {} and {}", stepA.serialNr(), stepB.serialNr());
                             locs.set(idxA, mergeBase);
                             alreadyRebasedSerialNrs.add(stepA.serialNr());
                             apps.set(idxB, null);

@@ -1,13 +1,12 @@
 package de.uka.ilkd.key.proof;
 
 
+import java.net.MalformedURLException;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
-
-import javax.annotation.Nullable;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * Represents an exception with position information. The row position is absolut this means, if in
@@ -40,10 +39,10 @@ public abstract class SVInstantiationExceptionWithPosition extends SVInstantiati
         String msg = super.getMessage() + ":";
         if (!position.isNegative()) {
             if (inIfSequent()) {
-                msg += "\nAssumption number:" + position.getLine();
+                msg += "\nAssumption number:" + position.line();
             } else {
-                msg += "\nRow: " + position.getLine();
-                msg += "\nColumn: " + position.getColumn();
+                msg += "\nRow: " + position.line();
+                msg += "\nColumn: " + position.column();
             }
         }
 
@@ -60,6 +59,6 @@ public abstract class SVInstantiationExceptionWithPosition extends SVInstantiati
     @Nullable
     @Override
     public Location getLocation() throws MalformedURLException {
-        return new Location((URL) null, position);
+        return new Location(null, position);
     }
 }

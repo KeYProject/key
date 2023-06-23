@@ -8,6 +8,8 @@
 package de.uka.ilkd.key.prover.impl;
 
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.prover.GoalChooser;
@@ -16,8 +18,10 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +34,8 @@ import org.slf4j.LoggerFactory;
 public class ApplyStrategy extends AbstractProverCore {
     public static final Logger LOGGER = LoggerFactory.getLogger(ApplyStrategy.class);
 
+    public static final AtomicLong PERF_GOAL_APPLY = new AtomicLong();
+
     /**
      * the proof that is worked with
      */
@@ -41,7 +47,7 @@ public class ApplyStrategy extends AbstractProverCore {
      * The default {@link GoalChooser} to choose goals to which rules are applied if the
      * {@link StrategySettings} of the proof provides no customized one.
      */
-    private GoalChooser defaultGoalChooser;
+    private final GoalChooser defaultGoalChooser;
 
     private long time;
 
@@ -106,11 +112,15 @@ public class ApplyStrategy extends AbstractProverCore {
                 "No more rules automatically applicable to any goal.", g, app);
         } else {
             assert g != null;
-            g.apply(app);
+            var time = System.nanoTime();
+            try {
+                g.apply(app);
+            } finally {
+                PERF_GOAL_APPLY.getAndAdd(System.nanoTime() - time);
+            }
             return new SingleRuleApplicationInfo(g, app);
         }
     }
-
 
     /**
      * applies rules until this is no longer possible or the thread is interrupted.
@@ -119,13 +129,22 @@ public class ApplyStrategy extends AbstractProverCore {
             final StopCondition stopCondition) {
         time = System.currentTimeMillis();
         SingleRuleApplicationInfo srInfo = null;
+
+        var perfScope = new PerfScope();
+        long applyAutomatic = 0;
         try {
             LOGGER.trace("Strategy started.");
             boolean shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof, time,
                 countApplied, srInfo);
 
             while (!shouldStop) {
-                srInfo = applyAutomaticRule(goalChooser, stopCondition, stopAtFirstNonClosableGoal);
+                var applyAutomaticTime = System.nanoTime();
+                try {
+                    srInfo =
+                        applyAutomaticRule(goalChooser, stopCondition, stopAtFirstNonClosableGoal);
+                } finally {
+                    applyAutomatic += System.nanoTime() - applyAutomaticTime;
+                }
                 if (!srInfo.isSuccess()) {
                     return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(),
                         System.currentTimeMillis() - time, countApplied, closedGoals);
@@ -142,7 +161,7 @@ public class ApplyStrategy extends AbstractProverCore {
                 return new ApplyStrategyInfo(
                     stopCondition.getStopMessage(maxApplications, timeout, proof, time,
                         countApplied, srInfo),
-                    proof, null, (Goal) null, System.currentTimeMillis() - time, countApplied,
+                    proof, null, null, System.currentTimeMillis() - time, countApplied,
                     closedGoals);
             }
         } catch (InterruptedException e) {
@@ -150,12 +169,15 @@ public class ApplyStrategy extends AbstractProverCore {
             return new ApplyStrategyInfo("Interrupted.", proof, null, goalChooser.getNextGoal(),
                 System.currentTimeMillis() - time, countApplied, closedGoals);
         } catch (Throwable t) { // treated later in finished()
-            t.printStackTrace();
+            LOGGER.warn("doWork exception", t);
             return new ApplyStrategyInfo("Error.", proof, t, null,
                 System.currentTimeMillis() - time, countApplied, closedGoals);
         } finally {
             time = (System.currentTimeMillis() - time);
             LOGGER.trace("Strategy stopped, applied {} steps in {}ms", countApplied, time);
+
+            LOGGER.trace("applyAutomaticRule: " + PerfScope.formatTime(applyAutomatic));
+            perfScope.report();
         }
         assert srInfo != null;
         return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(), time,
@@ -338,7 +360,7 @@ public class ApplyStrategy extends AbstractProverCore {
         final GoalChooser goalChooser = getGoalChooserForProof(proof);
         proof = null;
         if (goalChooser != null) {
-            goalChooser.init(null, ImmutableSLList.<Goal>nil());
+            goalChooser.init(null, ImmutableSLList.nil());
         }
     }
 

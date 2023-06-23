@@ -3,6 +3,9 @@
  */
 package recoder.kit.transformation.java5to4;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
 import recoder.abstraction.*;
@@ -29,9 +32,6 @@ import recoder.list.generic.ASTArrayList;
 import recoder.service.NameInfo;
 import recoder.service.SourceInfo;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * traverses a (sub)tree and replaces (un-)boxing conversions with explicit conversions.
  *
@@ -41,8 +41,8 @@ import java.util.List;
 public class ResolveBoxing extends TwoPassTransformation {
 
     private final NonTerminalProgramElement root;
-    private final List<Expression> toUnbox = new ArrayList<Expression>();
-    private final List<Expression> toBox = new ArrayList<Expression>();
+    private final List<Expression> toUnbox = new ArrayList<>();
+    private final List<Expression> toBox = new ArrayList<>();
 
     /**
      * @param sc
@@ -71,8 +71,9 @@ public class ResolveBoxing extends TwoPassTransformation {
                     if (mr.getArguments() != null) {
                         int idx = mr.getArguments().indexOf(e);
                         // TODO does not work with var arg!!! Will throw exception !!!
-                        if (idx != -1)
+                        if (idx != -1) {
                             tt = m.getSignature().get(idx);
+                        }
                         // otherwise, expression is not used as an argument
                         // but e.g. as a reference prefix
                     }
@@ -114,22 +115,26 @@ public class ResolveBoxing extends TwoPassTransformation {
                 } else if (parent instanceof Return) {
                     tt = si.getType(MiscKit.getParentMemberDeclaration(parent));
                 } else if (parent instanceof Switch) {
-                    if (t instanceof ClassType && !((ClassType) t).isEnumType())
+                    if (t instanceof ClassType && !((ClassType) t).isEnumType()) {
                         toUnbox.add(e);
+                    }
                 } else if (parent instanceof Assert) {
-                    if (t instanceof ClassType)
+                    if (t instanceof ClassType) {
                         toUnbox.add(e);
+                    }
                 } else if (parent instanceof ArrayReference) {
-                    if (t instanceof ClassType)
+                    if (t instanceof ClassType) {
                         toUnbox.add(e);
+                    }
                 } else if (parent instanceof ArrayInitializer) {
                     tt = ((ArrayType) si.getType((ArrayInitializer) parent)).getBaseType();
                 }
                 if (tt != null) {
-                    if (tt instanceof ClassType && t instanceof PrimitiveType)
+                    if (tt instanceof ClassType && t instanceof PrimitiveType) {
                         toBox.add(e);
-                    else if (tt instanceof PrimitiveType && t instanceof ClassType)
+                    } else if (tt instanceof PrimitiveType && t instanceof ClassType) {
                         toUnbox.add(e);
+                    }
                 }
             }
         }
@@ -161,11 +166,12 @@ public class ResolveBoxing extends TwoPassTransformation {
                 id = f.createIdentifier("Float");
             } else if (t == ni.getDoubleType()) {
                 id = f.createIdentifier("Double");
-            } else
+            } else {
                 throw new Error();
+            }
             TypeReference tr = f.createTypeReference(id);
             MethodReference replacement = f.createMethodReference(tr, f.createIdentifier("valueOf"),
-                new ASTArrayList<Expression>(e.deepClone()));
+                new ASTArrayList<>(e.deepClone()));
             replace(e, replacement);
         }
         for (Expression e : toUnbox) {
@@ -187,13 +193,15 @@ public class ResolveBoxing extends TwoPassTransformation {
                 id = f.createIdentifier("floatValue");
             } else if (t == ni.getJavaLangDouble()) {
                 id = f.createIdentifier("doubleValue");
-            } else
+            } else {
                 throw new Error("cannot unbox type " + t.getFullName() + " (" + t.getClass() + ")");
+            }
             ReferencePrefix rp;
-            if (e instanceof ParenthesizedExpression)
+            if (e instanceof ParenthesizedExpression) {
                 rp = (ParenthesizedExpression) e.deepClone();
-            else
+            } else {
                 rp = f.createParenthesizedExpression(e.deepClone());
+            }
             MethodReference replacement = f.createMethodReference(rp, id);
             replace(e, replacement);
         }

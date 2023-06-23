@@ -11,7 +11,7 @@ import de.uka.ilkd.key.util.pp.Layouter;
  */
 public final class TermLabelSV extends AbstractSV implements SchemaVariable, TermLabel {
 
-    protected TermLabelSV(Name name) {
+    TermLabelSV(Name name) {
         super(name, Sort.TERMLABEL, true, false);
     }
 

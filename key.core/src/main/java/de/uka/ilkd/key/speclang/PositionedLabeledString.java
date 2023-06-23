@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.speclang;
 
-import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.parser.Location;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A positionedString with labels, which can then be passed over to the translated term. For the
@@ -17,33 +17,17 @@ public class PositionedLabeledString extends PositionedString {
 
     public final ImmutableArray<TermLabel> labels;
 
-    public PositionedLabeledString(String text, String fileName, Position pos,
+    public PositionedLabeledString(String text, Location location,
             ImmutableArray<TermLabel> labels) {
-        super(text, fileName, pos);
+        super(text, location);
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";
         this.labels = labels;
 
     }
 
-    public PositionedLabeledString(String text, String fileName, Position pos, TermLabel label) {
-        this(text, fileName, pos, new ImmutableArray<TermLabel>(label));
-    }
-
-    public PositionedLabeledString(String text, String fileName, ImmutableArray<TermLabel> labels) {
-        this(text, fileName, null, labels);
-    }
-
-    public PositionedLabeledString(String text, String fileName, TermLabel label) {
-        this(text, fileName, new ImmutableArray<TermLabel>(label));
-    }
-
-    public PositionedLabeledString(String text, ImmutableArray<TermLabel> labels) {
-        this(text, null, labels);
-    }
-
-    public PositionedLabeledString(String text, TermLabel label) {
-        this(text, new ImmutableArray<TermLabel>(label));
+    public PositionedLabeledString(String text, Location location, TermLabel label) {
+        this(text, location, new ImmutableArray<>(label));
     }
 
     /**

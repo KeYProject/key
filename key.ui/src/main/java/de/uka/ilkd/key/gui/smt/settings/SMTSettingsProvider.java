@@ -1,5 +1,13 @@
 package de.uka.ilkd.key.gui.smt.settings;
 
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
@@ -10,15 +18,6 @@ import de.uka.ilkd.key.settings.ProofIndependentSMTSettings.ProgressMode;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
-
-
-import javax.swing.*;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
 /**
  * General SMT settings panel in the settings dialog.
@@ -51,9 +50,10 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     private final JSpinner objectBoundField;
     private final JSpinner locsetBoundField;
     private final JCheckBox solverSupportCheck;
+    private final JCheckBox enableOnLoad;
 
     private transient ProofIndependentSMTSettings settings;
-    private transient List<SettingsProvider> children = new ArrayList<>();
+    private final transient List<SettingsProvider> children = new ArrayList<>();
 
 
     public SMTSettingsProvider() {
@@ -66,6 +66,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         locsetBoundField = createLocSetBoundField();
         seqBoundField = createSeqBoundField();
         solverSupportCheck = createSolverSupportCheck();
+        enableOnLoad = createEnableOnLoad();
 
         // Load all available solver types in the system according to SolverTypes.
         // Note that this should happen before creating the NewTranslationOptions, otherwise
@@ -113,7 +114,6 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     public void applySettings(MainWindow window) {
         ProofIndependentSMTSettings pi = SettingsManager.getSmtPiSettings();
         pi.copy(settings);
-        pi.fireSettingsChanged();
         setSmtSettings(pi.clone());
     }
 
@@ -170,6 +170,12 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
             e -> settings.setCheckForSupport(solverSupportCheck.isSelected()));
     }
 
+    private JCheckBox createEnableOnLoad() {
+        return addCheckBox("Enable SMT solvers when loading proofs",
+            "", true,
+            e -> settings.setEnableOnLoad(enableOnLoad.isSelected()));
+    }
+
     private JTextField getSaveToFilePanel() {
         return addFileChooserPanel("Store translation to file:", "",
             BUNDLE.getString(INFO_SAVE_TO_FILE_PANEL), true,
@@ -200,5 +206,6 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         // Timeout can have up to 3 decimal places in seconds to still be an integer in ms.
         timeoutField.setValue(((double) this.settings.getTimeout()) / 1000);
         maxProcesses.setValue(this.settings.getMaxConcurrentProcesses());
+        enableOnLoad.setEnabled(this.settings.isEnableOnLoad());
     }
 }

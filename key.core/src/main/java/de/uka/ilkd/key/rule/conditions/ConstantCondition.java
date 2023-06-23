@@ -36,12 +36,12 @@ public class ConstantCondition extends VariableConditionAdapter {
         if (var instanceof TermSV) {
             Term tInst = (Term) instMap.getInstantiation((TermSV) t);
             boolean atomic = (tInst.arity() == 0);
-            return negated ? !atomic : atomic;
+            return negated != atomic;
         }
         if (var instanceof FormulaSV) {
             Term tInst = (Term) instMap.getInstantiation((FormulaSV) t);
             boolean atomic = (tInst.arity() == 0);
-            return negated ? !atomic : atomic;
+            return negated != atomic;
         }
         return false;
     }

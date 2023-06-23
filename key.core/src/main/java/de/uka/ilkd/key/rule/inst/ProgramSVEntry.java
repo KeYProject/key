@@ -17,9 +17,9 @@ public class ProgramSVEntry implements Serializable {
      */
     private static final long serialVersionUID = -5837249343101979072L;
     /** the SchemaVariable */
-    private SchemaVariable key;
+    private final SchemaVariable key;
     /** the JavaProgramElement */
-    private JavaProgramElement value;
+    private final JavaProgramElement value;
 
     /**
      * creates a new entry encapsulating the SchemaVariable key and its JavaProgramElement

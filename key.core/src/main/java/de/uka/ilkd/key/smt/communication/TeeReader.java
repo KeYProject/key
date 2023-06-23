@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.smt.communication;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import javax.annotation.Nonnull;
 
 /**
  * A {@link TeeReader} writes everything it reads to a separated writer.

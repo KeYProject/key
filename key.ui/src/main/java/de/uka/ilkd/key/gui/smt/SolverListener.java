@@ -7,15 +7,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.LinkedList;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.Timer;
-import java.util.TimerTask;
-
-import javax.swing.JOptionPane;
-import javax.swing.JProgressBar;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -29,14 +24,18 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-
-import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
-import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
+import de.uka.ilkd.key.smt.SMTFocusResults;
+import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
 import de.uka.ilkd.key.smt.SMTSolver.SolverState;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
+import de.uka.ilkd.key.smt.SolverLauncher;
+import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
@@ -45,12 +44,12 @@ public class SolverListener implements SolverLauncherListener {
     private ProgressDialog progressDialog;
     private ProgressModel progressModel;
     // Every intern SMT problem refers to one solver
-    private Collection<InternSMTProblem> problems = new LinkedList<InternSMTProblem>();
+    private final Collection<InternSMTProblem> problems = new LinkedList<>();
     // Every SMT problem refers to many solvers.
-    private Collection<SMTProblem> smtProblems = new LinkedList<SMTProblem>();
+    private Collection<SMTProblem> smtProblems = new LinkedList<>();
     private boolean[][] problemProcessed;
     private int finishedCounter;
-    private Timer timer = new Timer();
+    private final Timer timer = new Timer();
     private final DefaultSMTSettings settings;
     private final Proof smtProof;
     private final static ColorSettings.ColorProperty RED =
@@ -68,7 +67,7 @@ public class SolverListener implements SolverLauncherListener {
         final int solverIndex;
         final SMTSolver solver;
         final SMTProblem problem;
-        final LinkedList<Information> information = new LinkedList<Information>();
+        final LinkedList<Information> information = new LinkedList<>();
         private boolean stopped = false;
         private boolean running = false;
 
@@ -95,6 +94,10 @@ public class SolverListener implements SolverLauncherListener {
             return problem;
         }
 
+        public SMTSolver getSolver() {
+            return solver;
+        }
+
         private void addInformation(String title, String content) {
             information.add(new Information(title, content, solver.name()));
         }
@@ -106,7 +109,7 @@ public class SolverListener implements SolverLauncherListener {
 
                 solver.getException().printStackTrace(new PrintWriter(writer));
                 addInformation("Error-Message",
-                    solver.getException().toString() + "\n\n" + writer.toString());
+                    solver.getException().toString() + "\n\n" + writer);
 
 
             }
@@ -119,19 +122,20 @@ public class SolverListener implements SolverLauncherListener {
             Collection<Throwable> exceptionsOfTacletTranslation =
                 solver.getExceptionsOfTacletTranslation();
             if (!exceptionsOfTacletTranslation.isEmpty()) {
-                String exceptionText =
-                    "The following exceptions have ocurred while translating the taclets:\n\n";
+                StringBuilder exceptionText =
+                    new StringBuilder(
+                        "The following exceptions have ocurred while translating the taclets:\n\n");
                 int i = 1;
                 for (Throwable e : exceptionsOfTacletTranslation) {
-                    exceptionText += i + ". " + e.getMessage();
+                    exceptionText.append(i).append(". ").append(e.getMessage());
                     StringWriter sw = new StringWriter();
                     PrintWriter pw = new PrintWriter(sw);
                     e.printStackTrace(pw);
-                    exceptionText += "\n\n" + sw.toString();
-                    exceptionText += "\n #######################\n\n";
+                    exceptionText.append("\n\n").append(sw);
+                    exceptionText.append("\n #######################\n\n");
                     i++;
                 }
-                addInformation("Warning", exceptionText);
+                addInformation("Warning", exceptionText.toString());
             }
 
             if (solver.getType().supportHasBeenChecked()
@@ -201,20 +205,46 @@ public class SolverListener implements SolverLauncherListener {
         KeYMediator mediator = MainWindow.getInstance().getMediator();
         mediator.stopInterface(true);
         try {
-            new ProofSMTApplyUserAction(mediator, smtProof, smtProblems).actionPerformed(null);
+            new ProofSMTApplyUserAction(mediator, smtProof, problems).actionPerformed(null);
         } finally {
             mediator.startInterface(true);
         }
 
     }
 
+    /**
+     * Reduce the sequent on each open goal to the formulas present
+     * in the unsat core computed by one of the SMT solvers.
+     */
     private void focusResults() {
         KeYMediator mediator = MainWindow.getInstance().getMediator();
         mediator.stopInterface(true);
         try {
-            if (!SMTFocusResults.focus(problems, mediator.getServices())) {
+            // focus each goal
+            Set<Goal> focusedGoals = new HashSet<>();
+            Set<Goal> failedToFocus = new HashSet<>();
+            for (InternSMTProblem problem : problems) {
+                Goal goal = problem.problem.getGoal();
+                Node goalNode = goal.node();
+                if (focusedGoals.contains(goal)
+                        || problem.solver.getFinalResult().isValid() != ThreeValuedTruth.VALID) {
+                    continue; // already done
+                }
+                if (SMTFocusResults.focus(problem.problem, mediator.getServices())) {
+                    focusedGoals.add(goal);
+                    failedToFocus.remove(goal);
+
+                    // focus SMT application
+                    if (goalNode == mediator.getSelectedNode()) {
+                        mediator.getSelectionModel().setSelectedNode(goal.node());
+                    }
+                } else {
+                    failedToFocus.add(goal);
+                }
+            }
+            if (!failedToFocus.isEmpty()) {
                 JOptionPane.showMessageDialog(MainWindow.getInstance(),
-                    "None of the SMT solvers provided an unsat core.",
+                    "None of the SMT solvers provided an unsat core for one of the goals.",
                     "Failed to use unsat core", JOptionPane.ERROR_MESSAGE);
             }
         } finally {
@@ -224,7 +254,7 @@ public class SolverListener implements SolverLauncherListener {
 
     private void showInformation(InternSMTProblem problem) {
         new InformationWindow(progressDialog, problem.solver, problem.information,
-            "Information for " + problem.toString());
+            "Information for " + problem);
     }
 
     private void prepareDialog(Collection<SMTProblem> smtproblems,
@@ -262,9 +292,7 @@ public class SolverListener implements SolverLauncherListener {
         }
 
 
-
         boolean ce = solverTypes.contains(SolverTypes.Z3_CE_SOLVER);
-
 
 
         progressDialog =
@@ -274,7 +302,6 @@ public class SolverListener implements SolverLauncherListener {
         SwingUtilities.invokeLater(() -> progressDialog.setVisible(true));
 
     }
-
 
 
     private InternSMTProblem getProblem(int col, int row) {
@@ -338,7 +365,6 @@ public class SolverListener implements SolverLauncherListener {
     }
 
 
-
     private boolean refreshProgessOfProblem(InternSMTProblem problem) {
         SolverState state = problem.solver.getState();
         switch (state) {
@@ -367,7 +393,7 @@ public class SolverListener implements SolverLauncherListener {
         progressModel.setProgress((int) progress, problem.getSolverIndex(),
             problem.getProblemIndex());
         float remainingTime = calculateRemainingTime(problem);
-        progressModel.setText(Float.toString(remainingTime) + " sec.", problem.getSolverIndex(),
+        progressModel.setText(remainingTime + " sec.", problem.getSolverIndex(),
             problem.getProblemIndex());
     }
 
@@ -422,7 +448,6 @@ public class SolverListener implements SolverLauncherListener {
             progressModel.setProgress(0, x, y);
             progressModel.setTextColor(RED.get(), x, y);
             progressModel.setText("Exception!", x, y);
-
 
 
             break;
@@ -516,7 +541,8 @@ public class SolverListener implements SolverLauncherListener {
 
     private void storeToFile(String text, String path) {
         try {
-            final BufferedWriter out2 = new BufferedWriter(new FileWriter(path));
+            final BufferedWriter out2 =
+                new BufferedWriter(new FileWriter(path, StandardCharsets.UTF_8));
             out2.write(text);
             out2.close();
         } catch (IOException e) {
@@ -542,21 +568,18 @@ public class SolverListener implements SolverLauncherListener {
 
 
     public static String computeSolverTypeWarningMessage(SolverType type) {
-        StringBuffer message = new StringBuffer();
-        message.append("You are using a version of " + type.getName()
+        String message = "You are using a version of " + type.getName()
             + " which has not been tested for this version of KeY.\nIt can therefore be that"
-            + " errors occur that would not occur\nusing the following version or higher:\n");
-        message.append(type.getMinimumSupportedVersion());
-        return message.toString();
+            + " errors occur that would not occur\nusing the following version or higher:\n" +
+            type.getMinimumSupportedVersion();
+        return message;
     }
 
     private class ProgressDialogListenerImpl implements ProgressDialogListener {
 
 
-
-        private SolverLauncher launcher;
-        private boolean counterexample;
-
+        private final SolverLauncher launcher;
+        private final boolean counterexample;
 
 
         public ProgressDialogListenerImpl(SolverLauncher launcher, boolean counterexample) {
@@ -609,7 +632,7 @@ public class SolverListener implements SolverLauncherListener {
         public void focusButtonClicked() {
             focusResults();
         }
-    };
+    }
 
     /**
      * Checks if the given {@link Term} contains a modality, query, or update.

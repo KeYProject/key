@@ -4,12 +4,6 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Proof;
@@ -20,7 +14,12 @@ import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +32,7 @@ public final class ProofCorrectnessMgt {
     private final DefaultMgtProofListener proofListener = new DefaultMgtProofListener();
     private final DefaultMgtProofTreeListener proofTreeListener = new DefaultMgtProofTreeListener();
 
-    private Set<RuleApp> cachedRuleApps = new LinkedHashSet<RuleApp>();
+    private final Set<RuleApp> cachedRuleApps = new LinkedHashSet<>();
     private ProofStatus proofStatus = ProofStatus.OPEN;
 
 
@@ -101,7 +100,7 @@ public final class ProofCorrectnessMgt {
         // look for cycles
         while (!newPaths.isEmpty()) {
             final Iterator<ImmutableList<Contract>> it = newPaths.iterator();
-            newPaths = DefaultImmutableSet.<ImmutableList<Contract>>nil();
+            newPaths = DefaultImmutableSet.nil();
 
             while (it.hasNext()) {
                 final ImmutableList<Contract> path = it.next();
@@ -147,7 +146,7 @@ public final class ProofCorrectnessMgt {
         ImmutableSet<Proof> newProofs = proofs;
         while (newProofs.size() > 0) {
             final Iterator<Proof> it = newProofs.iterator();
-            newProofs = DefaultImmutableSet.<Proof>nil();
+            newProofs = DefaultImmutableSet.nil();
 
             while (it.hasNext()) {
                 final Proof p = it.next();
@@ -234,7 +233,7 @@ public final class ProofCorrectnessMgt {
 
 
     public ImmutableSet<Contract> getUsedContracts() {
-        ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
+        ImmutableSet<Contract> result = DefaultImmutableSet.nil();
         for (RuleApp ruleApp : cachedRuleApps) {
             RuleJustification ruleJusti = getJustification(ruleApp);
             if (ruleJusti instanceof RuleJustificationBySpec) {

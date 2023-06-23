@@ -1,14 +1,14 @@
 package de.uka.ilkd.key.strategy;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -107,7 +107,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      */
     static ImmutableList<RuleAppContainer> createInitialAppContainers(
             ImmutableList<IBuiltInRuleApp> birs, PosInOccurrence pio, Goal goal) {
-        ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
+        ImmutableList<RuleAppContainer> result = ImmutableSLList.nil();
 
         for (IBuiltInRuleApp bir : birs) {
             result = result.prepend(createAppContainer(bir, pio, goal));
@@ -121,14 +121,14 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     @Override
     public ImmutableList<RuleAppContainer> createFurtherApps(Goal goal) {
         if (!isStillApplicable(goal)) {
-            return ImmutableSLList.<RuleAppContainer>nil();
+            return ImmutableSLList.nil();
         }
 
         final PosInOccurrence pio = getPosInOccurrence(goal);
 
         RuleAppContainer container = createAppContainer(bir, pio, goal);
         if (container.getCost() instanceof TopRuleAppCost) {
-            return ImmutableSLList.<RuleAppContainer>nil();
+            return ImmutableSLList.nil();
         }
         return ImmutableSLList.<RuleAppContainer>nil().prepend(container);
     }

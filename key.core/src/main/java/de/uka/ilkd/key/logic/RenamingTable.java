@@ -15,14 +15,16 @@ public abstract class RenamingTable {
 
     public static RenamingTable getRenamingTable(
             HashMap<? extends SourceElement, ? extends SourceElement> hmap) {
-        if (hmap.size() == 0)
+        if (hmap.size() == 0) {
             return null;
+        }
         if (hmap.size() == 1) {
             Entry<? extends SourceElement, ? extends SourceElement> entry =
                 hmap.entrySet().iterator().next();
             return new SingleRenamingTable(entry.getKey(), entry.getValue());
-        } else
+        } else {
             return new MultiRenamingTable(hmap);
+        }
     }
 
     public abstract HashMap<? extends SourceElement, ? extends SourceElement> getHashMap();

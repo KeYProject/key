@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -69,14 +70,18 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
      */
     public int getChildCount() {
         int result = 0;
-        if (modArray != null)
+        if (modArray != null) {
             result += modArray.size();
-        if (name != null)
+        }
+        if (name != null) {
             result++;
-        if (basetype != null)
+        }
+        if (basetype != null) {
             result++;
-        if (members != null)
+        }
+        if (members != null) {
             result += members.size();
+        }
         return result;
     }
 
@@ -101,13 +106,15 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
             index -= len;
         }
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (basetype != null) {
-            if (index == 0)
+            if (index == 0) {
                 return basetype;
+            }
             index--;
         }
         if (members != null) {
@@ -204,7 +211,7 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
 
     public String getAlternativeNameRepresentation() {
         if (altNameRepresentation == null) {
-            final StringBuffer alt = new StringBuffer();
+            final StringBuilder alt = new StringBuilder();
             Type baseType = basetype.getKeYJavaType().getJavaType();
 
             if (baseType instanceof ArrayType) {

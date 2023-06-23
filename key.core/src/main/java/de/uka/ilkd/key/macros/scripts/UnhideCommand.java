@@ -1,9 +1,10 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Semisequent;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
@@ -12,11 +13,8 @@ import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
-import org.key_project.util.collection.ImmutableList;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Proof script command to insert a formula hidden earlier in the proof.
@@ -87,7 +85,7 @@ public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
         return "unhide";
     }
 
-    public class Parameters {
+    public static class Parameters {
         @Option("#2")
         public Sequent sequent;
     }

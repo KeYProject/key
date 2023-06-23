@@ -5,18 +5,18 @@
  */
 package recoder.bytecode;
 
+import java.util.List;
+
 import recoder.abstraction.AnnotationUse;
 import recoder.abstraction.ElementValuePair;
-
-import java.util.List;
 
 /**
  * @author gutzmann
  */
 public class AnnotationUseInfo implements AnnotationUse {
-    protected List<ElementValuePair> elementValuePairs;
+    protected final List<ElementValuePair> elementValuePairs;
 
-    protected String fullAnnotationTypeName;
+    protected final String fullAnnotationTypeName;
 
     /**
      * @param accessFlags
@@ -33,11 +33,12 @@ public class AnnotationUseInfo implements AnnotationUse {
     }
 
     private String getParamStr() {
-        StringBuffer res = new StringBuffer();
+        StringBuilder res = new StringBuilder();
         boolean first = true;
         for (ElementValuePair evp : elementValuePairs) {
-            if (!first)
+            if (!first) {
                 res.append(",");
+            }
             first = false;
             res.append(evp.toString());
         }

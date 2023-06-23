@@ -2,12 +2,12 @@
 
 package recoder.java.declaration;
 
+import java.util.List;
+
 import recoder.java.SourceElement;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.TypeReferenceContainer;
 import recoder.list.generic.ASTList;
-
-import java.util.List;
 
 /**
  * Variable declaration.

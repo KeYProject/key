@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.speclang.translation;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
@@ -16,6 +14,8 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Resolver for attributes (i.e., fields).

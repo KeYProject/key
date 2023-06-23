@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.speclang.njml;
 
+import java.util.Map;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -15,13 +19,11 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
-import org.antlr.v4.runtime.ParserRuleContext;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Map;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Stateful service for translating JML into KeY entities.
@@ -197,10 +199,11 @@ public class JmlIO {
      */
     public Term translateTerm(LabeledParserRuleContext expr) {
         Term term = translateTerm(expr.first);
-        if (expr.second != null)
+        if (expr.second != null) {
             return services.getTermBuilder().addLabel(term, expr.second);
-        else
+        } else {
             return term;
+        }
     }
 
     /**
@@ -210,10 +213,11 @@ public class JmlIO {
     public Term translateTerm(LabeledParserRuleContext expr, OriginTermLabel.SpecType type) {
         Term term = translateTerm(expr.first);
         OriginTermLabel origin = new OriginTermLabel(new OriginTermLabel.Origin(type));
-        if (expr.second != null)
+        if (expr.second != null) {
             return services.getTermBuilder().addLabel(term, expr.second);
-        else
+        } else {
             return services.getTermBuilder().addLabel(term, origin);
+        }
     }
 
 

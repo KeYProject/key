@@ -1,9 +1,10 @@
 package de.uka.ilkd.key.smt;
 
-import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.Nullable;
 
 /**
  * Little helper class that helps to check for the version of a solver. Mainly it provides a method
@@ -26,7 +27,8 @@ public class VersionChecker {
         try {
             p = pb.start();
             p.waitFor(MAX_DELAY, TimeUnit.MILLISECONDS);
-            try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+            try (BufferedReader r = new BufferedReader(
+                new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8))) {
                 // Avoid potential blocking by the buffer's readLine()
                 if (!r.ready()) {
                     return null;

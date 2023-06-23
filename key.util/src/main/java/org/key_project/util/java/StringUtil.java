@@ -1,11 +1,11 @@
 package org.key_project.util.java;
 
-import javax.annotation.Nonnull;
-import javax.swing.*;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
+import javax.swing.*;
 
 
 /**
@@ -400,7 +400,7 @@ public final class StringUtil {
         while (first <= last && predicate.test(value[last])) {
             --last;
         }
-        return (first < last) ? new String(Arrays.copyOfRange(value, first, last + 1)) : "";
+        return (first < last + 1) ? text.substring(first, last + 1) : "";
     }
 
     /**

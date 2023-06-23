@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import org.key_project.util.java.StringUtil;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.Throw;
@@ -14,6 +12,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.util.java.StringUtil;
 
 /**
  * The default implementation of {@link IExecutionExceptionalMethodReturn}.

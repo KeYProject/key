@@ -1,13 +1,7 @@
 package de.uka.ilkd.key.ldt;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
@@ -29,6 +23,11 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -95,7 +94,7 @@ public final class HeapLDT extends LDT {
         final Namespace<Sort> sorts = services.getNamespaces().sorts();
         final Namespace<IProgramVariable> progVars = services.getNamespaces().programVariables();
 
-        fieldSort = (Sort) sorts.lookup(new Name("Field"));
+        fieldSort = sorts.lookup(new Name("Field"));
         select = addSortDependingFunction(services, SELECT_NAME.toString());
         store = addFunction(services, "store");
         create = addFunction(services, "create");
@@ -339,7 +338,7 @@ public final class HeapLDT extends LDT {
         assert fieldPV != services.getJavaInfo().getArrayLength();
 
         final Name name = new Name(getFieldSymbolName(fieldPV));
-        Function result = (Function) services.getNamespaces().functions().lookup(name);
+        Function result = services.getNamespaces().functions().lookup(name);
         if (result == null) {
             int index = name.toString().indexOf("::");
             assert index > 0;
@@ -361,7 +360,7 @@ public final class HeapLDT extends LDT {
                     }
                     result = new ObserverFunction(kind.toString(), fieldPV.sort(),
                         fieldPV.getKeYJavaType(), targetSort(), fieldPV.getContainerType(),
-                        fieldPV.isStatic(), new ImmutableArray<KeYJavaType>(), heapCount, 1);
+                        fieldPV.isStatic(), new ImmutableArray<>(), heapCount, 1);
                 } else {
                     result = new Function(name, fieldSort, new Sort[0], null, true);
                 }
@@ -381,7 +380,7 @@ public final class HeapLDT extends LDT {
     }
 
     @Override
-    public final boolean containsFunction(Function op) {
+    public boolean containsFunction(Function op) {
         if (super.containsFunction(op)) {
             return true;
         }
@@ -459,7 +458,7 @@ public final class HeapLDT extends LDT {
 
 
     @Override
-    public final Type getType(Term t) {
+    public Type getType(Term t) {
         assert false;
         return null;
     }

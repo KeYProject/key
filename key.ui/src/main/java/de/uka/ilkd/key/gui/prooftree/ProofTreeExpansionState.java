@@ -8,7 +8,6 @@ package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.*;
 import java.util.function.Predicate;
-
 import javax.annotation.Nonnull;
 import javax.swing.JTree;
 import javax.swing.event.*;
@@ -202,7 +201,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
 
     @Override
     public Iterator<TreePath> iterator() {
-        return new Iterator<TreePath>() {
+        return new Iterator<>() {
             final Iterator<TreePath> i = paths.iterator();
 
             @Override

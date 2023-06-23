@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.java.recoderext;
 
+import java.net.URI;
+import java.util.*;
+import javax.annotation.Nonnull;
+
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
@@ -7,11 +12,13 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kin
 import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.misc.Interval;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.StringUtil;
+
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.misc.Interval;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Constructor;
 import recoder.abstraction.Method;
@@ -24,9 +31,6 @@ import recoder.java.statement.EmptyStatement;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-
-import javax.annotation.Nonnull;
-import java.util.*;
 
 import static java.lang.String.format;
 
@@ -120,14 +124,15 @@ public final class JMLTransformer extends RecoderModelTransformer {
             column = 0;
         }
         de.uka.ilkd.key.java.Position pos =
-            de.uka.ilkd.key.java.Position.newOneZeroBased(ctx.start.getLine(), column);
-        return new PositionedString(sb.toString(), ctx.start.getTokenSource().getSourceName(), pos);
+            de.uka.ilkd.key.java.Position.fromOneZeroBased(ctx.start.getLine(), column);
+        return new PositionedString(sb.toString(), Location.fromToken(ctx.start));
     }
 
     public static String getFullText(ParserRuleContext context) {
         if (context.start == null || context.stop == null || context.start.getStartIndex() < 0
-                || context.stop.getStopIndex() < 0)
+                || context.stop.getStopIndex() < 0) {
             return context.getText(); // Fallback
+        }
         return context.start.getInputStream()
                 .getText(Interval.of(context.start.getStartIndex(), context.stop.getStopIndex()));
     }
@@ -152,10 +157,10 @@ public final class JMLTransformer extends RecoderModelTransformer {
     private static Position updatePositionRelativeTo(Position p,
             de.uka.ilkd.key.java.Position pos) {
         if (p == Position.UNDEFINED) {
-            return new Position(pos.getLine(), pos.getColumn() - 1);
+            return new Position(pos.line(), pos.column() - 1);
         }
-        int line = Math.max(0, pos.getLine() + p.getLine() - 1);
-        int column = Math.max(0, pos.getColumn() + p.getColumn() - 1);
+        int line = Math.max(0, pos.line() + p.getLine() - 1);
+        int column = Math.max(0, pos.column() + p.getColumn() - 1);
         return new Position(line, column);
     }
 
@@ -234,7 +239,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
             if (isGhost) {
                 throw new SLTranslationException(
                     "JML field declaration cannot be" + " both ghost and model!",
-                    declWithMods.fileName, declWithMods.pos);
+                    declWithMods.location);
             }
         }
         if (!(isGhost || isModel)) {
@@ -244,7 +249,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 "Could not translate JML specification. "
                     + "You have either tried to use an unsupported keyword (" + s + ") "
                     + "or a JML field declaration without a ghost or model modifier.",
-                declWithMods.fileName, declWithMods.pos);
+                declWithMods.location);
         }
 
         // determine parent, child index
@@ -274,7 +279,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
                     fieldDecl.setEndPosition(old.getEndPosition());
                     fieldDecl.setRelativePosition(old.getRelativePosition());
                 }
-                updatePositionInformation(fieldDecl, declWithMods.pos);
+                updatePositionInformation(fieldDecl, declWithMods.location.getPosition());
 
                 // set comments: the original list of comments with the
                 // declaration,
@@ -306,13 +311,13 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 if (isModel) {
                     throw new SLTranslationException(
                         "JML model fields cannot be declared" + " within a method!",
-                        declWithMods.fileName, declWithMods.pos);
+                        declWithMods.location);
                 }
                 List<Statement> declStatement =
                     services.getProgramFactory().parseStatements(declWithMods.text);
                 assert declStatement.size() == 1;
                 fieldDecl = (LocalVariableDeclaration) declStatement.get(0);
-                updatePositionInformation(fieldDecl, declWithMods.pos);
+                updatePositionInformation(fieldDecl, declWithMods.location.getPosition());
                 attach((LocalVariableDeclaration) fieldDecl, (StatementBlock) astParent,
                     childIndex); // Unlike
                 // above, here
@@ -326,7 +331,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
             }
         } catch (Throwable e) {
             throw new SLTranslationException(e.getMessage() + " (" + e.getClass().getName() + ")",
-                declWithMods.fileName, declWithMods.pos, e);
+                declWithMods.location, e);
         }
 
         // add ghost or model modifier
@@ -343,13 +348,13 @@ public final class JMLTransformer extends RecoderModelTransformer {
         assert originalComments.length > 0;
 
         // prepend Java modifiers
-        PositionedString declWithMods = new PositionedString(decl.getParsableDeclaration(),
-            decl.getSourceFileName(), decl.getApproxPosition());
+        PositionedString declWithMods =
+            new PositionedString(decl.getParsableDeclaration(), decl.getLocation());
 
         // only handle model methods
         if (!decl.getMods().contains(JMLModifier.MODEL)) {
             throw new SLTranslationException("JML method declaration has to be model!",
-                declWithMods.fileName, declWithMods.pos);
+                declWithMods.location);
         }
 
         // determine parent
@@ -360,15 +365,15 @@ public final class JMLTransformer extends RecoderModelTransformer {
         MethodDeclaration methodDecl;
         try {
             methodDecl = services.getProgramFactory().parseMethodDeclaration(declWithMods.text);
-            if (declWithMods.pos != de.uka.ilkd.key.java.Position.UNDEFINED) {
-                updatePositionInformation(methodDecl, declWithMods.pos);
+            if (declWithMods.location.getPosition() != de.uka.ilkd.key.java.Position.UNDEFINED) {
+                updatePositionInformation(methodDecl, declWithMods.location.getPosition());
             }
             attach(methodDecl, astParent, 0); // about the 0 see the comment in
             // transformFieldDecl() above
         } catch (Throwable e) {
             throw new SLTranslationException(
-                format("%s (%s)", e.getMessage(), e.getClass().getName()), declWithMods.fileName,
-                declWithMods.pos, e);
+                format("%s (%s)", e.getMessage(), e.getClass().getName()), declWithMods.location,
+                e);
         }
 
         // add model modifier
@@ -393,8 +398,9 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
     private void transformAssertStatement(TextualJMLAssertStatement stat,
             Comment[] originalComments) throws SLTranslationException {
-        if (originalComments.length <= 0)
+        if (originalComments.length == 0) {
             throw new IllegalArgumentException();
+        }
 
         // determine parent, child index
         StatementBlock astParent = (StatementBlock) originalComments[0].getParent().getASTParent();
@@ -411,7 +417,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
         } catch (Throwable e) {
             throw new SLTranslationException(
                 String.format("%s (%s)", e.getMessage(), e.getClass().getName()),
-                ctx.start.getTokenSource().getSourceName(), pos, e);
+                Location.fromToken(ctx.start), e);
         }
     }
 
@@ -435,7 +441,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
             doAttach(assignStmt, astParent, childIndex);
         } catch (Throwable e) {
             throw new SLTranslationException(e.getMessage() + " (" + e.getClass().getName() + ")",
-                stat.getAssignment().start.getTokenSource().getSourceName(), pos, e);
+                Location.fromToken(stat.getAssignment().start), e);
         }
     }
 
@@ -456,15 +462,15 @@ public final class JMLTransformer extends RecoderModelTransformer {
             // Note (DS): I don't really know what I do here (concerning the
             // position information), but it seems to work...
             updatePositionInformation(mps,
-                de.uka.ilkd.key.java.Position.fromPosition(startPosition));
+                de.uka.ilkd.key.java.Position.fromSEPosition(startPosition));
             doAttach(mps, astParent, childIndex);
         } catch (Throwable e) {
             throw new SLTranslationException(e.getMessage() + " (" + e.getClass().getName() + ")",
-                stat.getSourceFileName(), stat.getApproxPosition(), e);
+                stat.getLocation(), e);
         }
     }
 
-    private void transformClasslevelComments(TypeDeclaration td, String fileName)
+    private void transformClasslevelComments(TypeDeclaration td, URI fileName)
             throws SLTranslationException {
         // iterate over all pre-existing children
         ProgramElement[] children = getChildren(td);
@@ -491,7 +497,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
             String concatenatedComment = concatenate(comments);
             Position recoderPos = comments[0].getStartPosition();
             de.uka.ilkd.key.java.Position pos =
-                de.uka.ilkd.key.java.Position.fromPosition(recoderPos);
+                de.uka.ilkd.key.java.Position.fromSEPosition(recoderPos);
 
             // call preparser
             var parser = new PreParser();
@@ -510,8 +516,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 } else if (c instanceof TextualJMLSetStatement) {
                     if (i == 0 || !(children[i - 1] instanceof MethodDeclaration)) {
                         throw new SLTranslationException(
-                            "A set assignment only allowed inside of a method body.", fileName,
-                            pos);
+                            "A set assignment only allowed inside of a method body.",
+                            new Location(fileName, pos));
                     }
                     Statement emptyStmt = new EmptyStatement();
                     Comment emptyStmtComment = new Comment();
@@ -525,7 +531,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
         }
     }
 
-    private void transformMethodlevelCommentsHelper(ProgramElement pe, String fileName)
+    private void transformMethodlevelCommentsHelper(ProgramElement pe, URI fileName)
             throws SLTranslationException {
         // recurse to all pre-existing children
         ProgramElement[] children = getChildren(pe);
@@ -533,8 +539,9 @@ public final class JMLTransformer extends RecoderModelTransformer {
             transformMethodlevelCommentsHelper(aChildren, fileName);
         }
 
-        if (pe instanceof MethodDeclaration)
+        if (pe instanceof MethodDeclaration) {
             return;
+        }
 
         // get comments
         Comment[] comments = getCommentsAndSetParent(pe);
@@ -546,7 +553,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
         String concatenatedComment = concatenate(comments);
         Position recoderPos = comments[0].getStartPosition();
         de.uka.ilkd.key.java.Position pos =
-            de.uka.ilkd.key.java.Position.fromPosition(recoderPos);
+            de.uka.ilkd.key.java.Position.fromSEPosition(recoderPos);
 
         // call preparser
         var parser = new PreParser();
@@ -568,7 +575,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
         }
     }
 
-    private void transformMethodlevelComments(MethodDeclaration md, String fileName)
+    private void transformMethodlevelComments(MethodDeclaration md, URI fileName)
             throws SLTranslationException {
         StatementBlock body = md.getBody();
         if (body != null) {
@@ -645,7 +652,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
     public void makeExplicit() {
         // abort if JML is disabled
         // if(!ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().useJML()) {
-        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().useJML()) {
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isUseJML()) {
             return;
         }
 
@@ -672,8 +679,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
                      * a MalformedURLException later if a parsing error occurs, but at least show
                      * the error message of the parser.
                      */
-                    String resource =
-                        dl == null ? "UNKNOWN:unknown" : MiscTools.extractURI(dl).toString();
+                    URI resource = dl == null ? null : MiscTools.extractURI(dl).orElse(null);
 
                     transformClasslevelComments(td, resource);
 
@@ -706,7 +712,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
             // RuntimeException runtimeE
             // = new RuntimeException(e.getMessage()
             // + "\n" + e.getFileName()
-            // + ", line " + e.getLine()
+            // + ", line " + e.line()
             // + ", column " + e.getColumn());
             // runtimeE.setStackTrace(e.getStackTrace());
             // throw runtimeE;

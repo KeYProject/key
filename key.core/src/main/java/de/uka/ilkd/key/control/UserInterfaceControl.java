@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -99,12 +98,12 @@ public interface UserInterfaceControl {
      *
      * @return The used {@link ProofControl}.
      */
-    public ProofControl getProofControl();
+    ProofControl getProofControl();
 
     /**
      * Returns the {@link TermLabelVisibilityManager}.
      *
      * @return The {@link TermLabelVisibilityManager}.
      */
-    public TermLabelVisibilityManager getTermLabelVisibilityManager();
+    TermLabelVisibilityManager getTermLabelVisibilityManager();
 }

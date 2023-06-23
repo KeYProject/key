@@ -1,18 +1,17 @@
 package de.uka.ilkd.key.nparser;
 
-import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.util.HelperClassForTests;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -24,9 +23,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @Disabled
 public class ParseAllKeyFilesTest {
     public static Collection<Path> getFiles() throws IOException {
-        return Files.walk(HelperClassForTests.TESTCASE_DIRECTORY.toPath())
-                .filter(file -> Files.isRegularFile(file) && file.toString().endsWith(".key"))
-                .collect(Collectors.toList());
+        try (var s = Files.walk(HelperClassForTests.TESTCASE_DIRECTORY.toPath())) {
+            return s.filter(file -> Files.isRegularFile(file) && file.toString().endsWith(".key"))
+                    .collect(Collectors.toList());
+        }
     }
 
     @ParameterizedTest

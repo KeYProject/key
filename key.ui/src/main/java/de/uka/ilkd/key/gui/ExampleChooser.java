@@ -1,16 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
-import org.key_project.util.java.IOUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -18,8 +7,22 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.List;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
+
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
+
+import org.key_project.util.java.IOUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dialog to choose an example to load.
@@ -274,8 +277,9 @@ public final class ExampleChooser extends JDialog {
         // create "load" button
         loadButton = new JButton("Load Example");
         loadButton.addActionListener(e -> {
-            if (selectedExample == null)
+            if (selectedExample == null) {
                 throw new RuntimeException("No example selected");
+            }
             fileToLoad = selectedExample.getObligationFile();
             setVisible(false);
         });
@@ -285,10 +289,12 @@ public final class ExampleChooser extends JDialog {
         // create "load proof" button
         loadProofButton = new JButton("Load Proof");
         loadProofButton.addActionListener(e -> {
-            if (selectedExample == null)
+            if (selectedExample == null) {
                 throw new IllegalStateException("No example selected");
-            if (!selectedExample.hasProof())
+            }
+            if (!selectedExample.hasProof()) {
                 throw new IllegalStateException("Selected example has no proof.");
+            }
             fileToLoad = selectedExample.getProofFile();
             setVisible(false);
         });
@@ -345,7 +351,7 @@ public final class ExampleChooser extends JDialog {
 
     private static StringBuilder extractDescription(File file, StringBuilder sb,
             Properties properties) {
-        try (BufferedReader r = new BufferedReader(new FileReader(file))) {
+        try (BufferedReader r = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
             String line;
             boolean emptyLineSeen = false;
             while ((line = r.readLine()) != null) {
@@ -468,7 +474,8 @@ public final class ExampleChooser extends JDialog {
 
         String line;
         final File index = new File(new File(examplesDir, "index"), "samplesIndex.txt");
-        try (BufferedReader br = new BufferedReader(new FileReader(index))) {
+        try (BufferedReader br =
+            new BufferedReader(new FileReader(index, StandardCharsets.UTF_8))) {
             while ((line = br.readLine()) != null) {
                 line = line.trim();
                 if (line.startsWith("#") || line.length() == 0) {

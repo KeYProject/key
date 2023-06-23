@@ -9,7 +9,7 @@ import de.uka.ilkd.key.logic.Named;
 
 public class RuleSet implements Named {
     /** name of the heuristic */
-    private Name name;
+    private final Name name;
 
 
     /**

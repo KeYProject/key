@@ -1,11 +1,12 @@
 package org.key_project.util.testcase.java;
 
-import org.junit.jupiter.api.Test;
-import org.key_project.util.java.StringUtil;
-
-import static org.junit.jupiter.api.Assertions.*;
 import java.util.Comparator;
 
+import org.key_project.util.java.StringUtil;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.key_project.util.java.StringUtil.trim;
 
 /**
@@ -65,7 +66,7 @@ public class StringUtilTest {
     @Test
     public void testTrimRight() {
         // Test empty stuff
-        assertEquals(null, StringUtil.trimRight(null));
+        assertNull(StringUtil.trimRight(null));
         assertEquals("", StringUtil.trimRight(""));
         assertEquals("", StringUtil.trimRight(" "));
         assertEquals("", StringUtil.trimRight("\t"));
@@ -288,5 +289,9 @@ public class StringUtilTest {
             "   \n\t\fa234231hsdafhvnyxcksdaökfhsdaöfhsahövcln231847231 42310897423187sdfsdafbc\n",
             it -> true));
         assertEquals("", trim("", 'c'));
+
+        assertEquals(".", trim("\".\"", '"'));
+        assertEquals(".", trim(".", '"'));
+        assertEquals(".", trim(".", it -> false));
     }
 }
