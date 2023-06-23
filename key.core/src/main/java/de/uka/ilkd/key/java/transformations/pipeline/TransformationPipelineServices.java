@@ -99,7 +99,6 @@ public class TransformationPipelineServices {
             switch (ptype.getType()) {
             case BOOLEAN:
                 return new BooleanLiteralExpr(false);
-            case KEY_BIGINT:
             case BYTE:
             case SHORT:
             case INT:
@@ -111,15 +110,6 @@ public class TransformationPipelineServices {
                 return new CharLiteralExpr((char) 0);
             case FLOAT:
             case DOUBLE:
-            case KEY_REAL:
-                return new DoubleLiteralExpr("0.0");
-
-            case KEY_LOCSET:
-            case KEY_SEQ:
-            case KEY_FREE:
-            case KEY_MAP:
-                throw new IllegalArgumentException("TODO");
-            // return new KeyEscapeExpression(null, new NodeList<>());
             }
         }
         LOGGER.error("makeImplicitMembersExplicit: unknown primitive type: {}", type);

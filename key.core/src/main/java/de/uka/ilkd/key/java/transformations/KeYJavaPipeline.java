@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.java.transformations;
 
+import com.github.javaparser.ast.CompilationUnit;
+import de.uka.ilkd.key.java.transformations.pipeline.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-
-import de.uka.ilkd.key.java.transformations.pipeline.*;
-
-import com.github.javaparser.ast.CompilationUnit;
 
 /**
  * @author Alexander Weigl
@@ -15,6 +16,8 @@ import com.github.javaparser.ast.CompilationUnit;
 public class KeYJavaPipeline {
     private final TransformationPipelineServices pipelineServices;
     private final List<JavaTransformer> steps = new LinkedList<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeYJavaPipeline.class);
+
 
     public KeYJavaPipeline(TransformationPipelineServices pipelineServices) {
         this.pipelineServices = pipelineServices;
@@ -57,7 +60,10 @@ public class KeYJavaPipeline {
     public void apply(Collection<CompilationUnit> compilationUnits) {
         for (JavaTransformer step : steps) {
             for (CompilationUnit compilationUnit : compilationUnits) {
+                long start = System.currentTimeMillis();
                 step.apply(compilationUnit);
+                long stop = System.currentTimeMillis();
+                LOGGER.info("Processed in {} ms: {}", stop - start, compilationUnit.getStorage().get().getPath());
             }
         }
     }

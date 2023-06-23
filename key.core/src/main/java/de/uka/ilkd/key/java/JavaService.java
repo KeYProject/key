@@ -765,7 +765,7 @@ public class JavaService {
             Collection<Path> sourcePaths) {
         this.services = services;
         this.mapping = mapping;
-        programFactory = new JavaParserFactory(bootClassPath, sourcePaths);
+        programFactory = new JavaParserFactory(services, bootClassPath, sourcePaths);
         typeConverter = new JP2KeYTypeConverter(services, programFactory.getTypeSolver(), mapping);
         converter = new JP2KeYConverter(services, mapping, new Namespace<>(), typeConverter);
     }
