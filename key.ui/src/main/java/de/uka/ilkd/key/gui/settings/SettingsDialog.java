@@ -43,7 +43,7 @@ public class SettingsDialog extends JDialog {
         getRootPane().registerKeyboardAction(e -> dispose(),
             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-        setSize(600, 400);
+        setSize(new Dimension(900, 600));
     }
 
     private JPanel createButtonBar() {
