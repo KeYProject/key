@@ -33,17 +33,24 @@ import org.key_project.util.collection.ImmutableSLList;
  * </ol>
  *
  * [scriptDoc "rule"]
- * This command can be used to apply a calculus rule to the currently active
- * open goal. Its general syntax is
- * ```
- * rule "ruleName" on="term" formula="toplevelFormula" occ="occ_number"
- * ```
+ * This command can be used to apply a single calculus rule to the currently active
+ * open goal.
  *
  * ### Parameters:
- * [parameter "on" Term optional]
  *
+ * [parameter "<1st>" "String"] The name of the rule to be applied
+ * [parameter "on" "Term [optional]"] The term to be used as the "find" term in
+ * a taclet with "find".
+ * [parameter "occ" "int [optional]"] The number of the occurrence of *on* in case there
+ * are several applicable rule apps
+ * [parameter "formula" "Term [optional]"] The toplevel formula in which the
+ * find clause is to be searched.
+ * [parameter "matches" "String [optional]"] Instead of giving the toplevl formula
+ * completely, a regular expression can be specified to match the toplevel formula.
+ * [parameter "inst_SCHEMA" "Term [optional]"] If there are further schema variables
+ * to be instantiated parameters prefixed with "inst_" can be added, e.g.
+ * <tt>inst_b="true"</tt> if schema variable b is to be set to the formula true.
  * [/scriptDoc]
- *
  */
 public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
