@@ -413,6 +413,7 @@ public class RuleCommand extends AbstractCommand {
          * Represents a part of a formula (may use Java regular expressions as long as supported by
          * proof script parser). Rule is applied to the sequent formula which matches that string.
          */
+        @Documentation("Instead of giving the toplevl formula completely, a regular expression can be specified to match the toplevel formula.")
         @Option(value = "matches")
         public @Nullable String matches = null;
 

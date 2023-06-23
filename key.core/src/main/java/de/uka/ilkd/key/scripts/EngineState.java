@@ -366,11 +366,11 @@ public class EngineState {
         return exprEvaluator;
     }
 
-    public void putUserData(String key, Object val) {
+    public void putUserData(String key, @Nullable Object val) {
         userData.put(key, val);
     }
 
-    public Object getUserData(String key) {
+    public @Nullable Object getUserData(String key) {
         return userData.get(key);
     }
 }
