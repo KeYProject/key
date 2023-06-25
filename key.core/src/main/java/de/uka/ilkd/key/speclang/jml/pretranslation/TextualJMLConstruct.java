@@ -158,6 +158,8 @@ public abstract class TextualJMLConstruct {
 
         if (start != null && type != null) {
             String filename = start.getTokenSource().getSourceName();
+            if(filename != null && filename.equals("<unknown>"))
+                filename = "unknown";
             int line = start.getLine();
             label.add(new OriginTermLabel(new OriginTermLabel.FileOrigin(type, URI.create("file://"+filename), line)));
         } else if (type != null) {
