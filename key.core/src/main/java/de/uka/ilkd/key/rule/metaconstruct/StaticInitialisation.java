@@ -47,8 +47,7 @@ public class StaticInitialisation extends ProgramTransformer {
             if (ec == null) {
                 // in this case we are at the top level of a diamond
                 // in this case we assume as scope the type of the method prefix
-                m = mr.method(services, mrPrefixType, mr.getMethodSignature(services, null),
-                    mrPrefixType);
+                m = mr.method(services, mrPrefixType, mr.getMethodSignature(services, null));
             } else {
                 m = mr.method(services, mr.determineStaticPrefixType(services, ec), ec);
             }

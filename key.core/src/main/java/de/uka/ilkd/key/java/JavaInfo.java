@@ -24,6 +24,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
+
 /**
  * an instance serves as representation of a Java model underlying a DL formula. This class provides
  * calls to access the elements of the Java model using the KeY data structures only. Implementation
@@ -489,6 +491,7 @@ public final class JavaInfo {
      * @param signature a IList<Type> with the arguments types
      * @return a matching program method
      */
+    @Nullable
     public IProgramMethod getProgramMethod(KeYJavaType classType, String methodName,
             Iterable<KeYJavaType> signature) {
         return kpmi.getProgramMethod(classType, methodName, signature);
@@ -514,6 +517,7 @@ public final class JavaInfo {
         return getProgramMethod(classType, methodName, signature.toImmutableList(), context);
     }
 
+    @Nullable
     private IProgramMethod getProgramMethodFromPartialSignature(KeYJavaType classType,
             String methodName, List<List<KeYJavaType>> signature,
             ImmutableList<KeYJavaType> partialSignature) {
@@ -539,6 +543,7 @@ public final class JavaInfo {
      * KeYJavaTypes must be considered. This is the case for sort int in KeY, which has the
      * following as possible corresponding KeYJavaTypes: char, byte, short, int, long
      */
+    @Nullable
     public IProgramMethod getProgramMethod(KeYJavaType classType, String methodName,
             List<List<KeYJavaType>> signature) {
         ImmutableList<KeYJavaType> partialSignature = ImmutableSLList.nil();
@@ -1336,8 +1341,7 @@ public final class JavaInfo {
             throws NullPointerException {
         String name = method.getName();
         ImmutableArray<KeYJavaType> paramTypes = method.getParamTypes();
-        IProgramMethod canonicalMethod;
-        canonicalMethod = getProgramMethod(context, name, paramTypes);
+        IProgramMethod canonicalMethod = getProgramMethod(context, name, paramTypes);
         if (method.isPublic()) {
             /*
              * Canonical ProgramMmethod can be located in a supertype in case the method is public.

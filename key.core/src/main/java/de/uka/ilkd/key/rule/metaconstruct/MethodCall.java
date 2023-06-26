@@ -162,11 +162,10 @@ public class MethodCall extends ProgramTransformer {
                 // execContext are in different packages we have to
                 // simulate visibility rules like being in prefixType
                 result = mr.method(services, prefixType,
-                    mr.getMethodSignature(services, execContext), prefixType);
+                    mr.getMethodSignature(services, execContext));
             }
         } else {
-            result = mr.method(services, prefixType, mr.getMethodSignature(services, execContext),
-                prefixType);
+            result = mr.method(services, prefixType, mr.getMethodSignature(services, execContext));
         }
         return result;
     }
@@ -212,7 +211,7 @@ public class MethodCall extends ProgramTransformer {
         staticPrefixType = getStaticPrefixType(methRef.getReferencePrefix(), services);
         pm = execContext == null
                 ? methRef.method(services, staticPrefixType,
-                    methRef.getMethodSignature(services, null), staticPrefixType)
+                    methRef.getMethodSignature(services, null))
                 : methRef.method(services, staticPrefixType, execContext);
         if (pm == null) {
             Debug.fail("methodcall:No implementation available for ", methRef);

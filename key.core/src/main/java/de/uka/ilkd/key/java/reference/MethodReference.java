@@ -309,13 +309,15 @@ public class MethodReference extends JavaNonTerminalProgramElement
 
     public IProgramMethod method(Services services, KeYJavaType refPrefixType,
             ExecutionContext ec) {
+        final String methodName = name.toString();
+        var sig = getMethodSignature(services, ec);
         ProgramVariable inst = services.getJavaInfo().getAttribute(
             PipelineConstants.IMPLICIT_ENCLOSING_THIS, ec.getTypeReference().getKeYJavaType());
-        IProgramMethod pm = method(services, refPrefixType, getMethodSignature(services, ec),
-            ec.getTypeReference().getKeYJavaType());
+        IProgramMethod pm =
+                services.getJavaInfo().getProgramMethod(refPrefixType, methodName, sig, ec.getTypeReference().getKeYJavaType());
         while (inst != null && pm == null) {
             KeYJavaType classType = inst.getKeYJavaType();
-            pm = method(services, classType, getMethodSignature(services, ec), classType);
+            pm = services.getJavaInfo().getProgramMethod(classType, methodName, sig);
             if (pm != null) {
                 return pm;
             }
@@ -329,15 +331,12 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * @param services the Services class offering access to metamodel information
      * @param classType the KeYJavaType where to start looking for the declared method
      * @param signature the IList<KeYJavaType> of the arguments types
-     * @param context the KeYJavaType from where the method is called
      * @return the found program method
      */
     public IProgramMethod method(Services services, KeYJavaType classType,
-            ImmutableList<KeYJavaType> signature, KeYJavaType context) {
+            ImmutableList<KeYJavaType> signature) {
         final String methodName = name.toString();
-        IProgramMethod pm =
-            services.getJavaInfo().getProgramMethod(classType, methodName, signature, context);
-        return pm;
+        return services.getJavaInfo().getProgramMethod(classType, methodName, signature);
     }
 
     public boolean implicit() {

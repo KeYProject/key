@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
@@ -384,6 +385,7 @@ public class KeYProgModelInfo {
      *         null if none or more than one IProgramMethod is found (in this case
      *         a debug output is written to console).
      */
+    @Nullable
     public IProgramMethod getProgramMethod(@Nonnull KeYJavaType ct, String name,
             Iterable<KeYJavaType> signature) {
         if (ct.getJavaType() instanceof ArrayType) {
@@ -395,10 +397,9 @@ public class KeYProgModelInfo {
         List<ResolvedType> jpSignature = StreamSupport.stream(signature.spliterator(), false)
                 .map(this::getJavaParserType).toList();
         var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);
-        var declaration = method.getDeclaration()
-                .orElseThrow(() -> new NoSuchElementException(
-                    "Unresolved method " + name + " in type " + ct.getJavaType()));
-        return (IProgramMethod) mapping.resolvedDeclarationToKeY(declaration).orElseThrow();
+        return method.getDeclaration()
+                .map(d -> (IProgramMethod) mapping.resolvedDeclarationToKeY(d).orElseThrow())
+                .orElse(null);
     }
 
     /**

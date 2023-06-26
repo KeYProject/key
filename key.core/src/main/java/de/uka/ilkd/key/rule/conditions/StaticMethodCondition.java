@@ -83,8 +83,7 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
                 // we are only interested in the signature. The method
                 // must be declared in the static context.
             } else { // no execution context
-                method = mr.method(services, prefixType, mr.getMethodSignature(services, ec),
-                    prefixType);
+                method = mr.method(services, prefixType, mr.getMethodSignature(services, ec));
             }
             if (method == null) {
                 return false;
