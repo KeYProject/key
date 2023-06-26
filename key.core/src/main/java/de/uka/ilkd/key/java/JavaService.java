@@ -580,24 +580,32 @@ public class JavaService {
             }
 
             Type javaType = var.getKeYJavaType().getJavaType();
-            if (javaType == null)
+            if (javaType == null) {
                 continue;
+            }
+
             var spec = new VariableDeclarator(name2typeReference(javaType.getFullName()),
                 var.name().toString());
-            var field = new FieldDeclaration(new NodeList<>(), spec);
 
+            FieldSpecification keySpec;
+            var existingSpec = lookupVarSpec(var);
+            if (existingSpec.isPresent()) {
+                keySpec = (FieldSpecification) existingSpec.get();
+            } else {
+                keySpec = new FieldSpecification(var);
+                mapping.put(spec, keySpec);
+            }
+
+            var field = new FieldDeclaration(new NodeList<>(), spec);
             classContext.addMember(field);
 
-            if (lookupVarSpec(var).isEmpty()) {
-                var keySpec = new FieldSpecification(var);
-                var keyField = new de.uka.ilkd.key.java.declaration.FieldDeclaration(
-                    new Modifier[0],
-                    new TypeRef(var.getKeYJavaType()),
-                    new FieldSpecification[] { keySpec },
-                    false);
-                mapping.put(spec, keySpec);
-                mapping.put(field, keyField);
-            }
+            var keyField = new de.uka.ilkd.key.java.declaration.FieldDeclaration(
+                new Modifier[0],
+                new TypeRef(var.getKeYJavaType()),
+                new FieldSpecification[] { keySpec },
+                false);
+
+            mapping.put(field, keyField);
         }
     }
 
