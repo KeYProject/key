@@ -1,7 +1,8 @@
 package org.key_project.util;
 
-import org.jspecify.annotations.NullMarked;
 import org.key_project.util.java.StringUtil;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Helper functions for {@link String}s

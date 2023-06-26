@@ -5,8 +5,12 @@ import java.util.Comparator;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
 import javax.swing.*;
+
+import org.checkerframework.checker.nullness.qual.AssertNonNullIfNonNull;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -14,6 +18,7 @@ import javax.swing.*;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public final class StringUtil {
     /** Pattern for newlines */
     private static final Pattern NEWLINE_PATTERN = Pattern.compile("(\\r\\n|\\r|\\n)");
@@ -74,7 +79,7 @@ public final class StringUtil {
      * @param text The text to check.
      * @return {@code true} = text is {@code null} or empty, {@code false} = text is not empty.
      */
-    public static boolean isEmpty(String text) {
+    public static boolean isEmpty(@Nullable String text) {
         return text == null || text.isEmpty();
     }
 
@@ -85,7 +90,7 @@ public final class StringUtil {
      * @return {@code true} = text is {@code null} or trimmed empty, {@code false} = text is not
      *         empty.
      */
-    public static boolean isTrimmedEmpty(String text) {
+    public static boolean isTrimmedEmpty(@Nullable String text) {
         return text == null || text.trim().isEmpty();
     }
 
@@ -95,7 +100,7 @@ public final class StringUtil {
      * @param text The text.
      * @return The trimmed text.
      */
-    public static String trim(String text) {
+    public static @Nullable String trim(@Nullable String text) {
         return text != null ? text.trim() : null;
     }
 
@@ -105,7 +110,8 @@ public final class StringUtil {
      * @param text The text to convert.
      * @return The text in lower case or {@code null} if the given text is {@code null}.
      */
-    public static String toLowerCase(String text) {
+    public static @AssertNonNullIfNonNull("text") @Nullable String toLowerCase(
+            @Nullable String text) {
         return text != null ? text.toLowerCase() : null;
     }
 
@@ -153,7 +159,7 @@ public final class StringUtil {
      *         {@code false} if at least one string is {@code null} or the string does not contain
      *         the substring.
      */
-    public static boolean contains(String string, CharSequence substring) {
+    public static boolean contains(@Nullable String string, @Nullable CharSequence substring) {
         return string != null && substring != null && string.contains(substring);
     }
 
@@ -168,7 +174,7 @@ public final class StringUtil {
      *
      * @author Mattias Ulbrich (under GPL)
      */
-    public static String wrapLines(String string, int length) {
+    public static @NonNull String wrapLines(@NonNull String string, int length) {
         char[] c = string.toCharArray();
         WrapUtils.wrapLines(c, length);
         return new String(c);
@@ -184,7 +190,7 @@ public final class StringUtil {
      *
      * @author Mattias Ulbrich (under GPL)
      */
-    public static String wrapLines(String string) {
+    public static @NonNull String wrapLines(@NonNull String string) {
         return wrapLines(string, 100);
     }
 
@@ -195,7 +201,7 @@ public final class StringUtil {
      * @param text The text to convert.
      * @return The single lined text.
      */
-    public static String toSingleLinedString(String text) {
+    public static @Nullable String toSingleLinedString(@Nullable String text) {
         return replaceAll(text, new char[] { '\n', '\r', '\t' }, ' ');
     }
 
@@ -207,7 +213,8 @@ public final class StringUtil {
      * @param toReplace The sign to replace with.
      * @return The new created {@link String}.
      */
-    public static String replaceAll(String text, char[] toSearch, char toReplace) {
+    public static @Nullable String replaceAll(@Nullable String text, char[] toSearch,
+            char toReplace) {
         if (text != null && toSearch != null) {
             // Sort toSearch
             Arrays.sort(toSearch);
@@ -232,7 +239,7 @@ public final class StringUtil {
      * @param second The second {@link String}.
      * @return {@code true} equal ignoring whitespace, {@code false} different.
      */
-    public static boolean equalIgnoreWhiteSpace(String first, String second) {
+    public static boolean equalIgnoreWhiteSpace(@Nullable String first, @Nullable String second) {
         if (first != null) {
             if (second != null) {
                 char[] firstContent = first.toCharArray();
@@ -295,7 +302,8 @@ public final class StringUtil {
      * @return The created text.
      * @throws IllegalArgumentException If the text is already longer as the given length
      */
-    public static String fillString(String text, char leadingCharacter, int length)
+    public static @NonNull String fillString(@Nullable String text, char leadingCharacter,
+            int length)
             throws IllegalArgumentException {
         StringBuilder sb = new StringBuilder();
         if (text != null) {
@@ -322,7 +330,8 @@ public final class StringUtil {
      * @param text The text to trim its right side.
      * @return The trimmed text.
      */
-    public static String trimRight(String text) {
+    public static @AssertNonNullIfNonNull("text") @Nullable String trimRight(
+            @Nullable String text) {
         if (text != null) {
             char[] content = text.toCharArray();
             int newLength = content.length;
@@ -342,7 +351,8 @@ public final class StringUtil {
      * @param maxLength The maximal length to ensure.
      * @return The text considering the maximal length.
      */
-    public static String chop(String text, int maxLength) {
+    public static @AssertNonNullIfNonNull("text") @Nullable String chop(@Nullable String text,
+            int maxLength) {
         if (text != null && text.length() > maxLength) {
             if (maxLength <= 0) {
                 return EMPTY_STRING;
@@ -368,11 +378,11 @@ public final class StringUtil {
      * @return {@code true} {@link Object} is {@link String} with given prefix, {@code false}
      *         otherwise.
      */
-    public static boolean startsWith(Object obj, String prefix) {
+    public static boolean startsWith(@Nullable Object obj, @Nullable String prefix) {
         return obj instanceof String && prefix != null && ((String) obj).startsWith(prefix);
     }
 
-    public static boolean isNumber(String val) {
+    public static boolean isNumber(@NonNull String val) {
         try {
             Long.parseLong(val);
         } catch (NumberFormatException e) {
@@ -389,8 +399,8 @@ public final class StringUtil {
      *
      * The given predicate test the characters, if true the character is removed.
      */
-    @Nonnull
-    public static String trim(@Nonnull String text, @Nonnull Predicate<Character> predicate) {
+    public static @NonNull String trim(@NonNull String text,
+            @NonNull Predicate<Character> predicate) {
         int first = 0;
         int last = text.length() - 1;
         char[] value = text.toCharArray();
@@ -409,8 +419,8 @@ public final class StringUtil {
      *
      * @see #trim(String, Predicate)
      */
-    @Nonnull
-    public static String trim(String text, char c) {
+
+    public static @NonNull String trim(@NonNull String text, char c) {
         return trim(text, it -> it == c);
     }
 
@@ -419,8 +429,8 @@ public final class StringUtil {
      *
      * @see #trim(String, Predicate)
      */
-    @Nonnull
-    public static String trim(String text, String chars) {
+
+    public static @NonNull String trim(@NonNull String text, @NonNull String chars) {
         return trim(text, it -> chars.indexOf(it) >= 0);
     }
 
@@ -431,7 +441,7 @@ public final class StringUtil {
      * @param with with
      * @return the normalized text.
      */
-    public static String replaceNewlines(String text, String with) {
+    public static @NonNull String replaceNewlines(@NonNull String text, String with) {
         return NEWLINE_PATTERN.matcher(text).replaceAll(with);
     }
 
@@ -442,7 +452,7 @@ public final class StringUtil {
      * @param s string to search in
      * @param word string to be searched for
      */
-    public static boolean containsWholeWord(String s, String word) {
+    public static boolean containsWholeWord(@NonNull String s, @NonNull String word) {
         Pattern p = Pattern.compile("\\b" + word + "\\b");
         Matcher m = p.matcher(s);
         return m.find();
@@ -462,7 +472,7 @@ public final class StringUtil {
      * @param comment
      * @return
      */
-    public static boolean isJMLComment(String comment) {
+    public static boolean isJMLComment(@NonNull String comment) {
         try {
             return (comment.startsWith("/*@") || comment.startsWith("//@")
                     || comment.startsWith("/*+KeY@") || comment.startsWith("//+KeY@")
