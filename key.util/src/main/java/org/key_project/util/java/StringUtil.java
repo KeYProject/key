@@ -467,9 +467,9 @@ public final class StringUtil {
             return (comment.startsWith("/*@") || comment.startsWith("//@")
                     || comment.startsWith("/*+KeY@") || comment.startsWith("//+KeY@")
                     || (comment.startsWith("/*-") && !comment.startsWith("KeY", 3)
-                    && comment.contains("@"))
+                            && comment.contains("@"))
                     || (comment.startsWith("//-") && !comment.startsWith("KeY", 3)
-                    && comment.contains("@")));
+                            && comment.contains("@")));
         } catch (IndexOutOfBoundsException e) {
             return false;
         }

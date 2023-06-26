@@ -11,7 +11,8 @@ import org.key_project.util.java.StringUtil;
 public class Strings {
     /**
      * @deprecated This class has been merged with {@link org.key_project.util.java.StringUtil}.
-     * Call {@link org.key_project.util.java.StringUtil#containsWholeWord(String, String)}
+     *             Call
+     *             {@link org.key_project.util.java.StringUtil#containsWholeWord(String, String)}
      */
     @Deprecated
     public static boolean containsWholeWord(String s, String word) {
@@ -20,8 +21,9 @@ public class Strings {
 
     /**
      * @deprecated This class has been merged with {@link org.key_project.util.java.StringUtil}.
-     * Call {@link org.key_project.util.java.StringUtil#isJMLComment(String)}
+     *             Call {@link org.key_project.util.java.StringUtil#isJMLComment(String)}
      */
+    @Deprecated
     public static boolean isJMLComment(String comment) {
         return StringUtil.isJMLComment(comment);
     }
