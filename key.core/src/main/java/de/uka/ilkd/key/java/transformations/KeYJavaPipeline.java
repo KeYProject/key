@@ -1,13 +1,14 @@
 package de.uka.ilkd.key.java.transformations;
 
-import com.github.javaparser.ast.CompilationUnit;
-import de.uka.ilkd.key.java.transformations.pipeline.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
+import de.uka.ilkd.key.java.transformations.pipeline.*;
+
+import com.github.javaparser.ast.CompilationUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Alexander Weigl
@@ -63,7 +64,10 @@ public class KeYJavaPipeline {
                 long start = System.currentTimeMillis();
                 step.apply(compilationUnit);
                 long stop = System.currentTimeMillis();
-                LOGGER.info("Processed in {} ms: {}", stop - start, compilationUnit.getStorage().get().getPath());
+                if (compilationUnit.getStorage().isPresent()) {
+                    LOGGER.info("Processed in {} ms: {}", stop - start,
+                        compilationUnit.getStorage().get().getPath());
+                }
             }
         }
     }

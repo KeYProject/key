@@ -55,6 +55,7 @@ import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.resolution.types.ResolvedVoidType;
+import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
 
 import static java.lang.String.format;
 
@@ -396,7 +397,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         }
 
         final var name = n.getNameAsString();
-        if(name.startsWith("\\")) {
+        if (name.startsWith("\\")) {
             JavaInfo ji = services.getJavaInfo();
             return new TypeRef(ji.getPrimitiveKeYJavaType(name));
         }
@@ -554,17 +555,17 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             var kjt = getKeYJavaType(rtype);
 
             var descriptor =
-                    "L" + n.getScope().toString().replace(".", "/") + "/" + n.getNameAsString() + ";";
+                "L" + n.getScope().toString().replace(".", "/") + "/" + n.getNameAsString() + ";";
             boolean notFullyQualifiedName = !rtype.toDescriptor().equals(descriptor);
             ProgramVariable variable = new LocationVariable(
-                    new ProgramElementName(n.getNameAsString()), kjt);
+                new ProgramElementName(n.getNameAsString()), kjt);
             if (notFullyQualifiedName) { // regular field access
                 ReferencePrefix prefix = accept(n.getScope());
                 return new FieldReference(pi, c, variable, prefix);
             } else {
                 return new FieldReference(pi, c, variable, translatePackageReference(n.getScope()));
             }
-        }catch (UnsolvedSymbolException e) {
+        } catch (UnsolvedSymbolException e) {
             throw e;
         }
     }
@@ -596,6 +597,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(FieldDeclaration n, Void arg) {
+        var existing = mapping.nodeToKeY(n);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
         var pi = createPositionInfo(n);
         var c = createComments(n);
         var isInInterface = parentIsInterface(n);
@@ -756,15 +761,27 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             return lookupSchemaVariable(n.getName());
         }
 
-        try {
-            ResolvedType rtype = n.calculateResolvedType();
-
-            var type = getKeYJavaType(rtype);
-            // TODO weigl find declaraton with n.resolve()
+        var target = n.resolve();
+        if (target.toAst().isEmpty()) {
+            var type = getKeYJavaType(target.getType());
             return new LocationVariable(new ProgramElementName(n.getNameAsString()), type);
-        } catch (UnsolvedSymbolException e) {
-            throw e; //debugging purpose
         }
+
+        var ast = target.toAst().get();
+        // Make sure the field is already converted
+        var other = (VariableDeclaration) mapping.nodeToKeY(ast)
+                .orElseGet(() -> accept(ast));
+        if (other.getVariables().size() == 1) {
+            return other.getVariables().get(0).getProgramVariable();
+        }
+        if (!(target instanceof JavaParserFieldDeclaration)) {
+            reportUnsupportedElement(target.toAst().get());
+            return null;
+        }
+        // Field declarations can have multiple variables
+        var decl = ((JavaParserFieldDeclaration) target).getVariableDeclarator();
+        var keyDecl = (VariableSpecification) mapping.nodeToKeY(decl).orElseThrow();
+        return keyDecl.getProgramVariable();
     }
 
     @Override
@@ -1058,6 +1075,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(VariableDeclarationExpr n, Void arg) {
+        var existing = mapping.nodeToKeY(n);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
         TypeReference type = requireTypeReference(n.getVariable(0).getType());
         var varsList = new ArrayList<VariableSpecification>(n.getVariables().size());
         for (VariableDeclarator v : n.getVariables()) {
@@ -1068,7 +1089,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         var isInInterface = parentIsInterface(n);
-        return new LocalVariableDeclaration(pi, c, modifiers, type, isInInterface, vars);
+        return addToMapping(n,
+            new LocalVariableDeclaration(pi, c, modifiers, type, isInInterface, vars));
     }
 
 

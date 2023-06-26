@@ -553,7 +553,7 @@ public final class JMLTransformer extends JavaTransformer {
             } else if (c instanceof TextualJMLAssertStatement) {
                 statement = transformAssertStatement((TextualJMLAssertStatement) c);
             } else {
-                //throw new SLTranslationException("Unexpected statement " + c);
+                // throw new SLTranslationException("Unexpected statement " + c);
                 continue;
             }
             var target = findInnermostBlock(pe).orElseThrow();

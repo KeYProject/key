@@ -1,15 +1,16 @@
 package de.uka.ilkd.key.java;
 
-import com.github.javaparser.resolution.MethodUsage;
-import com.github.javaparser.resolution.declarations.*;
-import com.github.javaparser.resolution.types.ResolvedReferenceType;
-import com.github.javaparser.resolution.types.ResolvedType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+
+import com.github.javaparser.resolution.MethodUsage;
+import com.github.javaparser.resolution.declarations.*;
+import com.github.javaparser.resolution.types.ResolvedReferenceType;
+import com.github.javaparser.resolution.types.ResolvedType;
 
 /**
  * @author Alexander Weigl

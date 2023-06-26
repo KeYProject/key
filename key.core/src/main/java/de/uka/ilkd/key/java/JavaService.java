@@ -13,7 +13,9 @@ import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.transformations.KeYJavaPipeline;
 import de.uka.ilkd.key.java.transformations.pipeline.ConstantStringExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
@@ -543,7 +545,7 @@ public class JavaService {
      * @param vars a list of variables
      * @return a newly created context.
      */
-    protected TypeScope.JPContext createContext(ImmutableList<ProgramVariable> vars) {
+    protected TypeScope.JPContext createContext(Iterable<ProgramVariable> vars) {
         var classContext = interactClassDecl();
         addProgramVariablesToClassContext(classContext, vars);
         var cu = new CompilationUnit(null, new NodeList<>(), new NodeList<>(classContext), null);
@@ -558,7 +560,7 @@ public class JavaService {
      * @param vars vars to add
      */
     private void addProgramVariablesToClassContext(ClassOrInterfaceDeclaration classContext,
-            ImmutableList<ProgramVariable> vars) {
+            Iterable<ProgramVariable> vars) {
         Set<String> names = new HashSet<>();
 
         for (ProgramVariable var : vars) {
@@ -571,25 +573,31 @@ public class JavaService {
                 /// The program variable "variant" introduced to prove loop termination has sort
                 /// "any" and, hence, no type. Parsing modalities fails on branches on which the
                 /// variable exists. Therefore, it seems better to silently ignore such program
-                /// variables (not making themaccessible) rather than to throw an exception.
+                /// variables (not making them accessible) rather than to throw an exception.
                 /// MU 01.2019
                 // throw new IllegalArgumentException("Variable " + var + " has no type");
                 continue;
             }
 
-            VariableSpecification keyVarSpec =
-                lookupVarSpec(var).orElseGet(() -> new FieldSpecification(var));
-
             Type javaType = var.getKeYJavaType().getJavaType();
             if (javaType == null)
                 continue;
-            String typeName = javaType.getFullName();
-
-
-            var decl = new VariableDeclarator(name2typeReference(typeName), keyVarSpec.getName());
-            var field = new FieldDeclaration(new NodeList<>(), decl);
+            var spec = new VariableDeclarator(name2typeReference(javaType.getFullName()),
+                var.name().toString());
+            var field = new FieldDeclaration(new NodeList<>(), spec);
 
             classContext.addMember(field);
+
+            if (lookupVarSpec(var).isEmpty()) {
+                var keySpec = new FieldSpecification(var);
+                var keyField = new de.uka.ilkd.key.java.declaration.FieldDeclaration(
+                    new Modifier[0],
+                    new TypeRef(var.getKeYJavaType()),
+                    new FieldSpecification[] { keySpec },
+                    false);
+                mapping.put(spec, keySpec);
+                mapping.put(field, keyField);
+            }
         }
     }
 

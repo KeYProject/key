@@ -14,9 +14,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.TacletForTests;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -136,7 +133,7 @@ public class TestJP2KeY {
     public void testReadBlockWithContext() {
         ProgramVariable pv = new LocationVariable(new ProgramElementName("i"),
             TacletForTests.services().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT));
-        ImmutableList<ProgramVariable> list = ImmutableSLList.<ProgramVariable>nil().prepend(pv);
+        var list = Collections.singletonList(pv);
         JavaBlock block = c2k.readBlock("{ i = 2; }", c2k.createContext(list), null);
         ProgramVariable prgVarCmp =
             (ProgramVariable) ((Operator) ((StatementBlock) block.program()).getStatementAt(0))
