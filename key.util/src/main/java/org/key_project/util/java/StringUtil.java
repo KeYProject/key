@@ -111,7 +111,7 @@ public final class StringUtil {
      * @return The text in lower case or {@code null} if the given text is {@code null}.
      */
     public static @PolyNull String toLowerCase(@PolyNull String text) {
-        return text != null ? text.toLowerCase() : null;
+        return text == null ? null : text.toLowerCase();
     }
 
     /**

@@ -1,11 +1,13 @@
 package org.key_project.util.java;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Provides utility methods to work with numbers.
  *
  * @author Martin Hentschel
  */
-@SuppressWarnings("nullness")
+@NullMarked
 public class NumberUtil {
     /**
      * The maximal number of digits of an integer value.

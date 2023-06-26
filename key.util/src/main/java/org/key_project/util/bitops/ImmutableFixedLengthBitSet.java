@@ -1,5 +1,8 @@
 package org.key_project.util.bitops;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 
@@ -9,11 +12,11 @@ import java.util.BitSet;
  *
  * @author Dominic Scheurer
  */
-@SuppressWarnings("nullness")
+@NullMarked
 public class ImmutableFixedLengthBitSet {
 
-    private boolean[] bitSet = null;
-    private int value = -1;
+    private final boolean[] bitSet;
+    private int value;
 
     /**
      * Constructs a new {@link ImmutableFixedLengthBitSet} for the given length. All bits are set to

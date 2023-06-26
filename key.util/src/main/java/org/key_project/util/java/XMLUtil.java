@@ -1,5 +1,9 @@
 package org.key_project.util.java;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -8,7 +12,7 @@ import java.util.Map.Entry;
  *
  * @author Martin Hentschel
  */
-@SuppressWarnings("nullness")
+@NullMarked
 public final class XMLUtil {
     /**
      * Attribute name to store encodings.
@@ -33,7 +37,7 @@ public final class XMLUtil {
      * @param replacer The {@link ITagReplacer} to use.
      * @return The new created text.
      */
-    public static String replaceTags(String text, ITagReplacer replacer) {
+    public static @Nullable String replaceTags(@Nullable String text, @Nullable ITagReplacer replacer) {
         if (text != null && replacer != null) {
             StringBuilder sb = new StringBuilder();
             char[] signs = text.toCharArray();
@@ -50,6 +54,7 @@ public final class XMLUtil {
                         sb.append(sign);
                     }
                 } else {
+                    assert tagSB != null : "@AssumeAssertion(nullness): tagSB must have been intialised already";
                     tagSB.append(sign);
                     if (sign == '>' && !inAttribute) {
                         inTag = false;
@@ -81,7 +86,7 @@ public final class XMLUtil {
          * @param tag The found tag.
          * @return The replacement to use or {@code null} to remove the tag.
          */
-        String replaceTag(String tag);
+        @Nullable String replaceTag(String tag);
     }
 
     /**
@@ -93,7 +98,7 @@ public final class XMLUtil {
      */
     public static class HTMLRendererReplacer implements ITagReplacer {
         @Override
-        public String replaceTag(String tag) {
+        public @Nullable String replaceTag(String tag) {
             if (tag.startsWith("<br")) {
                 return StringUtil.NEW_LINE;
             } else if (tag.startsWith("<li")) {
@@ -118,7 +123,7 @@ public final class XMLUtil {
      * @param text The text to remove tags from.
      * @return The text without tags.
      */
-    public static String removeTags(String text) {
+    public static @Nullable String removeTags(@Nullable String text) {
         if (text != null) {
             StringBuilder sb = new StringBuilder();
             char[] signs = text.toCharArray();
@@ -165,7 +170,7 @@ public final class XMLUtil {
      * @param text The text to encode.
      * @return The encoded text.
      */
-    public static String encodeText(String text) {
+    public static @Nullable String encodeText(@Nullable String text) {
         if (text != null) {
             char[] signs = text.toCharArray();
             StringBuilder sb = new StringBuilder();

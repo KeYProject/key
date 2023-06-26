@@ -1,12 +1,15 @@
 package org.key_project.util;
 
+import org.jspecify.annotations.NullMarked;
+
 import java.util.Random;
 
 /**
  * @author Alexander Weigl
  * @version 1 (06.12.18)
  */
-@SuppressWarnings("nullness")
+
+@NullMarked
 public class RandomName {
     private static final Random random = new Random();
 

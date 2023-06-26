@@ -1,5 +1,6 @@
 package org.key_project.util.java;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This class provides a simple routine that performs line wrapping of strings that may contain long
@@ -13,7 +14,7 @@ package org.key_project.util.java;
  *
  * @author Mattias Ulbrich, Mar 2021
  */
-@SuppressWarnings("nullness")
+@NullMarked
 public class WrapUtils {
 
     /*
