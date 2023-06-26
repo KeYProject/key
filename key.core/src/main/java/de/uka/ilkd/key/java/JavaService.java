@@ -640,25 +640,31 @@ public class JavaService {
      *        interpreted
      * @return the parsed and resolved recoder statement block
      */
-    BlockStmt parseBlock(String input, TypeScope.JPContext context) {
+    Node parseBlock(String input, TypeScope.JPContext context) {
         parseSpecialClasses();
         // TODO javaparser change grammar of the parser to allow blocks without context information
         // Context-block
+        Node original;
         BlockStmt block;
         if (input.contains("..") || input.contains("...")) {
             // TODO weigl further eloborate the situation, how to work with contexts provided?
-            KeyContextStatementBlock blockStmt =
-                unwrapParseResult(programFactory.parseContextBlock(input));
-            block = new BlockStmt(blockStmt.getStatements());
+            var b = unwrapParseResult(programFactory.parseContextBlock(input));
+            original = b;
+            block = new BlockStmt(b.getStatements());
         } else { // Simple Java-block
             block = unwrapParseResult(programFactory.parseStatementBlock(input));
+            original = block;
         }
         // TODO javaparser result unused
         embedMethod(embedBlock(block), context);
         // normalise constant string expressions
         new ConstantStringExpressionEvaluator(createPipelineServices())
                 .apply(context.getClassDeclaration());
-        return block;
+        if (block != original) {
+            var csb = (KeyContextStatementBlock)original;
+            csb.setStatements(block.getStatements());
+        }
+        return original;
     }
 
     private TransformationPipelineServices createPipelineServices() {
