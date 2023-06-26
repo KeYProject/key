@@ -213,7 +213,10 @@ public class TacletPBuilder extends ExpressionBuilder {
                 throw new BuildingException(ctx, e);
             }
         } catch (RuntimeException e) {
-            LOGGER.error("Error in parsing taclet.", e);
+            // TODO javaparser
+            LOGGER.error(
+                "THIS CONSUMES ERRORS! REMOVE BEFORE MERGING \"removal of recoder\"! Error in parsing taclet.",
+                e);
             addWarning(ctx, e, e.getMessage());
         }
         return null;

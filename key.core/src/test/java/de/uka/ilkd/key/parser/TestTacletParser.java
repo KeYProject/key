@@ -366,6 +366,7 @@ public class TestTacletParser {
         // broken taclet with free variable SV in replacewith
         // buggy { find(==>b) replacewith(==>b,z=z) }
 
+        // TODO javaparser this test works, remove the taclet parsing catchall
         String brokenTacletString = "buggy { \\find(==>b)" + "\\replacewith(==>b,z=z) }";
         Assertions.assertThrows(BuildingException.class, () -> {
             parseTaclet(brokenTacletString);

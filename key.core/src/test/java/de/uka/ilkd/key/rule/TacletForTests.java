@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.io.File;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaService;
@@ -27,6 +28,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import org.key_project.util.collection.ImmutableSLList;
 
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
@@ -144,6 +146,12 @@ public class TacletForTests {
         return rules;
     }
 
+    @Nonnull
+    public static NoPosTacletApp lookupTaclet(String name) {
+        var result = getRules().lookup(name);
+        assertNotNull(result, "Failed to find taclet " + name);
+        return result;
+    }
 
     public static Namespace<RuleSet> getHeuristics() {
         return nss.ruleSets();

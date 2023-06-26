@@ -93,7 +93,7 @@ public class TestApplyTaclet {
     @Test
     public void testSuccTacletWithoutIf() {
         Term fma = proof[0].root().sequent().succedent().getFirst().formula();
-        NoPosTacletApp impright = TacletForTests.getRules().lookup("imp_right");
+        NoPosTacletApp impright = TacletForTests.lookupTaclet("imp_right");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(impright);
         Goal goal = createGoal(proof[0].root(), tacletIndex);
@@ -118,7 +118,7 @@ public class TestApplyTaclet {
     public void testAddingRule() {
         Term fma = proof[0].root().sequent().succedent().getFirst().formula();
         NoPosTacletApp imprightadd =
-            TacletForTests.getRules().lookup("TestApplyTaclet_imp_right_add");
+            TacletForTests.lookupTaclet("TestApplyTaclet_imp_right_add");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(imprightadd);
         Goal goal = createGoal(proof[0].root(), tacletIndex);
@@ -163,7 +163,7 @@ public class TestApplyTaclet {
 
     @Test
     public void testSuccTacletAllRight() {
-        NoPosTacletApp allright = TacletForTests.getRules().lookup("all_right");
+        NoPosTacletApp allright = TacletForTests.lookupTaclet("all_right");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(allright);
         Goal goal = createGoal(proof[1].root(), tacletIndex);
@@ -187,7 +187,7 @@ public class TestApplyTaclet {
 
     @Test
     public void testTacletWithIf() {
-        NoPosTacletApp close = TacletForTests.getRules().lookup("close_goal");
+        NoPosTacletApp close = TacletForTests.lookupTaclet("close_goal");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(close);
         Goal goal = createGoal(proof[2].root(), tacletIndex);
@@ -223,7 +223,7 @@ public class TestApplyTaclet {
     @Test
     public void testAntecTacletWithoutIf() {
         Term fma = proof[3].root().sequent().antecedent().getFirst().formula();
-        NoPosTacletApp impleft = TacletForTests.getRules().lookup("imp_left");
+        NoPosTacletApp impleft = TacletForTests.lookupTaclet("imp_left");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(impleft);
         Goal goal = createGoal(proof[3].root(), tacletIndex);
@@ -259,7 +259,7 @@ public class TestApplyTaclet {
     @Test
     public void testRewriteTacletWithoutIf() {
         NoPosTacletApp contradiction =
-            TacletForTests.getRules().lookup("TestApplyTaclet_contradiction");
+            TacletForTests.lookupTaclet("TestApplyTaclet_contradiction");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(contradiction);
         Goal goal = createGoal(proof[0].root(), tacletIndex);
@@ -281,7 +281,7 @@ public class TestApplyTaclet {
 
     @Test
     public void testNoFindTacletWithoutIf() {
-        NoPosTacletApp cut = TacletForTests.getRules().lookup("TestApplyTaclet_cut");
+        NoPosTacletApp cut = TacletForTests.lookupTaclet("TestApplyTaclet_cut");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         Term t_c = TacletForTests.parseTerm("D");
         tacletIndex.add(cut);
@@ -344,12 +344,12 @@ public class TestApplyTaclet {
      *
      *
      * public void testNatAutomatically() { TacletAppIndex index=new TacletAppIndex(new
-     * TacletIndex()); index.addTaclet(TacletForTests.getRules().lookup("close_goal"));
-     * index.addTaclet(TacletForTests.getRules().lookup("imp_left"));
-     * index.addTaclet(TacletForTests.getRules().lookup("imp_right"));
-     * index.addTaclet(TacletForTests.getRules().lookup("not_left"));
-     * index.addTaclet(TacletForTests.getRules().lookup("not_right"));
-     * index.addTaclet(TacletForTests.getRules().lookup ("TestApplyTaclet_predsuccelim"));
+     * TacletIndex()); index.addTaclet(TacletForTests.lookupTaclet("close_goal"));
+     * index.addTaclet(TacletForTests.lookupTaclet("imp_left"));
+     * index.addTaclet(TacletForTests.lookupTaclet("imp_right"));
+     * index.addTaclet(TacletForTests.lookupTaclet("not_left"));
+     * index.addTaclet(TacletForTests.lookupTaclet("not_right"));
+     * index.addTaclet(TacletForTests.lookupTaclet ("TestApplyTaclet_predsuccelim"));
      * index.addTaclet(pluszeroelim); index.addTaclet(zeropluselim); index.addTaclet(succelim);
      * index.addTaclet(switchsecondsucc); index.addTaclet(switchfirstsucc);
      * index.addTaclet(closewitheq); String s=(automaticProof(seq_testNat, index));
@@ -359,7 +359,7 @@ public class TestApplyTaclet {
 
     @Test
     public void testIncompleteNoFindTacletApp() {
-        NoPosTacletApp cut = TacletForTests.getRules().lookup("TestApplyTaclet_cut");
+        NoPosTacletApp cut = TacletForTests.lookupTaclet("TestApplyTaclet_cut");
         assertFalse(cut.complete(), "TacletApp should not be complete, as b is not instantiated");
         SchemaVariable b = TacletForTests.getSchemaVariables().lookup(new Name("b"));
         assertTrue(cut.uninstantiatedVars().contains(b),
@@ -368,7 +368,7 @@ public class TestApplyTaclet {
 
     @Test
     public void testIncompleteSuccTacletApp() {
-        TacletApp orright = TacletForTests.getRules().lookup("or_right");
+        TacletApp orright = TacletForTests.lookupTaclet("or_right");
         assertFalse(orright.complete(),
             "TacletApp should not be complete, as SVs are not instantiated");
 
@@ -393,7 +393,7 @@ public class TestApplyTaclet {
 
     @Test
     public void testPrgTacletApp() {
-        NoPosTacletApp wh0 = TacletForTests.getRules().lookup("TestApplyTaclet_while0");
+        NoPosTacletApp wh0 = TacletForTests.lookupTaclet("TestApplyTaclet_while0");
         SchemaVariable e2 = TacletForTests.getSchemaVariables().lookup(new Name("#e2"));
         SchemaVariable p1 = TacletForTests.getSchemaVariables().lookup(new Name("#p1"));
         // wh0=wh0.addInstantiation(e2,TacletForTests.parseExpr("boolean", "false"));
@@ -425,7 +425,7 @@ public class TestApplyTaclet {
         // resulted in
         // ==> , b==>b instead of
         // b==> , b==>b
-        NoPosTacletApp cdr = TacletForTests.getRules().lookup("TestApplyTaclet_cut_direct_r");
+        NoPosTacletApp cdr = TacletForTests.lookupTaclet("TestApplyTaclet_cut_direct_r");
 
         Sequent seq = proof[1].root().sequent();
         PosInOccurrence pio =
@@ -461,7 +461,7 @@ public class TestApplyTaclet {
         // the last time the bug above had been fixed, the hidden
         // taclets got broken (did not hide anymore)
         // also known as bug #176
-        NoPosTacletApp hide_r = TacletForTests.getRules().lookup("TestApplyTaclet_hide_r");
+        NoPosTacletApp hide_r = TacletForTests.lookupTaclet("TestApplyTaclet_hide_r");
 
         Sequent seq = proof[1].root().sequent();
         PosInOccurrence pio =
@@ -483,7 +483,7 @@ public class TestApplyTaclet {
     @Test
     public void testBugID177() {
         // bug #177
-        NoPosTacletApp al = TacletForTests.getRules().lookup("and_left");
+        NoPosTacletApp al = TacletForTests.lookupTaclet("and_left");
 
         Sequent seq = proof[5].root().sequent();
         PosInOccurrence pio =
@@ -510,7 +510,7 @@ public class TestApplyTaclet {
     public void testBugID188() {
         // bug #188
 
-        NoPosTacletApp al = TacletForTests.getRules().lookup("and_left");
+        NoPosTacletApp al = TacletForTests.lookupTaclet("and_left");
         Sequent seq = proof[7].root().sequent();
         PosInOccurrence pio =
             new PosInOccurrence(seq.antecedent().get(0), PosInTerm.getTopLevel(), true);
@@ -552,7 +552,7 @@ public class TestApplyTaclet {
     @Test
     public void testModalityLevel0() {
         Services services = TacletForTests.services();
-        NoPosTacletApp apply_eq_nonrigid = TacletForTests.getRules().lookup("apply_eq_nonrigid");
+        NoPosTacletApp apply_eq_nonrigid = TacletForTests.lookupTaclet("apply_eq_nonrigid");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(apply_eq_nonrigid);
         Goal goal = createGoal(proof[8].root(), tacletIndex);
@@ -583,7 +583,7 @@ public class TestApplyTaclet {
     @Test
     public void testModalityLevel1() {
         Services services = TacletForTests.services();
-        NoPosTacletApp apply_eq_nonrigid = TacletForTests.getRules().lookup("apply_eq_nonrigid");
+        NoPosTacletApp apply_eq_nonrigid = TacletForTests.lookupTaclet("apply_eq_nonrigid");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(apply_eq_nonrigid);
         Goal goal = createGoal(proof[10].root(), tacletIndex);
@@ -640,7 +640,7 @@ public class TestApplyTaclet {
     public void testModalityLevel2() {
         Services services = TacletForTests.services();
         NoPosTacletApp make_insert_eq_nonrigid =
-            TacletForTests.getRules().lookup("make_insert_eq_nonrigid");
+            TacletForTests.lookupTaclet("make_insert_eq_nonrigid");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(make_insert_eq_nonrigid);
         Goal goal = createGoal(proof[12].root(), tacletIndex);
@@ -676,7 +676,7 @@ public class TestApplyTaclet {
     @Test
     public void testBugEmptyBlock() {
         NoPosTacletApp testApplyTaclet_wrap_blocks_two_empty_lists =
-            TacletForTests.getRules().lookup("TestApplyTaclet_wrap_blocks_two_empty_lists");
+            TacletForTests.lookupTaclet("TestApplyTaclet_wrap_blocks_two_empty_lists");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(testApplyTaclet_wrap_blocks_two_empty_lists);
         Goal goal = createGoal(proof[14].root(), tacletIndex);
@@ -708,8 +708,8 @@ public class TestApplyTaclet {
 
 
     private void doTestCatchList(int p_proof) {
-        NoPosTacletApp test_catch_list0 = TacletForTests.getRules().lookup("test_catch_list0");
-        NoPosTacletApp test_catch_list1 = TacletForTests.getRules().lookup("test_catch_list1");
+        NoPosTacletApp test_catch_list0 = TacletForTests.lookupTaclet("test_catch_list0");
+        NoPosTacletApp test_catch_list1 = TacletForTests.lookupTaclet("test_catch_list1");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(test_catch_list0);
         tacletIndex.add(test_catch_list1);
@@ -752,7 +752,7 @@ public class TestApplyTaclet {
     public void testTacletVariableCollector() {
         TacletSchemaVariableCollector coll = new TacletSchemaVariableCollector();
         NoPosTacletApp tacletApp =
-            TacletForTests.getRules().lookup("testUninstantiatedSVCollector");
+            TacletForTests.lookupTaclet("testUninstantiatedSVCollector");
         assertNotNull(tacletApp);
         Taclet t = tacletApp.taclet();
         coll.visit(t, false);
@@ -781,7 +781,7 @@ public class TestApplyTaclet {
     @Test
     public void testCompleteContextAddBug() {
         NoPosTacletApp app =
-            TacletForTests.getRules().lookup("TestApplyTaclet_allPullOutBehindDiamond");
+            TacletForTests.lookupTaclet("TestApplyTaclet_allPullOutBehindDiamond");
 
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(app);
@@ -813,7 +813,7 @@ public class TestApplyTaclet {
      */
     @Test
     public void testContextAdding() {
-        NoPosTacletApp app = TacletForTests.getRules().lookup("TestApplyTaclet_addEmptyStatement");
+        NoPosTacletApp app = TacletForTests.lookupTaclet("TestApplyTaclet_addEmptyStatement");
 
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(app);
@@ -849,7 +849,7 @@ public class TestApplyTaclet {
      */
     @Test
     public void testRemoveEmptyBlock() {
-        NoPosTacletApp app = TacletForTests.getRules().lookup("TestApplyTaclet_removeEmptyBlock");
+        NoPosTacletApp app = TacletForTests.lookupTaclet("TestApplyTaclet_removeEmptyBlock");
 
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(app);
@@ -880,7 +880,7 @@ public class TestApplyTaclet {
 
     @Test
     public void testAddExistingFormulaSucc() {
-        NoPosTacletApp app = TacletForTests.getRules().lookup("TestApplyTaclet_cut_direct");
+        NoPosTacletApp app = TacletForTests.lookupTaclet("TestApplyTaclet_cut_direct");
 
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(app);
@@ -919,7 +919,7 @@ public class TestApplyTaclet {
 
     @Test
     public void testAddExistingFormulaAntec() {
-        NoPosTacletApp app = TacletForTests.getRules().lookup("TestApplyTaclet_cut_direct");
+        NoPosTacletApp app = TacletForTests.lookupTaclet("TestApplyTaclet_cut_direct");
 
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(app);
@@ -961,8 +961,8 @@ public class TestApplyTaclet {
     public void testAddExistingFormulaTwoInSucc() {
 
         // setup
-        NoPosTacletApp orRight = TacletForTests.getRules().lookup("or_right");
-        NoPosTacletApp app = TacletForTests.getRules().lookup("TestApplyTaclet_cut_direct");
+        NoPosTacletApp orRight = TacletForTests.lookupTaclet("or_right");
+        NoPosTacletApp app = TacletForTests.lookupTaclet("TestApplyTaclet_cut_direct");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(app);
         tacletIndex.add(orRight);
@@ -1021,8 +1021,8 @@ public class TestApplyTaclet {
     public void testAddExistingFormulaTwoInSucc2() {
 
         // setup
-        NoPosTacletApp orRight = TacletForTests.getRules().lookup("or_right");
-        NoPosTacletApp app = TacletForTests.getRules().lookup("TestApplyTaclet_cut_direct");
+        NoPosTacletApp orRight = TacletForTests.lookupTaclet("or_right");
+        NoPosTacletApp app = TacletForTests.lookupTaclet("TestApplyTaclet_cut_direct");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(app);
         tacletIndex.add(orRight);
@@ -1080,8 +1080,8 @@ public class TestApplyTaclet {
     public void testAddExistingFormulaTwoInAntec() {
 
         // setup
-        NoPosTacletApp andLeft = TacletForTests.getRules().lookup("and_left");
-        NoPosTacletApp app = TacletForTests.getRules().lookup("TestApplyTaclet_cut_direct");
+        NoPosTacletApp andLeft = TacletForTests.lookupTaclet("and_left");
+        NoPosTacletApp app = TacletForTests.lookupTaclet("TestApplyTaclet_cut_direct");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(app);
         tacletIndex.add(andLeft);
@@ -1140,8 +1140,8 @@ public class TestApplyTaclet {
     public void testAddExistingFormulaTwoInAntec2() {
 
         // setup
-        NoPosTacletApp andLeft = TacletForTests.getRules().lookup("and_left");
-        NoPosTacletApp app = TacletForTests.getRules().lookup("TestApplyTaclet_cut_direct");
+        NoPosTacletApp andLeft = TacletForTests.lookupTaclet("and_left");
+        NoPosTacletApp app = TacletForTests.lookupTaclet("TestApplyTaclet_cut_direct");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(app);
         tacletIndex.add(andLeft);

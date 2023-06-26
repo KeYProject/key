@@ -1,9 +1,6 @@
 package de.uka.ilkd.key.java;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 
@@ -100,5 +97,20 @@ public class ResolvedLogicalType implements ResolvedReferenceTypeDeclaration {
 
     public KeYJavaType getKeYJavaType() {
         return keYJavaType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        ResolvedLogicalType that = (ResolvedLogicalType) o;
+        return Objects.equals(keYJavaType, that.keYJavaType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(keYJavaType);
     }
 }
