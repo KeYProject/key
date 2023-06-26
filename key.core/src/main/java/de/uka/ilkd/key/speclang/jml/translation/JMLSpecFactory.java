@@ -65,7 +65,7 @@ public class JMLSpecFactory {
     protected final de.uka.ilkd.key.logic.TermBuilder tb;
     protected final de.uka.ilkd.key.java.Services services;
     protected final ContractFactory cf;
-    private int invCounter;
+    private final Map<KeYJavaType, Integer> invCounter = new IdentityHashMap<>();
     /**
      * Used to check that there is only one represents clause per type and field.
      */
@@ -221,12 +221,12 @@ public class JMLSpecFactory {
     // -------------------------------------------------------------------------
 
     protected String getDefaultInvName(String name, KeYJavaType kjt) {
-        invCounter++;
         if (name == null) {
-            return "JML class invariant nr " + (invCounter - 1) + " in " + kjt.getName();
+            int number = invCounter.getOrDefault(kjt, 1);
+            invCounter.put(kjt, number + 1);
+            return "JML class invariant no " + number + " in " + kjt.getName();
         } else {
-            return "JML class invariant \"" + name + "\" in " + kjt.getName() + " (nr "
-                + (invCounter - 1) + ")";
+            return "JML class invariant \"" + name + "\" in " + kjt.getName();
         }
     }
 
