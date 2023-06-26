@@ -315,17 +315,13 @@ public class MergeRuleTests {
         assertTrue(proofFile.exists(),
             "Proof file: " + proofFile.getAbsolutePath() + " could not be found!");
 
-        try {
+        return Assertions.assertDoesNotThrow(() -> {
             KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
                 proofFile.toPath(), null, null, null, true);
             Proof proof = environment.getLoadedProof();
-            Assertions.assertNotNull(proof);
-
+            Assertions.assertNotNull(proof, "Loaded proof should not be null");
             return proof;
-        } catch (ProblemLoaderException e) {
-            Assertions.fail("Proof could not be loaded", e);
-            return null;
-        }
+        });
     }
 
     private static class IncompleteRuleAppException extends RuntimeException {

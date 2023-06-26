@@ -335,7 +335,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
     }
 
     @Override
-    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm)
+    public List<SpecificationElement> extractMethodSpecs(IProgramMethod pm)
             throws SLTranslationException {
         return extractMethodSpecs(pm, true);
     }
@@ -347,9 +347,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * @param addInvariant whether to add <i>static</i> invariants to pre- and post-conditions
      */
     @Override
-    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm,
+    public List<SpecificationElement> extractMethodSpecs(IProgramMethod pm,
             boolean addInvariant) throws SLTranslationException {
-        ImmutableSet<SpecificationElement> result = DefaultImmutableSet.nil();
+        List<SpecificationElement> result = new ArrayList<>();
 
         // get type declaration, file name
         TypeDeclaration td = (TypeDeclaration) pm.getContainerType().getJavaType();
@@ -492,7 +492,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             try {
                 ImmutableSet<Contract> contracts = jsf.createJMLOperationContracts(pm, specCase);
                 for (Contract contract : contracts) {
-                    result = result.add(contract);
+                    result.add(contract);
                 }
             } catch (SLWarningException e) {
                 warnings = warnings.append(e.getWarning());

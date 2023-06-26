@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.speclang;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
@@ -20,10 +22,10 @@ public interface SpecExtractor {
     /**
      * Returns the operation contracts for the passed operation.
      */
-    ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm)
+    List<SpecificationElement> extractMethodSpecs(IProgramMethod pm)
             throws SLTranslationException;
 
-    ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm,
+    List<SpecificationElement> extractMethodSpecs(IProgramMethod pm,
             boolean addInvariant) throws SLTranslationException;
 
     /**

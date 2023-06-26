@@ -1689,7 +1689,7 @@ public final class SpecificationRepository {
         mergeContracts.put(mps, DefaultImmutableSet.nil());
     }
 
-    public void addSpecs(ImmutableSet<SpecificationElement> specs) {
+    public void addSpecs(Iterable<SpecificationElement> specs) {
         for (SpecificationElement spec : specs) {
             if (spec instanceof Contract) {
                 addContract((Contract) spec);

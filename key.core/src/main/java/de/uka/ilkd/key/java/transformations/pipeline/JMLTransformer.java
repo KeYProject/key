@@ -515,13 +515,13 @@ public final class JMLTransformer extends JavaTransformer {
 
     private static Optional<BlockStmt> findInnermostBlock(Node node) {
         while (true) {
+            node = node.getParentNode().get();
             if (node instanceof BlockStmt) {
                 return Optional.of((BlockStmt) node);
             }
             if (node.getParentNode().isEmpty()) {
                 return Optional.empty();
             }
-            node = node.getParentNode().get();
         }
     }
 

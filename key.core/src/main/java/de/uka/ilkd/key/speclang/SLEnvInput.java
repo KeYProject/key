@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AbstractEnvInput;
@@ -157,7 +158,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     private void addLoopContracts(SpecExtractor specExtractor,
-            final SpecificationRepository specRepos, final KeYJavaType kjt, final IProgramMethod pm)
+            final SpecificationRepository specRepos, final IProgramMethod pm)
             throws ProofInputException {
         // Loop contracts on loops.
         // For loop contracts on blocks, see addBlockAndLoopContracts.
@@ -200,16 +201,14 @@ public final class SLEnvInput extends AbstractEnvInput {
 
     private void addMergePointStatements(SpecExtractor specExtractor,
             final SpecificationRepository specRepos, final IProgramMethod pm,
-            final ImmutableSet<SpecificationElement> methodSpecs) throws ProofInputException {
+            final ImmutableList<ProgramVariable> methodParameters) throws ProofInputException {
         // merge point statements
         final JavaASTCollector mpsCollector =
             new JavaASTCollector(pm.getBody(), MergePointStatement.class);
         mpsCollector.start();
         for (ProgramElement mps : mpsCollector.getNodes()) {
-            final ImmutableSet<MergeContract> mergeContracts = //
-                specExtractor.extractMergeContracts(pm, (MergePointStatement) mps,
-                    ((Contract) methodSpecs.iterator().next()).getOrigVars().params);
-
+            final ImmutableSet<MergeContract> mergeContracts = specExtractor
+                    .extractMergeContracts(pm, (MergePointStatement) mps, methodParameters);
             mergeContracts.forEach(specRepos::addMergeContract);
         }
     }
@@ -300,14 +299,16 @@ public final class SLEnvInput extends AbstractEnvInput {
                 javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
             for (IProgramMethod pm : pms) {
                 // contracts
-                final ImmutableSet<SpecificationElement> methodSpecs =
+                final List<SpecificationElement> methodSpecs =
                     specExtractor.extractMethodSpecs(pm, staticInvPresent);
+                var iter = methodSpecs.iterator();
+                var params = iter.hasNext() ? ((Contract) iter.next()).getOrigVars().params : null;
                 specRepos.addSpecs(methodSpecs);
 
                 addLoopInvariants(specExtractor, specRepos, kjt, pm);
-                addLoopContracts(specExtractor, specRepos, kjt, pm);
+                addLoopContracts(specExtractor, specRepos, pm);
                 addBlockAndLoopContracts(specExtractor, specRepos, pm);
-                addMergePointStatements(specExtractor, specRepos, pm, methodSpecs);
+                addMergePointStatements(specExtractor, specRepos, pm, params);
                 addLabeledBlockContracts(specExtractor, specRepos, pm);
                 addLabeledLoopContracts(specExtractor, specRepos, pm);
                 transformJmlAsserts(pm);
@@ -317,7 +318,7 @@ public final class SLEnvInput extends AbstractEnvInput {
             final ImmutableList<IProgramMethod> constructors = javaInfo.getConstructors(kjt);
             for (IProgramMethod constructor : constructors) {
                 assert constructor.isConstructor();
-                final ImmutableSet<SpecificationElement> constructorSpecs =
+                final List<SpecificationElement> constructorSpecs =
                     specExtractor.extractMethodSpecs(constructor, staticInvPresent);
                 specRepos.addSpecs(constructorSpecs);
             }

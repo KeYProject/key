@@ -1530,7 +1530,15 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(KeyMergePointStatement n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        IProgramVariable ident = accept(n.getExpr());
+        // TODO javaparser remove the following code once jp is fixed
+        // IProgramVariable ident = accept(n.getExpr());
+        Object expr = accept(n.getExpr());
+        IProgramVariable ident;
+        if (expr instanceof IProgramVariable) {
+            ident = (IProgramVariable) expr;
+        } else {
+            ident = null;
+        }
         return new MergePointStatement(pi, c, ident);
     }
 
