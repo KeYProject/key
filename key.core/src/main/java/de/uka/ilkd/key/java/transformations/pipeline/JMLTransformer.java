@@ -497,9 +497,7 @@ public final class JMLTransformer extends JavaTransformer {
                 // for the moment we attach it to the method!
                 attachContract(child, (TextualJMLSpecCase) c);
             } else {
-                LOGGER.trace("Jml element unhandled: {}", c.getClass());
-                // throw new SLTranslationException("Unexpected jml statement " + c.getClass() + "@"
-                // + c.getLocation());
+                LOGGER.trace("{}: Jml element unhandled: {}", c.getLocation(), c.getClass());
             }
         }
     }
@@ -553,7 +551,7 @@ public final class JMLTransformer extends JavaTransformer {
             } else if (c instanceof TextualJMLAssertStatement) {
                 statement = transformAssertStatement((TextualJMLAssertStatement) c);
             } else {
-                // throw new SLTranslationException("Unexpected statement " + c);
+                LOGGER.trace("{}: Jml element unhandled: {}", c.getLocation(), c.getClass());
                 continue;
             }
             var target = findInnermostBlock(pe).orElseThrow();

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
@@ -550,23 +551,19 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             return new SchematicFieldReference(pi, c, name, scope);
         }
 
-        try {
-            var rtype = n.calculateResolvedType();
-            var kjt = getKeYJavaType(rtype);
+        var rtype = n.calculateResolvedType();
+        var kjt = getKeYJavaType(rtype);
 
-            var descriptor =
-                "L" + n.getScope().toString().replace(".", "/") + "/" + n.getNameAsString() + ";";
-            boolean notFullyQualifiedName = !rtype.toDescriptor().equals(descriptor);
-            ProgramVariable variable = new LocationVariable(
-                new ProgramElementName(n.getNameAsString()), kjt);
-            if (notFullyQualifiedName) { // regular field access
-                ReferencePrefix prefix = accept(n.getScope());
-                return new FieldReference(pi, c, variable, prefix);
-            } else {
-                return new FieldReference(pi, c, variable, translatePackageReference(n.getScope()));
-            }
-        } catch (UnsolvedSymbolException e) {
-            throw e;
+        var descriptor =
+            "L" + n.getScope().toString().replace(".", "/") + "/" + n.getNameAsString() + ";";
+        boolean notFullyQualifiedName = !rtype.toDescriptor().equals(descriptor);
+        ProgramVariable variable = new LocationVariable(
+            new ProgramElementName(n.getNameAsString()), kjt);
+        if (notFullyQualifiedName) { // regular field access
+            ReferencePrefix prefix = accept(n.getScope());
+            return new FieldReference(pi, c, variable, prefix);
+        } else {
+            return new FieldReference(pi, c, variable, translatePackageReference(n.getScope()));
         }
     }
 
@@ -761,7 +758,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             return lookupSchemaVariable(n.getName());
         }
 
-        var target = n.resolve();
+        ResolvedValueDeclaration target;
+        try {
+            target = n.resolve();
+        } catch(UnsolvedSymbolException e) {
+            var type = n.calculateResolvedType();
+            var keyType = getKeYJavaType(type);
+            return new TypeRef(keyType);
+        }
         if (target.toAst().isEmpty()) {
             var type = getKeYJavaType(target.getType());
             return new LocationVariable(new ProgramElementName(n.getNameAsString()), type);
