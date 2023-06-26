@@ -1,5 +1,6 @@
 package org.key_project.util;
 
+import org.jspecify.annotations.NullMarked;
 import org.key_project.util.java.StringUtil;
 
 /**
@@ -8,6 +9,7 @@ import org.key_project.util.java.StringUtil;
  * @author Alexander Weigl
  * @version 1 (29.03.19)
  */
+@NullMarked
 public class Strings {
     /**
      * @deprecated This class has been merged with {@link org.key_project.util.java.StringUtil}.

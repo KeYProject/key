@@ -35,6 +35,7 @@ import java.util.ServiceLoader;
  * @see IClassLoader
  * @see JavaApplicationClassLoader
  */
+@SuppressWarnings("nullness")
 public class ClassLoaderUtil {
     /**
      * The {@link IClassLoader} instance to use.

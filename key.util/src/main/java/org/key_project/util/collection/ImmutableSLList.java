@@ -20,7 +20,7 @@ import java.util.stream.Collector;
  * and head with amortized O(1). This will be done later (if necessary).
  */
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "nullness"})
 public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
     /**

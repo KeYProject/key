@@ -10,6 +10,7 @@ import java.util.ServiceLoader;
  *
  * @author Martin Hentschel
  */
+@SuppressWarnings("nullness")
 public class JavaApplicationClassLoader implements IClassLoader {
     /**
      * {@inheritDoc}

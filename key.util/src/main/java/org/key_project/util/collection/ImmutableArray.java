@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import javax.annotation.Nonnull;
 
+@SuppressWarnings("nullness")
 public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Serializable {
 
     /**

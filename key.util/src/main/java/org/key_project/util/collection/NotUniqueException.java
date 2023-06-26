@@ -3,6 +3,7 @@ package org.key_project.util.collection;
 
 
 /** thrown if a duplicate is being added via addUnique() */
+@SuppressWarnings("nullness")
 public class NotUniqueException extends Exception {
 
     private static final long serialVersionUID = 6565515240836947955L;

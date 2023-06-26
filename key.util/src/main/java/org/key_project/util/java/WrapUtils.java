@@ -13,6 +13,7 @@ package org.key_project.util.java;
  *
  * @author Mattias Ulbrich, Mar 2021
  */
+@SuppressWarnings("nullness")
 public class WrapUtils {
 
     /*

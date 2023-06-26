@@ -12,6 +12,7 @@ package org.key_project.util.java.thread;
  * @author Martin Hentschel
  * @see IRunnableWithResult
  */
+@SuppressWarnings("nullness")
 public abstract class AbstractRunnableWithException implements IRunnableWithException {
     /**
      * An occurred exception.

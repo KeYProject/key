@@ -13,6 +13,7 @@ import java.util.function.Predicate;
  *
  * @author Mattias Ulbrich
  */
+@SuppressWarnings("nullness")
 public final class Immutables {
 
     private Immutables() {

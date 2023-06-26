@@ -1,5 +1,6 @@
 package org.key_project.util.java;
 
+@SuppressWarnings("nullness")
 public final class IntegerUtil {
     /**
      * Forbid instances.

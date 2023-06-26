@@ -9,6 +9,7 @@ import java.util.List;
  * @author Alexander Weigl
  * @version 1 (29.03.19)
  */
+@SuppressWarnings("nullness")
 public class Filenames {
     // =======================================================
     // Methods operating on Strings

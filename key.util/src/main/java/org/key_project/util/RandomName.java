@@ -6,6 +6,7 @@ import java.util.Random;
  * @author Alexander Weigl
  * @version 1 (06.12.18)
  */
+@SuppressWarnings("nullness")
 public class RandomName {
     private static final Random random = new Random();
 

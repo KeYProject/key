@@ -12,6 +12,7 @@ import javax.annotation.Nonnull;
  * offer a public static final variable .<called>nil()
  */
 
+@SuppressWarnings("nullness")
 public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
 
     /**

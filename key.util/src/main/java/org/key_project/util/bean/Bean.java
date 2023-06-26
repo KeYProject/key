@@ -13,6 +13,7 @@ import org.key_project.util.java.ArrayUtil;
  * @author Martin Hentschel
  * @see IBean
  */
+@SuppressWarnings("nullness")
 public class Bean implements IBean {
     /**
      * The used {@link PropertyChangeSupport}.

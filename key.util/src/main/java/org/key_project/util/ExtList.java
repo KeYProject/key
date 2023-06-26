@@ -10,6 +10,7 @@ import java.util.LinkedList;
  * Extends java.util.LinkedList in order to collect elements according to their type.
  * Has facilities to get elements of a certain type ({@link #get(Class)}, {@link #collect(Class)}).
  */
+@SuppressWarnings("nullness")
 public class ExtList extends LinkedList<Object> {
 
     private static final long serialVersionUID = 9182017368310263908L;

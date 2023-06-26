@@ -24,6 +24,7 @@ import org.jspecify.annotations.Nullable;
  * @version 1 (15.03.19)
  */
 @NullMarked
+@SuppressWarnings("nullness")
 public class Lookup {
     public static final Lookup DEFAULT = new Lookup();
 

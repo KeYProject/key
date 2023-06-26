@@ -5,6 +5,7 @@ package org.key_project.util.java;
  *
  * @author Martin Hentschel
  */
+@SuppressWarnings("nullness")
 public class NumberUtil {
     /**
      * The maximal number of digits of an integer value.

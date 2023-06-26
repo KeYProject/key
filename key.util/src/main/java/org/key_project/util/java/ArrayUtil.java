@@ -10,6 +10,7 @@ import java.util.function.Predicate;
  *
  * @author Martin Hentschel
  */
+@SuppressWarnings("nullness")
 public final class ArrayUtil {
     /**
      * Forbid instances by this private constructor.

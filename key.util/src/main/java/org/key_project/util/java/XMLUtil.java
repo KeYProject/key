@@ -8,6 +8,7 @@ import java.util.Map.Entry;
  *
  * @author Martin Hentschel
  */
+@SuppressWarnings("nullness")
 public final class XMLUtil {
     /**
      * Attribute name to store encodings.

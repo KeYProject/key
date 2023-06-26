@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
  * @author Alexander Weigl
  * @version 1 (13.02.19)
  */
+@SuppressWarnings("nullness")
 public final class FindResources {
     /**
      * List directory contents for a resource folder. Not recursive. This is basically a brute-force

@@ -14,6 +14,7 @@ import java.util.stream.StreamSupport;
  * @author Alexander Weigl
  * @version 1 (29.03.19)
  */
+@SuppressWarnings("nullness")
 public class KeYCollections {
     // =======================================================
     // Methods operating on Arrays

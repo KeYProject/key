@@ -6,6 +6,7 @@ import java.util.Map;
 /**
  * Simple realisation of an LRU cache.
  */
+@SuppressWarnings("nullness")
 public class LRUCache<K, V> extends LinkedHashMap<K, V> {
 
     /**

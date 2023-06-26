@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
  *
  * @param <T> type of object to store
  */
+@SuppressWarnings("nullness")
 public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     /**

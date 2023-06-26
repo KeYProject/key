@@ -10,6 +10,7 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author Arne Keller
  */
+@SuppressWarnings("nullness")
 public final class EqualsModProofIrrelevancyUtil {
     private EqualsModProofIrrelevancyUtil() {
 

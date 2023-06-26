@@ -18,6 +18,7 @@ import java.util.zip.ZipInputStream;
  *
  * @author Martin Hentschel
  */
+@SuppressWarnings("nullness")
 public final class IOUtil {
     /**
      * The size of used buffers.

@@ -9,6 +9,7 @@ import java.util.BitSet;
  *
  * @author Dominic Scheurer
  */
+@SuppressWarnings("nullness")
 public class ImmutableFixedLengthBitSet {
 
     private boolean[] bitSet = null;

@@ -419,7 +419,7 @@ subprojects {
             "org.checkerframework.checker.nullness.NullnessChecker",
         ]
         extraJavacArgs = [
-            "-AonlyDefs=^org\\.key_project\\.util\\.lookup",
+            "-AonlyDefs=^org\\.key_project\\.util",
             "-Xmaxerrs", "10000",
             "-Werror",
             "-Aversion",
