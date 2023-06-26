@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.*;
 
-import org.checkerframework.checker.nullness.qual.AssertNonNullIfNonNull;
+import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -110,8 +110,7 @@ public final class StringUtil {
      * @param text The text to convert.
      * @return The text in lower case or {@code null} if the given text is {@code null}.
      */
-    public static @AssertNonNullIfNonNull("text") @Nullable String toLowerCase(
-            @Nullable String text) {
+    public static @PolyNull String toLowerCase(@PolyNull String text) {
         return text != null ? text.toLowerCase() : null;
     }
 
@@ -330,8 +329,7 @@ public final class StringUtil {
      * @param text The text to trim its right side.
      * @return The trimmed text.
      */
-    public static @AssertNonNullIfNonNull("text") @Nullable String trimRight(
-            @Nullable String text) {
+    public static @PolyNull String trimRight(@PolyNull String text) {
         if (text != null) {
             char[] content = text.toCharArray();
             int newLength = content.length;
@@ -351,8 +349,7 @@ public final class StringUtil {
      * @param maxLength The maximal length to ensure.
      * @return The text considering the maximal length.
      */
-    public static @AssertNonNullIfNonNull("text") @Nullable String chop(@Nullable String text,
-            int maxLength) {
+    public static @PolyNull String chop(@PolyNull String text, int maxLength) {
         if (text != null && text.length() > maxLength) {
             if (maxLength <= 0) {
                 return EMPTY_STRING;
