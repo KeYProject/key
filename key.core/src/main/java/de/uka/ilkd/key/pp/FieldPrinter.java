@@ -130,7 +130,7 @@ class FieldPrinter {
      * angle brackets, e.g. o.$created
      */
     protected boolean isBuiltinObjectProperty(Term fieldTerm) {
-        return fieldTerm.op().name().toString().contains("::<")
+        return JavaDLFieldNames.isImplicitField(fieldTerm.op().name())
                 && isFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT());
     }
 

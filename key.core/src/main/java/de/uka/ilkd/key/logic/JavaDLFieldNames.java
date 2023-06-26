@@ -20,10 +20,6 @@ public class JavaDLFieldNames {
         return name.getProgramName().startsWith("$");
     }
 
-    public static boolean makeImplicitFieldName() {
-
-    }
-
     public static String toJava(String name) {
         return name.replace("::$", "::");
     }
