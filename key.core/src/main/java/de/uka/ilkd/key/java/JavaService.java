@@ -661,7 +661,7 @@ public class JavaService {
         new ConstantStringExpressionEvaluator(createPipelineServices())
                 .apply(context.getClassDeclaration());
         if (block != original) {
-            var csb = (KeyContextStatementBlock)original;
+            var csb = (KeyContextStatementBlock) original;
             csb.setStatements(block.getStatements());
         }
         return original;

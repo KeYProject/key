@@ -44,7 +44,6 @@ public class KeYProgModelInfo {
     private final KeYJPMapping mapping;
     private final JP2KeYTypeConverter typeConverter;
     private final Map<KeYJavaType, Map<String, IProgramMethod>> implicits = new LinkedHashMap<>();
-    // TODO javaparser what is this
 
     public KeYProgModelInfo(Services services, KeYJPMapping mapping,
             JP2KeYTypeConverter typeConverter) {

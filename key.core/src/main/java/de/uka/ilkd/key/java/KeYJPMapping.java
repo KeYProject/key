@@ -35,7 +35,7 @@ public class KeYJPMapping {
      * to the KeY-equivalent
      */
     private final HashMap<ResolvedType, KeYJavaType> typeMap;
-    private final Map<KeYJavaType, ResolvedType> typeMapRev = new HashMap<>();
+    private final Map<KeYJavaType, ResolvedType> typeMapRev;
 
     /**
      * maps a KeY programelement to the Recoder-equivalent
@@ -52,8 +52,9 @@ public class KeYJPMapping {
 
     public KeYJPMapping() {
         this.map = new IdentityHashMap<>(4096);
-        this.typeMap = new LinkedHashMap<>(4096);
         this.revMap = new IdentityHashMap<>(4096);
+        this.typeMap = new LinkedHashMap<>(4096);
+        this.typeMapRev = new LinkedHashMap<>(4096);
         this.packageNames = new LinkedHashSet<>(4096);
     }
 
@@ -65,9 +66,10 @@ public class KeYJPMapping {
      * @param o what to clone
      */
     KeYJPMapping(KeYJPMapping o) {
-        this.map = new LinkedHashMap<>(o.map);
+        this.map = new IdentityHashMap<>(o.map);
+        this.revMap = new IdentityHashMap<>(o.revMap);
         this.typeMap = new LinkedHashMap<>(o.typeMap);
-        this.revMap = new LinkedHashMap<>(o.revMap);
+        this.typeMapRev = new LinkedHashMap<>(o.typeMapRev);
         this.packageNames = new LinkedHashSet<>(o.packageNames);
         this.superArrayType = o.superArrayType;
         this.parsedSpecial = o.parsedSpecial;

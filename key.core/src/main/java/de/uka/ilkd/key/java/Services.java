@@ -101,10 +101,11 @@ public class Services implements TermServices {
     }
 
     private Services(Profile profile, HashMap<String, Counter> counters, ServiceCaches caches) {
-        this(profile, new KeYJPMapping(), counters, caches);
+        this(profile, null, counters, caches);
     }
 
-    private Services(Profile profile, KeYJPMapping mapping, HashMap<String, Counter> counters,
+    private Services(Profile profile, @Nullable KeYProgModelInfo kpmi,
+            HashMap<String, Counter> counters,
             ServiceCaches caches) {
         assert profile != null;
         assert counters != null;
@@ -119,7 +120,8 @@ public class Services implements TermServices {
         this.cee = new ConstantExpressionEvaluator();
 
         typeconverter = new TypeConverter(this);
-        this.mapping = mapping;
+        this.javainfo = kpmi == null ? null : new JavaInfo(kpmi, this);
+        this.mapping = kpmi == null ? null : kpmi.rec2key();
         nameRecorder = new NameRecorder();
     }
 
@@ -233,7 +235,7 @@ public class Services implements TermServices {
     public Services copy(Profile profile, boolean shareCaches) {
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
         Services s = new Services(profile,
-            javainfo == null ? null : javainfo.getKeYProgModelInfo().rec2key().copy(),
+            javainfo == null ? null : javainfo.getKeYProgModelInfo().copy(),
             copyCounters(), newCaches);
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
@@ -425,8 +427,10 @@ public class Services implements TermServices {
     }
 
     private void activateJavaPath(Path bootClassPath) {
-        var m = mapping == null ? new KeYJPMapping() : mapping;
-        javaService = new JavaService(this, m, bootClassPath, Collections.emptyList());
+        if (mapping == null) {
+            mapping = new KeYJPMapping();
+        }
+        javaService = new JavaService(this, mapping, bootClassPath, Collections.emptyList());
         var jpTypoConv = javaService.getTypeConverter();
         var kpmi = new KeYProgModelInfo(this, mapping, jpTypoConv);
         javainfo = new JavaInfo(kpmi, this);

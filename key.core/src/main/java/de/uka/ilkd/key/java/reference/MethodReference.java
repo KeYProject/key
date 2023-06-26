@@ -314,7 +314,8 @@ public class MethodReference extends JavaNonTerminalProgramElement
         ProgramVariable inst = services.getJavaInfo().getAttribute(
             PipelineConstants.IMPLICIT_ENCLOSING_THIS, ec.getTypeReference().getKeYJavaType());
         IProgramMethod pm =
-                services.getJavaInfo().getProgramMethod(refPrefixType, methodName, sig, ec.getTypeReference().getKeYJavaType());
+            services.getJavaInfo().getProgramMethod(refPrefixType, methodName, sig,
+                ec.getTypeReference().getKeYJavaType());
         while (inst != null && pm == null) {
             KeYJavaType classType = inst.getKeYJavaType();
             pm = services.getJavaInfo().getProgramMethod(classType, methodName, sig);

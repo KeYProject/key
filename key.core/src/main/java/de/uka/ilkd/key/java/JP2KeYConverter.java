@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
@@ -53,10 +52,12 @@ import com.github.javaparser.ast.type.*;
 import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 import com.github.javaparser.ast.visitor.Visitable;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
+import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.resolution.types.ResolvedVoidType;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
+import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserVariableDeclaration;
 
 import static java.lang.String.format;
 
@@ -761,7 +762,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         ResolvedValueDeclaration target;
         try {
             target = n.resolve();
-        } catch(UnsolvedSymbolException e) {
+        } catch (UnsolvedSymbolException e) {
             var type = n.calculateResolvedType();
             var keyType = getKeYJavaType(type);
             return new TypeRef(keyType);
@@ -778,14 +779,20 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         if (other.getVariables().size() == 1) {
             return other.getVariables().get(0).getProgramVariable();
         }
-        if (!(target instanceof JavaParserFieldDeclaration)) {
-            reportUnsupportedElement(target.toAst().get());
-            return null;
+        if (target instanceof JavaParserFieldDeclaration) {
+            // Field declarations can have multiple variables
+            var decl = ((JavaParserFieldDeclaration) target).getVariableDeclarator();
+            var keyDecl = (VariableSpecification) mapping.nodeToKeY(decl).orElseThrow();
+            return keyDecl.getProgramVariable();
         }
-        // Field declarations can have multiple variables
-        var decl = ((JavaParserFieldDeclaration) target).getVariableDeclarator();
-        var keyDecl = (VariableSpecification) mapping.nodeToKeY(decl).orElseThrow();
-        return keyDecl.getProgramVariable();
+        if (target instanceof JavaParserVariableDeclaration) {
+            // Variable declarations can have multiple variables
+            var decl = ((JavaParserVariableDeclaration) target).getVariableDeclarator();
+            var keyDecl = (VariableSpecification) mapping.nodeToKeY(decl).orElseThrow();
+            return keyDecl.getProgramVariable();
+        }
+        reportUnsupportedElement(target.toAst().get());
+        return null;
     }
 
     @Override

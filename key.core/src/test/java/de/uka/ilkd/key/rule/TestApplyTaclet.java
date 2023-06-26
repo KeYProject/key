@@ -69,9 +69,6 @@ public class TestApplyTaclet {
 
     @BeforeEach
     public void setUp() {
-
-
-        TacletForTests.setStandardFile(TacletForTests.testRules);
         TacletForTests.parse();
         assert TacletForTests.services().getNamespaces().programVariables()
                 .lookup(new Name("i")) != null;

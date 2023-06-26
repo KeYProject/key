@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.java;
 
 import java.util.*;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
@@ -23,8 +24,6 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
 
 /**
  * an instance serves as representation of a Java model underlying a DL formula. This class provides
