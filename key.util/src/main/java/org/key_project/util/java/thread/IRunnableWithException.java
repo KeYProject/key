@@ -1,5 +1,8 @@
 package org.key_project.util.java.thread;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * A {@link Runnable} that has a result that is accessible via {@link #getResult()}.
@@ -11,11 +14,12 @@ package org.key_project.util.java.thread;
  * @author Martin Hentschel
  * @see AbstractRunnableWithException
  */
+@NullMarked
 public interface IRunnableWithException extends Runnable {
     /**
      * Returns an occurred exception.
      *
      * @return An occurred exception.
      */
-    Exception getException();
+    @Nullable Exception getException();
 }

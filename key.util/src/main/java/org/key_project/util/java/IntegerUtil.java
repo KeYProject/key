@@ -1,6 +1,8 @@
 package org.key_project.util.java;
 
-@SuppressWarnings("nullness")
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public final class IntegerUtil {
     /**
      * Forbid instances.

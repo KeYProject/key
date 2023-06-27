@@ -1,5 +1,9 @@
 package org.key_project.util.java.thread;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * Provides a basic implementation of {@link IRunnableWithException}.
@@ -12,18 +16,18 @@ package org.key_project.util.java.thread;
  * @author Martin Hentschel
  * @see IRunnableWithResult
  */
-@SuppressWarnings("nullness")
+@NullMarked
 public abstract class AbstractRunnableWithException implements IRunnableWithException {
     /**
      * An occurred exception.
      */
-    private Exception exception;
+    private @MonotonicNonNull Exception exception;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Exception getException() {
+    public @Nullable Exception getException() {
         return exception;
     }
 
