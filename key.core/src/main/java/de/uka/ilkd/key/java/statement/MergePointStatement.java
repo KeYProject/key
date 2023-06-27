@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.java.statement;
 
-import java.util.List;
 import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
@@ -21,6 +20,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
+import de.uka.ilkd.key.speclang.njml.JmlParser;
 import org.key_project.util.ExtList;
 
 /**
@@ -34,27 +35,27 @@ public class MergePointStatement extends JavaStatement
     // Those are used for JML to JavaDL conversions
     protected final IProgramVariable identifier;
 
-    // TODO weigl revise extra comments
-    // protected final Comment[] comments;
+    TextualJMLMergePointDecl context;
 
-    public MergePointStatement(PositionInfo pi, List<Comment> comments,
+    public MergePointStatement(PositionInfo pi, TextualJMLMergePointDecl context,
             IProgramVariable identifier) {
-        super(pi, comments);
+        super(pi);
         this.identifier = identifier;
+        this.context = context;
     }
 
     public MergePointStatement(IProgramVariable indexPV) {
         this(null, null, indexPV);
     }
 
-    public MergePointStatement(LocationVariable identifier, Comment[] comments) {
-        this(null, null, identifier);
-    }
-
     public MergePointStatement(ExtList children) {
         super(children);
         identifier = Objects.requireNonNull(children.get(IProgramVariable.class));
         // comments = children.get(Comment[].class);
+    }
+
+    public TextualJMLMergePointDecl getContext() {
+        return context;
     }
 
     /*

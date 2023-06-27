@@ -22,6 +22,8 @@ import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
+import de.uka.ilkd.key.java.transformations.pipeline.JMLCommentTransformer;
+import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInProgram;
@@ -31,6 +33,9 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.metaconstruct.*;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSetStatement;
 import de.uka.ilkd.key.util.AssertionFailure;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -58,6 +63,8 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.resolution.types.ResolvedVoidType;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserVariableDeclaration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.lang.String.format;
 
@@ -93,6 +100,7 @@ public class JP2KeYConverter {
 
 
 class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JP2KeYConverter.class);
     private final Services services;
     private final KeYJPMapping mapping;
     private final JP2KeYTypeConverter typeConverter;
@@ -416,11 +424,15 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     private List<Comment> createComments(Node n) {
-        // TODO javaparser this is always empty?
-        return n.getAssociatedSpecificationComments()
+        var comments = new ArrayList<Comment>();
+        if (n.containsData(JMLCommentTransformer.BEFORE_COMMENTS)) {
+            comments.addAll(n.getData(JMLCommentTransformer.BEFORE_COMMENTS).stream().map(c -> new Comment(c.asString(), createPositionInfo(c))).toList());
+        }
+        comments.addAll(n.getAssociatedSpecificationComments()
                 .map(l -> l.stream().map(c -> new Comment(c.asString(), createPositionInfo(c)))
                         .toList())
-                .orElse(Collections.emptyList());
+                .orElse(Collections.emptyList()));
+        return comments;
     }
 
     private <T> ImmutableArray<T> map(NodeList<? extends Visitable> nodes) {
@@ -517,6 +529,20 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(EmptyStmt n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
+        if (n.containsData(JMLTransformer.KEY_CONSTRUCT)) {
+            var construct = n.getData(JMLTransformer.KEY_CONSTRUCT);
+            if (construct instanceof TextualJMLAssertStatement) {
+                var a = (TextualJMLAssertStatement) construct;
+                return new JmlAssert(a.getKind(), a.getContext(), pi, services);
+            }
+            if (construct instanceof TextualJMLMergePointDecl) {
+                var a = (TextualJMLMergePointDecl) construct;
+                var loc = new LocationVariable(services.getVariableNamer().getTemporaryNameProposal("x"),
+                                services.getNamespaces().sorts().lookup("boolean"));
+                return new MergePointStatement(pi, a, loc);
+            }
+            LOGGER.warn(n.getRange() + " Ignoring statement " + construct.getClass());
+        }
         return new EmptyStatement(pi, c);
     }
 
@@ -1530,16 +1556,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(KeyMergePointStatement n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        // TODO javaparser remove the following code once jp is fixed
-        // IProgramVariable ident = accept(n.getExpr());
-        Object expr = accept(n.getExpr());
-        IProgramVariable ident;
-        if (expr instanceof IProgramVariable) {
-            ident = (IProgramVariable) expr;
-        } else {
-            ident = null;
-        }
-        return new MergePointStatement(pi, c, ident);
+        IProgramVariable expr = accept(n.getExpr());
+        return new MergePointStatement(pi, null, expr);
     }
 
     @Override

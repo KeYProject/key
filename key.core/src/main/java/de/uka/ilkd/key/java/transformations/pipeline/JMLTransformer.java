@@ -17,11 +17,12 @@ import java.net.URI;
 import java.util.*;
 import javax.annotation.Nonnull;
 
+import com.github.javaparser.ast.stmt.EmptyStmt;
+import de.uka.ilkd.key.java.statement.JmlAssert;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
 import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
@@ -61,15 +62,15 @@ public final class JMLTransformer extends JavaTransformer {
         EnumSet.of(JMLModifier.ABSTRACT, JMLModifier.FINAL, JMLModifier.PRIVATE,
             JMLModifier.PROTECTED,
             JMLModifier.PUBLIC, JMLModifier.STATIC);
-
+    public static final DataKey<TextualJMLConstruct> KEY_CONSTRUCT = new DataKey<>() {
+    };
 
     /**
      * JML markers left and right.
      */
     private static final String JML = "/*@";
     private static final String JMR = "@*/";
-    private static final DataKey<List<TextualJMLSpecCase>> KEY_CONTRACTS = new DataKey<>() {
-    };
+
     private static ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
     private static final Logger LOGGER = LoggerFactory.getLogger(JMLTransformer.class);
 
@@ -373,52 +374,31 @@ public final class JMLTransformer extends JavaTransformer {
         return methodDecl;
     }
 
-    private Statement transformAssertStatement(TextualJMLAssertStatement stat)
-            throws SLTranslationException {
-        ParserRuleContext ctx = stat.getContext().first;
-
-        // Convert to block with block contract, attach to AST.
-        var location = Location.fromToken(ctx.start);
-
-        try {
-            String comment = format(
-                """
-                        /*@ normal_behavior
-                          @ %s %s
-                          @ assignable \\strictly_nothing;
-                          @*/
-                        """,
-                stat.getKind() == Kind.ASSERT ? "ensures" : "ensures_free", stat.getClauseText());
-            // TODO javaparser wrong assert used
-
-            BlockStmt block = new BlockStmt();
-            block.setAssociatedSpecificationComments(new NodeList<>(new BlockComment(comment)));
-            updatePositionInformation(block, location.getPosition());
-            return block;
-        } catch (Throwable e) {
-            throw new SLTranslationException(
-                format("%s (%s)", e.getMessage(), e.getClass().getName()), location, e);
-        }
+    private Statement storeInStatement(TextualJMLConstruct construct) {
+        var stmt = new EmptyStmt();
+        var pos = construct.getLocation().getPosition();
+        var rangePos = new Position(pos.line(), pos.column());
+        stmt.setRange(Range.range(rangePos, rangePos));
+        stmt.setData(KEY_CONSTRUCT, construct);
+        return stmt;
     }
 
-    private Statement transformSetStatement(TextualJMLSetStatement stat)
-            throws SLTranslationException {
+    private Statement transformAssertStatement(TextualJMLAssertStatement stat) {
+        return storeInStatement(stat);
+    }
+
+    private Statement transformSetStatement(TextualJMLSetStatement stat) {
         // parse statement, attach to AST
         var location = Location.fromToken(stat.getAssignment().start);
-        try {
-            String assignment = getFullText(stat.getAssignment()).substring(3);
-            var result = services.getParser().parseBlock("{" + assignment + "}");
-            // TODO javaparser error handling!
-            var stmtList = result.getResult().orElseThrow().getStatements();
-            assert stmtList.size() == 1;
-            var assignStmt = stmtList.get(0);
-            shiftPosition(assignStmt, location.getPosition());
-            // updatePositionInformation(assignStmt, pos);
-            return assignStmt;
-        } catch (Throwable e) {
-            throw new SLTranslationException(e.getMessage() + " (" + e.getClass().getName() + ")",
-                location, e);
-        }
+        String assignment = getFullText(stat.getAssignment()).substring(3);
+        var result = services.getParser().parseBlock("{" + assignment + "}");
+        // TODO javaparser error handling!
+        var stmtList = result.getResult().orElseThrow().getStatements();
+        assert stmtList.size() == 1;
+        var assignStmt = stmtList.get(0);
+        shiftPosition(assignStmt, location.getPosition());
+        // updatePositionInformation(assignStmt, pos);
+        return assignStmt;
     }
 
     private void shiftPosition(Node node, de.uka.ilkd.key.java.Position pos) {
@@ -442,13 +422,8 @@ public final class JMLTransformer extends JavaTransformer {
         }
     }
 
-    private Statement transformMergePointDecl(TextualJMLMergePointDecl stat,
-            List<Comment> originalComments) {
-        assert !originalComments.isEmpty();
-        // create MPS
-        KeyMergePointStatement mps = new KeyMergePointStatement(new BooleanLiteralExpr(true));
-        mps.setAssociatedSpecificationComments(new NodeList<>(originalComments));
-        return mps;
+    private Statement transformMergePointDecl(TextualJMLMergePointDecl stat) {
+        return storeInStatement(stat);
     }
 
     private static <T> Optional<T> extractData(Node node, DataKey<T> key) {
@@ -465,6 +440,9 @@ public final class JMLTransformer extends JavaTransformer {
             throws SLTranslationException {
         List<Comment> comments = extractData(child, JMLCommentTransformer.BEFORE_COMMENTS)
                 .orElse(new ArrayList<>());
+        if (!comments.isEmpty()) {
+            child.setAssociatedSpecificationComments(new NodeList<>(comments));
+        }
         comments.addAll(extractData(child, JMLCommentTransformer.AFTER_COMMENTS)
                 .orElse(Collections.emptyList()));
         if (comments.isEmpty()) {
@@ -482,34 +460,12 @@ public final class JMLTransformer extends JavaTransformer {
         warnings = warnings.append(pp.getWarnings());
 
         // handle model and ghost declarations in textual constructs
-        // (and set assignments which RecodeR evilly left hanging *behind*
-        // the method to which they belong)
         for (TextualJMLConstruct c : constructs) {
-            BodyDeclaration<?> body;
             if (c instanceof TextualJMLFieldDecl) {
-                body = transformClassFieldDecl((TextualJMLFieldDecl) c, comments);
-                td.addMember(body);
+                td.addMember(transformClassFieldDecl((TextualJMLFieldDecl) c, comments));
             } else if (c instanceof TextualJMLMethodDecl) {
-                body = transformMethodDecl((TextualJMLMethodDecl) c, comments, td);
-                td.addMember(body);
-            } else if (c instanceof TextualJMLSpecCase) {
-                // TODO javaparser what to do with an TextualJMLSpecCase
-                // for the moment we attach it to the method!
-                attachContract(child, (TextualJMLSpecCase) c);
-            } else {
-                LOGGER.trace("{}: Jml element unhandled: {}", c.getLocation(), c.getClass());
+                td.addMember(transformMethodDecl((TextualJMLMethodDecl) c, comments, td));
             }
-        }
-    }
-
-    private void attachContract(Node child, TextualJMLSpecCase c) {
-        if (child.containsData(KEY_CONTRACTS)) {
-            var contracts = child.getData(KEY_CONTRACTS);
-            contracts.add(c);
-        } else {
-            List<TextualJMLSpecCase> contracts = new ArrayList<>(8);
-            contracts.add(c);
-            child.setData(KEY_CONTRACTS, contracts);
         }
     }
 
@@ -547,7 +503,7 @@ public final class JMLTransformer extends JavaTransformer {
             } else if (c instanceof TextualJMLSetStatement) {
                 statement = transformSetStatement((TextualJMLSetStatement) c);
             } else if (c instanceof TextualJMLMergePointDecl) {
-                statement = transformMergePointDecl((TextualJMLMergePointDecl) c, comments);
+                statement = transformMergePointDecl((TextualJMLMergePointDecl) c);
             } else if (c instanceof TextualJMLAssertStatement) {
                 statement = transformAssertStatement((TextualJMLAssertStatement) c);
             } else {
@@ -564,30 +520,39 @@ public final class JMLTransformer extends JavaTransformer {
     private void transformMethodLevelCommentsHelper(Node pe, URI fileName)
             throws SLTranslationException {
         // recurse to all pre-existing children
-        var children = getChildren(pe).toArray(new Node[0]);
+        var children = pe.getChildNodes().toArray(new Node[0]);
         for (Node aChildren : children) {
             transformMethodLevelCommentsHelper(aChildren, fileName);
         }
 
-        if (pe instanceof MethodDeclaration || pe instanceof Comment
-                || pe.getParentNode().isEmpty()) {
+        // get comments
+        var before = extractData(pe, JMLCommentTransformer.BEFORE_COMMENTS);
+        before.ifPresent(c -> pe.setAssociatedSpecificationComments(new NodeList<>(c)));
+
+        if (pe instanceof MethodDeclaration || pe.getParentNode().isEmpty()) {
+            assert !pe.containsData(JMLCommentTransformer.AFTER_COMMENTS);
             return;
         }
 
         var parent = findInnermostBlock(pe);
-        var parentOffset = parent.filter(p -> pe instanceof Statement)
-                .map(p -> p.getStatements().indexOf(pe)).orElse(-1);
+        boolean hasStatement = pe instanceof Statement;
+        int parentOffset;
+        if (parent.isPresent()) {
+            var stmts = parent.get().getStatements();
+            // If pe is a statement we insert before the statement,
+            // else insert at the end (this happens only for orphan comments that are always at the end)
+            parentOffset = hasStatement ? stmts.indexOf(pe) : stmts.size();
+        } else {
+            parentOffset = -1;
+        }
 
-        // get comments
-        var before = extractData(pe, JMLCommentTransformer.BEFORE_COMMENTS);
         if (before.isPresent()) {
             parentOffset = transformMethodLevelCommentsAt(pe, before.get(), fileName, parentOffset);
         }
         var after = extractData(pe, JMLCommentTransformer.AFTER_COMMENTS);
         if (after.isPresent()) {
-            transformMethodLevelCommentsAt(pe, after.get(), fileName, parentOffset + 1);
+            transformMethodLevelCommentsAt(pe, after.get(), fileName, parentOffset + (hasStatement ? 1 : 0));
         }
-
     }
 
     public void analyze() {

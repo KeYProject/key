@@ -38,6 +38,9 @@ public class JMLCommentTransformer extends JavaTransformer {
         }
 
         var orphan = cu.getOrphanComments();
+        for (Comment comment : orphan) {
+            comment.setParentNode(cu);
+        }
         var filterComments = filterToplevel(allComments, cu);
         filterComments.addAll(orphan);
         PositionUtils.sortByBeginPosition(filterComments);
@@ -60,8 +63,6 @@ public class JMLCommentTransformer extends JavaTransformer {
                 }
                 n.setData(BEFORE_COMMENTS, specs);
                 specs.add(c);
-                // TODO javaparser this is useless, the list is an accumulation returned by
-                // javaparser
                 allComments.remove(c);
                 commentIdx++;
             }

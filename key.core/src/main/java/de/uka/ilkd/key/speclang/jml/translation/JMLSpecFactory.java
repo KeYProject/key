@@ -1159,9 +1159,9 @@ public class JMLSpecFactory {
     }
 
     public ImmutableSet<MergeContract> createJMLMergeContracts(final IProgramMethod method,
-            final MergePointStatement mps, final TextualJMLMergePointDecl mergePointDecl)
+            final MergePointStatement mps)
             throws SLTranslationException {
-
+        TextualJMLMergePointDecl mergePointDecl = mps.getContext();
         final JmlParser.Merge_point_statementContext ctx = mergePointDecl.getMergeProc();
 
         // default merge procedure is MergeByIfThenElse
