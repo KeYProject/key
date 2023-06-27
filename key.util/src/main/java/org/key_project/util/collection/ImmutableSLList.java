@@ -259,7 +259,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
          * @return true if predicate is fullfilled for at least one element
          */
         @Override
-        public boolean exists(Predicate<S> predicate) {
+        public boolean exists(Predicate<? super S> predicate) {
             ImmutableList<S> list = this;
             while (!list.isEmpty()) {
                 if (predicate.test(list.head())) {
@@ -584,7 +584,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
          * @return true if predicate is fullfilled for at least one element
          */
         @Override
-        public boolean exists(Predicate<S> predicate) {
+        public boolean exists(Predicate<? super S> predicate) {
             return false;
         }
 

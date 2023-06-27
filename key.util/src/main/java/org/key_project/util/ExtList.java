@@ -15,7 +15,7 @@ import java.util.List;
  * Has facilities to get elements of a certain type ({@link #get(Class)}, {@link #collect(Class)}).
  */
 @NullMarked
-public class ExtList extends LinkedList<Object> {
+public final class ExtList extends LinkedList<Object> {
 
     private static final long serialVersionUID = 9182017368310263908L;
 

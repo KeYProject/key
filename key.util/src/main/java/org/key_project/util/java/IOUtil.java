@@ -745,6 +745,7 @@ public final class IOUtil {
         return file != null ? file.toString() : null;
     }
 
+    @SuppressWarnings("nullness")
     public static @Nullable URI toURI(@Nullable URL url) {
         try {
             if (url != null) {

@@ -1,5 +1,8 @@
 package org.key_project.util.collection;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
@@ -13,7 +16,7 @@ import java.util.function.Predicate;
  *
  * @author Mattias Ulbrich
  */
-@SuppressWarnings("nullness")
+@NullMarked
 public final class Immutables {
 
     private Immutables() {
@@ -61,7 +64,7 @@ public final class Immutables {
      * The implementation uses a hash set internally and thus runs in O(n).
      *
      * It reuses as much created datastructure as possible. In particular, if the list is already
-     * duplicate-fre, it does not allocate new memory (well, only temporarily) and returns the
+     * duplicate-free, it does not allocate new memory (well, only temporarily) and returns the
      * argument.
      *
      * Sidenote: Would that not make a nice KeY-Verification condition? Eat your own dogfood.
@@ -88,6 +91,7 @@ public final class Immutables {
 
         while (!stack.isEmpty()) {
             ImmutableList<T> top = stack.head();
+            assert !top.isEmpty() : "@AssumeAssertion(nullness)";
             T element = top.head();
             stack = stack.tail();
             if (alreadySeen.contains(element)) {
@@ -100,6 +104,7 @@ public final class Immutables {
 
         while (!stack.isEmpty()) {
             ImmutableList<T> top = stack.head();
+            assert !top.isEmpty() : "@AssumeAssertion(nullness)";
             T element = top.head();
             stack = stack.tail();
             if (!alreadySeen.contains(element)) {
@@ -165,11 +170,11 @@ public final class Immutables {
      *
      * @returns the filtered list
      */
-    public static <T> ImmutableList<T> filter(ImmutableList<T> ts, Predicate<T> predicate) {
+    public static <T extends @Nullable Object> ImmutableList<T> filter(ImmutableList<T> ts, Predicate<? super T> predicate) {
         // This must be a loop. A tail recursive implementation is not optimised
         // by the compiler and quickly leads to a stack overlow.
         ImmutableList<T> acc = ImmutableSLList.nil();
-        while (ts.size() > 0) {
+        while (!ts.isEmpty()) {
             T hd = ts.head();
             if (predicate.test(hd)) {
                 acc = acc.prepend(hd);
@@ -188,11 +193,11 @@ public final class Immutables {
      * @param function a non-interfering, stateless function to apply to each element
      * @return the mapped list of the same length as this
      */
-    public static <T, R> ImmutableList<R> map(ImmutableList<T> ts, Function<T, R> function) {
+    public static <T extends @Nullable Object, R extends @Nullable Object> ImmutableList<R> map(ImmutableList<T> ts, Function<? super T, R> function) {
         // This must be a loop. A tail recursive implementation is not optimised
         // by the compiler and quickly leads to a stack overlow.
         ImmutableList<R> acc = ImmutableSLList.nil();
-        while (ts.size() > 0) {
+        while (!ts.isEmpty()) {
             T hd = ts.head();
             acc = acc.prepend(function.apply(hd));
             ts = ts.tail();
