@@ -206,7 +206,8 @@ public final class JavaInfo {
                 name2KJTCache.put(at.getFullName(), type);
                 name2KJTCache.put(at.getAlternativeNameRepresentation(), type);
             } else {
-                name2KJTCache.put(getFullName(type), type);
+                var name = getFullName(type);
+                name2KJTCache.put(name, type);
             }
         }
     }
@@ -320,6 +321,7 @@ public final class JavaInfo {
     /**
      * returns a primitive KeYJavaType matching the given typename.
      */
+    @Nullable
     public KeYJavaType getPrimitiveKeYJavaType(String typename) {
         PrimitiveType type = PrimitiveType.getPrimitiveType(typename);
         if (type != null) {

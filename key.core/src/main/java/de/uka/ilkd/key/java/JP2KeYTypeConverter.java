@@ -228,6 +228,10 @@ public class JP2KeYTypeConverter {
 
     private void addReferenceType(ResolvedReferenceType type) {
         var ref = type.asReferenceType().getTypeDeclaration().get();
+        if (ref instanceof ResolvedLogicalType) {
+            storeInCache(type, ((ResolvedLogicalType) ref).getKeYJavaType());
+            return;
+        }
         var sort = namespaces.sorts().lookup(new Name(type.describe()));
         if (sort == null) {
             if (ref.isInterface()) {

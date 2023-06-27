@@ -80,15 +80,13 @@ public class KeYProgModelInfo {
     }
 
     @Nonnull
-    private List<ResolvedMethodDeclaration> getAllRecoderMethods(KeYJavaType kjt) {
-        if (kjt.getJavaType() instanceof TypeDeclaration) {
-            // TODO javaparser this does not work, type map
-            var rtype = rec2key().resolveType(kjt).asReferenceType();
-            return rtype.getAllMethods();
+    private List<ResolvedMethodDeclaration> getAllMethods(KeYJavaType kjt) {
+        var type = rec2key().resolveType(kjt);
+        if (type.isReferenceType()) {
+            return type.asReferenceType().getAllMethods();
         }
         return Collections.emptyList();
     }
-
 
     /**
      * Returns all visible methods that are defined in this
@@ -98,7 +96,7 @@ public class KeYProgModelInfo {
      * @return the list of visible methods of this type and its supertypes.
      */
     public ImmutableList<IProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
-        var methods = getAllRecoderMethods(kjt);
+        var methods = getAllMethods(kjt);
         ImmutableList<IProgramMethod> result = ImmutableSLList.nil();
         for (var rm : methods) {
             var declaration = rec2key().resolvedDeclarationToKeY(rm);
@@ -143,22 +141,32 @@ public class KeYProgModelInfo {
         var rt = rec2key().resolveType(t);
         if (rt.isReferenceType())
             return rt.asReferenceType().getQualifiedName();
-        return rt.toDescriptor();
+        return rt.describe();
     }
-
 
     public boolean isFinal(KeYJavaType kjt) {
-        var recoderType = rec2key().resolveType(kjt);
-        if (recoderType.isReferenceType()) { // TODO weigl enum declarations and records!
-            var rt = recoderType.asReferenceType();
-            var td = rt.getTypeDeclaration().get();
-            var node = (NodeWithModifiers<?>) td.asClass().toAst().get();
-            return node.hasModifier(Modifier.Keyword.FINAL);
-        } else { // array or primitive type
+        var type = rec2key().resolveType(kjt);
+        if (type.isArray() || type.isPrimitive() || type.isVoid()) {
             return false;
         }
+        if (type.isReferenceType()) { // TODO weigl enum declarations and records!
+            var rt = type.asReferenceType();
+            var td = rt.getTypeDeclaration().orElseThrow();
+            if (td.isClass()) {
+                var node = (NodeWithModifiers<?>) td.asClass().toAst().get();
+                return node.hasModifier(Modifier.Keyword.FINAL);
+            }
+            if (td.isInterface()) {
+                // Interfaces can't be final
+                return false;
+            }
+            if (td instanceof ResolvedLogicalType) {
+                // Logic types are not final? Just following primitive types here
+                return false;
+            }
+        }
+        throw new UnsupportedOperationException("Type " + type.getClass() + " is not supported");
     }
-
 
     /**
      * Checks whether subType is a subtype of superType or not.
@@ -239,14 +247,6 @@ public class KeYProgModelInfo {
          * }
          * return false;
          */
-    }
-
-    private List<ResolvedMethodDeclaration> getMethods(KeYJavaType kjt) {
-        var type = getJavaParserType(kjt);
-        if (type.isReferenceType()) {
-            return type.asReferenceType().getAllMethods();
-        }
-        return Collections.emptyList();
     }
 
     private List<ResolvedConstructorDeclaration> getDeclaredConstructors(KeYJavaType ct) {
@@ -392,6 +392,9 @@ public class KeYProgModelInfo {
         }
 
         var type = getJavaParserType(ct);
+        if (!type.isReferenceType()) {
+            return null;
+        }
         var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
         List<ResolvedType> jpSignature = StreamSupport.stream(signature.spliterator(), false)
                 .map(this::getJavaParserType).toList();
@@ -624,6 +627,9 @@ public class KeYProgModelInfo {
     public ImmutableList<KeYJavaType> findImplementations(KeYJavaType ct, String name,
             ImmutableList<KeYJavaType> signature) {
         var type = rec2key().resolveType(ct);
+        if (!type.isReferenceType()) {
+            return ImmutableList.of();
+        }
         var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
         List<ResolvedType> jpSignature = signature.map(this::getJavaParserType).toList();
         var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);

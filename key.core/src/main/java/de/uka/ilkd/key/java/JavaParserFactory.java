@@ -365,7 +365,9 @@ public class JavaParserFactory {
             if (name.contains("\\")) { // e.g., java.math.\bigint.
                 name = "\\" + name.replaceFirst(".*\\\\", "");
                 var kjt = services.getJavaInfo().getPrimitiveKeYJavaType(name);
-                return SymbolReference.solved(new ResolvedLogicalType(kjt));
+                if (kjt != null) {
+                    return SymbolReference.solved(new ResolvedLogicalType(kjt));
+                }
             }
             return SymbolReference.unsolved();
         }

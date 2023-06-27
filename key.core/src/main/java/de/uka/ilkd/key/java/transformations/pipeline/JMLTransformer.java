@@ -17,8 +17,6 @@ import java.net.URI;
 import java.util.*;
 import javax.annotation.Nonnull;
 
-import com.github.javaparser.ast.stmt.EmptyStmt;
-import de.uka.ilkd.key.java.statement.JmlAssert;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -38,9 +36,8 @@ import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.comments.BlockComment;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.comments.LineComment;
-import com.github.javaparser.ast.expr.BooleanLiteralExpr;
-import com.github.javaparser.ast.key.KeyMergePointStatement;
 import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.EmptyStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.visitor.VoidVisitorWithDefaults;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -48,7 +45,6 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.lang.String.format;
 
 /**
  * RecodeR transformation that parses JML comments, and attaches code-like
@@ -540,7 +536,8 @@ public final class JMLTransformer extends JavaTransformer {
         if (parent.isPresent()) {
             var stmts = parent.get().getStatements();
             // If pe is a statement we insert before the statement,
-            // else insert at the end (this happens only for orphan comments that are always at the end)
+            // else insert at the end (this happens only for orphan comments that are always at the
+            // end)
             parentOffset = hasStatement ? stmts.indexOf(pe) : stmts.size();
         } else {
             parentOffset = -1;
@@ -551,7 +548,8 @@ public final class JMLTransformer extends JavaTransformer {
         }
         var after = extractData(pe, JMLCommentTransformer.AFTER_COMMENTS);
         if (after.isPresent()) {
-            transformMethodLevelCommentsAt(pe, after.get(), fileName, parentOffset + (hasStatement ? 1 : 0));
+            transformMethodLevelCommentsAt(pe, after.get(), fileName,
+                parentOffset + (hasStatement ? 1 : 0));
         }
     }
 

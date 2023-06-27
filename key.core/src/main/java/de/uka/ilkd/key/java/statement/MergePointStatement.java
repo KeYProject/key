@@ -18,10 +18,8 @@ import java.util.Objects;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
-import de.uka.ilkd.key.speclang.njml.JmlParser;
+
 import org.key_project.util.ExtList;
 
 /**

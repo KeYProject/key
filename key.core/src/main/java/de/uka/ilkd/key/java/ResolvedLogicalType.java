@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.java;
 
 import java.util.*;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 
@@ -14,9 +15,10 @@ import com.github.javaparser.resolution.types.ResolvedType;
  * @version 1 (23.06.23)
  */
 public class ResolvedLogicalType implements ResolvedReferenceTypeDeclaration {
+    @Nonnull
     private final KeYJavaType keYJavaType;
 
-    public ResolvedLogicalType(KeYJavaType kjt) {
+    public ResolvedLogicalType(@Nonnull KeYJavaType kjt) {
         this.keYJavaType = kjt;
     }
 
@@ -95,6 +97,7 @@ public class ResolvedLogicalType implements ResolvedReferenceTypeDeclaration {
         return Collections.emptyList();
     }
 
+    @Nonnull
     public KeYJavaType getKeYJavaType() {
         return keYJavaType;
     }
