@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Test cases for validating the correct handling of declarations inside KeY files.
  */
 public class TestDeclParser {
+    private static Services SERVICES = null;
     private NamespaceSet nss;
     private Services serv;
     private Namespace<SchemaVariable> parsedSchemaVars;
@@ -37,19 +38,21 @@ public class TestDeclParser {
 
     @BeforeEach
     public void setUp() {
-        serv = new Services(AbstractProfile.getDefaultProfile());
+        if (SERVICES == null) {
+            SERVICES = new Services(AbstractProfile.getDefaultProfile());
+            var nss = SERVICES.getNamespaces();
+            NamespaceBuilder nb = new NamespaceBuilder(nss);
+            nb.addSort("boolean").addSort("int").addSort("Seq").addSort("LocSet").addSort("double")
+                    .addSort("float");
+            assertNotNull(nss.sorts().lookup("boolean"));
+            assertNotNull(nss.sorts().lookup("int"));
+            assertNotNull(nss.sorts().lookup("boolean"));
+            SERVICES.activateJava(null);
+            SERVICES.getJavaService().parseSpecialClasses();
+        }
+        serv = SERVICES.copy(false);
         nss = serv.getNamespaces();
         io = new KeyIO(serv, nss);
-        NamespaceBuilder nb = new NamespaceBuilder(nss);
-        nb.addSort("boolean").addSort("int").addSort("Seq").addSort("LocSet").addSort("double")
-                .addSort("float");
-        // String sorts = "\\sorts{boolean;int;LocSet;}";
-        // parseDecls(sorts);
-        assertNotNull(nss.sorts().lookup("boolean"));
-        assertNotNull(nss.sorts().lookup("int"));
-        assertNotNull(nss.sorts().lookup("boolean"));
-        serv.activateJava(null);
-        serv.getJavaService().parseSpecialClasses();
     }
 
     private void evaluateDeclarations(String s) {
@@ -61,7 +64,6 @@ public class TestDeclParser {
             throw new RuntimeException("'" + s + "' was not parseable and evaluatable", e);
         }
     }
-
 
     @Test
     public void testSortDecl() {

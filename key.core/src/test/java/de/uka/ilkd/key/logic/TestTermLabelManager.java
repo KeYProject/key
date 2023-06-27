@@ -42,6 +42,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Martin Hentschel
  */
 public class TestTermLabelManager {
+    private static InitConfig CONFIG = null;
+
     @Test
     public void testrefactorGoal_childrenAndGrandchildren_allRules() throws ProblemLoaderException {
         doRefactoringTestLogging(true, true,
@@ -579,80 +581,83 @@ public class TestTermLabelManager {
             final TermLabelPolicy modalityTermPolicy, final ChildTermLabelPolicy directChildPolicy,
             final ChildTermLabelPolicy childAndGrandchildPolicy, final TermLabelUpdate update,
             final TermLabelRefactoring refactoring) throws ProblemLoaderException {
-        KeYEnvironment<?> env = null;
-        try {
-            env = KeYEnvironment.load(new File(HelperClassForTests.TESTCASE_DIRECTORY,
-                "termLabels/flatSteps/FlatSteps.java").toPath(), null, null, null);
-            Profile profile = new JavaProfile() {
-                @Override
-                protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
-                    ImmutableList<TermLabelPolicy> applicationTermPolicies = ImmutableSLList.nil();
-                    if (applicationTermPolicy != null) {
-                        applicationTermPolicies =
-                            applicationTermPolicies.prepend(applicationTermPolicy);
-                    }
-                    ImmutableList<TermLabelPolicy> modalityTermPolicies = ImmutableSLList.nil();
-                    if (modalityTermPolicy != null) {
-                        modalityTermPolicies = modalityTermPolicies.prepend(modalityTermPolicy);
-                    }
-                    ImmutableList<ChildTermLabelPolicy> directChildTermLabelPolicies =
-                        ImmutableSLList.nil();
-                    if (directChildPolicy != null) {
-                        directChildTermLabelPolicies =
-                            directChildTermLabelPolicies.prepend(directChildPolicy);
-                    }
-                    ImmutableList<ChildTermLabelPolicy> childAndGrandchildTermLabelPolicies =
-                        ImmutableSLList.nil();
-                    if (childAndGrandchildPolicy != null) {
-                        childAndGrandchildTermLabelPolicies =
-                            childAndGrandchildTermLabelPolicies.prepend(childAndGrandchildPolicy);
-                    }
-                    ImmutableList<TermLabelUpdate> termLabelUpdates = ImmutableSLList.nil();
-                    if (update != null) {
-                        termLabelUpdates = termLabelUpdates.prepend(update);
-                    }
-                    ImmutableList<TermLabelRefactoring> termLabelRefactorings =
-                        ImmutableSLList.nil();
-                    if (refactoring != null) {
-                        termLabelRefactorings = termLabelRefactorings.prepend(refactoring);
-                    }
-
-                    ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
-                    result = result.prepend(new TermLabelConfiguration(new Name("ONE"),
-                        new LoggingFactory(new Name("ONE")), applicationTermPolicies,
-                        modalityTermPolicies, directChildTermLabelPolicies,
-                        childAndGrandchildTermLabelPolicies, termLabelUpdates,
-                        termLabelRefactorings, null));
-                    result = result.prepend(new TermLabelConfiguration(new Name("TWO"),
-                        new LoggingFactory(new Name("TWO")), applicationTermPolicies,
-                        modalityTermPolicies, directChildTermLabelPolicies,
-                        childAndGrandchildTermLabelPolicies, termLabelUpdates,
-                        termLabelRefactorings, null));
-                    result = result.prepend(new TermLabelConfiguration(new Name("THREE"),
-                        new LoggingFactory(new Name("THREE")), applicationTermPolicies,
-                        modalityTermPolicies, directChildTermLabelPolicies,
-                        childAndGrandchildTermLabelPolicies, termLabelUpdates,
-                        termLabelRefactorings, null));
-                    result = result.prepend(new TermLabelConfiguration(new Name("ADD"),
-                        new LoggingFactory(new Name("ADD")), applicationTermPolicies,
-                        modalityTermPolicies, directChildTermLabelPolicies,
-                        childAndGrandchildTermLabelPolicies, termLabelUpdates,
-                        termLabelRefactorings, null));
-                    result = result.prepend(new TermLabelConfiguration(new Name("APPLICATION"),
-                        new LoggingFactory(new Name("APPLICATION")), applicationTermPolicies,
-                        modalityTermPolicies, directChildTermLabelPolicies,
-                        childAndGrandchildTermLabelPolicies, termLabelUpdates,
-                        termLabelRefactorings, null));
-                    return result;
+        if (CONFIG == null) {
+            KeYEnvironment<?> env = null;
+            try {
+                env = KeYEnvironment.load(new File(HelperClassForTests.TESTCASE_DIRECTORY,
+                    "termLabels/flatSteps/FlatSteps.java").toPath(), null, null, null);
+            } finally {
+                if (env != null) {
+                    env.dispose();
                 }
-            };
-            return env.getInitConfig()
-                    .copyWithServices(env.getInitConfig().getServices().copy(profile, false));
-        } finally {
-            if (env != null) {
-                env.dispose();
             }
+            CONFIG = env.getInitConfig();
         }
+
+        Profile profile = new JavaProfile() {
+            @Override
+            protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
+                ImmutableList<TermLabelPolicy> applicationTermPolicies = ImmutableSLList.nil();
+                if (applicationTermPolicy != null) {
+                    applicationTermPolicies =
+                        applicationTermPolicies.prepend(applicationTermPolicy);
+                }
+                ImmutableList<TermLabelPolicy> modalityTermPolicies = ImmutableSLList.nil();
+                if (modalityTermPolicy != null) {
+                    modalityTermPolicies = modalityTermPolicies.prepend(modalityTermPolicy);
+                }
+                ImmutableList<ChildTermLabelPolicy> directChildTermLabelPolicies =
+                    ImmutableSLList.nil();
+                if (directChildPolicy != null) {
+                    directChildTermLabelPolicies =
+                        directChildTermLabelPolicies.prepend(directChildPolicy);
+                }
+                ImmutableList<ChildTermLabelPolicy> childAndGrandchildTermLabelPolicies =
+                    ImmutableSLList.nil();
+                if (childAndGrandchildPolicy != null) {
+                    childAndGrandchildTermLabelPolicies =
+                        childAndGrandchildTermLabelPolicies.prepend(childAndGrandchildPolicy);
+                }
+                ImmutableList<TermLabelUpdate> termLabelUpdates = ImmutableSLList.nil();
+                if (update != null) {
+                    termLabelUpdates = termLabelUpdates.prepend(update);
+                }
+                ImmutableList<TermLabelRefactoring> termLabelRefactorings =
+                    ImmutableSLList.nil();
+                if (refactoring != null) {
+                    termLabelRefactorings = termLabelRefactorings.prepend(refactoring);
+                }
+
+                ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
+                result = result.prepend(new TermLabelConfiguration(new Name("ONE"),
+                    new LoggingFactory(new Name("ONE")), applicationTermPolicies,
+                    modalityTermPolicies, directChildTermLabelPolicies,
+                    childAndGrandchildTermLabelPolicies, termLabelUpdates,
+                    termLabelRefactorings, null));
+                result = result.prepend(new TermLabelConfiguration(new Name("TWO"),
+                    new LoggingFactory(new Name("TWO")), applicationTermPolicies,
+                    modalityTermPolicies, directChildTermLabelPolicies,
+                    childAndGrandchildTermLabelPolicies, termLabelUpdates,
+                    termLabelRefactorings, null));
+                result = result.prepend(new TermLabelConfiguration(new Name("THREE"),
+                    new LoggingFactory(new Name("THREE")), applicationTermPolicies,
+                    modalityTermPolicies, directChildTermLabelPolicies,
+                    childAndGrandchildTermLabelPolicies, termLabelUpdates,
+                    termLabelRefactorings, null));
+                result = result.prepend(new TermLabelConfiguration(new Name("ADD"),
+                    new LoggingFactory(new Name("ADD")), applicationTermPolicies,
+                    modalityTermPolicies, directChildTermLabelPolicies,
+                    childAndGrandchildTermLabelPolicies, termLabelUpdates,
+                    termLabelRefactorings, null));
+                result = result.prepend(new TermLabelConfiguration(new Name("APPLICATION"),
+                    new LoggingFactory(new Name("APPLICATION")), applicationTermPolicies,
+                    modalityTermPolicies, directChildTermLabelPolicies,
+                    childAndGrandchildTermLabelPolicies, termLabelUpdates,
+                    termLabelRefactorings, null));
+                return result;
+            }
+        };
+        return CONFIG.copyWithServices(CONFIG.getServices().copy(profile, false));
     }
 
     private static class LoggingTermLabelRefactoring implements TermLabelRefactoring {

@@ -23,6 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class AbstractTestTermParser {
 
+    private static Services SERVICES = null;
+
     protected final TermFactory tf;
     protected final TermBuilder tb;
     protected final NamespaceSet nss;
@@ -166,9 +168,12 @@ public class AbstractTestTermParser {
     }
 
     protected Services getServices() {
-        File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-            + "termParser" + File.separator + "parserTest.key");
-        return HelperClassForTests.createServices(keyFile);
+        if (SERVICES == null) {
+            File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY + File.separator
+                + "termParser" + File.separator + "parserTest.key");
+            SERVICES = HelperClassForTests.createServices(keyFile);
+        }
+        return SERVICES.copy(false);
     }
 
 }

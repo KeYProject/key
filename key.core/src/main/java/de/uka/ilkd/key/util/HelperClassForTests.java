@@ -282,8 +282,7 @@ public class HelperClassForTests {
     }
 
     public static Services createServices(File keyFile) {
-        JavaInfo javaInfo = HelperClassForTests.parse(keyFile).getFirstProof().getJavaInfo();
-        return javaInfo.getServices();
+        return HelperClassForTests.parse(keyFile).getFirstProof().getServices();
     }
 
     public static Services createServices() {
