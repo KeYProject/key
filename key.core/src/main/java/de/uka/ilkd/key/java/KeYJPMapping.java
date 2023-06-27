@@ -25,6 +25,11 @@ public class KeYJPMapping {
     private boolean parsedSpecial = false;
 
     /**
+     * are we currently parsing library classes
+     */
+    private boolean parsingLibraries = false;
+
+    /**
      * maps a recoder programelement (or something similar, e.g. Type)
      * to the KeY-equivalent
      */
@@ -202,5 +207,13 @@ public class KeYJPMapping {
      */
     public void parsedSpecial(boolean b) {
         parsedSpecial = b;
+    }
+
+    public boolean isParsingLibraries() {
+        return parsingLibraries;
+    }
+
+    public void setParsingLibraries(boolean parsingLibraries) {
+        this.parsingLibraries = parsingLibraries;
     }
 }

@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.abstraction;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -64,6 +66,10 @@ public final class PrimitiveType implements Type {
             return pt;
         }
         return typeMap.get(name);
+    }
+
+    public static Collection<PrimitiveType> getPrimitiveTypes() {
+        return Collections.unmodifiableCollection(ldtMap.values());
     }
 
     public static PrimitiveType getPrimitiveTypeByLDT(Name ldtName) {

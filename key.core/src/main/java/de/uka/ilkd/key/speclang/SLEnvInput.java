@@ -83,31 +83,33 @@ public final class SLEnvInput extends AbstractEnvInput {
             Path path) throws ProofInputException {
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
         for (KeYJavaType kjt : allKJTs) {
-            if (kjt.getJavaType() instanceof TypeDeclaration
-                    && ((TypeDeclaration) kjt.getJavaType()).isLibraryClass()) {
-                final String filePath =
-                    String.format("%s/%s.key", path, kjt.getFullName().replace(".", "/"));
-                RuleSource rs = null;
+            var javaType = kjt.getJavaType();
+            if (!(javaType instanceof TypeDeclaration)
+                    || !((TypeDeclaration) javaType).isLibraryClass()) {
+                continue;
+            }
 
-                // external or internal path?
-                var file = Path.of(filePath);
-                if (file.toFile().isFile()) {
-                    rs = RuleSourceFactory.initRuleFile(file);
+            var p = Path.of(kjt.getFullName().replace(".", "/") + ".key");
+            final Path file = path.resolve(p);
+            RuleSource rs;
+
+            // external or internal path?
+            if (file.toFile().isFile()) {
+                rs = RuleSourceFactory.initRuleFile(file);
+            } else {
+                URL url = KeYResourceManager.getManager().getResourceFile(JavaService.class,
+                    file.toString());
+                if (url != null) {
+                    rs = RuleSourceFactory.initRuleFile(url);
                 } else {
-                    URL url = KeYResourceManager.getManager().getResourceFile(JavaService.class,
-                        filePath);
-                    if (url != null) {
-                        rs = RuleSourceFactory.initRuleFile(url);
-                    }
-                }
-
-                // rule source found? -> read
-                if (rs != null) {
-                    final KeYFile keyFile = new KeYFile(path.toString(), rs, null, getProfile());
-                    keyFile.setInitConfig(initConfig);
-                    warnings = warnings.union(keyFile.read());
+                    continue;
                 }
             }
+
+            // read rule source found
+            final KeYFile keyFile = new KeYFile(path.toString(), rs, null, getProfile());
+            keyFile.setInitConfig(initConfig);
+            warnings = warnings.union(keyFile.read());
         }
         return warnings;
     }

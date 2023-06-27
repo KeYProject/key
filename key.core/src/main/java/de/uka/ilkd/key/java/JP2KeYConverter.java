@@ -35,7 +35,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSetStatement;
 import de.uka.ilkd.key.util.AssertionFailure;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -343,7 +342,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var c = createComments(n);
         ProgramElementName name = new ProgramElementName(n.getNameAsString());
         ProgramElementName fullName = new ProgramElementName(n.getFullyQualifiedName().get());
-        boolean isLibrary = false; // TODO weigl
+        boolean isLibrary = mapping.isParsingLibraries();
         ImmutableArray<de.uka.ilkd.key.java.declaration.Modifier> modArray = map(n.getModifiers());
         ImmutableArray<MemberDeclaration> members = map(n.getMembers());
         boolean parentIsInterface = false;
@@ -426,7 +425,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     private List<Comment> createComments(Node n) {
         var comments = new ArrayList<Comment>();
         if (n.containsData(JMLCommentTransformer.BEFORE_COMMENTS)) {
-            comments.addAll(n.getData(JMLCommentTransformer.BEFORE_COMMENTS).stream().map(c -> new Comment(c.asString(), createPositionInfo(c))).toList());
+            comments.addAll(n.getData(JMLCommentTransformer.BEFORE_COMMENTS).stream()
+                    .map(c -> new Comment(c.asString(), createPositionInfo(c))).toList());
         }
         comments.addAll(n.getAssociatedSpecificationComments()
                 .map(l -> l.stream().map(c -> new Comment(c.asString(), createPositionInfo(c)))
@@ -537,8 +537,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             }
             if (construct instanceof TextualJMLMergePointDecl) {
                 var a = (TextualJMLMergePointDecl) construct;
-                var loc = new LocationVariable(services.getVariableNamer().getTemporaryNameProposal("x"),
-                                services.getNamespaces().sorts().lookup("boolean"));
+                var loc =
+                    new LocationVariable(services.getVariableNamer().getTemporaryNameProposal("x"),
+                        services.getNamespaces().sorts().lookup("boolean"));
                 return new MergePointStatement(pi, a, loc);
             }
             LOGGER.warn(n.getRange() + " Ignoring statement " + construct.getClass());

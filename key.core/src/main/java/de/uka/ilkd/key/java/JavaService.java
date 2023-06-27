@@ -53,6 +53,7 @@ import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.VoidType;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -415,6 +416,7 @@ public class JavaService {
             return;
         }
 
+        mapping.setParsingLibraries(true);
         try {
             List<CompilationUnit> specialClasses = parseLibs(fileRepo);
             /*
@@ -426,13 +428,14 @@ public class JavaService {
             programFactory.setJavaRedux(specialClasses);
             transformModel(specialClasses);
 
-            // make them available to the rec2key mapping
+            // make them available to the mapping
             for (CompilationUnit cu : specialClasses) {
-                // weigl: allowed for fragments
-                // var dl = cu.getStorage();
-                // if (dl.isEmpty())
-                // throw new AssertionError("DataLocation not set on compilation unit");
                 converter.processCompilationUnit(cu);
+            }
+
+            // Make sure all primitive types are registered
+            for (var type : ResolvedPrimitiveType.values()) {
+                typeConverter.getKeYJavaType(type);
             }
 
             /*
@@ -456,6 +459,7 @@ public class JavaService {
         }
 
         // tell the mapping that we have parsed the special classes
+        mapping.setParsingLibraries(false);
         mapping.parsedSpecial(true);
     }
 
