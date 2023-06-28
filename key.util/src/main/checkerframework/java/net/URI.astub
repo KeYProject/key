@@ -1,0 +1,14 @@
+package java.net;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
+@AnnotatedFor("nullness")
+public class URI {
+
+    public URI(@Nullable String scheme,
+               @Nullable String userInfo, @Nullable String host, int port,
+               @Nullable String path, @Nullable String query, @Nullable String fragment)
+      throws URISyntaxException {}
+
+}
