@@ -32,6 +32,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public ImmutableList<LabeledParserRuleContext> getEnsuresFree(Name toString) {
         return getList(ENSURES_FREE, toString);
     }
+    
+    public ImmutableList<LabeledParserRuleContext> getAssignableFree(Name toString) {
+        return getList(ASSIGNABLE_FREE, toString);
+    }
 
     private ImmutableList<LabeledParserRuleContext> getList(@Nonnull ClauseHd clause,
             @Nonnull Name heap) {
@@ -78,7 +82,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
      * Heap-dependent clauses
      */
     public enum ClauseHd {
-        ACCESSIBLE, ASSIGNABLE, REQUIRES, REQUIRES_FREE, ENSURES, ENSURES_FREE, AXIOMS,
+        ACCESSIBLE, ASSIGNABLE, ASSIGNABLE_FREE, REQUIRES, REQUIRES_FREE, ENSURES, ENSURES_FREE,
+        AXIOMS,
     }
 
     private final Behavior behavior;
