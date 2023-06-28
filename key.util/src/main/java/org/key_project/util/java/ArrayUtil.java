@@ -1,5 +1,8 @@
 package org.key_project.util.java;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -10,7 +13,7 @@ import java.util.function.Predicate;
  *
  * @author Martin Hentschel
  */
-@SuppressWarnings("nullness")
+@NullMarked
 public final class ArrayUtil {
     /**
      * Forbid instances by this private constructor.
@@ -21,11 +24,13 @@ public final class ArrayUtil {
     /**
      * Searches an element in the given {@link Iterable} instance.
      *
+     * Returns the first element that satisfies the predicate.
+     *
      * @param array The instance to search in.
      * @param filter The filter to select an element.
      * @return The found element or {@code null} if no element was found.
      */
-    public static <T> T search(T[] array, Predicate<T> filter) {
+    public static <T extends @Nullable Object> @Nullable T search(T[] array, Predicate<T> filter) {
         T result = null;
         if (array != null && filter != null) {
             int i = 0;
@@ -55,7 +60,7 @@ public final class ArrayUtil {
      * @throws IllegalArgumentException Both parameters are {@code null}.
      */
     @SuppressWarnings("unchecked")
-    public static <T> T[] addAll(T[] array, T[] toAdd) {
+    public static <T extends @Nullable Object> T [] addAll(T @Nullable [] array, T @Nullable [] toAdd) {
         if (array != null) {
             if (toAdd != null) {
                 T[] result =
@@ -100,7 +105,7 @@ public final class ArrayUtil {
      * @throws IllegalArgumentException Both parameters are {@code null}.
      */
     @SuppressWarnings("unchecked")
-    public static <T> T[] addAll(T[] array, T[] toAdd, Class<?> newArrayType) {
+    public static <T extends @Nullable Object> T[] addAll(T @Nullable [] array, T @Nullable [] toAdd, Class<?> newArrayType) {
         if (array != null) {
             if (toAdd != null) {
                 T[] result = (T[]) java.lang.reflect.Array.newInstance(newArrayType,
@@ -140,7 +145,7 @@ public final class ArrayUtil {
      * @throws IllegalArgumentException Both parameters are {@code null}.
      */
     @SuppressWarnings("unchecked")
-    public static <T> T[] add(T[] array, T toAdd) {
+    public static <T extends @Nullable Object> T[] add(T @Nullable [] array, @Nullable T toAdd) {
         if (array != null) {
             T[] result = (T[]) java.lang.reflect.Array
                     .newInstance(array.getClass().getComponentType(), array.length + 1);
