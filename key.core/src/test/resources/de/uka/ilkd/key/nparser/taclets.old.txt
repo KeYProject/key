@@ -2454,13 +2454,13 @@ blockBreakLabel {
 \find(#allmodal ( (modal operator))\[{ ..
   #lb0:
   {
-    break;
+    break #lb1;
     #slist
   }
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   do-break(#lb0:
-  break;)
+  break #lb1;)
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -2469,12 +2469,12 @@ Choices: programRules:Java}
 blockBreakLabeled {
 \find(#allmodal ( (modal operator))\[{ ..
   {
-    break;
+    break #lb;
     #slist
   }
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  break;
+  break #lb;
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -2483,12 +2483,12 @@ Choices: programRules:Java}
 blockBreakNoLabel {
 \find(#allmodal ( (modal operator))\[{ ..
   {
-    break;
+    break #lb1;
     #slist
   }
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  break;
+  break #lb1;
 ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
@@ -2511,12 +2511,12 @@ Choices: programRules:Java}
 blockContinueLabeled {
 \find(#allmodal ( (modal operator))\[{ ..
   {
-    continue;
+    continue #lb;
     #slist
   }
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  continue;
+  continue #lb;
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -2903,11 +2903,11 @@ Choices: integerSimplificationRules:full}
 break {
 \find(#allmodal ( (modal operator))\[{ ..
   #lb0:
-  break;
+  break #lb1;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   do-break(#lb0:
-  break;)
+  break #lb1;)
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -8053,7 +8053,7 @@ execBreakEliminateContinueLabelWildcard {
   exec {
     break;
     #slist
-  } ccatch (\Continue) {
+  } ccatch (\Continue *) {
     #slist1
   }#cs
 ... }\] (post))
@@ -8123,7 +8123,7 @@ Choices: programRules:Java}
 execBreakLabelEliminateBreak {
 \find(#allmodal ( (modal operator))\[{ ..
   exec {
-    break;
+    break #lb;
     #slist
   } ccatch (\Break) {
     #slist1
@@ -8131,7 +8131,7 @@ execBreakLabelEliminateBreak {
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   exec {
-    break;
+    break #lb;
   }#cs
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -8141,7 +8141,7 @@ Choices: programRules:Java}
 execBreakLabelEliminateBreakLabelNoMatch {
 \find(#allmodal ( (modal operator))\[{ ..
   exec {
-    break;
+    break #lb;
     #slist
   } ccatch (\Break #lb1) {
     #slist1
@@ -8150,7 +8150,7 @@ execBreakLabelEliminateBreakLabelNoMatch {
 \varcond(\different (#lb (program Label), #lb1 (program Label)), )
 \replacewith(#allmodal ( (modal operator))\[{ ..
   exec {
-    break;
+    break #lb;
   }#cs
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -8160,7 +8160,7 @@ Choices: programRules:Java}
 execBreakLabelEliminateContinue {
 \find(#allmodal ( (modal operator))\[{ ..
   exec {
-    break;
+    break #lb;
     #slist
   } ccatch (\Continue) {
     #slist1
@@ -8168,7 +8168,7 @@ execBreakLabelEliminateContinue {
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   {
-    break;
+    break #lb;
   }
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -8178,7 +8178,7 @@ Choices: programRules:Java}
 execBreakLabelEliminateContinueLabel {
 \find(#allmodal ( (modal operator))\[{ ..
   exec {
-    break;
+    break #lb;
     #slist
   } ccatch (\Continue #lb1) {
     #slist1
@@ -8186,7 +8186,7 @@ execBreakLabelEliminateContinueLabel {
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   {
-    break;
+    break #lb;
   }
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -8196,15 +8196,15 @@ Choices: programRules:Java}
 execBreakLabelEliminateContinueLabelWildcard {
 \find(#allmodal ( (modal operator))\[{ ..
   exec {
-    break;
+    break #lb;
     #slist
-  } ccatch (\Continue) {
+  } ccatch (\Continue *) {
     #slist1
   }#cs
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   {
-    break;
+    break #lb;
   }
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -8214,7 +8214,7 @@ Choices: programRules:Java}
 execBreakLabelEliminateExcCcatch {
 \find(#allmodal ( (modal operator))\[{ ..
   exec {
-    break;
+    break #lb;
     #slist
   } ccatch (#t #v) {
     #slist1
@@ -8222,7 +8222,7 @@ execBreakLabelEliminateExcCcatch {
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   {
-    break;
+    break #lb;
   }
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -8232,7 +8232,7 @@ Choices: programRules:Java}
 execBreakLabelEliminateReturn {
 \find(#allmodal ( (modal operator))\[{ ..
   exec {
-    break;
+    break #lb;
     #slist
   } ccatch (\Return) {
     #slist1
@@ -8240,7 +8240,7 @@ execBreakLabelEliminateReturn {
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   exec {
-    break;
+    break #lb;
   }#cs
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -8250,7 +8250,7 @@ Choices: programRules:Java}
 execBreakLabelEliminateReturnVal {
 \find(#allmodal ( (modal operator))\[{ ..
   exec {
-    break;
+    break #lb;
     #slist
   } ccatch (\Return #t #v) {
     #slist1
@@ -8258,7 +8258,7 @@ execBreakLabelEliminateReturnVal {
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   exec {
-    break;
+    break #lb;
   }#cs
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -8268,7 +8268,7 @@ Choices: programRules:Java}
 execBreakLabelMatch {
 \find(#allmodal ( (modal operator))\[{ ..
   exec {
-    break;
+    break #lb;
     #slist
   } ccatch (\Break #lb) {
     #slist1
@@ -8286,7 +8286,7 @@ Choices: programRules:Java}
 execBreakLabelWildcard {
 \find(#allmodal ( (modal operator))\[{ ..
   exec {
-    break;
+    break #lb;
     #slist
   } ccatch (\Break *) {
     #slist1
@@ -8458,7 +8458,7 @@ Choices: programRules:Java}
 execContinueLabelEliminateBreak {
 \find(#allmodal ( (modal operator))\[{ ..
   exec {
-    continue;
+    continue #lb;
     #slist
   } ccatch (\Break) {
     #slist1
@@ -8466,7 +8466,7 @@ execContinueLabelEliminateBreak {
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   exec {
-    continue;
+    continue #lb;
   }#cs
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -8476,7 +8476,7 @@ Choices: programRules:Java}
 execContinueLabelEliminateBreakLabel {
 \find(#allmodal ( (modal operator))\[{ ..
   exec {
-    continue;
+    continue #lb;
     #slist
   } ccatch (\Break #lb1) {
     #slist1
@@ -8484,7 +8484,7 @@ execContinueLabelEliminateBreakLabel {
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   exec {
-    continue;
+    continue #lb;
   }#cs
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -8494,7 +8494,7 @@ Choices: programRules:Java}
 execContinueLabelEliminateBreakLabelWildcard {
 \find(#allmodal ( (modal operator))\[{ ..
   exec {
-    continue;
+    continue #lb;
     #slist
   } ccatch (\Break *) {
     #slist1
@@ -8502,7 +8502,7 @@ execContinueLabelEliminateBreakLabelWildcard {
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   exec {
-    continue;
+    continue #lb;
   }#cs
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -8512,7 +8512,7 @@ Choices: programRules:Java}
 execContinueLabelEliminateContinue {
 \find(#allmodal ( (modal operator))\[{ ..
   exec {
-    continue;
+    continue #lb;
     #slist
   } ccatch (\Continue) {
     #slist1
@@ -8520,7 +8520,7 @@ execContinueLabelEliminateContinue {
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   exec {
-    continue;
+    continue #lb;
   }#cs
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -8530,7 +8530,7 @@ Choices: programRules:Java}
 execContinueLabelEliminateContinueLabelNoMatch {
 \find(#allmodal ( (modal operator))\[{ ..
   exec {
-    continue;
+    continue #lb;
     #slist
   } ccatch (\Continue #lb1) {
     #slist1
@@ -8539,7 +8539,7 @@ execContinueLabelEliminateContinueLabelNoMatch {
 \varcond(\different (#lb (program Label), #lb1 (program Label)), )
 \replacewith(#allmodal ( (modal operator))\[{ ..
   exec {
-    continue;
+    continue #lb;
   }#cs
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -8549,7 +8549,7 @@ Choices: programRules:Java}
 execContinueLabelEliminateExcCcatch {
 \find(#allmodal ( (modal operator))\[{ ..
   exec {
-    continue;
+    continue #lb;
     #slist
   } ccatch (#t #v) {
     #slist1
@@ -8557,7 +8557,7 @@ execContinueLabelEliminateExcCcatch {
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   {
-    continue;
+    continue #lb;
   }
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -8567,7 +8567,7 @@ Choices: programRules:Java}
 execContinueLabelEliminateReturn {
 \find(#allmodal ( (modal operator))\[{ ..
   exec {
-    continue;
+    continue #lb;
     #slist
   } ccatch (\Return) {
     #slist1
@@ -8575,7 +8575,7 @@ execContinueLabelEliminateReturn {
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   exec {
-    continue;
+    continue #lb;
   }#cs
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -8585,7 +8585,7 @@ Choices: programRules:Java}
 execContinueLabelEliminateReturnVal {
 \find(#allmodal ( (modal operator))\[{ ..
   exec {
-    continue;
+    continue #lb;
     #slist
   } ccatch (\Return #t #v) {
     #slist1
@@ -8593,7 +8593,7 @@ execContinueLabelEliminateReturnVal {
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   exec {
-    continue;
+    continue #lb;
   }#cs
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -8603,7 +8603,7 @@ Choices: programRules:Java}
 execContinueLabelMatch {
 \find(#allmodal ( (modal operator))\[{ ..
   exec {
-    continue;
+    continue #lb;
     #slist
   } ccatch (\Continue #lb) {
     #slist1
@@ -8621,9 +8621,9 @@ Choices: programRules:Java}
 execContinueLabelWildcard {
 \find(#allmodal ( (modal operator))\[{ ..
   exec {
-    continue;
+    continue #lb;
     #slist
-  } ccatch (\Continue) {
+  } ccatch (\Continue *) {
     #slist1
   }#cs
 ... }\] (post))
@@ -8809,7 +8809,7 @@ execReturnEliminateContinueLabelWildcard {
   exec {
     return;
     #slist
-  } ccatch (\Continue) {
+  } ccatch (\Continue *) {
     #slist1
   }#cs
 ... }\] (post))
@@ -8974,7 +8974,7 @@ execReturnValEliminateContinueLabelWildcard {
   exec {
     return #se;
     #slist
-  } ccatch (\Continue) {
+  } ccatch (\Continue *) {
     #slist1
   }#cs
 ... }\] (post))
@@ -9138,7 +9138,7 @@ execThrowEliminateContinueLabelWildcard {
   exec {
     throw #se;
     #slist
-  } ccatch (\Continue) {
+  } ccatch (\Continue *) {
     #slist1
   }#cs
 ... }\] (post))
@@ -12615,14 +12615,14 @@ Choices: programRules:Java}
 lsLblBreak {
 \find(#allmodal ( (modal operator))\[{ ..
   loop-scope (#lhs) {
-    break;
+    break #lb;
     #slist
   }
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   {
     #lhs = true;
-    break;
+    break #lb;
   }
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -12633,7 +12633,7 @@ lsLblContinueMatch {
 \find(#allmodal ( (modal operator))\[{ ..
   #lb:
   loop-scope (#lhs) {
-    continue;
+    continue #lb;
     #slist
   }
 ... }\] (post))
@@ -12645,19 +12645,19 @@ Choices: programRules:Java}
 lsLblContinueNoMatch1 {
 \find(#allmodal ( (modal operator))\[{ ..
   loop-scope (#lhs) {
-    continue;
+    continue #lb;
     #slist
   }
 ... }\] (post))
 \varcond(\varcond (\storeStmtIn(#lsStmt (program Statement), #allmodal ( (modal operator))\[{
   loop-scope (#lhs) {
-    continue;
+    continue #lb;
     #slist
   }
 }\] (post))), \varcond (\not\isLabeled(#lsStmt (program Statement)), )
 \replacewith(#allmodal ( (modal operator))\[{ ..
   #lhs = true;
-  continue;
+  continue #lb;
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -12667,14 +12667,14 @@ lsLblContinueNoMatch2 {
 \find(#allmodal ( (modal operator))\[{ ..
   #lb1:
   loop-scope (#lhs) {
-    continue;
+    continue #lb;
     #slist
   }
 ... }\] (post))
 \varcond(\different (#lb1 (program Label), #lb (program Label)), )
 \replacewith(#allmodal ( (modal operator))\[{ ..
   #lhs = true;
-  continue;
+  continue #lb;
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -17716,7 +17716,7 @@ tryBreak {
   try {
     break;
     #slist
-  }#cs
+  } catch (#t #v0) { #slist1 }
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   break;
@@ -17728,12 +17728,12 @@ Choices: programRules:Java}
 tryBreakLabel {
 \find(#allmodal ( (modal operator))\[{ ..
   try {
-    break;
+    break #lb;
     #slist
-  }#cs
+  } catch (#t #v0) { #slist1 }
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  break;
+  break #lb;
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -17746,7 +17746,7 @@ tryCatchFinallyThrow {
     #slist
   } catch (#t #v0) {
     #slist1
-  }#cs finally {
+  } catch (#t #v0) { #slist3 } finally {
     #slist2
   }
 ... }\] (post))
@@ -17756,7 +17756,7 @@ tryCatchFinallyThrow {
       throw new java.lang.NullPointerException();
     } catch (#t #v0) {
       #slist1
-    }#cs finally {
+    } catch (#t #v0) { #slist3 } finally {
       #slist2
     }
   } else if (#se instanceof #t) {
@@ -17770,7 +17770,7 @@ tryCatchFinallyThrow {
   } else {
     try {
       throw #se;
-    }#cs finally {
+    } catch (#t #v0) { #slist3 } finally {
       #slist2
     }
   }
@@ -17809,7 +17809,7 @@ Choices: programRules:Java}
 == tryEmpty (tryEmpty) =========================================
 tryEmpty {
 \find(#allmodal ( (modal operator))\[{ ..
-  try {}#cs
+  try {} catch (#t #v0) { #slist1 }
 ... }\] (post))
 \replacewith(#allmodal(post)) 
 \heuristics(simplify_prog)
@@ -17821,7 +17821,7 @@ tryFinallyBreak {
   try {
     break;
     #slist
-  }#cs finally {
+  } catch (#t #v0) { #slist1 } finally {
     #slist2
   }
 ... }\] (post))
@@ -17838,9 +17838,9 @@ Choices: programRules:Java}
 tryFinallyBreakLabel {
 \find(#allmodal ( (modal operator))\[{ ..
   try {
-    break;
+    break #lb;
     #slist
-  }#cs finally {
+  } catch (#t #v0) { #slist1 } finally {
     #slist2
   }
 ... }\] (post))
@@ -17848,7 +17848,7 @@ tryFinallyBreakLabel {
   {
     #slist2
   }
-  break;
+  break #lb;
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -17856,7 +17856,7 @@ Choices: programRules:Java}
 == tryFinallyEmpty (tryEmpty) =========================================
 tryFinallyEmpty {
 \find(#allmodal ( (modal operator))\[{ ..
-  try {}#cs finally {
+  try {} catch (#t #v0) { #slist1 } finally {
     #slist2
   }
 ... }\] (post))
@@ -17874,7 +17874,7 @@ tryFinallyReturn {
   try {
     return #se;
     #slist
-  }#cs finally {
+  } catch (#t #v0) { #slist1 } finally {
     #slist2
   }
 ... }\] (post))
@@ -17895,7 +17895,7 @@ tryFinallyReturnNoValue {
   try {
     return;
     #slist
-  }#cs finally {
+  } catch (#t #v0) { #slist1 } finally {
     #slist2
   }
 ... }\] (post))
@@ -17946,7 +17946,7 @@ tryMultipleCatchThrow {
     #slist1
   } catch (#t2 #v1) {
     #slist3
-  }#cs
+  } catch (#t #v0) { #slist2 }
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   if (#se == null) {
@@ -17956,7 +17956,7 @@ tryMultipleCatchThrow {
       #slist1
     } catch (#t2 #v1) {
       #slist3
-    }#cs
+    } catch (#t #v0) { #slist2 }
   } else if (#se instanceof #t) {
     #t #v0;
     #v0 = (#t) #se;
@@ -17966,7 +17966,7 @@ tryMultipleCatchThrow {
       throw #se;
     } catch (#t2 #v1) {
       #slist3
-    }#cs
+    } catch (#t #v0) { #slist2 }
   }
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -17978,7 +17978,7 @@ tryReturn {
   try {
     return #se;
     #slist
-  }#cs
+  } catch (#t #v0) { #slist1 }
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   return #se;
@@ -17992,7 +17992,7 @@ tryReturnNoValue {
   try {
     return;
     #slist
-  }#cs
+  } catch (#t #v0) { #slist1 }
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   return;
@@ -18004,12 +18004,12 @@ Choices: programRules:Java}
 try_continue_1 {
 \find(#allmodal ( (modal operator))\[{ ..
   try {
-    continue;
+    continue #lb;
     #slist
-  }#cs
+  } catch (#t #v0) { #slist1 }
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  continue;
+  continue #lb;
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -18020,7 +18020,7 @@ try_continue_2 {
   try {
     continue;
     #slist
-  }#cs
+  } catch (#t #v0) { #slist1 }
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   continue;
@@ -18032,9 +18032,9 @@ Choices: programRules:Java}
 try_finally_continue_1 {
 \find(#allmodal ( (modal operator))\[{ ..
   try {
-    continue;
+    continue #lb;
     #slist
-  }#cs finally {
+  } catch (#t #v0) { #slist1 } finally {
     #slist2
   }
 ... }\] (post))
@@ -18042,7 +18042,7 @@ try_finally_continue_1 {
   {
     #slist2
   }
-  continue;
+  continue #lb;
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -18053,7 +18053,7 @@ try_finally_continue_2 {
   try {
     continue;
     #slist
-  }#cs finally {
+  } catch (#t #v0) { #slist1 } finally {
     #slist2
   }
 ... }\] (post))

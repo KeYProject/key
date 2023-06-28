@@ -1911,7 +1911,7 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnCcatchContinueWildcardParameterDeclaration(
             CcatchContinueWildcardParameterDeclaration x) {
-        l.keyWord("\\Continue");
+        l.keyWord("\\Continue").brk().print("*");
     }
 
     /**

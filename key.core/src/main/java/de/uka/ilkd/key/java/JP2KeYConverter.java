@@ -692,7 +692,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(InstanceOfExpr n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        var lhs = (Expression) accept(n.getExpression());
+        Expression lhs = accept(n.getExpression());
         var type = requireTypeReference(n.getType());
         return new Instanceof(pi, c, lhs, type);
     }
@@ -727,25 +727,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(MethodCallExpr n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        // We currently only support Class names as scope
-
-        // TODO javaparser this is a mess
-        String name = n.getNameAsString();
-        String qualifier;
-        if (n.getScope().isPresent()) {
-            var scope = n.getScope().get();
-            if (scope.isNameExpr()) {
-                qualifier = scope.asNameExpr().getName().asString();
-            } else {
-                qualifier = null;
-            }
-        } else {
-            qualifier = null;
-        }
-        var methodName = qualifier == null ? new ProgramElementName(n.getNameAsString())
-                : new ProgramElementName(n.getNameAsString(), qualifier);
-        // TODO javaparser this can be a nameexpr (see above) e.g. in Class.staticMethod()
-        ReferencePrefix prefix = null;
+        var methodName = new ProgramElementName(n.getNameAsString());
+        ReferencePrefix prefix = accepto(n.getScope());
         ImmutableArray<Expression> args = map(n.getArguments());
         return new MethodReference(pi, c, prefix, methodName, args);
     }
@@ -1059,7 +1042,13 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var c = createComments(n);
         StatementBlock body = accept(n.getTryBlock());
         ImmutableArray<Branch> branches = map(n.getCatchClauses());
-        // TODO weigl add finally clauses to branches
+        if (n.getFinallyBlock().isPresent()) {
+            StatementBlock block = accept(n.getFinallyBlock().get());
+            var fin = new Finally(block);
+            var list = branches.toList();
+            list.add(fin);
+            branches = new ImmutableArray<>(list);
+        }
         return new Try(pi, c, body, branches, null, 0);
     }
 
@@ -1364,28 +1353,38 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(KeyCcatchBreak n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
+        CcatchNonstandardParameterDeclaration param;
         if (n.getLabel().isPresent()) {
-            var label = nameToLabel(n.getLabel());
-            return new CcatchBreakLabelParameterDeclaration(pi, c, label);
+            if (n.getLabel().get().asString().equals("*")) {
+                param = new CcatchBreakWildcardParameterDeclaration(pi, c);
+            } else {
+                var label = nameToLabel(n.getLabel());
+                param = new CcatchBreakLabelParameterDeclaration(pi, c, label);
+            }
+        } else {
+            param = new CcatchBreakParameterDeclaration(pi, c);
         }
-        if (n.getBlock().isPresent()) {
-            return new CcatchBreakParameterDeclaration(pi, c);
-        }
-        return new CcatchBreakWildcardParameterDeclaration(pi, c);
+        StatementBlock block = accepto(n.getBlock());
+        return new Ccatch(pi, c, null, param, block);
     }
 
     @Override
     public Object visit(KeyCcatchContinue n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
+        CcatchNonstandardParameterDeclaration param;
         if (n.getLabel().isPresent()) {
-            var label = nameToLabel(n.getLabel());
-            return new CcatchContinueLabelParameterDeclaration(pi, c, label);
+            if (n.getLabel().get().asString().equals("*")) {
+                param = new CcatchContinueWildcardParameterDeclaration(pi, c);
+            } else {
+                var label = nameToLabel(n.getLabel());
+                param = new CcatchContinueLabelParameterDeclaration(pi, c, label);
+            }
+        } else {
+            param = new CcatchContinueParameterDeclaration(pi, c);
         }
-        if (n.getBlock().isPresent()) {
-            return new CcatchContinueParameterDeclaration(pi, c);
-        }
-        return new CcatchContinueWildcardParameterDeclaration(pi, c);
+        StatementBlock block = accepto(n.getBlock());
+        return new Ccatch(pi, c, null, param, block);
     }
 
     @Override
@@ -1411,11 +1410,15 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(KeyCcatchReturn n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
+        CcatchNonstandardParameterDeclaration param;
         if (n.getParameter().isPresent()) {
-            ParameterDeclaration delegate = null;
-            return new CcatchReturnValParameterDeclaration(pi, c, delegate);
+            ParameterDeclaration delegate = accept(n.getParameter().get());
+            param = new CcatchReturnValParameterDeclaration(pi, c, delegate);
+        } else {
+            param = new CcatchReturnParameterDeclaration(pi, c);
         }
-        return new CcatchReturnParameterDeclaration(pi, c);
+        StatementBlock block = accepto(n.getBlock());
+        return new Ccatch(pi, c, null, param, block);
     }
 
     @Override
