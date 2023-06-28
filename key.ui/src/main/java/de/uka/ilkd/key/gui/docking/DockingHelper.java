@@ -28,6 +28,8 @@ import bibliothek.gui.dock.common.action.CCheckBox;
 import bibliothek.gui.dock.common.action.core.CommonDecoratableDockAction;
 import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.intern.action.CDecorateableAction;
+import bibliothek.gui.dock.control.focus.DefaultFocusRequest;
+import bibliothek.gui.dock.control.focus.FocusRequest;
 
 public class DockingHelper {
     public final static List<String> LEFT_TOP_PANEL = new LinkedList<>();
@@ -112,6 +114,23 @@ public class DockingHelper {
         grid.add(1, 0, 2, 3, mainPanels.toArray(new CDockable[] {}));
         grid.add(2, 0, 1, 3, rightPanels.toArray(new CDockable[] {}));
         mainWindow.getDockControl().getContentArea().deploy(grid);
+    }
+
+    /**
+     * Focus the specified panel.
+     *
+     * @param mainWindow main window
+     * @param panel class name of the panel to show
+     */
+    public static void focus(MainWindow mainWindow, Class<?> panel) {
+        SingleCDockable dockable = mainWindow.getDockControl().getSingleDockable(panel.getName());
+        if (dockable == null) {
+            return;
+        }
+        dockable.setVisible(true);
+        FocusRequest request =
+            new DefaultFocusRequest(dockable.intern(), null, false, true, false, true);
+        dockable.getControl().getController().setFocusedDockable(request);
     }
 
     /**
