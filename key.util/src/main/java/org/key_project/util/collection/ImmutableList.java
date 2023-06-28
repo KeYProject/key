@@ -22,6 +22,7 @@ public interface ImmutableList<T extends @Nullable Object> extends Iterable<T>, 
      *
      * @return a Collector that accumulates the input elements into a new ImmutableList.
      */
+    @SuppressWarnings("nullness") // it seems some annotations are missing on Collector.of ...
     static <T extends @Nullable Object> Collector<T, List<T>, ImmutableList<T>> collector() {
         return Collector.of(LinkedList::new, List::add, (list1, list2) -> {
             list1.addAll(list2);
