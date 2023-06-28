@@ -805,6 +805,11 @@ public class OriginTermLabel implements TermLabel {
         INVARIANT("invariant"),
 
         /**
+         * invariant_free
+         */
+        INVARIANT_FREE("invariant_free"),
+
+        /**
          * loop_invariant
          */
         LOOP_INVARIANT("loop_invariant"),
