@@ -216,7 +216,7 @@ public final class SpecificationRepository {
         // search through all locally available methods
         final String name = pm.getMethodDeclaration().getName();
         final int numParams = pm.getParameterDeclarationCount();
-        final ImmutableList<IProgramMethod> candidatePMs =
+        final List<IProgramMethod> candidatePMs =
             services.getJavaInfo().getAllProgramMethods(kjt);
         outer: for (IProgramMethod candidatePM : candidatePMs) {
             if (candidatePM.getMethodDeclaration().getName().equals(name)
@@ -232,7 +232,10 @@ public final class SpecificationRepository {
 
         // not found (happens for private methods of superclasses)
         // -> search through superclasses
-        for (KeYJavaType sup : services.getJavaInfo().getAllSupertypes(kjt).removeAll(kjt)) {
+        for (KeYJavaType sup : services.getJavaInfo().getAllSupertypes(kjt)) {
+            if (sup.equals(kjt)) {
+                continue;
+            }
             final IProgramMethod result = (IProgramMethod) getCanonicalFormForKJT(obs, sup);
             if (result != null) {
                 return result;
@@ -1127,9 +1130,7 @@ public final class SpecificationRepository {
                     ImmutableList<FunctionalOperationContract> lookupContracts =
                         ImmutableSLList.nil();
                     ImmutableSet<FunctionalOperationContract> cs = getOperationContracts(kjt, pm);
-                    ImmutableList<KeYJavaType> superTypes =
-                        services.getJavaInfo().getAllSupertypes(kjt);
-                    for (KeYJavaType superType : superTypes) {
+                    for (KeYJavaType superType : services.getJavaInfo().getAllSupertypes(kjt)) {
                         for (FunctionalOperationContract fop : cs) {
                             if (fop.getSpecifiedIn().equals(superType)) {
                                 lookupContracts = lookupContracts.append(fop);

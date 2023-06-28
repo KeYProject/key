@@ -33,7 +33,6 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
-import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.helper.FindResources;
@@ -269,7 +268,7 @@ public class HelperClassForTests {
         JavaInfo javaInfo = services.getJavaInfo();
         KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
         // Assert.assertNotNull(containerKJT);
-        ImmutableList<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
+        Iterable<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
         IProgramMethod pm =
             CollectionUtil.search(pms, element -> methodFullName.equals(element.getFullName()));
         if (pm == null) {

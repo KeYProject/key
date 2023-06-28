@@ -208,19 +208,19 @@ public class JP2KeYTypeConverter {
         result.setJavaType(arrayType);
     }
 
-    private KeYJavaType getSerializableType() {
+    public KeYJavaType getSerializableType() {
         if (__serializableType == null)
             __serializableType = getKeYJavaType("java.io.Serializable");
         return __serializableType;
     }
 
-    private KeYJavaType getCloneableType() {
+    public KeYJavaType getCloneableType() {
         if (__cloneableType == null)
             __cloneableType = getKeYJavaType("java.lang.Cloneable");
         return __cloneableType;
     }
 
-    private KeYJavaType getObjectType() {
+    public KeYJavaType getObjectType() {
         if (__objectType == null)
             __objectType = getKeYJavaType("java.lang.Object");
         return __objectType;

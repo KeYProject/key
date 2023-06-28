@@ -18,7 +18,6 @@ import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -297,9 +296,7 @@ public final class SLEnvInput extends AbstractEnvInput {
             }
 
             // contracts, loop invariants
-            final ImmutableList<ProgramMethod> pms =
-                javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
-            for (IProgramMethod pm : pms) {
+            for (IProgramMethod pm : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
                 // contracts
                 final List<SpecificationElement> methodSpecs =
                     specExtractor.extractMethodSpecs(pm, staticInvPresent);
@@ -317,8 +314,7 @@ public final class SLEnvInput extends AbstractEnvInput {
             }
 
             // constructor contracts
-            final ImmutableList<IProgramMethod> constructors = javaInfo.getConstructors(kjt);
-            for (IProgramMethod constructor : constructors) {
+            for (IProgramMethod constructor : javaInfo.getConstructors(kjt)) {
                 assert constructor.isConstructor();
                 final List<SpecificationElement> constructorSpecs =
                     specExtractor.extractMethodSpecs(constructor, staticInvPresent);

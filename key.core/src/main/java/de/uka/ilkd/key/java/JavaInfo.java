@@ -463,19 +463,19 @@ public final class JavaInfo {
     /**
      * returns all methods from the given Type as IProgramMethods
      */
-    public ImmutableList<IProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
+    public List<IProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
         return kpmi.getAllProgramMethods(kjt);
     }
 
     /**
      * returns all methods declared in the given Type as IProgramMethods
      */
-    public ImmutableList<ProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType kjt) {
+    public List<ProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType kjt) {
         return kpmi.getAllProgramMethodsLocallyDeclared(kjt);
     }
 
 
-    public ImmutableList<IProgramMethod> getConstructors(KeYJavaType kjt) {
+    public List<IProgramMethod> getConstructors(KeYJavaType kjt) {
         return kpmi.getConstructors(kjt);
     }
 
@@ -635,7 +635,7 @@ public final class JavaInfo {
             /*
              * Traverse type hierarchy to find a method with the specified name.
              */
-            ImmutableList<KeYJavaType> allSupertypes = kpmi.getAllSupertypes(classKJT).reverse();
+            Iterable<KeYJavaType> allSupertypes = kpmi.getAllSupertypes(classKJT);
             Iterator<KeYJavaType> iterator = allSupertypes.iterator();
             while (iterator.hasNext() && pm == null) {
                 KeYJavaType next = iterator.next();
@@ -818,9 +818,8 @@ public final class JavaInfo {
      * @param fields the IList<Field> where we have to look for the field
      * @return the program variable of the given name or null if not found
      */
-    private ProgramVariable find(String programName, ImmutableList<Field> fields) {
-        for (Field field1 : fields) {
-            Field field = field1;
+    private ProgramVariable find(String programName, Iterable<Field> fields) {
+        for (Field field : fields) {
             if (programName.equals(field.getProgramName())) {
                 return (ProgramVariable) field.getProgramVariable();
             }
@@ -935,11 +934,9 @@ public final class JavaInfo {
                 }
                 return res;
             } else {
-                final ImmutableList<Field> list = kpmi.getAllFieldsLocallyDeclaredIn(classType);
-                for (Field field : list) {
-                    if (field != null
-                            && (field.getName().equals(name)
-                                    || field.getProgramName().equals(name))) {
+                for (Field field : kpmi.getAllFieldsLocallyDeclaredIn(classType)) {
+                    if (field.getName().equals(name)
+                            || field.getProgramName().equals(name)) {
                         return (ProgramVariable) field.getProgramVariable();
                     }
                 }
@@ -1006,13 +1003,13 @@ public final class JavaInfo {
 
         // the assert statements below are not for fun, some methods rely
         // on the correct order
-        ImmutableList<KeYJavaType> hierarchy = ImmutableSLList.nil();
+        List<KeYJavaType> hierarchy = kpmi.getAllSupertypes(type);
         if (traverseSubtypes) {
-            hierarchy = kpmi.getAllSubtypes(type);
-            assert !hierarchy.contains(type);
+            var subTypes = kpmi.getAllSubtypes(type);
+            assert !subTypes.contains(type);
+            hierarchy.addAll(subTypes);
         }
 
-        hierarchy = hierarchy.prepend(kpmi.getAllSupertypes(type));
         // weigl: unclear assertion: assert hierarchy.head() == type;
 
 
@@ -1165,7 +1162,7 @@ public final class JavaInfo {
      * @return list of all subtypes
      */
     public ImmutableList<KeYJavaType> getAllSubtypes(KeYJavaType type) {
-        return kpmi.getAllSubtypes(type);
+        return ImmutableList.fromList(kpmi.getAllSubtypes(type));
     }
 
     /**
@@ -1174,23 +1171,23 @@ public final class JavaInfo {
      * @param type the KeYJavaType whose supertypes are returned
      * @return list of all supertypes
      */
-    public ImmutableList<KeYJavaType> getAllSupertypes(KeYJavaType type) {
+    public List<KeYJavaType> getAllSupertypes(KeYJavaType type) {
         if (type.getJavaType() instanceof ArrayType) {
-            ImmutableList<KeYJavaType> res = ImmutableSLList.nil();
-            for (Sort s : getSuperSorts(type.getSort())) {
-                res = res.append(getKeYJavaType(s));
-            }
-            return res;
+            return getSuperSorts(type.getSort())
+                    .stream()
+                    .map(this::getKeYJavaType)
+                    .toList();
         }
         return kpmi.getAllSupertypes(type);
     }
 
-    private ImmutableList<Sort> getSuperSorts(Sort sort) {
-        ImmutableList<Sort> res = ImmutableSLList.nil();
+    private List<Sort> getSuperSorts(Sort sort) {
+        List<Sort> res = new ArrayList<>(0);
         final Sort object = getJavaLangObject().getSort();
         if (sort != object) {
             for (Sort exsort : sort.extendsSorts(services)) {
-                res = res.append(getSuperSorts(exsort)).append(exsort);
+                res.addAll(getSuperSorts(exsort));
+                res.add(exsort);
             }
         }
         return res;
@@ -1347,7 +1344,7 @@ public final class JavaInfo {
             /*
              * Canonical ProgramMmethod can be located in a supertype in case the method is public.
              */
-            ImmutableList<KeYJavaType> allSupertypes = kpmi.getAllSupertypes(context);
+            List<KeYJavaType> allSupertypes = kpmi.getAllSupertypes(context);
             Iterator<KeYJavaType> iterator = allSupertypes.iterator();
             iterator.next(); // skip first element (it equals context and was already processed
             // above)

@@ -27,7 +27,6 @@ import com.github.javaparser.resolution.declarations.*;
 import com.github.javaparser.resolution.logic.MethodResolutionCapability;
 import com.github.javaparser.resolution.logic.MethodResolutionLogic;
 import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
-import com.github.javaparser.resolution.types.ResolvedArrayType;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.DefaultConstructorDeclaration;
@@ -95,13 +94,13 @@ public class KeYProgModelInfo {
      *
      * @return the list of visible methods of this type and its supertypes.
      */
-    public ImmutableList<IProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
+    public List<IProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
         var methods = getAllMethods(kjt);
-        ImmutableList<IProgramMethod> result = ImmutableSLList.nil();
+        List<IProgramMethod> result = new ArrayList<>(methods.size());
         for (var rm : methods) {
             var declaration = rec2key().resolvedDeclarationToKeY(rm);
             if (declaration.isPresent()) {
-                result = result.prepend((IProgramMethod) declaration.get());
+                result.add((IProgramMethod) declaration.get());
             }
         }
         return result;
@@ -120,16 +119,6 @@ public class KeYProgModelInfo {
                 .flatMap(ResolvedReferenceType::getTypeDeclaration)
                 .flatMap(AssociableToAST::toAst)
                 .flatMap(Node::findCompilationUnit);
-    }
-
-    private <T extends com.github.javaparser.ast.type.Type> T searchType(String shortName,
-            List<T> types) {
-        for (var type : types) {
-            if (type.toDescriptor().equals(shortName)) { // TODO weigl getname of type
-                return type;
-            }
-        }
-        return null;
     }
 
     /**
@@ -181,79 +170,17 @@ public class KeYProgModelInfo {
     private boolean isSubtype(ResolvedType subType, ResolvedType superType) {
         return superType.isAssignableBy(subType); // TODO weigl check if it is the right method and
                                                   // order.
-
-        /*
-         * if (subType instanceof ClassOrInterfaceType && superType instanceof ClassOrInterfaceType)
-         * {
-         *
-         * return isSubtype((recoder.abstraction.ClassType) subType,
-         * (recoder.abstraction.ClassType) superType);
-         * } else if (superType instanceof recoder.abstraction.ArrayType &&
-         * subType instanceof recoder.abstraction.ArrayType) {
-         * return isAssignmentCompatible((recoder.abstraction.ArrayType) subType,
-         * (recoder.abstraction.ArrayType) superType);
-         * } else if (subType instanceof recoder.abstraction.ArrayType &&
-         * superType instanceof recoder.abstraction.ClassType) {
-         * return "java.lang.Object".equals(superType.getFullName())
-         * || "Object".equals(superType.getName());
-         * }
-         * // should not occur
-         * throw new RuntimeException("Method isSubtype in class KeYProgModelInfo " +
-         * "currently only supports two class types or two " +
-         * "array type but no mixture!");
-         */
     }
 
     public boolean isPackage(String name) {
         return mapping.isPackageName(name);
     }
 
-    /**
-     * checks whether subType is assignment compatible to type according
-     * to the rules defined in the java language specification
-     */
-    private boolean isAssignmentCompatible(ResolvedArrayType subType, ResolvedArrayType type) {
-        return subType.isAssignableBy(type);
-        /*
-         * recoder.abstraction.Type bt1 = subType.getBaseType();
-         * recoder.abstraction.Type bt2 = type.getBaseType();
-         * if (bt1 instanceof recoder.abstraction.PrimitiveType &&
-         * bt2 instanceof recoder.abstraction.PrimitiveType) {
-         * return bt1.getFullName().equals(bt2.getFullName());
-         * }
-         * if (bt1 instanceof recoder.abstraction.ClassType &&
-         * bt2 instanceof recoder.abstraction.ClassType)
-         * return isSubtype((recoder.abstraction.ClassType) bt1,
-         * (recoder.abstraction.ClassType) bt2);
-         * if (bt1 instanceof recoder.abstraction.ArrayType &&
-         * bt2 instanceof recoder.abstraction.ArrayType)
-         * return isAssignmentCompatible((recoder.abstraction.ArrayType) bt1,
-         * (recoder.abstraction.ArrayType) bt2);
-         * if (bt1 instanceof recoder.abstraction.ClassType &&
-         * bt2 instanceof recoder.abstraction.ArrayType)
-         * return false;
-         * if (bt1 instanceof recoder.abstraction.ArrayType &&
-         * bt2 instanceof recoder.abstraction.ClassType) {
-         * if (((recoder.abstraction.ClassType) bt2).isInterface()) {
-         * return bt2.
-         * getFullName().equals("java.lang.Cloneable") ||
-         * bt2.
-         * getFullName().equals("java.lang.Serializable")
-         * ;
-         * } else {
-         * return bt2.
-         * getFullName().equals("java.lang.Object");
-         * }
-         * }
-         * return false;
-         */
-    }
-
     private List<ResolvedConstructorDeclaration> getDeclaredConstructors(KeYJavaType ct) {
         return getReferenceType(ct)
                 .flatMap(ResolvedReferenceType::getTypeDeclaration)
                 .map(ResolvedReferenceTypeDeclaration::getConstructors)
-                .orElse(Collections.emptyList());
+                .orElseGet(ArrayList::new);
     }
 
     private ResolvedType getJavaParserType(KeYJavaType ct) {
@@ -265,34 +192,25 @@ public class KeYProgModelInfo {
         return type.isReferenceType() ? Optional.of(type.asReferenceType()) : Optional.empty();
     }
 
-
-    private List<ResolvedConstructorDeclaration> getRecoderConstructors(KeYJavaType ct,
-            ImmutableList<KeYJavaType> signature) {
-        // var cd = getConstructors(ct);
-        // return rct.getProgramModelInfo().getConstructors(rct, getRecoderTypes(signature));
-        // return cd;
-        // TODO weigl
-        throw new UnsupportedOperationException();
-    }
-
     /**
      * Returns the ProgramMethods locally defined within the given
      * class type.
      *
      * @param ct a class type.
      */
-    public ImmutableList<ProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType ct) {
-        ImmutableList<ProgramMethod> result = ImmutableSLList.nil();
+    public List<ProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType ct) {
+        var result = new ArrayList<ProgramMethod>();
         var type = getJavaParserType(ct);
         if (!type.isReferenceType()) {
             return result;
         }
         var rml = type.asReferenceType().getDeclaredMethods();
+        result.ensureCapacity(rml.size());
         for (MethodUsage methodUsage : rml) {
             if (methodUsage.getDeclaration() instanceof JavaParserMethodDeclaration) {
                 var element = mapping.resolvedDeclarationToKeY(methodUsage.getDeclaration());
                 if (element.isPresent()) {
-                    result = result.prepend((ProgramMethod) element.get());
+                    result.add((ProgramMethod) element.get());
                 }
             }
         }
@@ -307,20 +225,19 @@ public class KeYProgModelInfo {
      * @param ct a class type.
      */
 
-    public ImmutableList<IProgramMethod> getConstructors(KeYJavaType ct) {
+    public List<IProgramMethod> getConstructors(KeYJavaType ct) {
         var rcl = getDeclaredConstructors(ct);
-        ImmutableList<IProgramMethod> result = ImmutableSLList.nil();
-        for (int i = rcl.size() - 1; i >= 0; i--) {
-            var rm = rcl.get(i);
-            if (rm instanceof DefaultConstructorDeclaration) {
+        var result = new ArrayList<IProgramMethod>(rcl.size());
+        for (ResolvedConstructorDeclaration decl : rcl) {
+            if (decl instanceof DefaultConstructorDeclaration) {
                 // TODO javaparser this node is only returned by
                 // ResolvedReferenceTypeDeclaration::getConstructors
                 // and neither implements hashCode nor equals
                 continue;
             }
-            var m = mapping.resolvedDeclarationToKeY(rm);
+            var m = mapping.resolvedDeclarationToKeY(decl);
             if (m.isPresent()) {
-                result = result.prepend((IProgramMethod) m.get());
+                result.add((IProgramMethod) m.get());
             }
         }
         return result;
@@ -335,17 +252,8 @@ public class KeYProgModelInfo {
      * @return the most specific constructor declared in the given type
      */
     public IProgramMethod getConstructor(KeYJavaType ct, ImmutableList<KeYJavaType> signature) {
+        // TODO javaparser
         throw new UnsupportedOperationException();
-        // var constructors = getRecoderConstructors(ct, signature);
-        // if (constructors.size() == 1) {
-        // return (IProgramMethod) rec2key().toKeY(constructors.get(0)).orElse(null);
-        // }
-        // if (constructors.isEmpty()) {
-        // LOGGER.debug("javainfo: Constructor not found: {}", ct);
-        // return null;
-        // }
-        // Debug.fail();
-        // return null;
     }
 
     /**
@@ -426,43 +334,11 @@ public class KeYProgModelInfo {
         throw new UnsupportedOperationException();
     }
 
-
-    /**
-     * returns the same fields as given in <tt>rfl</tt> and returns
-     * their KeY representation
-     *
-     * @param rfl the List of fields to be looked up
-     * @return list with the corresponding fields as KeY datastructures
-     */
-    private ImmutableList<Field> asKeYFields(
-            Collection<com.github.javaparser.ast.body.FieldDeclaration> rfl) {
-        ImmutableList<Field> result = ImmutableSLList.nil();
-        if (rfl == null) {
-            // this occurs for the artificial Null object at the moment
-            // should it have implicit fields?
-            return result;
-        }
-        for (var rf : rfl) {
-            for (var decl : rf.getVariables()) {
-                Field f = (Field) rec2key().typeToKeY(decl);
-                if (f != null) {
-                    result = result.prepend(f);
-                } else {
-                    LOGGER.debug("Field has no KeY equivalent (recoder field): {}", rf);
-                    LOGGER.debug("This happens currently as classes only available in byte code "
-                        + "are only partially converted ");
-                }
-            }
-        }
-        return result;
-    }
-
-    private ImmutableList<Field> asKeYFieldsR(Stream<ResolvedFieldDeclaration> rfl) {
-        return ImmutableList.fromList(rfl
-                .flatMap(
-                    it -> ((FieldDeclaration) mapping.resolvedDeclarationToKeY(it).orElseThrow())
-                            .getFieldSpecifications().stream())
-                .collect(Collectors.toList()));
+    private List<Field> asKeYFieldsR(Stream<ResolvedFieldDeclaration> rfl) {
+        return rfl.flatMap(
+            it -> ((FieldDeclaration) mapping.resolvedDeclarationToKeY(it).orElseThrow())
+                    .getFieldSpecifications().stream())
+                .collect(Collectors.toList());
     }
 
     /**
@@ -473,13 +349,13 @@ public class KeYProgModelInfo {
      * @param ct the class type whose fields are returned
      * @return the list of field members of the given type.
      */
-    public ImmutableList<Field> getAllFieldsLocallyDeclaredIn(KeYJavaType ct) {
+    public List<Field> getAllFieldsLocallyDeclaredIn(KeYJavaType ct) {
         if (ct.getJavaType() instanceof ArrayType) {
             return getVisibleArrayFields(ct);
         }
         return getReferenceType(ct)
                 .map(r -> asKeYFieldsR(r.getDeclaredFields().stream()))
-                .orElse(ImmutableSLList.nil());
+                .orElseGet(ArrayList::new);
     }
 
 
@@ -494,14 +370,14 @@ public class KeYProgModelInfo {
      * @param ct the class type whose fields are returned
      * @return the list of field members of the given type.
      */
-    public ImmutableList<Field> getAllVisibleFields(KeYJavaType ct) {
+    public List<Field> getAllVisibleFields(KeYJavaType ct) {
         if (ct.getJavaType() instanceof ArrayDeclaration) {
             return getVisibleArrayFields(ct);
         }
         // TODO javaparser this should be declared + visible to inheritors of super
         return getReferenceType(ct)
                 .map(r -> asKeYFieldsR(r.getDeclaredFields().stream()))
-                .orElse(ImmutableSLList.nil());
+                .orElseGet(ArrayList::new);
     }
 
     /**
@@ -510,35 +386,31 @@ public class KeYProgModelInfo {
      * @param arrayType the KeYJavaType of the array
      * @return the list of visible fields
      */
-    private ImmutableList<Field> getVisibleArrayFields(KeYJavaType arrayType) {
-        ImmutableList<Field> result = ImmutableSLList.nil();
-
+    private List<Field> getVisibleArrayFields(KeYJavaType arrayType) {
         final ImmutableArray<MemberDeclaration> members =
             ((ArrayDeclaration) arrayType.getJavaType()).getMembers();
-
-        for (int i = members.size() - 1; i >= 0; i--) {
-            final MemberDeclaration member = members.get(i);
+        List<Field> result = new ArrayList<>();
+        for (MemberDeclaration member : members) {
             if (member instanceof FieldDeclaration) {
                 final ImmutableArray<FieldSpecification> specs =
                     ((FieldDeclaration) member).getFieldSpecifications();
-                for (int j = specs.size() - 1; j >= 0; j--) {
-                    result = result.prepend(specs.get(j));
+                for (FieldSpecification spec : specs) {
+                    result.add(spec);
                 }
             }
         }
 
         // fields of java.lang.Object visible in an array
-        var obj =
-            new ReferenceTypeImpl(services.getJavaService().getProgramFactory().getTypeSolver()
-                    .getSolvedJavaLangObject());
-        var kjt = rec2key().resolvedTypeToKeY(obj).orElseThrow();
-        return getReferenceType(kjt)
-                .map(r -> ImmutableList.fromList(r.getDeclaredFields()
-                        .stream()
-                        .filter(f -> f.accessSpecifier() != AccessSpecifier.PRIVATE)
-                        .map(f -> (Field) mapping.resolvedDeclarationToKeY(f).orElseThrow())
-                        .toList()))
-                .orElse(ImmutableSLList.nil());
+        var kjt = typeConverter.getObjectType();
+        var objectFields = getReferenceType(kjt)
+                .orElseThrow()
+                .getDeclaredFields()
+                .stream()
+                .filter(f -> f.accessSpecifier() != AccessSpecifier.PRIVATE)
+                .map(f -> (Field) mapping.resolvedDeclarationToKeY(f).orElseThrow())
+                .toList();
+        result.addAll(objectFields);
+        return result;
     }
 
     /**
@@ -590,11 +462,11 @@ public class KeYProgModelInfo {
      * @return list of KeYJavaTypes representing the given recoder types in
      *         the same order
      */
-    private ImmutableList<KeYJavaType> asKeYJavaTypes(
-            final List<ResolvedReferenceTypeDeclaration> rctl) {
-        return rctl.stream()
+    private List<KeYJavaType> asKeYJavaTypes(
+            final Stream<ResolvedReferenceTypeDeclaration> rctl) {
+        return rctl
                 .map(it -> rec2key().resolvedTypeToKeY(new ReferenceTypeImpl(it)).orElseThrow())
-                .collect(ImmutableList.collector());
+                .collect(Collectors.toList());
     }
 
     /**
@@ -604,12 +476,11 @@ public class KeYProgModelInfo {
      * @param ct a class type
      * @return the list of the known subtypes of the given class type.
      */
-    public ImmutableList<KeYJavaType> getAllSupertypes(KeYJavaType ct) {
+    public List<KeYJavaType> getAllSupertypes(KeYJavaType ct) {
         final var superTypes = getAllDeclaredSupertypes(ct)
                 .stream().map(ResolvedReferenceType::asReferenceType)
                 .filter(it -> it.getTypeDeclaration().isPresent())
-                .map(it -> it.getTypeDeclaration().get())
-                .collect(Collectors.toList());
+                .map(it -> it.getTypeDeclaration().get());
 
         return asKeYJavaTypes(superTypes);
     }
@@ -620,8 +491,8 @@ public class KeYProgModelInfo {
      * @param ct a class type
      * @return the list of the known subtypes of the given class type.
      */
-    public ImmutableList<KeYJavaType> getAllSubtypes(KeYJavaType ct) {
-        return asKeYJavaTypes(getAllRecoderSubtypes(ct));
+    public List<KeYJavaType> getAllSubtypes(KeYJavaType ct) {
+        return asKeYJavaTypes(getAllRecoderSubtypes(ct).stream());
     }
 
     public ImmutableList<KeYJavaType> findImplementations(KeYJavaType ct, String name,

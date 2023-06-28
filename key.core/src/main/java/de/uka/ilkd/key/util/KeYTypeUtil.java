@@ -12,7 +12,6 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 
-import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.CollectionUtil;
 
 /**
@@ -145,7 +144,7 @@ public final class KeYTypeUtil {
     public static IProgramMethod findExplicitConstructor(Services services,
             final IProgramMethod implicitConstructor) {
         if (services != null && implicitConstructor != null) {
-            ImmutableList<IProgramMethod> pms =
+            Iterable<IProgramMethod> pms =
                 services.getJavaInfo().getConstructors(implicitConstructor.getContainerType());
             return CollectionUtil.search(pms, element -> {
                 if (implicitConstructor.getParameterDeclarationCount() == element

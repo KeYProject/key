@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.java;
 
 import java.io.File;
+import java.util.List;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
@@ -72,7 +73,7 @@ public class TestJavaInfo {
     public void testGetAllSupertypes() {
         KeYJavaType rte = javaInfo.getKeYJavaType("java.lang.RuntimeException");
         assertNotNull(rte, "Did not find class java.lang.RuntimeException");
-        final ImmutableList<KeYJavaType> allSupertypes = javaInfo.getAllSupertypes(rte);
+        final List<KeYJavaType> allSupertypes = javaInfo.getAllSupertypes(rte);
 
         assertNotNull(allSupertypes, "No supertypes of java.lang.RuntimeException?");
 

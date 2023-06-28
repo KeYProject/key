@@ -15,7 +15,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-import org.key_project.util.collection.ImmutableList;
 
 /**
  * This{@link SymbolicExecutionExceptionBreakpoint} represents an exception breakpoint and is
@@ -102,8 +101,7 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
                         } else if (suspendOnSubclasses) {
                             JavaInfo info = proof.getServices().getJavaInfo();
                             KeYJavaType kjt = locVar.getKeYJavaType();
-                            ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(kjt);
-                            for (KeYJavaType kjtloc : kjts) {
+                            for (KeYJavaType kjtloc : info.getAllSupertypes(kjt)) {
                                 if (kjtloc.getSort().toString().equals(exceptionName)
                                         && !exceptionParentNodes.contains(SETParent)) {
                                     exceptionNodes.add(node);
