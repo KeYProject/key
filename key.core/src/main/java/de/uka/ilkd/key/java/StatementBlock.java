@@ -36,12 +36,12 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     private final MethodFrame innerMostMethodFrame;
 
     public StatementBlock(PositionInfo pi, List<Comment> comments,
-            @Nonnull ImmutableArray<? extends Statement> body,
-            int prefixLength, MethodFrame innerMostMethodFrame) {
+            @Nonnull ImmutableArray<? extends Statement> body) {
         super(pi, comments);
         this.body = body;
-        this.prefixLength = prefixLength;
-        this.innerMostMethodFrame = innerMostMethodFrame;
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.getLength();
+        innerMostMethodFrame = info.getInnerMostMethodFrame();
     }
 
     public StatementBlock() {
@@ -269,6 +269,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         return prefixLength;
     }
 
+    @Nullable
     @Override
     public MethodFrame getInnerMostMethodFrame() {
         return innerMostMethodFrame;

@@ -46,8 +46,8 @@ public class For extends LoopStatement implements VariableScope {
             children.get(IForUpdates.class), children.get(Statement.class), children);
     }
 
-    public For(PositionInfo pi, List<Comment> c, LoopInit inits, ForUpdates updates,
-            Guard guard, Statement body) {
+    public For(PositionInfo pi, List<Comment> c, ILoopInit inits, IForUpdates updates,
+            IGuard guard, Statement body) {
         super(pi, c, inits, updates, guard, body);
     }
 

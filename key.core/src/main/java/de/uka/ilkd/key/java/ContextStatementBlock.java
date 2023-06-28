@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -30,57 +29,21 @@ public class ContextStatementBlock extends StatementBlock {
      */
     private final IExecutionContext executionContext;
 
-    /**
-     * length of this progran prefix
-     */
-    private final int patternPrefixLength;
-
-    /**
-     * creates a ContextStatementBlock
-     *
-     * @param children the body of the context term
-     */
-    public ContextStatementBlock(ExtList children) {
-        super(children);
-        executionContext = null;
-        patternPrefixLength = this.getPrefixLength();
-    }
-
-    /**
-     * creates a ContextStatementBlock
-     *
-     * @param children the body of the context term
-     * @param executionContext the required execution context
-     */
-    public ContextStatementBlock(ExtList children, IExecutionContext executionContext) {
-        super(children);
-        this.executionContext = executionContext;
-        patternPrefixLength = this.getPrefixLength();
-
-    }
-
     public ContextStatementBlock(Statement s, IExecutionContext executionContext) {
         super(s);
         this.executionContext = executionContext;
-        patternPrefixLength = this.getPrefixLength();
     }
 
     public ContextStatementBlock(Statement[] body, IExecutionContext executionContext) {
         super(body);
         this.executionContext = executionContext;
-        patternPrefixLength = this.getPrefixLength();
     }
 
     public ContextStatementBlock(PositionInfo pi, List<Comment> c,
             ImmutableArray<? extends Statement> body,
-            int i, MethodFrame o, IExecutionContext execContext, int i1) {
-        super(pi, c, body, i, o);
+            IExecutionContext execContext) {
+        super(pi, c, body);
         this.executionContext = execContext;
-        this.patternPrefixLength = i1;
-    }
-
-    public boolean requiresExplicitExecutionContextMatch() {
-        return executionContext != null;
     }
 
     public IExecutionContext getExecutionContext() {
@@ -131,14 +94,11 @@ public class ContextStatementBlock extends StatementBlock {
 
     /* toString */
     public String toString() {
-        String result = ".." +
+        return ".." +
             super.toString() +
             "\n" +
             "...";
-        return result;
     }
-
-
 
     public int getTypeDeclarationCount() {
         throw new UnsupportedOperationException(getClass() + ": We are not quite a StatementBlock");
@@ -157,6 +117,7 @@ public class ContextStatementBlock extends StatementBlock {
     }
 
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
+        assert getPrefixLength() > 0;
         SourceData newSource = source;
 
         if (matchCond.getInstantiations().getContextInstantiation() != null) {
@@ -178,11 +139,11 @@ public class ContextStatementBlock extends StatementBlock {
             prefix = (ProgramPrefix) src;
             final int srcPrefixLength = prefix.getPrefixLength();
 
-            if (patternPrefixLength > srcPrefixLength) {
+            if (getPrefixLength() > srcPrefixLength) {
                 return null;
             }
 
-            pos = srcPrefixLength - patternPrefixLength;
+            pos = srcPrefixLength - getPrefixLength();
 
             ProgramPrefix firstActiveStatement = getPrefixElementAt(prefix, pos);
 
@@ -228,10 +189,6 @@ public class ContextStatementBlock extends StatementBlock {
         matchCond =
             makeContextInfoComplete(matchCond, newSource, prefix, pos, relPos, src, services);
 
-        if (matchCond == null) {
-            return null;
-        }
-
         return matchCond;
     }
 
@@ -259,7 +216,7 @@ public class ContextStatementBlock extends StatementBlock {
     }
 
     /**
-     * matches the inner most execution context in prefix, used to resolve references in succeeding
+     * matches the innermost execution context in prefix, used to resolve references in succeeding
      * matchings
      *
      * @param matchCond the MatchCond the matchonditions already found

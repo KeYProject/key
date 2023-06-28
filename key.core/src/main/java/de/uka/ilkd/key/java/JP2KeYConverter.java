@@ -295,7 +295,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         ImmutableArray<Statement> body = map(n.getStatements());
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        return new StatementBlock(pi, c, body, 0, null);
+        return new StatementBlock(pi, c, body);
     }
 
     @Override
@@ -661,10 +661,30 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         ImmutableArray<LoopInitializer> inits = map(n.getInitialization());
-        ImmutableArray<Expression> update = map(n.getUpdate());
-        Guard guard = new Guard(pi, null, accepto(n.getCompare()));
-        final var loopInit = new LoopInit(inits);
-        return new For(pi, c, loopInit, new ForUpdates(update), guard, accept(n.getBody()));
+        ImmutableArray<Expression> updates = map(n.getUpdate());
+        Object guard = accepto(n.getCompare());
+
+        IGuard forGuard;
+        if (guard instanceof ProgramSV) {
+            forGuard = (ProgramSV) guard;
+        } else {
+            forGuard = new Guard(pi, null, (Expression) guard);
+        }
+
+        ILoopInit forInit;
+        if (inits.size() == 1 && inits.get(0) instanceof ProgramSV) {
+            forInit = (ProgramSV) inits.get(0);
+        } else {
+            forInit = new LoopInit(inits);
+        }
+
+        IForUpdates forUpdates;
+        if (updates.size() == 1 && updates.get(0) instanceof ProgramSV) {
+            forUpdates = (ProgramSV) updates.get(0);
+        } else {
+            forUpdates = new ForUpdates(updates);
+        }
+        return new For(pi, c, forInit, forUpdates, forGuard, accept(n.getBody()));
     }
 
     @Override
@@ -1611,19 +1631,13 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var c = createComments(n);
         IExecutionContext execContext = accepto(n.getContext());
         ImmutableArray<? extends Statement> body = map(n.getStatements());
-        // TODO weigl prefixLength constants
-        return new ContextStatementBlock(pi, c, body, 0, null, execContext, 0);
+        return new ContextStatementBlock(pi, c, body, execContext);
     }
-
 
     @Override
     public Object visit(KeyExpressionSV n, Void arg) {
-        var pi = createPositionInfo(n);
-        var c = createComments(n);
         return lookupSchemaVariable(n.getText(), n);
-        // reportUnsupportedElement(n);
     }
-
 
     @Override
     public Object visit(KeyMetaConstructExpression n, Void arg) {

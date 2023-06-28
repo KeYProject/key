@@ -98,10 +98,8 @@ public abstract class Literal extends JavaProgramElement
         if (this.equals(src)) {
             source.next();
             return matchCond;
-        } else {
-            LOGGER.debug("Program match failed (pattern {}, source {})", this, src);
-            return null;
         }
+        return null;
     }
 
     /*

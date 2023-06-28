@@ -1644,7 +1644,11 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnExecutionContext(ExecutionContext x) {
         l.beginRelativeC();
         l.print("source=");
-        writeFullMethodSignature(x.getMethodContext());
+        if (x.getMethodContext() == null) {
+            l.print("null");
+        } else {
+            writeFullMethodSignature(x.getMethodContext());
+        }
         l.print("@");
         x.getTypeReference().visit(this);
         if (x.getRuntimeInstance() != null) {
