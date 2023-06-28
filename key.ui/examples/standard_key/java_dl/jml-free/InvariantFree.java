@@ -28,4 +28,12 @@ final class B {
     int bar(A a) {
         return a.g;
     }
+    
+    /*@ normal_behavior
+      @ requires \invariant_for(a);
+      @ ensures \result > 0;
+      @*/
+    int baz(A a) {
+        return a.g;
+    }
 }
