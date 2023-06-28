@@ -1,5 +1,7 @@
 package org.key_project.util.reflection;
 
+import org.jspecify.annotations.NullMarked;
+
 import java.util.ServiceLoader;
 
 /**
@@ -35,7 +37,7 @@ import java.util.ServiceLoader;
  * @see IClassLoader
  * @see JavaApplicationClassLoader
  */
-@SuppressWarnings("nullness")
+@NullMarked
 public class ClassLoaderUtil {
     /**
      * The {@link IClassLoader} instance to use.

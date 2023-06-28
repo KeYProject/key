@@ -1,6 +1,7 @@
 package org.key_project.util.java;
 
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -843,7 +844,11 @@ public final class IOUtil {
                     Files.createDirectories(path);
                 } else {
                     // create nonexistent parent directories and then extract the file
-                    Files.createDirectories(path.getParent());
+                    // Since path is the result of resolving a zip entry name in the
+                    // target directory, it does have a parent.
+                    @SuppressWarnings("nullness")
+                    @NonNull Path parent = path.getParent();
+                    Files.createDirectories(parent);
                     Files.copy(zin, path);
                 }
             }

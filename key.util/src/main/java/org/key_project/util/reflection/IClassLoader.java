@@ -1,5 +1,7 @@
 package org.key_project.util.reflection;
 
+import org.jspecify.annotations.NullMarked;
+
 import java.util.ServiceLoader;
 
 /**
@@ -11,6 +13,7 @@ import java.util.ServiceLoader;
  * @author Martin Hentschel
  * @see ClassLoaderUtil
  */
+@NullMarked
 public interface IClassLoader {
     /**
      * Returns the {@link Class} for the given class name similar to {@link Class#forName(String)}.

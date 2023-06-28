@@ -183,7 +183,7 @@ public interface ImmutableList<T extends @Nullable Object> extends Iterable<T>, 
     /**
      * @return <T> the first element in list
      */
-    @Nullable T head();
+    T head();
 
     /**
      * return true if predicate is fullfilled for at least one element
@@ -229,7 +229,7 @@ public interface ImmutableList<T extends @Nullable Object> extends Iterable<T>, 
     /**
      * @return true iff the list is empty
      */
-    @EnsuresNonNullIf(expression = {"head()"}, result = false)
+    // not true: @EnsuresNonNullIf(expression = {"head()"}, result = false)
     boolean isEmpty();
 
     /**

@@ -4,6 +4,8 @@ import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -12,6 +14,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.logging.LogManager;
 import java.util.stream.Collector;
 
 /**
@@ -33,7 +36,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
      * generated serial id
      */
     private static final long serialVersionUID = 8717813038177120287L;
-
+    private static final Logger log = LoggerFactory.getLogger(ImmutableSLList.NIL.class);
 
     /** the empty list */
     public static <T extends @Nullable Object> ImmutableSLList<T> nil() {
@@ -69,7 +72,9 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
     public <S extends @Nullable Object> S[] toArray(S[] array) {
         S[] result;
         if (array.length < size()) {
-            result = (S[]) Array.newInstance(array.getClass().getComponentType(), size());
+            Class<? extends Object[]> arrayClass = array.getClass();
+            assert arrayClass.isArray() : "@AssumeAssertion(nullness): This has indeed a component type";
+            result = (S[]) Array.newInstance(arrayClass.getComponentType(), size());
         } else {
             result = array;
         }
@@ -85,14 +90,14 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
      * Convert the list to a Java array (O(n))
      */
     @Override
+    @SuppressWarnings("nullness")
     public <S extends @Nullable Object> S[] toArray(Class<S> type) {
         S[] result = (S[]) Array.newInstance(type, size());
         ImmutableList<T> rest = this;
         for (int i = 0, sz = size(); i < sz; i++) {
             //@ assert !rest.isEmpty();
-            @SuppressWarnings("nullness")
             T head = rest.head();
-            result[i] = type.cast(head);
+            result[i] = (S)type.cast(head);
             rest = rest.tail();
         }
         return result;
@@ -169,7 +174,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
     }
 
 
-    private static class Cons<S> extends ImmutableSLList<S> {
+    private static class Cons<S extends @Nullable Object> extends ImmutableSLList<S> {
 
         /**
          *
@@ -378,7 +383,6 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
 
         /** @return true iff the list is empty */
         @Override
-        @EnsuresNonNullIf(expression = {"head()"}, result = false)
         public boolean isEmpty() {
             return false;
         }
@@ -604,7 +608,6 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         }
 
         @Override
-        @EnsuresNonNullIf(expression = {"head()"}, result = false)
         public boolean isEmpty() {
             return true;
         }
@@ -615,8 +618,10 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         }
 
         @Override
-        public @Nullable S head() {
-            return null;
+        public S head() {
+            NoSuchElementException ex = new NoSuchElementException();
+            log.error("head on NIL!", ex);
+            throw ex;
         }
 
         @Override
