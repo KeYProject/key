@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.java.declaration.modifier;
 
-import org.key_project.util.ExtList;
+import java.util.List;
+
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.PositionInfo;
 
 /**
  * Protected.
@@ -22,8 +25,8 @@ public class Protected extends VisibilityModifier {
      * @param children list of children. May contain: Comments
      */
 
-    public Protected(ExtList children) {
-        super(children);
+    public Protected(PositionInfo pi, List<Comment> c) {
+        super(pi, c);
     }
 
 

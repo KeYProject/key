@@ -35,7 +35,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
-import de.uka.ilkd.key.util.AssertionFailure;
 
 import org.key_project.util.collection.ImmutableArray;
 
@@ -130,18 +129,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         throw new JavaBuildingExceptions(Collections.singletonList(problem));
     }
 
-    private void reportUnsupportedElement(Node n) {
-        reportError(n, "Unsupported element detected given by Java Parser: "
+    private <T> T reportUnsupportedElement(Node n) {
+        return reportError(n, "Unsupported element detected given by Java Parser: "
             + n.getMetaModel().getTypeName() + ". Please extend the KeY-Java-Hierarchy");
     }
 
     @Nonnull
     private TypeReference requireTypeReference(Type type) {
-        TypeReference res = accept(type);
-        // if (res.isEmpty()) {
-        // reportError(type, "Expected non schema type");
-        // }
-        return res;
+        return accept(type);
     }
 
     private <O> O addToMapping(Node value, O o) {
@@ -402,13 +397,17 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     @Override
     public Object visit(ClassOrInterfaceType n, Void arg) {
         if (n.getTypeArguments().isPresent()) {
-            reportError(n, "Type arguments found.");
+            return reportError(n, "Type arguments found.");
         }
 
         final var name = n.getNameAsString();
         if (name.startsWith("\\")) {
             JavaInfo ji = services.getJavaInfo();
-            return new TypeRef(ji.getPrimitiveKeYJavaType(name));
+            var type = ji.getPrimitiveKeYJavaType(name);
+            if (type == null) {
+                return reportError(n, "Unresolved KeY type");
+            }
+            return new TypeRef(type);
         }
         return getKeYJavaType(n);
     }
@@ -435,6 +434,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return comments;
     }
 
+    @SuppressWarnings("unchecked")
     private <T> ImmutableArray<T> map(NodeList<? extends Visitable> nodes) {
         var list = new ArrayList<T>(nodes.size());
         for (Node node : nodes) {
@@ -444,6 +444,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new ImmutableArray<>(list);
     }
 
+    @SuppressWarnings("unchecked")
     private <T> ImmutableArray<T> flatMap(NodeList<? extends Visitable> nodes) {
         var seq = nodes.stream()
                 .flatMap(it -> ((List<T>) Objects.requireNonNull(it.accept(this, null))).stream())
@@ -453,9 +454,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Nullable
     private <R> R accepto(Optional<? extends Node> node) {
-        if (node.isEmpty())
-            return null;
-        return accept(node.get());
+        return node.<R>map(this::accept).orElse(null);
     }
 
     @Override
@@ -821,8 +820,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             var keyDecl = (VariableSpecification) mapping.nodeToKeY(decl).orElseThrow();
             return keyDecl.getProgramVariable();
         }
-        reportUnsupportedElement(target.toAst().get());
-        return null;
+        return reportUnsupportedElement(target.toAst().get());
     }
 
     @Override
@@ -857,8 +855,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(PackageDeclaration n, Void arg) {
-        if (n.getAnnotations().isNonEmpty())
-            reportUnsupportedElement(n);
+        if (n.getAnnotations().isNonEmpty()) {
+            return reportUnsupportedElement(n);
+        }
 
         mapping.registerPackageName(n.getName().asString());
         var ref = translatePackageReference(n.getName());
@@ -948,9 +947,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(SimpleName n, Void arg) {
-        // TODO
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
@@ -965,14 +962,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(IntersectionType n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(UnionType n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
@@ -985,8 +980,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(SingleMemberAnnotationExpr n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
@@ -1084,7 +1078,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 var num = lit.asNumber();
                 if (num instanceof Long) {
                     if (-num.longValue() != (long) Integer.MIN_VALUE) {
-                        reportUnsupportedElement(n);
+                        return reportUnsupportedElement(n);
                     }
                     return new IntLiteral(pi, c, Integer.MIN_VALUE);
                 }
@@ -1110,14 +1104,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         case POSTFIX_DECREMENT:
             return new PostDecrement(pi, c, child);
         }
-        reportUnsupportedElement(n);
-        return null;
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(UnknownType n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
@@ -1189,8 +1181,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         } else if (lit.isTextBlockLiteralExpr()) {
             return new StringLiteral(lit.asTextBlockLiteralExpr().getValue());
         } else {
-            reportUnsupportedElement(lit);
-            throw new AssertionFailure();
+            return reportUnsupportedElement(lit);
         }
     }
 
@@ -1284,8 +1275,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     @Override
     public Object visit(VariableDeclarator n, Void arg) {
         // Only allowed inside VariableDeclarationExpr which is handled above
-        reportUnsupportedElement(n);
-        return null;
+        return reportUnsupportedElement(n);
     }
 
     @Override
@@ -1308,7 +1298,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var c = createComments(n);
 
         if (n.isStatic()) {
-            reportUnsupportedElement(n);
+            return reportUnsupportedElement(n);
         }
 
         if (n.isAsterisk()) {
@@ -1327,44 +1317,40 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var c = createComments(n);
         var k = n.getKeyword();
         switch (k) {
-        case DEFAULT:
-            reportUnsupportedElement(n);
-            break;
         case PUBLIC:
-            return new Public(/* pi, c */);
+            return new Public(pi, c);
         case PROTECTED:
-            return new Protected(/* pi, c */);
+            return new Protected(pi, c);
         case PRIVATE:
-            return new Private(/* pi, c */);
+            return new Private(pi, c);
         case ABSTRACT:
-            return new Abstract(/* pi, c */);
+            return new Abstract(pi, c);
         case STATIC:
-            return new Static(/* pi, c */);
+            return new Static(pi, c);
         case FINAL:
-            return new Final(/* pi, c */);
+            return new Final(pi, c);
         case TRANSIENT:
-            return new Transient(/* pi, c */);
+            return new Transient(pi, c);
         case VOLATILE:
-            return new Volatile(/* pi, c */);
+            return new Volatile(pi, c);
         case SYNCHRONIZED:
-            return new Synchronized(/* pi, c */);
+            return new Synchronized(pi, c);
         case NATIVE:
-            return new Native(/* pi, c */);
+            return new Native(pi, c);
         case STRICTFP:
-            return new StrictFp(/* pi, c */);
-        case TRANSITIVE:
-            reportUnsupportedElement(n);
-            break;
+            return new StrictFp(pi, c);
         case GHOST:
-            return new Ghost(/* pi, c */);
+            return new Ghost(pi, c);
         case MODEL:
-            return new Model(/* pi, c */);
+            return new Model(pi, c);
         case TWO_STATE:
-            return new TwoState(/* pi, c */);
+            return new TwoState(pi, c);
         case NO_STATE:
-            return new NoState(/* pi, c */);
+            return new NoState(pi, c);
+        case DEFAULT, TRANSITIVE:
+            break;
         }
-        return null;
+        return reportUnsupportedElement(n);
     }
 
 
@@ -1444,8 +1430,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     @Override
     public Object visit(KeyCatchAllStatement n, Void arg) {
         // TODO
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
     // endregion
 
@@ -1563,7 +1548,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var c = createComments(n);
         TypeReference classContext = requireTypeReference(n.getContext());
         ReferencePrefix runtimeInstance = accepto(n.getInstance());
-        IProgramMethod methodContext = accept(n.getSignature());
+        IProgramMethod methodContext =
+            resolveMethodSignature(classContext.getKeYJavaType(), n.getSignature());
+        if (methodContext == null) {
+            return reportError(n, "Failed to resolve method");
+        }
         return new ExecutionContext(pi, c, classContext, runtimeInstance, methodContext);
     }
 
@@ -1611,11 +1600,15 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(KeyMethodSignature n, Void arg) {
-        var pi = createPositionInfo(n);
-        var c = createComments(n);
-        // TODO weigl unclear
-        reportUnsupportedElement(n);
-        return null;
+        return reportUnsupportedElement(n);
+    }
+
+    @Nullable
+    private IProgramMethod resolveMethodSignature(KeYJavaType type, KeyMethodSignature sig) {
+        var name = sig.getName().asString();
+        ImmutableArray<TypeReference> params = map(sig.getParamTypes());
+        var paramTypes = params.stream().map(TypeReference::getKeYJavaType).toList();
+        return services.getJavaInfo().getProgramMethod(type, name, paramTypes);
     }
 
     @Override
@@ -1651,9 +1644,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         case "#length-reference":
             return new ArrayLength(child);
         default:
-            reportError(n, "Program meta construct " + mcName + " unknown.");
+            return reportError(n, "Program meta construct " + mcName + " unknown.");
         }
-        return null;
     }
 
 
@@ -1677,7 +1669,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         case "#enhancedfor-elim": {
             EnhancedFor efor = accept(n.getChild());
             if (efor == null) {
-                reportError(n, "#enhancedfor-elim requires an enhanced for loop as argument");
+                return reportError(n,
+                    "#enhancedfor-elim requires an enhanced for loop as argument");
             }
             ProgramSV execSV = null;
             for (var programSV : labels) {
@@ -1730,9 +1723,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         case "#reattachLoopInvariant":
             return new ReattachLoopInvariant(accept(n.getChild()));
         default:
-            reportError(n, "Program meta construct " + n.getKind() + " unknown.");
+            return reportError(n, "Program meta construct " + n.getKind() + " unknown.");
         }
-        return null;
     }
 
     @Override
@@ -1741,8 +1733,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         if ("#typeof".equals(n.getKind())) {
             return new TypeOf(child);
         } else {
-            reportError(n, "Program meta construct " + n.getKind() + " unknown.");
-            return null;
+            return reportError(n, "Program meta construct " + n.getKind() + " unknown.");
         }
     }
 
@@ -1759,32 +1750,27 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     // region Unsupported AST Classes
     @Override
     public Object visit(LocalClassDeclarationStmt n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(LocalRecordDeclarationStmt n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(TypeParameter n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(AnnotationDeclaration n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(AnnotationMemberDeclaration n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
@@ -1797,150 +1783,126 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(EnumConstantDeclaration n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(EnumDeclaration n, Void arg) {
-        reportUnsupportedElement(n);
         // Important: get the kjt of n.resolve() and setKeYJavaType with the resulting KeY
         // declaration
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(JavadocComment n, Void arg) {
-        reportUnsupportedElement(n);
-        return null;
+        return reportUnsupportedElement(n);
     }
 
 
     @Override
     public Object visit(MarkerAnnotationExpr n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(MemberValuePair n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(WildcardType n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(LambdaExpr n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(MethodReferenceExpr n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
 
     @Override
     public Object visit(ModuleDeclaration n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(ModuleRequiresDirective n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(ModuleExportsDirective n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(ModuleProvidesDirective n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(ModuleUsesDirective n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(ModuleOpensDirective n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(UnparsableStmt n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(ReceiverParameter n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(VarType n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return getKeYJavaType(n.resolve());
     }
 
     @Override
     public Object visit(SwitchExpr n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(YieldStmt n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(TextBlockLiteralExpr n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(PatternExpr n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(RecordDeclaration n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(CompactConstructorDeclaration n, Void arg) {
-        reportUnsupportedElement(n);
-        return super.visit(n, arg);
+        return reportUnsupportedElement(n);
     }
 
     @Override
     public Object visit(KeyRangeExpression n, Void arg) {
-        reportUnsupportedElement(n);
-        return null;
+        return reportUnsupportedElement(n);
     }
     // endregion
 
@@ -1998,8 +1960,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         if (n != null) {
             return n;
         } else {
-            reportError(context, "Schema variable not declared: " + name);
-            throw new IllegalStateException();
+            return reportError(context, "Schema variable not declared: " + name);
         }
     }
 

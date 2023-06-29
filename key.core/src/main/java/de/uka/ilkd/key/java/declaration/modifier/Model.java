@@ -1,8 +1,10 @@
 package de.uka.ilkd.key.java.declaration.modifier;
 
-import de.uka.ilkd.key.java.declaration.Modifier;
+import java.util.List;
 
-import org.key_project.util.ExtList;
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.declaration.Modifier;
 
 
 /**
@@ -13,8 +15,8 @@ public class Model extends Modifier {
     public Model() {}
 
 
-    public Model(ExtList children) {
-        super(children);
+    public Model(PositionInfo pi, List<Comment> c) {
+        super(pi, c);
     }
 
 

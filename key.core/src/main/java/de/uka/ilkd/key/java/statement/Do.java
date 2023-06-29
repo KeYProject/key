@@ -12,23 +12,6 @@ import org.key_project.util.ExtList;
  *
  */
 public class Do extends LoopStatement {
-
-    /**
-     * Do.
-     */
-    public Do() {
-        super();
-    }
-
-    /**
-     * Do.
-     *
-     * @param guard an expression.
-     */
-    public Do(Expression guard) {
-        super(guard);
-    }
-
     /**
      * Do.
      *

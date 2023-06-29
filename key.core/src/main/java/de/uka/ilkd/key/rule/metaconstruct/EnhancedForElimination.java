@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -39,7 +40,6 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  *
@@ -319,7 +319,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         final KeYJavaType iterableType = iterableExpr.getKeYJavaType(services, execContext);
         final IProgramMethod iteratorMethod =
             services.getJavaInfo().getProgramMethod(iterableType, ITERATOR_METHOD_NAME,
-                ImmutableSLList.nil(), execContext.getTypeReference().getKeYJavaType());
+                Collections.emptyList(), execContext.getTypeReference().getKeYJavaType());
 
         // local variable "it"
         final KeYJavaType iteratorType = iteratorMethod.getReturnType();

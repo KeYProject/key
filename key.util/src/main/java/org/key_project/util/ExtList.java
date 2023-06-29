@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import javax.annotation.Nullable;
 
 
 /**
@@ -75,6 +76,7 @@ public class ExtList extends ArrayList<Object> {
      * @return the first element with type cl in list
      */
     @SuppressWarnings("unchecked")
+    @Nullable
     public <T> T get(Class<T> cl) {
         for (Object next : this) {
             if (cl.isInstance(next) && (next != null)) {

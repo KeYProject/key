@@ -1,8 +1,10 @@
 package de.uka.ilkd.key.java.declaration.modifier;
 
-import de.uka.ilkd.key.java.declaration.Modifier;
+import java.util.List;
 
-import org.key_project.util.ExtList;
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.declaration.Modifier;
 
 /**
  * Transient.
@@ -24,8 +26,8 @@ public class Transient extends Modifier {
      * @param children the children of this AST element as KeY classes. May contain: Comments
      */
 
-    public Transient(ExtList children) {
-        super(children);
+    public Transient(PositionInfo pi, List<Comment> c) {
+        super(pi, c);
     }
 
     /**

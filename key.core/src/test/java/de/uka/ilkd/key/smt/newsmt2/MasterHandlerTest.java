@@ -34,6 +34,7 @@ import org.key_project.util.Streams;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -51,6 +52,7 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
  *     gradlew :key.core:testStrictSMT
  * </pre>
  */
+@Tag("slow")
 public class MasterHandlerTest {
     /**
      * If this variable is set when running this test class, then those cases with expected result

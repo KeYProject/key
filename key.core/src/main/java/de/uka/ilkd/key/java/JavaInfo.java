@@ -509,13 +509,8 @@ public final class JavaInfo {
      * @return a matching program method
      */
     public IProgramMethod getProgramMethod(KeYJavaType classType, String methodName,
-            ImmutableList<? extends Type> signature, KeYJavaType context) {
+            Iterable<? extends Type> signature, KeYJavaType context) {
         return kpmi.getProgramMethod(classType, methodName, signature, context);
-    }
-
-    public IProgramMethod getProgramMethod(KeYJavaType classType, String methodName,
-            ImmutableArray<? extends Type> signature, KeYJavaType context) {
-        return getProgramMethod(classType, methodName, signature.toImmutableList(), context);
     }
 
     @Nullable
@@ -559,16 +554,15 @@ public final class JavaInfo {
      * @param classType the KeYJavaType of the class where to look for the method
      * @param methodName the name of the method
      * @param args an array of ProgramVariables as the arguments of the method
-     * @param context the KeYJavaType of the class context from <em>where</em> the method is called
      * @return a matching program method
      */
     public IProgramMethod getProgramMethod(KeYJavaType classType, String methodName,
-            ProgramVariable[] args, KeYJavaType context) {
-        ImmutableList<Type> types = ImmutableSLList.nil();
-        for (int i = args.length - 1; i >= 0; i--) {
-            types = types.prepend(args[i].getKeYJavaType());
+            ProgramVariable[] args) {
+        List<KeYJavaType> types = new ArrayList<>(args.length);
+        for (ProgramVariable arg : args) {
+            types.add(arg.getKeYJavaType());
         }
-        return getProgramMethod(classType, methodName, types, context);
+        return getProgramMethod(classType, methodName, types);
     }
 
     public IProgramMethod getToplevelPM(KeYJavaType kjt, String methodName,

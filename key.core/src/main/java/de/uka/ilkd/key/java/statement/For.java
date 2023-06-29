@@ -21,11 +21,6 @@ public class For extends LoopStatement implements VariableScope {
         new ImmutableArray<>(new VariableSpecification[0]);
 
     /**
-     * For.
-     */
-    public For() {}
-
-    /**
      * For. Used for the Recoder2KeY transformation
      *
      * @param inits a loop initializer mutable list.

@@ -1,10 +1,12 @@
 package de.uka.ilkd.key.java.declaration;
 
+import java.util.List;
+
+import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.TerminalProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
 
 /**
  * Modifier. taken from COMPOST and changed to achieve an immutable structure
@@ -20,11 +22,9 @@ public abstract class Modifier extends JavaProgramElement implements TerminalPro
 
     /**
      * Modifier.
-     *
-     * @param children May contain: some Comments
      */
-    public Modifier(ExtList children) {
-        super(children);
+    public Modifier(PositionInfo pi, List<Comment> c) {
+        super(pi, c);
     }
 
     /**

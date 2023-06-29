@@ -1,8 +1,10 @@
 package de.uka.ilkd.key.java.declaration.modifier;
 
-import de.uka.ilkd.key.java.declaration.Modifier;
+import java.util.List;
 
-import org.key_project.util.ExtList;
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.declaration.Modifier;
 
 
 /**
@@ -20,14 +22,8 @@ public abstract class VisibilityModifier extends Modifier
     public VisibilityModifier() {
     }
 
-
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children the children of this AST element as KeY classes. May contain: Comments
-     */
-    public VisibilityModifier(ExtList children) {
-        super(children);
+    public VisibilityModifier(PositionInfo pi, List<Comment> c) {
+        super(pi, c);
     }
 
     /** Whether it represents a <code>public</code> modifier. */

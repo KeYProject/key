@@ -14,7 +14,6 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import com.github.javaparser.ast.AccessSpecifier;
 import com.github.javaparser.ast.CompilationUnit;
@@ -326,7 +325,7 @@ public class KeYProgModelInfo {
      */
     public IProgramMethod getProgramMethod(
             @Nonnull KeYJavaType ct, String name,
-            ImmutableList<? extends Type> signature, KeYJavaType context) {
+            Iterable<? extends Type> signature, KeYJavaType context) {
         if (ct.getJavaType() instanceof ArrayType || context.getJavaType() instanceof ArrayType) {
             return getImplicitMethod(ct, name);
         }
@@ -504,6 +503,7 @@ public class KeYProgModelInfo {
         var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
         List<ResolvedType> jpSignature = signature.map(this::getJavaParserType).toList();
         var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);
+        throw new UnsupportedOperationException("findImplementations");
         // TODO javaparser
 
         // If ct is an interface, but does not declare the method, we
@@ -513,7 +513,7 @@ public class KeYProgModelInfo {
         // rct = rct.getAllSupertypes().get(1);
         // }
         //
-        ImmutableList<KeYJavaType> classList = ImmutableSLList.nil();
+        // ImmutableList<KeYJavaType> classList = ImmutableSLList.nil();
         // classList = recFindImplementations(rct, name, rsignature, classList);
         //
         //
@@ -534,7 +534,7 @@ public class KeYProgModelInfo {
         // } // no implementation is needed if classes above are abstract
         // }
 
-        return classList;
+        // return classList;
     }
 
 

@@ -1,8 +1,10 @@
 package de.uka.ilkd.key.java.declaration.modifier;
 
-import de.uka.ilkd.key.java.declaration.Modifier;
+import java.util.List;
 
-import org.key_project.util.ExtList;
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.declaration.Modifier;
 
 /**
  * Abstract.
@@ -21,8 +23,8 @@ public class Abstract extends Modifier {
      *
      * @param children list of children. May contain: Comments
      */
-    public Abstract(ExtList children) {
-        super(children);
+    public Abstract(PositionInfo pi, List<Comment> c) {
+        super(pi, c);
     }
 
 

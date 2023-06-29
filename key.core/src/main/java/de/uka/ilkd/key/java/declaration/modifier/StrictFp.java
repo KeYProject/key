@@ -1,8 +1,10 @@
 package de.uka.ilkd.key.java.declaration.modifier;
 
-import de.uka.ilkd.key.java.declaration.Modifier;
+import java.util.List;
 
-import org.key_project.util.ExtList;
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.declaration.Modifier;
 
 
 /**
@@ -25,8 +27,8 @@ public class StrictFp extends Modifier {
      * @param children the children of this AST element as KeY classes. May contain: Comments
      */
 
-    public StrictFp(ExtList children) {
-        super(children);
+    public StrictFp(PositionInfo pi, List<Comment> c) {
+        super(pi, c);
     }
 
 
