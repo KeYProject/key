@@ -35,7 +35,6 @@ import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.comments.BlockComment;
 import com.github.javaparser.ast.comments.Comment;
-import com.github.javaparser.ast.comments.LineComment;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.EmptyStmt;
 import com.github.javaparser.ast.stmt.Statement;
@@ -60,12 +59,6 @@ public final class JMLTransformer extends JavaTransformer {
             JMLModifier.PUBLIC, JMLModifier.STATIC);
     public static final DataKey<TextualJMLConstruct> KEY_CONSTRUCT = new DataKey<>() {
     };
-
-    /**
-     * JML markers left and right.
-     */
-    private static final String JML = "/*@";
-    private static final String JMR = "@*/";
 
     private static ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
     private static final Logger LOGGER = LoggerFactory.getLogger(JMLTransformer.class);
@@ -173,15 +166,15 @@ public final class JMLTransformer extends JavaTransformer {
      * Puts the JML modifiers from the passed list into a string enclosed in JML
      * markers.
      */
-    private String getJMLModString(ImmutableList<JMLModifier> mods) {
-        StringBuilder sb = new StringBuilder(JML);
+    private BlockComment getJMLModComment(ImmutableList<JMLModifier> mods) {
+        StringBuilder sb = new StringBuilder("@");
         for (var mod : mods) {
             if (!JAVA_MODS.contains(mod)) {
-                sb.append(mod.name()).append(" ");
+                sb.append(mod.toString()).append(" ");
             }
         }
-        sb.append(JMR);
-        return sb.toString();
+        sb.append("@");
+        return new BlockComment(sb.toString());
     }
 
     /**
@@ -266,7 +259,7 @@ public final class JMLTransformer extends JavaTransformer {
         // set comments: the original list of comments with the declaration, and the JML
         // modifiers
         NodeList<Comment> newComments = new NodeList<>(originalComments);
-        Comment jmlComment = new BlockComment(getJMLModString(decl.getMods()));
+        Comment jmlComment = getJMLModComment(decl.getMods());
         jmlComment.setParentNode(fieldDecl);
         newComments.add(jmlComment);
         fieldDecl.setAssociatedSpecificationComments(newComments);
@@ -325,7 +318,7 @@ public final class JMLTransformer extends JavaTransformer {
 
     @Nonnull
     private MethodDeclaration transformMethodDecl(TextualJMLMethodDecl decl,
-            List<Comment> originalComments, TypeDeclaration<?> parent)
+            List<Comment> originalComments)
             throws SLTranslationException {
         assert !originalComments.isEmpty();
 
@@ -363,7 +356,7 @@ public final class JMLTransformer extends JavaTransformer {
         // set comments: the original list of comments with the declaration,
         // and the JML modifiers
         NodeList<Comment> newComments = new NodeList<>(originalComments);
-        Comment jmlComment = new LineComment(getJMLModString(decl.getMods()));
+        Comment jmlComment = getJMLModComment(decl.getMods());
         jmlComment.setParentNode(methodDecl);
         newComments.add(jmlComment);
         methodDecl.setAssociatedSpecificationComments(newComments);
@@ -460,7 +453,7 @@ public final class JMLTransformer extends JavaTransformer {
             if (c instanceof TextualJMLFieldDecl) {
                 td.addMember(transformClassFieldDecl((TextualJMLFieldDecl) c, comments));
             } else if (c instanceof TextualJMLMethodDecl) {
-                td.addMember(transformMethodDecl((TextualJMLMethodDecl) c, comments, td));
+                td.addMember(transformMethodDecl((TextualJMLMethodDecl) c, comments));
             }
         }
     }

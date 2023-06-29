@@ -15,6 +15,7 @@ package de.uka.ilkd.key.java.declaration;
 
 import java.util.List;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.*;
@@ -48,32 +49,22 @@ public abstract class TypeDeclaration extends JavaDeclaration
     protected final boolean parentIsInterfaceDeclaration;
     protected final boolean isLibrary;
 
-    /** JML modifiers of a type */
-    public static final class JMLModifiers {
-        /** strictly pure */
-        public final boolean strictlyPure;
-        /** pure */
-        public final boolean pure;
-        /** nullable by default */
-        public final boolean nullableByDefault;
-        /** spec math mode */
-        public final SpecMathMode specMathMode;
-
-        /** constructor */
-        public JMLModifiers(boolean strictlyPure, boolean pure, boolean nullableByDefault,
-                SpecMathMode specMathMode) {
-            this.strictlyPure = strictlyPure;
-            this.pure = pure;
-            this.nullableByDefault = nullableByDefault;
-            this.specMathMode = specMathMode;
-        }
-    }
+    /**
+     * JML modifiers of a type
+     *
+     * @param strictlyPure strictly pure
+     * @param pure pure
+     * @param nullableByDefault nullable by default
+     * @param specMathMode spec math mode
+     */
+    public record JMLModifiers(boolean strictlyPure, boolean pure, boolean nullableByDefault,
+            @Nullable SpecMathMode specMathMode) {}
 
     protected final JMLModifiers jmlModifiers;
 
 
-
-    public TypeDeclaration(PositionInfo pi, List<Comment> comments,
+    public TypeDeclaration(
+            PositionInfo pi, List<Comment> comments,
             @Nonnull ImmutableArray<Modifier> modArray,
             ProgramElementName name, ProgramElementName fullName,
             ImmutableArray<MemberDeclaration> members, boolean parentIsInterfaceDeclaration,
@@ -105,7 +96,8 @@ public abstract class TypeDeclaration extends JavaDeclaration
      * @param members an array containing the memberdeclarations of
      *        this type
      */
-    public TypeDeclaration(Modifier[] mods,
+    public TypeDeclaration(
+            Modifier[] mods,
             ProgramElementName name,
             ProgramElementName fullName,
             MemberDeclaration[] members,
@@ -129,7 +121,8 @@ public abstract class TypeDeclaration extends JavaDeclaration
      *        several Modifier (as modifiers of the type decl),
      *        Comments
      */
-    public TypeDeclaration(ExtList children,
+    public TypeDeclaration(
+            ExtList children,
             ProgramElementName name,
             ProgramElementName fullName,
             boolean isLibrary) {
@@ -156,7 +149,8 @@ public abstract class TypeDeclaration extends JavaDeclaration
      *        several Modifier (as modifiers of the type decl),
      *        Comments
      */
-    public TypeDeclaration(ExtList children,
+    public TypeDeclaration(
+            ExtList children,
             ProgramElementName fullName,
             boolean isLibrary) {
         this(children,

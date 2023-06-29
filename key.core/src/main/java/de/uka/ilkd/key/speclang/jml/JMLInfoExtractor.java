@@ -214,7 +214,7 @@ public final class JMLInfoExtractor {
         if (!(t.getJavaType() instanceof TypeDeclaration)) {
             return false;
         } else {
-            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().pure;
+            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().pure();
         }
     }
 
@@ -228,7 +228,7 @@ public final class JMLInfoExtractor {
         if (!(t.getJavaType() instanceof TypeDeclaration)) {
             return false;
         } else {
-            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().strictlyPure;
+            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().strictlyPure();
         }
     }
 
@@ -243,7 +243,7 @@ public final class JMLInfoExtractor {
         if (!(t.getJavaType() instanceof TypeDeclaration)) {
             return false;
         } else {
-            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().nullableByDefault;
+            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().nullableByDefault();
         }
     }
 
@@ -280,7 +280,7 @@ public final class JMLInfoExtractor {
         boolean nullable = checkFor("nullable", comments);
 
         if (!non_null && !nullable) {
-            return td.getJmlModifiers().nullableByDefault;
+            return td.getJmlModifiers().nullableByDefault();
         } else {
             return nullable;
         }
@@ -355,7 +355,7 @@ public final class JMLInfoExtractor {
      * Returns true iff the given method is specified "pure".
      */
     public static boolean isPure(IProgramMethod pm) {
-        return pm.getMethodDeclaration().getJmlModifiers().pure
+        return pm.getMethodDeclaration().getJmlModifiers().pure()
                 || isPureByDefault(pm.getContainerType());
     }
 
@@ -364,7 +364,7 @@ public final class JMLInfoExtractor {
      * Returns true iff the given method is specified "helper".
      */
     public static boolean isHelper(IProgramMethod pm) {
-        return pm.getMethodDeclaration().getJmlModifiers().helper;
+        return pm.getMethodDeclaration().getJmlModifiers().helper();
     }
 
     /**
@@ -372,7 +372,7 @@ public final class JMLInfoExtractor {
      * specified so.
      */
     public static boolean isStrictlyPure(IProgramMethod pm) {
-        return pm.getMethodDeclaration().getJmlModifiers().strictlyPure
+        return pm.getMethodDeclaration().getJmlModifiers().strictlyPure()
                 || isStrictlyPureByDefault(pm.getContainerType());
     }
 
@@ -384,7 +384,7 @@ public final class JMLInfoExtractor {
         if (!(t.getJavaType() instanceof TypeDeclaration)) {
             return null;
         } else {
-            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().specMathMode;
+            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().specMathMode();
         }
     }
 
@@ -406,7 +406,7 @@ public final class JMLInfoExtractor {
      */
     @Nullable
     public static SpecMathMode getSpecMathMode(@Nonnull IProgramMethod pm) {
-        var methodMode = pm.getMethodDeclaration().getJmlModifiers().specMathMode;
+        var methodMode = pm.getMethodDeclaration().getJmlModifiers().specMathMode();
         return methodMode != null ? methodMode : getSpecMathMode(pm.getContainerType());
     }
 

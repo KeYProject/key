@@ -48,26 +48,14 @@ public class MethodDeclaration extends JavaDeclaration
 
     /**
      * JML modifiers of a method
+     *
+     * @param pure pure
+     * @param strictlyPure strictly pure
+     * @param helper helper
+     * @param specMathMode spec math mode
      */
-    public static final class JMLModifiers {
-        /** pure */
-        public final boolean pure;
-        /** strictly pure */
-        public final boolean strictlyPure;
-        /** helper */
-        public final boolean helper;
-        /** spec math mode */
-        public final SpecMathMode specMathMode;
-
-        /** constructor */
-        public JMLModifiers(boolean pure, boolean strictlyPure, boolean helper,
-                SpecMathMode specMathMode) {
-            this.pure = pure;
-            this.strictlyPure = strictlyPure;
-            this.helper = helper;
-            this.specMathMode = specMathMode;
-        }
-    }
+    public record JMLModifiers(boolean pure, boolean strictlyPure, boolean helper,
+            SpecMathMode specMathMode) {}
 
     /**
      * this field stores if parent is an InterfaceDeclaration because we will be
@@ -76,7 +64,8 @@ public class MethodDeclaration extends JavaDeclaration
     protected final boolean parentIsInterfaceDeclaration;
 
 
-    public MethodDeclaration(PositionInfo pi, List<Comment> comments,
+    public MethodDeclaration(
+            PositionInfo pi, List<Comment> comments,
             @Nonnull ImmutableArray<Modifier> modArray,
             TypeReference returnType,
             Comment[] voidComments, ProgramElementName name,
@@ -105,7 +94,8 @@ public class MethodDeclaration extends JavaDeclaration
      * @param parentIsInterfaceDeclaration a boolean set true iff
      *        parent is an InterfaceDeclaration
      */
-    public MethodDeclaration(ExtList children,
+    public MethodDeclaration(
+            ExtList children,
             boolean parentIsInterfaceDeclaration,
             Comment[] voidComments) {
         super(children);
@@ -133,7 +123,8 @@ public class MethodDeclaration extends JavaDeclaration
      * @param parentIsInterfaceDeclaration a boolean set true iff
      *        parent is an InterfaceDeclaration
      */
-    public MethodDeclaration(Modifier[] modifiers,
+    public MethodDeclaration(
+            Modifier[] modifiers,
             TypeReference returnType,
             ProgramElementName name,
             ParameterDeclaration[] parameters,
@@ -162,7 +153,8 @@ public class MethodDeclaration extends JavaDeclaration
      * @param parentIsInterfaceDeclaration a boolean set true iff
      *        parent is an InterfaceDeclaration
      */
-    public MethodDeclaration(Modifier[] modifiers,
+    public MethodDeclaration(
+            Modifier[] modifiers,
             TypeReference returnType,
             ProgramElementName name,
             ImmutableArray<ParameterDeclaration> parameters,

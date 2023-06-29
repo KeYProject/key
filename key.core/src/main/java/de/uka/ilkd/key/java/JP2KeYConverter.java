@@ -144,6 +144,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return o;
     }
 
+    private static ProgramElementName createProgramElementName(SimpleName n) {
+        var c = createComments(n);
+        return new ProgramElementName(n.asString(), c.toArray(Comment[]::new));
+    }
+
     @Override
     public Object visit(ArrayAccessExpr n, Void arg) {
         var pi = createPositionInfo(n);
@@ -335,7 +340,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(ClassOrInterfaceDeclaration n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        ProgramElementName name = new ProgramElementName(n.getNameAsString());
+        ProgramElementName name = createProgramElementName(n.getName());
         ProgramElementName fullName = new ProgramElementName(n.getFullyQualifiedName().get());
         boolean isLibrary = mapping.isParsingLibraries();
         ImmutableArray<de.uka.ilkd.key.java.declaration.Modifier> modArray = map(n.getModifiers());
@@ -380,7 +385,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Nonnull
-    private PositionInfo createPositionInfo(Node node) {
+    private static PositionInfo createPositionInfo(Node node) {
         if (node.getRange().isEmpty()) {
             return PositionInfo.UNDEFINED;
         }
@@ -421,7 +426,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             map(n.getTypes()));
     }
 
-    private List<Comment> createComments(Node n) {
+    private static List<Comment> createComments(Node n) {
         var comments = new ArrayList<Comment>();
         if (n.containsData(JMLCommentTransformer.BEFORE_COMMENTS)) {
             comments.addAll(n.getData(JMLCommentTransformer.BEFORE_COMMENTS).stream()
@@ -478,7 +483,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             map(n.getModifiers()),
             null,
             null,
-            new ProgramElementName(n.getNameAsString()),
+            createProgramElementName(n.getName()),
             map(n.getParameters()),
             thr,
             accept(n.getBody()), isInInterface);
@@ -505,7 +510,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     private Label simpleNameToLabel(Optional<SimpleName> label) {
-        return label.map(name -> new ProgramElementName(name.asString())).orElse(null);
+        return label.map(JP2KeYVisitor::createProgramElementName).orElse(null);
     }
 
     @Override
@@ -585,7 +590,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             "L" + n.getScope().toString().replace(".", "/") + "/" + n.getNameAsString() + ";";
         boolean notFullyQualifiedName = !rtype.toDescriptor().equals(descriptor);
         ProgramVariable variable = new LocationVariable(
-            new ProgramElementName(n.getNameAsString()), kjt);
+            createProgramElementName(n.getName()), kjt);
         if (notFullyQualifiedName) { // regular field access
             ReferencePrefix prefix = accept(n.getScope());
             return new FieldReference(pi, c, variable, prefix);
@@ -729,7 +734,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         if (n.getLabel().asString().startsWith("#")) {
             id = (ProgramSV) lookupSchemaVariable(n.getLabel());
         } else {
-            id = new ProgramElementName(n.getLabel().asString());
+            id = createProgramElementName(n.getLabel());
         }
         var stmt = accept(n.getStatement());
         return new LabeledStatement(id, (Statement) stmt, createPositionInfo(n));
@@ -746,7 +751,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(MethodCallExpr n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        var methodName = new ProgramElementName(n.getNameAsString());
+        var methodName = createProgramElementName(n.getName());
         ReferencePrefix prefix = accepto(n.getScope());
         ImmutableArray<Expression> args = map(n.getArguments());
         return new MethodReference(pi, c, prefix, methodName, args);
@@ -766,7 +771,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             pi, c, map(n.getModifiers()),
             returnType,
             null,
-            new ProgramElementName(n.getNameAsString()),
+            createProgramElementName(n.getName()),
             map(n.getParameters()),
             thr,
             accepto(n.getBody()),
@@ -798,7 +803,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         }
         if (target.toAst().isEmpty()) {
             var type = getKeYJavaType(target.getType());
-            return new LocationVariable(new ProgramElementName(n.getNameAsString()), type);
+            return new LocationVariable(createProgramElementName(n.getName()), type);
         }
 
         var ast = target.toAst().get();
@@ -868,12 +873,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             com.github.javaparser.ast.expr.Expression name) {
         if (name.isFieldAccessExpr()) {
             var fa = name.asFieldAccessExpr();
-            var pen = new ProgramElementName(fa.getNameAsString());
+            var pen = createProgramElementName(fa.getName());
             var inner = translatePackageReference(fa.getScope());
             return new PackageReference(pen, inner);
         } else if (name.isNameExpr()) {
             var n = name.asNameExpr();
-            var pen = new ProgramElementName(n.getNameAsString());
+            var pen = createProgramElementName(n.getName());
             return new PackageReference(pen, null);
         }
         throw new IllegalArgumentException("Unexpected expression type: " + name.getClass());
@@ -882,7 +887,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     @Nonnull
     private PackageReference translatePackageReference(Name name) {
         // Translate recursively since PackageReference and Name are ordered differently
-        var pen = new ProgramElementName(name.getIdentifier());
+        var pen = new ProgramElementName(name.getIdentifier(),
+            createComments(name).toArray(Comment[]::new));
         var inner = name.getQualifier().map(this::translatePackageReference).orElse(null);
         return new PackageReference(pen, inner);
     }
@@ -890,7 +896,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     private static ReferencePrefix convertScopeToReferencePrefix(ClassOrInterfaceType scope) {
         var name = scope.getName();
         var inner = scope.getScope().map(JP2KeYVisitor::convertScopeToReferencePrefix).orElse(null);
-        return new PackageReference(new ProgramElementName(name.asString()), inner);
+        return new PackageReference(createProgramElementName(name), inner);
     }
 
     @Nonnull
@@ -900,7 +906,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         }
         ReferencePrefix prefix =
             type.getScope().map(JP2KeYVisitor::convertScopeToReferencePrefix).orElse(null);
-        var name = new ProgramElementName(type.getName().asString());
+        var name = createProgramElementName(type.getName());
         var resolvedType = getKeYJavaType(type.resolve());
         return new TypeRef(name, 0, prefix, resolvedType);
     }
