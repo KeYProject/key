@@ -777,9 +777,9 @@ public final class MiscTools {
 
         try {
             return new URI(source);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+        } catch (URISyntaxException ignored) {
         }
+        return Path.of(source).toUri();
     }
 
     /**

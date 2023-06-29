@@ -47,6 +47,7 @@ public class PositionInfo {
      * The URI of the parent class of this location (the class the statement originates from). May
      * be null.
      */
+    @Nullable
     private URI parentClassURI;
 
     private PositionInfo() {
@@ -80,9 +81,6 @@ public class PositionInfo {
         if (fileURI == null) {
             this.fileURI = null;
         } else {
-            if (fileURI.toString().contains("unknown")) {
-                int i = 0;
-            }
             this.fileURI = fileURI.normalize();
         }
     }
@@ -126,6 +124,7 @@ public class PositionInfo {
         return null;
     }
 
+    @Nullable
     public URI getParentClassURI() {
         return parentClassURI;
     }
