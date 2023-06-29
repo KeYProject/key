@@ -75,20 +75,20 @@ class EndToEndTests {
         Pair<Proof, File> iteration1 = sliceProofFullFilename(
             new File(testCaseDirectory,
                 "../../../../../key.ui/examples/firstTouch/05-ReverseArray/reverseArray.proof"),
-            6530, 4229, true, true);
+            5253, 4184, true, true);
         Pair<Proof, File> iteration2 =
-            sliceProofFullFilename(iteration1.second, 4229, 4222, true, true);
+            sliceProofFullFilename(iteration1.second, 4184, 4183, true, true);
         Pair<Proof, File> iteration3 =
-            sliceProofFullFilename(iteration2.second, 4222, 4213, true, true);
+            sliceProofFullFilename(iteration2.second, 4183, 4182, true, true);
         Pair<Proof, File> iteration4 =
-            sliceProofFullFilename(iteration3.second, 4213, 4202, true, true);
+            sliceProofFullFilename(iteration3.second, 4182, 4181, true, true);
         Pair<Proof, File> iteration5 =
-            sliceProofFullFilename(iteration4.second, 4202, 4190, true, true);
-        Files.delete(iteration5.second.toPath());
+            sliceProofFullFilename(iteration4.second, 4181, 4180, true, true);
+        /*Files.delete(iteration5.second.toPath());
         Files.delete(iteration4.second.toPath());
         Files.delete(iteration3.second.toPath());
         Files.delete(iteration2.second.toPath());
-        Files.delete(iteration1.second.toPath());
+        Files.delete(iteration1.second.toPath());*/
     }
 
     /**
@@ -263,6 +263,7 @@ class EndToEndTests {
             // analyze proof
             AnalysisResults results =
                 tracker.get().analyze(doDependencyAnalysis, doDeduplicateRuleApps);
+            System.out.println(results);
             assertEquals(expectedTotal, results.totalSteps);
             assertEquals(expectedInSlice, results.usefulStepsNr);
             // slice proof
