@@ -416,28 +416,29 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 final String invFreeString = pm.isStatic() ? "\\inv_free" : "<inv_free>";
                 if (!pm.isConstructor()) {
                     specCase.addClause(REQUIRES, new LabeledParserRuleContext(
-                            JmlFacade.parseExpr(invString), IMPL_TERM_LABEL));
+                        JmlFacade.parseExpr(invString), IMPL_TERM_LABEL));
                     specCase.addClause(REQUIRES_FREE, new LabeledParserRuleContext(
-                            JmlFacade.parseExpr(invFreeString), IMPL_TERM_LABEL));
+                        JmlFacade.parseExpr(invFreeString), IMPL_TERM_LABEL));
                 } else if (addInvariant) {
                     // add static invariant to constructor's precondition
                     specCase.addClause(REQUIRES, new LabeledParserRuleContext(
-                            JmlFacade.parseExpr(format("%s.\\inv", pm.getName())),
-                            IMPL_TERM_LABEL));
+                        JmlFacade.parseExpr(format("%s.\\inv", pm.getName())),
+                        IMPL_TERM_LABEL));
                     specCase.addClause(REQUIRES_FREE, new LabeledParserRuleContext(
-                            JmlFacade.parseExpr(format("%s.\\inv_free", pm.getName())),
-                            IMPL_TERM_LABEL));
+                        JmlFacade.parseExpr(format("%s.\\inv_free", pm.getName())),
+                        IMPL_TERM_LABEL));
 
                 }
                 if (specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                     specCase.addClause(ENSURES, new LabeledParserRuleContext(
-                            JmlFacade.parseExpr(invString), IMPL_TERM_LABEL));
+                        JmlFacade.parseExpr(invString), IMPL_TERM_LABEL));
                     specCase.addClause(ENSURES_FREE, new LabeledParserRuleContext(
-                            JmlFacade.parseExpr(invFreeString), IMPL_TERM_LABEL));
+                        JmlFacade.parseExpr(invFreeString), IMPL_TERM_LABEL));
 
                 }
                 if (specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR && !pm.isModel()) {
-                    specCase.addClause(TextualJMLSpecCase.Clause.SIGNALS, new LabeledParserRuleContext(
+                    specCase.addClause(TextualJMLSpecCase.Clause.SIGNALS,
+                        new LabeledParserRuleContext(
                             JmlFacade.parseClause(format("signals (Throwable e) %s;", invString)),
                             IMPL_TERM_LABEL));
 

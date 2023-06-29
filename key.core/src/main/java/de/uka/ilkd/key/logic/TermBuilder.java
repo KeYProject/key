@@ -1541,7 +1541,7 @@ public class TermBuilder {
         }
         return func(services.getJavaInfo().getStaticInv(t), hs);
     }
-    
+
     public Term invFree(Term[] h, Term o) {
         Term[] p = new Term[h.length + 1];
         System.arraycopy(h, 0, p, 0, h.length);

@@ -40,7 +40,7 @@ public interface ClassInvariant extends SpecificationElement {
      * Tells whether the invariant is free (i.e., can be assumed without proof).
      */
     boolean isFree();
-    
+
     /**
      * Returns another class invariant like this one, except that it refers to the passed
      * KeYJavaType.

@@ -980,7 +980,7 @@ public class JMLSpecFactory {
         String name = getDefaultInvName(null, kjt);
         String display = getDefaultInvName(textualInv.getName(), kjt);
         return new ClassInvariantImpl(name, display, kjt, getVisibility(textualInv), inv,
-                context.selfVar, textualInv.isFree());
+            context.selfVar, textualInv.isFree());
     }
 
     public InitiallyClause createJMLInitiallyClause(@Nonnull KeYJavaType kjt,

@@ -1477,7 +1477,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         assert result != null;
         return termFactory.invFor(result);
     }
-    
+
     @Override
     public SLExpression visitPrimaryInvFreeFor(JmlParser.PrimaryInvFreeForContext ctx) {
         SLExpression result = accept(ctx.expression());
@@ -1490,7 +1490,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         KeYJavaType typ = accept(ctx.referencetype());
         return termFactory.staticInfFor(typ);
     }
-    
+
     @Override
     public SLExpression visitPrimaryStaticInvFree(JmlParser.PrimaryStaticInvFreeContext ctx) {
         KeYJavaType typ = accept(ctx.referencetype());

@@ -83,7 +83,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
         if (name.equals("<inv>") && receiver.isTerm()) {
             return new SLExpression(services.getTermBuilder().inv(receiver.getTerm()));
         }
-        if(name.equals("<inv_free>") && receiver.isTerm()) {
+        if (name.equals("<inv_free>") && receiver.isTerm()) {
             return new SLExpression(services.getTermBuilder().invFree(receiver.getTerm()));
         }
 

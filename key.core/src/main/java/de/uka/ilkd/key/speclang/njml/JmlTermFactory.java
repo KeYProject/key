@@ -831,7 +831,7 @@ public final class JmlTermFactory {
         final Term result = isStatic ? tb.staticInv(targetType) : tb.inv(selfVar);
         return new SLExpression(result);
     }
-    
+
     /**
      * Need to handle this one differently from INV_FREE_FOR since here static invariants may occur
      * too. For a static invariant, take the passed type as receiver.

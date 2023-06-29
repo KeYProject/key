@@ -1055,7 +1055,7 @@ public final class SpecificationRepository {
 
                 for (ClassInvariant inv : myInvs) {
                     if (!inv.isFree()) {
-                        invDef = tb.and(invDef, inv.getInv(selfVar, services));     
+                        invDef = tb.and(invDef, inv.getInv(selfVar, services));
                     } else {
                         freeInvDef = tb.and(freeInvDef, inv.getInv(selfVar, services));
                     }
@@ -1064,7 +1064,8 @@ public final class SpecificationRepository {
                         if (!inv.isFree()) {
                             staticInvDef = tb.and(staticInvDef, inv.getInv(null, services));
                         } else {
-                            freeStaticInvDef = tb.and(freeStaticInvDef, inv.getInv(selfVar, services));
+                            freeStaticInvDef =
+                                tb.and(freeStaticInvDef, inv.getInv(selfVar, services));
                         }
                     }
                 }
@@ -1072,9 +1073,9 @@ public final class SpecificationRepository {
                 invDef = tb.tf().createTerm(Equality.EQV, tb.inv(tb.var(selfVar)), invDef);
                 staticInvDef = tb.tf().createTerm(Equality.EQV, tb.staticInv(kjt), staticInvDef);
                 freeInvDef = tb.tf().createTerm(Equality.EQV,
-                        tb.invFree(tb.var(selfVar)), freeInvDef);
+                    tb.invFree(tb.var(selfVar)), freeInvDef);
                 freeStaticInvDef = tb.tf().createTerm(Equality.EQV,
-                        tb.staticInvFree(kjt), freeStaticInvDef);
+                    tb.staticInvFree(kjt), freeStaticInvDef);
 
                 final IObserverFunction invSymbol = services.getJavaInfo().getInv();
                 final IObserverFunction staticInvSymbol = services.getJavaInfo().getStaticInv(kjt);
@@ -1091,16 +1092,16 @@ public final class SpecificationRepository {
                     "Static class invariant axiom for " + kjt.getFullName(), staticInvSymbol, kjt,
                     new Private(), null, staticInvDef, null, ImmutableSLList.nil(), null);
                 result = result.add(staticInvRepresentsAxiom);
-                
+
                 final ClassAxiom invFreeRepresentsAxiom = new RepresentsAxiom(
-                        "Free class invariant axiom for " + kjt.getFullName(), freeInvSymbol, kjt,
-                        new Private(), null, freeInvDef, selfVar, ImmutableSLList.nil(), null);
+                    "Free class invariant axiom for " + kjt.getFullName(), freeInvSymbol, kjt,
+                    new Private(), null, freeInvDef, selfVar, ImmutableSLList.nil(), null);
                 result = result.add(invFreeRepresentsAxiom);
 
                 final ClassAxiom staticFreeInvRepresentsAxiom = new RepresentsAxiom(
-                        "Free static class invariant axiom for " + kjt.getFullName(),
-                        freeStaticInvSymbol, kjt, new Private(), null, freeStaticInvDef, null,
-                        ImmutableSLList.nil(), null);
+                    "Free static class invariant axiom for " + kjt.getFullName(),
+                    freeStaticInvSymbol, kjt, new Private(), null, freeStaticInvDef, null,
+                    ImmutableSLList.nil(), null);
                 result = result.add(staticFreeInvRepresentsAxiom);
 
             }

@@ -1422,13 +1422,15 @@ public final class JavaInfo {
      * @see #getInvProgramVar()
      */
     public IObserverFunction getInvFree() {
-        if (invFree == null || invFree.getHeapCount(services) != HeapContext.getModHeaps(services, false).size()) {
-            invFree = (ObserverFunction) services.getNamespaces().functions().lookup(ObserverFunction.createName("<inv_free>", getJavaLangObject()));
+        if (invFree == null || invFree.getHeapCount(services) != HeapContext
+                .getModHeaps(services, false).size()) {
+            invFree = (ObserverFunction) services.getNamespaces().functions()
+                    .lookup(ObserverFunction.createName("<inv_free>", getJavaLangObject()));
             if (invFree == null) {
                 invFree = new ObserverFunction("<inv_free>", Sort.FORMULA, null,
-                        services.getTypeConverter().getHeapLDT().targetSort(), getJavaLangObject(),
-                        false, new ImmutableArray<>(), HeapContext.getModHeaps(services, false).size(),
-                        1);
+                    services.getTypeConverter().getHeapLDT().targetSort(), getJavaLangObject(),
+                    false, new ImmutableArray<>(), HeapContext.getModHeaps(services, false).size(),
+                    1);
                 services.getNamespaces().functions().add(invFree);
             }
         }
@@ -1436,7 +1438,8 @@ public final class JavaInfo {
     }
 
     /**
-     * Returns the special program variable symbol <code>&lt;inv_free&gt;</code> which stands for the free class
+     * Returns the special program variable symbol <code>&lt;inv_free&gt;</code> which stands for
+     * the free class
      * invariant of an object.
      *
      * @see #getFreeInv()
@@ -1445,8 +1448,8 @@ public final class JavaInfo {
         if (invFreeProgVar == null) {
             ProgramElementName pen = new ProgramElementName("<inv_free>", "java.lang.Object");
             invFreeProgVar = new LocationVariable(pen,
-                    getPrimitiveKeYJavaType(PrimitiveType.JAVA_BOOLEAN), getJavaLangObject(),
-                    false, true);
+                getPrimitiveKeYJavaType(PrimitiveType.JAVA_BOOLEAN), getJavaLangObject(),
+                false, true);
         }
         return invFreeProgVar;
     }
@@ -1481,11 +1484,12 @@ public final class JavaInfo {
     public IObserverFunction getStaticInvFree(KeYJavaType target) {
         ObserverFunction inv = staticFreeInvs.get(target);
         if (inv == null) {
-            inv = (ObserverFunction) services.getNamespaces().functions().lookup(ObserverFunction.createName("<$inv_free>", target));
+            inv = (ObserverFunction) services.getNamespaces().functions()
+                    .lookup(ObserverFunction.createName("<$inv_free>", target));
             if (inv == null) {
                 inv = new ObserverFunction("<$inv_free>", Sort.FORMULA, null,
-                        services.getTypeConverter().getHeapLDT().targetSort(), target, true,
-                        new ImmutableArray<>(), HeapContext.getModHeaps(services, false).size(), 1);
+                    services.getTypeConverter().getHeapLDT().targetSort(), target, true,
+                    new ImmutableArray<>(), HeapContext.getModHeaps(services, false).size(), 1);
                 services.getNamespaces().functions().add(inv);
             }
             staticFreeInvs.put(target, inv);

@@ -58,7 +58,7 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
     public String getName() {
         return name;
     }
-    
+
     public boolean isFree() {
         return free;
     }

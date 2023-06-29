@@ -79,7 +79,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
             VisibilityModifier visibility, Term inv, ParsableVariable selfVar) {
         this(name, displayName, kjt, visibility, inv, selfVar, false);
     }
-    
+
     /**
      * Creates a class invariant.
      *
