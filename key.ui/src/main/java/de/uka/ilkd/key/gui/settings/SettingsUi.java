@@ -102,11 +102,10 @@ public class SettingsUi extends JPanel {
     }
 
     private void setSettingsPanel(JComponent comp) {
-        // int dividerLocation = root.getDividerLocation();
         root.setRightComponent(comp);
-        // root.setDividerLocation(dividerLocation);
 
-        root.setDividerLocation(root.getLeftComponent().getPreferredSize().width);
+        // set divider location slightly more to the right to avoid horizontal scroll bar
+        root.setDividerLocation(root.getLeftComponent().getPreferredSize().width + 2);
     }
 
     private JPanel createWestPanel() {
