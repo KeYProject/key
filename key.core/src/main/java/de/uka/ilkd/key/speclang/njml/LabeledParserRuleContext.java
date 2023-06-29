@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.speclang.njml;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.net.URI;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 

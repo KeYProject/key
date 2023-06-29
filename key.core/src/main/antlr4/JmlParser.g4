@@ -87,7 +87,7 @@ accessible_clause
 :
   ACCESSIBLE
   targetHeap?
-  entity_name?
+  //ambigous entity_name?
   (lhs=expression COLON)? rhs=storeRefUnion
   (MEASURED_BY mby=expression)?
   SEMI_TOPLEVEL
