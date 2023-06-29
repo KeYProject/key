@@ -831,7 +831,7 @@ public final class MainWindow extends JFrame {
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(createFileMenu());
         menuBar.add(createViewMenu());
-        menuBar.add(createProofMenu());
+        menuBar.add(createProofMenu(null));
         menuBar.add(createOptionsMenu());
         KeYGuiExtensionFacade.addExtensionsToMainMenu(this, menuBar);
         menuBar.add(Box.createHorizontalGlue());
@@ -915,40 +915,50 @@ public final class MainWindow extends JFrame {
         return goalSelection;
     }
 
-    JMenu createProofMenu() {
+    /**
+     * Create the proof menu.
+     *
+     * @param proof a specific proof that the menu should work on, may be null
+     * @return the menu
+     */
+    public JMenu createProofMenu(Proof selected) {
         JMenu proof = new JMenu("Proof");
         proof.setMnemonic(KeyEvent.VK_P);
 
-        proof.add(autoModeAction);
-        GoalBackAction goalBack = new GoalBackAction(this, true);
-        proof.addMenuListener(new MenuListener() {
-            @Override
-            public void menuSelected(MenuEvent e) {
-                /*
-                 * we use this MenuListener to update the name only if the menu is shown since it
-                 * would be slower to update the name (which means scanning all open and closed
-                 * goals) at every selection change (via the KeYSelectionListener in GoalBackAction)
-                 */
-                goalBack.updateName();
-            }
+        if (selected == null) {
+            proof.add(autoModeAction);
+            GoalBackAction goalBack = new GoalBackAction(this, true);
+            proof.addMenuListener(new MenuListener() {
+                @Override
+                public void menuSelected(MenuEvent e) {
+                    /*
+                     * we use this MenuListener to update the name only if the menu is shown since
+                     * it
+                     * would be slower to update the name (which means scanning all open and closed
+                     * goals) at every selection change (via the KeYSelectionListener in
+                     * GoalBackAction)
+                     */
+                    goalBack.updateName();
+                }
 
-            @Override
-            public void menuDeselected(MenuEvent e) {
-            }
+                @Override
+                public void menuDeselected(MenuEvent e) {
+                }
 
-            @Override
-            public void menuCanceled(MenuEvent e) {
-            }
-        });
-        proof.add(goalBack);
-        proof.add(new PruneProofAction(this));
-        proof.add(new AbandonTaskAction(this));
-        proof.addSeparator();
-        proof.add(new SearchInProofTreeAction(this));
-        proof.add(new SearchInSequentAction(this, sequentViewSearchBar));
-        proof.add(new SearchNextAction(this, sequentViewSearchBar));
-        proof.add(new SearchPreviousAction(this, sequentViewSearchBar));
-        {
+                @Override
+                public void menuCanceled(MenuEvent e) {
+                }
+            });
+            proof.add(goalBack);
+            proof.add(new PruneProofAction(this));
+        }
+        proof.add(new AbandonTaskAction(this, selected));
+        if (selected == null) {
+            proof.addSeparator();
+            proof.add(new SearchInProofTreeAction(this));
+            proof.add(new SearchInSequentAction(this, sequentViewSearchBar));
+            proof.add(new SearchNextAction(this, sequentViewSearchBar));
+            proof.add(new SearchPreviousAction(this, sequentViewSearchBar));
             JMenu searchModeMenu = new JMenu("Search Mode");
 
             for (SequentViewSearchBar.SearchMode mode : SequentViewSearchBar.SearchMode.values()) {
@@ -958,11 +968,11 @@ public final class MainWindow extends JFrame {
             proof.add(searchModeMenu);
         }
         proof.addSeparator();
-        proof.add(new ShowUsedContractsAction(this));
-        proof.add(new ShowActiveTactletOptionsAction(this));
+        proof.add(new ShowUsedContractsAction(this, selected));
+        proof.add(new ShowActiveTactletOptionsAction(this, selected));
         proof.add(showActiveSettingsAction);
-        proof.add(new ShowProofStatistics(this));
-        proof.add(new ShowKnownTypesAction(this));
+        proof.add(new ShowProofStatistics(this, selected));
+        proof.add(new ShowKnownTypesAction(this, selected));
         return proof;
     }
 

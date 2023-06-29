@@ -74,15 +74,17 @@ public class TaskTree extends JPanel {
         delegateView.setRootVisible(false);
         delegateView.putClientProperty("JTree.lineStyle", "Horizontal");
 
+        // create a context menu on demand
         MouseListener ml = new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 if (e.isPopupTrigger()) {
                     TreePath selPath = delegateView.getPathForLocation(e.getX(), e.getY());
                     if (selPath != null && selPath.getLastPathComponent() instanceof BasicTask) {
+                        BasicTask task = (BasicTask) selPath.getLastPathComponent();
                         delegateView.setSelectionPath(selPath);
                         JPopupMenu popup = new JPopupMenu();
-                        for (Component comp : MainWindow.getInstance().createProofMenu()
+                        for (Component comp : MainWindow.getInstance().createProofMenu(task.proof())
                                 .getMenuComponents()) {
                             popup.add(comp);
                         }
