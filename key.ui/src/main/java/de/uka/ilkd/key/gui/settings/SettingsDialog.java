@@ -32,7 +32,7 @@ public class SettingsDialog extends JDialog {
         setTitle("Settings");
 
         mainWindow = owner;
-        ui = new SettingsUi(owner);
+        ui = new SettingsUi(owner, this);
 
         JPanel root = new JPanel(new BorderLayout());
         root.add(ui);
@@ -59,7 +59,8 @@ public class SettingsDialog extends JDialog {
 
     public void setSettingsProvider(List<SettingsProvider> providers) {
         this.providers = providers;
-        this.ui.setSettingsProvider(providers);
+        int width = this.ui.setSettingsProvider(providers);
+        setSize(new Dimension(width, 600));
     }
 
     SettingsUi getUi() {

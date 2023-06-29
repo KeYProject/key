@@ -15,7 +15,6 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 /**
  * @author Alexander Weigl
@@ -23,17 +22,17 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
  */
 public class SettingsUi extends JPanel {
     private static final long serialVersionUID = -217841876110516940L;
-    private static final Icon ICON_TREE_NODE_RETRACTED = IconFactory.TREE_NODE_EXPANDED.get();
-    private static final Icon ICON_TREE_NODE_EXPANDED = IconFactory.TREE_NODE_RETRACTED.get();
 
     private final JSplitPane root;
+    private final JComponent westPanel;
     private DefaultTreeModel treeModel = new DefaultTreeModel(null, false);
     private final JTree treeSettingsPanels = new JTree(treeModel);
     private final JTextField txtSearch = new JTextField();
     private final MainWindow mainWindow;
-    // private JScrollPane center;
+    private final JDialog frame;
 
-    public SettingsUi(MainWindow mainWindow) {
+    public SettingsUi(MainWindow mainWindow, JDialog frame) {
+        this.frame = frame;
         this.mainWindow = mainWindow;
         treeSettingsPanels.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         treeSettingsPanels.setCellRenderer(new DefaultTreeCellRenderer() {
@@ -95,7 +94,8 @@ public class SettingsUi extends JPanel {
         });
 
         setLayout(new BorderLayout(5, 5));
-        root.setLeftComponent(createWestPanel());
+        westPanel = createWestPanel();
+        root.setLeftComponent(westPanel);
         root.setRightComponent(new JLabel("empty"));
         add(root, BorderLayout.CENTER);
         root.setDividerLocation(0.3d);
@@ -121,7 +121,7 @@ public class SettingsUi extends JPanel {
         return p;
     }
 
-    public void setSettingsProvider(List<SettingsProvider> providers) {
+    public int setSettingsProvider(List<SettingsProvider> providers) {
         SettingsTreeNode root = new SettingsTreeNode(providers);
         treeModel = new DefaultTreeModel(root);
         treeSettingsPanels.setModel(treeModel);
@@ -132,6 +132,15 @@ public class SettingsUi extends JPanel {
         if (!providers.isEmpty()) {
             setSettingsPanel(providers.get(0).getPanel(mainWindow));
         }
+        // determine optimal dialog width
+        int w = providers.stream().map(x -> {
+            JPanel panel = (JPanel) x.getPanel(mainWindow);
+            setSettingsPanel(panel);
+            frame.pack();
+            return panel.getWidth();
+        }).max(Integer::compareTo).orElse(600);
+        setSettingsPanel(!providers.isEmpty() ? providers.get(0).getPanel(mainWindow) : null);
+        return w + westPanel.getWidth() + 15;
     }
 
     public void getPaths(TreePath parent, List<TreePath> list) {
