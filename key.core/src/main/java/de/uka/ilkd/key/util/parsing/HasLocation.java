@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.util.parsing;
 
 
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.parser.Location;
 
 /**
@@ -15,5 +17,6 @@ public interface HasLocation {
      *
      * @return the location of the exception
      */
+    @Nonnull
     Location getLocation();
 }

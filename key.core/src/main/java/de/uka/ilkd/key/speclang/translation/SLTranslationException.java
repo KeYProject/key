@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.speclang.translation;
 
 import java.net.URI;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
@@ -32,7 +33,7 @@ public class SLTranslationException extends ProofInputException implements HasLo
     }
 
     @Override
-    public Location getLocation() {
+    public @Nonnull Location getLocation() {
         return location;
     }
 }

@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.util;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
@@ -25,9 +25,8 @@ public class RecognitionException extends Exception implements HasLocation {
         return position;
     }
 
-    @Nullable
     @Override
-    public Location getLocation() {
+    public @Nonnull Location getLocation() {
         return new Location(MiscTools.getURIFromTokenSource(input.getSourceName()), position);
     }
 }

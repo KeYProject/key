@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.parser;
 
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
@@ -30,7 +30,7 @@ public final class ParserException extends Exception implements HasLocation {
     /**
      * @return The location may be null.
      */
-    @Nullable
+    @Nonnull
     @Override
     public Location getLocation() {
         return location;

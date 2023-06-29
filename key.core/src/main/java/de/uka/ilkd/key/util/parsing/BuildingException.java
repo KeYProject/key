@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.util.parsing;
 
 import java.net.URI;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Position;
@@ -53,9 +54,8 @@ public class BuildingException extends RuntimeException implements HasLocation {
         return getMessage() + " (" + getPosition(offendingSymbol) + ")";
     }
 
-    @Nullable
     @Override
-    public Location getLocation() {
+    public @Nonnull Location getLocation() {
         if (offendingSymbol != null) {
             URI uri = MiscTools.getURIFromTokenSource(offendingSymbol.getTokenSource());
             return new Location(uri, Position.fromToken(offendingSymbol));

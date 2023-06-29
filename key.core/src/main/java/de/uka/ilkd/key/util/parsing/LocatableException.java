@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.util.parsing;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.parser.Location;
 
@@ -38,9 +38,8 @@ public class LocatableException extends RuntimeException implements HasLocation 
         this.location = location;
     }
 
-    @Nullable
     @Override
-    public Location getLocation() {
+    public @Nonnull Location getLocation() {
         return location;
     }
 }

@@ -2,6 +2,8 @@ package de.uka.ilkd.key.proof;
 
 
 
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
@@ -55,7 +57,7 @@ public abstract class SVInstantiationExceptionWithPosition extends SVInstantiati
     }
 
     @Override
-    public Location getLocation() {
+    public @Nonnull Location getLocation() {
         return new Location(null, position);
     }
 }

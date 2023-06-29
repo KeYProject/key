@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
@@ -13,7 +13,7 @@ public class ScriptException extends Exception implements HasLocation {
 
     public ScriptException() {
         super();
-        this.location = null;
+        this.location = Location.UNDEFINED;
     }
 
     public ScriptException(String message, Location location, Throwable cause) {
@@ -29,23 +29,22 @@ public class ScriptException extends Exception implements HasLocation {
 
     public ScriptException(String message) {
         super(message);
-        this.location = null;
+        this.location = Location.UNDEFINED;
     }
 
     public ScriptException(Throwable cause) {
         super(cause);
-        this.location = null;
+        this.location = Location.UNDEFINED;
     }
 
     public ScriptException(String message, Throwable cause) {
         super(message, cause);
-        this.location = null;
+        this.location = Location.UNDEFINED;
     }
 
-    @Nullable
+    @Nonnull
     @Override
     public Location getLocation() {
         return location;
     }
-
 }
