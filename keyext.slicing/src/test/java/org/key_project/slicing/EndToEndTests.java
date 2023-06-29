@@ -84,11 +84,11 @@ class EndToEndTests {
             sliceProofFullFilename(iteration3.second, 4182, 4181, true, true);
         Pair<Proof, File> iteration5 =
             sliceProofFullFilename(iteration4.second, 4181, 4180, true, true);
-        /*Files.delete(iteration5.second.toPath());
+        Files.delete(iteration5.second.toPath());
         Files.delete(iteration4.second.toPath());
         Files.delete(iteration3.second.toPath());
         Files.delete(iteration2.second.toPath());
-        Files.delete(iteration1.second.toPath());*/
+        Files.delete(iteration1.second.toPath());
     }
 
     /**
