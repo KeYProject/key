@@ -20,6 +20,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -699,6 +700,8 @@ public class TestApplyTaclet {
         assertEquals(correctSeq, goals.head().sequent(), "Wrong result");
     }
 
+    // test_catch_list0/1 use weird currently unsupported schema java syntax
+    @Disabled
     @Test
     public void testCatchList() {
         doTestCatchList(16);

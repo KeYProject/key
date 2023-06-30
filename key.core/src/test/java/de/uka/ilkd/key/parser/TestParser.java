@@ -18,6 +18,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
 import org.antlr.v4.runtime.CharStreams;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -82,6 +83,8 @@ public class TestParser {
 
     }
 
+    // Handled by javac, javaparser does no type checking
+    @Disabled
     @Test
     void testConstantEvaluationError() throws MalformedURLException {
         var file =

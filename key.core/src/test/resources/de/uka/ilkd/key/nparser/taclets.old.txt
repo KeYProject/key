@@ -15614,12 +15614,12 @@ Choices: programRules:Java}
 == seqConcatUnfoldLeft (seqConcatUnfold) =========================================
 seqConcatUnfoldLeft {
 \find(#allmodal ( (modal operator))\[{ ..
-  #v = \singleton(#nseLeft, #eRight);
+  #v = \seq_concat(#nseLeft, #eRight);
 ... }\] (post))
 \varcond(\new(#vLeftNew (program Variable), \typeof(#nseLeft (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   #typeof(#nseLeft) #vLeftNew = #nseLeft;
-  #v = \singleton(#vLeftNew, #eRight);
+  #v = \seq_concat(#vLeftNew, #eRight);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -15627,12 +15627,12 @@ Choices: programRules:Java}
 == seqConcatUnfoldRight (seqConcatUnfold) =========================================
 seqConcatUnfoldRight {
 \find(#allmodal ( (modal operator))\[{ ..
-  #v = \singleton(#seLeft, #nseRight);
+  #v = \seq_concat(#seLeft, #nseRight);
 ... }\] (post))
 \varcond(\new(#vRightNew (program Variable), \typeof(#nseRight (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   #typeof(#nseRight) #vRightNew = #nseRight;
-  #v = \singleton(#seLeft, #vRightNew);
+  #v = \seq_concat(#seLeft, #vRightNew);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -15743,12 +15743,12 @@ Choices: sequences:on}
 == seqGetUnfoldLeft (seqGetUnfold) =========================================
 seqGetUnfoldLeft {
 \find(#allmodal ( (modal operator))\[{ ..
-  #v = #nseLeft[#eRight];
+  #v = \seq_get(#nseLeft, #eRight);
 ... }\] (post))
 \varcond(\new(#vLeftNew (program Variable), \typeof(#nseLeft (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   #typeof(#nseLeft) #vLeftNew = #nseLeft;
-  #v = #vLeftNew[#eRight];
+  #v = \seq_get(#vLeftNew, #eRight);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -15756,12 +15756,12 @@ Choices: programRules:Java}
 == seqGetUnfoldRight (seqGetUnfold) =========================================
 seqGetUnfoldRight {
 \find(#allmodal ( (modal operator))\[{ ..
-  #v = #seLeft[#nseRight];
+  #v = \seq_get(#seLeft, #nseRight);
 ... }\] (post))
 \varcond(\new(#vRightNew (program Variable), \typeof(#nseRight (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   #typeof(#nseRight) #vRightNew = #nseRight;
-  #v = #seLeft[#vRightNew];
+  #v = \seq_get(#seLeft, #vRightNew);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -15803,12 +15803,12 @@ Choices: programRules:Java}
 == seqLengthUnfold (seqLengthUnfold) =========================================
 seqLengthUnfold {
 \find(#allmodal ( (modal operator))\[{ ..
-  #v = #nse.length;
+  #v = \seq_length(#nse);
 ... }\] (post))
 \varcond(\new(#vNew (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   #typeof(#nse) #vNew = #nse;
-  #v = #vNew.length;
+  #v = \seq_length(#vNew);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}

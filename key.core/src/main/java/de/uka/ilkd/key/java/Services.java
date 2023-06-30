@@ -18,8 +18,6 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
-import org.key_project.util.lookup.Lookup;
-
 /**
  * this is a collection of common services to the KeY prover. Services include information on the
  * underlying Java model and a converter to transform Java program elements to logic (where
@@ -132,6 +130,7 @@ public class Services implements TermServices {
         this.cee = s.cee;
         this.typeconverter = s.typeconverter;
         this.javainfo = s.javainfo;
+        this.mapping = s.mapping;
         this.counters = s.counters;
         this.specRepos = s.specRepos;
         this.javaModel = s.javaModel;
@@ -243,15 +242,6 @@ public class Services implements TermServices {
         nameRecorder = nameRecorder.copy();
         s.setJavaModel(getJavaModel());
         return s;
-    }
-
-    /**
-     * Generate a copy of this object. All references are copied w/o duplicating their content.
-     *
-     * @return a freshly created Services object
-     */
-    public Services shallowCopy() {
-        return new Services(this);
     }
 
     /**
@@ -453,19 +443,5 @@ public class Services implements TermServices {
             }
         }
         activateJavaPath(path);
-    }
-
-    public Lookup createLookup() {
-        Lookup lookup = new Lookup();
-        lookup.register(getJavaInfo());
-        lookup.register(getJavaModel());
-        lookup.register(getProfile());
-        lookup.register(getProof());
-        lookup.register(getNamespaces());
-        lookup.register(getTermBuilder());
-        lookup.register(getNameRecorder());
-        lookup.register(getVariableNamer());
-        lookup.register(getJavaInfo());
-        return lookup;
     }
 }

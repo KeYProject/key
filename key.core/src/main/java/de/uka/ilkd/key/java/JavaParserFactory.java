@@ -65,12 +65,6 @@ public class JavaParserFactory {
     @Nonnull
     private List<CompilationUnit> javaBootClassCollection = new ArrayList<>();
 
-    /**
-     * Dangerous flag! Only useful for testing purpose that does not require name resolution against
-     * JavaRedux.
-     */
-    private boolean useSystemClassLoaderInResolution;
-
 
     public JavaParserFactory(Services services, Path bootClassPath, Collection<Path> sourcePaths) {
         this.services = services;
@@ -122,13 +116,8 @@ public class JavaParserFactory {
             config = new ParserConfiguration();
             config.setStoreTokens(true);
         }
-        config.setSymbolResolver(getSymbolResolver());
+        config.setSymbolResolver(getSymbolSolver());
         return config;
-    }
-
-    @Nonnull
-    private JavaSymbolSolver getSymbolResolver() {
-        return symbolResolver;
     }
 
     @Nonnull
@@ -139,19 +128,6 @@ public class JavaParserFactory {
     @Nonnull
     public TypeSolver getTypeSolver() {
         return typeSolver;
-    }
-
-    /**
-     * If set to true the symbol solver do not use the {@link ClassLoaderTypeSolver} with the system
-     * class loader.
-     * This means, that classes defined by the JRE are not found, if they are not given in the class
-     * path.
-     * In particular, only JavaRedux and Red classes (if added) are
-     * the next parser runs
-     */
-    public void setUseSystemClassLoaderInResolution(boolean useSystemClassLoaderInResolution) {
-        this.useSystemClassLoaderInResolution = useSystemClassLoaderInResolution;
-        typeSolver.lazyRebuild();
     }
 
     @Nonnull
@@ -224,12 +200,6 @@ public class JavaParserFactory {
 
             for (var sourcePath : sourcePaths) {
                 addToTypeSolver(ct, sourcePath);
-            }
-
-            if (useSystemClassLoaderInResolution) {
-                LOGGER.warn("useSystemClassLoaderInResolution activated: " +
-                    "Reflection based type solver added. Only for testing purpose!");
-                ct.add(new ReflectionTypeSolver(true));
             }
             delegate = ct;
         }
