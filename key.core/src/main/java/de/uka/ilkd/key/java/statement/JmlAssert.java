@@ -33,6 +33,12 @@ public class JmlAssert extends JavaStatement {
      * the kind of the statement, assert or assume
      */
     private final TextualJMLAssertStatement.Kind kind;
+
+    /*
+     * Temporary until jml labels are there ...
+     */
+    private final String optLabel;
+
     /**
      * the condition in parse tree form
      */
@@ -58,10 +64,11 @@ public class JmlAssert extends JavaStatement {
      * @param positionInfo the position information for this statement
      * @param services needed for pretty printing (not pretty when null)
      */
-    public JmlAssert(Kind kind, LabeledParserRuleContext condition,
+    public JmlAssert(Kind kind, String label, LabeledParserRuleContext condition,
             AssertionProofContext assertionProof, PositionInfo positionInfo, Services services) {
         super(positionInfo);
         this.kind = kind;
+        this.optLabel = label;
         this.condition = condition;
         this.assertionProof = assertionProof;
         this.services = services;
@@ -75,6 +82,7 @@ public class JmlAssert extends JavaStatement {
     public JmlAssert(ExtList children, Services services) {
         super(children);
         this.kind = children.get(TextualJMLAssertStatement.Kind.class);
+        this.optLabel = children.get(String.class);
         this.condition = children.get(LabeledParserRuleContext.class);
         this.assertionProof = children.get(AssertionProofContext.class);
         this.cond = children.get(Term.class);
@@ -215,5 +223,9 @@ public class JmlAssert extends JavaStatement {
         cond = replacer.replace(cond);
         vars.atPres = atPres;
 
+    }
+
+    public String getOptLabel() {
+        return optLabel;
     }
 }

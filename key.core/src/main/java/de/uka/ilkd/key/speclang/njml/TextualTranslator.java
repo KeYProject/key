@@ -503,7 +503,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         TextualJMLAssertStatement b =
             new TextualJMLAssertStatement(TextualJMLAssertStatement.Kind.ASSERT,
                 new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.ASSERT),
-                ctx.assertionProof());
+                ctx.assertionProof(), ctx.label == null ? null : ctx.label.getText());
         constructs = constructs.append(b);
         return null;
     }

@@ -187,7 +187,7 @@ block_specification: method_specification;
 block_loop_specification:
   loop_contract_keyword spec_case ((also_keyword)+ loop_contract_keyword spec_case)*;
 loop_contract_keyword: LOOP_CONTRACT;
-assert_statement: (ASSERT expression | UNREACHABLE) (assertionProof SEMI? | SEMI_TOPLEVEL);
+assert_statement: (ASSERT (label=IDENT COLON)? expression | UNREACHABLE) (assertionProof SEMI? | SEMI_TOPLEVEL);
 //breaks_clause: BREAKS expression;
 //continues_clause: CONTINUES expression;
 //returns_clause: RETURNS expression;

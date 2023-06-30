@@ -14,18 +14,20 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
 
     private final LabeledParserRuleContext context;
     private final AssertionProofContext assertionProof;
+    private final String optLabel;
     private final Kind kind;
 
     public TextualJMLAssertStatement(Kind kind, LabeledParserRuleContext clause) {
-        this(kind, clause, null);
+        this(kind, clause, null, null);
     }
 
     public TextualJMLAssertStatement(Kind kind, LabeledParserRuleContext clause,
-            AssertionProofContext assertionProof) {
+            AssertionProofContext assertionProof, String optLabel) {
         super(ImmutableSLList.nil(), kind.toString() + " " + clause);
         this.kind = kind;
         this.context = clause;
         this.assertionProof = assertionProof;
+        this.optLabel = optLabel;
     }
 
     public LabeledParserRuleContext getContext() {
@@ -64,6 +66,10 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
 
     public Kind getKind() {
         return kind;
+    }
+
+    public String getOptLabel() {
+        return optLabel;
     }
 
     public enum Kind {
