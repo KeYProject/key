@@ -220,9 +220,9 @@ public final class ProblemInitializer {
         final Path javaPath =
             envInput.readJavaPath().map(p -> p.toAbsolutePath().normalize()).orElse(null);
         final Optional<List<Path>> classPath = envInput.readClassPath();
-        final JavaService r2k = initConfig.getServices().getJavaService();
+        final JavaService javaService = initConfig.getServices().getJavaService();
         final Path bootClassPath = Optional.ofNullable(envInput.readBootClassPath())
-                .or(() -> r2k.getProgramFactory().getBootClassPath())
+                .or(() -> javaService.getProgramFactory().getBootClassPath())
                 .orElse(null);
         final Includes includes = envInput.readIncludes();
 
@@ -242,19 +242,13 @@ public final class ProblemInitializer {
             readEnvInput(keyFile, initConfig);
         }
 
-        // create Recoder2KeY, set classpath
-        var classPathWithJava = javaPath == null ? classPath.orElse(null) : classPath.map(p -> {
-            var r = new ArrayList<>(p);
-            r.add(javaPath);
-            return (List<Path>) r;
-        }).orElse(Collections.singletonList(javaPath));
-        r2k.setClassPath(bootClassPath, classPathWithJava);
+        // create converter, set classpath
+        javaService.setClassPath(bootClassPath, classPath.orElse(null));
 
         reportStatus("Reading Java libraries");
-        r2k.parseSpecialClasses(fileRepo);
+        javaService.parseSpecialClasses(fileRepo);
         if (javaPath != null) {
             reportStatus("Reading Java source");
-            var javaService = initConfig.getServices().getJavaService();
             javaService.getProgramFactory().addSourcePaths(
                 Collections.singletonList(javaPath));
             List<Path> classes = getClasses(javaPath);
@@ -267,7 +261,7 @@ public final class ProblemInitializer {
             // support for single file loading
             for (var cls : classes) {
                 try {
-                    r2k.readCompilationUnit(cls, fileRepo);
+                    javaService.readCompilationUnit(cls, fileRepo);
                 } catch (IOException e) {
                     throw new ProofInputException("Failed to read file " + cls, e);
                 }
