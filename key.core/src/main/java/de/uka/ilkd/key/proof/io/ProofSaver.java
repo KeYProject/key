@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.proof.io;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -81,7 +82,7 @@ public class ProofSaver extends OutputStreamProofSaver {
      * @throws IOException if I/O fails
      */
     protected void save(File file) throws IOException {
-        save(new FileOutputStream(file));
+        save(new BufferedOutputStream(new FileOutputStream(file)));
     }
 
     public String save() throws IOException {

@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.proof.io;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -51,7 +52,7 @@ public class ProofBundleSaver extends ProofSaver {
         String proofFileName = MiscTools.toValidFileName(proof.name().toString() + ".proof");
 
         // save the proof file to the FileRepo (stream is closed by the save method!)
-        save(repo.createOutputStream(Paths.get(proofFileName)));
+        save(new BufferedOutputStream(repo.createOutputStream(Paths.get(proofFileName))));
 
         // save proof bundle with the help of the FileRepo
         ((AbstractFileRepo) repo).saveProof(file.toPath());
