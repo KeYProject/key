@@ -63,7 +63,7 @@ public class JMLParserExceptionTest {
         assert fileURL != null : "Directory 'exceptional' not found";
         assert fileURL.getProtocol().equals("file") : "Test resources must be in file system";
         Path dir = Paths.get(fileURL.toURI());
-        if(FIX_FILE != null) {
+        if (FIX_FILE != null) {
             List<Arguments> list = List.of(Arguments.of(dir.resolve(FIX_FILE), FIX_FILE));
             return list.stream();
         }
@@ -146,8 +146,8 @@ public class JMLParserExceptionTest {
 
                 String loc = props.getProperty("position");
                 if (loc != null) {
-                    Location actLoc = ExceptionTools.getLocation(e).
-                            orElseThrow(() -> new Exception("there is no location in the exception"));
+                    Location actLoc = ExceptionTools.getLocation(e).orElseThrow(
+                        () -> new Exception("there is no location in the exception"));
                     assertEquals(file.toUri(), actLoc.getFileURI().orElse(null),
                         "Exception location must point to file under test");
                     assertEquals(loc, actLoc.getPosition().toString());
