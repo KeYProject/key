@@ -263,7 +263,10 @@ class ScriptLineParser {
     }
 
     private Location getLocation() {
-        return new Location(fileURI, Position.newOneBased(line, col));
+        Position pos = line >= 1 ?
+                Position.newOneBased(line, col) :
+                Position.UNDEFINED;
+        return new Location(fileURI, pos);
     }
 
     public int getOffset() {
