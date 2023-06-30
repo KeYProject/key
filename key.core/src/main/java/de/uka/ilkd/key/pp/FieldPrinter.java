@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.pp;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.UnknownJavaTypeException;
@@ -81,13 +83,11 @@ class FieldPrinter {
          * not find a better solution to this yet. But it seems to be standard, as it is done
          * similary in method HeapLDT.getPrettyFieldName(). (Kai Wallisch 09/2014)
          */
-        String[] originTypeAndName = fieldTerm.toString().split("::\\$");
-        assert originTypeAndName.length == 2;
-        String[] pvTypeAndName = pv.toString().split("::");
-        assert pvTypeAndName.length == 2;
+        var splitFieldTerm = JavaDLFieldNames.split(fieldTerm.toString());
+        var splitPV = JavaDLFieldNames.split(pv.toString());
 
-        return (pvTypeAndName[0].equals(originTypeAndName[0])
-                && pvTypeAndName[1].equals(originTypeAndName[1]));
+        return (Objects.equals(splitPV.scope(), splitFieldTerm.scope()) &&
+                splitPV.nameWithoutFieldPrefix().equals(splitFieldTerm.nameWithoutFieldPrefix()));
     }
 
     /*

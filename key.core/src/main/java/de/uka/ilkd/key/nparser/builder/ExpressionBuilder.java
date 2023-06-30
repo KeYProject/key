@@ -663,8 +663,9 @@ public class ExpressionBuilder extends DefaultBuilder {
                         + "\\javaSource section.");
             }
 
+            var javaAttributeName = JavaDLFieldNames.split(attributeName).nameWithoutFieldPrefix();
             ProgramVariable var =
-                javaInfo.getCanonicalFieldProgramVariable(attributeName, prefixKJT);
+                javaInfo.getCanonicalFieldProgramVariable(javaAttributeName, prefixKJT);
             if (var == null) {
                 LogicVariable logicalvar =
                     (LogicVariable) namespaces().variables().lookup(attributeName);

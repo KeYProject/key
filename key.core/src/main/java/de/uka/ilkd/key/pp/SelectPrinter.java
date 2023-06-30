@@ -221,7 +221,7 @@ class SelectPrinter extends FieldPrinter {
 
     /*
      * Print a select-term of the following form: T::select( ... , ... , java.lang.Object::<...>)
-     * For example: boolean::select(heap, object, java.lang.Object::$created)
+     * For example: boolean::select(heap, object, java.lang.Object::#$created)
      */
     private void printBuiltinObjectProperty(LogicPrinter lp, Term t, Term heapTerm, Term objectTerm,
             Term fieldTerm,
@@ -232,8 +232,7 @@ class SelectPrinter extends FieldPrinter {
         KeYJavaType objectKJT = javaInfo.getKeYJavaType(objectTerm.sort());
 
         if (selectKJT != null && objectKJT != null) {
-
-            assert fieldTerm.op().name().toString().contains("::<");
+            assert JavaDLFieldNames.isImplicitField(fieldTerm.op().name());
             String prettyFieldName = HeapLDT.getPrettyFieldName(fieldTerm.op());
             ProgramVariable pv =
                 javaInfo.getCanonicalFieldProgramVariable(prettyFieldName, objectKJT);

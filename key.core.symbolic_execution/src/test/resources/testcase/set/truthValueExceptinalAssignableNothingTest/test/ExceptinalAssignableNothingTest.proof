@@ -391,7 +391,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
             (rule "commute_and" (formula "2") (term "0,0"))
             (rule "commute_and" (formula "1") (term "0,0"))
             (rule "ifthenelse_split" (formula "1") (term "0"))
-            (branch "f_0 = java.lang.Object::$created & o_0 = n_3 TRUE"
+            (branch "f_0 = java.lang.Object::#$created & o_0 = n_3 TRUE"
                (rule "andLeft" (formula "1"))
                (rule "applyEqReverse" (formula "4") (term "2,0") (ifseqformula "3"))
                (rule "hideAuxiliaryEq" (formula "3"))
@@ -425,7 +425,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                (rule "eqSymm" (formula "9"))
                (rule "close" (formula "9") (ifseqformula "1"))
             )
-            (branch "f_0 = java.lang.Object::$created & o_0 = n_3 FALSE"
+            (branch "f_0 = java.lang.Object::#$created & o_0 = n_3 FALSE"
                (rule "applyEqReverse" (formula "2") (term "2,0") (ifseqformula "1"))
                (rule "hideAuxiliaryEq" (formula "1"))
                (rule "ifthenelse_split" (formula "1") (term "0"))
@@ -504,7 +504,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                      (rule "applyEqReverse" (formula "2") (term "2,0") (ifseqformula "1"))
                      (rule "hideAuxiliaryEq" (formula "1"))
                      (rule "ifthenelse_split" (formula "1") (term "0"))
-                     (branch "f_0 = java.lang.Object::$initialized & o_0 = n_3 TRUE"
+                     (branch "f_0 = java.lang.Object::#$initialized & o_0 = n_3 TRUE"
                         (rule "andLeft" (formula "1"))
                         (rule "applyEqReverse" (formula "13") (term "1") (ifseqformula "3"))
                         (rule "hideAuxiliaryEq" (formula "3"))
@@ -534,7 +534,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                         (rule "eqSymm" (formula "3"))
                         (rule "close" (formula "8") (ifseqformula "3"))
                      )
-                     (branch "f_0 = java.lang.Object::$initialized & o_0 = n_3 FALSE"
+                     (branch "f_0 = java.lang.Object::#$initialized & o_0 = n_3 FALSE"
                         (rule "close" (formula "12") (ifseqformula "1"))
                      )
                   )

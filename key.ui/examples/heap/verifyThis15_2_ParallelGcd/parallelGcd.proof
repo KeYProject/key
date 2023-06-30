@@ -487,7 +487,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                                   (builtin "One Step Simplification" (formula "8"))
                                  (rule "true_left" (formula "8"))
                                  (rule "ifthenelse_split" (formula "2") (term "0"))
-                                 (branch "f_0 = java.lang.Object::$created & o_0 = e_3 TRUE"
+                                 (branch "f_0 = java.lang.Object::#$created & o_0 = e_3 TRUE"
                                     (rule "andLeft" (formula "2"))
                                     (rule "applyEqReverse" (formula "5") (term "2,0") (ifseqformula "4"))
                                     (rule "hideAuxiliaryEq" (formula "4"))
@@ -505,7 +505,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                                     (rule "applyEq" (formula "1") (term "1,0") (ifseqformula "3"))
                                     (rule "close" (formula "21") (ifseqformula "1"))
                                  )
-                                 (branch "f_0 = java.lang.Object::$created & o_0 = e_3 FALSE"
+                                 (branch "f_0 = java.lang.Object::#$created & o_0 = e_3 FALSE"
                                     (rule "applyEqReverse" (formula "3") (term "2,0") (ifseqformula "2"))
                                     (rule "hideAuxiliaryEq" (formula "2"))
                                     (rule "ifthenelse_split" (formula "2") (term "0"))
@@ -566,7 +566,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                                           (rule "applyEqReverse" (formula "3") (term "2,0") (ifseqformula "2"))
                                           (rule "hideAuxiliaryEq" (formula "2"))
                                           (rule "ifthenelse_split" (formula "2") (term "0"))
-                                          (branch "f_0 = java.lang.Object::$initialized & o_0 = e_3 TRUE"
+                                          (branch "f_0 = java.lang.Object::#$initialized & o_0 = e_3 TRUE"
                                              (rule "andLeft" (formula "2"))
                                              (rule "applyEqReverse" (formula "29") (term "1") (ifseqformula "4"))
                                              (rule "hideAuxiliaryEq" (formula "4"))
@@ -590,7 +590,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                                              (rule "applyEq" (formula "1") (term "1,0") (ifseqformula "3"))
                                              (rule "close" (formula "19") (ifseqformula "1"))
                                           )
-                                          (branch "f_0 = java.lang.Object::$initialized & o_0 = e_3 FALSE"
+                                          (branch "f_0 = java.lang.Object::#$initialized & o_0 = e_3 FALSE"
                                              (rule "close" (formula "28") (ifseqformula "2"))
                                           )
                                        )

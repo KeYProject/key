@@ -313,7 +313,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
          & (  wellFormed(heap)
             & (    boolean::select(heap,
                                    self,
-                                   java.lang.Object::$created)
+                                   java.lang.Object::#$created)
                  = TRUE
                & (  A::exactInstance(self) = TRUE
                   & (  measuredByEmpty
@@ -325,17 +325,17 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                            & (  exc_0_1 = null
                               & (    boolean::select(heap,
                                                      result_0_1,
-                                                     java.lang.Object::$created)
+                                                     java.lang.Object::#$created)
                                    = TRUE
                                  |   boolean::select(anon_heap_g<<anonHeapFunction>>,
                                                      result_0_1,
-                                                     java.lang.Object::$created)
+                                                     java.lang.Object::#$created)
                                    = TRUE))))))))))
 ->   !self = null
    & wellFormed(heap)
    &   boolean::select(heap,
                        self,
-                       java.lang.Object::$created)
+                       java.lang.Object::#$created)
      = TRUE
    & A::exactInstance(self) = TRUE
    & measuredByEmpty
@@ -357,11 +357,11 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
       & exc_0_1 = null
       & (    boolean::select(heap,
                              result_0_1,
-                             java.lang.Object::$created)
+                             java.lang.Object::#$created)
            = TRUE
          |   boolean::select(anon_heap_g<<anonHeapFunction>>,
                              result_0_1,
-                             java.lang.Object::$created)
+                             java.lang.Object::#$created)
            = TRUE))") (userinteraction))
          (branch "CUT: !self = null & ( !b = TRUE & ( !result_0_1 = null & ( wellFormed(heap) & ( self.$created = TRUE & ( A::exactInstance(self) = TRUE & ( measuredByEmpty & ( wellFormed(anon_heap_g<<anonHeapFunction>>) & ( heap[anon(allLocs, anon_heap_g<<anonHeapFunction>>)] = heapAfter_g & ( exc_0_1 = null & ( result_0_1.$created = TRUE | result_0_1.$created@anon_heap_g<<anonHeapFunction>> = TRUE)))))))))) -> !self = null & wellFormed(heap) & self.$created = TRUE & A::exactInstance(self) = TRUE & measuredByEmpty & ( b = TRUE & wellFormed(anon_heap_f<<anonHeapFunction>>) & heap[anon(allLocs, anon_heap_f<<anonHeapFunction>>)] = heapAfter_f & exc_0_0 = null & result_0_0 >= 1 | !b = TRUE & !result_0_1 = null & wellFormed(anon_heap_g<<anonHeapFunction>>) & heap[anon(allLocs, anon_heap_g<<anonHeapFunction>>)] = heapAfter_g & exc_0_1 = null & ( result_0_1.$created = TRUE | result_0_1.$created@anon_heap_g<<anonHeapFunction>> = TRUE)) TRUE"
             (builtin "One Step Simplification" (formula "2"))

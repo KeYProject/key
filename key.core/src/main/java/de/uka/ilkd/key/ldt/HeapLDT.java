@@ -97,13 +97,13 @@ public final class HeapLDT extends LDT {
         anon = addFunction(services, "anon");
         memset = addFunction(services, "memset");
         arr = addFunction(services, "arr");
-        created = addFunction(services, "java.lang.Object::$created");
-        initialized = addFunction(services, "java.lang.Object::$initialized");
-        classPrepared = addSortDependingFunction(services, "$classPrepared");
-        classInitialized = addSortDependingFunction(services, "$classInitialized");
+        created = addFunction(services, "java.lang.Object::#$created");
+        initialized = addFunction(services, "java.lang.Object::#$initialized");
+        classPrepared = addSortDependingFunction(services, "#$classPrepared");
+        classInitialized = addSortDependingFunction(services, "#$classInitialized");
         classInitializationInProgress =
-            addSortDependingFunction(services, "$classInitializationInProgress");
-        classErroneous = addSortDependingFunction(services, "$classErroneous");
+            addSortDependingFunction(services, "#$classInitializationInProgress");
+        classErroneous = addSortDependingFunction(services, "#$classErroneous");
         length = addFunction(services, "length");
         nullFunc = addFunction(services, "null");
         acc = addFunction(services, "acc");
@@ -123,18 +123,6 @@ public final class HeapLDT extends LDT {
         wellFormed = addFunction(services, "wellFormed");
     }
 
-    // -------------------------------------------------------------------------
-    // internal methods
-    // -------------------------------------------------------------------------
-
-    private String getFieldSymbolName(LocationVariable fieldPV) {
-        if (fieldPV.isImplicit()) {
-            return fieldPV.name().toString();
-        } else {
-            return JavaDLFieldNames.toJavaDL(fieldPV.name());
-        }
-    }
-
 
 
     // -------------------------------------------------------------------------
@@ -146,17 +134,11 @@ public final class HeapLDT extends LDT {
      * constant symbol to be used for pretty printing.
      */
     public static String getPrettyFieldName(Named fieldSymbol) {
-        String name = fieldSymbol.name().toString();
-        int index = name.indexOf("::");
-        if (index == -1) {
-            return name;
-        } else {
-            String result = name.substring(index + 2);
-            if (result.charAt(0) == '$') {
-                result = result.substring(1);
-            }
-            return result;
+        var split = JavaDLFieldNames.split(fieldSymbol.name().toString());
+        if (split.scope() == null) {
+            return split.name();
         }
+        return split.nameWithoutFieldPrefix();
     }
 
 
@@ -330,7 +312,7 @@ public final class HeapLDT extends LDT {
         assert fieldPV.isMember();
         assert fieldPV != services.getJavaInfo().getArrayLength();
 
-        final Name name = new Name(getFieldSymbolName(fieldPV));
+        final Name name = new Name(JavaDLFieldNames.toJavaDL(fieldPV.name()));
         Function result = services.getNamespaces().functions().lookup(name);
         if (result == null) {
             int index = name.toString().indexOf("::");

@@ -23,7 +23,7 @@
    & (  inInt(pos)
       & (    boolean::select(heap,
                              board,
-                             java.lang.Object::$created)
+                             java.lang.Object::#$created)
            = TRUE
          | board = null))
    & mbyAtPre = javaSubInt(length(board), pos)
@@ -165,7 +165,7 @@
                    | !o = null
                    & !  boolean::select(heapAtPre,
                                         o,
-                                        java.lang.Object::$created)
+                                        java.lang.Object::#$created)
                       = TRUE
                    |   any::select(heap, o, f)
                      = any::select(heapAtPre, o, f)))

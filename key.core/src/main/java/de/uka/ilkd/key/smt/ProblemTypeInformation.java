@@ -112,7 +112,7 @@ public class ProblemTypeInformation {
      */
     public Set<String> getFieldsForSort(Sort s) {
         Set<String> result = new HashSet<>();
-        result.add(Util.processName("java.lang.Object::$created"));
+        result.add(Util.processName("java.lang.Object::#$created"));
 
         JavaInfo info = services.getJavaInfo();
 

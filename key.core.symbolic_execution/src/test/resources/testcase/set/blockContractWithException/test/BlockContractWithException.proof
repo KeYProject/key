@@ -256,7 +256,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                   (rule "commute_and" (formula "2") (term "0,0"))
                   (rule "commute_and" (formula "1") (term "0,0"))
                   (rule "ifthenelse_split" (formula "1") (term "0"))
-                  (branch "f_2 = java.lang.Object::$created & o_2 = n_3 TRUE"
+                  (branch "f_2 = java.lang.Object::#$created & o_2 = n_3 TRUE"
                      (rule "andLeft" (formula "1"))
                      (rule "applyEqReverse" (formula "4") (term "2,0") (ifseqformula "3"))
                      (rule "hideAuxiliaryEq" (formula "3"))
@@ -288,7 +288,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                      (rule "eqSymm" (formula "10"))
                      (rule "close" (formula "10") (ifseqformula "1"))
                   )
-                  (branch "f_2 = java.lang.Object::$created & o_2 = n_3 FALSE"
+                  (branch "f_2 = java.lang.Object::#$created & o_2 = n_3 FALSE"
                      (rule "applyEqReverse" (formula "2") (term "2,0") (ifseqformula "1"))
                      (rule "hideAuxiliaryEq" (formula "1"))
                      (rule "ifthenelse_split" (formula "1") (term "0"))
@@ -362,7 +362,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                            (rule "applyEqReverse" (formula "2") (term "2,0") (ifseqformula "1"))
                            (rule "hideAuxiliaryEq" (formula "1"))
                            (rule "ifthenelse_split" (formula "1") (term "0"))
-                           (branch "f_2 = java.lang.Object::$initialized & o_2 = n_3 TRUE"
+                           (branch "f_2 = java.lang.Object::#$initialized & o_2 = n_3 TRUE"
                               (rule "andLeft" (formula "1"))
                               (rule "applyEqReverse" (formula "14") (term "1") (ifseqformula "3"))
                               (rule "hideAuxiliaryEq" (formula "3"))
@@ -392,7 +392,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                               (rule "eqSymm" (formula "3"))
                               (rule "close" (formula "9") (ifseqformula "3"))
                            )
-                           (branch "f_2 = java.lang.Object::$initialized & o_2 = n_3 FALSE"
+                           (branch "f_2 = java.lang.Object::#$initialized & o_2 = n_3 FALSE"
                               (rule "close" (formula "13") (ifseqformula "1"))
                            )
                         )
@@ -489,7 +489,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                (rule "replace_known_right" (formula "8") (term "0,0") (ifseqformula "7"))
                (builtin "One Step Simplification" (formula "8"))
                (rule "cut_direct" (formula "6") (term "0"))
-               (branch "CUT: boolean::select(heap, exc_0, java.lang.Object::$created) = TRUE TRUE"
+               (branch "CUT: boolean::select(heap, exc_0, java.lang.Object::#$created) = TRUE TRUE"
                   (builtin "One Step Simplification" (formula "7"))
                   (rule "true_left" (formula "7"))
                   (rule "cut_direct" (formula "8") (term "0"))
@@ -509,7 +509,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                      (rule "closeTypeSwitched" (formula "8") (ifseqformula "4"))
                   )
                )
-               (branch "CUT: boolean::select(heap, exc_0, java.lang.Object::$created) = TRUE FALSE"
+               (branch "CUT: boolean::select(heap, exc_0, java.lang.Object::#$created) = TRUE FALSE"
                   (builtin "One Step Simplification" (formula "6"))
                   (rule "cut_direct" (formula "9") (term "0"))
                   (branch "CUT: java.lang.RuntimeException::instance(exc_0) = TRUE TRUE"

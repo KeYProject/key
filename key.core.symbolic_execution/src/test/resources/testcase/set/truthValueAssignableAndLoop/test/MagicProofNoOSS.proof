@@ -720,7 +720,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                   (rule "hideAuxiliaryEq" (formula "1"))
                   (rule "commute_and" (formula "14"))
                   (rule "ifthenelse_split" (formula "1") (term "0"))
-                  (branch " !o_1 = null & !( boolean::select(heap, o_1, java.lang.Object::$created) = TRUE | boolean::select(anon_heap_LOOP<<anonHeapFunction>>, o_1, java.lang.Object::$created) = TRUE) TRUE"
+                  (branch " !o_1 = null & !( boolean::select(heap, o_1, java.lang.Object::#$created) = TRUE | boolean::select(anon_heap_LOOP<<anonHeapFunction>>, o_1, java.lang.Object::#$created) = TRUE) TRUE"
                      (rule "andLeft" (formula "1"))
                      (rule "notLeft" (formula "1"))
                      (rule "notLeft" (formula "1"))
@@ -734,7 +734,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                      (rule "notRight" (formula "17"))
                      (rule "close" (formula "15") (ifseqformula "1"))
                   )
-                  (branch " !o_1 = null & !( boolean::select(heap, o_1, java.lang.Object::$created) = TRUE | boolean::select(anon_heap_LOOP<<anonHeapFunction>>, o_1, java.lang.Object::$created) = TRUE) FALSE"
+                  (branch " !o_1 = null & !( boolean::select(heap, o_1, java.lang.Object::#$created) = TRUE | boolean::select(anon_heap_LOOP<<anonHeapFunction>>, o_1, java.lang.Object::#$created) = TRUE) FALSE"
                      (rule "close" (formula "17") (ifseqformula "1"))
                   )
                )
@@ -981,7 +981,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
             (rule "commute_and" (formula "1") (term "0,0,0"))
             (rule "commute_and_2" (formula "1") (term "0,0"))
             (rule "ifthenelse_split" (formula "1") (term "0"))
-            (branch " f_0 = ExampleInstance::$x & !f_0 = java.lang.Object::$created & o_0 = self TRUE"
+            (branch " f_0 = ExampleInstance::$x & !f_0 = java.lang.Object::#$created & o_0 = self TRUE"
                (rule "andLeft" (formula "1"))
                (rule "andLeft" (formula "1"))
                (rule "notLeft" (formula "2"))
@@ -1017,7 +1017,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                (rule "false_right" (formula "11"))
                (opengoal " ")
             )
-            (branch " f_0 = ExampleInstance::$x & !f_0 = java.lang.Object::$created & o_0 = self FALSE"
+            (branch " f_0 = ExampleInstance::$x & !f_0 = java.lang.Object::#$created & o_0 = self FALSE"
                (rule "close" (formula "12") (ifseqformula "1"))
             )
          )
