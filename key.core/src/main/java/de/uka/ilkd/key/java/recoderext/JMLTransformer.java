@@ -440,7 +440,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
         de.uka.ilkd.key.java.Position pos = ctx.getStartLocation().getPosition();
         final Kind kind = stat.getKind();
-        JmlAssert jmlAssert = new JmlAssert(kind, ctx, stat.getAssertionProof());
+        JmlAssert jmlAssert = new JmlAssert(kind, ctx, stat.getAssertionProof(), stat.getOptLabel());
         try {
             updatePositionInformation(jmlAssert, pos);
             doAttach(jmlAssert, astParent, childIndex);

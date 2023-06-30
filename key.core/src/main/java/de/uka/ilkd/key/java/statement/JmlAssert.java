@@ -34,6 +34,12 @@ public class JmlAssert extends JavaStatement {
      */
     private final TextualJMLAssertStatement.Kind kind;
 
+    /*
+     * Temporary solution until full jml labels are there ...
+     * (To be clarified if compatible still)
+     */
+    private final String optLabel;
+
     /**
      * the condition in parse tree form
      */
@@ -50,11 +56,12 @@ public class JmlAssert extends JavaStatement {
      * @param assertionProof the optional proof for an assert statement (not for assume)
      * @param positionInfo the position information for this statement
      */
-    public JmlAssert(TextualJMLAssertStatement.Kind kind, KeyAst.Expression condition,
+    public JmlAssert(TextualJMLAssertStatement.Kind kind, String label, KeyAst.Expression condition,
             KeyAst.@Nullable JMLProofScript assertionProof,
             PositionInfo positionInfo) {
         super(positionInfo);
         this.kind = kind;
+        this.optLabel = label;
         this.condition = condition;
         this.assertionProof = assertionProof;
     }
@@ -65,13 +72,14 @@ public class JmlAssert extends JavaStatement {
     public JmlAssert(ExtList children) {
         super(children);
         this.kind = Objects.requireNonNull(children.get(TextualJMLAssertStatement.Kind.class));
+        this.optLabel = children.get(String.class);
         this.condition = Objects.requireNonNull(children.get(KeyAst.Expression.class));
         // script may be null
         this.assertionProof = children.get(KeyAst.JMLProofScript.class);
     }
 
     public JmlAssert(JmlAssert other) {
-        this(other.kind, other.condition, other.assertionProof, other.getPositionInfo());
+        this(other.kind, other.optLabel, other.condition, other.assertionProof, other.getPositionInfo());
     }
 
     public TextualJMLAssertStatement.Kind getKind() {
@@ -195,5 +203,9 @@ public class JmlAssert extends JavaStatement {
         }
         result = result.prepend(condition.ctx);
         return result;
+    }
+
+    public String getOptLabel() {
+        return optLabel;
     }
 }

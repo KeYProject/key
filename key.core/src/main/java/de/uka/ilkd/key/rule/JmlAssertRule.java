@@ -15,7 +15,11 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.NoFindTacletBuilder;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -24,6 +28,8 @@ import org.key_project.logic.op.Modality;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Semisequent;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
@@ -148,6 +154,8 @@ public final class JmlAssertRule implements BuiltInRule {
             kind == Kind.ASSERT ? OriginTermLabel.SpecType.ASSERT
                     : OriginTermLabel.SpecType.ASSUME));
 
+        final String label = jmlAssert.getOptLabel();
+
         final ImmutableList<Goal> result;
         if (kind == Kind.ASSERT) {
             result = goal.split(2);
@@ -158,7 +166,7 @@ public final class JmlAssertRule implements BuiltInRule {
             throw new RuleAbortException(
                 String.format("Unknown assertion type %s", jmlAssert.getKind()));
         }
-        setUpUsageGoal(result.head(), occurrence, update, target, condition, tb, services);
+        setUpUsageGoal(result.head(), label, occurrence, update, target, condition, tb, services);
 
         return result;
     }
@@ -170,7 +178,7 @@ public final class JmlAssertRule implements BuiltInRule {
         goal.changeFormula(new SequentFormula(tb.apply(update, condition)), occurrence);
     }
 
-    private void setUpUsageGoal(Goal goal, PosInOccurrence occurrence,
+    private void setUpUsageGoal(Goal goal, String label, PosInOccurrence occurrence,
             JTerm update, JTerm target,
             JTerm condition, TermBuilder tb, Services services) {
         goal.setBranchLabel("Usage");
@@ -180,6 +188,13 @@ public final class JmlAssertRule implements BuiltInRule {
                 tb.prog(((Modality) target.op()).kind(), javaBlock, target.sub(0), null)));
 
         goal.changeFormula(new SequentFormula(newTerm), occurrence);
+        if (label != null) {
+            NoFindTacletBuilder bld = new NoFindTacletBuilder();
+            Sequent ante = JavaDLSequentKit.createAnteSequent(ImmutableList.of(new SequentFormula(tb.apply(update, condition))));
+            bld.addTacletGoalTemplate(new AntecSuccTacletGoalTemplate(ante, ImmutableList.of(), JavaDLSequentKit.getInstance().getEmptySequent()));
+            bld.setName(new Name("recall_" + label));
+            goal.addTaclet(bld.getNoFindTaclet(), SVInstantiations.EMPTY_SVINSTANTIATIONS, false);
+        }
     }
 
     @Override

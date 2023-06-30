@@ -1514,6 +1514,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
                 changeList.add(x.getKind());
                 changeList.add(x.getCondition());
                 changeList.add(x.getAssertionProof());
+                changeList.add(x.getOptLabel());
                 return new JmlAssert(changeList);
             }
         };
