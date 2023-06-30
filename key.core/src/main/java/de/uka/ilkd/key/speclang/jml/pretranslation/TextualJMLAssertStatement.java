@@ -15,19 +15,21 @@ import org.jspecify.annotations.Nullable;
  */
 public class TextualJMLAssertStatement extends TextualJMLConstruct {
     private final KeyAst.Expression context;
+    private final String optLabel;
     private final KeyAst.@Nullable JMLProofScript assertionProof;
     private final Kind kind;
 
     public TextualJMLAssertStatement(Kind kind, KeyAst.Expression clause) {
-        this(kind, clause, null);
+        this(kind, clause, null, null);
     }
 
     public TextualJMLAssertStatement(Kind kind, KeyAst.Expression clause,
-            KeyAst.@Nullable JMLProofScript assertionProof) {
+            KeyAst.@Nullable JMLProofScript assertionProof, String optLabel) {
         super(ImmutableSLList.nil(), kind.toString() + " " + clause);
         this.kind = kind;
         this.context = clause;
         this.assertionProof = assertionProof;
+        this.optLabel = optLabel;
     }
 
     public KeyAst.Expression getContext() {
@@ -69,6 +71,10 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
 
     public Kind getKind() {
         return kind;
+    }
+
+    public String getOptLabel() {
+        return optLabel;
     }
 
     public enum Kind {
