@@ -323,7 +323,7 @@ public abstract class AbstractFileRepo implements FileRepo {
                     .filter(l -> !l.matches(".*\\\\classpath \".*\";.*"))
                     .map(l -> l.replaceAll("\\\\javaSource \".*\";", "\\\\javaSource \"src\";"))
                     .map(l -> l.replaceAll("\\\\bootclasspath \".*\";",
-                        "\\\\bootclasspath \"bootclasspath\";"))
+                        ""))
                     .collect(Collectors.joining(System.lineSeparator()));
 
             // add classpath (has to be prior to javaSource)
