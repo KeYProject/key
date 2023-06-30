@@ -47,7 +47,11 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class JMLParserExceptionTest {
 
+    // The following can be changed temporarily to control run tests
     private static final boolean IGNORE_BROKEN = true;
+
+    // File name local to the res directoy with the test cases
+    private static final String FIX_FILE = null; // "SetInClass.java";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JMLParserExceptionTest.class);
 
@@ -59,6 +63,10 @@ public class JMLParserExceptionTest {
         assert fileURL != null : "Directory 'exceptional' not found";
         assert fileURL.getProtocol().equals("file") : "Test resources must be in file system";
         Path dir = Paths.get(fileURL.toURI());
+        if(FIX_FILE != null) {
+            List<Arguments> list = List.of(Arguments.of(dir.resolve(FIX_FILE), FIX_FILE));
+            return list.stream();
+        }
         return Files.walk(dir).filter(it -> it.getFileName().toString().endsWith(".java"))
                 .map(it -> Arguments.of(it, it.getFileName()));
     }
@@ -138,8 +146,9 @@ public class JMLParserExceptionTest {
 
                 String loc = props.getProperty("position");
                 if (loc != null) {
-                    Location actLoc = ExceptionTools.getLocation(e).orElseThrow();
-                    assertEquals(file.toUri(), actLoc.getFileURI().orElseThrow(),
+                    Location actLoc = ExceptionTools.getLocation(e).
+                            orElseThrow(() -> new Exception("there is no location in the exception"));
+                    assertEquals(file.toUri(), actLoc.getFileURI().orElse(null),
                         "Exception location must point to file under test");
                     assertEquals(loc, actLoc.getPosition().toString());
                 }
@@ -147,6 +156,7 @@ public class JMLParserExceptionTest {
                 // in case of a failed assertion log the stacktrace
                 LOGGER.info("Original stacktrace leading to failed junit assertion in {}",
                     file.getFileName(), e);
+                // e.printStackTrace();
                 throw assertionFailedError;
             }
         }
