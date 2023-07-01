@@ -1,10 +1,19 @@
-// exceptionClass: ConvertException
-// msgContains: XXXX
-// positiion: 19/xxx
+// exceptionClass: RuntimeException
+// msgContains: Error in equality-expression
+// position: 12/17
 // verbose: true
 // broken: true
 
-// This is broken since it exposes an IllegalArgumentException
+// It's not the best of error messages ...
+// and there is no file location information
+class TypeError {
+
+    /*@ public normal_behaviour
+      @  ensures 1 + 1 == true;
+      @*/
+    public void m() {}
+}
+
 
 /* Used to be an NPE 
 Caused by: java.lang.NullPointerException: Cannot read field "second" because "pos" is null
@@ -13,10 +22,4 @@ Caused by: java.lang.NullPointerException: Cannot read field "second" because "p
 	at de.uka.ilkd.key.java.Recoder2KeY.readCompilationUnitsAsFiles(Recoder2KeY.java:299)
 */
 
-class TypeError {
-
-    /*@ public normal_behaviour
-      @  ensures 1 + 1 == true;
-      @*/
-    public void m() {}
-}
+// FIXED: This is broken since it exposes an IllegalArgumentException
