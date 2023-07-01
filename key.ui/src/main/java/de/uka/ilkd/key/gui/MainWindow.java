@@ -312,6 +312,8 @@ public final class MainWindow extends JFrame {
             KeYGuiExtension.KeyboardShortcuts.MAIN_WINDOW);
 
         KeYGuiExtensionFacade.getStartupExtensions().forEach(it -> it.init(this, mediator));
+
+        DockingHelper.focus(this, ProofTreeView.class);
     }
 
     public LruCached<HTMLSyntaxHighlighter.Args, String> getHighlightCache() {
