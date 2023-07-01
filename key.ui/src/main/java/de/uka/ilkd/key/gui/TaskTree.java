@@ -297,6 +297,7 @@ public class TaskTree extends JPanel {
         static final Icon keyIcon = IconFactory.keyHole(20, 20);
         static final Icon keyClosedIcon = IconFactory.keyHoleClosed(20);
         static final Icon keyAlmostClosedIcon = IconFactory.keyHoleAlmostClosed(20, 20);
+        static final Icon keyCachedClosedIcon = IconFactory.keyCachedClosed(20, 20);
 
 
         public TaskTreeIconCellRenderer() {
@@ -323,6 +324,9 @@ public class TaskTree extends JPanel {
                     }
                     if (ps.getProofClosedButLemmasLeft()) {
                         sup.setIcon(keyAlmostClosedIcon);
+                    }
+                    if (ps.getProofClosedByCache()) {
+                        sup.setIcon(keyCachedClosedIcon);
                     }
                     if (ps.getProofOpen()) {
                         sup.setIcon(keyIcon);

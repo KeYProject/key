@@ -57,6 +57,7 @@ public final class ProofManagementDialog extends JDialog {
 
     private static final ImageIcon keyIcon = IconFactory.keyHole(20, 20);
     private static final ImageIcon keyAlmostClosedIcon = IconFactory.keyHoleAlmostClosed(20, 20);
+    private static final ImageIcon keyCachedlosedIcon = IconFactory.keyHoleAlmostClosed(20, 20);
     private static final Icon keyClosedIcon = IconFactory.keyHoleClosed(20);
     private boolean startedProof;
     private JTabbedPane tabbedPane;

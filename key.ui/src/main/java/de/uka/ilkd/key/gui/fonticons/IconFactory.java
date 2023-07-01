@@ -157,6 +157,7 @@ public final class IconFactory {
 
     private static final Image keyHole = getImage("images/ekey-mono.gif");
     private static final Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
+    private static final Image keyCachedClosed = getImage("images/closed-brackets.gif");
     private static final Image keyHoleInteractive = getImage("images/keyinteractive.gif");
     private static final Image keyHoleLinked = getImage("images/keylinked.gif");
     private static final Image keyLogo = getImage("images/key-color.png");
@@ -318,6 +319,10 @@ public final class IconFactory {
 
     public static ImageIcon keyHoleAlmostClosed(int x, int y) {
         return scaleIcon(keyHoleAlmostClosed, x, y);
+    }
+
+    public static ImageIcon keyCachedClosed(int x, int y) {
+        return scaleIcon(keyCachedClosed, x, y);
     }
 
     public static ImageIcon keyHoleInteractive(int x, int y) {
