@@ -56,7 +56,7 @@ public class SLExceptionFactory {
         this.fileName = fileName;
         this.offsetColumn = column;
         this.offsetLine = line;
-        this.line = 0;
+        this.line = 1;
         this.column = 0;
     }
 

@@ -1264,7 +1264,7 @@ public class Recoder2KeY implements JavaReader {
                 var location = ((HasLocation) cause).getLocation();
                 if (location != null) {
                     pos = location.getPosition();
-                    file = location.getFileURI().toString();
+                    file = location.getFileURI().map(Object::toString).orElse(null);
                 }
             } catch (MalformedURLException ignored) {
             }
