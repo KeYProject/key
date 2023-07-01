@@ -9,6 +9,8 @@ import java.awt.event.MouseListener;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 
@@ -38,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * Task tree panel, showing all currently opened proofs.
  * Usually located in the top left panel.
  */
-public class TaskTree extends JPanel {
+public class TaskTree extends JPanel implements MouseListener, PopupMenuListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskTree.class);
 
     /**
@@ -75,31 +77,75 @@ public class TaskTree extends JPanel {
         delegateView.putClientProperty("JTree.lineStyle", "Horizontal");
 
         // create a context menu on demand
-        MouseListener ml = new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    TreePath selPath = delegateView.getPathForLocation(e.getX(), e.getY());
-                    if (selPath != null && selPath.getLastPathComponent() instanceof BasicTask) {
-                        BasicTask task = (BasicTask) selPath.getLastPathComponent();
-                        delegateView.setSelectionPath(selPath);
-                        JPopupMenu popup = new JPopupMenu();
-                        for (Component comp : MainWindow.getInstance().createProofMenu(task.proof())
-                                .getMenuComponents()) {
-                            popup.add(comp);
-                        }
-                        popup.show(e.getComponent(), e.getX(), e.getY());
-                    }
+        delegateView.addMouseListener(this);
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        if (e.isPopupTrigger()) {
+            TreePath selPath = delegateView.getPathForLocation(e.getX(), e.getY());
+            if (selPath != null && selPath.getLastPathComponent() instanceof BasicTask) {
+                BasicTask task = (BasicTask) selPath.getLastPathComponent();
+                delegateView.setSelectionPath(selPath);
+                JPopupMenu popup = new JPopupMenu();
+                for (Component comp : MainWindow.getInstance().createProofMenu(task.proof())
+                        .getMenuComponents()) {
+                    popup.add(comp);
                 }
+                popup.show(e.getComponent(), e.getX(), e.getY());
+                // restore proof selection when popup is closed
+                popup.addPopupMenuListener(this);
             }
+        }
+    }
 
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                mousePressed(e);
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        mousePressed(e);
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+
+    }
+
+    @Override
+    public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+
+    }
+
+    @Override
+    public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+        popupMenuCanceled(e);
+    }
+
+    @Override
+    public void popupMenuCanceled(PopupMenuEvent e) {
+        // restore previous proof selection
+        Proof proof = mediator.getSelectedProof();
+        if (proof == null || proof.isDisposed()) {
+            return;
+        }
+        var task = model.getTaskForProof(proof);
+        if (task == null) {
+            return;
+        }
+        for (int i = 0; i < delegateView.getRowCount(); i++) {
+            if (delegateView.getPathForRow(i).getLastPathComponent() == task) {
+                delegateView.setSelectionPath(delegateView.getPathForRow(i));
+                break;
             }
-        };
-
-        delegateView.addMouseListener(ml);
+        }
     }
 
     public void addProof(de.uka.ilkd.key.proof.ProofAggregate plist) {
