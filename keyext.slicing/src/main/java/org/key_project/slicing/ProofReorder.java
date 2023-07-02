@@ -22,6 +22,7 @@ import de.uka.ilkd.key.util.Pair;
 import org.key_project.slicing.graph.AnnotatedEdge;
 import org.key_project.slicing.graph.DependencyGraph;
 import org.key_project.slicing.graph.GraphNode;
+import org.key_project.slicing.graph.PseudoInput;
 
 public final class ProofReorder {
     private ProofReorder() {
@@ -57,6 +58,26 @@ public final class ProofReorder {
             }
             List<Node> newOrder = new ArrayList<>();
             Set<Node> newOrderSorted = new HashSet<>();
+
+            // First, get all nodes that do not directly connect to the dependency graph of the
+            // previous branch. These are taclets that do not have any formulas as direct inputs,
+            // e.g. sign_case_distinction.
+            // However, if one of these nodes splits the proof, it will be done last.
+            Node finalNode = null;
+            Node toCheck = root;
+            while (toCheck.getBranchLocation() == loc) {
+                DependencyNodeData data = toCheck.lookup(DependencyNodeData.class);
+                if (data.inputs.size() == 1 && data.inputs.get(0).first instanceof PseudoInput) {
+                    if (toCheck.childrenCount() > 1) {
+                        finalNode = toCheck;
+                        break;
+                    }
+                    newOrder.add(toCheck);
+                    newOrder.add(toCheck);
+                }
+                toCheck = toCheck.child(0);
+            }
+
             while (!q.isEmpty()) {
                 var nextNode = q.pop();
                 List<Node> finalNewOrder = newOrder;
@@ -101,20 +122,6 @@ public final class ProofReorder {
                     outputs.forEach(q::addFirst);
                 });
             }
-            // Finally, get all nodes that do not directly connect to the dependency graph of the
-            // previous branch. These are taclets that do not have any formulas as direct inputs,
-            // e.g. sign_case_distinction
-            List<Node> nextQ = new ArrayList<>();
-            newOrder.forEach(node -> node.childrenIterator().forEachRemaining(node2 -> {
-                while (node2 != null && !newOrderSorted.contains(node2)
-                        && node2.getAppliedRuleApp() != null
-                        && node2.getBranchLocation() == node.getBranchLocation()) {
-                    nextQ.add(node2);
-                    node2 = node2.childrenCount() > 0 ? node2.child(0) : null;
-                }
-            }));
-            Collections.sort(nextQ);
-            newOrder.addAll(nextQ);
             // add the next branches to the queue
             for (int i = 0; i < newOrder.size(); i++) {
                 if (newOrder.get(i).childrenCount() != 1
@@ -129,6 +136,9 @@ public final class ProofReorder {
                     newOrder.add(last);
                     break;
                 }
+            }
+            if (finalNode != null) {
+                newOrder.add(finalNode);
             }
             steps.put(loc, newOrder);
         }
