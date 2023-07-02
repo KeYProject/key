@@ -6,6 +6,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.RuleApp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +23,15 @@ public class KeYSelectionModel {
     /** the current displayed node */
     private Node selectedNode;
     /**
-     * The currently displayed sequent. Equal to the sequent of {@link #selectedSequent} unless
+     * The currently displayed sequent. Equal to the sequent of {@link #selectedNode} unless
      * we are displaying an OSS node.
      */
     private Sequent selectedSequent;
+    /**
+     * The currently displayed rule application. Equal to the rule app of {@link #selectedNode}
+     * unless we are displaying an OSS node.
+     */
+    private RuleApp selectedRuleApp;
     /** the listeners to this model */
     private final List<KeYSelectionListener> listenerList;
     /** cached selected node event */
@@ -45,10 +51,12 @@ public class KeYSelectionModel {
         if (g == null) {
             selectedNode = proof.root().leavesIterator().next();
             selectedSequent = selectedNode.sequent();
+            selectedRuleApp = selectedNode.getAppliedRuleApp();
         } else {
             goalIsValid = true;
             selectedNode = g.node();
             selectedSequent = selectedNode.sequent();
+            selectedRuleApp = selectedNode.getAppliedRuleApp();
             selectedGoal = g;
         }
     }
@@ -68,15 +76,18 @@ public class KeYSelectionModel {
             if (g == null) {
                 selectedNode = proof.root().leavesIterator().next();
                 selectedSequent = selectedNode.sequent();
+                selectedRuleApp = selectedNode.getAppliedRuleApp();
             } else {
                 goalIsValid = true;
                 selectedNode = g.node();
                 selectedSequent = selectedNode.sequent();
+                selectedRuleApp = selectedNode.getAppliedRuleApp();
                 selectedGoal = g;
             }
         } else {
             selectedNode = null;
             selectedSequent = null;
+            selectedRuleApp = null;
             selectedGoal = null;
         }
         fireSelectedProofChanged();
@@ -104,6 +115,7 @@ public class KeYSelectionModel {
         goalIsValid = false;
         selectedNode = n;
         selectedSequent = selectedNode.sequent();
+        selectedRuleApp = selectedNode.getAppliedRuleApp();
         fireSelectedNodeChanged();
     }
 
@@ -113,7 +125,7 @@ public class KeYSelectionModel {
      * @param node selected node
      * @param sequent selected sequent
      */
-    public void setSelectedSequent(Node node, Sequent sequent) {
+    public void setSelectedSequentAndRuleApp(Node node, Sequent sequent, RuleApp ruleApp) {
         // switch proof if needed
         if (node.proof() != getSelectedProof()) {
             setSelectedProof(node.proof());
@@ -122,6 +134,7 @@ public class KeYSelectionModel {
         selectedGoal = null;
         selectedNode = node;
         selectedSequent = sequent;
+        selectedRuleApp = ruleApp;
         fireSelectedNodeChanged();
     }
 
@@ -135,6 +148,7 @@ public class KeYSelectionModel {
         selectedGoal = g;
         selectedNode = g.node();
         selectedSequent = selectedNode.sequent();
+        selectedRuleApp = selectedNode.getAppliedRuleApp();
         fireSelectedNodeChanged();
     }
 
@@ -149,6 +163,10 @@ public class KeYSelectionModel {
 
     public Sequent getSelectedSequent() {
         return selectedSequent;
+    }
+
+    public RuleApp getSelectedRuleApp() {
+        return selectedRuleApp;
     }
 
     /**
