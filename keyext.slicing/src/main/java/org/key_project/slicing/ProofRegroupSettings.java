@@ -10,6 +10,8 @@ import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 
 public class ProofRegroupSettings extends AbstractPropertiesSettings {
     private static final String PREFIX = "[ProofRegrouping]Group";
+    private static final List<String> DEFAULT_GROUPS = List.of("Propositional expansion",
+        "Negation/conjunctive normal form", "Polynomial/inequation normal form", "Simplification");
 
     private final List<PropertyEntry<String>> groups = new ArrayList<>();
 
@@ -26,10 +28,10 @@ public class ProofRegroupSettings extends AbstractPropertiesSettings {
             }
         }
         if (groups.isEmpty()) {
-            addGroup("Propositional expansion", List.of("alpha", "delta"));
-            addGroup("Normal form",
+            addGroup(DEFAULT_GROUPS.get(0), List.of("alpha", "delta"));
+            addGroup(DEFAULT_GROUPS.get(1),
                 List.of("negationNormalForm", "conjNormalForm"));
-            addGroup("Polynomials and inequations",
+            addGroup(DEFAULT_GROUPS.get(2),
                 List.of("polySimp_expand", "polySimp_normalise", "polySimp_newSym",
                     "polySimp_pullOutGcd", "polySimp_applyEq", "polySimp_applyEqRigid",
                     "polySimp_directEquations", "polySimp_applyEqPseudo",
@@ -39,7 +41,7 @@ public class ProofRegroupSettings extends AbstractPropertiesSettings {
                     "inEqSimp_expand", "inEqSimp_saturate",
                     "inEqSimp_pullOutGcd", "inEqSimp_special_nonLin",
                     "simplify_literals"));
-            addGroup("Simplification",
+            addGroup(DEFAULT_GROUPS.get(3),
                 List.of("simplify", "simplify_select", "simplify_enlarging"));
         }
     }
@@ -63,5 +65,30 @@ public class ProofRegroupSettings extends AbstractPropertiesSettings {
             m.put(name, List.of(pe.get().split(",")));
         }
         return m;
+    }
+
+    public Map<String, List<String>> getUserGroups() {
+        Map<String, List<String>> m = new HashMap<>();
+        for (var pe : groups) {
+            var name = pe.getKey().substring(PREFIX.length());
+            if (DEFAULT_GROUPS.contains(name)) {
+                continue;
+            }
+            m.put(name, List.of(pe.get().split(",")));
+        }
+        return m;
+    }
+
+    public void removeGroup(String name) {
+        PropertyEntry<String> toRemove = null;
+        for (var pe : groups) {
+            if (pe.getKey().substring(PREFIX.length()).equals(name)) {
+                toRemove = pe;
+                break;
+            }
+        }
+        groups.remove(toRemove);
+        propertyEntries.remove(toRemove);
+        properties.remove(toRemove);
     }
 }

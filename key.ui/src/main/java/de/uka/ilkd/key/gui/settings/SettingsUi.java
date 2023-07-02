@@ -33,7 +33,7 @@ public class SettingsUi extends JPanel {
     private final MainWindow mainWindow;
     // private JScrollPane center;
 
-    public SettingsUi(MainWindow mainWindow) {
+    public SettingsUi(MainWindow mainWindow, SettingsDialog dialog) {
         this.mainWindow = mainWindow;
         treeSettingsPanels.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         treeSettingsPanels.setCellRenderer(new DefaultTreeCellRenderer() {
@@ -84,7 +84,7 @@ public class SettingsUi extends JPanel {
         treeSettingsPanels.addTreeSelectionListener(e -> {
             SettingsTreeNode n = (SettingsTreeNode) e.getPath().getLastPathComponent();
             if (n.provider != null && n.provider.getPanel(mainWindow) != null) {
-                JComponent comp = n.provider.getPanel(mainWindow);
+                JComponent comp = n.provider.getPanel(mainWindow, dialog);
                 // center.setViewportView(comp);
                 // center.getVerticalScrollBar().setValue(0);
                 // center.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);

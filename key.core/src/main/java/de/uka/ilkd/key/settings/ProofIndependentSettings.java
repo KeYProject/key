@@ -60,6 +60,9 @@ public class ProofIndependentSettings {
             settings.addPropertyChangeListener(settingsListener);
             if (lastReadedProperties != null) {
                 settings.readSettings(lastReadedProperties);
+            } else {
+                // special case: no settings file present
+                settings.readSettings(new Properties());
             }
         }
     }

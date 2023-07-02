@@ -3,8 +3,11 @@ package de.uka.ilkd.key.gui.settings;
 
 import java.awt.*;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.Nullable;
 import javax.swing.*;
 
@@ -31,6 +34,8 @@ import net.miginfocom.swing.MigLayout;
 public abstract class SettingsPanel extends SimpleSettingsPanel {
     private static final long serialVersionUID = 3465371513326517504L;
 
+    private final Map<String, List<JComponent>> rows = new HashMap<>();
+
     protected SettingsPanel() {
         pCenter.setLayout(new MigLayout(new LC().fillX().wrapAfter(3), new AC().count(3).fill(1)
                 .grow(1000f, 1).size("16px", 2).grow(0f, 0).align("right", 0)));
@@ -42,7 +47,6 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      */
     protected static JTextArea createInfoArea(String info) {
         JTextArea textArea = new JTextArea(info);
-        // textArea.setBackground(this.getBackground());
         textArea.setEditable(false);
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
@@ -53,7 +57,9 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @param info
      * @param components
      */
-    protected void addRowWithHelp(String info, JComponent... components) {
+    protected List<JComponent> addRowWithHelp(String info, JComponent... components) {
+        List<JComponent> comps = new ArrayList<>(List.of(components));
+
         boolean hasInfo = info != null && !info.isEmpty();
         for (JComponent component : components) {
             component.setAlignmentX(LEFT_ALIGNMENT);
@@ -68,6 +74,8 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
             infoButton = new JLabel();
         }
         pCenter.add(infoButton);
+        comps.add(infoButton);
+        return comps;
     }
 
     /**
@@ -204,7 +212,21 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     protected void addTitledComponent(String title, JComponent component, String helpText) {
         JLabel label = new JLabel(title);
         label.setLabelFor(component);
-        addRowWithHelp(helpText, label, component);
+        var comps = addRowWithHelp(helpText, label, component);
+        comps.add(label);
+        rows.put(title, comps);
+    }
+
+    /**
+     * Remove a row previously added with {@link #addTitledComponent(String, JComponent, String)}.
+     *
+     * @param title title of component
+     */
+    protected void removeTitledComponent(String title) {
+        for (var c : rows.get(title)) {
+            pCenter.remove(c);
+        }
+        rows.remove(title);
     }
 
 

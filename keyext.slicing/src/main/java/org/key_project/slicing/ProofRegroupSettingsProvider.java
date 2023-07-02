@@ -8,10 +8,13 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
+import de.uka.ilkd.key.gui.utilities.FormDialog;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.Pair;
 
 import net.miginfocom.layout.CC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Settings for the proof slicing extension.
@@ -19,6 +22,9 @@ import net.miginfocom.layout.CC;
  * @author Arne Keller
  */
 public class ProofRegroupSettingsProvider extends SettingsPanel implements SettingsProvider {
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(ProofRegroupSettingsProvider.class);
+
     /**
      * Singleton instance of the settings.
      */
@@ -29,6 +35,9 @@ public class ProofRegroupSettingsProvider extends SettingsPanel implements Setti
      */
     private static final String INTRO_LABEL = "Adjust heuristics groups here.";
 
+    /**
+     * The configured groups: name -> text area with heuristic names.
+     */
     private final List<Pair<String, JTextArea>> groups = new ArrayList<>();
 
     /**
@@ -53,6 +62,11 @@ public class ProofRegroupSettingsProvider extends SettingsPanel implements Setti
 
     @Override
     public JComponent getPanel(MainWindow window) {
+        return getPanel(window, null);
+    }
+
+    @Override
+    public JComponent getPanel(MainWindow window, JDialog dialog) {
         ProofRegroupSettings ss = getSettings();
 
         pCenter.removeAll();
@@ -64,7 +78,74 @@ public class ProofRegroupSettingsProvider extends SettingsPanel implements Setti
             groups.add(new Pair<>(e.getKey(), ta));
         }
 
+        setupAddAndRemoveButtons(dialog, ss);
+
         return this;
+    }
+
+    private void setupAddAndRemoveButtons(JDialog dialog, ProofRegroupSettings ss) {
+        // remove any previously added buttons
+        for (int i = 0; i < pCenter.getComponentCount(); i++) {
+            if (pCenter.getComponent(i) instanceof JButton) {
+                pCenter.remove(i);
+                i--;
+            }
+        }
+
+        var addNew = new JButton("Add new group");
+        addNew.addActionListener(e -> {
+            try {
+                new FormDialog(dialog, "Add new group",
+                    List.of(new Pair<>("Name", new JTextField()),
+                        new Pair<>("Heuristics", new JTextArea())),
+                    data -> {
+                        var name = data.get(0).second;
+                        if (ss.getGroups().containsKey(name)) {
+                            return "Group name already in use!";
+                        }
+                        return null;
+                    },
+                    data -> {
+                        var name = data.get(0).second;
+                        var content = data.get(1).second;
+                        var ta =
+                            addTextArea(name, "", null, emptyValidator());
+                        ta.setText(content);
+                        groups.add(new Pair<>(name, ta));
+                        ss.addGroup(name, List.of(ta.getText().split("\n")));
+
+                        setupAddAndRemoveButtons(dialog, ss);
+                        dialog.validate();
+                        dialog.repaint();
+                    }, () -> {
+                        // ignore cancel
+                    });
+            } catch (Exception err) {
+                err.printStackTrace();
+            }
+        });
+        pCenter.add(addNew, "wrap");
+        for (var group : ss.getUserGroups().keySet()) {
+            var remove = new JButton("Remove " + group);
+            remove.addActionListener(e -> {
+                try {
+                    ss.removeGroup(group);
+                    for (var groupPair : groups) {
+                        if (groupPair.first.equals(group)) {
+                            removeTitledComponent(groupPair.first);
+                            groups.remove(groupPair);
+                            setupAddAndRemoveButtons(dialog, ss);
+                            dialog.validate();
+                            dialog.repaint();
+                            break;
+                        }
+                    }
+                } catch (Exception error) {
+                    LOGGER.error("failed to remove group", error);
+                }
+            });
+            pCenter.add(remove, "wrap");
+        }
     }
 
     @Override
