@@ -26,7 +26,6 @@ import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
-import de.uka.ilkd.key.proof.reference.CopyStepsAction;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 
@@ -40,11 +39,10 @@ import org.key_project.util.collection.ImmutableList;
 @KeYGuiExtension.Info(name = "Proof Caching", optional = true,
     description = "Functionality related to reusing previous proof results in similar proofs",
     experimental = false)
-public class CloseReferenceExtension
+public class CachingExtension
         implements KeYGuiExtension, KeYGuiExtension.Startup, KeYGuiExtension.ContextMenu,
-        KeYGuiExtension.Toolbar, KeYGuiExtension.StatusLine, KeYGuiExtension.Settings,
-        KeYSelectionListener, RuleAppListener,
-        ProofDisposedListener {
+        KeYGuiExtension.StatusLine, KeYGuiExtension.Settings,
+        KeYSelectionListener, RuleAppListener, ProofDisposedListener {
 
     /**
      * The mediator.
@@ -128,19 +126,14 @@ public class CloseReferenceExtension
     public List<Action> getContextActions(@Nonnull KeYMediator mediator,
             @Nonnull ContextMenuKind kind, @Nonnull Object underlyingObject) {
         if (kind.getType() == Node.class) {
-            return List.of(new CloseByReference(mediator, (Node) underlyingObject),
-                new CopyReferencedProof(mediator, (Node) underlyingObject));
+            Node node = (Node) underlyingObject;
+            List<Action> actions = new ArrayList<>();
+            actions.add(new CloseByReference(mediator, node));
+            actions.add(new CopyReferencedProof(mediator, node));
+            actions.add(new GotoReferenceAction(mediator, node));
+            return actions;
         }
         return new ArrayList<>();
-    }
-
-    @Nonnull
-    @Override
-    public JToolBar getToolbar(MainWindow mainWindow) {
-        JToolBar bar = new JToolBar();
-        bar.add(new CopyStepsAction(mainWindow));
-        bar.add(new GotoReferenceAction(mainWindow));
-        return bar;
     }
 
     @Override
@@ -221,7 +214,7 @@ public class CloseReferenceExtension
             this.mediator = mediator;
             this.node = node;
             setName("Close by reference to other proof");
-            setEnabled(node.leaf() && !node.isClosed());
+            setEnabled(node.leaf() && !node.isClosed() && node.lookup(ClosedBy.class) == null);
             setMenuPath("Proof Caching");
         }
 
