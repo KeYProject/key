@@ -922,6 +922,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 if (selected != null) {
                     mediator.goalChosen(selected);
                 } else if (treeNode instanceof GUIOneStepChildTreeNode) {
+                    // One Step Simplifier child node: show a sequent modified to include
+                    // the transformed formula
                     var ossNode = ((GUIOneStepChildTreeNode) treeNode);
                     var pio = ossNode.getRuleApp().posInOccurrence();
                     var ossParentNode = ((GUIProofTreeNode) ossNode.getParent());
@@ -930,6 +932,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
                             .replaceFormula(ossNode.getFormulaNr(), pio.sequentFormula()).sequent();
                     mediator.getSelectionModel().setSelectedSequent(ossParentNode.getNode(),
                         modifiedSequent);
+
+                    // ensure the proper node is selected in the tree
+                    ignoreChange = true;
+                    delegateView.setSelectionPath(newTP);
+                    ignoreChange = false;
                 } else {
                     mediator.nonGoalNodeChosen(node);
                 }
