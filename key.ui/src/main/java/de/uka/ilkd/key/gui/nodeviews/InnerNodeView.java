@@ -13,8 +13,10 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.rule.*;
@@ -49,15 +51,22 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     public final JTextArea tacletInfo;
 
     Node node;
+    Sequent sequent;
 
     public InnerNodeView(Node node, MainWindow mainWindow) {
+        this(node.proof(), node, node.getAppliedRuleApp(), node.sequent(), mainWindow);
+    }
+
+    public InnerNodeView(Proof proof, Node node, RuleApp ruleApp, Sequent sequent,
+            MainWindow mainWindow) {
         super(mainWindow);
         this.node = node;
-        node.proof().addProofDisposedListener(this);
+        this.sequent = sequent;
+        proof.addProofDisposedListener(this);
         this.listener = new InnerNodeViewListener(this);
 
         filter = new IdentitySequentPrintFilter();
-        getFilter().setSequent(node.sequent());
+        getFilter().setSequent(sequent);
         setLogicPrinter(
             SequentViewLogicPrinter.positionPrinter(mainWindow.getMediator().getNotationInfo(),
                 mainWindow.getMediator().getServices(), getVisibleTermLabels()));
@@ -65,7 +74,8 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
         setBackground(INACTIVE_BACKGROUND_COLOR);
 
         tacletInfo = new JTextArea(
-            TacletDescriber.getTacletDescription(mainWindow.getMediator(), node,
+            TacletDescriber.getTacletDescription(mainWindow.getMediator(),
+                node != null ? node.getAppliedRuleApp() : ruleApp,
                 SequentView.getLineWidth()));
         tacletInfo.setBackground(getBackground());
         tacletInfo.setBorder(new CompoundBorder(new MatteBorder(3, 0, 0, 0, Color.black),
@@ -159,7 +169,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     @Override
     public String getTitle() {
         // If a leaf becomes an inner node, it is already closed.
-        if (node.leaf()) {
+        if (node != null && node.leaf()) {
             return "Closed Goal";
         }
         return "Inner Node";
@@ -174,10 +184,12 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
         setLineWidth(computeLineWidth());
         updateSequent(node);
         posTable = getInitialPositionTable();
-        RuleApp app = node.getAppliedRuleApp();
+        if (node != null) {
+            RuleApp app = node.getAppliedRuleApp();
 
-        if (app != null) {
-            highlightRuleAppPosition(app);
+            if (app != null) {
+                highlightRuleAppPosition(app);
+            }
         }
 
         updateHidingProperty();

@@ -16,13 +16,15 @@ import de.uka.ilkd.key.rule.RuleApp;
 public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
 
     private final RuleApp app;
+    private final int formulaNr;
     private final GUIAbstractTreeNode parent;
 
     public GUIOneStepChildTreeNode(GUIProofTreeModel tree, GUIAbstractTreeNode parent,
-            RuleApp app) {
+            RuleApp app, int formulaNr) {
         super(tree, parent.getNode());
         this.parent = parent;
         this.app = app;
+        this.formulaNr = formulaNr;
     }
 
     @Override
@@ -56,6 +58,10 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
 
     public RuleApp getRuleApp() {
         return app;
+    }
+
+    public int getFormulaNr() {
+        return formulaNr;
     }
 
     @Override
