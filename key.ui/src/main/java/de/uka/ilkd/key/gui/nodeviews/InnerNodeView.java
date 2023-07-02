@@ -50,8 +50,9 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
 
     public final JTextArea tacletInfo;
 
-    Node node;
-    Sequent sequent;
+    private Node node;
+    private Sequent sequent;
+    private RuleApp ruleApp;
 
     public InnerNodeView(Node node, MainWindow mainWindow) {
         this(node.proof(), node, node.getAppliedRuleApp(), node.sequent(), mainWindow);
@@ -61,6 +62,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
             MainWindow mainWindow) {
         super(mainWindow);
         this.node = node;
+        this.ruleApp = ruleApp;
         this.sequent = sequent;
         proof.addProofDisposedListener(this);
         this.listener = new InnerNodeViewListener(this);
@@ -81,8 +83,6 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
         tacletInfo.setBorder(new CompoundBorder(new MatteBorder(3, 0, 0, 0, Color.black),
             new EmptyBorder(new Insets(4, 0, 0, 0))));
         tacletInfo.setEditable(false);
-
-        // updateUI();
     }
 
     static final HighlightPainter RULEAPP_HIGHLIGHTER =
@@ -184,12 +184,9 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
         setLineWidth(computeLineWidth());
         updateSequent(node);
         posTable = getInitialPositionTable();
-        if (node != null) {
-            RuleApp app = node.getAppliedRuleApp();
 
-            if (app != null) {
-                highlightRuleAppPosition(app);
-            }
+        if (ruleApp != null) {
+            highlightRuleAppPosition(ruleApp);
         }
 
         updateHidingProperty();

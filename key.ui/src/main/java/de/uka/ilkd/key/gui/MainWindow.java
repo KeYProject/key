@@ -1167,7 +1167,7 @@ public final class MainWindow extends JFrame {
                 newSequentView = currentGoalView;
             } else {
                 Sequent seq = getMediator().getSelectionModel().getSelectedSequent();
-                RuleApp ruleApp = getMediator().getSelectedNode().getAppliedRuleApp();
+                RuleApp ruleApp = getMediator().getSelectionModel().getSelectedRuleApp();
                 newSequentView = new InnerNodeView(getMediator().getSelectedProof(),
                     getMediator().getSelectedNode(), ruleApp, seq, this);
                 if (!isPrintRunImmediately) {
