@@ -8,11 +8,13 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.swing.*;
 
+import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
@@ -42,7 +44,7 @@ import org.key_project.util.collection.ImmutableList;
 public class CachingExtension
         implements KeYGuiExtension, KeYGuiExtension.Startup, KeYGuiExtension.ContextMenu,
         KeYGuiExtension.StatusLine, KeYGuiExtension.Settings,
-        KeYSelectionListener, RuleAppListener, ProofDisposedListener {
+        KeYSelectionListener, RuleAppListener, ProofDisposedListener, AutoModeListener {
 
     /**
      * The mediator.
@@ -104,6 +106,7 @@ public class CachingExtension
     public void preInit(MainWindow window, KeYMediator mediator) {
         this.mediator = mediator;
         mediator.addKeYSelectionListener(this);
+        mediator.getUI().getProofControl().addAutoModeListener(this);
     }
 
     @Override
@@ -139,6 +142,25 @@ public class CachingExtension
     @Override
     public List<JComponent> getStatusLineComponents() {
         return List.of(new ReferenceSearchButton(mediator));
+    }
+
+    @Override
+    public void autoModeStarted(ProofEvent e) {
+
+    }
+
+    @Override
+    public void autoModeStopped(ProofEvent e) {
+        Proof p = e.getSource();
+        if (p == null || p.closed()) {
+            return;
+        }
+        // show statistics if closed by reference
+        if (p.openGoals().stream().allMatch(goal -> goal.node().lookup(ClosedBy.class) != null)) {
+            ShowProofStatistics.Window win =
+                new ShowProofStatistics.Window(MainWindow.getInstance(), p);
+            win.setVisible(true);
+        }
     }
 
     /**

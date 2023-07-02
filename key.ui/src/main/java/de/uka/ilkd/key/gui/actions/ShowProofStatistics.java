@@ -18,6 +18,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
@@ -95,12 +96,24 @@ public class ShowProofStatistics extends MainWindowAction {
     }
 
     public static String getHTMLStatisticsMessage(Proof proof) {
-        final int openGoals = proof.openGoals().size();
+        int openGoals = proof.openGoals().size();
+        long openCachedGoals =
+            proof.openGoals().stream().filter(g -> g.node().lookup(ClosedBy.class) != null).count();
+        openGoals -= openCachedGoals;
         StringBuilder stats = new StringBuilder("<html><head>" + "<style type=\"text/css\">"
             + "body {font-weight: normal; text-align: center;}" + "td {padding: 1px;}"
             + "th {padding: 2px; font-weight: bold;}" + "</style></head><body>");
 
-        if (openGoals > 0) {
+        stats.append("<br>");
+        if (openCachedGoals > 0 && openGoals > 0) {
+            stats.append("<strong>").append(openGoals).append(" open goal")
+                    .append(openGoals > 1 ? "s, " : ", ").append(openCachedGoals)
+                    .append(" cached goal").append(openCachedGoals > 1 ? "s." : ".")
+                    .append("</strong>");
+        } else if (openCachedGoals > 0) {
+            stats.append("<strong>").append(openCachedGoals).append(" cached goal")
+                    .append(openCachedGoals > 1 ? "s." : ".").append("</strong>");
+        } else if (openGoals > 0) {
             stats.append("<strong>").append(openGoals).append(" open goal")
                     .append(openGoals > 1 ? "s." : ".").append("</strong>");
         } else {
@@ -172,9 +185,9 @@ public class ShowProofStatistics extends MainWindowAction {
             statisticsPane.setBorder(BorderFactory.createEmptyBorder());
             statisticsPane.setCaretPosition(0);
             statisticsPane.setBackground(MainWindow.getInstance().getBackground());
-            statisticsPane.setSize(new Dimension(10, 360));
+            statisticsPane.setSize(new Dimension(10, 420));
             statisticsPane.setPreferredSize(
-                new Dimension(statisticsPane.getPreferredSize().width + 15, 360));
+                new Dimension(statisticsPane.getPreferredSize().width + 15, 420));
 
             JScrollPane scrollPane = new JScrollPane(statisticsPane);
             scrollPane.setBorder(BorderFactory.createEmptyBorder());
