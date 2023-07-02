@@ -2,6 +2,7 @@ package de.uka.ilkd.key.core;
 
 import java.util.*;
 
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -20,6 +21,11 @@ public class KeYSelectionModel {
     private Goal selectedGoal;
     /** the current displayed node */
     private Node selectedNode;
+    /**
+     * The currently displayed sequent. Equal to the sequent of {@link #selectedSequent} unless
+     * we are displaying an OSS node.
+     */
+    private Sequent selectedSequent;
     /** the listeners to this model */
     private final List<KeYSelectionListener> listenerList;
     /** cached selected node event */
@@ -38,9 +44,11 @@ public class KeYSelectionModel {
         Goal g = proof.openGoals().iterator().next();
         if (g == null) {
             selectedNode = proof.root().leavesIterator().next();
+            selectedSequent = selectedNode.sequent();
         } else {
             goalIsValid = true;
             selectedNode = g.node();
+            selectedSequent = selectedNode.sequent();
             selectedGoal = g;
         }
     }
@@ -59,13 +67,16 @@ public class KeYSelectionModel {
             Goal g = proof.openGoals().iterator().next();
             if (g == null) {
                 selectedNode = proof.root().leavesIterator().next();
+                selectedSequent = selectedNode.sequent();
             } else {
                 goalIsValid = true;
                 selectedNode = g.node();
+                selectedSequent = selectedNode.sequent();
                 selectedGoal = g;
             }
         } else {
             selectedNode = null;
+            selectedSequent = null;
             selectedGoal = null;
         }
         fireSelectedProofChanged();
@@ -92,6 +103,25 @@ public class KeYSelectionModel {
         }
         goalIsValid = false;
         selectedNode = n;
+        selectedSequent = selectedNode.sequent();
+        fireSelectedNodeChanged();
+    }
+
+    /**
+     * Sets the node and sequent focused by the user.
+     *
+     * @param node selected node
+     * @param sequent selected sequent
+     */
+    public void setSelectedSequent(Node node, Sequent sequent) {
+        // switch proof if needed
+        if (node.proof() != getSelectedProof()) {
+            setSelectedProof(node.proof());
+        }
+        goalIsValid = true;
+        selectedGoal = null;
+        selectedNode = node;
+        selectedSequent = sequent;
         fireSelectedNodeChanged();
     }
 
@@ -104,6 +134,7 @@ public class KeYSelectionModel {
         goalIsValid = true;
         selectedGoal = g;
         selectedNode = g.node();
+        selectedSequent = selectedNode.sequent();
         fireSelectedNodeChanged();
     }
 
@@ -114,6 +145,10 @@ public class KeYSelectionModel {
      */
     public Node getSelectedNode() {
         return selectedNode;
+    }
+
+    public Sequent getSelectedSequent() {
+        return selectedSequent;
     }
 
     /**

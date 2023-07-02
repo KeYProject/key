@@ -51,9 +51,11 @@ import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.gui.utilities.LruCached;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
@@ -1164,7 +1166,10 @@ public final class MainWindow extends JFrame {
                 }
                 newSequentView = currentGoalView;
             } else {
-                newSequentView = new InnerNodeView(getMediator().getSelectedNode(), this);
+                Sequent seq = getMediator().getSelectionModel().getSelectedSequent();
+                RuleApp ruleApp = getMediator().getSelectedNode().getAppliedRuleApp();
+                newSequentView = new InnerNodeView(getMediator().getSelectedProof(),
+                    getMediator().getSelectedNode(), ruleApp, seq, this);
                 if (!isPrintRunImmediately) {
                     newSequentView.printSequent();
                 }

@@ -921,6 +921,15 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 Goal selected = proof.getGoal(node);
                 if (selected != null) {
                     mediator.goalChosen(selected);
+                } else if (treeNode instanceof GUIOneStepChildTreeNode) {
+                    var ossNode = ((GUIOneStepChildTreeNode) treeNode);
+                    var pio = ossNode.getRuleApp().posInOccurrence();
+                    var ossParentNode = ((GUIProofTreeNode) ossNode.getParent());
+                    var newSequent = ossParentNode.getNode().sequent();
+                    var modifiedSequent = newSequent
+                            .replaceFormula(ossNode.getFormulaNr(), pio.sequentFormula()).sequent();
+                    mediator.getSelectionModel().setSelectedSequent(ossParentNode.getNode(),
+                        modifiedSequent);
                 } else {
                     mediator.nonGoalNodeChosen(node);
                 }
