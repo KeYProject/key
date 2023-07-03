@@ -1199,6 +1199,15 @@ public final class MainWindow extends JFrame {
 
     }
 
+    /**
+     * Scroll the sequent view to the specified y coordinate.
+     *
+     * @param y coordinate in pixels
+     */
+    public void scrollTo(int y) {
+        mainFrame.scrollTo(y);
+    }
+
     void displayResults(String message) {
         setStatusLine(message);
     }
