@@ -65,7 +65,8 @@ public class JavaParserFactory {
     private final JavaSymbolSolver symbolResolver = new JavaSymbolSolver(typeSolver);
 
     @Nonnull
-    private List<CompilationUnit> javaBootClassCollection = new ArrayList<>();
+    private List<CompilationUnit> bootClasses = new ArrayList<>();
+    private List<CompilationUnit> libraryClasses = new ArrayList<>();
     @Nonnull
     private List<CompilationUnit> userClasses = new ArrayList<>();
 
@@ -82,9 +83,20 @@ public class JavaParserFactory {
         return Collections.unmodifiableList(sourcePaths);
     }
 
-    public void setJavaRedux(Collection<CompilationUnit> redux) {
-        javaBootClassCollection.clear();
-        javaBootClassCollection.addAll(redux);
+    public void setBootClasses(Collection<CompilationUnit> classes) {
+        bootClasses.clear();
+        bootClasses.addAll(classes);
+        typeSolver.lazyRebuild();
+    }
+
+    public void setLibraryClasses(Collection<CompilationUnit> classes) {
+        libraryClasses.clear();
+        libraryClasses.addAll(classes);
+        typeSolver.lazyRebuild();
+    }
+
+    public void addUserClasses(Collection<CompilationUnit> classes) {
+        userClasses.addAll(classes);
         typeSolver.lazyRebuild();
     }
 
@@ -160,10 +172,6 @@ public class JavaParserFactory {
         return Optional.ofNullable(bootClassPath);
     }
 
-    public void appendToJavaRedux(List<CompilationUnit> collect) {
-        this.javaBootClassCollection.addAll(collect);
-    }
-
     /**
      * A wrapper do make the type solver dynamic and aware of sourcePath changes.
      * The type solver is an attribute of {@link CompilationUnit} which are used to resolve types.
@@ -194,16 +202,14 @@ public class JavaParserFactory {
             // resolve logical datatypes as \\map or \\seq, or \\dl_Free
             ct.add(new LogicalTypeSolver());
 
-            if (javaBootClassCollection.isEmpty()) {
-                addToTypeSolver(ct, bootClassPath);
-            } else {
-                var ts = new ListTypeSolver();
-                ct.add(ts);
+            if (!bootClasses.isEmpty()) {
+                ct.add(new ListTypeSolver(bootClasses));
             }
-
-
-            for (var sourcePath : sourcePaths) {
-                addToTypeSolver(ct, sourcePath);
+            if (!libraryClasses.isEmpty()) {
+                ct.add(new ListTypeSolver(libraryClasses));
+            }
+            if (!userClasses.isEmpty()) {
+                ct.add(new ListTypeSolver(userClasses));
             }
             delegate = ct;
         }
@@ -263,13 +269,18 @@ public class JavaParserFactory {
         }
     }
 
-    private class ListTypeSolver implements TypeSolver {
+    private static class ListTypeSolver implements TypeSolver {
         private TypeSolver parent;
+        private final Collection<CompilationUnit> units;
 
         private final Cache<String, SymbolReference<ResolvedReferenceTypeDeclaration>> foundTypes =
             CacheBuilder.newBuilder().softValues()
                     .maximumSize(1024)
                     .build();
+
+        public ListTypeSolver(Collection<CompilationUnit> units) {
+            this.units = units;
+        }
 
         @Override
         public TypeSolver getParent() {
@@ -297,8 +308,7 @@ public class JavaParserFactory {
 
         private SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveTypeUncached(
                 String name) {
-            for (CompilationUnit unit : javaBootClassCollection) {
-
+            for (CompilationUnit unit : units) {
                 final var primaryType = unit.getPrimaryType();
                 if (primaryType.isPresent()) {
                     var cname = primaryType.get().getFullyQualifiedName();
@@ -309,7 +319,12 @@ public class JavaParserFactory {
                     }
                 }
 
-                var astTypeDeclaration = Navigator.findType(unit, name);
+                String localName = unit.getPackageDeclaration()
+                        .map(p -> p.getName().asString())
+                        .filter(name::startsWith)
+                        .map(p -> name.substring(Math.min(name.length(), p.length() + 1)))
+                        .orElse(name);
+                var astTypeDeclaration = Navigator.findType(unit, localName);
                 if (astTypeDeclaration.isPresent()) {
                     return SymbolReference
                             .solved(JavaParserFacade.get(this)

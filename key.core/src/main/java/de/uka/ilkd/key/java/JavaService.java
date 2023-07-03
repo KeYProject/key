@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -170,19 +171,31 @@ public class JavaService {
     /**
      * read a compilation unit, given as a string.
      *
-     * @param file where to read from
+     * @param files where to read from
      * @param repo the repo to use for reading
      * @return a KeY structured compilation unit.
      */
-    public de.uka.ilkd.key.java.ast.CompilationUnit readCompilationUnit(Path file, FileRepo repo)
-            throws IOException {
+    public <E extends Throwable> List<de.uka.ilkd.key.java.ast.CompilationUnit> readCompilationUnits(
+            Collection<Path> files, FileRepo repo,
+            BiFunction<BuildingExceptions, Path, E> exceptionProvider)
+            throws IOException, E {
         parseSpecialClasses();
-        // TODO javaparser problem: method used in foreach loop, pipeline should be used with all
-        // files at once
-        // However, unwrapParseResult does not contain any file related info
-        var cu = unwrapParseResult(parseCompilationUnit(file, repo));
-        transformModel(Collections.singletonList(cu));
-        return converter.processCompilationUnit(cu);
+        var cus = new ArrayList<CompilationUnit>(files.size());
+        for (Path file : files) {
+            try {
+                var cu = unwrapParseResult(parseCompilationUnit(file, repo));
+                cus.add(cu);
+            } catch (BuildingExceptions e) {
+                throw exceptionProvider.apply(e, file);
+            }
+        }
+        programFactory.addUserClasses(cus);
+        transformModel(Collections.unmodifiableList(cus));
+        var result = new ArrayList<de.uka.ilkd.key.java.ast.CompilationUnit>(cus.size());
+        for (CompilationUnit cu : cus) {
+            result.add(converter.processCompilationUnit(cu));
+        }
+        return result;
     }
 
     /**
@@ -196,9 +209,7 @@ public class JavaService {
         LOGGER.debug("Reading {}", trim(text));
         var reader = new StringReader(text);
         var cu = unwrapParseResult(programFactory.parseCompilationUnit(reader));
-
-        // TODO javaparser why? this method is used in tests only
-        programFactory.appendToJavaRedux(Collections.singletonList(cu));
+        programFactory.addUserClasses(Collections.singletonList(cu));
         // transform program
         transformModel(Collections.singletonList(cu));
         return converter.processCompilationUnit(cu);
@@ -206,9 +217,8 @@ public class JavaService {
 
     // ----- parsing libraries
 
-    public void setClassPath(Path bootClassPath, List<Path> classPath) {
+    public void setClassPath(Path bootClassPath) {
         programFactory.setBootClassPath(bootClassPath);
-        programFactory.addSourcePaths(classPath);
     }
 
     /**
@@ -227,7 +237,7 @@ public class JavaService {
      * @param fileRepo the FileRepo that provides the InputStream to resources
      * @return the compilation units
      */
-    private List<CompilationUnit> parseInternalClasses(FileRepo fileRepo) throws IOException {
+    private List<CompilationUnit> parseBootClasses(FileRepo fileRepo) throws IOException {
         List<URI> paths;
 
         if (programFactory.getBootClassPath().isEmpty()) {
@@ -287,14 +297,8 @@ public class JavaService {
      * @throws IOException an exception
      * @author mulbrich
      */
-    private List<CompilationUnit> parseLibs(FileRepo fileRepo) throws IOException {
-        LOGGER.debug("Parsing internal classes");
-        var internal = parseInternalClasses(fileRepo);
-        LOGGER.debug("Finished internal classes");
+    private List<CompilationUnit> parseLibraryClasses(FileRepo fileRepo) throws IOException {
         List<FileCollection> sources = new ArrayList<>();
-        List<CompilationUnit> rcuList = new ArrayList<>(internal);
-
-        LOGGER.debug("Parsing library classes");
         for (var cp : programFactory.getSourcePaths()) {
             if (Files.isDirectory(cp)) {
                 sources.add(new DirectoryFileCollection(cp.toFile()));
@@ -307,6 +311,8 @@ public class JavaService {
          * While the resources are read (and possibly copied) via the FileRepo, the data location
          * is left as it is. This leaves the line information intact.
          */
+
+        List<CompilationUnit> rcuList = new ArrayList<>();
 
         // -- read jml files --
         for (FileCollection fc : sources) {
@@ -424,19 +430,36 @@ public class JavaService {
 
         mapping.setParsingLibraries(true);
         try {
-            List<CompilationUnit> specialClasses = parseLibs(fileRepo);
-            /*
-             * dynamicallyCreatedCompilationUnits = keySourceInfo.getCreatedStubClasses();
-             * specialClasses.addAll(dynamicallyCreatedCompilationUnits);
-             * keySourceInfo.setIgnoreUnresolvedClasses(false);
-             * changeHistory.updateModel();
-             */
-            programFactory.setJavaRedux(specialClasses);
-            transformModel(specialClasses);
+            {
+                LOGGER.debug("Parsing internal classes");
+                var bootClasses = parseBootClasses(fileRepo);
+                programFactory.setBootClasses(bootClasses);
+                LOGGER.debug("Finished parsing internal classes");
 
-            // make them available to the mapping
-            for (CompilationUnit cu : specialClasses) {
-                converter.processCompilationUnit(cu);
+                transformModel(bootClasses);
+                for (CompilationUnit cu : bootClasses) {
+                    converter.processCompilationUnit(cu);
+                }
+                LOGGER.debug("Finished processing internal classes");
+            }
+
+            {
+                LOGGER.debug("Parsing library classes");
+                var libraryClasses = parseLibraryClasses(fileRepo);
+                programFactory.setLibraryClasses(libraryClasses);
+                LOGGER.debug("Finished parsing library classes");
+
+                transformModel(libraryClasses);
+
+                /*
+                 * dynamicallyCreatedCompilationUnits = keySourceInfo.getCreatedStubClasses();
+                 * specialClasses.addAll(dynamicallyCreatedCompilationUnits);
+                 */
+
+                for (CompilationUnit cu : libraryClasses) {
+                    converter.processCompilationUnit(cu);
+                }
+                LOGGER.debug("Finished processing library classes");
             }
 
             // Make sure all primitive types are registered

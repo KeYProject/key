@@ -215,17 +215,14 @@ public final class ProblemInitializer {
         assert initConfig.getServices().getJavaModel() == null;
 
         activateInitConfigJava(initConfig, envInput);
-
         // read Java source and classpath settings
         envInput.setInitConfig(initConfig);
+        final JavaService javaService = initConfig.getServices().getJavaService();
+
         final Path javaPath =
             envInput.readJavaPath().map(p -> p.toAbsolutePath().normalize()).orElse(null);
         final Optional<List<Path>> classPath = envInput.readClassPath();
-        final JavaService javaService = initConfig.getServices().getJavaService();
-        final Path bootClassPath = Optional.ofNullable(envInput.readBootClassPath())
-                .or(() -> javaService.getProgramFactory().getBootClassPath())
-                .orElse(null);
-        final Includes includes = envInput.readIncludes();
+        final Path bootClassPath = javaService.getProgramFactory().getBootClassPath().orElse(null);
 
         if (fileRepo != null) {
             // set the paths in the FileRepo (all three methods can deal with null parameters)
@@ -236,6 +233,7 @@ public final class ProblemInitializer {
 
         // weigl: 2021-01, Early including the includes of the KeYUserProblemFile,
         // this allows to use included symbols inside JML.
+        final Includes includes = envInput.readIncludes();
         for (var fileName : includes.getRuleSets()) {
             KeYFile keyFile =
                 new KeYFile(fileName.file().getFileName().toString(), fileName, progMon,
@@ -243,15 +241,10 @@ public final class ProblemInitializer {
             readEnvInput(keyFile, initConfig);
         }
 
-        // create converter, set classpath
-        javaService.setClassPath(bootClassPath, classPath.orElse(null));
-
         reportStatus("Reading Java libraries");
         javaService.parseSpecialClasses(fileRepo);
         if (javaPath != null) {
             reportStatus("Reading Java source");
-            javaService.getProgramFactory().addSourcePaths(
-                Collections.singletonList(javaPath));
             List<Path> classes = getClasses(javaPath);
             if (envInput.isIgnoreOtherJavaFiles()) {
                 Path file = envInput.getJavaFile();
@@ -259,13 +252,11 @@ public final class ProblemInitializer {
                     classes = Collections.singletonList(file);
                 }
             }
-            // support for single file loading
-            for (var cls : classes) {
-                try {
-                    javaService.readCompilationUnit(cls, fileRepo);
-                } catch (IOException e) {
-                    throw new ProofInputException("Failed to read file " + cls, e);
-                }
+            try {
+                javaService.readCompilationUnits(classes, fileRepo,
+                    (ex, p) -> new ProofInputException("Failed to parse file " + p, ex));
+            } catch (IOException e) {
+                throw new ProofInputException("Failed to read file", e);
             }
         }
         Path initialFile = envInput.getInitialFile();
