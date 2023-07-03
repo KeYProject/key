@@ -24,8 +24,6 @@ import de.uka.ilkd.key.util.KeYResourceManager;
  * possible) and back.
  */
 public class Services implements TermServices {
-    @Nullable
-    private KeYJPMapping mapping;
     /**
      * the proof
      */
@@ -52,7 +50,7 @@ public class Services implements TermServices {
      * the information object on the Java model
      */
     @Nullable
-    private JavaInfo javainfo;
+    private JavaInfo javaInfo;
 
     /**
      * variable namer for inner renaming
@@ -95,14 +93,10 @@ public class Services implements TermServices {
      * information stored at none of these.
      */
     public Services(Profile profile) {
-        this(profile, new LinkedHashMap<>(), new ServiceCaches());
+        this(profile, null, new LinkedHashMap<>(), new ServiceCaches());
     }
 
-    private Services(Profile profile, HashMap<String, Counter> counters, ServiceCaches caches) {
-        this(profile, null, counters, caches);
-    }
-
-    private Services(Profile profile, @Nullable KeYProgModelInfo kpmi,
+    private Services(Profile profile, @Nullable JavaService javaService,
             HashMap<String, Counter> counters,
             ServiceCaches caches) {
         assert profile != null;
@@ -118,8 +112,13 @@ public class Services implements TermServices {
         this.cee = new ConstantExpressionEvaluator();
 
         typeconverter = new TypeConverter(this);
-        this.javainfo = kpmi == null ? null : new JavaInfo(kpmi, this);
-        this.mapping = kpmi == null ? null : kpmi.rec2key();
+        if (javaService == null) {
+            this.javaService = null;
+            this.javaInfo = null;
+        } else {
+            this.javaService = javaService.copy(this);
+            this.javaInfo = new JavaInfo(new KeYProgModelInfo(this.javaService), this);
+        }
         nameRecorder = new NameRecorder();
     }
 
@@ -129,8 +128,7 @@ public class Services implements TermServices {
         this.namespaces = s.namespaces;
         this.cee = s.cee;
         this.typeconverter = s.typeconverter;
-        this.javainfo = s.javainfo;
-        this.mapping = s.mapping;
+        this.javaInfo = s.javaInfo;
         this.counters = s.counters;
         this.specRepos = s.specRepos;
         this.javaModel = s.javaModel;
@@ -175,7 +173,8 @@ public class Services implements TermServices {
      */
     @Nonnull
     public JavaInfo getJavaInfo() {
-        return javainfo;
+        assert javaInfo != null;
+        return javaInfo;
     }
 
 
@@ -233,9 +232,7 @@ public class Services implements TermServices {
      */
     public Services copy(Profile profile, boolean shareCaches) {
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-        Services s = new Services(profile,
-            javainfo == null ? null : javainfo.getKeYProgModelInfo().copy(),
-            copyCounters(), newCaches);
+        Services s = new Services(profile, javaService, copyCounters(), newCaches);
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
@@ -262,7 +259,8 @@ public class Services implements TermServices {
      * creates a new service object with the same ldt information as the actual one
      */
     public Services copyPreservesLDTInformation() {
-        Services s = new Services(getProfile());
+        Services s =
+            new Services(getProfile(), javaService, new LinkedHashMap<>(), new ServiceCaches());
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
         s.nameRecorder = nameRecorder.copy();
@@ -413,17 +411,16 @@ public class Services implements TermServices {
 
     @Nonnull
     public JavaService getJavaService() {
+        assert javaService != null;
         return javaService;
     }
 
     private void activateJavaPath(Path bootClassPath) {
-        if (mapping == null) {
-            mapping = new KeYJPMapping();
+        if (javaService != null && javaService.getBootClassPath().equals(bootClassPath)) {
+            return;
         }
-        javaService = new JavaService(this, mapping, bootClassPath, Collections.emptyList());
-        var jpTypoConv = javaService.getTypeConverter();
-        var kpmi = new KeYProgModelInfo(this, mapping, jpTypoConv);
-        javainfo = new JavaInfo(kpmi, this);
+        javaService = new JavaService(this, bootClassPath, Collections.emptyList());
+        javaInfo = new JavaInfo(new KeYProgModelInfo(javaService), this);
     }
 
     public void activateJava(@Nullable Path bootClassPath) {

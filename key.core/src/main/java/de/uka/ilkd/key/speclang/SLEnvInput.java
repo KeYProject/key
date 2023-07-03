@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.speclang;
 
-import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,7 +17,6 @@ import de.uka.ilkd.key.java.ast.statement.JmlAssert;
 import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
 import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.java.ast.statement.MergePointStatement;
-import de.uka.ilkd.key.java.loader.JavaReduxFileCollection;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -33,17 +32,20 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
-import de.uka.ilkd.key.util.KeYResourceManager;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * EnvInput for standalone specification language front ends.
  */
 public final class SLEnvInput extends AbstractEnvInput {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SLEnvInput.class);
 
 
     // -------------------------------------------------------------------------
@@ -82,8 +84,9 @@ public final class SLEnvInput extends AbstractEnvInput {
 
     private ImmutableSet<PositionedString> createDLLibrarySpecsHelper(
             Collection<KeYJavaType> allKJTs,
-            Path path) throws ProofInputException {
+            Path basePath) throws ProofInputException {
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
+        int i = 0;
         for (KeYJavaType kjt : allKJTs) {
             var javaType = kjt.getJavaType();
             if (!(javaType instanceof TypeDeclaration)
@@ -91,28 +94,20 @@ public final class SLEnvInput extends AbstractEnvInput {
                 continue;
             }
 
-            var p = Path.of(kjt.getFullName().replace(".", "/") + ".key");
-            final Path file = path.resolve(p);
-            RuleSource rs;
-
-            // external or internal path?
-            if (file.toFile().isFile()) {
-                rs = RuleSourceFactory.initRuleFile(file);
-            } else {
-                URL url = KeYResourceManager.getManager().getResourceFile(JavaService.class,
-                    file.toString());
-                if (url != null) {
-                    rs = RuleSourceFactory.initRuleFile(url);
-                } else {
-                    continue;
-                }
+            final Path file = basePath.resolve(kjt.getFullName().replace(".", "/") + ".key");
+            if (!Files.exists(file)) {
+                continue;
             }
+            RuleSource rs = RuleSourceFactory.initRuleFile(file);
 
             // read rule source found
-            final KeYFile keyFile = new KeYFile(path.toString(), rs, null, getProfile());
+            LOGGER.debug("Reading library specification file: {}", file);
+            final KeYFile keyFile = new KeYFile(file.toString(), rs, null, getProfile());
             keyFile.setInitConfig(initConfig);
             warnings = warnings.union(keyFile.read());
+            i += 1;
         }
+        LOGGER.info("Read {} library specification files", i);
         return warnings;
     }
 
@@ -125,24 +120,13 @@ public final class SLEnvInput extends AbstractEnvInput {
         final var allKJTs =
             initConfig.getServices().getJavaInfo().getAllKeYJavaTypes();
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
-        // either boot class path or JavaRedux
-        if (bootClassPath != null) {
-            warnings = warnings
-                    .union(createDLLibrarySpecsHelper(allKJTs, bootClassPath.toAbsolutePath()));
-        } else {
-            var path = Path.of(JavaReduxFileCollection.JAVA_SRC_DIR);
-            if (!initConfig.getProfile().getInternalClassDirectory().isEmpty()) {
-                path = path.resolve(initConfig.getProfile().getInternalClassDirectory());
-            }
-            warnings = warnings.union(createDLLibrarySpecsHelper(allKJTs, path));
-        }
+        var javaService = initConfig.getServices().getJavaService();
+        warnings =
+            warnings.union(createDLLibrarySpecsHelper(allKJTs, javaService.getBootClassPath()));
 
-        // if applicable: class path
-        if (classPath != null) {
-            for (var file : classPath) {
-                warnings =
-                    warnings.union(createDLLibrarySpecsHelper(allKJTs, file.toAbsolutePath()));
-            }
+        for (var file : javaService.getLibraryPath()) {
+            warnings =
+                warnings.union(createDLLibrarySpecsHelper(allKJTs, file.toAbsolutePath()));
         }
         return warnings;
     }

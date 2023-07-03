@@ -1,23 +1,19 @@
 package de.uka.ilkd.key.java.loader;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.Reader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ResolvedLogicalType;
 
-import org.key_project.util.java.IOUtil;
-
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
-import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.key.sv.KeyContextStatementBlock;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.resolution.Navigator;
@@ -26,61 +22,56 @@ import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclar
 import com.github.javaparser.resolution.model.SymbolReference;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.*;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Alexander Weigl
  * @version 1 (05.03.22)
  */
 public class JavaParserFactory {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JavaParserFactory.class);
     private final Services services;
-
-    /**
-     * the File object that describes the directory from which the internal
-     * classes are to be read. They are read in differently - therefore the
-     * second category. A null value indicates that the boot classes are to
-     * be read from an internal repository.
-     */
-    private Path bootClassPath;
-
-
-    /**
-     * A list of {@link File} objects that describes the classpath to be searched
-     * for classes or Java files.
-     */
-    @Nonnull
-    private final ArrayList<Path> sourcePaths;
-
     @Nullable
     private ParserConfiguration config;
 
+    @Nonnull
     private final DynamicTypeSolver typeSolver = new DynamicTypeSolver();
 
     @Nonnull
     private final JavaSymbolSolver symbolResolver = new JavaSymbolSolver(typeSolver);
 
     @Nonnull
-    private List<CompilationUnit> bootClasses = new ArrayList<>();
-    private List<CompilationUnit> libraryClasses = new ArrayList<>();
+    private final List<CompilationUnit> bootClasses;
     @Nonnull
-    private List<CompilationUnit> userClasses = new ArrayList<>();
+    private final List<CompilationUnit> libraryClasses;
+    @Nonnull
+    private final List<CompilationUnit> userClasses;
 
 
-    public JavaParserFactory(Services services, Path bootClassPath, Collection<Path> sourcePaths) {
+    public JavaParserFactory(Services services) {
         this.services = services;
-        this.bootClassPath = bootClassPath;
-        this.sourcePaths = new ArrayList<>(sourcePaths);
+        bootClasses = new ArrayList<>();
+        libraryClasses = new ArrayList<>();
+        userClasses = new ArrayList<>();
         typeSolver.lazyRebuild();
     }
 
-    @Nonnull
-    public List<Path> getSourcePaths() {
-        return Collections.unmodifiableList(sourcePaths);
+    private JavaParserFactory(JavaParserFactory o, Services services) {
+        this.services = services;
+        // This is not a deep copy!
+        // However, deep copying is pretty much impossible.
+        // The KeyJPMapping has a reference to the old classes.
+        // Therefore, doing a deep copy here "invalidates" all
+        // existing KeyJavaTypes.
+        bootClasses = new ArrayList<>(o.bootClasses);
+        libraryClasses = new ArrayList<>(o.libraryClasses);
+        userClasses = new ArrayList<>(o.userClasses);
+        typeSolver.lazyRebuild();
+    }
+
+    public JavaParserFactory copy(Services services) {
+        return new JavaParserFactory(this, services);
     }
 
     public void setBootClasses(Collection<CompilationUnit> classes) {
@@ -97,32 +88,6 @@ public class JavaParserFactory {
 
     public void addUserClasses(Collection<CompilationUnit> classes) {
         userClasses.addAll(classes);
-        typeSolver.lazyRebuild();
-    }
-
-    public void addSourcePaths(Collection<Path> files) {
-        if (files == null) {
-            return;
-        }
-        sourcePaths.ensureCapacity(sourcePaths.size() + files.size());
-        for (Path path : files) {
-            if (sourcePaths.contains(path)) {
-                continue; // ignore that path is already set
-            }
-            for (Path existing : sourcePaths) {
-                if (path.startsWith(existing)) {
-                    throw new IllegalStateException(
-                        "A parent of this path is already given in the classpath");
-                }
-
-                if (existing.startsWith(path)) {
-                    throw new IllegalStateException(
-                        "A child folder of this path is already given in the classpath");
-                }
-            }
-            sourcePaths.add(path);
-        }
-
         typeSolver.lazyRebuild();
     }
 
@@ -161,15 +126,6 @@ public class JavaParserFactory {
 
     public ParseResult<KeyContextStatementBlock> parseContextBlock(String sr) {
         return createJavaParser().parseSchemaBlock(sr);
-    }
-
-    public void setBootClassPath(Path bootClassPath) {
-        this.bootClassPath = bootClassPath;
-        this.typeSolver.rebuild();
-    }
-
-    public Optional<Path> getBootClassPath() {
-        return Optional.ofNullable(bootClassPath);
     }
 
     /**
@@ -212,39 +168,6 @@ public class JavaParserFactory {
                 ct.add(new ListTypeSolver(userClasses));
             }
             delegate = ct;
-        }
-
-
-        private void addToTypeSolver(CombinedTypeSolver ct, Path sourcePath) {
-            if (sourcePath == null)
-                return;
-            if (IOUtil.isFolderInsideJar(sourcePath)) {
-                try {
-                    var fsPath = IOUtil.openFileInJar(sourcePath);
-                    ct.add(new JavaParserTypeSolver(fsPath, getConfiguration()));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                return;
-            }
-
-            if (Files.isRegularFile(sourcePath) && sourcePath.getFileName().endsWith(".jar")) {
-                try {
-                    ct.add(new JarTypeSolver(sourcePath));
-                } catch (IOException e) {
-                    LOGGER.error(e.getMessage(), e);
-                }
-                return;
-            }
-
-            if (Files.isDirectory(sourcePath)) {
-                ct.add(new JavaParserTypeSolver(sourcePath, getConfiguration()));
-                return;
-            }
-
-            LOGGER.error(
-                "You gave me {} to add into the classpath. But I am not aware how to handle this path",
-                sourcePath);
         }
 
         @Override

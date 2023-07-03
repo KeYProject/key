@@ -1,13 +1,11 @@
 package de.uka.ilkd.key.gui.plugins.javac;
 
 import java.awt.*;
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -143,8 +141,7 @@ public class JavacExtension
             }
 
             var bootClassPath = jm.getBootClassPath() != null ? jm.getBootClassPath() : null;
-            var classpath =
-                jm.getClassPathEntries().stream().map(Path::toFile).collect(Collectors.toList());
+            var classpath = jm.getClassPathEntries();
             var javaPath = jm.getModelDir();
 
             lblStatus.setForeground(Color.black);
@@ -153,7 +150,7 @@ public class JavacExtension
 
             CompletableFuture<List<PositionedIssueString>> task =
                 JavaCompilerCheckFacade.check(mediator.getUI(),
-                    bootClassPath.toFile(), classpath, javaPath.toFile());
+                    bootClassPath, classpath, javaPath);
             try {
                 task.thenAccept(it -> SwingUtilities.invokeLater(() -> {
                     lblStatus.setText("Javac finished");

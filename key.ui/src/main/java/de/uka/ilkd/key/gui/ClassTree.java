@@ -244,19 +244,18 @@ public class ClassTree extends JTree {
     private static DefaultMutableTreeNode createTree(boolean addContractTargets,
             boolean skipLibraryClasses, Services services) {
         // get all classes
-        var kjts = services.getJavaInfo().getAllKeYJavaTypes();
-        kjts.removeIf(kjt -> !(kjt.getJavaType() instanceof ClassDeclaration
+        var types = new ArrayList<>(services.getJavaInfo().getAllKeYJavaTypes());
+        types.removeIf(kjt -> !(kjt.getJavaType() instanceof ClassDeclaration
                 || kjt.getJavaType() instanceof InterfaceDeclaration)
                 || (((TypeDeclaration) kjt.getJavaType()).isLibraryClass()
                         && skipLibraryClasses));
 
         // sort classes alphabetically
-        final KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[0]);
-        Arrays.sort(kjtsarr, Comparator.comparing(KeYJavaType::getFullName));
+        types.sort(Comparator.comparing(KeYJavaType::getFullName));
 
         // build tree
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(new Entry(""));
-        for (KeYJavaType keYJavaType : kjtsarr) {
+        for (KeYJavaType keYJavaType : types) {
             insertIntoTree(rootNode, keYJavaType, addContractTargets, services);
         }
 

@@ -222,7 +222,7 @@ public final class ProblemInitializer {
         final Path javaPath =
             envInput.readJavaPath().map(p -> p.toAbsolutePath().normalize()).orElse(null);
         final Optional<List<Path>> classPath = envInput.readClassPath();
-        final Path bootClassPath = javaService.getProgramFactory().getBootClassPath().orElse(null);
+        final Path bootClassPath = javaService.getBootClassPath();
 
         if (fileRepo != null) {
             // set the paths in the FileRepo (all three methods can deal with null parameters)

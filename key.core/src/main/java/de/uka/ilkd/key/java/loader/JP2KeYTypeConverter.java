@@ -14,7 +14,7 @@ import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -59,19 +59,7 @@ public class JP2KeYTypeConverter {
      */
     private CreateArrayMethodBuilder arrayMethodBuilder;
 
-    /**
-     * The type converter provides methods on key types.
-     * <p>
-     * set by the constructor
-     */
-    private final TypeConverter typeConverter;
-
-    /**
-     * the namespaces to store new types to.
-     * <p>
-     * set by the constructor
-     */
-    private final NamespaceSet namespaces;
+    private final Services services;
 
     /**
      * The associated Recoder<->KeY object
@@ -86,16 +74,23 @@ public class JP2KeYTypeConverter {
     public JP2KeYTypeConverter(Services services, TypeSolver typeSolver, KeYJPMapping jp2KeY) {
         this.jp2KeY = jp2KeY;
         this.typeSolver = typeSolver;
-        this.typeConverter = services.getTypeConverter();
-        this.namespaces = services.getNamespaces();
+        this.services = services;
     }
 
     public TypeConverter getTypeConverter() {
-        return typeConverter;
+        return services.getTypeConverter();
+    }
+
+    private Namespace<Sort> getSortsNamespace() {
+        return services.getNamespaces().sorts();
     }
 
     private void storeInCache(ResolvedType t, KeYJavaType kjt) {
         jp2KeY.put(t, kjt);
+    }
+
+    public void validate() {
+        assert __objectType != null && __objectType.getJavaType() != null;
     }
 
     /**
@@ -168,7 +163,7 @@ public class JP2KeYTypeConverter {
         // initialized by
         // this step
         var primitiveType = PrimitiveType.getPrimitiveType(type.describe());
-        var result = typeConverter.getKeYJavaType(primitiveType);
+        var result = getTypeConverter().getKeYJavaType(primitiveType);
         var sort = result.getSort();
         if (sort == null) {
             throw new RuntimeException("Cannot assign " + description + " a primitive sort.");
@@ -177,12 +172,12 @@ public class JP2KeYTypeConverter {
     }
 
     private void addNullType(ResolvedType type) {
-        var sort = namespaces.sorts().lookup(NullSort.NAME);
+        var sort = getSortsNamespace().lookup(NullSort.NAME);
         if (sort == null) {
             sort = new NullSort(getObjectType().getSort());
         }
-        if (namespaces.sorts().lookup(sort.name()) == null) {
-            namespaces.sorts().add(sort);
+        if (getSortsNamespace().lookup(sort.name()) == null) {
+            getSortsNamespace().add(sort);
         }
         storeInCache(type, new KeYJavaType(NullType.JAVA_NULL, sort));
     }
@@ -199,8 +194,8 @@ public class JP2KeYTypeConverter {
         var arraySort = ArraySort.getArraySort(kjt.getSort(), elemType, getObjectType().getSort(),
             getCloneableType().getSort(), getSerializableType().getSort());
         var result = new KeYJavaType(arraySort);
-        if (namespaces.sorts().lookup(arraySort.name()) == null) {
-            namespaces.sorts().add(arraySort);
+        if (getSortsNamespace().lookup(arraySort.name()) == null) {
+            getSortsNamespace().add(arraySort);
         }
 
         storeInCache(type, result);
@@ -235,7 +230,7 @@ public class JP2KeYTypeConverter {
             storeInCache(type, ((ResolvedLogicalType) ref).getKeYJavaType());
             return;
         }
-        var sort = namespaces.sorts().lookup(new Name(type.describe()));
+        var sort = getSortsNamespace().lookup(new Name(type.describe()));
         if (sort == null) {
             if (ref.isInterface()) {
                 sort = createObjectSort(ref, directSuperSorts(ref).add(getObjectType().getSort()));
@@ -244,8 +239,8 @@ public class JP2KeYTypeConverter {
             }
         }
 
-        if (namespaces.sorts().lookup(sort.name()) == null) {
-            namespaces.sorts().add(sort);
+        if (getSortsNamespace().lookup(sort.name()) == null) {
+            getSortsNamespace().add(sort);
         }
         // Important: javaType is null until being set by visiting the class/interface/enum
         // declaration!
@@ -440,7 +435,7 @@ public class JP2KeYTypeConverter {
 
     private void initArrayMethodBuilder() {
         final KeYJavaType integerType = getKeYJavaType(ResolvedPrimitiveType.INT);
-        final HeapLDT heapLDT = typeConverter.getHeapLDT();
+        final HeapLDT heapLDT = getTypeConverter().getHeapLDT();
         Sort heapSort = heapLDT == null ? Sort.ANY : heapLDT.targetSort();
         int heapCount = (heapLDT == null) ? 1 : (heapLDT.getAllHeaps().size() - 1);
         arrayMethodBuilder =

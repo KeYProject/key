@@ -43,18 +43,14 @@ public class KeYProgModelInfo {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KeYProgModelInfo.class);
 
-    private final Services services;
     private final KeYJPMapping mapping;
     private final JP2KeYTypeConverter typeConverter;
     private final Map<KeYJavaType, Map<String, IProgramMethod>> implicits = new LinkedHashMap<>();
 
-    public KeYProgModelInfo(Services services, KeYJPMapping mapping,
-            JP2KeYTypeConverter typeConverter) {
-        this.services = services;
-        this.typeConverter = typeConverter;
-        this.mapping = mapping;
+    public KeYProgModelInfo(JavaService service) {
+        this.typeConverter = service.getTypeConverter();
+        this.mapping = service.getMapping();
     }
-
 
     public KeYJPMapping rec2key() {
         return mapping;
@@ -598,10 +594,5 @@ public class KeYProgModelInfo {
     private void putImplicitMethod(IProgramMethod m, KeYJavaType t) {
         Map<String, IProgramMethod> map = implicits.computeIfAbsent(t, k -> new LinkedHashMap<>());
         map.put(m.name().toString(), m);
-    }
-
-
-    public KeYProgModelInfo copy() {
-        return new KeYProgModelInfo(services, rec2key().copy(), typeConverter);
     }
 }

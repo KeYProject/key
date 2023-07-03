@@ -40,7 +40,7 @@ public final class JavaInfo {
 
 
     private final Services services;
-    private KeYProgModelInfo kpmi;
+    private final KeYProgModelInfo kpmi;
 
     /**
      * the type of null
@@ -108,11 +108,6 @@ public final class JavaInfo {
         services = s;
     }
 
-    private JavaInfo(JavaInfo proto, Services s) {
-        this(proto.getKeYProgModelInfo().copy(), s);
-        nullType = proto.getNullType();
-    }
-
     /**
      * returns the underlying KeYProgModelInfo providing access to the Recoder structures.
      */
@@ -126,17 +121,6 @@ public final class JavaInfo {
      */
     public KeYJPMapping rec2key() {
         return getKeYProgModelInfo().rec2key();
-    }
-
-    /**
-     * copies this JavaInfo and uses the given Services object as the Services object of the copied
-     * JavaInfo
-     *
-     * @param serv the Services the copy will use and vice versa
-     * @return a copy of the JavaInfo
-     */
-    public JavaInfo copy(Services serv) {
-        return new JavaInfo(this, serv);
     }
 
     /**
@@ -204,14 +188,18 @@ public final class JavaInfo {
         var types = kpmi.rec2key().keYTypes();
         nameCachedSize = types.size();
         name2KJTCache = new LinkedHashMap<>();
+        Arrays.fill(commonTypes, null);
         for (final KeYJavaType type : types) {
             if (type.getJavaType() instanceof ArrayType) {
                 final ArrayType at = (ArrayType) type.getJavaType();
-                name2KJTCache.put(at.getFullName(), type);
-                name2KJTCache.put(at.getAlternativeNameRepresentation(), type);
+                var old = name2KJTCache.put(at.getFullName(), type);
+                assert old == null;
+                old = name2KJTCache.put(at.getAlternativeNameRepresentation(), type);
+                assert old == null;
             } else {
                 var name = getFullName(type);
-                name2KJTCache.put(name, type);
+                var old = name2KJTCache.put(name, type);
+                assert old == null;
             }
         }
     }

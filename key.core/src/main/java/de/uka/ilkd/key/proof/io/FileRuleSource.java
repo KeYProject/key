@@ -3,6 +3,7 @@ package de.uka.ilkd.key.proof.io;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -21,7 +22,13 @@ public class FileRuleSource extends RuleSource {
 
     FileRuleSource(Path ruleFile) {
         this.ruleFile = Objects.requireNonNull(ruleFile);
-        numberOfChars = ruleFile.toFile().length();
+        long size;
+        try {
+            size = Files.size(ruleFile);
+        } catch (IOException e) {
+            size = 0;
+        }
+        numberOfChars = size;
     }
 
     @Override

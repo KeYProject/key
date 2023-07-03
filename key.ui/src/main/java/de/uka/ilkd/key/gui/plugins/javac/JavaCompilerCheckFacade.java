@@ -58,7 +58,7 @@ public class JavaCompilerCheckFacade {
     @Nonnull
     public static CompletableFuture<List<PositionedIssueString>> check(
             ProblemInitializer.ProblemInitializerListener listener,
-            File bootClassPath, List<File> classPath, File javaPath) {
+            Path bootClassPath, List<Path> classPath, Path javaPath) {
         if (Boolean.getBoolean("KEY_JAVAC_DISABLE")) {
             LOGGER.info("Javac check is disabled by system property -PKEY_JAVAC_DISABLE");
             return CompletableFuture.completedFuture(Collections.emptyList());
@@ -83,7 +83,7 @@ public class JavaCompilerCheckFacade {
         List<String> classes = new ArrayList<>();
 
         // gather configured bootstrap classpath and regular classpath
-        List<File> paths = new ArrayList<>();
+        List<Path> paths = new ArrayList<>();
         if (bootClassPath != null) {
             paths.add(bootClassPath);
         }
@@ -92,11 +92,11 @@ public class JavaCompilerCheckFacade {
         }
         paths.add(javaPath);
         ArrayList<Path> files = new ArrayList<>();
-        for (File path : paths) {
-            if (!path.isDirectory()) {
+        for (Path path : paths) {
+            if (!Files.isDirectory(path)) {
                 continue;
             }
-            try (var s = Files.walk(path.toPath())) {
+            try (var s = Files.walk(path)) {
                 s.filter(f -> !Files.isDirectory(f))
                         .filter(f -> f.getFileName().toString().endsWith(".java"))
                         .forEachOrdered(files::add);
@@ -121,7 +121,7 @@ public class JavaCompilerCheckFacade {
                 it -> new PositionedIssueString(
                     it.getMessage(Locale.ENGLISH),
                     new Location(
-                        fileManager.asPath(it.getSource()).toFile().toPath().toUri(),
+                        fileManager.asPath(it.getSource()).toUri(),
                         Position.newOneBased((int) it.getLineNumber(),
                             (int) it.getColumnNumber())),
                     it.getCode() + " " + it.getKind()))

@@ -78,15 +78,7 @@ public class KeYJPMapping {
         this.packageNames = new LinkedHashSet<>(o.packageNames);
         this.superArrayType = o.superArrayType;
         this.parsedSpecial = o.parsedSpecial;
-    }
-
-    /**
-     * returns a matching ModelElement (KeY) to a given recoder.ModelElement
-     *
-     * @param pe a recoder.ModelElement
-     */
-    public Object typeToKeY(Node pe) {
-        return map.get(pe);
+        this.parsingLibraries = o.parsingLibraries;
     }
 
     /**
@@ -137,15 +129,15 @@ public class KeYJPMapping {
     }
 
     public Set<Object> elemsKeY() {
-        return revMap.keySet();
+        return Collections.unmodifiableSet(revMap.keySet());
     }
 
     public Collection<KeYJavaType> keYTypes() {
-        return this.typeMap.values();
+        return Collections.unmodifiableCollection(this.typeMap.values());
     }
 
     public Set<Node> elemsRec() {
-        return map.keySet();
+        return Collections.unmodifiableSet(map.keySet());
     }
 
     public void setSuperArrayType(KeYJavaType superArrayType) {
@@ -193,7 +185,6 @@ public class KeYJPMapping {
     public int size() {
         return map.size();
     }
-
 
     /**
      * As long as we do not support lemmata we need the source code of

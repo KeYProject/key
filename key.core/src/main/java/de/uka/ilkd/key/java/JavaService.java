@@ -106,6 +106,48 @@ public class JavaService {
     private final JavaParserFactory programFactory;
 
     /**
+     * the File object that describes the directory from which the internal
+     * classes are to be read. They are read in differently - therefore the
+     * second category. A null value indicates that the boot classes are to
+     * be read from an internal repository.
+     */
+    @Nonnull
+    private final Path bootClassPath;
+
+
+    /**
+     * A list of {@link File} objects that describes the classpath to be searched
+     * for classes or Java files.
+     */
+    @Nonnull
+    private final Collection<Path> libraryPath;
+
+    public JavaService(Services services, @Nonnull Path bootClassPath,
+            @Nonnull Collection<Path> libraryPath) {
+        this.services = services;
+        this.mapping = new KeYJPMapping();
+        this.bootClassPath = bootClassPath;
+        this.libraryPath = libraryPath;
+        programFactory = new JavaParserFactory(services);
+        typeConverter = new JP2KeYTypeConverter(services, programFactory.getTypeSolver(), mapping);
+        converter = new JP2KeYConverter(services, mapping, new Namespace<>(), typeConverter);
+    }
+
+    private JavaService(JavaService o, Services services) {
+        this.services = services;
+        this.bootClassPath = o.bootClassPath;
+        this.libraryPath = o.libraryPath;
+        this.mapping = o.mapping.copy();
+        programFactory = o.programFactory.copy(services);
+        typeConverter = new JP2KeYTypeConverter(services, programFactory.getTypeSolver(), mapping);
+        converter = new JP2KeYConverter(services, mapping, new Namespace<>(), typeConverter);
+    }
+
+    public JavaService copy(Services services) {
+        return new JavaService(this, services);
+    }
+
+    /**
      * return the associated converter object
      *
      * @return not null
@@ -119,8 +161,24 @@ public class JavaService {
      *
      * @return not null
      */
+    @Nonnull
     public JP2KeYTypeConverter getTypeConverter() {
         return typeConverter;
+    }
+
+    @Nonnull
+    public KeYJPMapping getMapping() {
+        return mapping;
+    }
+
+    @Nonnull
+    public Path getBootClassPath() {
+        return bootClassPath;
+    }
+
+    @Nonnull
+    public Collection<Path> getLibraryPath() {
+        return Collections.unmodifiableCollection(libraryPath);
     }
 
     private static BuildingIssue buildingIssueFromProblem(Problem problem) {
@@ -217,10 +275,6 @@ public class JavaService {
 
     // ----- parsing libraries
 
-    public void setClassPath(Path bootClassPath) {
-        programFactory.setBootClassPath(bootClassPath);
-    }
-
     /**
      * This method loads the internal classes - also called the "boot" classes.
      * <p>
@@ -239,17 +293,11 @@ public class JavaService {
      */
     private List<CompilationUnit> parseBootClasses(FileRepo fileRepo) throws IOException {
         List<URI> paths;
-
-        if (programFactory.getBootClassPath().isEmpty()) {
-            var bootCollection = new JavaReduxFileCollection(services.getProfile());
-            paths = bootCollection.getResources().collect(Collectors.toList());
-        } else {
-            try (var stream = Files.walk(programFactory.getBootClassPath().get())) {
-                paths = stream.filter(it -> {
-                    var name = it.getFileName().toString();
-                    return name.endsWith(".java") || name.endsWith(".jml");
-                }).map(Path::toUri).collect(Collectors.toList());
-            }
+        try (var stream = Files.walk(bootClassPath)) {
+            paths = stream.filter(it -> {
+                var name = it.getFileName().toString();
+                return name.endsWith(".java") || name.endsWith(".jml");
+            }).map(Path::toUri).collect(Collectors.toList());
         }
 
         List<Pair<Path, ParseResult<CompilationUnit>>> compilationUnits = paths.stream()
@@ -299,7 +347,7 @@ public class JavaService {
      */
     private List<CompilationUnit> parseLibraryClasses(FileRepo fileRepo) throws IOException {
         List<FileCollection> sources = new ArrayList<>();
-        for (var cp : programFactory.getSourcePaths()) {
+        for (var cp : libraryPath) {
             if (Files.isDirectory(cp)) {
                 sources.add(new DirectoryFileCollection(cp.toFile()));
             } else {
@@ -466,6 +514,8 @@ public class JavaService {
             for (var type : ResolvedPrimitiveType.values()) {
                 typeConverter.getKeYJavaType(type);
             }
+
+            typeConverter.validate();
 
             /*
              * TODO weigl
@@ -816,15 +866,6 @@ public class JavaService {
     }
 
     // ----- error handling
-    public JavaService(Services services, KeYJPMapping mapping, Path bootClassPath,
-            Collection<Path> sourcePaths) {
-        this.services = services;
-        this.mapping = mapping;
-        programFactory = new JavaParserFactory(services, bootClassPath, sourcePaths);
-        typeConverter = new JP2KeYTypeConverter(services, programFactory.getTypeSolver(), mapping);
-        converter = new JP2KeYConverter(services, mapping, new Namespace<>(), typeConverter);
-    }
-
 
     public JavaParserFactory getProgramFactory() {
         return programFactory;
