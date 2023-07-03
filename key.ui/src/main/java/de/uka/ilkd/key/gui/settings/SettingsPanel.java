@@ -32,8 +32,20 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     private static final long serialVersionUID = 3465371513326517504L;
 
     protected SettingsPanel() {
-        pCenter.setLayout(new MigLayout(new LC().fillX().wrapAfter(3), new AC().count(3).fill(1)
-                .grow(1000f, 1).size("16px", 2).grow(0f, 0).align("right", 0)));
+        pCenter.setLayout(new MigLayout(
+            // set up rows:
+            new LC().fillX()
+                    // remove the padding after the help icon
+                    .insets(null, null, null, "0").wrapAfter(3),
+            // set up columns:
+            new AC().count(3).fill(1)
+                    // label column does not grow
+                    .grow(0f, 0)
+                    // input area does grow
+                    .grow(1000f, 1)
+                    // help icon always has the same size
+                    .size("16px", 2)
+                    .align("right", 0)));
     }
 
     /**

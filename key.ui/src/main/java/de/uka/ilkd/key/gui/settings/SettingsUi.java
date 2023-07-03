@@ -121,6 +121,12 @@ public class SettingsUi extends JPanel {
         return p;
     }
 
+    /**
+     * Configure the settings providers to display. Calculates the maximum width of the settings UI.
+     *
+     * @param providers settings providers
+     * @return maximum width of the dialog
+     */
     public int setSettingsProvider(List<SettingsProvider> providers) {
         SettingsTreeNode root = new SettingsTreeNode(providers);
         treeModel = new DefaultTreeModel(root);
