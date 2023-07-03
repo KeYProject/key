@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.proof.ProofAggregate;
 
 

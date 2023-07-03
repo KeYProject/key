@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
-import de.uka.ilkd.key.java.JavaParserFactory;
+import de.uka.ilkd.key.java.loader.JavaParserFactory;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
 

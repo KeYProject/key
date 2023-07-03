@@ -5,7 +5,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import javax.annotation.Nonnull;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nparser.ChoiceInformation;
 import de.uka.ilkd.key.nparser.KeyAst;

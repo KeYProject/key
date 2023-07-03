@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.statement.Break;
+import de.uka.ilkd.key.java.ast.statement.Break;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 class BreakToBeReplaced {

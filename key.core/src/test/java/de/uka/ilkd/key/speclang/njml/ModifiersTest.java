@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import de.uka.ilkd.key.java.JavaService;
-import de.uka.ilkd.key.java.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.rule.TacletForTests;
 

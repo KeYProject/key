@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.rule.inst;
 
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 
 import org.key_project.util.collection.ImmutableArray;

@@ -5,16 +5,17 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.expression.operator.LessThan;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.expression.operator.LessThan;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.statement.IGuard;
+import de.uka.ilkd.key.java.ast.statement.While;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -88,7 +89,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
 
         // try to retrieve a loop index variable
-        de.uka.ilkd.key.java.statement.IGuard guard = loop.getGuard();
+        IGuard guard = loop.getGuard();
         // the guard is expected to be of the form "i < x" and we want to retrieve "i".
         assert guard.getChildCount() == 1 : "child count: " + guard.getChildCount();
         ProgramElement guardStatement = guard.getChildAt(0);

@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 
 /**
  * this class describes the position of a statement in a program.

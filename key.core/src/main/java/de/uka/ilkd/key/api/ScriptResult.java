@@ -3,7 +3,7 @@ package de.uka.ilkd.key.api;
 import java.util.List;
 import java.util.Set;
 
-import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.proof.Node;
 
 /**

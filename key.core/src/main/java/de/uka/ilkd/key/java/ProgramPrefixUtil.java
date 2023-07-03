@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 
 public class ProgramPrefixUtil {

@@ -1,17 +1,21 @@
 package de.uka.ilkd.key.pp;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.expression.*;
-import de.uka.ilkd.key.java.expression.Operator;
-import de.uka.ilkd.key.java.expression.literal.*;
-import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
-import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.ccatch.*;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
+import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
+import de.uka.ilkd.key.java.ast.expression.literal.*;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqGet;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqLength;
+import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramPrefix;
@@ -302,12 +306,12 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnSingleton(de.uka.ilkd.key.java.expression.operator.adt.Singleton x) {
+    public void performActionOnSingleton(Singleton x) {
         printDLFunctionOperator("\\singleton", x);
     }
 
     @Override
-    public void performActionOnSetUnion(de.uka.ilkd.key.java.expression.operator.adt.SetUnion x) {
+    public void performActionOnSetUnion(SetUnion x) {
         printDLFunctionOperator("\\set_union", x);
     }
 
@@ -317,19 +321,19 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnSetMinus(de.uka.ilkd.key.java.expression.operator.adt.SetMinus x) {
+    public void performActionOnSetMinus(SetMinus x) {
         printDLFunctionOperator("\\set_minus", x);
     }
 
 
     @Override
-    public void performActionOnAllFields(de.uka.ilkd.key.java.expression.operator.adt.AllFields x) {
+    public void performActionOnAllFields(AllFields x) {
         printDLFunctionOperator("\\all_fields", x);
     }
 
     @Override
     public void performActionOnAllObjects(
-            de.uka.ilkd.key.java.expression.operator.adt.AllObjects x) {
+            AllObjects x) {
         printDLFunctionOperator("\\all_objects", x);
     }
 
@@ -354,29 +358,29 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnSeqSingleton(
-            de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton x) {
+            SeqSingleton x) {
         printDLFunctionOperator("\\seq_singleton", x);
     }
 
     @Override
-    public void performActionOnSeqConcat(de.uka.ilkd.key.java.expression.operator.adt.SeqConcat x) {
+    public void performActionOnSeqConcat(SeqConcat x) {
         printDLFunctionOperator("\\singleton", x);
     }
 
     @Override
     public void performActionOnSeqIndexOf(
-            de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf x) {
+            SeqIndexOf x) {
         printDLFunctionOperator("\\indexOf", x);
     }
 
     @Override
-    public void performActionOnSeqSub(de.uka.ilkd.key.java.expression.operator.adt.SeqSub x) {
+    public void performActionOnSeqSub(SeqSub x) {
         printDLFunctionOperator("\\seq_sub", x);
     }
 
     @Override
     public void performActionOnSeqReverse(
-            de.uka.ilkd.key.java.expression.operator.adt.SeqReverse x) {
+            SeqReverse x) {
         printDLFunctionOperator("\\seq_reverse", x);
     }
 

@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.statement.Break;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.statement.Break;
+import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**

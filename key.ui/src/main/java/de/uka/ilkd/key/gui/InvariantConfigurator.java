@@ -11,7 +11,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;

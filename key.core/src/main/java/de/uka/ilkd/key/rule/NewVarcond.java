@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 /**

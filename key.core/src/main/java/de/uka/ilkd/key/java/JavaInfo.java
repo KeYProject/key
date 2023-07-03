@@ -3,12 +3,16 @@ package de.uka.ilkd.key.java;
 import java.util.*;
 import javax.annotation.Nullable;
 
-import de.uka.ilkd.key.java.abstraction.*;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.abstraction.*;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -65,8 +69,8 @@ public final class JavaInfo {
      * The default execution context is for the case of program statements on the top level. It is
      * equivalent to a static class belonging the default package. This should only be used when
      * using KeY in academic mode, if the verification conditions are generated they "must" start
-     * with a {@link de.uka.ilkd.key.java.statement.MethodBodyStatement} or a
-     * {@link de.uka.ilkd.key.java.statement.MethodFrame}, which contains a valid execution context.
+     * with a {@link MethodBodyStatement} or a
+     * {@link MethodFrame}, which contains a valid execution context.
      */
     private ExecutionContext defaultExecutionContext;
 
@@ -154,7 +158,7 @@ public final class JavaInfo {
     // ------------------- common services ----------------------
 
     /**
-     * returns the full name of a given {@link de.uka.ilkd.key.java.abstraction.KeYJavaType}.
+     * returns the full name of a given {@link KeYJavaType}.
      *
      * @param t the KeYJavaType including the package prefix
      * @return the full name

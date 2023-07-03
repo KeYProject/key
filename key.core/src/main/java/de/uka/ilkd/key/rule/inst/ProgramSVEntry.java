@@ -2,7 +2,7 @@ package de.uka.ilkd.key.rule.inst;
 
 import java.io.Serializable;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 /**

@@ -3,7 +3,8 @@ package de.uka.ilkd.key.speclang;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.init.ContractPO;
@@ -76,7 +77,7 @@ public class FunctionalLoopContract extends FunctionalAuxiliaryContract<LoopCont
      *
      * @param services services.
      *
-     * @see LoopContract#replaceEnhancedForVariables(de.uka.ilkd.key.java.StatementBlock, Services)
+     * @see LoopContract#replaceEnhancedForVariables(StatementBlock, Services)
      */
     public void replaceEnhancedForVariables(Services services) {
         setAuxiliaryContract(getAuxiliaryContract()

@@ -4,8 +4,8 @@ import java.io.File;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TestJavaInfo;
-import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
-import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.DoubleLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.FloatLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;

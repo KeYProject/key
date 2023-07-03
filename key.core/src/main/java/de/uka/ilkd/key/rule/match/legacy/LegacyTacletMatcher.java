@@ -2,10 +2,10 @@ package de.uka.ilkd.key.rule.match.legacy;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.java.ContextStatementBlock;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceData;
+import de.uka.ilkd.key.java.ast.ContextStatementBlock;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceData;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.Sequent;

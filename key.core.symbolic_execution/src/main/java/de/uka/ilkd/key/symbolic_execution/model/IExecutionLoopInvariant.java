@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.statement.While;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopInvariant;

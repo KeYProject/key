@@ -2,7 +2,7 @@ package de.uka.ilkd.key.proof;
 
 import java.net.URI;
 
-import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 
 import org.key_project.util.collection.DefaultImmutableSet;

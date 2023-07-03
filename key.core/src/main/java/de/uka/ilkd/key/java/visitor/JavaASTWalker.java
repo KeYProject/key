@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 
 /**
  * walks through a java AST in depth-left-fist-order at default. Implementing method doAction

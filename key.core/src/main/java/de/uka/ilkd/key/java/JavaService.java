@@ -11,11 +11,17 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.Modifier;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.TypeScope;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.ast.declaration.Modifier;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.loader.JP2KeYConverter;
+import de.uka.ilkd.key.java.loader.JP2KeYTypeConverter;
+import de.uka.ilkd.key.java.loader.JavaParserFactory;
+import de.uka.ilkd.key.java.loader.JavaReduxFileCollection;
 import de.uka.ilkd.key.java.transformations.KeYJavaPipeline;
 import de.uka.ilkd.key.java.transformations.pipeline.ConstantStringExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
@@ -168,7 +174,7 @@ public class JavaService {
      * @param repo the repo to use for reading
      * @return a KeY structured compilation unit.
      */
-    public de.uka.ilkd.key.java.CompilationUnit readCompilationUnit(Path file, FileRepo repo)
+    public de.uka.ilkd.key.java.ast.CompilationUnit readCompilationUnit(Path file, FileRepo repo)
             throws IOException {
         parseSpecialClasses();
         // TODO javaparser problem: method used in foreach loop, pipeline should be used with all
@@ -185,7 +191,7 @@ public class JavaService {
      * @param text a string represents a compilation unit
      * @return a KeY structured compilation unit.
      */
-    public de.uka.ilkd.key.java.CompilationUnit readCompilationUnit(String text) {
+    public de.uka.ilkd.key.java.ast.CompilationUnit readCompilationUnit(String text) {
         parseSpecialClasses();
         LOGGER.debug("Reading {}", trim(text));
         var reader = new StringReader(text);
@@ -603,7 +609,7 @@ public class JavaService {
             var field = new FieldDeclaration(new NodeList<>(), spec);
             classContext.addMember(field);
 
-            var keyField = new de.uka.ilkd.key.java.declaration.FieldDeclaration(
+            var keyField = new de.uka.ilkd.key.java.ast.declaration.FieldDeclaration(
                 new Modifier[0],
                 new TypeRef(var.getKeYJavaType()),
                 new FieldSpecification[] { keySpec },

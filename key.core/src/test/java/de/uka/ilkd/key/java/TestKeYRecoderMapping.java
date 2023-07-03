@@ -53,12 +53,12 @@
 // @Test
 // public void testtoRecoder() {
 // assertEquals(rp, mapping.toRecoder(kp),
-// "Fehler[1] in toRecoder(de.uka.ilkd.key.java.ProgramElement)");
-// // Assert.assertTrue("Fehler[2] in toRecoder(de.uka.ilkd.key.java.ProgramElement)",
+// "Fehler[1] in toRecoder(de.uka.ilkd.key.java.ast.ProgramElement)");
+// // Assert.assertTrue("Fehler[2] in toRecoder(de.uka.ilkd.key.java.ast.ProgramElement)",
 // // null==mapping.toRecoder(kp2));
 // assertEquals(rm, mapping.toRecoder(km),
-// "Fehler[2] in toRecoder(de.uka.ilkd.key.java.ModelElement)");
-// // Assert.assertTrue("Fehler[4] in toRecoder(de.uka.ilkd.key.java.ModelElement)",
+// "Fehler[2] in toRecoder(de.uka.ilkd.key.java.ast.ModelElement)");
+// // Assert.assertTrue("Fehler[4] in toRecoder(de.uka.ilkd.key.java.ast.ModelElement)",
 // // null==mapping.toRecoder(km2));
 // }
 //

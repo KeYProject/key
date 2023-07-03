@@ -19,8 +19,8 @@ The following explanations are adapted from the
 <DL>
 <DT>Source and Program Elements</DT>
 <DD>
-A {@link de.uka.ilkd.key.java.SourceElement} is a syntactical entity and not
-necessary a {@link de.uka.ilkd.key.java.ModelElement}, such as a {@link de.uka.ilkd.key.java.Comment}.
+A {@link de.uka.ilkd.key.java.ast.SourceElement} is a syntactical entity and not
+necessary a {@link de.uka.ilkd.key.java.ast.ModelElement}, such as a {@link de.uka.ilkd.key.java.ast.Comment}.
 <P>
 A {@link de.uka.ilkd.key.java.ProgramElement} is a {@link de.uka.ilkd.key.java.SourceElement}
 and a {@link de.uka.ilkd.key.ModelElement}. It is aware of its parent in the syntax 
@@ -60,21 +60,21 @@ There are a couple of abstractions dealing with properties of being a
 parent node.
 <P>
 These are {@link de.uka.ilkd.key.java.declaration.TypeDeclarationContainer},
-{@link de.uka.ilkd.key.java.ExpressionContainer},
-{@link de.uka.ilkd.key.java.StatementContainer},
-{@link de.uka.ilkd.key.java.ParameterContainer},
-{@link de.uka.ilkd.key.java.NamedProgramElement} and
+{@link de.uka.ilkd.key.java.ast.ExpressionContainer},
+{@link de.uka.ilkd.key.java.ast.StatementContainer},
+{@link de.uka.ilkd.key.java.ast.ParameterContainer},
+{@link de.uka.ilkd.key.java.ast.NamedProgramElement} and
 {@link de.uka.ilkd.key.java.reference.TypeReferenceContainer}.  A
-An {@link de.uka.ilkd.key.java.ExpressionContainer} contains
-{@link de.uka.ilkd.key.java.Expression}s, a
-{@link de.uka.ilkd.key.java.StatementContainer} contains
-{@link de.uka.ilkd.key.java.Statement}s, a
-{@link de.uka.ilkd.key.java.ParameterContainer}
+An {@link de.uka.ilkd.key.java.ast.ExpressionContainer} contains
+{@link de.uka.ilkd.key.java.ast.Expression}s, a
+{@link de.uka.ilkd.key.java.ast.StatementContainer} contains
+{@link de.uka.ilkd.key.java.ast.Statement}s, a
+{@link de.uka.ilkd.key.java.ast.ParameterContainer}
 (either a {@link de.uka.ilkd.key.java.declaration.MethodDeclaration} or a
 {@link de.uka.ilkd.key.java.statement.Catch} statement) contains
 {@link de.uka.ilkd.key.java.declaration.ParameterDeclaration}s.
-A {@link de.uka.ilkd.key.java.NamedProgramElement} is a subtype of
-{@link de.uka.ilkd.key.java.NamedModelElement}.
+A {@link de.uka.ilkd.key.java.ast.NamedProgramElement} is a subtype of
+{@link de.uka.ilkd.key.java.ast.NamedModelElement}.
 A {@link de.uka.ilkd.key.java.reference.TypeReferenceContainer} contains one or 
 several names, but these are names of types that are referred to explicitely 
 by a {@link de.uka.ilkd.key.java.reference.TypeReference}.

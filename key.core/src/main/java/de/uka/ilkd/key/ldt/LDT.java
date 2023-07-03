@@ -4,11 +4,11 @@ import java.util.Map;
 import java.util.TreeMap;
 import javax.annotation.Nullable;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Literal;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
@@ -175,7 +175,8 @@ public abstract class LDT implements Named {
      * @param ec the ExecutionContext in which the expression is evaluated
      * @return true if the LDT offers an operation for the given java operator and the subterms
      */
-    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public abstract boolean isResponsible(
+            de.uka.ilkd.key.java.ast.expression.Operator op, Term[] subs,
             Services services, ExecutionContext ec);
 
 
@@ -190,7 +191,8 @@ public abstract class LDT implements Named {
      * @param ec the ExecutionContext in which the expression is evaluated
      * @return true if the LDT offers an operation for the given java operator and the subterms
      */
-    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left,
+    public abstract boolean isResponsible(
+            de.uka.ilkd.key.java.ast.expression.Operator op, Term left,
             Term right, Services services, ExecutionContext ec);
 
 
@@ -204,7 +206,8 @@ public abstract class LDT implements Named {
      * @param ec the ExecutionContext in which the expression is evaluated
      * @return true if the LDT offers an operation for the given java operator and the subterm
      */
-    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+    public abstract boolean isResponsible(
+            de.uka.ilkd.key.java.ast.expression.Operator op, Term sub,
             TermServices services, ExecutionContext ec);
 
 
@@ -222,7 +225,8 @@ public abstract class LDT implements Named {
      * @return the function symbol for the given operation, null if not supported in general or not
      *         supported for this particular operator.
      */
-    public abstract Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
+    public abstract Function getFunctionFor(
+            de.uka.ilkd.key.java.ast.expression.Operator op,
             Services services, ExecutionContext ec);
 
     /**

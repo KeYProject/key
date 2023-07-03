@@ -2,19 +2,20 @@ package de.uka.ilkd.key.ldt;
 
 import javax.annotation.Nullable;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqReverse;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Literal;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.literal.EmptySeqLiteral;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqConcat;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqGet;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqIndexOf;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqLength;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqReverse;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqSingleton;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqSub;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -110,21 +111,24 @@ public final class SeqLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public boolean isResponsible(
+            Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
         return isResponsible(op, (Term) null, services, ec);
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
+    public boolean isResponsible(
+            Operator op, Term left, Term right,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+    public boolean isResponsible(
+            Operator op, Term sub,
             TermServices services, ExecutionContext ec) {
         return op instanceof SeqSingleton || op instanceof SeqConcat || op instanceof SeqSub
                 || op instanceof SeqReverse || op instanceof SeqIndexOf || op instanceof SeqGet
@@ -140,7 +144,8 @@ public final class SeqLDT extends LDT {
 
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
+    public Function getFunctionFor(
+            Operator op, Services serv,
             ExecutionContext ec) {
         if (op instanceof SeqSingleton) {
             return seqSingleton;

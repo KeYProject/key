@@ -1,17 +1,17 @@
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.TerminalProgramElement;
-import de.uka.ilkd.key.java.expression.ExpressionStatement;
-import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodName;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.Branch;
-import de.uka.ilkd.key.java.statement.IForUpdates;
-import de.uka.ilkd.key.java.statement.IGuard;
-import de.uka.ilkd.key.java.statement.ILoopInit;
+import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.TerminalProgramElement;
+import de.uka.ilkd.key.java.ast.expression.ExpressionStatement;
+import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.MethodName;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.statement.Branch;
+import de.uka.ilkd.key.java.ast.statement.IForUpdates;
+import de.uka.ilkd.key.java.ast.statement.IGuard;
+import de.uka.ilkd.key.java.ast.statement.ILoopInit;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 

@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.ast.Expression;
 
 import org.key_project.util.ExtList;
 

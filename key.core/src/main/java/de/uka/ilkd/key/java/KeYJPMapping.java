@@ -3,7 +3,7 @@ package de.uka.ilkd.key.java;
 import java.util.*;
 import javax.annotation.Nonnull;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.util.Debug;
 
 import com.github.javaparser.ast.Node;

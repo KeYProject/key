@@ -5,13 +5,16 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.abstraction.*;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
-import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.abstraction.*;
+import de.uka.ilkd.key.java.ast.expression.Literal;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
+import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.Singleton;
+import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
 import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
@@ -117,7 +120,8 @@ public final class TypeConverter {
         return LDTs.values();
     }
 
-    private Term translateOperator(de.uka.ilkd.key.java.expression.Operator op,
+    private Term translateOperator(
+            Operator op,
             ExecutionContext ec) {
 
         final Term[] subs = new Term[op.getArity()];
@@ -323,8 +327,8 @@ public final class TypeConverter {
             return convertToLogicElement(((ParenthesizedExpression) pe).getChildAt(0), ec);
         } else if (pe instanceof Instanceof) {
             return convertToInstanceofTerm((Instanceof) pe, ec);
-        } else if (pe instanceof de.uka.ilkd.key.java.expression.Operator) {
-            return translateOperator((de.uka.ilkd.key.java.expression.Operator) pe, ec);
+        } else if (pe instanceof Operator) {
+            return translateOperator((Operator) pe, ec);
         } else {
             assert !(pe instanceof MetaClassReference) : "not supported";
         }
@@ -354,7 +358,7 @@ public final class TypeConverter {
         }
     }
 
-    public static boolean isArithmeticOperator(de.uka.ilkd.key.java.expression.Operator op) {
+    public static boolean isArithmeticOperator(Operator op) {
         return op instanceof Divide || op instanceof Times || op instanceof Plus
                 || op instanceof Minus
                 || op instanceof Modulo || op instanceof ShiftLeft || op instanceof ShiftRight
@@ -952,7 +956,8 @@ public final class TypeConverter {
         return TC;
     }
 
-    private LDT getResponsibleLDT(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    private LDT getResponsibleLDT(
+            Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
         for (LDT ldt : LDTs.values()) {
             if (ldt.isResponsible(op, subs, services, ec)) {

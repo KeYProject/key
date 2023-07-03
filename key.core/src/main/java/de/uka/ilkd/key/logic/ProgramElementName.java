@@ -4,8 +4,9 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.reference.MethodName;
-import de.uka.ilkd.key.java.reference.ReferenceSuffix;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.reference.MethodName;
+import de.uka.ilkd.key.java.ast.reference.ReferenceSuffix;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
 
