@@ -17,7 +17,6 @@ import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.reference.MethodReference;
 import de.uka.ilkd.key.java.ast.statement.*;
-import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;

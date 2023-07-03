@@ -8,7 +8,6 @@ import de.uka.ilkd.key.java.ast.Expression;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
 import de.uka.ilkd.key.java.ast.reference.*;
-import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
