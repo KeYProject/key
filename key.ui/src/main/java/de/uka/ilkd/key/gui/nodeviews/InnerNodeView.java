@@ -51,8 +51,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     public final JTextArea tacletInfo;
 
     private Node node;
-    private Sequent sequent;
-    private RuleApp ruleApp;
+    private final RuleApp ruleApp;
 
     public InnerNodeView(Node node, MainWindow mainWindow) {
         this(node.proof(), node, node.getAppliedRuleApp(), node.sequent(), mainWindow);
@@ -63,7 +62,6 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
         super(mainWindow);
         this.node = node;
         this.ruleApp = ruleApp;
-        this.sequent = sequent;
         proof.addProofDisposedListener(this);
         this.listener = new InnerNodeViewListener(this);
 
@@ -76,8 +74,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
         setBackground(INACTIVE_BACKGROUND_COLOR);
 
         tacletInfo = new JTextArea(
-            TacletDescriber.getTacletDescription(mainWindow.getMediator(),
-                node != null ? node.getAppliedRuleApp() : ruleApp,
+            TacletDescriber.getTacletDescription(mainWindow.getMediator(), ruleApp,
                 SequentView.getLineWidth()));
         tacletInfo.setBackground(getBackground());
         tacletInfo.setBorder(new CompoundBorder(new MatteBorder(3, 0, 0, 0, Color.black),
