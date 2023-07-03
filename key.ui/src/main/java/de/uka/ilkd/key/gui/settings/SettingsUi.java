@@ -3,6 +3,7 @@ package de.uka.ilkd.key.gui.settings;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -139,7 +140,20 @@ public class SettingsUi extends JPanel {
             setSettingsPanel(providers.get(0).getPanel(mainWindow));
         }
         // determine optimal dialog width
-        int w = providers.stream().map(x -> {
+        int w = providers.stream().flatMap(x -> {
+            // collect all children providers
+            List<SettingsProvider> all = new ArrayList<>();
+            List<SettingsProvider> q = List.of(x);
+            while (!q.isEmpty()) {
+                List<SettingsProvider> newQ = new ArrayList<>();
+                for (var provider : q) {
+                    all.add(provider);
+                    newQ.addAll(provider.getChildren());
+                }
+                q = newQ;
+            }
+            return all.stream();
+        }).map(x -> {
             JPanel panel = (JPanel) x.getPanel(mainWindow);
             setSettingsPanel(panel);
             frame.pack();
