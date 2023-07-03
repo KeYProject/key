@@ -1,7 +1,9 @@
 package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.EventObject;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -12,6 +14,8 @@ import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.gui.GUIListener;
+import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
@@ -33,6 +37,9 @@ import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Extension for proof caching.
  *
@@ -43,8 +50,10 @@ import org.key_project.util.collection.ImmutableList;
     experimental = false)
 public class CachingExtension
         implements KeYGuiExtension, KeYGuiExtension.Startup, KeYGuiExtension.ContextMenu,
-        KeYGuiExtension.StatusLine, KeYGuiExtension.Settings,
+        KeYGuiExtension.StatusLine, KeYGuiExtension.Settings, GUIListener,
         KeYSelectionListener, RuleAppListener, ProofDisposedListener, AutoModeListener {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CachingExtension.class);
 
     /**
      * The mediator.
@@ -106,12 +115,18 @@ public class CachingExtension
     public void preInit(MainWindow window, KeYMediator mediator) {
         this.mediator = mediator;
         mediator.addKeYSelectionListener(this);
+        mediator.addGUIListener(this);
         mediator.getUI().getProofControl().addAutoModeListener(this);
     }
 
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
 
+    }
+
+    @Override
+    public void shutDown(EventObject e) {
+        CachingDatabase.shutdown();
     }
 
     @Override
@@ -135,6 +150,8 @@ public class CachingExtension
             actions.add(new CopyReferencedProof(mediator, node));
             actions.add(new GotoReferenceAction(mediator, node));
             return actions;
+        } else if (kind.getType() == Proof.class) {
+            return List.of(new AddToDatabaseAction(mediator, (Proof) underlyingObject));
         }
         return new ArrayList<>();
     }
@@ -146,7 +163,6 @@ public class CachingExtension
 
     @Override
     public void autoModeStarted(ProofEvent e) {
-
     }
 
     @Override
@@ -208,6 +224,46 @@ public class CachingExtension
         @Override
         public void proofDisposed(ProofDisposedEvent e) {
 
+        }
+    }
+
+    /**
+     * Action to search for suitable references on a single node.
+     *
+     * @author Arne Keller
+     */
+    static class AddToDatabaseAction extends KeyAction {
+        /**
+         * The mediator.
+         */
+        private final KeYMediator mediator;
+        /**
+         * The node to try to close by reference.
+         */
+        private final Proof proof;
+
+        /**
+         * Construct new action.
+         *
+         * @param mediator the mediator
+         * @param proof the proof
+         */
+        public AddToDatabaseAction(KeYMediator mediator, Proof proof) {
+            this.mediator = mediator;
+            this.proof = proof;
+            setName("Add to database of cached proofs");
+            setEnabled(proof.closed());
+            setMenuPath("Proof Caching");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                CachingDatabase.addProof(proof);
+            } catch (IOException err) {
+                LOGGER.error("failed to add proof to database ", err);
+                IssueDialog.showExceptionDialog(MainWindow.getInstance(), err);
+            }
         }
     }
 
@@ -301,5 +357,15 @@ public class CachingExtension
     @Override
     public SettingsProvider getSettings() {
         return new CachingSettingsProvider();
+    }
+
+    @Override
+    public void modalDialogOpened(EventObject e) {
+
+    }
+
+    @Override
+    public void modalDialogClosed(EventObject e) {
+
     }
 }
