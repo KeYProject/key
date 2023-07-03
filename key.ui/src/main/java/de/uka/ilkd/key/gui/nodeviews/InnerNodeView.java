@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -156,6 +157,28 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
             // something concerning highlighting does not work in the future, here could
             // be a starting place to find the mistake.
             getHighlighter().addHighlight(r.start() + 1, r.end() + 1, light);
+
+            // scroll the active formula into view
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    ImmutableList<Integer> pathTop =
+                        posTable.pathForPosition(pos.topLevel(), getFilter());
+                    if (pathTop == null) {
+                        return;
+                    }
+                    Range rFormula = posTable.rangeForPath(pathTop);
+                    setCaretPosition(rFormula.start());
+                    Rectangle2D rect = modelToView2D(rFormula.start() + 2);
+                    Rectangle visible = getVisibleRect();
+                    if (rect != null && visible != null
+                            && !visible.contains(rect.getMinX(), rect.getMinY())) {
+                        MainWindow.getInstance().scrollTo((int) rect.getMinY());
+                    }
+                } catch (BadLocationException e) {
+                    // ignore, should never happen
+                }
+            });
+
             return r;
         } else {
             return null;
