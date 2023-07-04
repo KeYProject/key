@@ -167,15 +167,25 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
                         return;
                     }
                     Range rFormula = posTable.rangeForPath(pathTop);
-                    setCaretPosition(rFormula.start());
-                    Rectangle2D rect = modelToView2D(rFormula.start() + 2);
+                    Rectangle2D rect = modelToView2D(rFormula.start() + 1);
+                    Rectangle2D rectTerm = modelToView2D(r.start() + 1);
+
                     Rectangle visible = getVisibleRect();
                     if (rect != null && visible != null
-                            && !visible.contains(rect.getMinX(), rect.getMinY())) {
-                        MainWindow.getInstance().scrollTo((int) rect.getMinY());
+                            && !visible.contains(rectTerm.getMinX(), rectTerm.getMinY())) {
+                        // scroll into view: first check if the sub-term is visible if we would
+                        // scroll to the top of the sequent formula
+                        if (rectTerm.getMinY() - rect.getMinY() > visible.getHeight()) {
+                            // it isn't: center the sub-term in view
+                            int y = (int) (rectTerm.getMinY() - visible.getHeight() / 2.0);
+                            MainWindow.getInstance().scrollTo(y);
+                        } else {
+                            // it is: scroll to the sequent formula
+                            MainWindow.getInstance().scrollTo((int) rect.getMinY());
+                        }
                     }
                 } catch (BadLocationException e) {
-                    // ignore, should never happen
+                    LOGGER.warn("could not scroll active formula into view ", e);
                 }
             });
 
