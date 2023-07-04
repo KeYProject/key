@@ -918,7 +918,7 @@ public final class MainWindow extends JFrame {
     /**
      * Create the proof menu.
      *
-     * @param proof a specific proof that the menu should work on, may be null
+     * @param selected a specific proof that the menu should work on, may be null
      * @return the menu
      */
     public JMenu createProofMenu(Proof selected) {
