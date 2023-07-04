@@ -4,12 +4,18 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.*;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.html.HTML;
+import javax.swing.text.html.HTMLDocument;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -32,6 +38,11 @@ public class ShowProofStatistics extends MainWindowAction {
      *
      */
     private static final long serialVersionUID = -8814798230037775905L;
+
+    /**
+     * Regex pattern to check for tooltips in statistics entries.
+     */
+    private static final Pattern TOOLTIP_PATTERN = Pattern.compile(".+\\[tooltip: (.+)]");
 
     public ShowProofStatistics(MainWindow mainWindow) {
         super(mainWindow);
@@ -95,7 +106,7 @@ public class ShowProofStatistics extends MainWindowAction {
         return stats.toString();
     }
 
-    public static String getHTMLStatisticsMessage(Proof proof) {
+    private static String getHTMLStatisticsMessage(Proof proof) {
         int openGoals = proof.openGoals().size();
         long openCachedGoals =
             proof.openGoals().stream().filter(g -> g.node().lookup(ClosedBy.class) != null).count();
@@ -103,6 +114,8 @@ public class ShowProofStatistics extends MainWindowAction {
         StringBuilder stats = new StringBuilder("<html><head>" + "<style type=\"text/css\">"
             + "body {font-weight: normal; text-align: center;}" + "td {padding: 1px;}"
             + "th {padding: 2px; font-weight: bold;}" + "</style></head><body>");
+        // sadly something like: .tooltip {text-decoration: underline dashed;}
+        // is not possible, the underline is solid...
 
         stats.append("<br>");
         if (openCachedGoals > 0 && openGoals > 0) {
@@ -111,8 +124,7 @@ public class ShowProofStatistics extends MainWindowAction {
                     .append(" cached goal").append(openCachedGoals > 1 ? "s." : ".")
                     .append("</strong>");
         } else if (openCachedGoals > 0) {
-            stats.append("<strong>").append(openCachedGoals).append(" cached goal")
-                    .append(openCachedGoals > 1 ? "s." : ".").append("</strong>");
+            stats.append("<strong>").append("Proved (using proof cache).").append("</strong>");
         } else if (openGoals > 0) {
             stats.append("<strong>").append(openGoals).append(" open goal")
                     .append(openGoals > 1 ? "s." : ".").append("</strong>");
@@ -128,8 +140,19 @@ public class ShowProofStatistics extends MainWindowAction {
             if ("".equals(x.second)) {
                 stats.append("<tr><th colspan=\"2\">").append(x.first).append("</th></tr>");
             } else {
-                stats.append("<tr><td>").append(x.first).append("</td><td>").append(x.second)
-                        .append("</td></tr>");
+                if (x.first.contains("[tooltip: ")) {
+                    Matcher m = TOOLTIP_PATTERN.matcher(x.first);
+                    m.find();
+                    String tooltip = m.group(1);
+                    stats.append("<tr><td class='tooltip' title='").append(tooltip).append("'>")
+                            .append(x.first, 0, x.first.indexOf('['))
+                            .append("</td><td>")
+                            .append(x.second)
+                            .append("</td></tr>");
+                } else {
+                    stats.append("<tr><td>").append(x.first).append("</td><td>").append(x.second)
+                            .append("</td></tr>");
+                }
             }
         }
 
@@ -180,7 +203,7 @@ public class ShowProofStatistics extends MainWindowAction {
 
             String stats = ShowProofStatistics.getHTMLStatisticsMessage(proof);
 
-            JEditorPane statisticsPane = new JEditorPane("text/html", stats);
+            JEditorPane statisticsPane = new StatisticsEditorPane("text/html", stats);
             statisticsPane.setEditable(false);
             statisticsPane.setBorder(BorderFactory.createEmptyBorder());
             statisticsPane.setCaretPosition(0);
@@ -268,6 +291,31 @@ public class ShowProofStatistics extends MainWindowAction {
                     assert false;
                 }
             }
+        }
+    }
+
+    /**
+     * Document pane extended to show tooltips for labeled elements.
+     *
+     * @author Arne Keller
+     */
+    private static final class StatisticsEditorPane extends JEditorPane {
+        public StatisticsEditorPane(String type, String text) {
+            super(type, text);
+            ToolTipManager.sharedInstance().registerComponent(this);
+        }
+
+        @Override
+        public String getToolTipText(MouseEvent evt) {
+            int pos = viewToModel2D(evt.getPoint());
+            if (pos >= 0) {
+                HTMLDocument hdoc = (HTMLDocument) getDocument();
+                javax.swing.text.Element e = hdoc.getCharacterElement(pos);
+                AttributeSet a = e.getAttributes();
+
+                return (String) a.getAttribute(HTML.Attribute.TITLE);
+            }
+            return null;
         }
     }
 
