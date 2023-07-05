@@ -8,6 +8,8 @@ import javax.swing.*;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -83,13 +85,16 @@ public class ReferenceSearchButton extends JButton
     public void copyButtonClicked() {
         if (dialog != null) {
             mediator.stopInterface(true);
-            new Thread(() -> mediator.getSelectedProof().copyCachedGoals(null,
+            Proof p = mediator.getSelectedProof();
+            new Thread(() -> p.copyCachedGoals(null,
                 total -> SwingUtilities.invokeLater(() -> dialog.setMaximum(total)),
                 () -> SwingUtilities.invokeLater(() -> {
                     if (dialog.incrementProgress()) {
                         mediator.startInterface(true);
                         dialog.dispose();
                         dialog = null;
+                        new ShowProofStatistics.Window(MainWindow.getInstance(), p)
+                                .setVisible(true);
                     }
                 }))).start();
         }
