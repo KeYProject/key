@@ -428,17 +428,20 @@ public class Services implements TermServices {
         if (bootClassPath != null) {
             path = bootClassPath;
         } else {
-            // TODO weigl: where to put this code. The implementation of services.getProfile() is
-            // stupid.
-            var resourcePath = "JavaRedux/JAVALANG.TXT";
-            var url =
-                KeYResourceManager.getManager().getResourceFile(JavaService.class, resourcePath);
-            try {
-                path = Paths.get(url.toURI()).getParent();
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
-            }
+            path = getReduxPath();
         }
         activateJavaPath(path);
+    }
+
+    public static Path getReduxPath() {
+        // TODO weigl: where to put this code. The implementation of services.getProfile() is
+        // stupid.
+        var resourcePath = "JavaRedux/JAVALANG.TXT";
+        var url = KeYResourceManager.getManager().getResourceFile(JavaService.class, resourcePath);
+        try {
+            return Paths.get(url.toURI()).getParent();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

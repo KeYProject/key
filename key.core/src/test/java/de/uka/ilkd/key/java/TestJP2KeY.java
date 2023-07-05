@@ -123,8 +123,7 @@ public class TestJP2KeY {
     @BeforeEach
     public void setUp() throws URISyntaxException, IOException {
         if (c2k == null) {
-            c2k = new JavaService(TacletForTests.services(), new KeYJPMapping(),
-                null, Collections.emptyList());
+            c2k = TacletForTests.services().getJavaService();
             c2k.parseSpecialClasses(null);
         }
     }

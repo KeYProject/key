@@ -210,10 +210,6 @@ public final class ProblemInitializer {
      * Helper for readEnvInput().
      */
     private void readJava(EnvInput envInput, InitConfig initConfig) throws ProofInputException {
-        // this method must only be called once per init config
-        assert initConfig.getServices().getJavaInfo() == null;
-        assert initConfig.getServices().getJavaModel() == null;
-
         activateInitConfigJava(initConfig, envInput);
         // read Java source and classpath settings
         envInput.setInitConfig(initConfig);
