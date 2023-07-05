@@ -34,6 +34,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleAppUtil;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.UseDependencyContractApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
@@ -169,8 +170,11 @@ public abstract class AbstractProofReplayer {
                         .createApp(pos)).setContract(currContract);
             } else {
                 useContractRule = UseDependencyContractRule.INSTANCE;
+                // copy over the mysterious "step"
+                PosInOccurrence step = findInNewSequent(((UseDependencyContractApp) ruleApp).step(),
+                    currGoal.sequent());
                 contractApp = (((UseDependencyContractRule) useContractRule)
-                        .createApp(pos)).setContract(currContract);
+                        .createApp(pos)).setContract(currContract).setStep(step);
             }
 
             if (contractApp.check(currGoal.proof().getServices()) == null) {
