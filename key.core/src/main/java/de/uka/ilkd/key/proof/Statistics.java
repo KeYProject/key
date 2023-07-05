@@ -284,7 +284,8 @@ public class Statistics {
          * @return 1 if the node is cached, 0 otherwise
          */
         private int cachedBranches(final Node node) {
-            return node.lookup(ClosedBy.class) != null ? 1 : 0;
+            // node has to be an open goal and needs to have cache info
+            return node.getAppliedRuleApp() == null && node.lookup(ClosedBy.class) != null ? 1 : 0;
         }
 
         /**

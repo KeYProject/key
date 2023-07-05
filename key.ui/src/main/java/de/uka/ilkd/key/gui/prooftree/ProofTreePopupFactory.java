@@ -12,6 +12,7 @@ import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.actions.useractions.RunStrategyOnNodeUserAction;
 import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
@@ -23,7 +24,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
-import de.uka.ilkd.key.util.Pair;
 
 public class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
@@ -175,34 +175,8 @@ public class ProofTreePopupFactory {
                             "If you wish to see the statistics "
                                 + "for a proof you have to load one first"));
             } else {
-                int openGoals = 0;
-
-                Iterator<Node> leavesIt = context.invokedNode.leavesIterator();
-                while (leavesIt.hasNext()) {
-                    if (proof.getGoal(leavesIt.next()) != null) {
-                        openGoals++;
-                    }
-                }
-
-                StringBuilder stats;
-                if (openGoals > 0) {
-                    stats =
-                        new StringBuilder(openGoals + " open goal" + (openGoals > 1 ? "s." : "."));
-                } else {
-                    stats = new StringBuilder("Closed.");
-                }
-                stats.append("\n\n");
-
-                for (Pair<String, String> x : context.invokedNode.statistics().getSummary()) {
-                    if ("".equals(x.second)) {
-                        stats.append("\n");
-                    }
-                    stats.append(x.first).append(": ").append(x.second).append("\n");
-                }
-
-                JOptionPane.showMessageDialog(MainWindow.getInstance(), stats.toString(),
-                    "Proof Statistics",
-                    JOptionPane.INFORMATION_MESSAGE);
+                new ShowProofStatistics.Window(MainWindow.getInstance(), context.invokedNode)
+                        .setVisible(true);
             }
         }
     }

@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -22,6 +23,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
@@ -106,11 +108,35 @@ public class ShowProofStatistics extends MainWindowAction {
         return stats.toString();
     }
 
+    private static String getHTMLStatisticsMessage(Node node) {
+        int openGoals = 0;
+        int openCachedGoals = 0;
+
+        Iterator<Node> leavesIt = node.leavesIterator();
+        while (leavesIt.hasNext()) {
+            if (node.proof().getGoal(leavesIt.next()) != null) {
+                if (node.lookup(ClosedBy.class) != null) {
+                    openCachedGoals++;
+                } else {
+                    openGoals++;
+                }
+            }
+        }
+
+        return getHTMLStatisticsMessage(openGoals, openCachedGoals, node.statistics());
+    }
+
     private static String getHTMLStatisticsMessage(Proof proof) {
         int openGoals = proof.openGoals().size();
-        long openCachedGoals =
-            proof.openGoals().stream().filter(g -> g.node().lookup(ClosedBy.class) != null).count();
+        int openCachedGoals =
+            (int) proof.openGoals().stream().filter(g -> g.node().lookup(ClosedBy.class) != null)
+                    .count();
         openGoals -= openCachedGoals;
+        return getHTMLStatisticsMessage(openGoals, openCachedGoals, proof.getStatistics());
+    }
+
+    private static String getHTMLStatisticsMessage(int openGoals, int openCachedGoals,
+            Statistics statistics) {
         StringBuilder stats = new StringBuilder("<html><head>" + "<style type=\"text/css\">"
             + "body {font-weight: normal; text-align: center;}" + "td {padding: 1px;}"
             + "th {padding: 2px; font-weight: bold;}" + "</style></head><body>");
@@ -132,9 +158,15 @@ public class ShowProofStatistics extends MainWindowAction {
             stats.append("<strong>Proved.</strong>");
         }
 
-        stats.append("<br/><br/><table>");
+        stats.append("<br/><br/>");
+        stats.append(getStatisticsTable(statistics));
+        stats.append("</body></html>");
+        return stats.toString();
+    }
 
-        final Statistics s = proof.getStatistics();
+    private static String getStatisticsTable(Statistics s) {
+        StringBuilder stats = new StringBuilder();
+        stats.append("<table>");
 
         for (Pair<String, String> x : s.getSummary()) {
             if ("".equals(x.second)) {
@@ -178,7 +210,7 @@ public class ShowProofStatistics extends MainWindowAction {
             }
         }
 
-        stats.append("</table></body></html>");
+        stats.append("</table>");
 
         return stats.toString();
     }
@@ -191,6 +223,7 @@ public class ShowProofStatistics extends MainWindowAction {
     public static final class Window extends JDialog {
 
         private static final long serialVersionUID = 1266280148508192284L;
+        private final Proof proof;
 
         /**
          * Creates a new (initially invisible) proof statistics window.
@@ -200,8 +233,27 @@ public class ShowProofStatistics extends MainWindowAction {
          */
         public Window(MainWindow mainWindow, Proof proof) {
             super(mainWindow, "Proof Statistics");
+            this.proof = proof;
 
             String stats = ShowProofStatistics.getHTMLStatisticsMessage(proof);
+            init(mainWindow, stats);
+        }
+
+        /**
+         * Creates a new (initially invisible) proof statistics window.
+         *
+         * @param mainWindow the main windown.
+         * @param node the node for which to show subtree statistics
+         */
+        public Window(MainWindow mainWindow, Node node) {
+            super(mainWindow, "Proof Statistics");
+            this.proof = node.proof();
+
+            String stats = ShowProofStatistics.getHTMLStatisticsMessage(node);
+            init(mainWindow, stats);
+        }
+
+        private void init(MainWindow mainWindow, String stats) {
 
             JEditorPane statisticsPane = new StatisticsEditorPane("text/html", stats);
             statisticsPane.setEditable(false);
