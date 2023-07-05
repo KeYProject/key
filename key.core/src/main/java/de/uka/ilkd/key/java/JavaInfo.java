@@ -501,7 +501,7 @@ public final class JavaInfo {
      * @return a matching program method
      */
     public IProgramMethod getProgramMethod(KeYJavaType classType, String methodName,
-            Iterable<? extends Type> signature, KeYJavaType context) {
+            Iterable<KeYJavaType> signature, KeYJavaType context) {
         return kpmi.getProgramMethod(classType, methodName, signature, context);
     }
 

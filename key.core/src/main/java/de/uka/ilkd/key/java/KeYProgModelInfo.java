@@ -326,12 +326,9 @@ public class KeYProgModelInfo {
      */
     public IProgramMethod getProgramMethod(
             @Nonnull KeYJavaType ct, String name,
-            Iterable<? extends Type> signature, KeYJavaType context) {
-        if (ct.getJavaType() instanceof ArrayType || context.getJavaType() instanceof ArrayType) {
-            return getImplicitMethod(ct, name);
-        }
-
-        throw new UnsupportedOperationException();
+            Iterable<KeYJavaType> signature, KeYJavaType context) {
+        // TODO javaparser implement resolution with context
+        return getProgramMethod(ct, name, signature);
     }
 
     private List<Field> asKeYFieldsR(Stream<ResolvedFieldDeclaration> rfl) {
