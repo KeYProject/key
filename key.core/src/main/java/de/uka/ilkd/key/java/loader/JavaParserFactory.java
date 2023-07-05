@@ -242,11 +242,13 @@ public class JavaParserFactory {
                     }
                 }
 
-                String localName = unit.getPackageDeclaration()
-                        .map(p -> p.getName().asString())
-                        .filter(name::startsWith)
-                        .map(p -> name.substring(Math.min(name.length(), p.length() + 1)))
-                        .orElse(name);
+                var packageName =
+                    unit.getPackageDeclaration().map(p -> p.getName().asString()).orElse("");
+                if (!name.startsWith(packageName)) {
+                    continue;
+                }
+                String localName =
+                    name.substring(Math.min(name.length(), packageName.length() + 1));
                 var astTypeDeclaration = Navigator.findType(unit, localName);
                 if (astTypeDeclaration.isPresent()) {
                     return SymbolReference

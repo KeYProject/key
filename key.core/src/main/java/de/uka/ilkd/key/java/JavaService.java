@@ -1,10 +1,8 @@
 package de.uka.ilkd.key.java;
 
 import java.io.*;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
@@ -19,10 +17,7 @@ import de.uka.ilkd.key.java.ast.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.ast.declaration.Modifier;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
-import de.uka.ilkd.key.java.loader.JP2KeYConverter;
-import de.uka.ilkd.key.java.loader.JP2KeYTypeConverter;
-import de.uka.ilkd.key.java.loader.JavaParserFactory;
-import de.uka.ilkd.key.java.loader.JavaReduxFileCollection;
+import de.uka.ilkd.key.java.loader.*;
 import de.uka.ilkd.key.java.transformations.KeYJavaPipeline;
 import de.uka.ilkd.key.java.transformations.pipeline.ConstantStringExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
@@ -234,6 +229,7 @@ public class JavaService {
      * @return a KeY structured compilation unit.
      */
     public <E extends Throwable> List<de.uka.ilkd.key.java.ast.CompilationUnit> readCompilationUnits(
+            Path parent,
             Collection<Path> files, FileRepo repo,
             BiFunction<BuildingExceptions, Path, E> exceptionProvider)
             throws IOException, E {
@@ -242,6 +238,9 @@ public class JavaService {
         for (Path file : files) {
             try {
                 var cu = unwrapParseResult(parseCompilationUnit(file, repo));
+                if (cu.getPackageDeclaration().isEmpty()) {
+                    fixupPackageDeclaration(cu, parent.relativize(file).toString());
+                }
                 cus.add(cu);
             } catch (BuildingExceptions e) {
                 throw exceptionProvider.apply(e, file);
@@ -275,13 +274,32 @@ public class JavaService {
 
     // ----- parsing libraries
 
+    private static void fixupPackageDeclaration(CompilationUnit cu, String relativePath) {
+        if (cu.getPackageDeclaration().isPresent()) {
+            return;
+        }
+        if (relativePath == null) {
+            throw new NullPointerException();
+        }
+        var pkg = relativePath;
+        if (pkg.endsWith(".java")) {
+            pkg = pkg.substring(0, pkg.length() - 5);
+        }
+        pkg = pkg.replace('\\', '.').replace('/', '.');
+        var lastDot = pkg.lastIndexOf('.');
+        if (lastDot == -1) {
+            return;
+        }
+        pkg = pkg.substring(0, lastDot);
+        cu.setPackageDeclaration(pkg);
+    }
+
     /**
      * This method loads the internal classes - also called the "boot" classes.
      * <p>
      * If the bootClassPath is set to null, it locates java classes that
      * are stored internally within the jar-file or the binary directory. The
-     * JAVALANG.TXT file lists all files to be loaded. The files are found using
-     * a special {@link JavaReduxFileCollection}.
+     * JAVALANG.TXT file lists all files to be loaded.
      * <p>
      * If, however, the bootClassPath is assigned a value, this is treated
      * as a directory (not a JAR file at the moment) and all files in this
@@ -292,19 +310,18 @@ public class JavaService {
      * @return the compilation units
      */
     private List<CompilationUnit> parseBootClasses(FileRepo fileRepo) throws IOException {
-        List<URI> paths;
+        List<Path> paths;
         try (var stream = Files.walk(bootClassPath)) {
             paths = stream.filter(it -> {
                 var name = it.getFileName().toString();
                 return name.endsWith(".java") || name.endsWith(".jml");
-            }).map(Path::toUri).collect(Collectors.toList());
+            }).collect(Collectors.toList());
         }
 
         List<Pair<Path, ParseResult<CompilationUnit>>> compilationUnits = paths.stream()
                 .filter(Objects::nonNull)
-                .map(it -> {
+                .map(path -> {
                     try {
-                        var path = Paths.get(it);
                         return new Pair<>(path, parseCompilationUnit(path, fileRepo));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
@@ -312,7 +329,13 @@ public class JavaService {
                 }).toList();
 
         if (compilationUnits.stream().allMatch(it -> it.second.isSuccessful())) {
-            return compilationUnits.stream().map(it -> it.second.getResult().get()).toList();
+            return compilationUnits.stream()
+                    .map(it -> {
+                        var cu = it.second.getResult().get();
+                        fixupPackageDeclaration(cu, bootClassPath.relativize(it.first).toString());
+                        return cu;
+                    })
+                    .collect(Collectors.toList());
         }
 
         var errors = compilationUnits.stream()
@@ -321,7 +344,7 @@ public class JavaService {
                     c.first,
                     c.second.getProblems().stream().map(JavaService::buildingIssueFromProblem)
                             .toList()))
-                .toList();
+                .collect(Collectors.toList());
         throw new LibraryParsingException(errors);
     }
 
@@ -349,46 +372,26 @@ public class JavaService {
         List<FileCollection> sources = new ArrayList<>();
         for (var cp : libraryPath) {
             if (Files.isDirectory(cp)) {
-                sources.add(new DirectoryFileCollection(cp.toFile()));
+                sources.add(new DirectoryFileCollection(cp));
             } else {
-                sources.add(new ZipFileCollection(cp.toFile()));
+                sources.add(new ZipFileCollection(cp));
             }
         }
-
-        /*
-         * While the resources are read (and possibly copied) via the FileRepo, the data location
-         * is left as it is. This leaves the line information intact.
-         */
 
         List<CompilationUnit> rcuList = new ArrayList<>();
 
-        // -- read jml files --
+        // -- read files --
         for (FileCollection fc : sources) {
-            FileCollection.Walker walker = fc.createWalker(".jml");
+            FileCollection.Walker walker = fc.createWalker(new String[] { ".jml", ".java" });
             while (walker.step()) {
                 var currentDataLocation = walker.getCurrentLocation();
                 try (InputStream is = walker.openCurrent(fileRepo);
                         Reader isr = new InputStreamReader(is);
                         Reader f = new BufferedReader(isr)) {
                     var cu = unwrapParseResult(programFactory.parseCompilationUnit(f));
+                    fixupPackageDeclaration(cu, walker.getRelativeLocation());
                     cu.setStorage(currentDataLocation);
                     removeCodeFromClasses(cu, false);
-                    rcuList.add(cu);
-                }
-            }
-        }
-
-        // -- read java files --
-        for (FileCollection fc : sources) {
-            FileCollection.Walker walker = fc.createWalker(".java");
-            while (walker.step()) {
-                var currentDataLocation = walker.getCurrentLocation();
-                try (InputStream is = walker.openCurrent(fileRepo);
-                        Reader isr = new InputStreamReader(is);
-                        Reader f = new BufferedReader(isr)) {
-                    var cu = unwrapParseResult(programFactory.parseCompilationUnit(f));
-                    cu.setStorage(currentDataLocation);
-                    removeCodeFromClasses(cu, true);
                     rcuList.add(cu);
                 }
             }
@@ -414,12 +417,6 @@ public class JavaService {
          * }
          * rcuList.addAll(manager.getCompilationUnits());
          */
-
-        var cu = unwrapParseResult(programFactory.parseCompilationUnit(
-            new StringReader("public class " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS +
-                " { public static void " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_METHOD
-                + "() {}  }")));
-        rcuList.add(cu);
         return rcuList;
     }
 
@@ -442,8 +439,9 @@ public class JavaService {
             @Override
             public void visit(MethodDeclaration n, Void arg) {
                 if (!allowed && n.getBody().isPresent()) {
-                    LOGGER.warn("Method body ({}) should not be allowed: {}", n.getNameAsString(),
-                        rcu.getStorage());
+                    LOGGER.warn("Method body of method {} should not be allowed: {}",
+                        n.getNameAsString(),
+                        rcu.getStorage().get().getPath());
                 }
                 n.setBody(null);
             }
@@ -479,8 +477,15 @@ public class JavaService {
         mapping.setParsingLibraries(true);
         try {
             {
-                LOGGER.debug("Parsing internal classes");
+                LOGGER.debug("Parsing internal classes from {}", bootClassPath);
                 var bootClasses = parseBootClasses(fileRepo);
+
+                var defaultCu = unwrapParseResult(programFactory.parseCompilationUnit(
+                    new StringReader("public class " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS +
+                        " { public static void " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_METHOD
+                        + "() {}  }")));
+                bootClasses.add(defaultCu);
+
                 programFactory.setBootClasses(bootClasses);
                 LOGGER.debug("Finished parsing internal classes");
 

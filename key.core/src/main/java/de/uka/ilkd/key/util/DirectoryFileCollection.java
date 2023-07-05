@@ -1,16 +1,13 @@
 package de.uka.ilkd.key.util;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 
@@ -28,7 +25,7 @@ import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 public class DirectoryFileCollection implements FileCollection {
 
     /** directory under inspection */
-    private final File directory;
+    private final Path directory;
 
     /**
      * create a new File collection for a given directory The argument may be a single file also. A
@@ -36,27 +33,8 @@ public class DirectoryFileCollection implements FileCollection {
      *
      * @param directory directory to iterate through,
      */
-    public DirectoryFileCollection(File directory) {
+    public DirectoryFileCollection(Path directory) {
         this.directory = directory;
-    }
-
-    /*
-     * add all files in or under dir to a file list. Extension is tested
-     */
-    private static void addAllFiles(File dir, String extension, List<File> files) {
-        File[] listFiles = dir.listFiles();
-
-        if (listFiles == null) {
-            throw new IllegalArgumentException(dir + " is not a directory or cannot be read!");
-        }
-
-        for (File file : listFiles) {
-            if (file.isDirectory()) {
-                addAllFiles(file, extension, files);
-            } else if (extension == null || file.getName().toLowerCase().endsWith(extension)) {
-                files.add(file);
-            }
-        }
     }
 
     /**
@@ -68,21 +46,21 @@ public class DirectoryFileCollection implements FileCollection {
      *
      * @author gladisch
      */
-    private static void sortFiles(List<File> files) {
+    private static void sortFiles(List<Path> files) {
         for (int a = 0; a < files.size() - 1; a++) {
             for (int b = a + 1; b < files.size(); b++) {
                 if (!(a < b)) {
                     throw new RuntimeException("Incorrect sorting algorithms.");
                 }
-                File fa = files.get(a);
-                File fb = files.get(b);
+                Path fa = files.get(a);
+                Path fb = files.get(b);
 
                 // Check if the path A contains the substring "JAVA/LANG"
-                String pathA = fa.getPath().toUpperCase().replace('\\', '/');
+                String pathA = fa.toString().toUpperCase().replace('\\', '/');
                 boolean A_isObjectClass = pathA.contains("JAVA/LANG/OBJECT.JAVA");
 
                 // Check if the path B contains the substring "JAVA/LANG/OBJECT.JAVA"
-                String pathB = fb.getPath().toUpperCase().replace('\\', '/');
+                String pathB = fb.toString().toUpperCase().replace('\\', '/');
                 boolean B_inJavaLang = pathB.contains("JAVA/LANG");
 
                 // Switch files to ensure the desired order of files
@@ -101,10 +79,7 @@ public class DirectoryFileCollection implements FileCollection {
      * @see de.uka.ilkd.key.util.FileCollection#createWalker(java.lang.String)
      */
     public Walker createWalker(String extension) {
-        List<File> files = new ArrayList<>();
-        addAllFiles(directory, extension, files);
-        sortFiles(files);
-        return new Walker(files.iterator());
+        return createWalker(new String[] { extension });
     }
 
 
@@ -114,9 +89,19 @@ public class DirectoryFileCollection implements FileCollection {
      * @see de.uka.ilkd.key.util.FileCollection#createWalker(java.lang.String[])
      */
     public Walker createWalker(String[] extensions) {
-        List<File> files = new ArrayList<>();
-        for (String extension : extensions) {
-            addAllFiles(directory, extension, files);
+        List<Path> files = new ArrayList<>();
+
+        try (var stream = Files.walk(directory)) {
+            stream.forEach(p -> {
+                for (String extension : extensions) {
+                    if (extension == null
+                            || p.getFileName().toString().toLowerCase().endsWith(extension)) {
+                        files.add(p);
+                    }
+                }
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         sortFiles(files);
         return new Walker(files.iterator());
@@ -126,28 +111,20 @@ public class DirectoryFileCollection implements FileCollection {
      * This class keeps an internal list of files to be iterated that is created at construction
      * time.
      */
-    private static class Walker implements FileCollection.Walker {
+    private class Walker implements FileCollection.Walker {
 
-        private final Iterator<File> iterator;
-        private File currentFile;
+        private final Iterator<Path> iterator;
+        private Path currentFile;
 
-        public Walker(Iterator<File> iterator) {
+        public Walker(Iterator<Path> iterator) {
             this.iterator = iterator;
-        }
-
-        public String getCurrentName() {
-            if (currentFile == null) {
-                throw new NoSuchElementException();
-            } else {
-                return currentFile.getPath();
-            }
         }
 
         public InputStream openCurrent() throws IOException {
             if (currentFile == null) {
                 throw new NoSuchElementException();
             } else {
-                return new FileInputStream(currentFile);
+                return Files.newInputStream(currentFile);
             }
 
         }
@@ -155,7 +132,7 @@ public class DirectoryFileCollection implements FileCollection {
         @Override
         public InputStream openCurrent(FileRepo fileRepo) throws IOException {
             if (fileRepo != null) {
-                return fileRepo.getInputStream(currentFile.toPath());
+                return fileRepo.getInputStream(currentFile);
             } else {
                 return openCurrent(); // fallback without FileRepo
             }
@@ -163,7 +140,7 @@ public class DirectoryFileCollection implements FileCollection {
 
         @Override
         public Path getCurrentLocation() {
-            return currentFile.toPath();
+            return currentFile;
         }
 
         @Override
@@ -182,10 +159,9 @@ public class DirectoryFileCollection implements FileCollection {
             return "file";
         }
 
-        @Nonnull
         @Override
-        public URI getCurrentDataLocation() {
-            return currentFile.toURI();
+        public String getRelativeLocation() {
+            return directory.relativize(currentFile).toString();
         }
     }
 

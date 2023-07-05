@@ -109,9 +109,13 @@ public class KeYProgModelInfo {
     public KeYJavaType resolveType(String shortName, KeYJavaType context) {
         var type = new ClassOrInterfaceType(null, shortName);
         var rt = getCompilationUnit(context).orElseThrow();
-        type.setParentNode(rt);
-        var rtype = type.resolve();
-        return typeConverter.getKeYJavaType(rtype);
+        try {
+            type.setParentNode(rt);
+            var rtype = type.resolve();
+            return typeConverter.getKeYJavaType(rtype);
+        } finally {
+            rt.remove(type);
+        }
     }
 
     private Optional<CompilationUnit> getCompilationUnit(KeYJavaType kjt) {

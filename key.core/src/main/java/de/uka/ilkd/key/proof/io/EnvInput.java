@@ -61,7 +61,7 @@ public interface EnvInput {
     /**
      * gets the classpath elements to be considered here.
      */
-    Optional<List<Path>> readClassPath() throws ProofInputException;
+    Optional<List<Path>> readClassPath();
 
     /**
      * gets the boot classpath element, null if none set.

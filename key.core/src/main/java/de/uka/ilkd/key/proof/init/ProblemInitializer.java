@@ -210,7 +210,6 @@ public final class ProblemInitializer {
      * Helper for readEnvInput().
      */
     private void readJava(EnvInput envInput, InitConfig initConfig) throws ProofInputException {
-        activateInitConfigJava(initConfig, envInput);
         // read Java source and classpath settings
         envInput.setInitConfig(initConfig);
         final JavaService javaService = initConfig.getServices().getJavaService();
@@ -249,7 +248,7 @@ public final class ProblemInitializer {
                 }
             }
             try {
-                javaService.readCompilationUnits(classes, fileRepo,
+                javaService.readCompilationUnits(javaPath, classes, fileRepo,
                     (ex, p) -> new ProofInputException("Failed to parse file " + p, ex));
             } catch (IOException e) {
                 throw new ProofInputException("Failed to read file", e);
@@ -389,8 +388,9 @@ public final class ProblemInitializer {
     }
 
     private void activateInitConfigJava(InitConfig config, EnvInput envInput) {
-        final Path bootClassPath = envInput.readBootClassPath();
-        config.getServices().activateJava(bootClassPath);
+        var bootClassPath = envInput.readBootClassPath();
+        var classPath = envInput.readClassPath().orElse(Collections.emptyList());
+        config.getServices().activateJava(bootClassPath, classPath);
     }
 
     /**

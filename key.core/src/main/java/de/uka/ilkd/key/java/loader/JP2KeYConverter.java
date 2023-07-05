@@ -580,6 +580,21 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return accept(n.getExpression());
     }
 
+    private static FieldSpecification findArrayLength(ArrayDeclaration type) {
+        for (MemberDeclaration member : type.getMembers()) {
+            if (!(member instanceof de.uka.ilkd.key.java.ast.declaration.FieldDeclaration)) {
+                continue;
+            }
+            var field = (de.uka.ilkd.key.java.ast.declaration.FieldDeclaration) member;
+            for (FieldSpecification spec : field.getFieldSpecifications()) {
+                if (Objects.equals(spec.getName(), "length")) {
+                    return spec;
+                }
+            }
+        }
+        throw new IllegalStateException("array type without length field");
+    }
+
     @Override
     public Object visit(FieldAccessExpr n, Void arg) {
         var pi = createPositionInfo(n);
@@ -600,6 +615,15 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             createProgramElementName(n.getName()), kjt);
         if (notFullyQualifiedName) { // regular field access
             ReferencePrefix prefix = accept(n.getScope());
+            if (n.getName().asString().equals("length")) {
+                var type = n.getScope().calculateResolvedType();
+                if (type.isArray()) {
+                    var arrayType = (ArrayDeclaration) getKeYJavaType(type).getJavaType();
+                    var length = findArrayLength(arrayType);
+                    return new FieldReference(pi, c, (ProgramVariable) length.getProgramVariable(),
+                        prefix);
+                }
+            }
             return new FieldReference(pi, c, variable, prefix);
         } else {
             return new FieldReference(pi, c, variable, translatePackageReference(n.getScope()));

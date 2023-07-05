@@ -107,7 +107,7 @@ public final class SLEnvInput extends AbstractEnvInput {
             warnings = warnings.union(keyFile.read());
             i += 1;
         }
-        LOGGER.info("Read {} library specification files", i);
+        LOGGER.info("Read {} library specification files from {}", i, basePath);
         return warnings;
     }
 

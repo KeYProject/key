@@ -18,7 +18,6 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.SpecificationElement;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.LRUCache;
@@ -1115,7 +1114,7 @@ public final class JavaInfo {
     public KeYJavaType getNullType() {
         if (nullType == null) {
             nullType = getTypeByClassName("null");
-            Debug.assertTrue(nullType != null, "we should already have it in the map");
+            assert nullType != null : "we should already have the nulltype in the map";
         }
         return nullType;
     }

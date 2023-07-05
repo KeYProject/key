@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.util;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -12,12 +11,9 @@ import java.util.NoSuchElementException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -28,22 +24,20 @@ import org.slf4j.LoggerFactory;
 
 
 public class ZipFileCollection implements FileCollection {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ZipFileCollection.class);
-
-    final File file;
+    final Path path;
     ZipFile zipFile;
 
-    public ZipFileCollection(File file) {
-        this.file = file;
+    public ZipFileCollection(Path path) {
+        this.path = path;
     }
 
 
     public Walker createWalker(String[] extensions) throws IOException {
         if (zipFile == null) {
             try {
-                zipFile = new ZipFile(file);
+                zipFile = new ZipFile(path.toFile());
             } catch (ZipException ex) {
-                throw new IOException("can't open " + file + ": " + ex.getMessage(), ex);
+                throw new IOException("can't open " + path + ": " + ex.getMessage(), ex);
             }
         }
         return new Walker(extensions);
@@ -60,18 +54,11 @@ public class ZipFileCollection implements FileCollection {
         private final List<String> extensions;
 
         public Walker(String[] extensions) {
+            assert extensions.length > 0;
             this.enumeration = zipFile.entries();
             this.extensions = new ArrayList<>();
             for (String extension : extensions) {
                 this.extensions.add(extension.toLowerCase());
-            }
-        }
-
-        public String getCurrentName() {
-            if (currentEntry == null) {
-                throw new NoSuchElementException();
-            } else {
-                return file.getAbsolutePath() + File.separatorChar + currentEntry.getName();
             }
         }
 
@@ -98,19 +85,22 @@ public class ZipFileCollection implements FileCollection {
 
         @Override
         public Path getCurrentLocation() {
-            return Path.of(currentEntry.toString());
+            return path.resolve(currentEntry.toString());
+        }
+
+        public String getRelativeLocation() {
+            return currentEntry.getName().toString();
         }
 
         public boolean step() {
             currentEntry = null;
-            while (enumeration.hasMoreElements() && currentEntry == null) {
-                currentEntry = enumeration.nextElement();
+            outer: while (enumeration.hasMoreElements()) {
+                var entry = enumeration.nextElement();
+                var name = entry.getName().toLowerCase();
                 for (String extension : extensions) {
-                    if (extension != null
-                            && !currentEntry.getName().toLowerCase().endsWith(extension)) {
-                        currentEntry = null;
-                    } else {
-                        break;
+                    if (name.endsWith(extension)) {
+                        currentEntry = entry;
+                        break outer;
                     }
                 }
             }
@@ -120,22 +110,10 @@ public class ZipFileCollection implements FileCollection {
         public String getType() {
             return "zip";
         }
-
-        @Nonnull
-        public URI getCurrentDataLocation() {
-            // don't use ArchiveDataLocation this keeps the zip open and keeps reference to it!
-            try {
-                // since we actually return a zip/jar, we use URLDataLocation
-                return MiscTools.getZipEntryURI(zipFile, currentEntry.getName());
-            } catch (IOException e) {
-                LOGGER.warn("Failed to get zip entry uri", e);
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     @Override
     public String toString() {
-        return "ZipFileCollection[" + file + "]";
+        return "ZipFileCollection[" + path + "]";
     }
 }

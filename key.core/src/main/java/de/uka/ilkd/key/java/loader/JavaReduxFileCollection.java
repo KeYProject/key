@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -155,23 +154,6 @@ public class JavaReduxFileCollection implements FileCollection {
             this.iterator = iterator;
         }
 
-        @Nonnull
-        public URI getCurrentDataLocation() throws NoSuchElementException {
-            if (currentURL == null) {
-                throw new NoSuchElementException("Location of " + current + " not found.");
-            }
-
-            try {
-                return currentURL.toURI();
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        public String getCurrentName() throws NoSuchElementException {
-            return current;
-        }
-
         public String getType() {
             return "internal";
         }
@@ -225,6 +207,10 @@ public class JavaReduxFileCollection implements FileCollection {
             return true;
         }
 
+        @Override
+        public String getRelativeLocation() {
+            return null;
+        }
     }
 
 }

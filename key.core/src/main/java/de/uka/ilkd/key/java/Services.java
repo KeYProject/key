@@ -3,6 +3,7 @@ package de.uka.ilkd.key.java;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -415,22 +416,27 @@ public class Services implements TermServices {
         return javaService;
     }
 
-    private void activateJavaPath(Path bootClassPath) {
-        if (javaService != null && javaService.getBootClassPath().equals(bootClassPath)) {
+    private void activateJavaPath(Path bootClassPath, Collection<Path> libraryPaths) {
+        if (javaService != null && javaService.getBootClassPath().equals(bootClassPath)
+                && javaService.getLibraryPath().equals(libraryPaths)) {
             return;
         }
-        javaService = new JavaService(this, bootClassPath, Collections.emptyList());
+        javaService = new JavaService(this, bootClassPath, libraryPaths);
         javaInfo = new JavaInfo(new KeYProgModelInfo(javaService), this);
     }
 
-    public void activateJava(@Nullable Path bootClassPath) {
+    public void activateJava(@Nullable Path bootClassPath, Collection<Path> libraryPaths) {
         Path path;
         if (bootClassPath != null) {
             path = bootClassPath;
         } else {
             path = getReduxPath();
         }
-        activateJavaPath(path);
+        activateJavaPath(path, libraryPaths);
+    }
+
+    public void activateJava(@Nullable Path bootClassPath) {
+        activateJavaPath(bootClassPath, Collections.emptyList());
     }
 
     public static Path getReduxPath() {
