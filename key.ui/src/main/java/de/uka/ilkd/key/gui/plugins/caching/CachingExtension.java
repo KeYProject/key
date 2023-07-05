@@ -10,7 +10,6 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.swing.*;
 
-import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -22,6 +21,7 @@ import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -34,6 +34,10 @@ import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
+import de.uka.ilkd.key.prover.ProverTaskListener;
+import de.uka.ilkd.key.prover.TaskFinishedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
+import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -51,7 +55,7 @@ import org.slf4j.LoggerFactory;
 public class CachingExtension
         implements KeYGuiExtension, KeYGuiExtension.Startup, KeYGuiExtension.ContextMenu,
         KeYGuiExtension.StatusLine, KeYGuiExtension.Settings, GUIListener,
-        KeYSelectionListener, RuleAppListener, ProofDisposedListener, AutoModeListener {
+        KeYSelectionListener, RuleAppListener, ProofDisposedListener, ProverTaskListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CachingExtension.class);
 
@@ -84,7 +88,10 @@ public class CachingExtension
     public void ruleApplied(ProofEvent e) {
         if (e.getSource().lookup(CopyingProofReplayer.class) != null
                 || e.getSource().lookup(TryCloseMacro.class) != null) {
-            return; // copy in progress!
+            // either:
+            // copy in progress,
+            // macro that excepts the proof to really close in progress
+            return;
         }
         if (!CachingSettingsProvider.getCachingSettings().getEnabled()) {
             return;
@@ -116,7 +123,7 @@ public class CachingExtension
         this.mediator = mediator;
         mediator.addKeYSelectionListener(this);
         mediator.addGUIListener(this);
-        mediator.getUI().getProofControl().addAutoModeListener(this);
+        mediator.getUI().addProverTaskListener(this);
     }
 
     @Override
@@ -162,20 +169,30 @@ public class CachingExtension
     }
 
     @Override
-    public void autoModeStarted(ProofEvent e) {
+    public void taskStarted(TaskStartedInfo info) {
+
     }
 
     @Override
-    public void autoModeStopped(ProofEvent e) {
-        Proof p = e.getSource();
-        if (p == null || p.closed()) {
+    public void taskProgress(int position) {
+
+    }
+
+    @Override
+    public void taskFinished(TaskFinishedInfo info) {
+        Proof p = info.getProof();
+        if (p == null || p.closed() || !(info.getSource() instanceof ApplyStrategy
+                || info.getSource() instanceof ProofMacro)) {
             return;
         }
         // show statistics if closed by reference
-        if (p.openGoals().stream().allMatch(goal -> goal.node().lookup(ClosedBy.class) != null)) {
-            ShowProofStatistics.Window win =
-                new ShowProofStatistics.Window(MainWindow.getInstance(), p);
-            win.setVisible(true);
+        if (p.countNodes() > 1 && p.openGoals().stream()
+                .allMatch(goal -> goal.node().lookup(ClosedBy.class) != null)) {
+            SwingUtilities.invokeLater(() -> {
+                ShowProofStatistics.Window win =
+                    new ShowProofStatistics.Window(MainWindow.getInstance(), p);
+                win.setVisible(true);
+            });
         }
     }
 

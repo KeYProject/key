@@ -233,6 +233,11 @@ public class ShowProofStatistics extends MainWindowAction {
          */
         public Window(MainWindow mainWindow, Proof proof) {
             super(mainWindow, "Proof Statistics");
+
+            if (!EventQueue.isDispatchThread()) {
+                throw new IllegalStateException("tried to open statistics dialog on worker thread");
+            }
+
             this.proof = proof;
 
             String stats = ShowProofStatistics.getHTMLStatisticsMessage(proof);
