@@ -33,6 +33,7 @@ import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Immutables;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -328,8 +329,8 @@ public class KeYFile implements EnvInput {
         ContractsAndInvariantsFinder cinvs =
             new ContractsAndInvariantsFinder(initConfig.getServices(), initConfig.namespaces());
         getParseContext().accept(cinvs);
-        specRepos.addContracts(ImmutableSet.fromCollection(cinvs.getContracts()));
-        specRepos.addClassInvariants(ImmutableSet.fromCollection(cinvs.getInvariants()));
+        specRepos.addContracts(Immutables.createSetFrom(cinvs.getContracts()));
+        specRepos.addClassInvariants(Immutables.createSetFrom(cinvs.getInvariants()));
 
         return DefaultImmutableSet.nil();
     }

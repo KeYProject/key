@@ -1,12 +1,11 @@
 package org.key_project.util.collection;
 
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-
 import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class is a collection of methods that operate on immutable collections, in particular
@@ -73,7 +72,8 @@ public final class Immutables {
      *
      * @return a duplicate-free version of the argument, never <code>null</code>
      */
-    public static <T> ImmutableList<T> removeDuplicates(ImmutableList<T> list) {
+    public static <T extends @Nullable Object> ImmutableList<T> removeDuplicates(
+            ImmutableList<T> list) {
 
         if (list.isEmpty()) {
             return list;
@@ -117,10 +117,11 @@ public final class Immutables {
 
     }
 
-    public static <T> ImmutableList<T> concatDuplicateFreeLists(ImmutableList<T> l1,
+    public static <T extends @Nullable Object> ImmutableList<T> concatDuplicateFreeLists(
+            ImmutableList<T> l1,
             ImmutableList<? extends T> l2) {
 
-        Set<T> lookup = new HashSet<>();
+        HashSet<T> lookup = new HashSet<>();
         for (T element : l1) {
             lookup.add(element);
         }
@@ -135,7 +136,19 @@ public final class Immutables {
         return result;
     }
 
-    public static <T> ImmutableSet<T> createSetFrom(Iterable<T> iterable) {
+    /**
+     * Returns an immutable set consisting of the elements of the
+     * given iterable collection.
+     *
+     * The iteration order of the result is identical to that of the argument.
+     *
+     * @param iterable the collection to iterate through to obtain the elements
+     *        for the resulting list
+     *
+     * @return the view onto the iterable as an immutable set
+     */
+    public static <T extends @Nullable Object> ImmutableSet<T> createSetFrom(
+            Iterable<? extends T> iterable) {
         return DefaultImmutableSet.fromImmutableList(createListFrom(iterable));
     }
 
@@ -148,9 +161,9 @@ public final class Immutables {
      * @param iterable the collection to iterate through to obtain the elements
      *        for the resulting list
      *
-     * @returns the view onto the iterable as an immutable list
+     * @return the view onto the iterable as an immutable list
      */
-    public static <T> ImmutableList<T> createListFrom(Iterable<T> iterable) {
+    public static <T> ImmutableList<T> createListFrom(Iterable<? extends T> iterable) {
         ImmutableList<T> result = ImmutableSLList.nil();
         for (T t : iterable) {
             result = result.prepend(t);
@@ -170,7 +183,8 @@ public final class Immutables {
      *
      * @returns the filtered list
      */
-    public static <T extends @Nullable Object> ImmutableList<T> filter(ImmutableList<T> ts, Predicate<? super T> predicate) {
+    public static <T extends @Nullable Object> ImmutableList<T> filter(ImmutableList<T> ts,
+            Predicate<? super T> predicate) {
         // This must be a loop. A tail recursive implementation is not optimised
         // by the compiler and quickly leads to a stack overlow.
         ImmutableList<T> acc = ImmutableSLList.nil();
@@ -193,7 +207,8 @@ public final class Immutables {
      * @param function a non-interfering, stateless function to apply to each element
      * @return the mapped list of the same length as this
      */
-    public static <T extends @Nullable Object, R extends @Nullable Object> ImmutableList<R> map(ImmutableList<T> ts, Function<? super T, R> function) {
+    public static <T extends @Nullable Object, R extends @Nullable Object> ImmutableList<R> map(
+            ImmutableList<T> ts, Function<? super T, R> function) {
         // This must be a loop. A tail recursive implementation is not optimised
         // by the compiler and quickly leads to a stack overlow.
         ImmutableList<R> acc = ImmutableSLList.nil();

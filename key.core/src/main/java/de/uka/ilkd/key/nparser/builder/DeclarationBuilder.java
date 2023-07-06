@@ -15,8 +15,8 @@ import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.rule.RuleSet;
 
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Immutables;
 
 import org.antlr.v4.runtime.Token;
 
@@ -119,9 +119,9 @@ public class DeclarationBuilder extends DefaultBuilder {
             Name sortName = new Name(sortId);
 
             ImmutableSet<Sort> ext = sortExt == null ? ImmutableSet.empty()
-                    : DefaultImmutableSet.fromCollection(sortExt);
+                    : Immutables.createSetFrom(sortExt);
             ImmutableSet<Sort> oneOf = sortOneOf == null ? ImmutableSet.empty()
-                    : DefaultImmutableSet.fromCollection(sortOneOf);
+                    : Immutables.createSetFrom(sortOneOf);
 
             // attention: no expand to java.lang here!
             if (sorts().lookup(sortName) == null) {
