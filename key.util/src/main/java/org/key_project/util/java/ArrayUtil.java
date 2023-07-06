@@ -1,12 +1,12 @@
 package org.key_project.util.java;
 
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Provides static methods to work with arrays.
@@ -60,25 +60,26 @@ public final class ArrayUtil {
      * @throws IllegalArgumentException Both parameters are {@code null}.
      */
     @SuppressWarnings("unchecked")
-    public static <T extends @Nullable Object> T [] addAll(T @Nullable [] array, T @Nullable [] toAdd) {
+    public static <T extends @Nullable Object> T[] addAll(T @Nullable [] array,
+            T @Nullable [] toAdd) {
         if (array != null) {
             if (toAdd != null) {
                 T[] result =
-                    (T[]) java.lang.reflect.Array.newInstance(array.getClass().getComponentType(),
+                    (T[]) java.lang.reflect.Array.newInstance(getComponentType(array),
                         array.length + toAdd.length);
                 System.arraycopy(array, 0, result, 0, array.length);
                 System.arraycopy(toAdd, 0, result, array.length, toAdd.length);
                 return result;
             } else {
                 T[] result = (T[]) java.lang.reflect.Array
-                        .newInstance(array.getClass().getComponentType(), array.length);
+                        .newInstance(getComponentType(array), array.length);
                 System.arraycopy(array, 0, result, 0, array.length);
                 return result;
             }
         } else {
             if (toAdd != null) {
                 T[] result = (T[]) java.lang.reflect.Array
-                        .newInstance(toAdd.getClass().getComponentType(), toAdd.length);
+                        .newInstance(getComponentType(toAdd), toAdd.length);
                 System.arraycopy(toAdd, 0, result, 0, toAdd.length);
                 return result;
             } else {
@@ -86,6 +87,12 @@ public final class ArrayUtil {
                     "Can not create an array if both paramters are null.");
             }
         }
+    }
+
+    private static <T extends @Nullable Object> Class<? extends T> getComponentType(T[] array) {
+        Class<? extends Object[]> arrayClass = array.getClass();
+        assert arrayClass.isArray() : "@AssumeAssertion(nullness): This is always the case";
+        return (Class<? extends T>) arrayClass.getComponentType();
     }
 
     /**
@@ -105,7 +112,8 @@ public final class ArrayUtil {
      * @throws IllegalArgumentException Both parameters are {@code null}.
      */
     @SuppressWarnings("unchecked")
-    public static <T extends @Nullable Object> T[] addAll(T @Nullable [] array, T @Nullable [] toAdd, Class<?> newArrayType) {
+    public static <T extends @Nullable Object> T[] addAll(T @Nullable [] array,
+            T @Nullable [] toAdd, Class<?> newArrayType) {
         if (array != null) {
             if (toAdd != null) {
                 T[] result = (T[]) java.lang.reflect.Array.newInstance(newArrayType,
@@ -145,10 +153,12 @@ public final class ArrayUtil {
      * @throws IllegalArgumentException Both parameters are {@code null}.
      */
     @SuppressWarnings("unchecked")
-    public static <T extends @Nullable Object> T[] add(T @Nullable [] array, @Nullable T toAdd) {
+    public static <T extends @Nullable Object> @Nullable T[] add(T @Nullable [] array,
+            @Nullable T toAdd) {
         if (array != null) {
-            T[] result = (T[]) java.lang.reflect.Array
-                    .newInstance(array.getClass().getComponentType(), array.length + 1);
+            @Nullable
+            T[] result = (@Nullable T[]) java.lang.reflect.Array
+                    .newInstance(getComponentType(array), array.length + 1);
             System.arraycopy(array, 0, result, 0, array.length);
             result[array.length] = toAdd;
             return result;
@@ -200,7 +210,7 @@ public final class ArrayUtil {
     public static <T> T[] insert(T[] array, T toInsert, int index) {
         if (array != null) {
             T[] result = (T[]) java.lang.reflect.Array
-                    .newInstance(array.getClass().getComponentType(), array.length + 1);
+                    .newInstance(getComponentType(array), array.length + 1);
             if (index >= 1) {
                 System.arraycopy(array, 0, result, 0, index);
             }
@@ -263,7 +273,8 @@ public final class ArrayUtil {
      *         was {@code null}.
      */
     @SuppressWarnings("unchecked")
-    public static <T> T[] remove(T[] array, T toRemove) {
+    public static <T extends @Nullable Object> T @Nullable [] remove(T @Nullable [] array,
+            @Nullable T toRemove) {
         if (array != null) {
             List<T> result = new LinkedList<>();
             for (T element : array) {
@@ -271,8 +282,8 @@ public final class ArrayUtil {
                     result.add(element);
                 }
             }
-            return result.toArray((T[]) java.lang.reflect.Array
-                    .newInstance(array.getClass().getComponentType(), result.size()));
+            return (T[]) result.toArray((T[]) java.lang.reflect.Array
+                    .newInstance(getComponentType(array), result.size()));
         } else {
             return null;
         }
