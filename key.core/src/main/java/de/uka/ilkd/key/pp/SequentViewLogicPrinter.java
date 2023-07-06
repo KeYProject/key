@@ -2,6 +2,7 @@ package de.uka.ilkd.key.pp;
 
 import java.util.LinkedList;
 import java.util.List;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -23,7 +24,7 @@ public class SequentViewLogicPrinter extends LogicPrinter {
      */
     private final VisibleTermLabels visibleTermLabels;
 
-    protected SequentViewLogicPrinter(NotationInfo notationInfo, Services services,
+    protected SequentViewLogicPrinter(NotationInfo notationInfo, @Nullable Services services,
             PosTableLayouter layouter, VisibleTermLabels visibleTermLabels) {
         super(notationInfo, services, layouter);
         this.visibleTermLabels = visibleTermLabels;

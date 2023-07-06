@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.pp;
 
+import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -1910,7 +1911,12 @@ public class PrettyPrinter implements Visitor {
 
         l.beginRelativeC();
         l.brk();
-        l.print(jmlAssert.getConditionText().trim());
+        createLogicPrinter().printTerm(jmlAssert.getCond());
         l.end();
+    }
+
+    private SequentViewLogicPrinter createLogicPrinter() {
+        return new SequentViewLogicPrinter(new NotationInfo(), null, l,
+            new TermLabelVisibilityManager());
     }
 }
