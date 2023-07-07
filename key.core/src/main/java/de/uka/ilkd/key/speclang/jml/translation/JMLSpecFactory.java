@@ -1543,7 +1543,7 @@ public class JMLSpecFactory {
         Map<LocationVariable, Term> mods =
             translateToTermAssignable(context, atPres, allVars, originalAssignables, false);
         Map<LocationVariable, Term> freeMods =
-                translateToTermAssignable(context, atPres, allVars, originalFreeAssignables, true);
+            translateToTermAssignable(context, atPres, allVars, originalFreeAssignables, true);
 
 
         // translateToTerm infFlowSpecs
@@ -1609,7 +1609,11 @@ public class JMLSpecFactory {
             Term a;
             ImmutableList<LabeledParserRuleContext> as = originalAssignables.get(h);
             if (as.isEmpty()) {
-                a = tb.allLocs();
+                if (free) {
+                    a = tb.strictlyNothing();
+                } else {
+                    a = tb.allLocs();
+                }
             } else {
                 a = tb.empty();
                 for (LabeledParserRuleContext expr : as) {
