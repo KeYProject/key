@@ -440,8 +440,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 if (specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                     specCase.addClause(ENSURES, new LabeledParserRuleContext(
                         JmlFacade.parseExpr(invString), IMPL_TERM_LABEL));
-                    specCase.addClause(ENSURES_FREE, new LabeledParserRuleContext(
-                        JmlFacade.parseExpr(invFreeString), IMPL_TERM_LABEL));
+                    if (hasFreeInvariant) {
+                        specCase.addClause(ENSURES_FREE, new LabeledParserRuleContext(
+                            JmlFacade.parseExpr(invFreeString), IMPL_TERM_LABEL));
+                    }
 
                 }
                 if (specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR && !pm.isModel()) {
