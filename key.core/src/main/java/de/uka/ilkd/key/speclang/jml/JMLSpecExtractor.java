@@ -414,11 +414,11 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 // the internal symbol
                 final String invString = pm.isStatic() ? "\\inv" : "<inv>";
                 final String invFreeString = pm.isStatic() ? "\\inv_free" : "<inv_free>";
-                
+
                 KeYJavaType classType = pm.getContainerType();
                 boolean hasFreeInvariant = services.getSpecificationRepository()
-                    .getClassInvariants(classType).stream().anyMatch(ClassInvariant::isFree);
-                
+                        .getClassInvariants(classType).stream().anyMatch(ClassInvariant::isFree);
+
                 if (!pm.isConstructor()) {
                     specCase.addClause(REQUIRES, new LabeledParserRuleContext(
                         JmlFacade.parseExpr(invString), IMPL_TERM_LABEL));
