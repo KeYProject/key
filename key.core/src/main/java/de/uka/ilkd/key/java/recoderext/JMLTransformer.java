@@ -517,7 +517,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
                     if (i == 0 || !(children[i - 1] instanceof MethodDeclaration)) {
                         throw new SLTranslationException(
                             "A set assignment only allowed inside of a method body.",
-                            new Location(fileName, pos));
+                            c.getLocation());
                     }
                     Statement emptyStmt = new EmptyStatement();
                     Comment emptyStmtComment = new Comment();
