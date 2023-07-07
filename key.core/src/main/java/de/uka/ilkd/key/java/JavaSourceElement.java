@@ -168,8 +168,8 @@ public abstract class JavaSourceElement implements SourceElement {
     }
 
     /** get the class the statement originates from */
-    public String getParentClass() {
-        return posInfo.getParentClass();
+    public URI getParentClass() {
+        return posInfo.getParentClassURI();
     }
 
 }
