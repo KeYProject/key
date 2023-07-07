@@ -1,14 +1,8 @@
 package de.uka.ilkd.key.proof;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -458,6 +452,17 @@ public class Node implements Iterable<Node> {
         return new SubtreeIterator(this);
     }
 
+
+    /**
+     * @return an iterator for all nodes in the subtree.
+     */
+    public Stream<Node> subtreeStream() {
+        var children = StreamSupport.stream(
+            Spliterators.spliteratorUnknownSize(subtreeIterator(), Spliterator.ORDERED), false);
+        return Stream.concat(Stream.of(this), children);
+    }
+
+
     /** @return number of children */
     public int childrenCount() {
         return children.size();
@@ -821,5 +826,13 @@ public class Node implements Iterable<Node> {
 
     void setStepIndex(int stepIndex) {
         this.stepIndex = stepIndex;
+    }
+
+    /**
+     * Returns a stream over all direct children (excluding this node) using the
+     * {@link #spliterator()}.
+     */
+    public Stream<Node> stream() {
+        return StreamSupport.stream(spliterator(), false);
     }
 }

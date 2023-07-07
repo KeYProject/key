@@ -261,7 +261,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         boolean depends = ctx.MEASURED_BY() != null || ctx.COLON() != null;
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         final LabeledParserRuleContext ctx2 =
-                createLabeledRuleContext(ctx, OriginTermLabel.SpecType.ACCESSIBLE, null);
+            createLabeledRuleContext(ctx, OriginTermLabel.SpecType.ACCESSIBLE, null);
         for (Name heap : heaps) {
             if (depends) {
                 TextualJMLDepends d = new TextualJMLDepends(mods, heaps, ctx2);

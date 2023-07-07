@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.util.MiscTools;
@@ -31,6 +32,7 @@ public final class Location implements Comparable<Location> {
     /**
      * The location of the resource of the Location. May be null!
      */
+    @Nullable
     private final URI fileUri;
 
     /**

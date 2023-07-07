@@ -806,7 +806,7 @@ preferences
 
 proofScript
 :
-  PROOFSCRIPT ps = STRING_LITERAL
+  PROOFSCRIPT ps = STRING_LITERAL SEMI?
 ;
 
 // PROOF

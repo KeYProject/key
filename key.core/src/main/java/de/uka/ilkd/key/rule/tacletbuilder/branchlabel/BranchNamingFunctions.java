@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
  */
 public final class BranchNamingFunctions {
     private static final Logger LOGGER = LoggerFactory.getLogger(BranchNamingFunctions.class);
-    private static final Map<String, Function<List<String>, BranchNamingFunction>>
-            functionList = new HashMap<>();
+    private static final Map<String, Function<List<String>, BranchNamingFunction>> functionList =
+        new HashMap<>();
 
     private BranchNamingFunctions() {}
 
@@ -31,7 +31,8 @@ public final class BranchNamingFunctions {
     }
 
 
-    public static void registerFunction(String name, Function<List<String>, BranchNamingFunction> fn) {
+    public static void registerFunction(String name,
+            Function<List<String>, BranchNamingFunction> fn) {
         LOGGER.info("Register branch name function: {}", name);
         functionList.put(name, fn);
     }

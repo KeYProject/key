@@ -46,7 +46,8 @@ public class NameLabelOf implements BranchNamingFunction {
             var name = term.getLabel(SpecNameLabel.NAME);
 
             if (name != null) {
-                return LogicPrinter.quickPrintTerm(term, services);
+                return ((SpecNameLabel) name).getLabel();
+                // return LogicPrinter.quickPrintTerm(term, services);
             }
 
             var origin = (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);

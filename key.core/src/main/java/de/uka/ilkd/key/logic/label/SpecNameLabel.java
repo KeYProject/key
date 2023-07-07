@@ -49,4 +49,9 @@ public class SpecNameLabel implements TermLabel {
     public boolean isProofRelevant() {
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "name(\"" + label + "\")";
+    }
 }
