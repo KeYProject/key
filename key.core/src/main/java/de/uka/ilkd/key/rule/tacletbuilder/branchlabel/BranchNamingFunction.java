@@ -5,18 +5,19 @@ import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import javax.annotation.Nonnull;
+
 /**
- * A {@code BranchNamingFunction} is a function that returns a string that is built in the
+ * A {@code BranchNamingFunction} is a function that returns a string that is inserted in the
  * branch name of a rule application.
  * <br>
- * It allows you to create branch labels dynamically based the term structure of the rule
- * application.
- * Introduced for supporting branch labels based on term label {@code name}.
+ * It allows you to create branch labels dynamically based the term structure, and other information
+ * of the rule application. Introduced for supporting branch labels based on term label {@code name}.
  *
  * @author Alexander Weigl
  * @version 1 (1/15/22)
  */
 public interface BranchNamingFunction {
     String getName(Services services, SequentChangeInfo currentSequent,
-            TacletApp tacletApp, MatchConditions matchConditions);
+                   TacletApp tacletApp, MatchConditions matchConditions);
 }

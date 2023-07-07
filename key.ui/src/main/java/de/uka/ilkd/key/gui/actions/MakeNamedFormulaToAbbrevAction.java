@@ -54,7 +54,7 @@ public class MakeNamedFormulaToAbbrevAction extends MainWindowAction {
         var l = (SpecNameLabel) t.getLabel(SpecNameLabel.NAME);
         if (l != null) {
             try {
-                getMediator().getNotationInfo().getAbbrevMap().put(t, l.getName(), true);
+                getMediator().getNotationInfo().getAbbrevMap().put(t, l.getLabel(), true);
             } catch (AbbrevException e) {
                 e.printStackTrace();
             }

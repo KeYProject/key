@@ -13,10 +13,10 @@ import de.uka.ilkd.key.logic.Name;
 public class SpecNameLabel implements TermLabel {
     public static final Name NAME = new Name("name");
 
-    public final String name;
+    private final String label;
 
-    public SpecNameLabel(String name) {
-        this.name = name;
+    public SpecNameLabel(String label) {
+        this.label = label;
     }
 
     public static TermLabelFactory<?> getFactory() {
@@ -32,7 +32,7 @@ public class SpecNameLabel implements TermLabel {
     @Override
     public Object getChild(int i) {
         if (i == 0)
-            return name;
+            return label;
         throw new IllegalArgumentException("index out of bounds");
     }
 
@@ -41,8 +41,8 @@ public class SpecNameLabel implements TermLabel {
         return 1;
     }
 
-    public String getName() {
-        return name;
+    public String getLabel() {
+        return label;
     }
 
     @Override

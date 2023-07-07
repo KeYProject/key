@@ -36,6 +36,7 @@ public class TacletGoalTemplate {
     /**
      *
      */
+    @Nullable
     private BranchNamingFunction namingFunction = null;
 
 
@@ -137,7 +138,7 @@ public class TacletGoalTemplate {
         return name;
     }
 
-    public void setBranchNamingFunction(BranchNamingFunction fn) {
+    public void setBranchNamingFunction(@Nullable BranchNamingFunction fn) {
         namingFunction = fn;
     }
 

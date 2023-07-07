@@ -133,7 +133,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
 
             var nfn = gt.getBranchNamingFunction();
             if (nfn == null)
-                currentGoal.setBranchLabel(null);
+                currentGoal.setBranchLabel(gt.name());
             else
                 currentGoal.setBranchLabel(
                     nfn.getName(services, currentSequent, tacletApp, mc));
