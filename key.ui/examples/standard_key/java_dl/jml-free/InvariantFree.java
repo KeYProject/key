@@ -11,6 +11,13 @@ final class A {
         f = 1;
         g = 0;
     }
+    
+    /*@ normal_behavior
+      @ ensures \result > 0;
+      @*/
+    int foo() {
+        return g;
+    }
 }
 
 final class B {

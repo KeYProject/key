@@ -414,20 +414,28 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 // the internal symbol
                 final String invString = pm.isStatic() ? "\\inv" : "<inv>";
                 final String invFreeString = pm.isStatic() ? "\\inv_free" : "<inv_free>";
+                
+                KeYJavaType classType = pm.getContainerType();
+                boolean hasFreeInvariant = services.getSpecificationRepository()
+                    .getClassInvariants(classType).stream().anyMatch(ClassInvariant::isFree);
+                
                 if (!pm.isConstructor()) {
                     specCase.addClause(REQUIRES, new LabeledParserRuleContext(
                         JmlFacade.parseExpr(invString), IMPL_TERM_LABEL));
-                    specCase.addClause(REQUIRES_FREE, new LabeledParserRuleContext(
-                        JmlFacade.parseExpr(invFreeString), IMPL_TERM_LABEL));
+                    if (hasFreeInvariant) {
+                        specCase.addClause(REQUIRES_FREE, new LabeledParserRuleContext(
+                            JmlFacade.parseExpr(invFreeString), IMPL_TERM_LABEL));
+                    }
                 } else if (addInvariant) {
                     // add static invariant to constructor's precondition
                     specCase.addClause(REQUIRES, new LabeledParserRuleContext(
                         JmlFacade.parseExpr(format("%s.\\inv", pm.getName())),
                         IMPL_TERM_LABEL));
-                    specCase.addClause(REQUIRES_FREE, new LabeledParserRuleContext(
-                        JmlFacade.parseExpr(format("%s.\\inv_free", pm.getName())),
-                        IMPL_TERM_LABEL));
-
+                    if (hasFreeInvariant) {
+                        specCase.addClause(REQUIRES_FREE, new LabeledParserRuleContext(
+                            JmlFacade.parseExpr(format("%s.\\inv_free", pm.getName())),
+                            IMPL_TERM_LABEL));
+                    }
                 }
                 if (specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                     specCase.addClause(ENSURES, new LabeledParserRuleContext(
