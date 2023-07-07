@@ -62,12 +62,10 @@ public class LetCommand implements ProofScriptCommand {
                 continue;
             }
 
-            if (!key.startsWith("@")) {
-                throw new ScriptException("Unexpected parameter to let, only @var allowed: " + key);
+            if (key.startsWith("@")) {
+                // get rid of @
+                key = key.substring(1);
             }
-
-            // get rid of @
-            key = key.substring(1);
 
             if (abbrMap.containsAbbreviation(key) && !force) {
                 throw new ScriptException(key + " is already fixed in this script");
