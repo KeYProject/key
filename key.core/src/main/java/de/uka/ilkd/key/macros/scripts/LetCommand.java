@@ -34,12 +34,11 @@ public class LetCommand extends AbstractCommand<Map<String, String>> {
             if ("#literal".equals(key)) {
                 continue;
             }
-            if (!key.startsWith("@")) {
-                throw new ScriptException("Unexpected parameter to let, only @var allowed: " + key);
+            if (key.startsWith("@")) {
+                // get rid of @
+                key = key.substring(1);
             }
 
-            // get rid of @
-            key = key.substring(1);
 
             if (abbrMap.containsAbbreviation(key)) {
                 // XXX desired or not?
