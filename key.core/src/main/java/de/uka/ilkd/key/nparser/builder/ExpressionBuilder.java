@@ -1142,7 +1142,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         List<String> parts = mapOf(ctx.name.simple_ident());
         String varfuncid = ctx.name.getText();
 
-         if (ctx.INT_LITERAL() != null) {// number
+        if (ctx.INT_LITERAL() != null) {// number
             return toZNotation(ctx.INT_LITERAL().getText(), functions());
         }
 
