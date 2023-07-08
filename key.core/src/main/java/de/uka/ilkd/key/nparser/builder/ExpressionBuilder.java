@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -19,6 +20,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.nparser.KeYLexer;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeYParser.DoubleLiteralContext;
 import de.uka.ilkd.key.nparser.KeYParser.FloatLiteralContext;
@@ -326,7 +328,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitWeak_arith_term(KeYParser.Weak_arith_termContext ctx) {
-        Term termL = accept(ctx.a);
+        Term termL = Objects.requireNonNull(accept(ctx.a));
         if (ctx.op.isEmpty()) {
             return updateOrigin(termL, ctx);
         }
@@ -334,9 +336,26 @@ public class ExpressionBuilder extends DefaultBuilder {
         List<Term> terms = mapOf(ctx.b);
         Term last = termL;
         for (int i = 0; i < terms.size(); i++) {
-            final String opTok = ctx.op.get(i).getText();
-            // it's either + or -.
-            String opname = opTok.equals("+") ? "add" : "sub";
+            String opname = "";
+            switch (ctx.op.get(i).getType()) {
+            case KeYLexer.UTF_INTERSECT:
+                opname = "intersect";
+                break;
+            case KeYLexer.UTF_SETMINUS:
+                opname = "setMinus";
+                break;
+            case KeYLexer.UTF_UNION:
+                opname = "union";
+                break;
+            case KeYLexer.PLUS:
+                opname = "add";
+                break;
+            case KeYLexer.MINUS:
+                opname = "sub";
+                break;
+            default:
+                semanticError(ctx, "Unexpected token: %s", ctx.op.get(i));
+            }
             Term cur = terms.get(i);
             last = binaryLDTSpecificTerm(ctx, opname, last, cur);
         }
@@ -376,15 +395,46 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
+    public Object visitEmptyset(KeYParser.EmptysetContext ctx) {
+        var op = services.getTypeConverter().getLocSetLDT().getEmpty();
+        return updateOrigin(getTermFactory().createTerm(op), ctx);
+    }
+
+    @Override
     public Object visitStrong_arith_term_2(KeYParser.Strong_arith_term_2Context ctx) {
-        Term termL = accept(ctx.a);
-        if (ctx.b == null) {
-            return termL;
+        if (ctx.b.isEmpty()) { // fast path
+            return accept(ctx.a);
         }
 
-        Term termR = accept(ctx.b);
-        String opName = ctx.SLASH() != null ? "div" : "mod";
-        return binaryLDTSpecificTerm(ctx, opName, termL, termR);
+        List<Term> termL = mapOf(ctx.b);
+        // List<String> opName = ctx.op.stream().map(it -> it.getType()== KeYLexer.PERCENT ? "mod" :
+        // "div").collect(Collectors.toList());
+
+        Term term = accept(ctx.a);
+        var sort = term.sort();
+        if (sort == null) {
+            semanticError(ctx, "No sort for term '%s'", term);
+        }
+
+        var ldt = services.getTypeConverter().getLDTFor(sort);
+
+        if (ldt == null) {
+            // falling back to integer ldt (for instance for untyped schema variables)
+            ldt = services.getTypeConverter().getIntegerLDT();
+        }
+
+        assert ctx.op.size() == ctx.b.size();
+
+        for (int i = 0; i < termL.size(); i++) {
+            var opName = ctx.op.get(i).getType() == KeYLexer.PERCENT ? "mod" : "div";
+            Function op = ldt.getFunctionFor(opName, services);
+            if (op == null) {
+                semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", opName,
+                    sort);
+            }
+            term = binaryTerm(ctx, op, term, termL.get(i));
+        }
+        return term;
     }
 
     protected Term capsulateTf(ParserRuleContext ctx, Supplier<Term> termSupplier) {
@@ -1346,7 +1396,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     if (isCall) {
                         String classRef = current.sort().name().toString();
                         KeYJavaType kjt = getTypeByClassName(classRef); // Why not direct use of
-                                                                        // Sort?
+                        // Sort?
                         if (kjt == null) {
                             semanticError(ctxSuffix, "Could not find sort for %s", classRef);
                         }

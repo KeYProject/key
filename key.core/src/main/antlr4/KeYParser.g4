@@ -327,7 +327,10 @@ literals:
   | integer
   | floatnum
   | string_literal
+  | emptyset
 ;
+
+emptyset: UTF_EMPTY;
 
 term: parallel_term;
 //labeled_term: a=parallel_term (LGUILLEMETS labels=label RGUILLEMETS)?;
@@ -344,10 +347,10 @@ unary_formula:
   | MODALITY sub=term60                           #modality_term
 ;
 equality_term: a=comparison_term ((NOT_EQUALS|EQUALS) b=comparison_term)?;
-comparison_term: a=weak_arith_term ((LESS|LESSEQUAL|GREATER|GREATEREQUAL) b=weak_arith_term)?;
-weak_arith_term: a=strong_arith_term_1 (op+=(PLUS|MINUS) b+=strong_arith_term_1)*;
+comparison_term: a=weak_arith_term ((LESS|LESSEQUAL|GREATER|GREATEREQUAL|UTF_PRECEDES|UTF_SUBSET_EQ|UTF_SUBSEQ|UTF_IN) b=weak_arith_term)?;
+weak_arith_term: a=strong_arith_term_1 (op+=(PLUS|MINUS|UTF_UNION|UTF_INTERSECT|UTF_SETMINUS) b+=strong_arith_term_1)*;
 strong_arith_term_1: a=strong_arith_term_2 (STAR b+=strong_arith_term_2)*;
-strong_arith_term_2: a=atom_prefix ((PERCENT|SLASH) b=strong_arith_term_2)?;
+strong_arith_term_2: a=atom_prefix (op+=(PERCENT|SLASH) b+=atom_prefix)*;
 update_term: (LBRACE u=term RBRACE) (atom_prefix | unary_formula);
 substitution_term:
  LBRACE SUBST  bv=one_bound_variable SEMI
