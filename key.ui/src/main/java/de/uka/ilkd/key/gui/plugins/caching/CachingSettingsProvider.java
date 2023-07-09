@@ -30,18 +30,18 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
      */
     private static final String STRATEGY_SEARCH =
         "Automatically search for references in auto mode";
-    /**
-     * Explanatory text for first option.
-     */
-    private static final String AGGRESSIVE_DEDUPLICATE_INFO =
-        "If enabled, the caching algorithm will run after every branching proof step created"
-            + " by the autopilot. When a reference is found, that branch is marked and "
-            + "the autopilot continues with the next open goal.";
+    private static final String DISPOSE_TITLE =
+        "Behaviour when disposing referenced proof";
+    public static final String DISPOSE_COPY =
+        "Copy steps into new proof";
+    public static final String DISPOSE_REOPEN =
+        "Reopen proof";
 
     /**
      * Checkbox for first option.
      */
     private final JCheckBox strategySearch;
+    private final JComboBox<String> disposeOption;
 
     /**
      * Construct a new settings provider.
@@ -53,6 +53,8 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
 
         strategySearch =
             addCheckBox(STRATEGY_SEARCH, "", true, emptyValidator());
+        disposeOption = addComboBox(DISPOSE_TITLE, null, 0, x -> {
+        }, DISPOSE_COPY, DISPOSE_REOPEN);
     }
 
     @Override
@@ -72,6 +74,7 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
     public JComponent getPanel(MainWindow window) {
         ProofCachingSettings ss = getCachingSettings();
         strategySearch.setSelected(ss.getEnabled());
+        disposeOption.setSelectedItem(ss.getDispose());
         return this;
     }
 
@@ -79,6 +82,7 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
     public void applySettings(MainWindow window) {
         ProofCachingSettings ss = getCachingSettings();
         ss.setEnabled(strategySearch.isEnabled());
+        ss.setDispose(disposeOption.getSelectedItem().toString());
     }
 
 

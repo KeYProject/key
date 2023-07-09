@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;

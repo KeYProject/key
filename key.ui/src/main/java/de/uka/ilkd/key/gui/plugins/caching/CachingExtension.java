@@ -57,6 +57,11 @@ public class CachingExtension
         KeYGuiExtension.StatusLine, KeYGuiExtension.Settings, GUIListener,
         KeYSelectionListener, RuleAppListener, ProofDisposedListener, ProverTaskListener {
 
+    /**
+     * Whether to enable the caching database. Remove (or replace with an optino) once the feature
+     * is done.
+     */
+    public static final boolean ENABLE_DATABASE = false;
     private static final Logger LOGGER = LoggerFactory.getLogger(CachingExtension.class);
 
     /**
@@ -113,7 +118,8 @@ public class CachingExtension
 
                 goal.node().register(c, ClosedBy.class);
                 c.getProof()
-                        .addProofDisposedListener(new CopyBeforeDispose(mediator, c.getProof(), p));
+                        .addProofDisposedListenerFirst(
+                            new CopyBeforeDispose(mediator, c.getProof(), p));
             }
         }
     }
@@ -157,8 +163,8 @@ public class CachingExtension
             actions.add(new CopyReferencedProof(mediator, node));
             actions.add(new GotoReferenceAction(mediator, node));
             return actions;
-        } else if (kind.getType() == Proof.class) {
-            return List.of(new AddToDatabaseAction(mediator, (Proof) underlyingObject));
+        } else if (kind.getType() == Proof.class && ENABLE_DATABASE) {
+            return List.of(new AddToDatabaseAction((Proof) underlyingObject));
         }
         return new ArrayList<>();
     }
@@ -231,10 +237,22 @@ public class CachingExtension
 
         @Override
         public void proofDisposing(ProofDisposedEvent e) {
-            if (!newProof.isDisposed()) {
+            if (newProof.isDisposed()) {
+                return;
+            }
+            if (CachingSettingsProvider.getCachingSettings().getDispose()
+                    .equals(CachingSettingsProvider.DISPOSE_COPY)) {
                 mediator.stopInterface(true);
                 newProof.copyCachedGoals(referencedProof, null, null);
                 mediator.startInterface(true);
+            } else {
+                newProof.openGoals().stream()
+                        .filter(x -> x.node().lookup(ClosedBy.class) != null
+                                && x.node().lookup(ClosedBy.class).getProof() == referencedProof)
+                        .forEach(x -> {
+                            x.setEnabled(true);
+                            x.node().deregister(x.node().lookup(ClosedBy.class), ClosedBy.class);
+                        });
             }
         }
 
@@ -251,10 +269,6 @@ public class CachingExtension
      */
     static class AddToDatabaseAction extends KeyAction {
         /**
-         * The mediator.
-         */
-        private final KeYMediator mediator;
-        /**
          * The node to try to close by reference.
          */
         private final Proof proof;
@@ -262,11 +276,9 @@ public class CachingExtension
         /**
          * Construct new action.
          *
-         * @param mediator the mediator
          * @param proof the proof
          */
-        public AddToDatabaseAction(KeYMediator mediator, Proof proof) {
-            this.mediator = mediator;
+        public AddToDatabaseAction(Proof proof) {
             this.proof = proof;
             setName("Add to database of cached proofs");
             setEnabled(proof.closed());

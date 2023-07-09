@@ -1277,6 +1277,18 @@ public class Proof implements Named {
     }
 
     /**
+     * Registers the given {@link ProofDisposedListener} to run before all previously registered
+     * listeners.
+     *
+     * @param l The {@link ProofDisposedListener} to register.
+     */
+    public void addProofDisposedListenerFirst(ProofDisposedListener l) {
+        if (l != null) {
+            proofDisposedListener.add(0, l);
+        }
+    }
+
+    /**
      * Unregisters the given {@link ProofDisposedListener}.
      *
      * @param l The {@link ProofDisposedListener} to unregister.

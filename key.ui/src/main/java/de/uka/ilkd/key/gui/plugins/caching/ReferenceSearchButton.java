@@ -65,7 +65,7 @@ public class ReferenceSearchButton extends JButton
 
                 goal.node().register(c, ClosedBy.class);
                 c.getProof()
-                        .addProofDisposedListener(new CachingExtension.CopyBeforeDispose(
+                        .addProofDisposedListenerFirst(new CachingExtension.CopyBeforeDispose(
                             mediator, c.getProof(), p));
             }
         }
