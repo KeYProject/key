@@ -43,6 +43,7 @@ import de.uka.ilkd.key.gui.nodeviews.*;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.gui.plugins.action_history.ActionHistoryExtension;
 import de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
@@ -647,6 +648,9 @@ public final class MainWindow extends JFrame {
         toolBar.addSeparator();
         toolBar.add(new GoalBackAction(this, false));
         toolBar.add(new PruneProofAction(this));
+        var act = new ActionHistoryExtension(this, mediator);
+        toolBar.add(act.getUndoButton().getAction());
+        toolBar.add(act.getUndoUptoButton());
         toolBar.addSeparator();
         // toolBar.add(createHeatmapToggle());
         // toolBar.add(createHeatmapMenuOpener());
