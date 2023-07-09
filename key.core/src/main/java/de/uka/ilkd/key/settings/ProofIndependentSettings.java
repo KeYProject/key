@@ -36,7 +36,6 @@ public class ProofIndependentSettings {
     private final GeneralSettings generalSettings = new GeneralSettings();
     private final ViewSettings viewSettings = new ViewSettings();
     private final TermLabelSettings termLabelSettings = new TermLabelSettings();
-
     private final String filename;
 
 

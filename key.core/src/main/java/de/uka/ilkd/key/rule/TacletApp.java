@@ -1306,11 +1306,6 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
                 && !Objects.equals(missingVars, that.missingVars)) {
             return false;
         }
-        /*
-         * if (updateContextFixed != that.updateContextFixed) {
-         * return false;
-         * }
-         */
         if (rule() instanceof Taclet) {
             if (!((Taclet) rule()).equalsModProofIrrelevancy(that.rule())) {
                 return false;

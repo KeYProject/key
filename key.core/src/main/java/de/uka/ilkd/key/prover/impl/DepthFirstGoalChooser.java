@@ -30,7 +30,7 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
                 do {
                     result = nextGoals.head();
                     nextGoals = nextGoals.tail();
-                } while (!result.isAutomatic());
+                } while (result != null && !result.isAutomatic());
             }
         } else {
             ++nextGoalCounter;

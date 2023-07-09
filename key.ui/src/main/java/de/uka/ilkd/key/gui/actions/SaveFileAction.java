@@ -32,9 +32,7 @@ public final class SaveFileAction extends MainWindowAction {
         if (mainWindow.getMediator().ensureProofLoaded()) {
             // Try to save back to file where proof was initially loaded from
             final Proof selectedProof = mainWindow.getMediator().getSelectedProof();
-            // mainWindow.getMediator().stopInterface(true);
             mainWindow.getUserInterface().saveProof(selectedProof, ".proof");
-            // mainWindow.getMediator().startInterface(true);
         } else {
             mainWindow.popupWarning("No proof.", "Oops...");
         }

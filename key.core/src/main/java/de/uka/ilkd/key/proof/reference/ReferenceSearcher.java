@@ -62,12 +62,15 @@ public final class ReferenceSearcher {
                 return n;
             }).filter(Objects::nonNull).collect(Collectors.toCollection(ArrayDeque::new));
             while (!nodesToCheck.isEmpty()) {
+                // for each node, check that the sequent in the reference is
+                // a subset of the new sequent
                 Node n = nodesToCheck.remove();
                 if (checkedNodes.contains(n)) {
                     continue;
                 }
                 checkedNodes.add(n);
 
+                // find the first node in the branch
                 while (n.parent() != null && n.parent().childrenCount() == 1) {
                     n = n.parent();
                 }

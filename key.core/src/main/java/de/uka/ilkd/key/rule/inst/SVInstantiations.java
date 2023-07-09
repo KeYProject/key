@@ -619,7 +619,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
     @Override
     public int hashCodeModProofIrrelevancy() {
-        return this.size();
+        return this.size(); // not used currently
     }
 
     public SVInstantiations union(SVInstantiations other, Services services) {
