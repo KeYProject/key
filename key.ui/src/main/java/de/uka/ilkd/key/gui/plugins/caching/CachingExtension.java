@@ -61,7 +61,7 @@ public class CachingExtension
      * Whether to enable the caching database. Remove (or replace with an optino) once the feature
      * is done.
      */
-    public static final boolean ENABLE_DATABASE = false;
+    public static final boolean ENABLE_DATABASE = true;
     private static final Logger LOGGER = LoggerFactory.getLogger(CachingExtension.class);
 
     /**

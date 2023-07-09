@@ -3,10 +3,17 @@ package de.uka.ilkd.key.gui.plugins.caching;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Random;
@@ -33,14 +40,17 @@ import org.w3c.dom.Node;
  *
  * @author Arne Keller
  */
-public class CachingDatabase {
+public final class CachingDatabase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CachingDatabase.class);
     private static final Random RAND = new Random();
+    private static final PathMatcher JAVA_MATCHER =
+        FileSystems.getDefault().getPathMatcher("glob:*.java");
 
     private static boolean initDone = false;
     private static boolean dirty = false;
     private static List<CachedProofBranch> cache;
+    private static Map<Integer, CachedFile> files;
 
     private CachingDatabase() {
 
@@ -52,6 +62,7 @@ public class CachingDatabase {
         }
         initDone = true;
         cache = new ArrayList<>();
+        files = new HashMap<>();
 
         // read candidates from ~/.key/cachedProofs.xml
         var cacheIndex = PathConfig.getCacheIndex();
@@ -76,8 +87,16 @@ public class CachingDatabase {
                         new CachedProofBranch(file, choiceSettings, branch.first, branch.second));
                 }
             }
+            var files = document.getElementsByTagName("otherFile");
+            for (int i = 0; i < files.getLength(); i++) {
+                var entry = files.item(i);
+                var name = entry.getAttributes().getNamedItem("name").getNodeValue();
+                var hash = entry.getAttributes().getNamedItem("hash").getNodeValue();
+                CachingDatabase.files.put(Integer.parseInt(hash), new CachedFile(name, Integer.parseInt(hash)));
+            }
         } catch (Exception e) {
             LOGGER.error("failed to load proof caching database ", e);
+            // TODO: add a safeguard to not delete the index file on the next write
         }
     }
 
@@ -153,6 +172,14 @@ public class CachingDatabase {
                     branchEl.appendChild(stepIndexEl);
                 }
             }
+            var cachedFiles = doc.createElement("cachedFiles");
+            doc.appendChild(cachedFiles);
+            for (var entry : files.values()) {
+                var entryEl = doc.createElement("otherFile");
+                entryEl.setAttribute("name", entry.filename);
+                entryEl.setAttribute("hash", Integer.toString(entry.hash));
+                cachedFiles.appendChild(entryEl);
+            }
             // save to file
             var transformerFactory = TransformerFactory.newInstance();
             var transformer = transformerFactory.newTransformer();
@@ -167,21 +194,76 @@ public class CachingDatabase {
 
     /**
      * Add a new proof to the database. Automatically saves a copy of the proof.
+     * This will also copy associated files (includes, java source files, ...) into the
+     * cache database.
      *
      * @param proof the proof to store
      */
     public static void addProof(Proof proof) throws IOException {
         init();
         dirty = true;
+        PathConfig.getCacheDirectory().mkdirs();
+
+        // save included (or otherwise referenced files) in ~/.key/cachedProofs/
+        var included = proof.getServices().getJavaModel().getIncludedFiles();
+        List<CachedFile> includedNew = new ArrayList<>();
+        if (included.length() > 0) {
+            for (var include : included.split(", ")) {
+                var absPath = include.substring(1, include.length() - 1);
+                // load into memory
+                var content = Files.readString(Path.of(absPath));
+                includedNew.add(getCached(content, "key"));
+            }
+        }
+        // save Java source files in ~/.key/cachedProofs/
+        var sourceDir = proof.getServices().getJavaModel().getModelDir();
+        List<CachedFile> sourceNew = new ArrayList<>();
+        // mirror normal KeY behaviour: read all .java files in the directory
+        try (var walker = Files.walk(Path.of(sourceDir))) {
+            walker.forEach(path -> {
+                if (!JAVA_MATCHER.matches(path.getFileName())) {
+                    return;
+                }
+                try {
+                    var content = Files.readString(path);
+                    sourceNew.add(CachingDatabase.getCached(content, "java"));
+                } catch (IOException e) {
+                    LOGGER.error("failed to save java source ", e);
+                }
+            });
+        }
+        // create a simulated source directory
+        File virtualSrc;
+        do {
+            var filename = "javaSource" + (RAND.nextInt(1000000));
+            virtualSrc = new File(PathConfig.getCacheDirectory(), filename);
+        } while (virtualSrc.exists());
+        virtualSrc.mkdir();
+        var virtualSource = Path.of(virtualSrc.toURI());
+        for (var path : sourceNew) {
+            Files.createLink(virtualSource.resolve(path.filename),
+                PathConfig.getCacheDirectory().toPath().resolve(path.filename));
+        }
+        // TODO: bootstrap path etc.
+
+        // construct new header
+        var proofHeader = new StringBuilder();
+        for (var include : includedNew) {
+            proofHeader.append("\\include \"").append(include).append("\";\n");
+        }
+        proofHeader.append("\\javaSource \"").append(virtualSrc).append("\";\n");
+        var oldHeader = proof.header();
+        proof.setProblemHeader(proofHeader.toString());
 
         // save to file in ~/.key/cachedProofs/
-        PathConfig.getCacheDirectory().mkdirs();
         File file;
         do {
             var filename = "proof" + (RAND.nextInt(1000000)) + ".proof";
             file = new File(PathConfig.getCacheDirectory(), filename);
         } while (file.exists());
         proof.saveToFile(file);
+
+        proof.setProblemHeader(oldHeader);
 
         // save sequents of candidate nodes in cache
         proof.setStepIndices();
@@ -212,5 +294,21 @@ public class CachingDatabase {
         init();
 
         return List.of();
+    }
+
+    private static CachedFile getCached(String content, String extension) throws IOException {
+        int hash = content.hashCode();
+        if (files.containsKey(hash)) {
+            return files.get(hash);
+        }
+        File file;
+        do {
+            var filename = extension + (RAND.nextInt(1000000)) + "." + extension;
+            file = new File(PathConfig.getCacheDirectory(), filename);
+        } while (file.exists());
+        Files.write(Path.of(file.toURI()), content.getBytes(StandardCharsets.UTF_8));
+        var cachedFile = new CachedFile(file.getName(), hash);
+        files.put(hash, cachedFile);
+        return cachedFile;
     }
 }

@@ -320,6 +320,9 @@ public class Proof implements Named {
         return problemHeader;
     }
 
+    public void setProblemHeader(String problemHeader) {
+        this.problemHeader = problemHeader;
+    }
 
     public ProofCorrectnessMgt mgt() {
         return localMgt;
