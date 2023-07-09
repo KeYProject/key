@@ -68,6 +68,11 @@ public class CachingExtension
      * The mediator.
      */
     private KeYMediator mediator;
+    /**
+     * Whether to try to close the current proof after a rule application.
+     * Will be false when running certain macros.
+     */
+    private boolean tryToClose = false;
 
     /**
      * Proofs tracked for automatic reference search.
@@ -91,8 +96,10 @@ public class CachingExtension
 
     @Override
     public void ruleApplied(ProofEvent e) {
-        if (e.getSource().lookup(CopyingProofReplayer.class) != null
-                || e.getSource().lookup(TryCloseMacro.class) != null) {
+        if (!tryToClose) {
+            return;
+        }
+        if (e.getSource().lookup(CopyingProofReplayer.class) != null) {
             // either:
             // copy in progress,
             // macro that excepts the proof to really close in progress
@@ -176,12 +183,15 @@ public class CachingExtension
 
     @Override
     public void taskStarted(TaskStartedInfo info) {
-
+        if (info.getKind().equals(TaskStartedInfo.TaskKind.Macro)
+                && info.getMessage().equals(new TryCloseMacro().getName())) {
+            tryToClose = false;
+        }
     }
 
     @Override
     public void taskProgress(int position) {
-
+        tryToClose = true;
     }
 
     @Override
