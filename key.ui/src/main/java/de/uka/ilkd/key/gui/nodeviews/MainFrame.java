@@ -103,4 +103,13 @@ public final class MainFrame extends JPanel {
     public boolean isShowTacletInfo() {
         return showTacletInfo;
     }
+
+    /**
+     * Scroll the sequent view to the specified y coordinate.
+     *
+     * @param y coordinate in pixels
+     */
+    public void scrollTo(int y) {
+        scrollPane.getVerticalScrollBar().setValue(y);
+    }
 }
