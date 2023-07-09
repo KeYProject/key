@@ -237,6 +237,7 @@ public class TaskTree extends JPanel {
      */
     class TaskTreeMouseListener extends MouseAdapter {
 
+        @Override
         public void mouseClicked(MouseEvent e) {
             problemChosen();
             checkPopup(e);
@@ -247,6 +248,21 @@ public class TaskTree extends JPanel {
             checkPopup(e);
         }
 
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            checkPopup(e);
+        }
+
+        /**
+         * Checks whether the popup menu should be shown and does so if necessary.
+         * <br>
+         * <b>Important:</b><br>
+         * For the platform specific popup trigger to work, we need to check the popup in pressed,
+         * released, and clicked event. For example, on Windows the e.isPopupTrigger() information
+         * is only available in the released event.
+         *
+         * @param e the mouse event that may create the popup
+         */
         private void checkPopup(MouseEvent e) {
             if (e.isPopupTrigger()) {
                 TreePath selPath = delegateView.getPathForLocation(e.getX(), e.getY());
