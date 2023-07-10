@@ -201,7 +201,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
             createPostconditionsNext(
                 selfTerm, heaps, nextVariables, modifiesClauses, freeModifiesClauses, services);
         final Term[] postconditions =
-            createPostconditions(modifiesClauses,freeModifiesClauses, conditionsAndClausesBuilder);
+            createPostconditions(modifiesClauses, freeModifiesClauses, conditionsAndClausesBuilder);
         final Term decreasesCheck = conditionsAndClausesBuilder.buildDecreasesCheck();
 
         final GoalsConfigurator configurator =
@@ -280,19 +280,19 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      * @return the postconditions for the current loop iteration.
      */
     private Term[] createPostconditions(
-        final Map<LocationVariable, Term> modifiesClauses,
-        final Map<LocationVariable, Term> freeModifiesClauses,
-        final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
+            final Map<LocationVariable, Term> modifiesClauses,
+            final Map<LocationVariable, Term> freeModifiesClauses,
+            final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term frameCondition =
             conditionsAndClausesBuilder.buildFrameCondition(
                 modifiesClauses, freeModifiesClauses);
         return new Term[] { postcondition, frameCondition };
     }
-    
+
     /**
      * Creates postconditions for the next loop iteration.
-     * 
+     *
      * @param selfTerm the self term.
      * @param heaps the heaps.
      * @param nextVariables the variables for the next loop iteration.
@@ -302,12 +302,12 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      * @return the postconditions for the next loop iteration.
      */
     private Term[] createPostconditionsNext(
-        final Term selfTerm,
-        final List<LocationVariable> heaps,
-        final LoopContract.Variables nextVariables,
-        final Map<LocationVariable, Term> modifiesClauses,
-        final Map<LocationVariable, Term> freeModifiesClauses,
-        final Services services) {
+            final Term selfTerm,
+            final List<LocationVariable> heaps,
+            final LoopContract.Variables nextVariables,
+            final Map<LocationVariable, Term> modifiesClauses,
+            final Map<LocationVariable, Term> freeModifiesClauses,
+            final Services services) {
         final Term nextPostcondition =
             new ConditionsAndClausesBuilder(contract.getAuxiliaryContract(), heaps, nextVariables,
                 selfTerm, services).buildPostcondition();

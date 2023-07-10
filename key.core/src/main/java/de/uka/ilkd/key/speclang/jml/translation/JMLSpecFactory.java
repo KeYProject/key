@@ -481,9 +481,9 @@ public class JMLSpecFactory {
             final ImmutableList<LabeledParserRuleContext> modFree, ContractClauses clauses)
             throws SLTranslationException {
         clauses.hasMod.put(heap, !translateStrictlyPure(context, progVars.paramVars, mod));
-        
+
         // For assignable_free, the default if there is no modFree term is strictly_nothing.
-        clauses.hasFreeMod.put(heap, 
+        clauses.hasFreeMod.put(heap,
             !modFree.isEmpty() && !translateStrictlyPure(context, progVars.paramVars, modFree));
 
         if (heap == savedHeap && mod.isEmpty()) {
@@ -500,18 +500,21 @@ public class JMLSpecFactory {
                     progVars.atPres, progVars.atBefores, mod));
             }
         }
-        
+
         if (heap == savedHeap && modFree.isEmpty()) {
             clauses.assignablesFree.put(heap, null);
         } else {
             final Boolean hasFreeMod = clauses.hasFreeMod.get(heap);
             if (hasFreeMod == null || !hasFreeMod) {
-                final ImmutableList<LabeledParserRuleContext> assignableFreeNothing = ImmutableSLList
-                        .<LabeledParserRuleContext>nil().append(getAssignableFreeNothing());
-                clauses.assignablesFree.put(heap, translateAssignableFree(context, progVars.paramVars,
+                final ImmutableList<LabeledParserRuleContext> assignableFreeNothing =
+                    ImmutableSLList
+                            .<LabeledParserRuleContext>nil().append(getAssignableFreeNothing());
+                clauses.assignablesFree.put(heap,
+                    translateAssignableFree(context, progVars.paramVars,
                         progVars.atPres, progVars.atBefores, assignableFreeNothing));
             } else {
-                clauses.assignablesFree.put(heap, translateAssignableFree(context, progVars.paramVars,
+                clauses.assignablesFree.put(heap,
+                    translateAssignableFree(context, progVars.paramVars,
                         progVars.atPres, progVars.atBefores, modFree));
             }
         }
@@ -523,7 +526,7 @@ public class JMLSpecFactory {
         return new LabeledParserRuleContext(JmlFacade.parseClause("assignable \\nothing;"),
             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
     }
-    
+
     @Nonnull
     private LabeledParserRuleContext getAssignableFreeNothing() {
         return new LabeledParserRuleContext(JmlFacade.parseClause("assignable_free \\nothing;"),
@@ -745,7 +748,7 @@ public class JMLSpecFactory {
                 SpecType.ASSIGNABLE);
         }
     }
-    
+
     private Term translateAssignableFree(Context context, ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atBefores,
             ImmutableList<LabeledParserRuleContext> originalClauses) throws SLTranslationException {
@@ -916,7 +919,7 @@ public class JMLSpecFactory {
             // create box modality contract
             FunctionalOperationContract contract = cf.func(name, pm, false, pres,
                 clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                clauses.assignables,  clauses.assignablesFree, clauses.accessibles, clauses.hasMod,
+                clauses.assignables, clauses.assignablesFree, clauses.accessibles, clauses.hasMod,
                 clauses.hasFreeMod, progVars);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
@@ -931,12 +934,12 @@ public class JMLSpecFactory {
             }
             FunctionalOperationContract contract1 = cf.func(name, pm, true, pres,
                 clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                clauses.assignables,  clauses.assignablesFree, clauses.accessibles, clauses.hasMod,
+                clauses.assignables, clauses.assignablesFree, clauses.accessibles, clauses.hasMod,
                 clauses.hasFreeMod, progVars);
             contract1 = cf.addGlobalDefs(contract1, abbrvLhs);
             FunctionalOperationContract contract2 = cf.func(name, pm, false, clauses.requires,
                 clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                clauses.assignables,  clauses.assignablesFree, clauses.accessibles, clauses.hasMod,
+                clauses.assignables, clauses.assignablesFree, clauses.accessibles, clauses.hasMod,
                 clauses.hasFreeMod, progVars);
             contract2 = cf.addGlobalDefs(contract2, abbrvLhs);
             result = result.add(contract1).add(contract2);
@@ -1338,7 +1341,7 @@ public class JMLSpecFactory {
             method, behavior, variables, clauses.requires, clauses.requiresFree, clauses.measuredBy,
             clauses.ensures, clauses.ensuresFree, clauses.infFlowSpecs, clauses.breaks,
             clauses.continues, clauses.returns, clauses.signals, clauses.signalsOnly,
-            clauses.diverges, clauses.assignables,  clauses.assignablesFree, clauses.hasMod,
+            clauses.diverges, clauses.assignables, clauses.assignablesFree, clauses.hasMod,
             clauses.hasFreeMod, clauses.decreases, services)
                     .create();
     }
@@ -1373,7 +1376,7 @@ public class JMLSpecFactory {
             method, behavior, variables, clauses.requires, clauses.requiresFree, clauses.measuredBy,
             clauses.ensures, clauses.ensuresFree, clauses.infFlowSpecs, clauses.breaks,
             clauses.continues, clauses.returns, clauses.signals, clauses.signalsOnly,
-            clauses.diverges, clauses.assignables,  clauses.assignablesFree, clauses.hasMod,
+            clauses.diverges, clauses.assignables, clauses.assignablesFree, clauses.hasMod,
             clauses.hasFreeMod, clauses.decreases, services)
                     .create();
     }
@@ -1626,7 +1629,7 @@ public class JMLSpecFactory {
                     Term translated =
                         new JmlIO(services).context(context).parameters(allVars).atPres(atPres)
                                 .atBefore(atPres).translateTerm(expr,
-                                        free ? SpecType.ASSIGNABLE_FREE : SpecType.ASSIGNABLE);
+                                    free ? SpecType.ASSIGNABLE_FREE : SpecType.ASSIGNABLE);
                     a = tb.union(a, translated);
                 }
             }

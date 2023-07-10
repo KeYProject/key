@@ -228,7 +228,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         Map<LocationVariable, Term> newMods = originalMods.entrySet().stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<LocationVariable, Term> newFreeMods = originalFreeMods.entrySet().stream().collect(
-                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+            MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<ProgramVariable, Term> newAccessibles = originalDeps.entrySet().stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Term newGlobalDefs = op.apply(globalDefs);
@@ -1218,7 +1218,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             ImmutableList<ProgramVariable> paramVars, Services services) {
         return getAnyMod(this.originalMods.get(heap), selfVar, paramVars, services);
     }
-    
+
     @Override
     public Term getFreeMod(LocationVariable heap, ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars, Services services) {
@@ -1252,7 +1252,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         }
         return result;
     }
-    
+
     @Override
     public boolean hasFreeModifiesClause(LocationVariable heap) {
         Boolean result = this.hasRealFreeModifiesClause.get(heap);
@@ -1268,12 +1268,12 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return getAnyMod(heap, this.originalMods.get(heap), heapTerm, selfTerm, paramTerms,
             services);
     }
-    
+
     @Override
     public Term getFreeMod(LocationVariable heap, Term heapTerm,
             Term selfTerm, ImmutableList<Term> paramTerms, Services services) {
         return getAnyMod(heap, this.originalFreeMods.get(heap), heapTerm, selfTerm, paramTerms,
-                services);
+            services);
     }
 
     @Override

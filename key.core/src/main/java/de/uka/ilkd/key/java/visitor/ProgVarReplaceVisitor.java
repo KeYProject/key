@@ -373,7 +373,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         final Map<LocationVariable, Term> newFreeModifiesClauses =
             new LinkedHashMap<LocationVariable, Term>();
         boolean changed = blockChanged;
-        
+
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             final Term oldPrecondition = oldContract.getPrecondition(heap, services);
             final Term oldFreePrecondition = oldContract.getFreePrecondition(heap, services);
@@ -567,11 +567,11 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             final Term m =
                 replaceVariablesInTerm(inv.getModifies(heap, selfTerm, atPres, services));
             newMods.put(heap, m);
-            
+
             final Term mf = replaceVariablesInTerm(
-                    inv.getFreeModifies(heap, selfTerm, atPres, services));
-            newFreeMods.put(heap, mf); 
-            
+                inv.getFreeModifies(heap, selfTerm, atPres, services));
+            newFreeMods.put(heap, mf);
+
             final ImmutableList<InfFlowSpec> infFlowSpecs = replaceVariablesInTermListTriples(
                 inv.getInfFlowSpecs(heap, selfTerm, atPres, services));
             newInfFlowSpecs.put(heap, infFlowSpecs);
@@ -609,8 +609,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         ImmutableList<Term> newLocalOuts = tb.var(MiscTools.getLocalOuts(newLoop, services));
 
         LoopSpecification newInv = inv.create(newLoop, newInvariants, newFreeInvariants, newMods,
-                newFreeMods, newInfFlowSpecs, newVariant, newSelfTerm, newLocalIns, newLocalOuts,
-                atPres);
+            newFreeMods, newInfFlowSpecs, newVariant, newSelfTerm, newLocalIns, newLocalOuts,
+            atPres);
         services.getSpecificationRepository().addLoopInvariant(newInv);
     }
 

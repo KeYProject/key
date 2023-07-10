@@ -94,19 +94,19 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
         return new Term[] { precondition, wellFormedHeapsCondition, reachableInCondition,
             selfConditions };
     }
-    
+
     /**
      * Creates postconditions for the current loop iteration.
-     * 
+     *
      * @param modifiesClauses the loop's modifies clauses.
      * @param freeModifiesClauses the loop's free modifies clauses.
      * @param conditionsAndClausesBuildera ConditionsAndClausesBuilder.
      * @return the postconditions for the current loop iteration.
      */
     private static Term[] createPostconditions(
-        final Map<LocationVariable, Term> modifiesClauses,
-        final Map<LocationVariable, Term>  freeModifiesClauses,
-        final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
+            final Map<LocationVariable, Term> modifiesClauses,
+            final Map<LocationVariable, Term> freeModifiesClauses,
+            final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term frameCondition =
             conditionsAndClausesBuilder.buildFrameCondition(
@@ -114,11 +114,11 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
         return new Term[] { postcondition, frameCondition };
     }
 
- 
-    
+
+
     /**
      * Creates postconditions for the next loop iteration.
-     * 
+     *
      * @param selfTerm the self term.
      * @param contract the loop contract being applied.
      * @param heaps the heaps.
@@ -126,16 +126,16 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
      * @param modifiesClauses the modified clauses.
      * @param freeModifiesClauses the free modified clauses.
      * @param services services.
-     * * @return the postconditions for the next loop iteration.
+     *        * @return the postconditions for the next loop iteration.
      */
     private static Term[] createPostconditionsNext(
-        final Term selfTerm,
-        final LoopContract contract,
-        final List<LocationVariable> heaps,
-        final LoopContract.Variables nextVariables,
-        final Map<LocationVariable, Term> modifiesClauses,
-        final Map<LocationVariable, Term> freeModifiesClauses,
-        final Services services) {
+            final Term selfTerm,
+            final LoopContract contract,
+            final List<LocationVariable> heaps,
+            final LoopContract.Variables nextVariables,
+            final Map<LocationVariable, Term> modifiesClauses,
+            final Map<LocationVariable, Term> freeModifiesClauses,
+            final Services services) {
         final Term nextPostcondition =
             new ConditionsAndClausesBuilder(contract, heaps, nextVariables, selfTerm, services)
                     .buildPostcondition();

@@ -85,7 +85,7 @@ public final class LoopSpecImpl implements LoopSpecification {
      */
     public LoopSpecImpl(LoopStatement loop, IProgramMethod pm, KeYJavaType kjt,
             Map<LocationVariable, Term> invariants, Map<LocationVariable, Term> freeInvariants,
-            Map<LocationVariable, Term> modifies, 
+            Map<LocationVariable, Term> modifies,
             Map<LocationVariable, Term> freeModifies,
             Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant,
             Term selfTerm, ImmutableList<Term> localIns, ImmutableList<Term> localOuts,
@@ -185,8 +185,9 @@ public final class LoopSpecImpl implements LoopSpecification {
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<LocationVariable, Term> newModifies = originalModifies.entrySet().stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
-        Map<LocationVariable, Term> newFreeModifies = originalFreeModifies.entrySet().stream().collect(
-            MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, Term> newFreeModifies =
+            originalFreeModifies.entrySet().stream().collect(
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<LocationVariable, ImmutableList<InfFlowSpec>> newInfFlowSpecs =
             originalInfFlowSpecs.entrySet().stream()
                     .collect(MapUtil.collector(Map.Entry::getKey, entry -> entry.getValue().stream()
@@ -255,9 +256,10 @@ public final class LoopSpecImpl implements LoopSpecification {
         OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
         return or.replace(originalModifies.get(baseHeap));
     }
-    
+
     @Override
-    public Term getFreeModifies(LocationVariable heap, Term selfTerm, Map<LocationVariable, Term> atPres,
+    public Term getFreeModifies(LocationVariable heap, Term selfTerm,
+            Map<LocationVariable, Term> atPres,
             Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
@@ -266,7 +268,8 @@ public final class LoopSpecImpl implements LoopSpecification {
     }
 
     @Override
-    public Term getFreeModifies(Term selfTerm, Map<LocationVariable, Term> atPres, Services services) {
+    public Term getFreeModifies(Term selfTerm, Map<LocationVariable, Term> atPres,
+            Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
@@ -321,7 +324,7 @@ public final class LoopSpecImpl implements LoopSpecification {
     public Map<LocationVariable, Term> getInternalModifies() {
         return originalModifies;
     }
-    
+
     @Override
     public Map<LocationVariable, Term> getInternalFreeModifies() {
         return originalFreeModifies;

@@ -71,9 +71,9 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             final Map<LocationVariable, Boolean> hasFreeMod,
             ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts) {
         super(baseName, block, labels, method, modality,
-                preconditions, freePreconditions, measuredBy, postconditions, freePostconditions,
-                modifiesClauses, freeModifiesClauses, infFlowSpecs, variables, transactionApplicable,
-                hasMod, hasFreeMod, functionalContracts);
+            preconditions, freePreconditions, measuredBy, postconditions, freePostconditions,
+            modifiesClauses, freeModifiesClauses, infFlowSpecs, variables, transactionApplicable,
+            hasMod, hasFreeMod, functionalContracts);
     }
 
     /**
@@ -254,9 +254,9 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 Map<LocationVariable, Boolean> hasMod, Map<LocationVariable, Boolean> hasFreeMod,
                 Services services) {
             super(baseName, block, labels, method, behavior, variables,
-                    requires, requiresFree, measuredBy, ensures, ensuresFree,
-                    infFlowSpecs, breaks, continues, returns, signals, signalsOnly,
-                    diverges, assignables, assignablesFree, hasMod, hasFreeMod, services);
+                requires, requiresFree, measuredBy, ensures, ensuresFree,
+                infFlowSpecs, breaks, continues, returns, signals, signalsOnly,
+                diverges, assignables, assignablesFree, hasMod, hasFreeMod, services);
         }
 
         @Override
@@ -271,9 +271,9 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod,
                 Map<LocationVariable, Boolean> hasFreeMod) {
             return new BlockContractImpl(baseName, block, labels, method, modality,
-                    preconditions, freePreconditions, measuredBy,
-                    postconditions, freePostconditions, modifiesClauses, freeModifiesClauses,
-                    infFlowSpecs, variables, transactionApplicable, hasMod, hasFreeMod, null);
+                preconditions, freePreconditions, measuredBy,
+                postconditions, freePostconditions, modifiesClauses, freeModifiesClauses,
+                infFlowSpecs, variables, transactionApplicable, hasMod, hasFreeMod, null);
         }
     }
 
@@ -322,7 +322,8 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             }
 
             Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<>();
-            Map<LocationVariable, Boolean> hasFreeMod = new LinkedHashMap<LocationVariable, Boolean>();
+            Map<LocationVariable, Boolean> hasFreeMod =
+                new LinkedHashMap<LocationVariable, Boolean>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 boolean hm = false;
                 boolean hfm = false;
@@ -335,14 +336,14 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 hasFreeMod.put(heap, hm);
             }
 
-            
+
             BlockContractImpl result = new BlockContractImpl(baseName.toString(), head.getBlock(),
-                    head.getLabels(), head.getMethod(), head.getModality(),
-                    preconditions, freePreconditions,
-                    contracts[0].getMby(), postconditions, freePostconditions,
-                    modifiesClauses, freeModifiesClauses, head.getInfFlowSpecs(),
-                    placeholderVariables, head.isTransactionApplicable(), hasMod, hasFreeMod,
-                    functionalContracts);
+                head.getLabels(), head.getMethod(), head.getModality(),
+                preconditions, freePreconditions,
+                contracts[0].getMby(), postconditions, freePostconditions,
+                modifiesClauses, freeModifiesClauses, head.getInfFlowSpecs(),
+                placeholderVariables, head.isTransactionApplicable(), hasMod, hasFreeMod,
+                functionalContracts);
 
             return result;
         }

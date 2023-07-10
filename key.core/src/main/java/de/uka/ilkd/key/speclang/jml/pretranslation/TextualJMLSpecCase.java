@@ -32,7 +32,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public ImmutableList<LabeledParserRuleContext> getEnsuresFree(Name toString) {
         return getList(ENSURES_FREE, toString);
     }
-    
+
     public ImmutableList<LabeledParserRuleContext> getAssignableFree(Name toString) {
         return getList(ASSIGNABLE_FREE, toString);
     }

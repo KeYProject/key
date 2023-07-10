@@ -87,7 +87,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      * @see #getModifiesClause(LocationVariable, Services)
      */
     protected final Map<LocationVariable, Term> modifiesClauses;
-    
+
     /**
      * @see #getFreeModifiesClause(LocationVariable, Services)
      */
@@ -112,7 +112,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      * @see #hasModifiesClause(LocationVariable)
      */
     protected final Map<LocationVariable, Boolean> hasMod;
-    
+
     /**
      * @see #hasFreeModifiesClause(LocationVariable)
      */
@@ -247,7 +247,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     public boolean hasModifiesClause(LocationVariable heap) {
         return hasMod.get(heap);
     }
-    
+
     @Override
     public boolean hasFreeModifiesClause(LocationVariable heap) {
         return hasFreeMod.get(heap);
@@ -450,24 +450,24 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     public Term getModifiesClause(final LocationVariable heap, final Services services) {
         return getModifiesClause(heap, variables.self, services);
     }
-    
+
     @Override
     public Term getFreeModifiesClause(final LocationVariable heap, final ProgramVariable self,
             final Services services) {
         return getTerm(
-                freeModifiesClauses.get(heap),
-                new Variables(self, null, null, null, null, null, null, null, null, null, services),
-                services);
+            freeModifiesClauses.get(heap),
+            new Variables(self, null, null, null, null, null, null, null, null, null, services),
+            services);
     }
 
     @Override
     public Term getFreeModifiesClause(final LocationVariable heapVariable, final Term heap,
             final Term self, final Services services) {
         return getTerm(
-                freeModifiesClauses.get(heapVariable),
-                heap,
-                new Terms(self, null, null, null, null, null, null, null, null, null),
-                services);
+            freeModifiesClauses.get(heapVariable),
+            heap,
+            new Terms(self, null, null, null, null, null, null, null, null, null),
+            services);
     }
 
     @Override
@@ -1020,7 +1020,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * A map from every heap to an assignable term.
          */
         private final Map<LocationVariable, Term> assignables;
-        
+
         /**
          * A map from every heap to a free assignable term.
          */
@@ -1035,7 +1035,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * A map specifying on which heaps this contract has a modifies clause.
          */
         private final Map<LocationVariable, Boolean> hasMod;
-        
+
         /**
          * A map specifying on which heaps this contract has a free modifies clause.
          */
@@ -1574,7 +1574,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @see AuxiliaryContract#getModifiesClause(LocationVariable, Services)
          */
         protected final Map<LocationVariable, Term> modifiesClauses;
-        
+
         /**
          * @see AuxiliaryContract#getModifiesClause(LocationVariable, Services)
          */
@@ -1706,20 +1706,20 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                     unionPossiblyNull(modifiesClauses.get(heap), additionalModifiesClause));
             }
         }
-        
+
         /**
          *
          * @param contract
-         *            the contract whose modified clause to add.
+         *        the contract whose modified clause to add.
          * @param heap
-         *            the heap to use.
+         *        the heap to use.
          */
         private void addFreeModifiesClauseFrom(final T contract, final LocationVariable heap) {
-            final Term additionalModifiesClause
-            = contract.getModifiesClause(heap, placeholderVariables.self, services);
+            final Term additionalModifiesClause =
+                contract.getModifiesClause(heap, placeholderVariables.self, services);
             if (additionalModifiesClause != null) {
                 freeModifiesClauses.put(heap,
-                        unionPossiblyNull(freeModifiesClauses.get(heap), additionalModifiesClause));
+                    unionPossiblyNull(freeModifiesClauses.get(heap), additionalModifiesClause));
             }
         }
 

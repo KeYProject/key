@@ -82,8 +82,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
      * @param services services.
      */
     public void updateBlockAndLoopContracts(final ImmutableSet<? extends JavaStatement> statements,
-        Map<LocationVariable, LocationVariable> atPreVars,
-        Map<LocationVariable, LocationVariable> atPreHeapVars, Services services) {
+            Map<LocationVariable, LocationVariable> atPreVars,
+            Map<LocationVariable, LocationVariable> atPreHeapVars, Services services) {
         for (JavaStatement statement : statements) {
             ImmutableSet<AuxiliaryContract> contracts = DefaultImmutableSet.nil();
 
@@ -148,7 +148,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         private Term atPreUpdate;
 
         public PrestateVariablesUpdater(final MethodFrame frame, final Services services,
-            final TermBuilder tb) {
+                final TermBuilder tb) {
             super(frame, services);
             this.frame = frame;
             selfTerm = MiscTools.getSelfTerm(frame, services);
@@ -176,7 +176,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         @Override
         public void performActionOnMergeContract(final MergeContract spec) {
             if ((!(spec instanceof UnparameterizedMergeContract)
-                && !(spec instanceof PredicateAbstractionMergeContract))) {
+                    && !(spec instanceof PredicateAbstractionMergeContract))) {
                 throw new AssertionError(
                     "Unsupported kind of merge contract: " + spec.getClass().getSimpleName());
             }
@@ -188,9 +188,9 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 addNeededVariables(pamc.getAtPres().keySet());
                 services.getSpecificationRepository().removeMergeContracts(mps);
                 services.getSpecificationRepository()
-                .addMergeContract(new PredicateAbstractionMergeContract(mps, atPres,
-                    pamc.getKJT(), pamc.getLatticeTypeName(),
-                    pamc.getAbstractionPredicates(atPres, services)));
+                        .addMergeContract(new PredicateAbstractionMergeContract(mps, atPres,
+                            pamc.getKJT(), pamc.getLatticeTypeName(),
+                            pamc.getAbstractionPredicates(atPres, services)));
             }
         }
 
@@ -221,7 +221,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 final Term freeTerm = spec.getInternalFreeModifies().getOrDefault(
                     services.getTypeConverter().getHeapLDT().getHeap(), tb.strictlyNothing());
                 if (heap != services.getTypeConverter().getHeapLDT().getSavedHeap()
-                      || !tb.strictlyNothing().equalsModIrrelevantTermLabels(term)) {
+                        || !tb.strictlyNothing().equalsModIrrelevantTermLabels(term)) {
                     final Term m = spec.getModifies(heap, self, atPres, services);
                     final ImmutableList<InfFlowSpec> infFlowSpecs =
                         spec.getInfFlowSpecs(heap, self, atPres, services);
@@ -235,7 +235,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     newInfFlowSpecs.put(heap, infFlowSpecs);
                 }
                 if (heap != services.getTypeConverter().getHeapLDT().getSavedHeap()
-                    || !tb.strictlyNothing().equalsModIrrelevantTermLabels(freeTerm)) {
+                        || !tb.strictlyNothing().equalsModIrrelevantTermLabels(freeTerm)) {
                     final Term m = spec.getFreeModifies(heap, selfTerm, atPres, services);
                     final ImmutableList<InfFlowSpec> infFlowSpecs =
                         spec.getInfFlowSpecs(heap, selfTerm, atPres, services);
@@ -301,7 +301,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         }
 
         private void performActionOnAuxContract(final AuxiliaryContract contract,
-            final JavaStatement statement) {
+                final JavaStatement statement) {
             final AuxiliaryContract.Variables variables = contract.getPlaceholderVariables();
             addNeededVariables(variables.outerRemembranceVariables.keySet());
             addNeededHeaps(variables.outerRemembranceHeaps.keySet());
@@ -317,9 +317,9 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
     }
 
     private static void updateAuxiliaryContract(final AuxiliaryContract contract,
-        final JavaStatement statement, final AuxiliaryContract.Variables variables,
-        final Map<LocationVariable, LocationVariable> nonHeapVars,
-        final Map<LocationVariable, LocationVariable> atPreHeapVars, final Services services) {
+            final JavaStatement statement, final AuxiliaryContract.Variables variables,
+            final Map<LocationVariable, LocationVariable> nonHeapVars,
+            final Map<LocationVariable, LocationVariable> atPreHeapVars, final Services services) {
         final AuxiliaryContract.Variables newVariables = new AuxiliaryContract.Variables(
             variables.self, variables.breakFlags, variables.continueFlags, variables.returnFlag,
             variables.result, variables.exception, variables.remembranceHeaps,

@@ -127,7 +127,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
                 mod.execPostOrder(tpvc);
             }
         }
-        
+
         // free modifies
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                 .getAllHeaps()) {

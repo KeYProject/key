@@ -130,13 +130,13 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @return whether this contract is strictly pure.
      */
     boolean hasModifiesClause(LocationVariable heap);
-    
+
     /**
      * Returns <code>true</code> iff the method (according to the free part of the contract)
      * does not modify the heap at all, i.e., iff it is "strictly pure."
      *
      * @param heap
-     *            the heap to use.
+     *        the heap to use.
      * @return whether this contract is strictly pure.
      */
     boolean hasFreeModifiesClause(LocationVariable heap);
@@ -355,11 +355,11 @@ public interface AuxiliaryContract extends SpecificationElement {
     /**
      *
      * @param heap
-     *            the heap to use.
+     *        the heap to use.
      * @param self
-     *            the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
+     *        the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
      * @param services
-     *            services.
+     *        services.
      * @return this contract's free modifies clause on the specified heap.
      */
     Term getFreeModifiesClause(LocationVariable heap, ProgramVariable self, Services services);
@@ -367,13 +367,13 @@ public interface AuxiliaryContract extends SpecificationElement {
     /**
      *
      * @param heapVariable
-     *            the heap to use.
+     *        the heap to use.
      * @param heap
-     *            the heap to use.
+     *        the heap to use.
      * @param self
-     *            the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
+     *        the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
      * @param services
-     *            services.
+     *        services.
      * @return this contract's free modifies clause on the specified heap.
      */
     Term getFreeModifiesClause(LocationVariable heapVariable, Term heap, Term self,
@@ -382,11 +382,11 @@ public interface AuxiliaryContract extends SpecificationElement {
     /**
      *
      * @param heap
-     *            the heap to use.
+     *        the heap to use.
      * @param variables
-     *            the variables to use instead of {@link #getPlaceholderVariables()}.
+     *        the variables to use instead of {@link #getPlaceholderVariables()}.
      * @param services
-     *            services.
+     *        services.
      * @return this contract's free modifies clause on the specified heap.
      */
     Term getFreeModifiesClause(LocationVariable heap, Variables variables, Services services);
@@ -394,9 +394,9 @@ public interface AuxiliaryContract extends SpecificationElement {
     /**
      *
      * @param heap
-     *            the heap to use.
+     *        the heap to use.
      * @param services
-     *            services.
+     *        services.
      * @return this contract's free modifies clause on the specified heap.
      */
     Term getFreeModifiesClause(LocationVariable heap, Services services);

@@ -855,7 +855,8 @@ public final class AuxiliaryContractBuilders {
         public Map<LocationVariable, Term> buildFreeModifiesClauses() {
             Map<LocationVariable, Term> result = new LinkedHashMap<>();
             for (final LocationVariable heap : heaps) {
-                result.put(heap, contract.getFreeModifiesClause(heap, var(heap), terms.self, services));
+                result.put(heap,
+                    contract.getFreeModifiesClause(heap, var(heap), terms.self, services));
             }
             return result;
         }
@@ -918,8 +919,7 @@ public final class AuxiliaryContractBuilders {
          */
         public Term buildFrameCondition(
                 final Map<LocationVariable, Term> modifiesClauses,
-                final Map<LocationVariable, Term> freeModifiesClauses
-                ) {
+                final Map<LocationVariable, Term> freeModifiesClauses) {
             Term result = tt();
             Map<LocationVariable, Map<Term, Term>> remembranceVariables =
                 constructRemembranceVariables();

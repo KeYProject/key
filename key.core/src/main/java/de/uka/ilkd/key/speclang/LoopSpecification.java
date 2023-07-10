@@ -78,9 +78,10 @@ public interface LoopSpecification extends SpecificationElement {
      * @return The modifies clause as a term.
      */
     Term getModifies(Term selfTerm, Map<LocationVariable, Term> atPres, Services services);
-    
+
     /**
      * Returns the free modifies clause.
+     *
      * @param heap the heap variable.
      * @param selfTerm the self term.
      * @param atPres the operators used for the pre-heap.
@@ -88,19 +89,20 @@ public interface LoopSpecification extends SpecificationElement {
      * @return The modifies clause as a term.
      */
     Term getFreeModifies(LocationVariable heap, Term selfTerm,
-                            Map<LocationVariable, Term> atPres,
-                            Services services);
+            Map<LocationVariable, Term> atPres,
+            Services services);
 
     /**
      * Returns the free modifies clause.
+     *
      * @param selfTerm the self term.
      * @param atPres the operators used for the pre-heap.
      * @param services the Services object.
      * @return The modifies clause as a term.
      */
     Term getFreeModifies(Term selfTerm,
-                            Map<LocationVariable, Term> atPres,
-                            Services services);
+            Map<LocationVariable, Term> atPres,
+            Services services);
 
     /**
      * Returns the information flow specification clause.
@@ -170,10 +172,11 @@ public interface LoopSpecification extends SpecificationElement {
      * @return The map with a modifies clause for each heap location.
      */
     Map<LocationVariable, Term> getInternalModifies();
-    
+
     /**
      * Returns the term internally used for the modifies clause.
      * Use with care - it is likely that this is *not* the right "self" for you.
+     *
      * @return The map with a modifies clause for each heap location.
      */
     Map<LocationVariable, Term> getInternalFreeModifies();
@@ -257,7 +260,7 @@ public interface LoopSpecification extends SpecificationElement {
      * @return The configured loop specification.
      */
     LoopSpecification configurate(
-            Map<LocationVariable, Term> invariants,  Map<LocationVariable, Term> freeInvariants,
+            Map<LocationVariable, Term> invariants, Map<LocationVariable, Term> freeInvariants,
             Map<LocationVariable, Term> modifies, Map<LocationVariable, Term> freeModifies,
             Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant);
 

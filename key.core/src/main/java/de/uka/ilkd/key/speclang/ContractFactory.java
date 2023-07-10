@@ -577,7 +577,7 @@ public class ContractFactory {
             Map<LocationVariable, Term> axioms,
             Map<LocationVariable, Term> mods,
             Map<LocationVariable, Term> freeMods,
- Map<ProgramVariable, Term> deps, Modality moda) {
+            Map<ProgramVariable, Term> deps, Modality moda) {
         for (FunctionalOperationContract other : others) {
             moda = combineModalities(moda, other.getModality());
             Term otherMby =
@@ -596,7 +596,8 @@ public class ContractFactory {
 
                 // the modifies clause must be computed before the preconditions
                 combineModifies(t, hasMod, mods, uniformMod, other, h, otherPre, services);
-                combineModifies(t, hasFreeMod, freeMods, uniformFreeMod, other, h, otherPre, services);
+                combineModifies(t, hasFreeMod, freeMods, uniformFreeMod, other, h, otherPre,
+                    services);
 
                 if (otherPre != null) {
                     pres.put(h, pres.get(h) == null ? otherPre : tb.or(pres.get(h), otherPre));
@@ -715,8 +716,8 @@ public class ContractFactory {
         }
         Modality moda = t.modality;
         return joinWithOtherContracts(name, t, others, pres, mby,
-                hasMod, hasFreeMod, uniformMod, uniformFreeMod,
-                posts, freePosts, axioms, mods, freeMods, deps, moda);
+            hasMod, hasFreeMod, uniformMod, uniformFreeMod,
+            posts, freePosts, axioms, mods, freeMods, deps, moda);
 
     }
 
