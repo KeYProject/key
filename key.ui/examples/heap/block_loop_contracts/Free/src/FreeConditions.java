@@ -1,7 +1,7 @@
 public class FreeConditions {
 
     public static int field;
-    public static Object obj;
+    public static /*@nullable@*/ Object obj;
 
     /*@ public normal_behavior
       @ ensures field == 42;
