@@ -8,8 +8,6 @@ import javax.swing.*;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -21,8 +19,7 @@ import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
  *
  * @author Arne Keller
  */
-public class ReferenceSearchButton extends JButton
-        implements ActionListener, ReferenceSearchDialogListener, KeYSelectionListener {
+public class ReferenceSearchButton extends JButton implements ActionListener, KeYSelectionListener {
     /**
      * Color used for the label if a reference is found.
      */
@@ -69,35 +66,8 @@ public class ReferenceSearchButton extends JButton
                             mediator, c.getProof(), p));
             }
         }
-        dialog = new ReferenceSearchDialog(p, this);
+        dialog = new ReferenceSearchDialog(p, new DefaultReferenceSearchDialogListener(mediator));
         dialog.setVisible(true);
-    }
-
-    @Override
-    public void closeButtonClicked() {
-        if (dialog != null) {
-            dialog.dispose();
-            dialog = null;
-        }
-    }
-
-    @Override
-    public void copyButtonClicked() {
-        if (dialog != null) {
-            mediator.stopInterface(true);
-            Proof p = mediator.getSelectedProof();
-            new Thread(() -> p.copyCachedGoals(null,
-                total -> SwingUtilities.invokeLater(() -> dialog.setMaximum(total)),
-                () -> SwingUtilities.invokeLater(() -> {
-                    if (dialog.incrementProgress()) {
-                        mediator.startInterface(true);
-                        dialog.dispose();
-                        dialog = null;
-                        new ShowProofStatistics.Window(MainWindow.getInstance(), p)
-                                .setVisible(true);
-                    }
-                }))).start();
-        }
     }
 
     @Override

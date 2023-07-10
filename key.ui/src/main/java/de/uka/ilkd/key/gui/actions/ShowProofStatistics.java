@@ -23,6 +23,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
+import de.uka.ilkd.key.gui.plugins.caching.DefaultReferenceSearchDialogListener;
+import de.uka.ilkd.key.gui.plugins.caching.ReferenceSearchDialog;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
@@ -282,6 +284,7 @@ public class ShowProofStatistics extends MainWindowAction {
             }
 
             JPanel buttonPane = new JPanel();
+            JPanel buttonPane2 = new JPanel();
 
             JButton okButton = new JButton("Close");
             okButton.addActionListener(event -> dispose());
@@ -296,9 +299,33 @@ public class ShowProofStatistics extends MainWindowAction {
                 event -> export("html", MiscTools.toValidFileName(proof.name().toString()),
                     ShowProofStatistics.getHTMLStatisticsMessage(proof)));
 
+            JButton saveButton = new JButton("Save proof");
+            saveButton.addActionListener(
+                e -> mainWindow.getUserInterface().saveProof(proof, ".proof"));
+            JButton saveBundleButton = new JButton("Save proof bundle");
+            saveBundleButton
+                    .addActionListener(e -> mainWindow.getUserInterface().saveProofBundle(proof));
+
             buttonPane.add(okButton);
             buttonPane.add(csvButton);
             buttonPane.add(htmlButton);
+            buttonPane2.add(saveButton);
+            buttonPane2.add(saveBundleButton);
+
+            if (proof.openGoals().stream().anyMatch(g -> g.node().lookup(ClosedBy.class) != null)) {
+                JButton copyReferences = new JButton("Copy referenced proof");
+                copyReferences.addActionListener(e -> {
+                    dispose();
+                    ReferenceSearchDialog dialog =
+                        new ReferenceSearchDialog(proof, new DefaultReferenceSearchDialogListener(
+                            MainWindow.getInstance().getMediator()));
+                    // show the dialog and start the copy
+                    // (two callbacks because setVisible will block)
+                    SwingUtilities.invokeLater(() -> dialog.setVisible(true));
+                    SwingUtilities.invokeLater(dialog::apply);
+                });
+                buttonPane2.add(copyReferences);
+            }
 
             getRootPane().setDefaultButton(okButton);
             getRootPane().addKeyListener(new KeyAdapter() {
@@ -313,12 +340,18 @@ public class ShowProofStatistics extends MainWindowAction {
 
             setLayout(new BorderLayout());
             add(scrollPane, BorderLayout.CENTER);
-            add(buttonPane, BorderLayout.PAGE_END);
+            JPanel buttonsPane = new JPanel();
+            BoxLayout layout = new BoxLayout(buttonsPane, BoxLayout.Y_AXIS);
+            buttonsPane.setLayout(layout);
+            buttonsPane.add(Box.createVerticalGlue());
+            buttonsPane.add(buttonPane);
+            buttonsPane.add(buttonPane2);
+            add(buttonsPane, BorderLayout.PAGE_END);
 
             int w = 50 + Math.max(scrollPane.getPreferredSize().width,
-                buttonPane.getPreferredSize().width);
+                buttonsPane.getPreferredSize().width);
             int h =
-                scrollPane.getPreferredSize().height + buttonPane.getPreferredSize().height + 100;
+                scrollPane.getPreferredSize().height + buttonsPane.getPreferredSize().height + 100;
             setSize(w, h);
             setLocationRelativeTo(mainWindow);
         }

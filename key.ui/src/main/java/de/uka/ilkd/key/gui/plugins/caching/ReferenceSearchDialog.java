@@ -100,7 +100,9 @@ public class ReferenceSearchDialog extends JDialog {
             applyButton.setEnabled(false);
             applyButton.addActionListener(e -> {
                 try {
-                    listener.copyButtonClicked();
+                    applyButton.setEnabled(false);
+                    closeDialog.setEnabled(false);
+                    listener.copyButtonClicked(this);
                 } catch (Exception exception) {
                     // There may be exceptions during rule application that should not be lost.
                     IssueDialog.showExceptionDialog(ReferenceSearchDialog.this, exception);
@@ -108,6 +110,10 @@ public class ReferenceSearchDialog extends JDialog {
             });
         }
         return applyButton;
+    }
+
+    public void apply() {
+        getApplyButton().doClick();
     }
 
     private JScrollPane getScrollPane() {
@@ -127,7 +133,7 @@ public class ReferenceSearchDialog extends JDialog {
     private JButton getCloseDialog() {
         if (closeDialog == null) {
             closeDialog = new JButton("Close");
-            closeDialog.addActionListener(e -> listener.closeButtonClicked());
+            closeDialog.addActionListener(e -> listener.closeButtonClicked(this));
         }
         return closeDialog;
     }

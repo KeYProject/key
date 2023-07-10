@@ -92,7 +92,8 @@ public final class CachingDatabase {
                 var entry = files.item(i);
                 var name = entry.getAttributes().getNamedItem("name").getNodeValue();
                 var hash = entry.getAttributes().getNamedItem("hash").getNodeValue();
-                CachingDatabase.files.put(Integer.parseInt(hash), new CachedFile(name, Integer.parseInt(hash)));
+                CachingDatabase.files.put(Integer.parseInt(hash),
+                    new CachedFile(name, Integer.parseInt(hash)));
             }
         } catch (Exception e) {
             LOGGER.error("failed to load proof caching database ", e);
@@ -244,7 +245,10 @@ public final class CachingDatabase {
             Files.createLink(virtualSource.resolve(path.filename),
                 PathConfig.getCacheDirectory().toPath().resolve(path.filename));
         }
-        // TODO: bootstrap path etc.
+        // TODO: bootstrap path (save hash)
+        // TODO: modify existing proof header
+        // TODO: save includes recursively
+        // TODO: save proofs compressed
 
         // construct new header
         var proofHeader = new StringBuilder();

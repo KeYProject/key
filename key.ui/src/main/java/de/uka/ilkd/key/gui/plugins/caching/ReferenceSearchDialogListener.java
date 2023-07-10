@@ -9,10 +9,10 @@ public interface ReferenceSearchDialogListener {
     /**
      * Button to close the dialog has been activated.
      */
-    void closeButtonClicked();
+    void closeButtonClicked(ReferenceSearchDialog dialog);
 
     /**
      * Button to copy proof steps has been activated.
      */
-    void copyButtonClicked();
+    void copyButtonClicked(ReferenceSearchDialog dialog);
 }
