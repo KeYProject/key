@@ -19,6 +19,8 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
+import org.key_project.util.java.CollectionUtil;
+
 /**
  * this is a collection of common services to the KeY prover. Services include information on the
  * underlying Java model and a converter to transform Java program elements to logic (where
@@ -416,9 +418,9 @@ public class Services implements TermServices {
         return javaService;
     }
 
-    private void activateJavaPath(Path bootClassPath, Collection<Path> libraryPaths) {
+    private void activateJavaPath(@Nonnull Path bootClassPath, Collection<Path> libraryPaths) {
         if (javaService != null && javaService.getBootClassPath().equals(bootClassPath)
-                && javaService.getLibraryPath().equals(libraryPaths)) {
+                && CollectionUtil.containsSame(javaService.getLibraryPath(), libraryPaths)) {
             return;
         }
         javaService = new JavaService(this, bootClassPath, libraryPaths);
@@ -436,7 +438,7 @@ public class Services implements TermServices {
     }
 
     public void activateJava(@Nullable Path bootClassPath) {
-        activateJavaPath(bootClassPath, Collections.emptyList());
+        activateJava(bootClassPath, Collections.emptyList());
     }
 
     public static Path getReduxPath() {

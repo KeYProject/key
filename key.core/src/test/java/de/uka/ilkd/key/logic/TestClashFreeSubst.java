@@ -9,7 +9,6 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.AbstractTestTermParser;
-import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -51,9 +50,16 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         assertNotNull(r2k);
         r2k.parseSpecialClasses();
 
-        parseDecls(
-            "\\sorts { srt; }\n" + "\\functions {\n" + "  srt f(srt);\n" + "  srt g(srt,srt);\n"
-                + "}\n" + "\\predicates {\n" + "  p(srt);\n" + "  q(srt,srt);\n" + "}");
+        parseDecls("""
+                \\sorts { srt; }
+                \\functions {
+                  srt f(srt);
+                  srt g(srt,srt);
+                }
+                \\predicates {
+                  p(srt);
+                  q(srt,srt);
+                }""");
 
         srt = lookup_sort("srt");
 
@@ -133,7 +139,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
                         bv[visited.varsBoundHere(0).size() + i] = top.varsBoundHere(0).get(i);
                     }
                     subStack.pop();
-                    subStack.push(TacletForTests.services().getTermBuilder().all(
+                    subStack.push(tb.all(
                         ImmutableSLList.<QuantifiableVariable>nil().append(bv), top.sub(0)));
                     return;
                 }

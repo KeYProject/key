@@ -17,11 +17,11 @@ public class MethodResolutionTest {
     private static final String CLASSES_A = """
             package a;
 
-            class Super {
+            public class Super {
                 public void test() {}
             }
 
-            public class Derived {
+            public class Derived extends Super {
                 // "Overwrites" Super::test, but only when called inside this class
                 private void test() {}
             }
@@ -39,6 +39,23 @@ public class MethodResolutionTest {
                 }
             }
             """;
+
+    public class Super {
+        public void test(double d) {}
+    }
+
+    public class Derived extends Super {
+        // "Overwrites" Super::test, but only when called inside this class
+        private void test(int i) {}
+    }
+
+    class Caller {
+        public void call(Derived d) {
+            // This has to resolve to Super::test
+            // Derived::test is private and not visible from here
+            d.test(1);
+        }
+    }
 
     private static JavaParserFactory factory = null;
 
