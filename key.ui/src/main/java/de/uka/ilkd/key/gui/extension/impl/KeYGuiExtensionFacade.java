@@ -16,6 +16,7 @@ import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Proof;
 
 /**
  * Facade for retrieving the GUI extensions.
@@ -237,6 +238,12 @@ public final class KeYGuiExtensionFacade {
     public static JPopupMenu createContextMenu(ContextMenuKind kind, Object underlyingObject,
             KeYMediator mediator) {
         JPopupMenu menu = new JPopupMenu();
+        if (underlyingObject instanceof Proof) {
+            for (Component comp : MainWindow.getInstance().createProofMenu((Proof) underlyingObject)
+                    .getMenuComponents()) {
+                menu.add(comp);
+            }
+        }
         List<Action> content = getContextMenuItems(kind, underlyingObject, mediator);
         content.forEach(menu::add);
         return menu;

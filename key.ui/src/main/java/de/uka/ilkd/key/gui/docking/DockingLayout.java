@@ -46,6 +46,7 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
     public static final String[] LAYOUT_NAMES = new String[] { "Default", "Slot 1", "Slot 2" };
     public static final int[] LAYOUT_KEYS = new int[] { KeyEvent.VK_F11, KeyEvent.VK_F12 };
 
+    private final List<Action> actions = new LinkedList<>();
     private final ButtonGroup layouts = new ButtonGroup();
     private MainWindow window;
 
@@ -87,6 +88,18 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
             }
         } catch (IOException e) {
             LOGGER.warn("Failed to load layouts", e);
+        }
+    }
+
+    private void ensureActions(MainWindow mw) {
+        if (actions.isEmpty()) {
+            int keypos = 0;
+            for (String layout : LAYOUT_NAMES) {
+                Integer key = keypos < LAYOUT_KEYS.length ? LAYOUT_KEYS[keypos] : null;
+                actions.add(new LoadLayoutAction(mw, layout, key));
+                actions.add(new SaveLayoutAction(mw, layout, key));
+                keypos++;
+            }
         }
     }
 
@@ -221,7 +234,64 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
         actions.add(new SaveAction(mainWindow));
         actions.add(new ResetLayoutAction(mainWindow));
 
+        ensureActions(mainWindow);
+
         return actions;
+    }
+}
+
+
+final class SaveLayoutAction extends MainWindowAction {
+    private static final long serialVersionUID = -2646217961498111734L;
+    private final String layoutName;
+
+    public SaveLayoutAction(MainWindow mainWindow, String name, Integer key) {
+        super(mainWindow);
+        this.layoutName = name;
+        setName("Save as " + name);
+        setIcon(IconFactory.saveFile(MainWindow.TOOLBAR_ICON_SIZE));
+        setMenuPath("View.Layout.Save");
+        if (key != null) {
+            setAcceleratorKey(KeyStroke.getKeyStroke(key,
+                InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+        }
+        KeyStrokeManager.lookupAndOverride(this, getClass().getName() + "$" + layoutName);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        mainWindow.getDockControl().save(layoutName);
+        mainWindow.setStatusLine("Save layout as " + layoutName);
+    }
+}
+
+
+final class LoadLayoutAction extends MainWindowAction {
+    private static final long serialVersionUID = 3378477658914832831L;
+    private final String layoutName;
+
+    public LoadLayoutAction(MainWindow mainWindow, String name, Integer key) {
+        super(mainWindow);
+        this.layoutName = name;
+        setName("Load " + name);
+        setIcon(IconFactory.openKeYFile(MainWindow.TOOLBAR_ICON_SIZE));
+        if (key != null) {
+            setAcceleratorKey(KeyStroke.getKeyStroke(key, InputEvent.CTRL_DOWN_MASK));
+        }
+        KeyStrokeManager.lookupAndOverride(this, getClass().getName() + "$" + layoutName);
+        setMenuPath("View.Layout.Load");
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        boolean defaultLayoutDefined =
+            Arrays.asList(mainWindow.getDockControl().layouts()).contains(layoutName);
+        if (defaultLayoutDefined) {
+            mainWindow.getDockControl().load(layoutName);
+            mainWindow.setStatusLine("Layout " + layoutName + " loaded");
+        } else {
+            mainWindow.setStatusLine("Layout " + layoutName + " could not be found.");
+        }
     }
 }
 

@@ -87,7 +87,7 @@ public class ProgressDialog extends JDialog {
         table.getTableHeader().setReorderingAllowed(false);
         table.setModel(model, titles);
         this.listener = listener;
-        this.setLocationByPlatform(true);
+        setLocationRelativeTo(MainWindow.getInstance());
         if (counterexample) {
             this.setTitle("SMT Counterexample Search");
         } else {
