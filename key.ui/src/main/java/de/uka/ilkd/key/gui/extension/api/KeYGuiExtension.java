@@ -3,12 +3,10 @@ package de.uka.ilkd.key.gui.extension.api;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nonnull;
-import javax.swing.Action;
-import javax.swing.JComponent;
-import javax.swing.JMenu;
-import javax.swing.JToolBar;
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.GoalList;
@@ -100,6 +98,19 @@ public interface KeYGuiExtension {
          */
         @Nonnull
         List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow);
+
+        /**
+         * A list of menu items which should be added to the main menu.
+         * These will be added before the actions returned by
+         * {@link #getMainMenuActions(MainWindow)} are added.
+         *
+         * @param mainWindow the main window
+         * @return list of menu items
+         */
+        @Nonnull
+        default List<JMenuItem> getMainMenuItems(@Nonnull MainWindow mainWindow) {
+            return Collections.emptyList();
+        }
     }
 
     /**
