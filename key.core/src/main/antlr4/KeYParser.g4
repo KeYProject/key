@@ -99,7 +99,7 @@ one_sort_decl
 
 simple_ident_dots
 :
-  simple_ident (DOT simple_ident)* | INT_LITERAL
+  simple_ident (DOT simple_ident)*
 ;
 
 simple_ident_dots_comma_list
@@ -304,7 +304,7 @@ id_declaration
 
 funcpred_name
 :
-  (sortId DOUBLECOLON)? name=simple_ident_dots
+  (sortId DOUBLECOLON)? (name=simple_ident_dots|num=INT_LITERAL)
 ;
 
 
@@ -329,7 +329,8 @@ literals:
   | string_literal
 ;
 
-term: parallel_term;
+
+term: parallel_term; // weigl: should normally be equivalence_term
 //labeled_term: a=parallel_term (LGUILLEMETS labels=label RGUILLEMETS)?;
 parallel_term: a=elementary_update_term (PARALLEL b=elementary_update_term)*;
 elementary_update_term: a=equivalence_term (ASSIGN b=equivalence_term)?;
@@ -348,7 +349,7 @@ comparison_term: a=weak_arith_term ((LESS|LESSEQUAL|GREATER|GREATEREQUAL) b=weak
 weak_arith_term: a=strong_arith_term_1 (op+=(PLUS|MINUS) b+=strong_arith_term_1)*;
 strong_arith_term_1: a=strong_arith_term_2 (STAR b+=strong_arith_term_2)*;
 strong_arith_term_2: a=atom_prefix ((PERCENT|SLASH) b=strong_arith_term_2)?;
-update_term: (LBRACE u=term RBRACE) (atom_prefix | unary_formula);
+update_term: (LBRACE u=parallel_term RBRACE) (atom_prefix | unary_formula);
 substitution_term:
  LBRACE SUBST  bv=one_bound_variable SEMI
      replacement=comparison_term RBRACE
@@ -383,7 +384,7 @@ primitive_term:
   | abbreviation
   | accessterm
   | literals
-;
+  ;
 
 /*
 weigl, 2021-03-12:
@@ -442,8 +443,16 @@ term
  */
 accessterm
 :
+  // OLD
   (sortId DOUBLECOLON)?
   firstName=simple_ident
+
+  /*Faster version
+  simple_ident_dots
+  ( EMPTYBRACKETS*
+    DOUBLECOLON
+    simple_ident
+  )?*/
   call?
   ( attribute )*
 ;
@@ -522,8 +531,9 @@ argument_list
     RPAREN
 ;
 
+integer_with_minux: MINUS? integer;
 integer:
-  (MINUS)? (INT_LITERAL | HEX_LITERAL | BIN_LITERAL)
+  (INT_LITERAL | HEX_LITERAL | BIN_LITERAL)
 ;
 
 floatnum: // called floatnum because "float" collide with the Java language
@@ -665,8 +675,9 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
 
 varexp_argument
 :
-    sortId //also covers possible varId
-  | TYPEOF LPAREN y=varId RPAREN
+    //weigl: Ambguity between term (which can also contain simple_ident_dots and sortId)
+    //       suggestion add an explicit keyword to request the sort by name or manually resolve later in builder
+    TYPEOF LPAREN y=varId RPAREN
   | CONTAINERTYPE LPAREN y=varId RPAREN
   | DEPENDINGON LPAREN y=varId RPAREN
   | term
@@ -691,8 +702,7 @@ option
 option_list
 :
   LPAREN
-    ( (option (COMMA option)*)
-      | option_expr)
+    (option_expr (COMMA option_expr)*)
   RPAREN
 ;
 
