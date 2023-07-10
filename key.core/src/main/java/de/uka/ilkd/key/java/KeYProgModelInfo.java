@@ -139,7 +139,7 @@ public class KeYProgModelInfo {
 
     public boolean isFinal(KeYJavaType kjt) {
         var type = rec2key().resolveType(kjt);
-        if (type.isArray() || type.isPrimitive() || type.isVoid()) {
+        if (type.isArray() || type.isPrimitive() || type.isVoid() || type.isNull()) {
             return false;
         }
         if (type.isReferenceType()) { // TODO weigl enum declarations and records!

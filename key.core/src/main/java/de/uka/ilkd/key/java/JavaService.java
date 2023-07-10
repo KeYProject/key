@@ -55,7 +55,9 @@ import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.VoidType;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.github.javaparser.resolution.model.typesystem.NullType;
 import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
+import com.github.javaparser.resolution.types.ResolvedVoidType;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -515,12 +517,15 @@ public class JavaService {
                 LOGGER.debug("Finished processing library classes");
             }
 
-            // Make sure all primitive types are registered
+            // Make sure some required types are registered
             for (var type : ResolvedPrimitiveType.values()) {
                 typeConverter.getKeYJavaType(type);
             }
-
-            typeConverter.validate();
+            typeConverter.getKeYJavaType(NullType.INSTANCE);
+            typeConverter.getKeYJavaType(ResolvedVoidType.INSTANCE);
+            var obj = typeConverter.getObjectType();
+            assert obj != null && obj.getJavaType() != null
+                    : "java.lang.Object has to be available";
 
             /*
              * TODO weigl

@@ -89,10 +89,6 @@ public class JP2KeYTypeConverter {
         jp2KeY.put(t, kjt);
     }
 
-    public void validate() {
-        assert __objectType != null && __objectType.getJavaType() != null;
-    }
-
     /**
      * return the corresponding KeY JavaType for a recoder type.
      * <p>
