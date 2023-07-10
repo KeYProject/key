@@ -121,7 +121,7 @@ public class SettingsManager {
         dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         dialog.setIconImage(IconFactory.keyLogo());
         dialog.setSize(800, 600);
-        dialog.setLocationByPlatform(true);
+        dialog.setLocationRelativeTo(mainWindow);
         return dialog;
     }
 

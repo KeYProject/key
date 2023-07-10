@@ -263,7 +263,7 @@ public class LoadUserTacletsDialog extends JPanel {
             textArea.setEditable(false);
             helpWindow.getContentPane().add(new JScrollPane(textArea));
             helpWindow.setMinimumSize(new Dimension(400, 200));
-            helpWindow.setLocationByPlatform(true);
+            helpWindow.setLocationRelativeTo(MainWindow.getInstance());
             helpWindow.setTitle("Help");
             helpWindow.pack();
 
@@ -448,7 +448,7 @@ public class LoadUserTacletsDialog extends JPanel {
             buttonPane.add(Box.createHorizontalStrut(5));
             buttonPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             pane.add(buttonPane);
-            dialog.setLocationByPlatform(true);
+            dialog.setLocationRelativeTo(MainWindow.getInstance());
             dialog.pack();
         }
         return dialog;
