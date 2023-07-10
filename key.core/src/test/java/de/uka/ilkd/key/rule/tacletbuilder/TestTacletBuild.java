@@ -130,7 +130,6 @@ public class TestTacletBuild {
 
     @Test
     public void testSchemavariablesInAddrulesRespectPrefix() {
-        Assertions.fail("TODO javaparser this test works, remove the taclet parsing catchall");
         var e = Assertions.assertThrows(BuildingException.class,
             () -> HelperClassForTests.parseThrowException(
                 new File(testRules + File.separator + "schemaVarInAddruleRespectPrefix.key")));

@@ -133,93 +133,84 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Taclet visitTaclet(KeYParser.TacletContext ctx) {
-        try {
-            Sequent ifSeq = Sequent.EMPTY_SEQUENT;
-            ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.nil();
-            if (ctx.LEMMA() != null) {
-                tacletAnnotations =
-                    tacletAnnotations.add(de.uka.ilkd.key.rule.TacletAnnotation.LEMMA);
-            }
-            String name = ctx.name.getText();
-            ChoiceExpr ch = accept(ctx.option_list());
-            var choices = requiredChoices;
-            if (ch != null) {
-                choices = ChoiceExpr.and(ch, choices);
-            }
+        Sequent ifSeq = Sequent.EMPTY_SEQUENT;
+        ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.nil();
+        if (ctx.LEMMA() != null) {
+            tacletAnnotations =
+                tacletAnnotations.add(de.uka.ilkd.key.rule.TacletAnnotation.LEMMA);
+        }
+        String name = ctx.name.getText();
+        ChoiceExpr ch = accept(ctx.option_list());
+        var choices = requiredChoices;
+        if (ch != null) {
+            choices = ChoiceExpr.and(ch, choices);
+        }
 
-            Term form = accept(ctx.form);
-            if (form != null) {
-                if (!axiomMode) {
-                    semanticError(ctx, "formula rules are only permitted for \\axioms");
-                }
-                TacletBuilder<?> b = createTacletBuilderFor(null, RewriteTaclet.NONE, ctx);
-                currentTBuilder.push(b);
-                SequentFormula sform = new SequentFormula(form);
-                Semisequent semi = new Semisequent(sform);
-                Sequent addSeq = Sequent.createAnteSequent(semi);
-                ImmutableList<Taclet> noTaclets = ImmutableSLList.nil();
-                DefaultImmutableSet<SchemaVariable> noSV = DefaultImmutableSet.nil();
-                addGoalTemplate(null, null, addSeq, noTaclets, noSV, null, ctx);
-                b.setName(new Name(name));
-                b.setChoices(choices);
-                b.setAnnotations(tacletAnnotations);
-                b.setOrigin(BuilderHelpers.getPosition(ctx));
-                Taclet r = b.getTaclet();
-                announceTaclet(ctx, r);
-                currentTBuilder.pop();
-                return r;
+        Term form = accept(ctx.form);
+        if (form != null) {
+            if (!axiomMode) {
+                semanticError(ctx, "formula rules are only permitted for \\axioms");
             }
-
-            // schema var decls
-            setSchemaVariables(new Namespace<>(schemaVariables()));
-            mapOf(ctx.one_schema_var_decl());
-
-            if (ctx.ifSeq != null) {
-                ifSeq = accept(ctx.ifSeq);
-            }
-
-            int applicationRestriction = RewriteTaclet.NONE;
-            if (!ctx.SAMEUPDATELEVEL().isEmpty()) {
-                applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL;
-            }
-            if (!ctx.INSEQUENTSTATE().isEmpty()) {
-                applicationRestriction |= RewriteTaclet.IN_SEQUENT_STATE;
-            }
-            if (!ctx.ANTECEDENTPOLARITY().isEmpty()) {
-                applicationRestriction |= RewriteTaclet.ANTECEDENT_POLARITY;
-            }
-            if (!ctx.SUCCEDENTPOLARITY().isEmpty()) {
-                applicationRestriction |= RewriteTaclet.SUCCEDENT_POLARITY;
-            }
-            @Nullable
-            Object find = accept(ctx.find);
-            TacletBuilder<?> b = createTacletBuilderFor(find, applicationRestriction, ctx);
+            TacletBuilder<?> b = createTacletBuilderFor(null, RewriteTaclet.NONE, ctx);
             currentTBuilder.push(b);
-            b.setIfSequent(ifSeq);
+            SequentFormula sform = new SequentFormula(form);
+            Semisequent semi = new Semisequent(sform);
+            Sequent addSeq = Sequent.createAnteSequent(semi);
+            ImmutableList<Taclet> noTaclets = ImmutableSLList.nil();
+            DefaultImmutableSet<SchemaVariable> noSV = DefaultImmutableSet.nil();
+            addGoalTemplate(null, null, addSeq, noTaclets, noSV, null, ctx);
             b.setName(new Name(name));
-            accept(ctx.goalspecs());
-            mapOf(ctx.varexplist());
-            accept(ctx.modifiers());
             b.setChoices(choices);
             b.setAnnotations(tacletAnnotations);
             b.setOrigin(BuilderHelpers.getPosition(ctx));
-            try {
-                Taclet r = peekTBuilder().getTaclet();
-                announceTaclet(ctx, r);
-                setSchemaVariables(schemaVariables().parent());
-                currentTBuilder.pop();
-                return r;
-            } catch (RuntimeException e) {
-                throw new BuildingException(ctx, e);
-            }
-        } catch (RuntimeException e) {
-            // TODO javaparser
-            LOGGER.error(
-                "THIS CONSUMES ERRORS! REMOVE BEFORE MERGING \"removal of recoder\"! Error in parsing taclet.",
-                e);
-            addWarning(ctx, e, e.getMessage());
+            Taclet r = b.getTaclet();
+            announceTaclet(ctx, r);
+            currentTBuilder.pop();
+            return r;
         }
-        return null;
+
+        // schema var decls
+        setSchemaVariables(new Namespace<>(schemaVariables()));
+        mapOf(ctx.one_schema_var_decl());
+
+        if (ctx.ifSeq != null) {
+            ifSeq = accept(ctx.ifSeq);
+        }
+
+        int applicationRestriction = RewriteTaclet.NONE;
+        if (!ctx.SAMEUPDATELEVEL().isEmpty()) {
+            applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL;
+        }
+        if (!ctx.INSEQUENTSTATE().isEmpty()) {
+            applicationRestriction |= RewriteTaclet.IN_SEQUENT_STATE;
+        }
+        if (!ctx.ANTECEDENTPOLARITY().isEmpty()) {
+            applicationRestriction |= RewriteTaclet.ANTECEDENT_POLARITY;
+        }
+        if (!ctx.SUCCEDENTPOLARITY().isEmpty()) {
+            applicationRestriction |= RewriteTaclet.SUCCEDENT_POLARITY;
+        }
+        @Nullable
+        Object find = accept(ctx.find);
+        TacletBuilder<?> b = createTacletBuilderFor(find, applicationRestriction, ctx);
+        currentTBuilder.push(b);
+        b.setIfSequent(ifSeq);
+        b.setName(new Name(name));
+        accept(ctx.goalspecs());
+        mapOf(ctx.varexplist());
+        accept(ctx.modifiers());
+        b.setChoices(choices);
+        b.setAnnotations(tacletAnnotations);
+        b.setOrigin(BuilderHelpers.getPosition(ctx));
+        try {
+            Taclet r = peekTBuilder().getTaclet();
+            announceTaclet(ctx, r);
+            setSchemaVariables(schemaVariables().parent());
+            currentTBuilder.pop();
+            return r;
+        } catch (RuntimeException e) {
+            throw new BuildingException(ctx, e);
+        }
     }
 
 
