@@ -1,4 +1,7 @@
 import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.loader.JP2KeYConverter;
+import de.uka.ilkd.key.java.loader.JP2KeYTypeConverter;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 

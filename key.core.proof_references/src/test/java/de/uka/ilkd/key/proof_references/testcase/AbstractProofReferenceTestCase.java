@@ -327,7 +327,7 @@ public abstract class AbstractProofReferenceTestCase {
                 choiceSettings.updateWith(cs);
             }
             // Load java file
-            environment = KeYEnvironment.load(javaFile, null, null, null);
+            environment = KeYEnvironment.load(javaFile.toPath(), null, null, null);
             // Search type
             KeYJavaType containerKJT =
                 environment.getJavaInfo().getTypeByClassName(containerTypeName, null);
@@ -401,7 +401,7 @@ public abstract class AbstractProofReferenceTestCase {
                 choiceSettings.updateWith(cs);
             }
             // Load java file
-            environment = KeYEnvironment.load(javaFile, null, null, null);
+            environment = KeYEnvironment.load(javaFile.toPath(), null, null, null);
             // Search method to proof
             IProgramMethod pm = HelperClassForTests.searchProgramMethod(environment.getServices(),
                 containerTypeName, methodFullName);

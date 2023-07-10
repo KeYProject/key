@@ -39,11 +39,9 @@ import org.slf4j.LoggerFactory;
 class KeyJavaPipelineTest {
     public KeYJavaPipeline createPipelineTest(Path testFolder) throws IOException {
         Services services = new Services(JavaProfile.getDefaultProfile());
-        var js = new JavaService(services, Collections.singleton(testFolder));
-        js.setUseSystemClassLoaderInResolution(true); // java.lang.Object is required for most
-                                                      // things
+        var js = new JavaService(services, null, Collections.singleton(testFolder));
         var inputFolder = testFolder.resolve("input");
-        final var jp = js.createJavaParser();
+        final var jp = js.getProgramFactory().createJavaParser();
         var files = Files.list(inputFolder);
         var cu = new ArrayList<CompilationUnit>();
         files.forEach(it -> {
@@ -61,7 +59,7 @@ class KeyJavaPipelineTest {
                 throw new RuntimeException(e);
             }
         });
-        var tservices = new TransformationPipelineServices(js,
+        var tservices = new TransformationPipelineServices(services.getJavaService().getProgramFactory(),
             new TransformationPipelineServices.TransformerCache(cu));
         var kjp = KeYJavaPipeline.createDefault(tservices);
         var kjp2 = new KeYJavaPipeline(tservices);

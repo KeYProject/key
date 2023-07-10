@@ -44,7 +44,7 @@ class JavaCompilerCheckFacadeTest {
                 public void reportException(Object sender, ProofOblInput input, Exception e) {}
             };
         var promise =
-            JavaCompilerCheckFacade.check(emptyListener, null, Collections.emptyList(), src);
+            JavaCompilerCheckFacade.check(emptyListener, null, Collections.emptyList(), src.toPath());
         promise.get();
     }
 

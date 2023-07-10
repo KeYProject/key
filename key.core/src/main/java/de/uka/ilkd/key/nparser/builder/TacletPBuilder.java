@@ -7,9 +7,8 @@ import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -303,6 +302,40 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
     }
 
+    private Sort visitSortId(String text, ParserRuleContext ctx) {
+        String primitiveName = text;
+        Type t = null;
+        if (primitiveName.equals(PrimitiveType.JAVA_BYTE.getName())) {
+            t = PrimitiveType.JAVA_BYTE;
+            primitiveName = PrimitiveType.JAVA_INT.getName();
+        } else if (primitiveName.equals(PrimitiveType.JAVA_CHAR.getName())) {
+            t = PrimitiveType.JAVA_CHAR;
+            primitiveName = PrimitiveType.JAVA_INT.getName();
+        } else if (primitiveName.equals(PrimitiveType.JAVA_SHORT.getName())) {
+            t = PrimitiveType.JAVA_SHORT;
+            primitiveName = PrimitiveType.JAVA_INT.getName();
+        } else if (primitiveName.equals(PrimitiveType.JAVA_INT.getName())) {
+            t = PrimitiveType.JAVA_INT;
+            primitiveName = PrimitiveType.JAVA_INT.getName();
+        } else if (primitiveName.equals(PrimitiveType.JAVA_LONG.getName())) {
+            t = PrimitiveType.JAVA_LONG;
+            primitiveName = PrimitiveType.JAVA_INT.getName();
+        } else if (primitiveName.equals(PrimitiveType.JAVA_BIGINT.getName())) {
+            t = PrimitiveType.JAVA_BIGINT;
+            primitiveName = PrimitiveType.JAVA_BIGINT.getName();
+        }
+        Sort s = lookupSort(primitiveName);
+        if (s == null) {
+            semanticError(ctx, "Could not find sort: %s", text);
+        }
+
+        if (text.contains("[")) {
+            var num = text.indexOf('[') - text.lastIndexOf(']') / 2 + 1;
+            return toArraySort(new Pair<>(s, t), num);
+        }
+        return s;
+    }
+
     private Object evaluateVarcondArgument(ArgumentType expectedType, Object prevValue,
             KeYParser.Varexp_argumentContext ctx) {
         if (prevValue != null && expectedType.clazz.isAssignableFrom(prevValue.getClass())) {
@@ -327,8 +360,9 @@ public class TacletPBuilder extends ExpressionBuilder {
         return null;
     }
 
-    private KeYJavaType getOrCreateJavaType(KeYParser.SortIdContext sortId) {
-        KeYJavaType t = getJavaInfo().getKeYJavaType(sortId.getText());
+
+    private KeYJavaType getOrCreateJavaType(String sortId, ParserRuleContext ctx) {
+        KeYJavaType t = getJavaInfo().getKeYJavaType(sortId);
         if (t != null) {
             return t;
         }
