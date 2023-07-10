@@ -48,17 +48,21 @@ public class ShowProofStatistics extends MainWindowAction {
      */
     private static final Pattern TOOLTIP_PATTERN = Pattern.compile(".+\\[tooltip: (.+)]");
 
-    public ShowProofStatistics(MainWindow mainWindow) {
+    private final Proof proof;
+
+    public ShowProofStatistics(MainWindow mainWindow, Proof proof) {
         super(mainWindow);
         setName("Show Proof Statistics");
         setIcon(IconFactory.statistics(16));
         getMediator().enableWhenProofLoaded(this);
         lookupAcceleratorKey();
+
+        this.proof = proof;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        final Proof proof = getMediator().getSelectedProof();
+        final Proof proof = this.proof == null ? getMediator().getSelectedProof() : this.proof;
         if (proof == null) {
             mainWindow.notify(new GeneralInformationEvent("No statistics available.",
                 "If you wish to see the statistics " + "for a proof you have to load one first"));

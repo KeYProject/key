@@ -75,10 +75,6 @@ public class TaskTree extends JPanel {
         delegateView.putClientProperty("JTree.lineStyle", "Horizontal");
     }
 
-    JTree jtree() {
-        return delegateView;
-    }
-
     public void addProof(de.uka.ilkd.key.proof.ProofAggregate plist) {
         TaskTreeNode bp = model.addProof(plist);
         Proof[] proofs = plist.getProofs();
@@ -241,6 +237,7 @@ public class TaskTree extends JPanel {
      */
     class TaskTreeMouseListener extends MouseAdapter {
 
+        @Override
         public void mouseClicked(MouseEvent e) {
             problemChosen();
             checkPopup(e);
@@ -251,12 +248,30 @@ public class TaskTree extends JPanel {
             checkPopup(e);
         }
 
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            checkPopup(e);
+        }
+
+        /**
+         * Checks whether the popup menu should be shown and does so if necessary.
+         * <br>
+         * <b>Important:</b><br>
+         * For the platform specific popup trigger to work, we need to check the popup in pressed,
+         * released, and clicked event. For example, on Windows the e.isPopupTrigger() information
+         * is only available in the released event.
+         *
+         * @param e the mouse event that may create the popup
+         */
         private void checkPopup(MouseEvent e) {
             if (e.isPopupTrigger()) {
-                JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
-                    DefaultContextMenuKind.PROOF_LIST, mediator.getSelectedProof(), mediator);
-                if (menu.getComponentCount() > 0) {
-                    menu.show(TaskTree.this, e.getX(), e.getY());
+                TreePath selPath = delegateView.getPathForLocation(e.getX(), e.getY());
+                if (selPath != null && selPath.getLastPathComponent() instanceof BasicTask) {
+                    BasicTask task = (BasicTask) selPath.getLastPathComponent();
+                    mediator.setProof(task.proof());
+                    JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
+                        DefaultContextMenuKind.PROOF_LIST, mediator.getSelectedProof(), mediator);
+                    menu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
         }
@@ -353,7 +368,7 @@ public class TaskTree extends JPanel {
                 return;
             }
             TaskTreeNode ttn = model.getTaskForProof(e.getSource().getSelectedProof());
-            jtree().setSelectionPath(new TreePath(ttn.getPath()));
+            delegateView.setSelectionPath(new TreePath(ttn.getPath()));
             validate();
         }
 
