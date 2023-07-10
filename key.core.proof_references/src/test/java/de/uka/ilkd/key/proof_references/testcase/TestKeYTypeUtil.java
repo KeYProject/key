@@ -24,7 +24,8 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     @Test
     public void testIsInnerType() throws Exception {
         KeYEnvironment<?> environment = KeYEnvironment.load(
-                new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest").toPath(), null, null,
+            new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest").toPath(),
+            null, null,
             null);
         try {
             Services services = environment.getServices();
@@ -65,7 +66,8 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     @Test
     public void testGetParentName() throws Exception {
         KeYEnvironment<?> environment = KeYEnvironment.load(
-                new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest").toPath(), null, null,
+            new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest").toPath(),
+            null, null,
             null);
         try {
             Services services = environment.getServices();
@@ -108,7 +110,8 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     @Test
     public void testIsType() throws Exception {
         KeYEnvironment<?> environment = KeYEnvironment.load(
-                new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest").toPath(), null, null,
+            new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest").toPath(),
+            null, null,
             null);
         try {
             Services services = environment.getServices();
@@ -144,7 +147,8 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     @Test
     public void testGetType() throws Exception {
         KeYEnvironment<?> environment = KeYEnvironment.load(
-                new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest").toPath(), null, null,
+            new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest").toPath(),
+            null, null,
             null);
         try {
             Services services = environment.getServices();

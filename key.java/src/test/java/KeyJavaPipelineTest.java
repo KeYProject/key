@@ -59,8 +59,9 @@ class KeyJavaPipelineTest {
                 throw new RuntimeException(e);
             }
         });
-        var tservices = new TransformationPipelineServices(services.getJavaService().getProgramFactory(),
-            new TransformationPipelineServices.TransformerCache(cu));
+        var tservices =
+            new TransformationPipelineServices(services.getJavaService().getProgramFactory(),
+                new TransformationPipelineServices.TransformerCache(cu));
         var kjp = KeYJavaPipeline.createDefault(tservices);
         var kjp2 = new KeYJavaPipeline(tservices);
         var cnt = 0;

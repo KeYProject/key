@@ -1374,7 +1374,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
         assertTrue(javaFile.exists());
         // Load java file
         KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(
-            SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled), javaFile.toPath(),
+            SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled),
+            javaFile.toPath(),
             null, null, null, true);
         setupTacletOptions(environment);
         // Start proof
