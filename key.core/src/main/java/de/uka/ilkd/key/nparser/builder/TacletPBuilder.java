@@ -7,6 +7,9 @@ import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -23,6 +26,7 @@ import de.uka.ilkd.key.parser.SchemaVariableModifierSet;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.conditions.TypeResolver;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -213,7 +217,6 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
     }
 
-
     private void announceTaclet(ParserRuleContext ctx, Taclet taclet) {
         taclet2Builder.put(taclet, peekTBuilder());
         LOGGER.trace("Taclet announced: \"{}\" from {}:{}", taclet.name(),
@@ -310,9 +313,9 @@ public class TacletPBuilder extends ExpressionBuilder {
         case TYPE_RESOLVER:
             return buildTypeResolver(ctx);
         case SORT:
-            return accept(ctx.sortId());
+            return visitSortId(ctx.term().getText(), ctx.term());
         case JAVA_TYPE:
-            return getOrCreateJavaType(ctx.sortId());
+            return getOrCreateJavaType(ctx.term().getText(), ctx);
         case VARIABLE:
             return varId(ctx, ctx.getText());
         case STRING:
@@ -329,7 +332,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         if (t != null) {
             return t;
         }
-        return new KeYJavaType((Sort) accept(sortId));
+        return new KeYJavaType((Sort) visitSortId(sortId, ctx));
     }
 
 
@@ -342,7 +345,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             return TypeResolver.createContainerTypeResolver(y);
         }
 
-        Sort s = accept(ctx.sortId());
+        Sort s = visitSortId(ctx.term().getText(), ctx.term());
         if (s != null) {
             if (s instanceof GenericSort) {
                 return TypeResolver.createGenericSortResolver((GenericSort) s);
@@ -378,13 +381,10 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public ChoiceExpr visitOption_list(KeYParser.Option_listContext ctx) {
-        if (ctx.option().isEmpty()) {
-            return accept(ctx.option_expr());
-        } else {
-            return ctx.option().stream()
-                    .map(it -> ChoiceExpr.variable(it.cat.getText(), it.value.getText()))
-                    .reduce(ChoiceExpr::and).orElse(ChoiceExpr.TRUE);
-        }
+        return ctx.option_expr().stream()
+                .map(it -> (ChoiceExpr) accept(it))
+                .reduce(ChoiceExpr::and)
+                .orElse(ChoiceExpr.TRUE);
     }
 
     @Override

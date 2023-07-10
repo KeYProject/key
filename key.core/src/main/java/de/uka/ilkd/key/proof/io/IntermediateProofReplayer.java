@@ -639,6 +639,11 @@ public class IntermediateProofReplayer {
                 useContractRule = UseDependencyContractRule.INSTANCE;
                 contractApp = (((UseDependencyContractRule) useContractRule).createApp(pos))
                         .setContract(currContract);
+                // restore "step" if needed
+                var depContractApp = ((UseDependencyContractApp) contractApp);
+                if (depContractApp.step() == null) {
+                    contractApp = depContractApp.setStep(builtinIfInsts.head());
+                }
             }
 
             if (contractApp.check(currGoal.proof().getServices()) == null) {

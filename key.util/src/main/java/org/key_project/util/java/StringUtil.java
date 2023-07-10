@@ -435,6 +435,21 @@ public final class StringUtil {
     }
 
     /**
+     * Count occurences of character x in text, starting at beginIndex and ending at endIndex
+     * (exclusive).
+     *
+     * @param text text
+     * @param beginIndex start index (inclusive)
+     * @param endIndex end index (exclusive)
+     * @param x character to search for
+     * @return number of times x is present
+     */
+    public static int count(String text, int beginIndex, int endIndex, char x) {
+        return (int) text.chars().skip(beginIndex).limit(endIndex - beginIndex)
+                .filter(ch -> ch == x).count();
+    }
+
+    /**
      * Efficient way to append repeated characters to a StringBuilder instead of String::repeat.
      * Allocates only once instead of twice and does half the work
      *
