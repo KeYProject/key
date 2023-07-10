@@ -1142,8 +1142,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         List<String> parts = mapOf(ctx.name.simple_ident());
         String varfuncid = ctx.name.getText();
 
-        if (ctx.name.INT_LITERAL() != null) {// number
-            return toZNotation(ctx.name.INT_LITERAL().getText(), functions());
+        if (ctx.INT_LITERAL() != null) {// number
+            return toZNotation(ctx.INT_LITERAL().getText(), functions());
         }
 
         assert parts != null && varfuncid != null;
@@ -1172,7 +1172,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
         } else {
             String firstName =
-                ctx.name.simple_ident().size() == 0 ? ctx.name.INT_LITERAL().getText()
+                ctx.name == null ? ctx.INT_LITERAL().getText()
                         : ctx.name.simple_ident(0).getText();
             op = lookupVarfuncId(ctx, firstName,
                 ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
