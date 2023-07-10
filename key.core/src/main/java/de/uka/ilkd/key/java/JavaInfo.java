@@ -620,17 +620,17 @@ public final class JavaInfo {
             /*
              * Traverse type hierarchy to find a method with the specified name.
              */
-            Iterable<KeYJavaType> allSupertypes = kpmi.getAllSupertypes(classKJT);
-            Iterator<KeYJavaType> iterator = allSupertypes.iterator();
-            while (iterator.hasNext() && pm == null) {
-                KeYJavaType next = iterator.next();
-                pm = getProgramMethod(next, methodName, signature);
-                if (pm != null && pm.isPrivate() && !next.equals(classKJT)) {
+            List<KeYJavaType> allSupertypes = kpmi.getAllSupertypes(classKJT);
+            for (int i = allSupertypes.size() - 1; i >= 0; i--) {
+                KeYJavaType next = allSupertypes.get(i);
+                var method = getProgramMethod(next, methodName, signature);
+                if (method != null && !(method.isPrivate() && !next.equals(classKJT))) {
                     /*
                      * Private methods from supertypes are not visible in their subtypes. They will
                      * not be selected here.
                      */
-                    pm = null;
+                    pm = method;
+                    break;
                 }
             }
         } else {
