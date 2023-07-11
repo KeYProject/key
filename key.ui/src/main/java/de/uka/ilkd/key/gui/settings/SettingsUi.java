@@ -23,6 +23,7 @@ import de.uka.ilkd.key.gui.MainWindow;
  */
 public class SettingsUi extends JPanel {
     private static final long serialVersionUID = -217841876110516940L;
+    private static int calculatedWidth = 0;
 
     private final JSplitPane root;
     private final JComponent westPanel;
@@ -140,6 +141,9 @@ public class SettingsUi extends JPanel {
             setSettingsPanel(providers.get(0).getPanel(mainWindow));
         }
         // determine optimal dialog width
+        if (calculatedWidth != 0) {
+            return calculatedWidth;
+        }
         int w = providers.stream().flatMap(x -> {
             // collect all children providers
             List<SettingsProvider> all = new ArrayList<>();
@@ -160,7 +164,8 @@ public class SettingsUi extends JPanel {
             return panel.getWidth();
         }).max(Integer::compareTo).orElse(600);
         setSettingsPanel(!providers.isEmpty() ? providers.get(0).getPanel(mainWindow) : null);
-        return w + westPanel.getWidth() + 15;
+        calculatedWidth = w + westPanel.getWidth() + this.root.getDividerSize() + 30;
+        return calculatedWidth;
     }
 
     public void getPaths(TreePath parent, List<TreePath> list) {
@@ -168,8 +173,8 @@ public class SettingsUi extends JPanel {
 
         TreeNode node = (TreeNode) parent.getLastPathComponent();
         if (node.getChildCount() >= 0) {
-            for (Enumeration e = node.children(); e.hasMoreElements();) {
-                TreeNode n = (TreeNode) e.nextElement();
+            for (Enumeration<? extends TreeNode> e = node.children(); e.hasMoreElements();) {
+                TreeNode n = e.nextElement();
                 TreePath path = parent.pathByAddingChild(n);
                 getPaths(path, list);
             }
