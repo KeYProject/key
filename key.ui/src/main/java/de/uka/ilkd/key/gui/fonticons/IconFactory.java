@@ -145,7 +145,7 @@ public final class IconFactory {
         new IconFontProvider(FontAwesomeSolid.ANGLE_DOWN);
     public static final IconFontProvider SEARCH_HIGHLIGHT =
         new IconFontProvider(FontAwesomeSolid.HIGHLIGHTER);
-    public static final IconFontProvider ABONDON = new IconFontProvider(FontAwesomeSolid.TRASH_ALT);
+    public static final IconFontProvider ABANDON = new IconFontProvider(FontAwesomeSolid.TRASH_ALT);
     public static final IconFontProvider SEARCH_HIDE =
         new IconFontProvider(FontAwesomeSolid.LOW_VISION);
     public static final IconFontProvider SEARCH_NEXT =
@@ -157,7 +157,7 @@ public final class IconFactory {
 
     private static final Image keyHole = getImage("images/ekey-mono.gif");
     private static final Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
-    private static final Image keyCachedClosed = getImage("images/closed-brackets.gif");
+    private static final Image keyCachedClosed = getImage("images/closed-cached.png");
     private static final Image keyHoleInteractive = getImage("images/keyinteractive.gif");
     private static final Image keyHoleLinked = getImage("images/keylinked.gif");
     private static final Image keyLogo = getImage("images/key-color.png");
@@ -214,7 +214,7 @@ public final class IconFactory {
     }
 
     public static Icon abandon(int x) {
-        return ABONDON.load(x);
+        return ABANDON.load(x);
     }
 
     public static Icon configure(int x) {
