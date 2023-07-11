@@ -38,9 +38,6 @@ import org.slf4j.LoggerFactory;
 public class ShowProofStatistics extends MainWindowAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(ShowProofStatistics.class);
 
-    /**
-     *
-     */
     private static final long serialVersionUID = -8814798230037775905L;
 
     /**
@@ -48,6 +45,10 @@ public class ShowProofStatistics extends MainWindowAction {
      */
     private static final Pattern TOOLTIP_PATTERN = Pattern.compile(".+\\[tooltip: (.+)]");
 
+    /**
+     * The proof to show statistics for. May be null if the currently selected proof
+     * is to be shown.
+     */
     private final Proof proof;
 
     public ShowProofStatistics(MainWindow mainWindow, Proof proof) {

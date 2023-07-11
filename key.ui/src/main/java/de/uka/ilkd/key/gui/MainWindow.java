@@ -610,16 +610,6 @@ public final class MainWindow extends JFrame {
         loadPreferences(this);
     }
 
-    /*
-     * private JToggleButton createHeatmapToggle() { return new JToggleButton(new
-     * HeatmapToggleAction(this)); }
-     */
-
-    /*
-     * private JButton createHeatmapMenuOpener() { return new JButton(new
-     * HeatmapSettingsAction(this)); }
-     */
-
     private JToolBar createFileOpsToolBar() {
         JToolBar fileOperations = new JToolBar("File Operations");
         fileOperations.add(openFileAction);
@@ -649,8 +639,6 @@ public final class MainWindow extends JFrame {
         toolBar.add(new GoalBackAction(this, false));
         toolBar.add(new PruneProofAction(this));
         toolBar.addSeparator();
-        // toolBar.add(createHeatmapToggle());
-        // toolBar.add(createHeatmapMenuOpener());
 
         return toolBar;
     }
@@ -787,14 +775,9 @@ public final class MainWindow extends JFrame {
         ThreadUtilities.invokeOnEventQueue(() -> setStatusLineImmediately(str, max));
     }
 
-    @Deprecated
-    public void selectFirstTab() {
-        // weigl disable: this.mainWindowTabbedPane.setSelectedIndex(0);
-    }
-
     /**
-     * Freeze the main window by blocking all input events, except those for the status line (i.e.
-     * the abort button within the status line)
+     * Freeze the main window by blocking all input events, except those for the toolbar (i.e.
+     * the abort button within the toolbar)
      */
     public void freezeExceptAutoModeButton() {
         if (!frozen) {

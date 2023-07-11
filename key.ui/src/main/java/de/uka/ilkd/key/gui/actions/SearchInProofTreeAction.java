@@ -26,7 +26,6 @@ public class SearchInProofTreeAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
-        mainWindow.selectFirstTab();
         mainWindow.getProofTreeView().showSearchPanel();
     }
 }
