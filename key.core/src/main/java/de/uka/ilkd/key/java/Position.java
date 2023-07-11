@@ -42,7 +42,7 @@ public class Position implements Comparable<Position> {
      */
     private Position(int line, int column) {
         if (line < 1 || column < 1) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(line + ", " + column);
         }
         this.line = line;
         this.column = column;

@@ -482,6 +482,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     }
 
     private void showError(Throwable e) {
+        LOGGER.error("failed to slice proof ", e);
         SwingUtilities.invokeLater(
             () -> IssueDialog.showExceptionDialog(MainWindow.getInstance(), e));
     }

@@ -947,17 +947,19 @@ public abstract class SequentView extends JEditorPane {
         var highlight = System.nanoTime();
         setTextCache.get(highlighted);
         var setText = System.nanoTime();
-        LOGGER.trace("updateSequent " + node.serialNr() + ": print " + (print - start) / 1e6
+        LOGGER.trace("updateSequent " + (node != null ? node.serialNr() : -1) + ": print "
+            + (print - start) / 1e6
             + "ms, highlight " + (highlight - print) / 1e6 + "ms, setText "
             + (setText - highlight) / 1e6 + "ms");
     }
 
     public void setFilter(SequentPrintFilter sequentPrintFilter, boolean forceUpdate) {
         this.filter = sequentPrintFilter;
-        Node selectedNode = getMainWindow().getMediator().getSelectedNode();
-        if (selectedNode != null) {
+        Sequent selectedSequent =
+            getMainWindow().getMediator().getSelectionModel().getSelectedSequent();
+        if (selectedSequent != null) {
             // bugfix #1458 (gitlab). The selected node may be null if no proof.
-            this.filter.setSequent(selectedNode.sequent());
+            this.filter.setSequent(selectedSequent);
         }
         if (forceUpdate) {
             printSequent();

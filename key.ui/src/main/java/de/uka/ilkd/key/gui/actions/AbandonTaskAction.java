@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.proof.Proof;
 
 public final class AbandonTaskAction extends MainWindowAction {
 
@@ -13,7 +14,9 @@ public final class AbandonTaskAction extends MainWindowAction {
      */
     private static final long serialVersionUID = 915588190956945751L;
 
-    public AbandonTaskAction(MainWindow mainWindow) {
+    private final Proof proof;
+
+    public AbandonTaskAction(MainWindow mainWindow, Proof proof) {
         super(mainWindow);
         setName("Abandon Proof");
         setIcon(IconFactory.abandon(16));
@@ -22,12 +25,18 @@ public final class AbandonTaskAction extends MainWindowAction {
 
         getMediator().enableWhenProofLoaded(this);
         lookupAcceleratorKey();
+
+        this.proof = proof;
     }
 
     public synchronized void actionPerformed(ActionEvent e) {
         boolean removalConfirmed = getMediator().getUI().confirmTaskRemoval("Are you sure?");
         if (removalConfirmed) {
-            getMediator().getSelectedProof().dispose();
+            if (proof == null) {
+                getMediator().getSelectedProof().dispose();
+            } else {
+                proof.dispose();
+            }
         }
     }
 
