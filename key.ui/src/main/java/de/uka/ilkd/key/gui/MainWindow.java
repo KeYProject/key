@@ -622,6 +622,7 @@ public final class MainWindow extends JFrame {
 
     private JToolBar createFileOpsToolBar() {
         JToolBar fileOperations = new JToolBar("File Operations");
+        fileOperations.setFloatable(false);
         fileOperations.add(openFileAction);
         fileOperations.add(openMostRecentFileAction);
         fileOperations.add(editMostRecentFileAction);
@@ -635,7 +636,7 @@ public final class MainWindow extends JFrame {
 
     private JToolBar createProofControlToolBar() {
         JToolBar toolBar = new JToolBar("Proof Control");
-        toolBar.setFloatable(true);
+        toolBar.setFloatable(false);
         toolBar.setRollover(true);
 
         toolBar.add(createWiderAutoModeButton());
@@ -660,7 +661,7 @@ public final class MainWindow extends JFrame {
 
     private JToolBar createNavigationToolBar() {
         JToolBar toolBar = new JToolBar("Selection Navigation");
-        toolBar.setFloatable(true);
+        toolBar.setFloatable(false);
         toolBar.setRollover(true);
 
         SelectionHistory history = new SelectionHistory(mediator);

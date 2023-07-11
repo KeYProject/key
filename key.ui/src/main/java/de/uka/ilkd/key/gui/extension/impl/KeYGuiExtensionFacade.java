@@ -223,6 +223,7 @@ public final class KeYGuiExtensionFacade {
      */
     public static List<JToolBar> createToolbars(MainWindow mainWindow) {
         return getToolbarExtensions().stream().map(it -> it.getToolbar(mainWindow))
+                .peek(x -> x.setFloatable(false))
                 .collect(Collectors.toList());
     }
 
