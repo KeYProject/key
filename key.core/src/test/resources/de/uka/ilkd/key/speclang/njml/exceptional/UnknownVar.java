@@ -1,4 +1,4 @@
-// exceptionClass: PosConvertException
+// exceptionClass: ParserException
 // msgContains: Could not resolve FieldReference "unknownVar"
 // position: 12/9
 

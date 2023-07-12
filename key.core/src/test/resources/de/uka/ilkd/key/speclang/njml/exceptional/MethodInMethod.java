@@ -1,7 +1,7 @@
 // position: 11/34
 // verbose: true
 // broken: false
-// exceptionClass: PosConvertException
+// exceptionClass: ParserException
 // msgContains: mismatched input '('
 
 class MethodInMethod {
