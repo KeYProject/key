@@ -160,6 +160,36 @@ public abstract class VariableDeclaration extends JavaDeclaration
         return super.isFinal();
     }
 
+    @Override
+    public boolean isPrivate() {
+        return super.isPrivate();
+    }
+
+    @Override
+    public boolean isProtected() {
+        return super.isProtected();
+    }
+
+    @Override
+    public boolean isPublic() {
+        return super.isPublic();
+    }
+
+    @Override
+    public boolean isStatic() {
+        return super.isStatic();
+    }
+
+    @Override
+    public boolean isModel() {
+        return super.isModel();
+    }
+
+    @Override
+    public boolean isGhost() {
+        return super.isGhost();
+    }
+
     /**
      * this field stores if parent is an InterfaceDeclaration because we will be unable to walk the
      * tree upwards to check this

@@ -144,12 +144,16 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return accept(type);
     }
 
-    private <O> O addToMapping(Node value, O o) {
+    private <O extends ProgramElement> O addToMapping(Node value, O o) {
         mapping.put(value, o);
         return o;
     }
 
     private static ProgramElementName createProgramElementName(SimpleName n) {
+        if (n.asString().startsWith("#")) {
+            throw new IllegalArgumentException(
+                "Creating a program element name from a string that identifies a schema variable");
+        }
         var c = createComments(n);
         return new ProgramElementName(n.asString(), c.toArray(Comment[]::new));
     }
@@ -791,10 +795,15 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(MethodCallExpr n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        var methodName = createProgramElementName(n.getName());
+        MethodName name;
+        if (n.getName().asString().startsWith("#")) {
+            name = (MethodName) lookupSchemaVariable(n.getName().asString(), n.getName());
+        } else {
+            name = createProgramElementName(n.getName());
+        }
         ReferencePrefix prefix = accepto(n.getScope());
         ImmutableArray<de.uka.ilkd.key.java.ast.Expression> args = map(n.getArguments());
-        return new MethodReference(pi, c, prefix, methodName, args);
+        return new MethodReference(pi, c, prefix, name, args);
     }
 
     @Override
@@ -837,33 +846,45 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         try {
             target = n.resolve();
         } catch (UnsolvedSymbolException e) {
-            var type = n.calculateResolvedType();
+            ResolvedType type;
+            try {
+                type = n.calculateResolvedType();
+            } catch (UnsolvedSymbolException ex) {
+                throw ex;
+            }
             var keyType = getKeYJavaType(type);
             return new TypeRef(keyType);
         }
         if (target.toAst().isEmpty()) {
-            var type = getKeYJavaType(target.getType());
-            return new LocationVariable(createProgramElementName(n.getName()), type);
+            return reportUnsupportedElement(n);
         }
 
         var ast = target.toAst().get();
         // Make sure the field is already converted
         var other = (VariableDeclaration) mapping.nodeToKeY(ast)
                 .orElseGet(() -> accept(ast));
-        if (other.getVariables().size() == 1) {
-            return other.getVariables().get(0).getProgramVariable();
-        }
+        var pi = createPositionInfo(n);
+        var c = createComments(n);
         if (target instanceof JavaParserFieldDeclaration) {
             // Field declarations can have multiple variables
             var decl = ((JavaParserFieldDeclaration) target).getVariableDeclarator();
             var keyDecl = (VariableSpecification) mapping.nodeToKeY(decl).orElseThrow();
-            return keyDecl.getProgramVariable();
+            var pv = (ProgramVariable) keyDecl.getProgramVariable();
+            if (pv.isMember()) {
+                // TODO javaparser prefix null? should we add default this?
+                return new FieldReference(pi, c, pv, null);
+            }
+            // This seems to happen when we create a fake field in JavaService::createContext
+            return pv;
         }
         if (target instanceof JavaParserVariableDeclaration) {
             // Variable declarations can have multiple variables
             var decl = ((JavaParserVariableDeclaration) target).getVariableDeclarator();
             var keyDecl = (VariableSpecification) mapping.nodeToKeY(decl).orElseThrow();
-            return keyDecl.getProgramVariable();
+            return (ProgramVariable) keyDecl.getProgramVariable();
+        }
+        if (other.getVariables().size() == 1) {
+            return (ProgramVariable) other.getVariables().get(0).getProgramVariable();
         }
         return reportUnsupportedElement(target.toAst().get());
     }

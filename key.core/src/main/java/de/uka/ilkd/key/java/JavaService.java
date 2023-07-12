@@ -677,15 +677,16 @@ public class JavaService {
                 continue;
             }
 
-            var spec = new VariableDeclarator(name2typeReference(javaType.getFullName()),
-                var.name().toString());
-
-            FieldSpecification keySpec;
             var existingSpec = lookupVarSpec(var);
-            if (existingSpec.isPresent()) {
-                keySpec = (FieldSpecification) existingSpec.get();
+            FieldSpecification keySpec;
+            VariableDeclarator spec;
+            if (existingSpec != null) {
+                keySpec = (FieldSpecification) existingSpec;
+                spec = (VariableDeclarator) Objects.requireNonNull(mapping.nodeFromKeY(keySpec));
             } else {
                 keySpec = new FieldSpecification(var);
+                spec = new VariableDeclarator(name2typeReference(javaType.getFullName()),
+                    var.name().toString());
                 mapping.put(spec, keySpec);
             }
 
@@ -707,14 +708,15 @@ public class JavaService {
      * <p>
      * used by addProgramVariablesToClassContext
      */
-    private Optional<VariableSpecification> lookupVarSpec(ProgramVariable pv) {
+    @Nullable
+    private VariableSpecification lookupVarSpec(ProgramVariable pv) {
         for (final Object o : mapping.elemsKeY()) {
             if ((o instanceof VariableSpecification)
                     && ((VariableSpecification) o).getProgramVariable() == pv) {
-                return Optional.of((VariableSpecification) o);
+                return (VariableSpecification) o;
             }
         }
-        return Optional.empty();
+        return null;
     }
 
     /**

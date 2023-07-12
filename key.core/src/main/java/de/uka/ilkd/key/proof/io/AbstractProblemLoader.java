@@ -700,7 +700,7 @@ public abstract class AbstractProblemLoader {
             try {
                 return readProofScript();
             } catch (ProofInputException e) {
-                throw new ProblemLoaderException(this, e);
+                throw new ProblemLoaderException(this, "Failed to read proof script", e);
             }
         } else {
             return null;

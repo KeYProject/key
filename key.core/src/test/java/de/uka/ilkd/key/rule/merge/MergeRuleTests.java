@@ -23,6 +23,8 @@ import de.uka.ilkd.key.util.ProofStarter;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -32,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Dominic Scheurer
  */
 public class MergeRuleTests {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MergeRuleTests.class);
 
     private static final File TEST_RESOURCES_DIR_PREFIX =
         new File(HelperClassForTests.TESTCASE_DIRECTORY, "merge/");
@@ -315,13 +318,21 @@ public class MergeRuleTests {
         assertTrue(proofFile.exists(),
             "Proof file: " + proofFile.getAbsolutePath() + " could not be found!");
 
-        return Assertions.assertDoesNotThrow(() -> {
-            KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
-                proofFile.toPath(), null, null, null, true);
-            Proof proof = environment.getLoadedProof();
-            Assertions.assertNotNull(proof, "Loaded proof should not be null");
-            return proof;
-        });
+        var environment = Assertions
+                .assertDoesNotThrow(() -> KeYEnvironment.load(JavaProfile.getDefaultInstance(),
+                    proofFile.toPath(), null, null, null, true));
+        Proof proof = environment.getLoadedProof();
+        Assertions.assertNotNull(proof, "Loaded proof should not be null");
+        var errors = environment.getReplayResult().getErrorList();
+        if (!errors.isEmpty()) {
+            LOGGER.warn("There were errors during load");
+            for (int i = 0; i < errors.size(); i++) {
+                var error = errors.get(i);
+                LOGGER.warn("Error " + i + ": ", error);
+            }
+            Assertions.fail("There were errors during load");
+        }
+        return proof;
     }
 
     private static class IncompleteRuleAppException extends RuntimeException {

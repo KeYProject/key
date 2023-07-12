@@ -222,7 +222,7 @@ public abstract class AbstractUserInterfaceControl
             if (loader != null && loader.getProof() != null) {
                 loader.getProof().dispose();
             }
-            throw new ProblemLoaderException(loader, e);
+            throw new ProblemLoaderException(loader, "Load failed", e);
         }
     }
 

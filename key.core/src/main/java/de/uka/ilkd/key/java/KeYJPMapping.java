@@ -2,7 +2,9 @@ package de.uka.ilkd.key.java;
 
 import java.util.*;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.util.Debug;
 
@@ -33,7 +35,7 @@ public class KeYJPMapping {
      * maps a recoder programelement (or something similar, e.g. Type)
      * to the KeY-equivalent
      */
-    private final Map<Node, Object> map;
+    private final Map<Node, ProgramElement> map;
 
     /**
      * maps a recoder programelement (or something similar, e.g. Type)
@@ -45,7 +47,7 @@ public class KeYJPMapping {
     /**
      * maps a KeY programelement to the Recoder-equivalent
      */
-    private final Map<Object, Node> revMap;
+    private final Map<ProgramElement, Node> revMap;
 
     /**
      * a pseudo super class for all arrays used to declare length
@@ -96,15 +98,20 @@ public class KeYJPMapping {
         return res;
     }
 
-    public Optional<Object> nodeToKeY(Node rm) {
+    public Optional<ProgramElement> nodeToKeY(Node rm) {
         return Optional.ofNullable(map.get(rm));
     }
 
-    public Optional<Object> resolvedDeclarationToKeY(ResolvedDeclaration rm) {
+    public Optional<ProgramElement> resolvedDeclarationToKeY(ResolvedDeclaration rm) {
         return rm.toAst().flatMap(this::nodeToKeY);
     }
 
-    public void put(Node node, Object value) {
+    @Nullable
+    public Node nodeFromKeY(ProgramElement el) {
+        return revMap.get(el);
+    }
+
+    public void put(Node node, ProgramElement value) {
         Object formerValue = map.putIfAbsent(node, value);
         var formerNode = revMap.putIfAbsent(value, node);
         if (formerValue != null && formerValue != value)
