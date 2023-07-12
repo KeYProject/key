@@ -1011,6 +1011,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @param pos the PosInOccurrence of the newl created PosTacletApp
      * @return the new TacletApp
      */
+    @Nullable
     public PosTacletApp setPosInOccurrence(PosInOccurrence pos, Services services) {
         if (taclet() instanceof NoFindTaclet) {
             throw new IllegalStateException("Cannot add position to an taclet" + " without find");

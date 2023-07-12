@@ -515,8 +515,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return label.map(name -> new ProgramElementName(name.asString())).orElse(null);
     }
 
+    @Nullable
     private Label simpleNameToLabel(Optional<SimpleName> label) {
-        return label.map(JP2KeYVisitor::createProgramElementName).orElse(null);
+        return label.map(l -> {
+            if (l.asString().startsWith("#")) {
+                return (Label) lookupSchemaVariable(l.asString(), l);
+            }
+            return createProgramElementName(l);
+        }).orElse(null);
     }
 
     @Override
@@ -1123,6 +1129,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                     }
                     return new IntLiteral(pi, c, Integer.MIN_VALUE);
                 }
+                return new IntLiteral(pi, c, -num.intValue());
             }
             return new Negative(pi, c, accept(expr));
         }

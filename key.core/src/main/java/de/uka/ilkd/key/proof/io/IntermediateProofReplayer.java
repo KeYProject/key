@@ -456,11 +456,17 @@ public class IntermediateProofReplayer {
                 }
 
                 ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
+                if (ourApp == null) {
+                    throw new TacletAppConstructionException("Failed to match find: " + pos);
+                }
                 ourApp = ourApp.setPosInOccurrence(pos, services);
+                if (ourApp == null) {
+                    throw new TacletAppConstructionException("Failed to set position: " + pos);
+                }
             } catch (TacletAppConstructionException e) {
                 throw e;
             } catch (Exception e) {
-                throw new TacletAppConstructionException("Wrong position information: " + pos, e);
+                throw new TacletAppConstructionException("Unexpected exception", e);
             }
         }
 

@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -294,9 +295,9 @@ public class NoPosTacletApp extends TacletApp {
      *
      * @return TacletApp with the resulting instantiations or null
      */
+    @Nullable
     public NoPosTacletApp matchFind(PosInOccurrence pos, Services services) {
-        NoPosTacletApp result = matchFind(pos, services, null);
-        return result;
+        return matchFind(pos, services, null);
     }
 
 
@@ -305,6 +306,7 @@ public class NoPosTacletApp extends TacletApp {
      * expensive pos.subTerm() while matching during a recursive descent in a term (where the
      * current subterm is known anyway).
      */
+    @Nullable
     public NoPosTacletApp matchFind(PosInOccurrence pos, Services services, Term t) {
         if ((t == null) && (pos != null)) {
             t = pos.subTerm();
