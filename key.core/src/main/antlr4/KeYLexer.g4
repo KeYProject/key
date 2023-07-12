@@ -233,13 +233,14 @@ CONTAINERTYPE : '\\containerType';
 //BIGINT : '\\bigint';
 
 // Unicode symbols for special functions/predicates
-UTF_PRECEDES : '\u227A';
-UTF_IN : '\u220A';
-UTF_EMPTY : '\u2205';
-UTF_UNION : '\u222A';
-UTF_INTERSECT : '\u2229';
-UTF_SUBSET : '\u2286';
-UTF_SETMINUS : '\u2216';
+UTF_PRECEDES  : '\u227A' /*≺*/ | '\\precedes';
+UTF_IN        : '\u220A' /*∊*/ | '\\in';
+UTF_EMPTY     : '\u2205' /*∅*/ | '\\emptyset';
+UTF_UNION     : '\u222A' /*∪*/ | '\\cup';
+UTF_INTERSECT : '\u2229' /*∩*/ | '\\cap';
+UTF_SUBSET_EQ : '\u2286' /*⊆*/ | '\\subseteq';
+UTF_SUBSEQ    : '\u2282' /*⊂*/ | '\\subset';
+UTF_SETMINUS  : '\u2216' /*∖*/ | '\\setminus';
 
 fragment
 VOCAB
@@ -374,15 +375,13 @@ GREATEREQUAL
 :   '>' '=' | '\u2265'
       ;
 
-RGUILLEMETS
-      :   '>' '>'
-      ;
-      
+
 WS:  [ \t\n\r\u00a0]+ -> channel(HIDDEN); //U+00A0 = non breakable whitespace
 STRING_LITERAL:'"' ('\\' . | ~( '"' | '\\') )* '"' ;
 LESS: '<';
 LESSEQUAL: '<' '=' | '\u2264';
-LGUILLEMETS: '<' '<';
+LGUILLEMETS: '<' '<' | '«' | '‹';
+RGUILLEMETS: '>''>' | '»' | '›';
 IMPLICIT_IDENT: '<' (LETTER)+ '>' ('$lmtd')? -> type(IDENT);
 
 EQV:	'<->' | '\u2194';
