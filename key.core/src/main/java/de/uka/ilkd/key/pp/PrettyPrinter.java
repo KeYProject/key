@@ -887,18 +887,18 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnBreak(Break x) {
         l.keyWord("break");
-        if (x.getProgramElementName() != null) {
+        if (x.getLabel() != null) {
             l.brk();
-            x.getProgramElementName().visit(this);
+            x.getLabel().visit(this);
         }
     }
 
     @Override
     public void performActionOnContinue(Continue x) {
         l.keyWord("continue");
-        if (x.getProgramElementName() != null) {
+        if (x.getLabel() != null) {
             l.brk();
-            x.getProgramElementName().visit(this);
+            x.getLabel().visit(this);
         }
     }
 
