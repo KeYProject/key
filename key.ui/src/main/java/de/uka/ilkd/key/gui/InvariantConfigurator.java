@@ -182,8 +182,10 @@ public class InvariantConfigurator {
 
                 final NamespaceSet nss = services.getNamespaces().copyWithParent();
                 Term self = loopInv.getInternalSelfTerm();
-                nss.programVariables()
-                        .add(new LocationVariable(new ProgramElementName("self"), self.sort()));
+                if (self != null) {
+                    nss.programVariables()
+                            .add(new LocationVariable(new ProgramElementName("self"), self.sort()));
+                }
                 parser = new KeyIO(services, nss);
                 parser.setAbbrevMap(getAbbrevMap());
 
