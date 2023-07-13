@@ -846,12 +846,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         try {
             target = n.resolve();
         } catch (UnsolvedSymbolException e) {
-            ResolvedType type;
-            try {
-                type = n.calculateResolvedType();
-            } catch (UnsolvedSymbolException ex) {
-                throw ex;
-            }
+            ResolvedType type = n.calculateResolvedType();
             var keyType = getKeYJavaType(type);
             return new TypeRef(keyType);
         }

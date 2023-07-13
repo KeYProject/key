@@ -13,7 +13,7 @@ import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.comments.Comment;
-import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.utils.PositionUtils;
 
 public class JMLCommentTransformer extends JavaTransformer {
@@ -72,7 +72,9 @@ public class JMLCommentTransformer extends JavaTransformer {
             if (n != null) {
                 List<Comment> specs = new ArrayList<>();
                 n.setData(AFTER_COMMENTS, specs);
-                specs.addAll(filterComments.subList(commentIdx, filterComments.size()));
+                var comments = filterComments.subList(commentIdx, filterComments.size());
+                specs.addAll(comments);
+                allComments.removeAll(comments);
             }
         }
     }
@@ -86,6 +88,21 @@ public class JMLCommentTransformer extends JavaTransformer {
             return true;
         if (cu instanceof BlockStmt)
             return true;
+        if (cu instanceof LabeledStmt) {
+            return true;
+        }
+        if (cu instanceof WhileStmt) {
+            return true;
+        }
+        if (cu instanceof ForStmt) {
+            return true;
+        }
+        if (cu instanceof ForEachStmt) {
+            return true;
+        }
+        if (cu instanceof DoStmt) {
+            return true;
+        }
         if (cu instanceof MethodDeclaration)
             return true;
         return false;
@@ -104,5 +121,8 @@ public class JMLCommentTransformer extends JavaTransformer {
     public void apply(CompilationUnit cu) {
         var comments = cu.getAllComments();
         cu.walk(it -> attachComments(it, comments));
+        if (!comments.isEmpty()) {
+            throw new IllegalStateException("Some comments were not attached to nodes");
+        }
     }
 }
