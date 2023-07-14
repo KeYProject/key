@@ -163,7 +163,8 @@ public class AbbrevManager implements KeYGuiExtension, KeYGuiExtension.LeftPanel
                     var file = fc.getSelectedFile().toPath();
                     try {
                         Files.writeString(file,
-                                abbrevMap.stream().map(it -> it.second + SEPERATOR_ABBREV_FILE + it.first)
+                                abbrevMap.stream().map(it -> it.second + SEPERATOR_ABBREV_FILE +
+                                                LogicPrinter.quickPrintTerm(it.first, mediator.getServices()))
                                         .collect(Collectors.joining("\n")));
                     } catch (IOException ex) {
                         LOGGER.error("File I/O error", ex);
@@ -313,7 +314,7 @@ public class AbbrevManager implements KeYGuiExtension, KeYGuiExtension.LeftPanel
 
                 for (Pair<Term, String> pair : from.abbreviations().export()) {
                     // print and parse to ensure the different namespace
-                    var term = kio.parseExpression(pair.first.toString());
+                    var term = kio.parseExpression(LogicPrinter.quickPrintTerm(pair.first, from.getServices()));
                     selected.abbreviations().forcePut(pair.second, term);
                 }
                 MainWindow.getInstance().makePrettyView();
