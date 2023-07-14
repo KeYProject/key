@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -46,8 +45,6 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
     public static final String[] LAYOUT_NAMES = new String[] { "Default", "Slot 1", "Slot 2" };
     public static final int[] LAYOUT_KEYS = new int[] { KeyEvent.VK_F11, KeyEvent.VK_F12 };
 
-    private final List<Action> actions = new LinkedList<>();
-    private final ButtonGroup layouts = new ButtonGroup();
     private MainWindow window;
 
     private void installIcons(MainWindow mw) {
@@ -91,18 +88,6 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
         }
     }
 
-    private void ensureActions(MainWindow mw) {
-        if (actions.isEmpty()) {
-            int keypos = 0;
-            for (String layout : LAYOUT_NAMES) {
-                Integer key = keypos < LAYOUT_KEYS.length ? LAYOUT_KEYS[keypos] : null;
-                actions.add(new LoadLayoutAction(mw, layout, key));
-                actions.add(new SaveLayoutAction(mw, layout, key));
-                keypos++;
-            }
-        }
-    }
-
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
         this.window = window;
@@ -125,7 +110,7 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
                 try {
                     window.getDockControl().writeXML(LAYOUT_FILE);
                 } catch (IOException ex) {
-                    LOGGER.warn("Failed to save layouts ", ex);
+                    LOGGER.warn("Failed to save layouts", ex);
                 }
             }
         });
@@ -140,102 +125,17 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
         DockingHelper.restoreMissingPanels(window);
     }
 
-    @Nonnull
-    @Override
-    public List<JMenuItem> getMainMenuItems(@Nonnull MainWindow mainWindow) {
-        List<JMenuItem> items = new ArrayList<>();
-
-        final class ActivateLayoutAction extends MainWindowAction {
-            private final String layout;
-
-            private ActivateLayoutAction(MainWindow mainWindow, String layout) {
-                super(mainWindow);
-                this.layout = layout;
-                setName(layout);
-                setMenuPath("View.Layout");
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setLayout(layout);
-                layouts.getElements().asIterator().forEachRemaining(
-                    button -> button.getModel().setSelected(button.getText().contains(layout)));
-            }
-        }
-
-        for (String s : LAYOUT_NAMES) {
-            JRadioButtonMenuItem button = new JRadioButtonMenuItem(s);
-            if (s.equals("Default")) {
-                button.getModel().setSelected(true);
-            } else {
-                button.getModel().setSelected(false);
-            }
-            layouts.add(button);
-            button.setAction(new ActivateLayoutAction(mainWindow, s));
-            items.add(button);
-        }
-        return items;
-    }
-
     @Override
     public List<Action> getMainMenuActions(MainWindow mainWindow) {
         List<Action> actions = new ArrayList<>();
-
-        final class SaveAction extends MainWindowAction {
-            private static final long serialVersionUID = -2688272657370615595L;
-
-            private SaveAction(MainWindow mainWindow) {
-                super(mainWindow);
-                setName("Save Layout");
-                setMenuPath("View.Layout");
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String layout = null;
-                var iter = layouts.getElements().asIterator();
-                while (iter.hasNext()) {
-                    var b = (JRadioButtonMenuItem) iter.next();
-                    if (b.getModel().isSelected()) {
-                        layout = b.getText();
-                        System.out.println("saving in " + layout);
-                        break;
-                    }
-                }
-                mainWindow.getDockControl().save(layout);
-            }
+        int keypos = 0;
+        for (String layout : LAYOUT_NAMES) {
+            Integer key = keypos < LAYOUT_KEYS.length ? LAYOUT_KEYS[keypos] : null;
+            actions.add(new LoadLayoutAction(mainWindow, layout, key));
+            actions.add(new SaveLayoutAction(mainWindow, layout, key));
+            keypos++;
         }
-
-        final class LoadAction extends MainWindowAction {
-            private static final long serialVersionUID = 3130337190207622893L;
-
-            private LoadAction(MainWindow mainWindow) {
-                super(mainWindow);
-                setName("Load Layout");
-                setMenuPath("View.Layout");
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String layout = null;
-                var iter = layouts.getElements().asIterator();
-                while (iter.hasNext()) {
-                    var b = (JRadioButtonMenuItem) iter.next();
-                    if (b.getModel().isSelected()) {
-                        layout = b.getText();
-                        break;
-                    }
-                }
-                setLayout(layout);
-            }
-        }
-
-        actions.add(new LoadAction(mainWindow));
-        actions.add(new SaveAction(mainWindow));
         actions.add(new ResetLayoutAction(mainWindow));
-
-        ensureActions(mainWindow);
-
         return actions;
     }
 }
@@ -245,7 +145,7 @@ final class SaveLayoutAction extends MainWindowAction {
     private static final long serialVersionUID = -2646217961498111734L;
     private final String layoutName;
 
-    public SaveLayoutAction(MainWindow mainWindow, String name, Integer key) {
+    SaveLayoutAction(MainWindow mainWindow, String name, Integer key) {
         super(mainWindow);
         this.layoutName = name;
         setName("Save as " + name);
@@ -270,7 +170,7 @@ final class LoadLayoutAction extends MainWindowAction {
     private static final long serialVersionUID = 3378477658914832831L;
     private final String layoutName;
 
-    public LoadLayoutAction(MainWindow mainWindow, String name, Integer key) {
+    LoadLayoutAction(MainWindow mainWindow, String name, Integer key) {
         super(mainWindow);
         this.layoutName = name;
         setName("Load " + name);
@@ -296,13 +196,14 @@ final class LoadLayoutAction extends MainWindowAction {
 }
 
 
-class ResetLayoutAction extends MainWindowAction {
+final class ResetLayoutAction extends MainWindowAction {
     private static final long serialVersionUID = 8772915552504055750L;
 
-    public ResetLayoutAction(MainWindow mainWindow) {
+    ResetLayoutAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Reset Layout");
         KeyStrokeManager.lookupAndOverride(this);
+        setPriority(10);
         setMenuPath("View.Layout");
     }
 
