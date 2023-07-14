@@ -12,12 +12,16 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.SpecNameLabel;
 import de.uka.ilkd.key.pp.AbbrevException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Alexander Weigl
  * @version 1 (1/16/22)
  */
 public class MakeNamedFormulaToAbbrevAction extends MainWindowAction {
+    private final static Logger LOGGER = LoggerFactory.getLogger(MakeNamedFormulaToAbbrevAction.class);
+
     public MakeNamedFormulaToAbbrevAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Introduce abbreviation for named formulas");
@@ -44,6 +48,8 @@ public class MakeNamedFormulaToAbbrevAction extends MainWindowAction {
         if ((e.getModifiers() & InputEvent.SHIFT_DOWN_MASK) != 0) {
             mainWindow.getVisibleTermLabels().setHidden(SpecNameLabel.NAME, true);
         }
+
+        mainWindow.makePrettyView();
     }
 
     private void findAndIntroduce(Iterator<SequentFormula> iterator) {
@@ -55,8 +61,9 @@ public class MakeNamedFormulaToAbbrevAction extends MainWindowAction {
         if (l != null) {
             try {
                 getMediator().getNotationInfo().getAbbrevMap().put(t, l.getLabel(), true);
+                LOGGER.info("Activate abbreviation @{} with {}", l.getLabel(), t);
             } catch (AbbrevException e) {
-                e.printStackTrace();
+                LOGGER.error("Could not activate abbreviation @{} with {}", l.getLabel(), t);
             }
         }
 
