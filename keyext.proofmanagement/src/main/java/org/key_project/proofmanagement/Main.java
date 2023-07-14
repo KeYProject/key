@@ -94,7 +94,7 @@ public final class Main {
         mergeCheck.addOption("--report", "out_path", STRINGS.getString("check_report_desc"));
 
         // TODO: bundle subcommand
-        CL.addSubCommand("bundle");
+        //CL.addSubCommand("bundle");
     }
 
     private Main() {
@@ -124,9 +124,9 @@ public final class Main {
                 CL.getSubCommandLine("check").printUsage(System.out);
             } else if (CL.subCommandUsed("merge")) {
                 System.out.println(USAGE_MERGE);
-            } else if (CL.subCommandUsed("bundle")) {
+            } else /*if (CL.subCommandUsed("bundle")) {
                 // TODO
-            } else {
+            } else */{
                 CL.printUsage(System.out);
             }
             //e.printStackTrace();
@@ -173,15 +173,7 @@ public final class Main {
 
             // generate report
             if (reportPath != null) {
-                try {
-                    HTMLReport.print(globalResult, reportPath);
-                } catch (IOException | URISyntaxException e) {
-                    System.err.println("Error creating the report: ");
-                    e.printStackTrace();
-                } catch (Throwable e) {
-                    System.err.println("Error creating the report: ");
-                    e.printStackTrace();
-                }
+                generateReport(globalResult, reportPath);
             }
         } catch (IOException e) {
             globalResult.print(LogLevel.ERROR, e.getMessage());
@@ -191,6 +183,18 @@ public final class Main {
         } catch (ProofManagementException e) {
             globalResult.print(LogLevel.ERROR, e.getMessage());
             globalResult.print("ProofManagement interrupted due to critical error.");
+            e.printStackTrace();
+        } catch (Throwable e) {
+            System.err.println("Error creating the report: ");
+            e.printStackTrace();
+        }
+    }
+
+    private static void generateReport(CheckerData globalResult, Path reportPath) {
+        try {
+            HTMLReport.print(globalResult, reportPath);
+        } catch (IOException | URISyntaxException e) {
+            System.err.println("Error creating the report: ");
             e.printStackTrace();
         } catch (Throwable e) {
             System.err.println("Error creating the report: ");
@@ -251,7 +255,7 @@ public final class Main {
         // perform a check with given commands
         if (commandLine.isSet("--check")) {
             String[] temp = commandLine.getString("--check", "").trim().split(" ");
-            String[] newArgs = Arrays.copyOfRange(temp, 0,temp.length + 1);
+            String[] newArgs = Arrays.copyOfRange(temp, 0, temp.length + 1);
             newArgs[newArgs.length - 1] = output.toString();
             try {
                 CommandLine checkCommandLine = commandLine.getSubCommandLine("check");

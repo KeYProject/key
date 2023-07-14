@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * A ProofBundleHandler for a proof bundle stored inside a zip file
@@ -35,7 +36,7 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
     //private final FileSystem fs;
 
     /** path of the temporary directory the bundle contents are unzipped to */
-    private Path tmpDir;
+    private final Path tmpDir;
 
     /**  */
     private final DirectoryProofBundleHandler dbh;
@@ -120,15 +121,16 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
         if (!closed) {
             closed = true;
             // delete temporary content from disk
-            Files.walk(tmpDir)
-                 .sorted(Comparator.reverseOrder())
-                 .forEach(p -> {
-                     try {
-                         Files.delete(p);
-                     } catch (IOException e) {
-                         e.printStackTrace();
-                     }
-                 });
+            try (Stream<Path> files = Files.walk(tmpDir)) {
+                 files.sorted(Comparator.reverseOrder())
+                    .forEach(p -> {
+                        try {
+                            Files.delete(p);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+            }
         }
     }
 }

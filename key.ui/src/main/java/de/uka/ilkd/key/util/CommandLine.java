@@ -187,7 +187,7 @@ public final class CommandLine {
 
     private String usedSubCommand = "";
 
-    private Map<String, CommandLine> subcommands = new HashMap<>();
+    private final Map<String, CommandLine> subcommands = new HashMap<>();
 
     public void addSubCommand(String name) {
         // TODO: test if valid name (e.g. must not start with MINUS)

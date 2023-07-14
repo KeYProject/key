@@ -27,7 +27,7 @@ public class ProofManagementExt implements
     @Override
     public List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
 
-        return Arrays.asList(new CheckAction());
+        return List.of(new CheckAction());
     }
 
     private static class CheckAction extends KeyAction {
@@ -39,10 +39,6 @@ public class ProofManagementExt implements
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            // TODO: checkboxes for existing checkers: missing, settings, dependency, replay
-            // TODO: bundle input path
-            // TODO: report output path
-            // TODO: buttons start/ok, cancel
             JDialog checkConfigDialog = new CheckConfigDialog(MainWindow.getInstance(),
                 "Check configuration", true);
             checkConfigDialog.setVisible(true);

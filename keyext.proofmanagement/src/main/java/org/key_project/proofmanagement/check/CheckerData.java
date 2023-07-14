@@ -118,7 +118,6 @@ public final class CheckerData implements Logger {
      * Adds a mapping to a reference choices id for the given choices. Use only if an equal
      * reference choices object has already been added via {@link #addReferenceChoices(Map)}.
      * @param choices the choices to add a mapping
-     * @return
      */
     public void addChoices(Map<String, String> choices) {
         // if no id is found, a NPE is thrown
@@ -191,9 +190,9 @@ public final class CheckerData implements Logger {
     }
 
     public enum ReplayState {
-        ERROR("\u2718"),
+        ERROR("\u2718"),   // cross/xmark
         UNKNOWN("?"),
-        SUCCESS("\u2714");
+        SUCCESS("\u2714"); // checkmark
 
         private final String shortStr;
         ReplayState(String shortStr) {
@@ -207,9 +206,9 @@ public final class CheckerData implements Logger {
     }
 
     public enum LoadingState {
-        ERROR("\u2718"),
+        ERROR("\u2718"),   // cross/xmark
         UNKNOWN("?"),
-        SUCCESS("\u2714");
+        SUCCESS("\u2714"); // checkmark
 
         private final String shortStr;
         LoadingState(String shortStr) {
@@ -226,7 +225,7 @@ public final class CheckerData implements Logger {
         UNKNOWN("?"),
         ILLEGAL_CYCLE("cycle"),
         UNPROVEN_DEP("open dep."),
-        OK("\u2714");
+        OK("\u2714"); // checkmark
 
         private final String shortStr;
         DependencyState(String shortStr) {

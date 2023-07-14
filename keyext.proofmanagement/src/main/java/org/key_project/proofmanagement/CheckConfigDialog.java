@@ -9,7 +9,17 @@ import java.awt.event.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * A small basic dialog of the ProofManagementExtension which allows the configuration of the check
+ * command via the GUI.
+ *
+ * @author Wolfram Pfeifer
+ */
 class CheckConfigDialog extends JDialog {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CheckConfigDialog.class);
 
     private final JCheckBox missingProofsCheck = new JCheckBox("Missing Proofs Checker");
     private final JCheckBox settingsCheck = new JCheckBox("Settings Checker");
@@ -23,9 +33,9 @@ class CheckConfigDialog extends JDialog {
 
     private final Component glassPane = new BlockingGlassPane();
 
-    SwingWorker<Void, Void> w;
+    private transient SwingWorker<Void, Void> checkWorker;
 
-    private class MyWorker extends SwingWorker<Void, Void> {
+    private class ProofManagementCheckWorker extends SwingWorker<Void, Void> {
         @Override
         protected Void doInBackground() throws Exception {
             Path reportPath = reportFileField.getText().isEmpty() ? null :
@@ -50,20 +60,29 @@ class CheckConfigDialog extends JDialog {
             runButton.setText("Run checkers");
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             if (isCancelled()) {
-                System.out.println("ProofManagement was cancelled by the user!");
+                LOGGER.info("ProofManagement was cancelled by the user!");
             } else {
                 CheckConfigDialog.this.setVisible(false);
             }
         }
     }
 
+    /**
+     * Pane that is fully transparent but blocks inputs from user to the underlying component(s).
+     * This creates the effect of a "locked" GUI (while the check is running). The "stop" button
+     * is not blocked to allow the user to interrupt the running proof management check. This may
+     * lead to exceptions though.
+     *
+     * @author Wolfram Pfeifer
+     */
     private class BlockingGlassPane extends JComponent {
         BlockingGlassPane() {
-            this.addMouseListener(new MouseInputAdapter() {
+            addMouseListener(new MouseInputAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    // TODO: this is not sufficient, it does not update the GUI (i.e. pressed state
-                    //       of the button)
+                    // This is not optimal, e.g., it does not update the GUI (i.e. pressed state of
+                    // the button). A proper forwarding of the events to the underlying stop button
+                    // would be nice, but this is much more difficult to implement correctly.
                     Point glassPanePoint = e.getPoint();
                     Point containerPoint =
                         SwingUtilities.convertPoint(BlockingGlassPane.this,
@@ -74,7 +93,7 @@ class CheckConfigDialog extends JDialog {
                             containerPoint.x,
                             containerPoint.y);
                     if (component == runButton) {
-                        w.cancel(true);
+                        checkWorker.cancel(true);
                     } else {
                         e.consume();
                     }
@@ -212,8 +231,8 @@ class CheckConfigDialog extends JDialog {
             runButton.setText("Stop");
             cancelButton.setEnabled(false);
             CheckConfigDialog.this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-            w = new MyWorker();
-            w.execute();
+            checkWorker = new ProofManagementCheckWorker();
+            checkWorker.execute();
         });
         cancelButton.addActionListener(e -> setVisible(false));
 
@@ -230,7 +249,7 @@ class CheckConfigDialog extends JDialog {
         setPreferredSize(new Dimension(600, 400));
 
         // for debugging:
-        bundleFileField.setText("/home/wolfram/Desktop/prooftest/testbundle.zproof");
+        bundleFileField.setText("/home/wolfram/Desktop/tmp/proof_management_test");
         reportFileField.setText("/home/wolfram/Desktop");
         runButton.setEnabled(true);
 

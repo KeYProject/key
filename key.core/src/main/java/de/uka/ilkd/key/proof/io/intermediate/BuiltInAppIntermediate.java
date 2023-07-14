@@ -1,6 +1,3 @@
-/**
- * 
- */
 package de.uka.ilkd.key.proof.io.intermediate;
 
 import de.uka.ilkd.key.logic.Name;
