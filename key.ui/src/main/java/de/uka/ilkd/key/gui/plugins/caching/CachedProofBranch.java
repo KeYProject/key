@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.io.File;
+import java.util.Collection;
 
 /**
  * Data object about a cached proof branch.
@@ -13,6 +14,10 @@ public class CachedProofBranch {
      * File the cached proof is stored in.
      */
     public final File proofFile;
+    /**
+     * Referenced files the proof depends on.
+     */
+    public final Collection<CachedFile> referencedFiles;
     public final String choiceSettings;
     /**
      * Step index of the cached branch.
@@ -32,8 +37,10 @@ public class CachedProofBranch {
      * @param stepIndex step index of the referenced node
      * @param sequent sequent of that node
      */
-    CachedProofBranch(File proofFile, String choiceSettings, int stepIndex, String sequent) {
+    CachedProofBranch(File proofFile, Collection<CachedFile> referencedFiles, String choiceSettings,
+            int stepIndex, String sequent) {
         this.proofFile = proofFile;
+        this.referencedFiles = referencedFiles;
         this.choiceSettings = choiceSettings;
         this.stepIndex = stepIndex;
         this.sequent = sequent;

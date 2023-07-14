@@ -12,11 +12,13 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Random;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
@@ -30,6 +32,8 @@ import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
+
+import org.key_project.util.java.XMLUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,9 +50,21 @@ public final class CachingDatabase {
     private static final Random RAND = new Random();
     private static final PathMatcher JAVA_MATCHER =
         FileSystems.getDefault().getPathMatcher("glob:*.java");
+    private static final Pattern PROOF_HEADER_CLEANER =
+        Pattern.compile("(\\\\include|\\\\javaSource) \"[^\"]+\";");
 
+    /**
+     * Whether the database is ready for queries.
+     */
     private static boolean initDone = false;
+    /**
+     * Whether the index needs to be written to disk due to changes.
+     */
     private static boolean dirty = false;
+    /**
+     * If true, the database is not in a valid state and may not be saved.
+     */
+    private static boolean doNotSave = true;
     private static List<CachedProofBranch> cache;
     private static Map<Integer, CachedFile> files;
 
@@ -76,28 +92,36 @@ public final class CachingDatabase {
             factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
             var builder = factory.newDocumentBuilder();
             var document = builder.parse(cacheIndex);
+
+            var otherFiles = document.getElementsByTagName("otherFile");
+            for (int i = 0; i < otherFiles.getLength(); i++) {
+                var entry = otherFiles.item(i);
+                var name = entry.getAttributes().getNamedItem("name").getNodeValue();
+                var hash = entry.getAttributes().getNamedItem("hash").getNodeValue();
+                files.put(Integer.parseInt(hash),
+                    new CachedFile(name, Integer.parseInt(hash)));
+            }
+
             var entries = document.getElementsByTagName("entry");
             for (int i = 0; i < entries.getLength(); i++) {
                 var entry = entries.item(i);
                 var parsed = extractEntry(entry);
                 var file = new File(parsed.first);
                 var choiceSettings = parsed.second;
+                var references = XMLUtil.findElementsByTagName(entry, "referencedFile").stream()
+                        .map(x -> {
+                            String id = XMLUtil.getAttribute(x, "id");
+                            return Objects.requireNonNull(files.get(Integer.parseInt(id)));
+                        }).collect(Collectors.toList());
                 for (var branch : parsed.third) {
                     cache.add(
-                        new CachedProofBranch(file, choiceSettings, branch.first, branch.second));
+                        new CachedProofBranch(file, references, choiceSettings, branch.first,
+                            branch.second));
                 }
             }
-            var files = document.getElementsByTagName("otherFile");
-            for (int i = 0; i < files.getLength(); i++) {
-                var entry = files.item(i);
-                var name = entry.getAttributes().getNamedItem("name").getNodeValue();
-                var hash = entry.getAttributes().getNamedItem("hash").getNodeValue();
-                CachingDatabase.files.put(Integer.parseInt(hash),
-                    new CachedFile(name, Integer.parseInt(hash)));
-            }
+            doNotSave = false;
         } catch (Exception e) {
             LOGGER.error("failed to load proof caching database ", e);
-            // TODO: add a safeguard to not delete the index file on the next write
         }
     }
 
@@ -137,8 +161,13 @@ public final class CachingDatabase {
      * Shut the caching database down. Writes the index to disk if changes have been done.
      */
     public static void shutdown() {
-        if (!dirty) {
+        if (!dirty || doNotSave) {
             return;
+        }
+        try {
+            deleteUnusedFiles();
+        } catch (IOException e) {
+            LOGGER.error("failed to delete unused files ", e);
         }
         // store cache in ~/.key/cachedProofs.xml
         try {
@@ -161,6 +190,10 @@ public final class CachingDatabase {
                 entryEl.appendChild(choiceSettingsEl);
                 var branchesEl = doc.createElement("branches");
                 entryEl.appendChild(branchesEl);
+                for (var ref : entry.get(0).referencedFiles) {
+                    var referencesEl = doc.createElement("referencedFile");
+                    referencesEl.setAttribute("id", String.valueOf(ref.hash));
+                }
 
                 for (var branch : entry) {
                     var branchEl = doc.createElement("branch");
@@ -190,6 +223,32 @@ public final class CachingDatabase {
             transformer.transform(source, result);
         } catch (Exception e) {
             LOGGER.error("failed to save proof cache database ", e);
+        }
+    }
+
+    /**
+     * Delete unused auxiliary files from the cache directory.
+     *
+     * @throws IOException on error
+     */
+    private static void deleteUnusedFiles() throws IOException {
+        var usedFilenames = new HashSet<>();
+        for (var entry : cache) {
+            entry.referencedFiles.stream().map(x -> x.filename).forEach(usedFilenames::add);
+        }
+
+        var cacheDir = PathConfig.getCacheDirectory();
+        var toDelete = new ArrayList<Path>();
+        try (var walker = Files.walk(cacheDir.toPath())) {
+            walker.forEach(path -> {
+                if (Files.isDirectory(path) || usedFilenames.contains(path.getFileName())) {
+                    return;
+                }
+                toDelete.add(path);
+            });
+        }
+        for (Path f : toDelete) {
+            Files.delete(f);
         }
     }
 
@@ -246,12 +305,14 @@ public final class CachingDatabase {
                 PathConfig.getCacheDirectory().toPath().resolve(path.filename));
         }
         // TODO: bootstrap path (save hash)
-        // TODO: modify existing proof header
         // TODO: save includes recursively
         // TODO: save proofs compressed
 
-        // construct new header
-        var proofHeader = new StringBuilder();
+        // construct new header:
+        // first, remove old include and javaSource entries
+        var proofHeader =
+            new StringBuilder(PROOF_HEADER_CLEANER.matcher(proof.header()).replaceAll(""));
+        // then add the cached entries
         for (var include : includedNew) {
             proofHeader.append("\\include \"").append(include).append("\";\n");
         }
@@ -287,9 +348,13 @@ public final class CachingDatabase {
             }
             return n;
         }).filter(Objects::nonNull).collect(Collectors.toCollection(ArrayDeque::new));
+        var finalReferences = new ArrayList<CachedFile>();
+        finalReferences.addAll(includedNew);
+        finalReferences.addAll(sourceNew);
         for (var node : nodesToCheck) {
-            cache.add(new CachedProofBranch(file, choiceSettings, node.getStepIndex(),
-                node.sequent().toString()));
+            cache.add(
+                new CachedProofBranch(file, finalReferences, choiceSettings, node.getStepIndex(),
+                    node.sequent().toString()));
         }
     }
 
@@ -297,9 +362,20 @@ public final class CachingDatabase {
             Sequent sequent) {
         init();
 
+        // TODO
+
         return List.of();
     }
 
+    /**
+     * Get a cached file with the specified content. If such a file does not yet
+     * exist in the cache directory, a new file will be created.
+     *
+     * @param content content to look for
+     * @param extension file extension
+     * @return the cached file
+     * @throws IOException if disk access fails
+     */
     private static CachedFile getCached(String content, String extension) throws IOException {
         int hash = content.hashCode();
         if (files.containsKey(hash)) {
