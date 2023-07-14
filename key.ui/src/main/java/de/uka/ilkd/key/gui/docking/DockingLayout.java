@@ -43,7 +43,8 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
     public static final float SIZE_ICON_DOCK = 12f;
     public static final File LAYOUT_FILE = new File(PathConfig.getKeyConfigDir(), "layout.xml");
     public static final String[] LAYOUT_NAMES = new String[] { "Default", "Slot 1", "Slot 2" };
-    public static final int[] LAYOUT_KEYS = new int[] { KeyEvent.VK_F11, KeyEvent.VK_F12 };
+    public static final int[] LAYOUT_KEYS =
+        new int[] { KeyEvent.VK_F10, KeyEvent.VK_F11, KeyEvent.VK_F12 };
 
     private MainWindow window;
 
