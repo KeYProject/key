@@ -7,7 +7,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 
@@ -119,11 +118,10 @@ class TacletDescriber {
      * </p>
      *
      * @param mediator The {@link KeYMediator} to use.
-     * @param node The {@link Node} to use.
+     * @param app The {@link RuleApp} to use.
      * @return The text to show.
      */
-    public static String getTacletDescription(KeYMediator mediator, Node node, int width) {
-        RuleApp app = node.getAppliedRuleApp();
+    public static String getTacletDescription(KeYMediator mediator, RuleApp app, int width) {
         StringBuilder s = new StringBuilder();
 
         if (app != null) {

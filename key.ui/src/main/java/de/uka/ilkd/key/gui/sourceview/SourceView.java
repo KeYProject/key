@@ -737,8 +737,7 @@ public final class SourceView extends JComponent {
                                                     node.proof()
                                                             .lookup(ProofJavaSourceCollection.class)
                                                             .addRelevantFile(posInf.getURI().get());
-                                                } else if (!posInf.getParentClassURI()
-                                                        .equals(PositionInfo.UNKNOWN_URI)) {
+                                                } else if (posInf.getParentClassURI() != null) {
                                                     node.proof()
                                                             .lookup(ProofJavaSourceCollection.class)
                                                             .addRelevantFile(
