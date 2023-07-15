@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -40,10 +41,10 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
         KeYGuiExtension.MainMenu {
     private static final Logger LOGGER = LoggerFactory.getLogger(DockingLayout.class);
 
-    public static final float SIZE_ICON_DOCK = 12f;
-    public static final File LAYOUT_FILE = new File(PathConfig.getKeyConfigDir(), "layout.xml");
-    public static final String[] LAYOUT_NAMES = new String[] { "Default", "Slot 1", "Slot 2" };
-    public static final int[] LAYOUT_KEYS =
+    private static final float SIZE_ICON_DOCK = 12f;
+    private static final File LAYOUT_FILE = new File(PathConfig.getKeyConfigDir(), "layout.xml");
+    private static final String[] LAYOUT_NAMES = new String[] { "Default", "Slot 1", "Slot 2" };
+    private static final int[] LAYOUT_KEYS =
         new int[] { KeyEvent.VK_F10, KeyEvent.VK_F11, KeyEvent.VK_F12 };
 
     private MainWindow window;
@@ -126,13 +127,19 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
         DockingHelper.restoreMissingPanels(window);
     }
 
+    @Nonnull
     @Override
-    public List<Action> getMainMenuActions(MainWindow mainWindow) {
+    public List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
         List<Action> actions = new ArrayList<>();
         int keypos = 0;
         for (String layout : LAYOUT_NAMES) {
             Integer key = keypos < LAYOUT_KEYS.length ? LAYOUT_KEYS[keypos] : null;
             actions.add(new LoadLayoutAction(mainWindow, layout, key));
+            keypos++;
+        }
+        keypos = 0;
+        for (String layout : LAYOUT_NAMES) {
+            Integer key = keypos < LAYOUT_KEYS.length ? LAYOUT_KEYS[keypos] : null;
             actions.add(new SaveLayoutAction(mainWindow, layout, key));
             keypos++;
         }
@@ -149,7 +156,7 @@ final class SaveLayoutAction extends MainWindowAction {
     SaveLayoutAction(MainWindow mainWindow, String name, Integer key) {
         super(mainWindow);
         this.layoutName = name;
-        setName("Save as " + name);
+        setName("Save " + name);
         setIcon(IconFactory.saveFile(MainWindow.TOOLBAR_ICON_SIZE));
         setMenuPath("View.Layout");
         if (key != null) {
@@ -162,7 +169,7 @@ final class SaveLayoutAction extends MainWindowAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         mainWindow.getDockControl().save(layoutName);
-        mainWindow.setStatusLine("Save layout as " + layoutName);
+        mainWindow.setStatusLine("Layout saved to " + layoutName);
     }
 }
 
@@ -189,7 +196,7 @@ final class LoadLayoutAction extends MainWindowAction {
             Arrays.asList(mainWindow.getDockControl().layouts()).contains(layoutName);
         if (defaultLayoutDefined) {
             mainWindow.getDockControl().load(layoutName);
-            mainWindow.setStatusLine("Layout " + layoutName + " loaded");
+            mainWindow.setStatusLine("Layout loaded from " + layoutName);
         } else {
             mainWindow.setStatusLine("Layout " + layoutName + " could not be found.");
         }
