@@ -1,11 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
@@ -45,14 +45,14 @@ public class ModelFieldCondition extends VariableConditionAdapter {
 
     @Override
     public boolean check(SchemaVariable var, SVSubstitute subst,
-                         SVInstantiations instMap, Services services) {
+            SVInstantiations instMap, Services services) {
 
         if (var == field) {
             ProgramVariable attribute;
             if (subst instanceof FieldReference) {
-                attribute = ((FieldReference)subst).getProgramVariable();
+                attribute = ((FieldReference) subst).getProgramVariable();
             } else if (subst instanceof ProgramVariable) {
-                attribute = (ProgramVariable)subst;
+                attribute = (ProgramVariable) subst;
             } else {
                 return !negated;
             }
@@ -65,6 +65,6 @@ public class ModelFieldCondition extends VariableConditionAdapter {
 
     @Override
     public String toString() {
-        return (negated ? "\\not":"") + "\\isModelField(" + field + ")";
+        return (negated ? "\\not" : "") + "\\isModelField(" + field + ")";
     }
 }
