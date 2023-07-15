@@ -49,4 +49,22 @@ public final class ThreadUtilities {
         }
     }
 
+    /**
+     * Get all running threads.
+     *
+     * @return array of threads, some entries may be null
+     */
+    public static Thread[] getThreads() {
+        ThreadGroup rootGroup = Thread.currentThread().getThreadGroup();
+        ThreadGroup parentGroup;
+        while ((parentGroup = rootGroup.getParent()) != null) {
+            rootGroup = parentGroup;
+        }
+
+        Thread[] threads = new Thread[rootGroup.activeCount()];
+        while (rootGroup.enumerate(threads, true) == threads.length) {
+            threads = new Thread[threads.length * 2];
+        }
+        return threads;
+    }
 }
