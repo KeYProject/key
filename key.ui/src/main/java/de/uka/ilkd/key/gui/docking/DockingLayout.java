@@ -151,7 +151,7 @@ final class SaveLayoutAction extends MainWindowAction {
         this.layoutName = name;
         setName("Save as " + name);
         setIcon(IconFactory.saveFile(MainWindow.TOOLBAR_ICON_SIZE));
-        setMenuPath("View.Layout.Save");
+        setMenuPath("View.Layout");
         if (key != null) {
             setAcceleratorKey(KeyStroke.getKeyStroke(key,
                 InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
@@ -180,7 +180,7 @@ final class LoadLayoutAction extends MainWindowAction {
             setAcceleratorKey(KeyStroke.getKeyStroke(key, InputEvent.CTRL_DOWN_MASK));
         }
         KeyStrokeManager.lookupAndOverride(this, getClass().getName() + "$" + layoutName);
-        setMenuPath("View.Layout.Load");
+        setMenuPath("View.Layout");
     }
 
     @Override
