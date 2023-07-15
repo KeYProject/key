@@ -81,18 +81,7 @@ public final class KeYGuiExtensionFacade {
 
     }
 
-    /*
-     * public static Optional<Action> getMainMenuExtensions(String name) {
-     * Spliterator<KeYGuiExtension.MainMenu> iter =
-     * ServiceLoader.load(KeYGuiExtension.MainMenu.class).spliterator(); return
-     * StreamSupport.stream(iter, false) .flatMap(it -> it.getMainMenuActions(mainWindow).stream())
-     * .filter(Objects::nonNull) .filter(it -> it.getValue(Action.NAME).equals(name)) .findAny(); }
-     */
-
     // region Menu Helper
-    private static void sortActionsIntoMenu(List<Action> actions, JMenuBar menuBar) {
-        actions.forEach(act -> sortActionIntoMenu(act, menuBar, new JMenu()));
-    }
 
     private static Iterator<String> getMenuPath(Action act) {
         Object path = act.getValue(KeyAction.PATH);
