@@ -705,9 +705,8 @@ public abstract class AbstractProblemLoader {
         }
     }
 
-    private ReplayResult replayProof(Proof proof)
-            throws ProofInputException, ProblemLoaderException {
-        LOGGER.info("Replaying proof " + proof.name());
+    private ReplayResult replayProof(Proof proof) {
+        LOGGER.info("Replaying proof {}", proof.name());
         String status = "";
         List<Throwable> errors = new LinkedList<>();
         Node lastTouchedNode = proof.root();

@@ -123,7 +123,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void progressStopped(Object sender) {
-        mainWindow.getMediator().startInterface(true);
+        // no need to call startInterface(), will be done by ProblemLoader once loading is done
     }
 
     @Override
