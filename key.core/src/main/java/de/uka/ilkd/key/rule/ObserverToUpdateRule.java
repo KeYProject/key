@@ -135,8 +135,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         if (inst.isFirst()) {
             // additional checks for method calls.
             // currently only applicable to strictly pure methods
-            // TODO check that this is not a two-state model method.
-            if (!inst.getFirst().pm.isModel()) {
+            if (!inst.getFirst().pm.isModel() || inst.getFirst().pm.getStateCount() > 1) {
                 return false;
             }
 
