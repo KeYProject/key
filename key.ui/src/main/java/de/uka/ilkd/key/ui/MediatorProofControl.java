@@ -95,6 +95,9 @@ public class MediatorProofControl extends AbstractProofControl {
      */
     @Override
     public void waitWhileAutoMode() {
+        if (SwingUtilities.isEventDispatchThread()) {
+            return; // do not block the UI thread
+        }
         while (ui.getMediator().isInAutoMode()) { // Wait until auto mode has stopped.
             try {
                 Thread.sleep(100);
