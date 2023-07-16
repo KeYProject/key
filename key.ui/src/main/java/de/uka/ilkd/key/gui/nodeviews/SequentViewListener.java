@@ -2,6 +2,8 @@ package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 import javax.swing.event.PopupMenuEvent;
@@ -48,8 +50,10 @@ abstract class SequentViewListener<T extends SequentView> implements MouseListen
      *
      * @param menu the menu to hide.
      */
-    void hideMenu(JMenu menu) {
-        menu.setPopupMenuVisible(false);
+    void hideMenu(@Nullable JMenu menu) {
+        if (menu != null) {
+            menu.setPopupMenuVisible(false);
+        }
     }
 
     /**
