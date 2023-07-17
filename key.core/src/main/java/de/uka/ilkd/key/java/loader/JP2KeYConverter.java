@@ -1697,7 +1697,23 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(KeyContextStatementBlock n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        IExecutionContext execContext = accepto(n.getContext());
+        IExecutionContext execContext;
+        if (n.getContext().isPresent()) {
+            execContext = accepto(n.getContext());
+        } else if (n.getTr().isPresent() || n.getSignature().isPresent() || n.getExpression().isPresent()) {
+            if (n.getTr().isEmpty() || n.getSignature().isEmpty()) {
+                return reportError(n, "No context type or method signature given");
+            }
+            var signature = n.getSignature().get();
+            var execPi = createPositionInfo(signature);
+            var execC = createComments(signature);
+            TypeReference classContext = requireTypeReference(n.getTr().get());
+            ReferencePrefix runtimeInstance = accepto(n.getExpression());
+            IProgramMethod methodContext = accept(signature);
+            execContext = new ExecutionContext(execPi, execC, classContext, runtimeInstance, methodContext);
+        } else {
+            execContext = null;
+        }
         /*
          * TODO
          * if(execContext==null) {
