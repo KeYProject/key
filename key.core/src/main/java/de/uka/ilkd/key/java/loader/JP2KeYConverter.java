@@ -520,7 +520,13 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     private Label nameToLabel(Optional<Name> label) {
-        return label.map(name -> new ProgramElementName(name.asString())).orElse(null);
+        return label.map(name -> {
+            var str = name.asString();
+            if (str.startsWith("#")) {
+                return (Label) lookupSchemaVariable(str, name);
+            }
+            return new ProgramElementName(str);
+        }).orElse(null);
     }
 
     @Nullable
