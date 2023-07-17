@@ -86,4 +86,29 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
             argSorts(), name().toString(), arity(),
             whereToBind(), isRigid());
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof LocationVariable)) {
+            return false;
+        }
+        LocationVariable that = (LocationVariable) obj;
+        return Objects.equals(getKeYJavaType(), that.getKeYJavaType())
+            && isStatic() == that.isStatic()
+            && isModel() == that.isModel()
+            && isGhost() == that.isGhost()
+            && isFinal() == that.isFinal()
+            && sort().equals(that.sort())
+            && Objects.equals(argSorts(), that.argSorts())
+            && name().toString().equals(that.name().toString())
+            && arity() == that.arity()
+            && Objects.equals(whereToBind(), that.whereToBind())
+            && isRigid() == that.isRigid();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getKeYJavaType(), isStatic(), isModel(), isGhost(), isFinal(), sort(),
+            argSorts(), name().toString(), arity(), whereToBind(), isRigid());
+    }
 }
