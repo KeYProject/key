@@ -38,7 +38,7 @@ public final class Watchdog {
     private static void run() {
         while (true) {
             try {
-                Thread.sleep(10000);
+                Thread.sleep(20000);
             } catch (InterruptedException e) {
                 return;
             }
@@ -66,8 +66,7 @@ public final class Watchdog {
              * Common-Cleaner TIMED_WAITING
              */
 
-            for (int i = 0; i < threads.length; i++) {
-                var thread = threads[i];
+            for (Thread thread : threads) {
                 if (thread == null || IGNORED_THREADS.contains(thread.getName())) {
                     continue;
                 }
@@ -81,6 +80,7 @@ public final class Watchdog {
                             && EventQueue.getCurrentEvent() == null) {
                         anyProgress = true; // nothing to do
                     }
+                    break;
                 case BLOCKED:
                 case TIMED_WAITING:
                 case TERMINATED:
@@ -93,8 +93,7 @@ public final class Watchdog {
                 // unfortunately, we cannot display a dialog since the UI thread is blocked...
                 LOGGER.error("Watchdog detected deadlock!");
                 LOGGER.info("Current thread state:");
-                for (int i = 0; i < threads.length; i++) {
-                    var thread = threads[i];
+                for (Thread thread : threads) {
                     if (thread == null || IGNORED_THREADS.contains(thread.getName())) {
                         continue;
                     }
