@@ -807,9 +807,18 @@ public class ContractFactory {
             IObserverFunction target, KeYJavaType specifiedIn) {
         final String methodName = target.name().toString();
         final int startIndexShortName = methodName.indexOf("::") + 2;
-        final String methodShortName = methodName.substring(startIndexShortName);
+        String methodShortName = methodName.substring(startIndexShortName);
+        // TODO javaparser workaround
+        String signature;
+        if (methodShortName.startsWith("#")) {
+            assert target.getParamTypes().isEmpty();
+            methodShortName = methodShortName.substring(1);
+            signature = methodShortName;
+        } else {
+            signature = methodShortName + "(" + concatenate(",", target.getParamTypes()) + ")";
+        }
         return forClass.getJavaType().getFullName() + "[" + specifiedIn.getJavaType().getFullName()
-            + "::" + methodShortName + "(" + concatenate(",", target.getParamTypes()) + ")" + "]"
+            + "::" + signature + "]"
             + "." + baseName;
     }
 
