@@ -30,7 +30,8 @@ public abstract class BinaryOperator extends Operator {
     }
 
     public BinaryOperator(PositionInfo pi, List<Comment> c, Expression lhs, Expression rhs) {
-        super(pi, c, new ImmutableArray<>(Objects.requireNonNull(lhs), Objects.requireNonNull(rhs)));
+        super(pi, c,
+            new ImmutableArray<>(Objects.requireNonNull(lhs), Objects.requireNonNull(rhs)));
     }
 
     /**

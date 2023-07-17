@@ -39,16 +39,14 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.StringUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
 
 
 public final class ProblemInitializer {
@@ -437,7 +435,7 @@ public final class ProblemInitializer {
         InitConfig initConfig = createInputConfigFor(envInput);
         InitConfig ic = prepare(envInput, initConfig);
         if (Debug.ENABLE_DEBUG) {
-                printMatcher(ic);
+            printMatcher(ic);
             print(ic);
         }
         return ic;
@@ -469,7 +467,8 @@ public final class ProblemInitializer {
             return;
         }
         LOGGER.debug("Java AST matchers under: {}", findJavaAst);
-        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(findJavaAst, StandardCharsets.UTF_8)))) {
+        try (PrintWriter out = new PrintWriter(
+            new BufferedWriter(new FileWriter(findJavaAst, StandardCharsets.UTF_8)))) {
             final List<Taclet> taclets = new ArrayList<>();
             taclets.addAll(ic.activatedTaclets());
             taclets.sort(Comparator.comparing(a -> a.name().toString()));
@@ -480,7 +479,9 @@ public final class ProblemInitializer {
                     var s = rw.find();
                     var jb = s.javaBlock();
                     if (jb != null && !jb.toString().equals("{}")) {
-                        out.format("\n===  %s ======================================================\n", taclet.name());
+                        out.format(
+                            "\n===  %s ======================================================\n",
+                            taclet.name());
                         toSexpr((NonTerminalProgramElement) jb.program(), 0, out);
                         out.println();
                         out.flush();

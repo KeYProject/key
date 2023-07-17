@@ -24,7 +24,8 @@ import org.key_project.util.collection.ImmutableArray;
 public class SeqGet extends Operator {
 
     public SeqGet(PositionInfo pi, List<Comment> c, Expression child, Expression b) {
-        super(pi, c, new ImmutableArray<>(Objects.requireNonNull(child), Objects.requireNonNull(b)));
+        super(pi, c,
+            new ImmutableArray<>(Objects.requireNonNull(child), Objects.requireNonNull(b)));
     }
 
     @Override
