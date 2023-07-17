@@ -719,17 +719,17 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             forGuard = new Guard(pi, null, (de.uka.ilkd.key.java.ast.Expression) guard);
         }
 
-        ILoopInit forInit;
+        ILoopInit forInit = null;
         if (inits.size() == 1 && inits.get(0) instanceof ProgramSV) {
             forInit = (ProgramSV) inits.get(0);
-        } else {
+        } else if(n.getInitialization().size()>0) {
             forInit = new LoopInit(inits);
         }
 
-        IForUpdates forUpdates;
+        IForUpdates forUpdates = null;
         if (updates.size() == 1 && updates.get(0) instanceof ProgramSV) {
             forUpdates = (ProgramSV) updates.get(0);
-        } else {
+        } else if (n.getUpdate().size() > 0) {
             forUpdates = new ForUpdates(updates);
         }
         return new For(pi, c, forInit, forUpdates, forGuard, accept(n.getBody()));
@@ -1511,7 +1511,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 n.getArguments().orElse(new NodeList<>()));
     }
 
-    public Object handleSpecialFunctionInvocation(Node n, String name, NodeList<com.github.javaparser.ast.expr.Expression> arguments){
+    public Object handleSpecialFunctionInvocation(Node n, String name, NodeList<com.github.javaparser.ast.expr.Expression> arguments) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
 
@@ -1695,6 +1695,16 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         IExecutionContext execContext = accepto(n.getContext());
+        /*TODO
+        if(execContext==null) {
+            //ExecutionContext	Context: #t (program Type)##pm (program ProgramMethod) Instance: #v (program Variable)
+            var t = lookupSchemaVariable("t", n); //type
+            var pm = lookupSchemaVariable("pm", n);  // program method
+            var v = lookupSchemaVariable("v", n);  // program var
+            execContext = new ExecutionContext((TypeReference) t, (IProgramMethod) pm, (ReferencePrefix) v);
+        }
+        */
+
         ImmutableArray<? extends Statement> body = map(n.getStatements());
         return new ContextStatementBlock(pi, c, body, execContext);
     }

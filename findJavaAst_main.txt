@@ -73,7 +73,7 @@ ContextStatementBlock	..{ ..   #sv = (byte) #seShortIntLong; ... } ...
     ProgramSV	#sv (program StaticVariable)
 
     TypeCast	(byte) #seShortIntLong;
-      SchemaTypeReference	byte;
+      TypeRef	byte;
 
 ===  activeUseCharCast ======================================================
 ContextStatementBlock	..{ ..   #sv = (char) #seByteShortIntLong; ... } ...
@@ -81,7 +81,7 @@ ContextStatementBlock	..{ ..   #sv = (char) #seByteShortIntLong; ... } ...
     ProgramSV	#sv (program StaticVariable)
 
     TypeCast	(char) #seByteShortIntLong;
-      SchemaTypeReference	char;
+      TypeRef	char;
 
 ===  activeUseDivision ======================================================
 ContextStatementBlock	..{ ..   #sv = #left / #right; ... } ...
@@ -103,7 +103,7 @@ ContextStatementBlock	..{ ..   #sv = (int) #seLong; ... } ...
     ProgramSV	#sv (program StaticVariable)
 
     TypeCast	(int) #seLong;
-      SchemaTypeReference	int;
+      TypeRef	int;
 
 ===  activeUseModulo ======================================================
 ContextStatementBlock	..{ ..   #sv = #left % #right; ... } ...
@@ -167,7 +167,7 @@ ContextStatementBlock	..{ ..   #sv = (short) #seIntLong; ... } ...
     ProgramSV	#sv (program StaticVariable)
 
     TypeCast	(short) #seIntLong;
-      SchemaTypeReference	short;
+      TypeRef	short;
 
 ===  activeUseStaticFieldReadAccess ======================================================
 ContextStatementBlock	..{ ..   #lhs = #sv; ... } ...
@@ -382,7 +382,7 @@ ContextStatementBlock	..{ ..   for (int #v = #se; #v < this.#length; #v++)     t
   For	for (int #v = #se; #v < this.#length; #v++)   this[#v] = #lit;
     LoopInit	int #v = #se
       LocalVariableDeclaration	int #v = #se;
-        SchemaTypeReference	int;
+        TypeRef	int;
 
 ===  array_post_declaration ======================================================
 ContextStatementBlock	..{ ..   #arraypost ... } ...
@@ -1506,7 +1506,7 @@ ContextStatementBlock	..{ ..   #lhs = (boolean) #exBool; ... } ...
     ProgramSV	#lhs (program LeftHandSide)
 
     TypeCast	(boolean) #exBool;
-      SchemaTypeReference	boolean;
+      TypeRef	boolean;
 
 ===  compound_addition_1 ======================================================
 ContextStatementBlock	..{ ..   #lhs = #nse + #se; ... } ...
@@ -2248,7 +2248,7 @@ ContextStatementBlock	..{ ..   #lhs = (byte) #nse; ... } ...
     ProgramSV	#lhs (program LeftHandSide)
 
     TypeCast	(byte) #nse;
-      SchemaTypeReference	byte;
+      TypeRef	byte;
 
 ===  compound_division_1 ======================================================
 ContextStatementBlock	..{ ..   #lhs = #nse / #se; ... } ...
@@ -2284,7 +2284,7 @@ ContextStatementBlock	..{ ..   #loc = (double) #nse; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(double) #nse;
-      SchemaTypeReference	double;
+      TypeRef	double;
 
 ===  compound_equality_comparison_1 ======================================================
 ContextStatementBlock	..{ ..   #lhs = #nse0 == #se; ... } ...
@@ -2320,7 +2320,7 @@ ContextStatementBlock	..{ ..   #loc = (float) #nse; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(float) #nse;
-      SchemaTypeReference	float;
+      TypeRef	float;
 
 ===  compound_greater_equal_than_comparison_1 ======================================================
 ContextStatementBlock	..{ ..   #lhs = #nse0 >= #se; ... } ...
@@ -2412,7 +2412,7 @@ ContextStatementBlock	..{ ..   #lhs = (int) #nse; ... } ...
     ProgramSV	#lhs (program LeftHandSide)
 
     TypeCast	(int) #nse;
-      SchemaTypeReference	int;
+      TypeRef	int;
 
 ===  compound_invert_bits ======================================================
 ContextStatementBlock	..{ ..   #lhs = ~#nse; ... } ...
@@ -2488,7 +2488,7 @@ ContextStatementBlock	..{ ..   #lhs = (long) #nse; ... } ...
     ProgramSV	#lhs (program LeftHandSide)
 
     TypeCast	(long) #nse;
-      SchemaTypeReference	long;
+      TypeRef	long;
 
 ===  compound_modulo_1 ======================================================
 ContextStatementBlock	..{ ..   #lhs = #nse % #se; ... } ...
@@ -2636,7 +2636,7 @@ ContextStatementBlock	..{ ..   #lhs = (short) #nse; ... } ...
     ProgramSV	#lhs (program LeftHandSide)
 
     TypeCast	(short) #nse;
-      SchemaTypeReference	short;
+      TypeRef	short;
 
 ===  compound_subtraction_1 ======================================================
 ContextStatementBlock	..{ ..   #lhs = #nse - #se; ... } ...
@@ -5457,7 +5457,7 @@ ContextStatementBlock	..{ ..   #loc = (double) #seDouble; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(double) #seDouble;
-      SchemaTypeReference	double;
+      TypeRef	double;
 
 ===  identityCastFloat ======================================================
 ContextStatementBlock	..{ ..   #loc = (float) #seFloat; ... } ...
@@ -5465,7 +5465,7 @@ ContextStatementBlock	..{ ..   #loc = (float) #seFloat; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(float) #seFloat;
-      SchemaTypeReference	float;
+      TypeRef	float;
 
 ===  if ======================================================
 ContextStatementBlock	..{ ..   if (#se) #s0 ... } ...
@@ -6385,7 +6385,7 @@ ContextStatementBlock	..{ ..   #loc = (byte) #seBigint; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(byte) #seBigint;
-      SchemaTypeReference	byte;
+      TypeRef	byte;
 
 ===  narrowingByteCastInt ======================================================
 ContextStatementBlock	..{ ..   #loc = (byte) #seInt; ... } ...
@@ -6393,7 +6393,7 @@ ContextStatementBlock	..{ ..   #loc = (byte) #seInt; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(byte) #seInt;
-      SchemaTypeReference	byte;
+      TypeRef	byte;
 
 ===  narrowingByteCastLong ======================================================
 ContextStatementBlock	..{ ..   #loc = (byte) #seLong; ... } ...
@@ -6401,7 +6401,7 @@ ContextStatementBlock	..{ ..   #loc = (byte) #seLong; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(byte) #seLong;
-      SchemaTypeReference	byte;
+      TypeRef	byte;
 
 ===  narrowingByteCastShort ======================================================
 ContextStatementBlock	..{ ..   #loc = (byte) #seShort; ... } ...
@@ -6409,7 +6409,7 @@ ContextStatementBlock	..{ ..   #loc = (byte) #seShort; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(byte) #seShort;
-      SchemaTypeReference	byte;
+      TypeRef	byte;
 
 ===  narrowingCastFloatToInt ======================================================
 ContextStatementBlock	..{ ..   #loc = (int) #seFloat; ... } ...
@@ -6417,7 +6417,7 @@ ContextStatementBlock	..{ ..   #loc = (int) #seFloat; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(int) #seFloat;
-      SchemaTypeReference	int;
+      TypeRef	int;
 
 ===  narrowingCastFloatToLong ======================================================
 ContextStatementBlock	..{ ..   #loc = (long) #seFloat; ... } ...
@@ -6425,7 +6425,7 @@ ContextStatementBlock	..{ ..   #loc = (long) #seFloat; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(long) #seFloat;
-      SchemaTypeReference	long;
+      TypeRef	long;
 
 ===  narrowingCharCastBigint ======================================================
 ContextStatementBlock	..{ ..   #loc = (char) #seBigint; ... } ...
@@ -6433,7 +6433,7 @@ ContextStatementBlock	..{ ..   #loc = (char) #seBigint; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(char) #seBigint;
-      SchemaTypeReference	char;
+      TypeRef	char;
 
 ===  narrowingCharCastByte ======================================================
 ContextStatementBlock	..{ ..   #loc = (char) #seByte; ... } ...
@@ -6441,7 +6441,7 @@ ContextStatementBlock	..{ ..   #loc = (char) #seByte; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(char) #seByte;
-      SchemaTypeReference	char;
+      TypeRef	char;
 
 ===  narrowingCharCastInt ======================================================
 ContextStatementBlock	..{ ..   #loc = (char) #seInt; ... } ...
@@ -6449,7 +6449,7 @@ ContextStatementBlock	..{ ..   #loc = (char) #seInt; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(char) #seInt;
-      SchemaTypeReference	char;
+      TypeRef	char;
 
 ===  narrowingCharCastLong ======================================================
 ContextStatementBlock	..{ ..   #loc = (char) #seLong; ... } ...
@@ -6457,7 +6457,7 @@ ContextStatementBlock	..{ ..   #loc = (char) #seLong; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(char) #seLong;
-      SchemaTypeReference	char;
+      TypeRef	char;
 
 ===  narrowingCharCastShort ======================================================
 ContextStatementBlock	..{ ..   #loc = (char) #seShort; ... } ...
@@ -6465,7 +6465,7 @@ ContextStatementBlock	..{ ..   #loc = (char) #seShort; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(char) #seShort;
-      SchemaTypeReference	char;
+      TypeRef	char;
 
 ===  narrowingIntCastBigint ======================================================
 ContextStatementBlock	..{ ..   #loc = (int) #seBigint; ... } ...
@@ -6473,7 +6473,7 @@ ContextStatementBlock	..{ ..   #loc = (int) #seBigint; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(int) #seBigint;
-      SchemaTypeReference	int;
+      TypeRef	int;
 
 ===  narrowingIntCastLong ======================================================
 ContextStatementBlock	..{ ..   #loc = (int) #seLong; ... } ...
@@ -6481,7 +6481,7 @@ ContextStatementBlock	..{ ..   #loc = (int) #seLong; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(int) #seLong;
-      SchemaTypeReference	int;
+      TypeRef	int;
 
 ===  narrowingLongCastBigint ======================================================
 ContextStatementBlock	..{ ..   #loc = (long) #seBigint; ... } ...
@@ -6489,7 +6489,7 @@ ContextStatementBlock	..{ ..   #loc = (long) #seBigint; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(long) #seBigint;
-      SchemaTypeReference	long;
+      TypeRef	long;
 
 ===  narrowingShortCastBigint ======================================================
 ContextStatementBlock	..{ ..   #loc = (short) #seBigint; ... } ...
@@ -6497,7 +6497,7 @@ ContextStatementBlock	..{ ..   #loc = (short) #seBigint; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(short) #seBigint;
-      SchemaTypeReference	short;
+      TypeRef	short;
 
 ===  narrowingShortCastInt ======================================================
 ContextStatementBlock	..{ ..   #loc = (short) #seInt; ... } ...
@@ -6505,7 +6505,7 @@ ContextStatementBlock	..{ ..   #loc = (short) #seInt; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(short) #seInt;
-      SchemaTypeReference	short;
+      TypeRef	short;
 
 ===  narrowingShortCastLong ======================================================
 ContextStatementBlock	..{ ..   #loc = (short) #seLong; ... } ...
@@ -6513,7 +6513,7 @@ ContextStatementBlock	..{ ..   #loc = (short) #seLong; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(short) #seLong;
-      SchemaTypeReference	short;
+      TypeRef	short;
 
 ===  postdecrement ======================================================
 ContextStatementBlock	..{ ..   #lhs1--; ... } ...
@@ -7951,7 +7951,7 @@ ContextStatementBlock	..{ ..   #loc = (float) #seCharByteShortInt; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(float) #seCharByteShortInt;
-      SchemaTypeReference	float;
+      TypeRef	float;
 
 ===  wideningCastLongToFloat ======================================================
 ContextStatementBlock	..{ ..   #loc = (float) #seLong; ... } ...
@@ -7959,7 +7959,7 @@ ContextStatementBlock	..{ ..   #loc = (float) #seLong; ... } ...
     ProgramSV	#loc (program Variable)
 
     TypeCast	(float) #seLong;
-      SchemaTypeReference	float;
+      TypeRef	float;
 
 ===  widening_identity_cast_1 ======================================================
 ContextStatementBlock	..{ ..   #lhs = (byte) #seByte; ... } ...
@@ -7967,7 +7967,7 @@ ContextStatementBlock	..{ ..   #lhs = (byte) #seByte; ... } ...
     ProgramSV	#lhs (program LeftHandSide)
 
     TypeCast	(byte) #seByte;
-      SchemaTypeReference	byte;
+      TypeRef	byte;
 
 ===  widening_identity_cast_10 ======================================================
 ContextStatementBlock	..{ ..   #lhs = (long) #seByteShortInt; ... } ...
@@ -7975,7 +7975,7 @@ ContextStatementBlock	..{ ..   #lhs = (long) #seByteShortInt; ... } ...
     ProgramSV	#lhs (program LeftHandSide)
 
     TypeCast	(long) #seByteShortInt;
-      SchemaTypeReference	long;
+      TypeRef	long;
 
 ===  widening_identity_cast_11 ======================================================
 ContextStatementBlock	..{ ..   #lhs = (long) #seLong; ... } ...
@@ -7983,7 +7983,7 @@ ContextStatementBlock	..{ ..   #lhs = (long) #seLong; ... } ...
     ProgramSV	#lhs (program LeftHandSide)
 
     TypeCast	(long) #seLong;
-      SchemaTypeReference	long;
+      TypeRef	long;
 
 ===  widening_identity_cast_12 ======================================================
 ContextStatementBlock	..{ ..   #lhs = (int) #seChar; ... } ...
@@ -7991,7 +7991,7 @@ ContextStatementBlock	..{ ..   #lhs = (int) #seChar; ... } ...
     ProgramSV	#lhs (program LeftHandSide)
 
     TypeCast	(int) #seChar;
-      SchemaTypeReference	int;
+      TypeRef	int;
 
 ===  widening_identity_cast_13 ======================================================
 ContextStatementBlock	..{ ..   #lhs = (long) #seChar; ... } ...
@@ -7999,7 +7999,7 @@ ContextStatementBlock	..{ ..   #lhs = (long) #seChar; ... } ...
     ProgramSV	#lhs (program LeftHandSide)
 
     TypeCast	(long) #seChar;
-      SchemaTypeReference	long;
+      TypeRef	long;
 
 ===  widening_identity_cast_2 ======================================================
 ContextStatementBlock	..{ ..   #lhs = (short) #seByte; ... } ...
@@ -8007,7 +8007,7 @@ ContextStatementBlock	..{ ..   #lhs = (short) #seByte; ... } ...
     ProgramSV	#lhs (program LeftHandSide)
 
     TypeCast	(short) #seByte;
-      SchemaTypeReference	short;
+      TypeRef	short;
 
 ===  widening_identity_cast_3 ======================================================
 ContextStatementBlock	..{ ..   #lhs = (char) #seChar; ... } ...
@@ -8015,7 +8015,7 @@ ContextStatementBlock	..{ ..   #lhs = (char) #seChar; ... } ...
     ProgramSV	#lhs (program LeftHandSide)
 
     TypeCast	(char) #seChar;
-      SchemaTypeReference	char;
+      TypeRef	char;
 
 ===  widening_identity_cast_4 ======================================================
 ContextStatementBlock	..{ ..   #lhs = (short) #seShort; ... } ...
@@ -8023,7 +8023,7 @@ ContextStatementBlock	..{ ..   #lhs = (short) #seShort; ... } ...
     ProgramSV	#lhs (program LeftHandSide)
 
     TypeCast	(short) #seShort;
-      SchemaTypeReference	short;
+      TypeRef	short;
 
 ===  widening_identity_cast_5 ======================================================
 ContextStatementBlock	..{ ..   #lhs = (int) #seByteShortInt; ... } ...
@@ -8031,7 +8031,7 @@ ContextStatementBlock	..{ ..   #lhs = (int) #seByteShortInt; ... } ...
     ProgramSV	#lhs (program LeftHandSide)
 
     TypeCast	(int) #seByteShortInt;
-      SchemaTypeReference	int;
+      TypeRef	int;
 
 ===  widening_identity_cast_bigint ======================================================
 ContextStatementBlock	..{ ..   #lhs = (\bigint) #seAny; ... } ...
@@ -8039,4 +8039,4 @@ ContextStatementBlock	..{ ..   #lhs = (\bigint) #seAny; ... } ...
     ProgramSV	#lhs (program LeftHandSide)
 
     TypeCast	(\bigint) #seAny;
-      SchemaTypeReference	\bigint;
+      TypeRef	\bigint;
