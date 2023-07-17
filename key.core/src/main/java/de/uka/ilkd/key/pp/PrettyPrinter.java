@@ -364,7 +364,7 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnSeqConcat(SeqConcat x) {
-        printDLFunctionOperator("\\singleton", x);
+        printDLFunctionOperator("\\seq_concat", x);
     }
 
     @Override
