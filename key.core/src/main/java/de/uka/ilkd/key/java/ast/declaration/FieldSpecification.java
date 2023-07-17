@@ -157,4 +157,9 @@ public class FieldSpecification extends VariableSpecification implements Field {
     public void visit(Visitor v) {
         v.performActionOnFieldSpecification(this);
     }
+
+    @Override
+    public boolean isImplicit() {
+        return var instanceof ProgramVariable && ((ProgramVariable) var).isImplicit();
+    }
 }

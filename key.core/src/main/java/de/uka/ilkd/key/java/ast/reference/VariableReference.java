@@ -39,17 +39,12 @@ public class VariableReference extends JavaNonTerminalProgramElement
         this.variable = Objects.requireNonNull(variable);
     }
 
-    public VariableReference(ExtList children) {
-        super(children);
-        variable = children.get(ProgramVariable.class);
-    }
-
-    public VariableReference(ProgramVariable variable, PositionInfo pi) {
+    public VariableReference(@Nonnull ProgramVariable variable, PositionInfo pi) {
         super(pi);
-        this.variable = variable;
+        this.variable = Objects.requireNonNull(variable);
     }
 
-    public VariableReference(ProgramVariable variable) {
+    public VariableReference(@Nonnull ProgramVariable variable) {
         this(variable, PositionInfo.UNDEFINED);
     }
 

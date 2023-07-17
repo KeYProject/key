@@ -21,12 +21,12 @@ public class FieldReference extends VariableReference
     @Nonnull
     protected final ReferencePrefix prefix;
 
-    public FieldReference(ProgramVariable pv, ReferencePrefix prefix) {
+    public FieldReference(@Nonnull ProgramVariable pv, ReferencePrefix prefix) {
         super(pv);
         this.prefix = constructPrefix(prefix, pv);
     }
 
-    public FieldReference(PositionInfo pi, List<Comment> c, ProgramVariable variable,
+    public FieldReference(PositionInfo pi, List<Comment> c, @Nonnull ProgramVariable variable,
             ReferencePrefix prefix) {
         super(pi, c, variable);
         this.prefix = constructPrefix(prefix, getProgramVariable());
@@ -38,11 +38,6 @@ public class FieldReference extends VariableReference
         } else {
             return prefix;
         }
-    }
-
-    public FieldReference(ExtList children, @Nullable ReferencePrefix prefix) {
-        super(children);
-        this.prefix = constructPrefix(prefix, getProgramVariable());
     }
 
 

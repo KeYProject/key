@@ -170,8 +170,6 @@ public interface Visitor {
 
     void performActionOnFieldSpecification(FieldSpecification x);
 
-    void performActionOnImplicitFieldSpecification(ImplicitFieldSpecification x);
-
     void performActionOnBinaryAnd(BinaryAnd x);
 
     void performActionOnBinaryAndAssignment(BinaryAndAssignment x);

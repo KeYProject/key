@@ -25,4 +25,5 @@ public interface Field extends Variable, Member {
      */
     String getProgramName();
 
+    boolean isImplicit();
 }

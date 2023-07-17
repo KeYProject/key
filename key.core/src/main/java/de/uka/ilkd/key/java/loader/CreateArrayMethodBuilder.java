@@ -14,7 +14,6 @@ import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.ast.declaration.ImplicitFieldSpecification;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.MemberDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.MethodDeclaration;
@@ -153,9 +152,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      */
     private ImmutableList<Field> filterImplicitFields(ImmutableList<Field> list) {
         ImmutableList<Field> result = ImmutableSLList.nil();
-        for (Field aList : list) {
-            Field field = aList;
-            if (field instanceof ImplicitFieldSpecification) {
+        for (Field field : list) {
+            if (field.isImplicit()) {
                 result = result.append(field);
             }
         }

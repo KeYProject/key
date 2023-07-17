@@ -689,9 +689,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         TypeReference type = requireTypeReference(n.getVariables().get(0).getType());
         var varsList = new ArrayList<FieldSpecification>(n.getVariables().size());
         for (VariableDeclarator v : n.getVariables()) {
-            // TODO javaparser always model = false?
-            final var fs = visitFieldSpecification(
-                new FullVariableDeclarator(v, n.isFinal(), n.isStatic(), false));
+            var isModel = n.hasModifier(Modifier.Keyword.MODEL);
+            // This is really odd, some interfaces have represents clauses. Those should be abstract classes...
+            // Normal fields of interfaces are implicitly static...
+            var isStatic = !isModel && n.isStatic();
+            var decl = new FullVariableDeclarator(v, n.isFinal(), isStatic, isModel);
+            final var fs = visitFieldSpecification(decl);
             varsList.add(fs);
             mapping.put(v, fs);
         }

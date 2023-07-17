@@ -441,11 +441,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
-    public void performActionOnImplicitFieldSpecification(ImplicitFieldSpecification x) {
-        doDefaultAction(x);
-    }
-
-    @Override
     public void performActionOnImport(Import x) {
         doDefaultAction(x);
     }

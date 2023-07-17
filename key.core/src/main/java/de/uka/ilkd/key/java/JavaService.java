@@ -10,6 +10,9 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.github.javaparser.*;
+import com.github.javaparser.Position;
+import com.github.javaparser.resolution.TypeSolver;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.TypeScope;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
@@ -37,10 +40,6 @@ import de.uka.ilkd.key.util.parsing.BuildingIssue;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import com.github.javaparser.ParseResult;
-import com.github.javaparser.Position;
-import com.github.javaparser.Problem;
-import com.github.javaparser.TokenRange;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
@@ -293,7 +292,12 @@ public class JavaService {
             return;
         }
         pkg = pkg.substring(0, lastDot);
-        cu.setPackageDeclaration(pkg);
+        try {
+            cu.setPackageDeclaration(pkg);
+        } catch(ParseProblemException ignored) {
+            LOGGER.warn("Failed to construct a package name for the java file " + relativePath + ", it might contain invalid characters. "
+            + "Add a package declaration to the file or rename its folder");
+        }
     }
 
     /**
@@ -492,7 +496,23 @@ public class JavaService {
                 LOGGER.debug("Finished parsing internal classes");
 
                 transformModel(bootClasses);
+                // Process java.lang.Object first (needed to construct array classes like int[]
+                var object = bootClasses.stream()
+                        .filter(b -> b.getPrimaryType().map(t -> t.getFullyQualifiedName().orElseThrow().equals(TypeSolver.JAVA_LANG_OBJECT)).orElse(false))
+                        .findFirst()
+                        .orElse(null);
+                if (object != null) {
+                    converter.processCompilationUnit(object);
+                }
+
+                var obj = typeConverter.getObjectType();
+                assert obj != null && obj.getJavaType() != null
+                        : "java.lang.Object has to be available";
+
                 for (CompilationUnit cu : bootClasses) {
+                    if (cu == object) {
+                        continue;
+                    }
                     converter.processCompilationUnit(cu);
                 }
                 LOGGER.debug("Finished processing internal classes");
@@ -523,9 +543,6 @@ public class JavaService {
             }
             typeConverter.getKeYJavaType(NullType.INSTANCE);
             typeConverter.getKeYJavaType(ResolvedVoidType.INSTANCE);
-            var obj = typeConverter.getObjectType();
-            assert obj != null && obj.getJavaType() != null
-                    : "java.lang.Object has to be available";
 
             /*
              * TODO weigl

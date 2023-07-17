@@ -1360,17 +1360,6 @@ public final class JavaInfo {
         };
 
         /**
-         * this filter is satisfied if the given program element is an instanceof
-         * ImplicitFieldSpecification
-         */
-        final static Filter IMPLICITFIELD = new Filter() {
-
-            public boolean isSatisfiedBy(ProgramElement pe) {
-                return pe instanceof ImplicitFieldSpecification;
-            }
-        };
-
-        /**
          * decides whether the given program element fulfills the filter condition or not
          *
          * @param pe the ProgramElement to be filtered

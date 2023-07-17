@@ -491,11 +491,6 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnImplicitFieldSpecification(ImplicitFieldSpecification x) {
-        performActionOnVariableSpecification(x);
-    }
-
-    @Override
     public void performActionOnSchematicFieldReference(SchematicFieldReference x) {
         performActionOnFieldReference(x);
     }

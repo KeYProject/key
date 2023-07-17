@@ -8,7 +8,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.ast.declaration.ImplicitFieldSpecification;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -61,10 +60,6 @@ public class DeclarationProgramVariableCollector extends JavaASTVisitor {
     }
 
     public void performActionOnFieldSpecification(FieldSpecification x) {
-        addVariable(x.getProgramVariable());
-    }
-
-    public void performActionOnImplicitFieldSpecification(ImplicitFieldSpecification x) {
         addVariable(x.getProgramVariable());
     }
 

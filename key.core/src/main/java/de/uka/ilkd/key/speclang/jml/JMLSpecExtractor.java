@@ -254,7 +254,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                         ImmutableSet<LabeledParserRuleContext> nonNullInvs =
                             createNonNullPositionedString(field.getProgramName(),
                                 field.getProgramVariable().getKeYJavaType(),
-                                field instanceof ImplicitFieldSpecification,
+                                field.isImplicit(),
                                 new Location(fileName, member.getEndPosition()), services);
                         for (LabeledParserRuleContext classInv : nonNullInvs) {
                             final ClassInvariant jmlClassInvariant =
