@@ -150,21 +150,19 @@ class DynamicGhost {
         x++; c.helper();
         x++; c.helper();
     }
+}
 
+class C {
+    int y;
 
-    class C {
-        int y;
+    //@ public ghost \locset rep;
+    //@ public invariant \subset(\locset(rep), rep);
+    //@ private invariant rep == this.*;
 
-        //@ public ghost \locset rep;
-        //@ public invariant \subset(\locset(rep), rep);
-        //@ private invariant rep == this.*;
+    //@ accessible \inv: rep;
 
-        //@ accessible \inv: rep;
-
-        //@ normal_behavior
-        //@ ensures \new_elems_fresh(rep);
-        //@ assignable rep;
-        public void helper() {}
-    }
-
+    //@ normal_behavior
+    //@ ensures \new_elems_fresh(rep);
+    //@ assignable rep;
+    public void helper() {}
 }

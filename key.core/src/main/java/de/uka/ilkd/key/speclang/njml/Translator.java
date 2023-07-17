@@ -1328,6 +1328,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
             base = visitFieldarrayaccess_suffix(base, suffx);
         }
         fullyQualifiedName = backupFullyQualifiedName;
+        if (base == null) {
+            raiseError(format("Field was not found: %s", ctx.getText()), ctx);
+        }
         return base;
     }
 
