@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.java.ast.expression.operator;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.Comment;
@@ -29,7 +30,7 @@ public abstract class BinaryOperator extends Operator {
     }
 
     public BinaryOperator(PositionInfo pi, List<Comment> c, Expression lhs, Expression rhs) {
-        super(pi, c, new ImmutableArray<>(lhs, rhs));
+        super(pi, c, new ImmutableArray<>(Objects.requireNonNull(lhs), Objects.requireNonNull(rhs)));
     }
 
     /**

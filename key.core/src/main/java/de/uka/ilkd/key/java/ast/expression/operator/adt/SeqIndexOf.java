@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.java.ast.expression.operator.adt;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Comment;
@@ -22,10 +23,9 @@ import org.key_project.util.collection.ImmutableArray;
  */
 public class SeqIndexOf extends Operator {
 
-    public SeqIndexOf(PositionInfo pi, List<Comment> c, Expression child) {
-        super(pi, c, new ImmutableArray<>(child));
+    public SeqIndexOf(PositionInfo pi, List<Comment> c, Expression a, Expression b) {
+        super(pi, c, new ImmutableArray<>(Objects.requireNonNull(a), Objects.requireNonNull(b)));
     }
-
 
     @Override
     public int getPrecedence() {

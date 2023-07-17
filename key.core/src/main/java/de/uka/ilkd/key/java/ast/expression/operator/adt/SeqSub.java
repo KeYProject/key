@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.java.ast.expression.operator.adt;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Comment;
@@ -18,11 +19,15 @@ import org.key_project.util.collection.ImmutableArray;
 public class SeqSub extends Operator {
 
     public SeqSub(PositionInfo pi, List<Comment> c, Expression... child) {
-        super(pi, c, new ImmutableArray<>(child));
+        super(pi, c, new ImmutableArray<>(Objects.requireNonNull(child)));
     }
 
-    public SeqSub(ExtList changeList) {
-        super(changeList);
+    public SeqSub(ExtList children) {
+        super(children);
+    }
+
+    public <T> SeqSub(PositionInfo pi, List<Comment> c, ImmutableArray<Expression> arguments) {
+        super(pi, c, arguments);
     }
 
 

@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.java.ast.expression.operator.adt;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Comment;
@@ -23,7 +24,7 @@ import org.key_project.util.collection.ImmutableArray;
 public class SeqGet extends Operator {
 
     public SeqGet(PositionInfo pi, List<Comment> c, Expression child, Expression b) {
-        super(pi, c, new ImmutableArray<>(child, b));
+        super(pi, c, new ImmutableArray<>(Objects.requireNonNull(child), Objects.requireNonNull(b)));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.java.ast.expression.operator.adt;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.Expression;
@@ -14,7 +15,7 @@ import org.key_project.util.ExtList;
 public class SeqConcat extends BinaryOperator {
 
     public SeqConcat(PositionInfo pi, List<Comment> c, Expression child, Expression b) {
-        super(pi, c, child, b);
+        super(pi, c, Objects.requireNonNull(child), Objects.requireNonNull(b));
     }
 
     public SeqConcat(Expression seq1, Expression seq2) {

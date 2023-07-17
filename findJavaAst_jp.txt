@@ -326,14 +326,28 @@ ContextStatementBlock	..{ ..   #v = \all_fields(#nseObj); ... } ...
   CopyAssignment	#v = \all_fields(#nseObj);
     ProgramSV	#v (program Variable)
 
-    MethodReference	\all_fields(#nseObj);
+    AllFields	\all_fields(#nseObj);
+      ProgramSV	#nseObj (program NonSimpleExpression)
+
+
+
+
 
 ===  allObjectsAssignment ======================================================
 ContextStatementBlock	..{ ..   #v = \all_objects(#eObj.#a); ... } ...
   CopyAssignment	#v = \all_objects(#eObj.#a);
     ProgramSV	#v (program Variable)
 
-    MethodReference	\all_objects(#eObj.#a);
+    AllObjects	\all_objects(#eObj.#a);
+      SchematicFieldReference	#eObj.#a;
+        ProgramSV	#eObj (program Expression)
+
+        ProgramSV	#a (program Variable)
+
+
+
+
+
 
 ===  arrayCreation ======================================================
 ContextStatementBlock	..{ ..   #lhs = #na; ... } ...
@@ -6666,144 +6680,288 @@ ContextStatementBlock	..{ ..   return #nse; ... } ...
 
 
 ===  seqConcatUnfoldLeft ======================================================
-ContextStatementBlock	..{ ..   #v = \seq_concat(#nseLeft, #eRight); ... } ...
-  CopyAssignment	#v = \seq_concat(#nseLeft, #eRight);
+ContextStatementBlock	..{ ..   #v = \singleton(#nseLeft, #eRight); ... } ...
+  CopyAssignment	#v = \singleton(#nseLeft, #eRight);
     ProgramSV	#v (program Variable)
 
-    MethodReference	\seq_concat(#nseLeft, #eRight);
+    SeqConcat	\singleton(#nseLeft, #eRight);
+      ProgramSV	#nseLeft (program NonSimpleExpression)
+
+      ProgramSV	#eRight (program Expression)
+
+
+
+
 
 ===  seqConcatUnfoldRight ======================================================
-ContextStatementBlock	..{ ..   #v = \seq_concat(#seLeft, #nseRight); ... } ...
-  CopyAssignment	#v = \seq_concat(#seLeft, #nseRight);
+ContextStatementBlock	..{ ..   #v = \singleton(#seLeft, #nseRight); ... } ...
+  CopyAssignment	#v = \singleton(#seLeft, #nseRight);
     ProgramSV	#v (program Variable)
 
-    MethodReference	\seq_concat(#seLeft, #nseRight);
+    SeqConcat	\singleton(#seLeft, #nseRight);
+      ProgramSV	#seLeft (program SimpleExpression)
+
+      ProgramSV	#nseRight (program NonSimpleExpression)
+
+
+
+
 
 ===  seqGetUnfoldLeft ======================================================
-ContextStatementBlock	..{ ..   #v = \seq_get(#nseLeft, #eRight); ... } ...
-  CopyAssignment	#v = \seq_get(#nseLeft, #eRight);
+ContextStatementBlock	..{ ..   #v = #nseLeft[#eRight]; ... } ...
+  CopyAssignment	#v = #nseLeft[#eRight];
     ProgramSV	#v (program Variable)
 
-    MethodReference	\seq_get(#nseLeft, #eRight);
+    SeqGet	#nseLeft[#eRight];
+      ProgramSV	#nseLeft (program NonSimpleExpression)
+
+      ProgramSV	#eRight (program Expression)
+
+
+
+
 
 ===  seqGetUnfoldRight ======================================================
-ContextStatementBlock	..{ ..   #v = \seq_get(#seLeft, #nseRight); ... } ...
-  CopyAssignment	#v = \seq_get(#seLeft, #nseRight);
+ContextStatementBlock	..{ ..   #v = #seLeft[#nseRight]; ... } ...
+  CopyAssignment	#v = #seLeft[#nseRight];
     ProgramSV	#v (program Variable)
 
-    MethodReference	\seq_get(#seLeft, #nseRight);
+    SeqGet	#seLeft[#nseRight];
+      ProgramSV	#seLeft (program SimpleExpression)
+
+      ProgramSV	#nseRight (program NonSimpleExpression)
+
+
+
+
 
 ===  seqIndexOfUnfoldLeft ======================================================
 ContextStatementBlock	..{ ..   #v = \indexOf(#nseLeft, #eRight); ... } ...
   CopyAssignment	#v = \indexOf(#nseLeft, #eRight);
     ProgramSV	#v (program Variable)
 
-    MethodReference	\indexOf(#nseLeft, #eRight);
+    SeqIndexOf	\indexOf(#nseLeft, #eRight);
+      ProgramSV	#nseLeft (program NonSimpleExpression)
+
+      ProgramSV	#eRight (program Expression)
+
+
+
+
 
 ===  seqIndexOfUnfoldRight ======================================================
 ContextStatementBlock	..{ ..   #v = \indexOf(#seLeft, #nseRight); ... } ...
   CopyAssignment	#v = \indexOf(#seLeft, #nseRight);
     ProgramSV	#v (program Variable)
 
-    MethodReference	\indexOf(#seLeft, #nseRight);
+    SeqIndexOf	\indexOf(#seLeft, #nseRight);
+      ProgramSV	#seLeft (program SimpleExpression)
+
+      ProgramSV	#nseRight (program NonSimpleExpression)
+
+
+
+
 
 ===  seqLengthUnfold ======================================================
-ContextStatementBlock	..{ ..   #v = \seq_length(#nse); ... } ...
-  CopyAssignment	#v = \seq_length(#nse);
+ContextStatementBlock	..{ ..   #v = #nse.length; ... } ...
+  CopyAssignment	#v = #nse.length;
     ProgramSV	#v (program Variable)
 
-    MethodReference	\seq_length(#nse);
+    SeqLength	#nse.length;
+      ProgramSV	#nse (program NonSimpleExpression)
+
+
+
+
 
 ===  seqReverseUnfold ======================================================
 ContextStatementBlock	..{ ..   #v = \seq_reverse(#nse); ... } ...
   CopyAssignment	#v = \seq_reverse(#nse);
     ProgramSV	#v (program Variable)
 
-    MethodReference	\seq_reverse(#nse);
+    SeqReverse	\seq_reverse(#nse);
+      ProgramSV	#nse (program NonSimpleExpression)
+
+
+
+
 
 ===  seqSingletonUnfold ======================================================
 ContextStatementBlock	..{ ..   #v = \seq_singleton(#nse); ... } ...
   CopyAssignment	#v = \seq_singleton(#nse);
     ProgramSV	#v (program Variable)
 
-    MethodReference	\seq_singleton(#nse);
+    SeqSingleton	\seq_singleton(#nse);
+      ProgramSV	#nse (program NonSimpleExpression)
+
+
+
+
 
 ===  seqSubUnfoldLeft ======================================================
 ContextStatementBlock	..{ ..   #v = \seq_sub(#nseLeft, #eMiddle, #eRight); ... } ...
   CopyAssignment	#v = \seq_sub(#nseLeft, #eMiddle, #eRight);
     ProgramSV	#v (program Variable)
 
-    MethodReference	\seq_sub(#nseLeft, #eMiddle, #eRight);
+    SeqSub	\seq_sub(#nseLeft, #eMiddle, #eRight);
+      ProgramSV	#nseLeft (program NonSimpleExpression)
+
+      ProgramSV	#eMiddle (program Expression)
+
+      ProgramSV	#eRight (program Expression)
+
+
+
+
 
 ===  seqSubUnfoldMiddle ======================================================
 ContextStatementBlock	..{ ..   #v = \seq_sub(#seLeft, #nseMiddle, #eRight); ... } ...
   CopyAssignment	#v = \seq_sub(#seLeft, #nseMiddle, #eRight);
     ProgramSV	#v (program Variable)
 
-    MethodReference	\seq_sub(#seLeft, #nseMiddle, #eRight);
+    SeqSub	\seq_sub(#seLeft, #nseMiddle, #eRight);
+      ProgramSV	#seLeft (program SimpleExpression)
+
+      ProgramSV	#nseMiddle (program NonSimpleExpression)
+
+      ProgramSV	#eRight (program Expression)
+
+
+
+
 
 ===  seqSubUnfoldRight ======================================================
 ContextStatementBlock	..{ ..   #v = \seq_sub(#seLeft, #seMiddle, #nseRight); ... } ...
   CopyAssignment	#v = \seq_sub(#seLeft, #seMiddle, #nseRight);
     ProgramSV	#v (program Variable)
 
-    MethodReference	\seq_sub(#seLeft, #seMiddle, #nseRight);
+    SeqSub	\seq_sub(#seLeft, #seMiddle, #nseRight);
+      ProgramSV	#seLeft (program SimpleExpression)
+
+      ProgramSV	#seMiddle (program SimpleExpression)
+
+      ProgramSV	#nseRight (program NonSimpleExpression)
+
+
+
+
 
 ===  setIntersectUnfoldLeft ======================================================
 ContextStatementBlock	..{ ..   #v = \intersect(#nseLeft, #eRight); ... } ...
   CopyAssignment	#v = \intersect(#nseLeft, #eRight);
     ProgramSV	#v (program Variable)
 
-    MethodReference	\intersect(#nseLeft, #eRight);
+    Intersect	\intersect(#nseLeft, #eRight);
+      ProgramSV	#nseLeft (program NonSimpleExpression)
+
+      ProgramSV	#eRight (program Expression)
+
+
+
+
 
 ===  setIntersectUnfoldRight ======================================================
 ContextStatementBlock	..{ ..   #v = \intersect(#seLeft, #nseRight); ... } ...
   CopyAssignment	#v = \intersect(#seLeft, #nseRight);
     ProgramSV	#v (program Variable)
 
-    MethodReference	\intersect(#seLeft, #nseRight);
+    Intersect	\intersect(#seLeft, #nseRight);
+      ProgramSV	#seLeft (program SimpleExpression)
+
+      ProgramSV	#nseRight (program NonSimpleExpression)
+
+
+
+
 
 ===  setMinusUnfoldLeft ======================================================
 ContextStatementBlock	..{ ..   #v = \set_minus(#nseLeft, #eRight); ... } ...
   CopyAssignment	#v = \set_minus(#nseLeft, #eRight);
     ProgramSV	#v (program Variable)
 
-    MethodReference	\set_minus(#nseLeft, #eRight);
+    SetMinus	\set_minus(#nseLeft, #eRight);
+      ProgramSV	#nseLeft (program NonSimpleExpression)
+
+      ProgramSV	#eRight (program Expression)
+
+
+
+
 
 ===  setMinusUnfoldRight ======================================================
 ContextStatementBlock	..{ ..   #v = \set_minus(#seLeft, #nseRight); ... } ...
   CopyAssignment	#v = \set_minus(#seLeft, #nseRight);
     ProgramSV	#v (program Variable)
 
-    MethodReference	\set_minus(#seLeft, #nseRight);
+    SetMinus	\set_minus(#seLeft, #nseRight);
+      ProgramSV	#seLeft (program SimpleExpression)
+
+      ProgramSV	#nseRight (program NonSimpleExpression)
+
+
+
+
 
 ===  setUnionUnfoldLeft ======================================================
 ContextStatementBlock	..{ ..   #v = \set_union(#nseLeft, #eRight); ... } ...
   CopyAssignment	#v = \set_union(#nseLeft, #eRight);
     ProgramSV	#v (program Variable)
 
-    MethodReference	\set_union(#nseLeft, #eRight);
+    SetUnion	\set_union(#nseLeft, #eRight);
+      ProgramSV	#nseLeft (program NonSimpleExpression)
+
+      ProgramSV	#eRight (program Expression)
+
+
+
+
 
 ===  setUnionUnfoldRight ======================================================
 ContextStatementBlock	..{ ..   #v = \set_union(#seLeft, #nseRight); ... } ...
   CopyAssignment	#v = \set_union(#seLeft, #nseRight);
     ProgramSV	#v (program Variable)
 
-    MethodReference	\set_union(#seLeft, #nseRight);
+    SetUnion	\set_union(#seLeft, #nseRight);
+      ProgramSV	#seLeft (program SimpleExpression)
+
+      ProgramSV	#nseRight (program NonSimpleExpression)
+
+
+
+
 
 ===  singletonAssignment ======================================================
 ContextStatementBlock	..{ ..   #v = \singleton(#seObj.#a); ... } ...
   CopyAssignment	#v = \singleton(#seObj.#a);
     ProgramSV	#v (program Variable)
 
-    MethodReference	\singleton(#seObj.#a);
+    Singleton	\singleton(#seObj.#a);
+      SchematicFieldReference	#seObj.#a;
+        ProgramSV	#seObj (program SimpleExpression)
+
+        ProgramSV	#a (program Variable)
+
+
+
+
+
 
 ===  singletonUnfold ======================================================
 ContextStatementBlock	..{ ..   #v = \singleton(#nseObj.#a); ... } ...
   CopyAssignment	#v = \singleton(#nseObj.#a);
     ProgramSV	#v (program Variable)
 
-    MethodReference	\singleton(#nseObj.#a);
+    Singleton	\singleton(#nseObj.#a);
+      SchematicFieldReference	#nseObj.#a;
+        ProgramSV	#nseObj (program NonSimpleExpression)
+
+        ProgramSV	#a (program Variable)
+
+
+
+
+
 
 ===  special_constructor_call ======================================================
 ContextStatementBlock	..{ ..   #scr ... } ...
