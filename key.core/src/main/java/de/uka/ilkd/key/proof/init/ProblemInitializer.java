@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.abstraction.Field;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -30,6 +31,7 @@ import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -37,13 +39,17 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
-
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-
+import org.key_project.util.java.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
 
 public final class ProblemInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProblemInitializer.class);
@@ -431,6 +437,7 @@ public final class ProblemInitializer {
         InitConfig initConfig = createInputConfigFor(envInput);
         InitConfig ic = prepare(envInput, initConfig);
         if (Debug.ENABLE_DEBUG) {
+                printMatcher(ic);
             print(ic);
         }
         return ic;
@@ -450,6 +457,51 @@ public final class ProblemInitializer {
             out.print(firstProof.toString());
         } catch (IOException e) {
             LOGGER.warn("Failed write proof", e);
+        }
+    }
+
+    private void printMatcher(InitConfig ic) {
+        File findJavaAst;
+        try {
+            findJavaAst = File.createTempFile("findJavaAst", ".txt");
+        } catch (IOException e) {
+            LOGGER.warn("Failed to create temp file", e);
+            return;
+        }
+        LOGGER.debug("Java AST matchers under: {}", findJavaAst);
+        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(findJavaAst, StandardCharsets.UTF_8)))) {
+            final List<Taclet> taclets = new ArrayList<>();
+            taclets.addAll(ic.activatedTaclets());
+            taclets.sort(Comparator.comparing(a -> a.name().toString()));
+
+            for (Taclet taclet : taclets) {
+                try {
+                    var rw = (RewriteTaclet) taclet;
+                    var s = rw.find();
+                    var jb = s.javaBlock();
+                    if (jb != null && !jb.toString().equals("{}")) {
+                        out.format("\n===  %s ======================================================\n", taclet.name());
+                        toSexpr((NonTerminalProgramElement) jb.program(), 0, out);
+                        out.println();
+                        out.flush();
+                    }
+                } catch (ClassCastException ignore) {
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Failed to save", e);
+        }
+    }
+
+    private void toSexpr(NonTerminalProgramElement s, int level, PrintWriter out) {
+        out.write(StringUtil.repeat(" ", level));
+        out.write(s.getClass().getSimpleName());
+        out.write("\t");
+        out.write(s.toString().replace('\n', ' '));
+        out.write("\n");
+        for (int i = 0; i < s.getChildCount(); i++) {
+            toSexpr((NonTerminalProgramElement) s.getChildAt(i), level + 2, out);
+            out.write("\n");
         }
     }
 

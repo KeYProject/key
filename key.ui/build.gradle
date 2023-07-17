@@ -60,13 +60,25 @@ application {
 run {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
     //systemProperties["slf4j.detectLoggerNameMismatch"] = true
-    //systemProperties["KeyDebugFlag"] = "on"
+    systemProperties["KeyDebugFlag"] = "on"
     //args "--experimental"
 
     // this can be used to solve a problem where the OS hangs during debugging of popup menus
     // (see https://docs.oracle.com/javase/10/troubleshoot/awt.htm#JSTGD425)
     //jvmArgs += "-Dsun.awt.disablegrab=true"
 }
+
+
+task runDebug(type:JavaExec) {
+    systemProperties["key.examples.dir"] = "$projectDir/examples"
+    systemProperties["KeyDebugFlag"] = "on"
+}
+
+task runExperimental(type:JavaExec) {
+    systemProperties["key.examples.dir"] = "$projectDir/examples"
+    args "--experimental"
+}
+
 
 task runWithProfiler(type: JavaExec) {
     group("application")
