@@ -190,8 +190,13 @@ public final class CommandLine {
     private final Map<String, CommandLine> subcommands = new HashMap<>();
 
     public void addSubCommand(String name) {
-        // TODO: test if valid name (e.g. must not start with MINUS)
-        // TODO: test if already exists
+        if (name.startsWith(MINUS)) {
+            throw new IllegalArgumentException(
+                "Subcommands must not start with '" + MINUS + "': " + name);
+        }
+        if (subcommands.containsKey(name)) {
+            throw new IllegalArgumentException(name + " has already been registered");
+        }
         subcommands.put(name, new CommandLine());
     }
 
@@ -252,7 +257,7 @@ public final class CommandLine {
      */
     public void addText(String description, boolean identToDescriptionColumn) {
         AdditionalHelpText text = new AdditionalHelpText();
-        text.description = description;
+        text.description = description +  "\n";
         text.indentToDescriptionColumn = identToDescriptionColumn;
         helpElements.add(text);
     }
@@ -268,7 +273,7 @@ public final class CommandLine {
     public void addTextPart(String command, String description, boolean identToDescriptionColumn) {
         AdditionalHelpTextParts text = new AdditionalHelpTextParts();
         text.command = command;
-        text.description = description;
+        text.description = description + "\n";
         text.indentToDescriptionColumn = identToDescriptionColumn;
         helpElements.add(text);
     }
@@ -580,5 +585,9 @@ public final class CommandLine {
      */
     public void setLineLength(int lineLength) {
         this.lineLength = lineLength;
+        // propagate to all subcommands
+        for (Map.Entry<String, CommandLine> subcommand : subcommands.entrySet()) {
+            subcommand.getValue().setLineLength(lineLength);
+        }
     }
 }
