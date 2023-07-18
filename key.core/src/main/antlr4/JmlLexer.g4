@@ -78,7 +78,7 @@ fragment Pfree: '_free'?;       //suffix
 ACCESSIBLE: 'accessible' Pred -> pushMode(expr);
 ASSERT: 'assert' Pred  -> pushMode(expr);
 ASSUME: 'assume' Pred -> pushMode(expr);
-ASSIGNABLE: 'assignable' Pred -> pushMode(expr);
+ASSIGNABLE: 'assignable' Pfree -> pushMode(expr);
 ASSIGNS: 'assigns' Pred -> pushMode(expr);
 AXIOM: 'axiom' -> pushMode(expr);
 BREAKS: 'breaks' -> pushMode(expr);

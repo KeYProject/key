@@ -1,4 +1,4 @@
-package org.key_project.action_history;
+package de.uka.ilkd.key.gui.plugins.action_history;
 
 import java.util.List;
 
