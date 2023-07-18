@@ -11,3 +11,8 @@
         $graph.nodes:{node | $dep(graph=graph, node=node)$}$
     </tbody>
 </table>
+
+<!-- make sure the table is sorted by SCC initially for a nice view -->
+<script type="text/javascript">
+    sortTable('depTable', 1, 1);
+</script>

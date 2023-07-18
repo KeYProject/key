@@ -1,8 +1,10 @@
 <head>
     <meta charset="UTF-8">
+    <title>$title$</title>
     <style type="text/css">
         $style()$
     </style>
+    $scripts()$
 </head>
 
 <body>
@@ -41,6 +43,18 @@ $/overview/overview(cd=checkerData)$
     $endif$
 </div>
 
-$script()$
+<script type="text/javascript">
+// make the filetree foldable/expandable
+let toggler = document.getElementsByClassName("caret");
+for (let i = 0; i < toggler.length; i++) {
+	toggler[i].addEventListener("click", function() {
+		this.parentElement.querySelector(".nested").classList.toggle("active");
+		this.classList.toggle("caret-down");
+	});
+}
+
+// ensure that the overview tab is opened when the file is loaded
+document.getElementById("defaultOpen").click()
+</script>
 
 </body>

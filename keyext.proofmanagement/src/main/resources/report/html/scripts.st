@@ -77,18 +77,6 @@ function openTab(evt, tabName) {
     document.getElementById(tabName).style.display = "block";
     evt.currentTarget.className += " active";
 }
-
-document.getElementById("defaultOpen").click()
-
-var toggler = document.getElementsByClassName("caret");
-var i;
-
-for (i = 0; i < toggler.length; i++) {
-	toggler[i].addEventListener("click", function() {
-		this.parentElement.querySelector(".nested").classList.toggle("active");
-		this.classList.toggle("caret-down");
-	});
-}
 </script>
 
 <script type="text/javascript">

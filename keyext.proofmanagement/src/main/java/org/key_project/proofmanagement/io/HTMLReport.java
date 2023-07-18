@@ -10,7 +10,6 @@ import org.stringtemplate.v4.misc.STNoSuchPropertyException;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -31,15 +30,14 @@ public final class HTMLReport {
      * Prints out the given check results to a target path.
      * @param data the check results to print
      * @param target the target path of the output
-     * @throws IOException if an error occurs when accessing to the target path
-     * @throws URISyntaxException if the StringTemplate resources for generating the html file
-     *  are not found
+     * @throws IOException if an error occurs when accessing to the target path or the string
+     * template resources
      */
-    public static void print(CheckerData data, Path target) throws IOException, URISyntaxException {
+    public static void print(CheckerData data, Path target) throws IOException {
 
         ST st = prepareStringTemplate();
 
-        st.add("title", "test report 2.0");
+        st.add("title", data.getPbh().getBundleName() + " - Proof Management Report");
 
         PathNode fileTree = data.getFileTree();
 
@@ -51,19 +49,27 @@ public final class HTMLReport {
 
         data.print("All checks completed!");
         data.print("Generating html report ...");
-        String output = st.render();
-        Files.write(target, output.getBytes(StandardCharsets.UTF_8));
+        try {
+            String output = st.render();
+            Files.write(target, output.getBytes(StandardCharsets.UTF_8));
+            data.print("Report generated at " + target.normalize());
+        } catch (IOException e) {
+            data.print("Unable to generate report: " + e.getMessage());
+        }
     }
 
     /**
      * Set up StringTemplate model adaptors and listeners.
      * @return the ST object for rendering the HTML report
-     * @throws URISyntaxException if an error occurs accessing the StringTemplate resources
+     * @throws IOException if an error occurs accessing the StringTemplate resources
      */
-    private static ST prepareStringTemplate() throws URISyntaxException {
+    private static ST prepareStringTemplate() throws IOException {
         ClassLoader classLoader = HTMLReport.class.getClassLoader();
         URL url = classLoader.getResource("report/html");
-        //Path resPath = Paths.get(url.toURI());
+
+        if (url == null) {
+            throw new IOException("Could not load report template resource from report/html.");
+        }
 
         STGroup group = new STRawGroupDir(url, "UTF-8", '$', '$');
 
