@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.github.javaparser.ast.expr.Name;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.KeYJPMapping;
 import de.uka.ilkd.key.java.Position;
@@ -33,10 +34,7 @@ import de.uka.ilkd.key.java.transformations.EvaluationException;
 import de.uka.ilkd.key.java.transformations.pipeline.JMLCommentTransformer;
 import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.PosInProgram;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -625,29 +623,44 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             return new SchematicFieldReference(pi, c, name, scope);
         }
 
-        var rtype = n.calculateResolvedType();
-        var kjt = getKeYJavaType(rtype);
+        ResolvedValueDeclaration target;
+        try {
+            target = n.resolve();
+        } catch (UnsolvedSymbolException e) {
+            ResolvedType type = n.calculateResolvedType();
+            var keyType = getKeYJavaType(type);
+            return new TypeRef(keyType);
+        }
 
-        var descriptor =
-            "L" + n.getScope().toString().replace(".", "/") + "/" + n.getNameAsString() + ";";
-        boolean notFullyQualifiedName = !rtype.toDescriptor().equals(descriptor);
-        ProgramVariable variable = new LocationVariable(
-            createProgramElementName(n.getName()), kjt);
-        if (notFullyQualifiedName) { // regular field access
-            ReferencePrefix prefix = accept(n.getScope());
-            if (n.getName().asString().equals("length")) {
-                var type = n.getScope().calculateResolvedType();
-                if (type.isArray()) {
-                    var arrayType = (ArrayDeclaration) getKeYJavaType(type).getJavaType();
-                    var length = findArrayLength(arrayType);
-                    return new FieldReference(pi, c, (ProgramVariable) length.getProgramVariable(),
-                        prefix);
+        var ast = target.toAst().orElseThrow();
+        var other = (VariableDeclaration) mapping.nodeToKeY(ast)
+                .orElseGet(() -> accept(ast));
+
+        ProgramVariable pv = null;
+        if (target instanceof JavaParserFieldDeclaration) {
+            // Field declarations can have multiple variables
+            var decl = ((JavaParserFieldDeclaration) target).getVariableDeclarator();
+            var keyDecl = (VariableSpecification) mapping.nodeToKeY(decl).orElseThrow();
+            pv = (ProgramVariable) keyDecl.getProgramVariable();
+        } else {
+            for (VariableSpecification variable : other.getVariables()) {
+                if (variable.getName() != null && JavaDLFieldNames.split(variable.getName()).name().equals(target.getName())) {
+                    pv = (ProgramVariable) variable.getProgramVariable();
+                    break;
                 }
             }
-            return new FieldReference(pi, c, variable, prefix);
-        } else {
-            return new FieldReference(pi, c, variable, translatePackageReference(n.getScope()));
         }
+        if (pv == null) {
+            return reportUnsupportedElement(n);
+        }
+
+        if (pv.isMember()) {
+            var scope = (ReferencePrefix) n.getScope().accept(this, arg);
+            return new FieldReference(pi, c, pv, scope);
+        }
+        // This seems to happen when we create a fake field in JavaService::createContext
+        return pv;
+
     }
 
     @Override
