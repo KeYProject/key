@@ -72,10 +72,10 @@ public class FilesChecker {
             HashMap<Path, byte[]> mapB = new HashMap<>();
             try {
                 for (Path p : filesA) {
-                    mapA.put(p, createMd5Checksum(p));
+                    mapA.put(p, createSHA256Checksum(p));
                 }
                 for (Path p : filesB) {
-                    mapB.put(p, createMd5Checksum(p));
+                    mapB.put(p, createSHA256Checksum(p));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -97,27 +97,25 @@ public class FilesChecker {
     }
 
     /**
-     * Reads the file with the given path and computes the md5 checksum of it.
+     * Reads the file with the given path and computes the SHA256 checksum of it.
      * @param path path of the file
      * @return md5 checksum of the file
      * @throws NoSuchAlgorithmException if the MD5 checksum is not available for some reason
      * @throws IOException if the file with the given path does not exist or can not be read
      */
-    public static byte[] createMd5Checksum(Path path) throws NoSuchAlgorithmException, IOException {
-        InputStream fis = new FileInputStream(path.toFile());
+    public static byte[] createSHA256Checksum(Path path) throws NoSuchAlgorithmException, IOException {
+        MessageDigest complete = MessageDigest.getInstance("SHA-256");
+        try (InputStream fis = new FileInputStream(path.toFile())) {
+            byte[] buffer = new byte[1024];
+            int numRead;
 
-        byte[] buffer = new byte[1024];
-        MessageDigest complete = MessageDigest.getInstance("MD5");
-        int numRead;
-
-        do {
-            numRead = fis.read(buffer);
-            if (numRead > 0) {
-                complete.update(buffer, 0, numRead);
-            }
-        } while (numRead != -1);
-
-        fis.close();
+            do {
+                numRead = fis.read(buffer);
+                if (numRead > 0) {
+                    complete.update(buffer, 0, numRead);
+                }
+            } while (numRead != -1);
+        }
         return complete.digest();
     }
 
