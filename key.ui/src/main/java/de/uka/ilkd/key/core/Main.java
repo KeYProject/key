@@ -539,12 +539,7 @@ public final class Main {
     public static void ensureExamplesAvailable() {
         File examplesDir = getExamplesDir() == null ? ExampleChooser.lookForExamples()
                 : new File(getExamplesDir());
-        if (!examplesDir.exists()) {
-            examplesDir = WebstartMain.setupExamples();
-        }
-        if (examplesDir != null) {
-            setExamplesDir(examplesDir.getAbsolutePath());
-        }
+        setExamplesDir(examplesDir.getAbsolutePath());
     }
 
     private static void updateSplashScreen() {
