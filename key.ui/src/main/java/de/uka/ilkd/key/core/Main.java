@@ -169,6 +169,9 @@ public final class Main {
      */
     public static final boolean showExampleChooserIfExamplesDirIsDefined = true;
 
+    private Main() {
+    }
+
     public static void main(final String[] args) {
         Locale.setDefault(Locale.US);
 
@@ -508,8 +511,6 @@ public final class Main {
 
             return new ConsoleUserInterfaceControl(loadOnly);
         } else {
-            updateSplashScreen();
-
             /*
              * explicitly enable pruning in closed branches for interactive mode (if not manually
              * disabled)
@@ -540,17 +541,6 @@ public final class Main {
         File examplesDir = getExamplesDir() == null ? ExampleChooser.lookForExamples()
                 : new File(getExamplesDir());
         setExamplesDir(examplesDir.getAbsolutePath());
-    }
-
-    private static void updateSplashScreen() {
-        try {
-            final java.awt.SplashScreen sp = java.awt.SplashScreen.getSplashScreen();
-            if (sp == null) {
-                // insert customization code here
-                // see http://docs.oracle.com/javase/tutorial/uiswing/misc/splashscreen.html
-            }
-        } catch (Exception e) {
-        }
     }
 
     private static void evaluateLemmataOptions(CommandLine options) {
