@@ -7,6 +7,7 @@ import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
+import org.key_project.util.java.SwingUtil;
 
 /**
  * Dialog showing reference search information.
@@ -118,14 +119,7 @@ public class ReferenceSearchDialog extends JDialog {
 
     private JScrollPane getScrollPane() {
         if (scrollPane == null) {
-            scrollPane = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-
-            Dimension dim = new Dimension(table.getPreferredSize());
-            dim.width += (Integer) UIManager.get("ScrollBar.width") + 2;
-            dim.height = scrollPane.getPreferredSize().height;
-            scrollPane.setPreferredSize(dim);
-
+            scrollPane = SwingUtil.createScrollPane(table);
         }
         return scrollPane;
     }

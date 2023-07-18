@@ -1,5 +1,6 @@
 package org.key_project.util.java;
 
+import javax.swing.*;
 import java.awt.*;
 
 /**
@@ -33,5 +34,24 @@ public final class SwingUtil {
             }
         }
         return null;
+    }
+
+    /**
+     * Create a scroll pane around the given table.
+     * It will always have vertical and horizontal scroll bars.
+     *
+     * @param table the table
+     * @return the scroll pane
+     */
+    public static JScrollPane createScrollPane(JTable table) {
+        var scrollPane = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+
+        Dimension dim = new Dimension(table.getPreferredSize());
+        dim.width += (Integer) UIManager.get("ScrollBar.width") + 2;
+        dim.height = scrollPane.getPreferredSize().height;
+        scrollPane.setPreferredSize(dim);
+
+        return scrollPane;
     }
 }

@@ -164,12 +164,13 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     }
 
     /**
-     * @param info
-     * @param selectionIndex
-     * @param validator
-     * @param items
-     * @param <T>
-     * @return
+     * @param title label of the combo box
+     * @param info help text
+     * @param selectionIndex which item to initially select
+     * @param validator validator
+     * @param items the items
+     * @param <T> the type of the items
+     * @return the combo box
      */
     protected <T> JComboBox<T> addComboBox(String title, String info, int selectionIndex,
             @Nullable Validator<T> validator, T... items) {

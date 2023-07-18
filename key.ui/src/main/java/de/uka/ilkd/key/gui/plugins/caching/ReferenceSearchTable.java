@@ -19,9 +19,6 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
  * @author Arne Keller
  */
 class ReferenceSearchTable extends JTable implements TableModel {
-
-    private static final long serialVersionUID = 1L;
-
     /**
      * The mediator.
      */
@@ -91,7 +88,7 @@ class ReferenceSearchTable extends JTable implements TableModel {
     @Override
     public Object getValueAt(int row, int column) {
         if (column == 0) {
-            return "" + openGoals.get(row).node().serialNr();
+            return String.valueOf(openGoals.get(row).node().serialNr());
         } else {
             Goal g = openGoals.get(row);
             ClosedBy c = g.node().lookup(ClosedBy.class);

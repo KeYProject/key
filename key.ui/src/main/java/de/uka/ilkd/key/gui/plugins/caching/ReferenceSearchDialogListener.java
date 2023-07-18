@@ -8,11 +8,15 @@ package de.uka.ilkd.key.gui.plugins.caching;
 public interface ReferenceSearchDialogListener {
     /**
      * Button to close the dialog has been activated.
+     *
+     * @param dialog the dialog
      */
     void closeButtonClicked(ReferenceSearchDialog dialog);
 
     /**
      * Button to copy proof steps has been activated.
+     *
+     * @param dialog the dialog
      */
     void copyButtonClicked(ReferenceSearchDialog dialog);
 }

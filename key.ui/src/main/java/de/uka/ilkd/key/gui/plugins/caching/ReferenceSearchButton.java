@@ -31,10 +31,6 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
      * The mediator.
      */
     private final KeYMediator mediator;
-    /**
-     * The opened dialog, once the user clicks on the button.
-     */
-    private ReferenceSearchDialog dialog = null;
 
     /**
      * Construct a new button.
@@ -66,7 +62,7 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
                             mediator, c.getProof(), p));
             }
         }
-        dialog = new ReferenceSearchDialog(p, new DefaultReferenceSearchDialogListener(mediator));
+        var dialog = new ReferenceSearchDialog(p, new DefaultReferenceSearchDialogListener(mediator));
         dialog.setVisible(true);
     }
 
