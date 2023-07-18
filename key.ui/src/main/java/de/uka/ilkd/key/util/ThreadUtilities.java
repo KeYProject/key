@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 public final class ThreadUtilities {
     private static final Logger LOGGER = LoggerFactory.getLogger(ThreadUtilities.class);
 
+    private ThreadUtilities() {
+    }
+
 
     /**
      * Invoke a runnable object on the AWT event thread and wait for the execution to finish.
@@ -61,7 +64,7 @@ public final class ThreadUtilities {
             rootGroup = parentGroup;
         }
 
-        Thread[] threads = new Thread[rootGroup.activeCount()];
+        Thread[] threads = new Thread[rootGroup.activeCount() + 1];
         while (rootGroup.enumerate(threads, true) == threads.length) {
             threads = new Thread[threads.length * 2];
         }

@@ -101,7 +101,7 @@ public class MediatorProofControl extends AbstractProofControl {
     @Override
     public void waitWhileAutoMode() {
         if (SwingUtilities.isEventDispatchThread()) {
-            LOGGER.warn("", new IllegalStateException(
+            LOGGER.error("", new IllegalStateException(
                 "tried to block the UI thread whilst waiting for auto mode to finish"));
             return; // do not block the UI thread
         }

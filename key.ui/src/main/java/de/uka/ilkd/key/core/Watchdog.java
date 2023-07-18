@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Watchdog to monitor the state of the KeY system. If all worker and UI threads
- * are waiting / blocked, a deadlock is reported.
+ * are waiting / blocked, a deadlock is reported to the log.
  *
  * @author Arne Keller
  */
@@ -31,6 +31,9 @@ public final class Watchdog {
 
     }
 
+    /**
+     * Start the watchdog in a background thread.
+     */
     public static void start() {
         new Thread(Watchdog::run, "Watchdog").start();
     }
