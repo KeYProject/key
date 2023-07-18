@@ -1,9 +1,7 @@
 package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.awt.event.ActionEvent;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.EventObject;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,7 +11,6 @@ import javax.swing.*;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
@@ -54,14 +51,8 @@ import org.slf4j.LoggerFactory;
     experimental = false)
 public class CachingExtension
         implements KeYGuiExtension, KeYGuiExtension.Startup, KeYGuiExtension.ContextMenu,
-        KeYGuiExtension.StatusLine, KeYGuiExtension.Settings, GUIListener,
+        KeYGuiExtension.StatusLine, KeYGuiExtension.Settings,
         KeYSelectionListener, RuleAppListener, ProofDisposedListener, ProverTaskListener {
-
-    /**
-     * Whether to enable the caching database. Remove (or replace with an optino) once the feature
-     * is done.
-     */
-    public static final boolean ENABLE_DATABASE = true;
     private static final Logger LOGGER = LoggerFactory.getLogger(CachingExtension.class);
 
     /**
@@ -78,10 +69,6 @@ public class CachingExtension
      * Proofs tracked for automatic reference search.
      */
     private final Set<Proof> trackedProofs = new HashSet<>();
-
-    @Override
-    public void selectedNodeChanged(KeYSelectionEvent e) {
-    }
 
     @Override
     public void selectedProofChanged(KeYSelectionEvent e) {
@@ -135,18 +122,12 @@ public class CachingExtension
     public void preInit(MainWindow window, KeYMediator mediator) {
         this.mediator = mediator;
         mediator.addKeYSelectionListener(this);
-        mediator.addGUIListener(this);
         mediator.getUI().addProverTaskListener(this);
     }
 
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
 
-    }
-
-    @Override
-    public void shutDown(EventObject e) {
-        CachingDatabase.shutdown();
     }
 
     @Override
@@ -170,8 +151,6 @@ public class CachingExtension
             actions.add(new CopyReferencedProof(mediator, node));
             actions.add(new GotoReferenceAction(mediator, node));
             return actions;
-        } else if (kind.getType() == Proof.class && ENABLE_DATABASE) {
-            return List.of(new AddToDatabaseAction((Proof) underlyingObject));
         }
         return new ArrayList<>();
     }
@@ -277,40 +256,6 @@ public class CachingExtension
      *
      * @author Arne Keller
      */
-    static class AddToDatabaseAction extends KeyAction {
-        /**
-         * The node to try to close by reference.
-         */
-        private final Proof proof;
-
-        /**
-         * Construct new action.
-         *
-         * @param proof the proof
-         */
-        public AddToDatabaseAction(Proof proof) {
-            this.proof = proof;
-            setName("Add to database of cached proofs");
-            setEnabled(proof.closed());
-            setMenuPath("Proof Caching");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            try {
-                CachingDatabase.addProof(proof);
-            } catch (IOException err) {
-                LOGGER.error("failed to add proof to database ", err);
-                IssueDialog.showExceptionDialog(MainWindow.getInstance(), err);
-            }
-        }
-    }
-
-    /**
-     * Action to search for suitable references on a single node.
-     *
-     * @author Arne Keller
-     */
     static class CloseByReference extends KeyAction {
         /**
          * The mediator.
@@ -388,7 +333,8 @@ public class CachingExtension
                 new CopyingProofReplayer(c.getProof(), node.proof()).copy(c.getNode(), current);
                 mediator.startInterface(true);
             } catch (IntermediateProofReplayer.BuiltInConstructionException ex) {
-                throw new RuntimeException(ex);
+                LOGGER.error("failed to copy proof ", ex);
+                IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
             }
         }
     }
@@ -396,15 +342,5 @@ public class CachingExtension
     @Override
     public SettingsProvider getSettings() {
         return new CachingSettingsProvider();
-    }
-
-    @Override
-    public void modalDialogOpened(EventObject e) {
-
-    }
-
-    @Override
-    public void modalDialogClosed(EventObject e) {
-
     }
 }
