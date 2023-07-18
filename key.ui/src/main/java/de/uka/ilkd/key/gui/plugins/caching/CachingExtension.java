@@ -54,6 +54,7 @@ import org.slf4j.LoggerFactory;
     experimental = false)
 public class CachingExtension
         implements KeYGuiExtension, KeYGuiExtension.Startup, KeYGuiExtension.ContextMenu,
+        KeYGuiExtension.MainMenu,
         KeYGuiExtension.StatusLine, KeYGuiExtension.Settings, GUIListener,
         KeYSelectionListener, RuleAppListener, ProofDisposedListener, ProverTaskListener {
 
@@ -210,6 +211,12 @@ public class CachingExtension
                 win.setVisible(true);
             });
         }
+    }
+
+    @Nonnull
+    @Override
+    public List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
+        return List.of(CachingDatabaseDialog.getOpenAction());
     }
 
     /**
