@@ -19,13 +19,9 @@ import de.uka.ilkd.key.java.declaration.VariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
-import de.uka.ilkd.key.java.expression.operator.DLEmbeddedExpression;
-import de.uka.ilkd.key.java.expression.operator.Instanceof;
-import de.uka.ilkd.key.java.expression.operator.Intersect;
-import de.uka.ilkd.key.java.expression.operator.Negative;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.expression.operator.NewArray;
+import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.Catch;
@@ -232,6 +228,9 @@ public abstract class ProgramSVSort extends AbstractSort {
     public static final ProgramSVSort SIMPLEEXPRESSIONNONFLOATDOUBLE =
         new SimpleExpressionExceptingTypeSort("SimpleExpressionNonFloatDouble",
             new PrimitiveType[] { PrimitiveType.JAVA_FLOAT, PrimitiveType.JAVA_DOUBLE });
+
+    public static final ProgramSVSort FLOAT_BINARY_EXP =
+        new FloatingPointBinaryExprSort("FloatingPointBinaryExpression");
 
     // --------------- Specials that can be get rid of perhaps--------------
 
@@ -1113,6 +1112,43 @@ public abstract class ProgramSVSort extends AbstractSort {
                 }
             }
             return false;
+        }
+    }
+
+    /**
+     * A schema variable for a binary operation in which at least one floating
+     * point type is involved and both arguments are simple expressions.
+     * Needed for numeric promotion with floating point types.
+     *
+     * @see de.uka.ilkd.key.rule.conditions.FloatingPointBalancedCondition
+     */
+    private static final class FloatingPointBinaryExprSort extends ExpressionSort {
+
+        public FloatingPointBinaryExprSort(String name) {
+            super(new Name(name));
+        }
+
+        @Override
+        public boolean canStandFor(ProgramElement check, ExecutionContext ec, Services services) {
+            if (!(check instanceof BinaryOperator || check instanceof ComparativeOperator)) {
+                return false;
+            }
+            Operator bin = (Operator) check;
+            if (!SIMPLEEXPRESSION.canStandFor(bin.getChildAt(0), ec, services) ||
+                    !SIMPLEEXPRESSION.canStandFor(bin.getChildAt(1), ec, services)) {
+                return false;
+            }
+            KeYJavaType t1 = getKeYJavaType(bin.getChildAt(0), ec, services);
+            KeYJavaType t2 = getKeYJavaType(bin.getChildAt(1), ec, services);
+
+            Sort floatSort = services.getTypeConverter().getFloatLDT().targetSort();
+            Sort doubleSort = services.getTypeConverter().getDoubleLDT().targetSort();
+            if (t1.getSort() != floatSort && t1.getSort() != doubleSort &&
+                    t2.getSort() != floatSort && t2.getSort() != doubleSort) {
+                return false;
+            }
+
+            return true;
         }
     }
 
