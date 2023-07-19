@@ -10,38 +10,39 @@ import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
+
 import org.key_project.proofmanagement.check.*;
-import org.key_project.proofmanagement.io.ProofBundleHandler;
-import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.HTMLReport;
+import org.key_project.proofmanagement.io.LogLevel;
+import org.key_project.proofmanagement.io.ProofBundleHandler;
 import org.key_project.proofmanagement.merge.ProofBundleMerger;
 
 /**
  * This is the starting class for ProofManagement.
  * <br>
  * CLI commands:
- *  check [--settings] [--dependency] [--report <out_path>] <bundle_path>
- *    options:
- *        --settings settings check
- *        --dependency dependency check
- *        --auto try to use automode to close open proofs
- *        --explicit (implies --auto) stores automatically found proofs explicitly as files
- *        --report generate html report, needs the target filename as parameter
- *        --missing check for contracts that have no proof
- *    checks that are always enabled:
- *        - check for duplicate proofs of the same contracts
- *    individually and independently trigger different checks
- *  merge [--force] [--no-check] <bundle1> <bundle2> ... <output>
- *    Merges the given n bundles into a single bundle. By default, no consistency checks are run
- *    (note that this may produce a completely broken bundle, if there are inconsistencies).
- *    options:
- *        --force merge the bundles even when the consistency check failed
- *        --check "<check_options>" passes the given options to the check command and
- *                  executes it
- *  bundle [--check]
- *    options:
- *        --check "<check_options>" passes the given options to the check command and
- *                  executes it
+ * check [--settings] [--dependency] [--report <out_path>] <bundle_path>
+ * options:
+ * --settings settings check
+ * --dependency dependency check
+ * --auto try to use automode to close open proofs
+ * --explicit (implies --auto) stores automatically found proofs explicitly as files
+ * --report generate html report, needs the target filename as parameter
+ * --missing check for contracts that have no proof
+ * checks that are always enabled:
+ * - check for duplicate proofs of the same contracts
+ * individually and independently trigger different checks
+ * merge [--force] [--no-check] <bundle1> <bundle2> ... <output>
+ * Merges the given n bundles into a single bundle. By default, no consistency checks are run
+ * (note that this may produce a completely broken bundle, if there are inconsistencies).
+ * options:
+ * --force merge the bundles even when the consistency check failed
+ * --check "<check_options>" passes the given options to the check command and
+ * executes it
+ * bundle [--check]
+ * options:
+ * --check "<check_options>" passes the given options to the check command and
+ * executes it
  *
  * @author Wolfram Pfeifer
  */
@@ -81,8 +82,8 @@ public final class Main {
         CL_CHECK.addOption("--dependency", null, STRINGS.getString("check_dependency_desc"));
         CL_CHECK.addOption("--missing", null, STRINGS.getString("check_missing_desc"));
         CL_CHECK.addOption("--replay", null, STRINGS.getString("check_replay_desc"));
-        //check.addOption("--auto", null, STRINGS.getString("check_auto_desc"));
-        //check.addOption("--explicit", null, STRINGS.getString("check_explicit_desc"));
+        // check.addOption("--auto", null, STRINGS.getString("check_auto_desc"));
+        // check.addOption("--explicit", null, STRINGS.getString("check_explicit_desc"));
         CL_CHECK.addOption("--report", "out_path", STRINGS.getString("check_report_desc"));
 
         CL_MERGE = CL.addSubCommand("merge");
@@ -96,12 +97,12 @@ public final class Main {
         CL_MERGE_CHECK.addOption("--dependency", null, STRINGS.getString("check_dependency_desc"));
         CL_MERGE_CHECK.addOption("--missing", null, STRINGS.getString("check_missing_desc"));
         CL_MERGE_CHECK.addOption("--replay", null, STRINGS.getString("check_replay_desc"));
-        //CL_MERGE_CHECK.addOption("--auto", null, STRINGS.getString("check_auto_desc"));
-        //CL_MERGE_CHECK.addOption("--explicit", null, STRINGS.getString("check_explicit_desc"));
+        // CL_MERGE_CHECK.addOption("--auto", null, STRINGS.getString("check_auto_desc"));
+        // CL_MERGE_CHECK.addOption("--explicit", null, STRINGS.getString("check_explicit_desc"));
         CL_MERGE_CHECK.addOption("--report", "out_path", STRINGS.getString("check_report_desc"));
 
         // TODO: bundle subcommand
-        //CL.addSubCommand("bundle");
+        // CL.addSubCommand("bundle");
     }
 
     private Main() {
@@ -109,6 +110,7 @@ public final class Main {
 
     /**
      * Main entry point for ProofManagement.
+     *
      * @param args the commandline arguments. See class JavaDoc for a detailed description.
      */
     public static void main(String[] args) {
@@ -134,17 +136,20 @@ public final class Main {
 
     // TODO: bundle subcommand, which zips a directory into a proof bundle (and may perform checks)
     // bundle [-c|--check "check_options"] <root_dir> <bundle_path>
-    /*private static void bundle(CommandLine commandLine) {
-
-        List<String> arguments = commandLine.getArguments();
-        if (arguments.size() != 2) {
-            commandLine.printUsage(System.out);
-        }
-    }*/
+    /*
+     * private static void bundle(CommandLine commandLine) {
+     *
+     * List<String> arguments = commandLine.getArguments();
+     * if (arguments.size() != 2) {
+     * commandLine.printUsage(System.out);
+     * }
+     * }
+     */
 
     /**
      * The check subcommand applies the selected checks to the proof bundle and generates an HTML
      * report if desired.
+     *
      * @param missing checks if there are any unproven contracts in the bundle
      * @param settings checks if the settings for the proofs are compatible
      * @param replay checks whether the proofs in the bundle are replayable
@@ -153,7 +158,7 @@ public final class Main {
      * @param reportPath the output path for the HTML report (if selected)
      */
     public static void check(boolean missing, boolean settings, boolean replay, boolean dependency,
-                              Path bundlePath, Path reportPath) {
+            Path bundlePath, Path reportPath) {
 
         // we accumulate results in this variable
         CheckerData globalResult = new CheckerData(LogLevel.DEBUG);

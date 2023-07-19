@@ -164,7 +164,7 @@ public class IntermediateProofReplayer {
      * @return result of the replay procedure (see {@link Result})
      */
     public Result replay(ProblemInitializer.ProblemInitializerListener listener,
-                         ProgressMonitor progressMonitor) {
+            ProgressMonitor progressMonitor) {
         return replay(listener, progressMonitor, true);
     }
 
@@ -172,10 +172,11 @@ public class IntermediateProofReplayer {
      * Starts the actual replay process. Results are stored in the supplied
      * proof object; the last selected goal may be obtained by
      * {@link #getLastSelectedGoal()}.
+     *
      * @param listener problem initializer listener for the current proof
      * @param progressMonitor progress monitor used to report replay progress
      * @param deleteIntermediateTree indicates if the intermediate proof tree should be
-     *                               deleted (set to false if it shal be kept for further use)
+     *        deleted (set to false if it shal be kept for further use)
      * @return result of the replay procedure (see {@link Result})
      */
     public Result replay(ProblemInitializer.ProblemInitializerListener listener,

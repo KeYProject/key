@@ -1,7 +1,5 @@
 package org.key_project.proofmanagement.check.dependency;
 
-import org.key_project.proofmanagement.io.Logger;
-
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.key_project.proofmanagement.io.Logger;
 
 /**
  * Represents a graph of dependencies between contracts/proofs, i.e. which proof depends on
@@ -21,12 +21,14 @@ public class DependencyGraph {
      * indicates the type of a contract application (if termination has to be considered or not)
      */
     public enum EdgeType {
-        /** indicates the application of either of the following:
+        /**
+         * indicates the application of either of the following:
          * <ul>
-         *     <li>an operation contract inside a diamond modality</li>
-         *     <li>a dependency contract</li>
-         *     <li>a model method's contract axiom</li>
-         * </ul> */
+         * <li>an operation contract inside a diamond modality</li>
+         * <li>a dependency contract</li>
+         * <li>a model method's contract axiom</li>
+         * </ul>
+         */
         TERMINATION_SENSITIVE,
 
         /** indicates the application of an operation contract inside a box modality */
@@ -41,8 +43,10 @@ public class DependencyGraph {
         /** unique id of the SCC */
         private final int id;
 
-        /** Indicates if the SCC contains illegal cycles (unsound mutual dependencies).
-         * Note: Only contains meaningful value after the DependencyChecker has been run! */
+        /**
+         * Indicates if the SCC contains illegal cycles (unsound mutual dependencies).
+         * Note: Only contains meaningful value after the DependencyChecker has been run!
+         */
         private boolean legal = true;
 
         /** nodes the SCC consists of */
@@ -50,6 +54,7 @@ public class DependencyGraph {
 
         /**
          * Creates a new SCC with the given id.
+         *
          * @param id the unique id for the new node
          */
         public SCC(int id) {
@@ -75,15 +80,16 @@ public class DependencyGraph {
         /**
          * Filters the edges starting from the given node to those where the end node
          * is also inside the SCC.
+         *
          * @param node the start node of the edge
          * @return all edges of node inside the SCC
          */
         public Map<DependencyNode, EdgeType> internalEdges(DependencyNode node) {
             return node.getDependencies()
-                       .keySet()
-                       .stream()
-                       .filter(n -> getNodes().contains(n))
-                       .collect(Collectors.toMap(n -> n, n -> node.getDependencies().get(n)));
+                    .keySet()
+                    .stream()
+                    .filter(n -> getNodes().contains(n))
+                    .collect(Collectors.toMap(n -> n, n -> node.getDependencies().get(n)));
         }
 
         @Override
@@ -104,7 +110,8 @@ public class DependencyGraph {
     /** allows for lookup of nodes by contract name */
     private final Map<String, DependencyNode> name2Node = new HashMap<>();
 
-    /** Set of the strongly connected components of the graph.
+    /**
+     * Set of the strongly connected components of the graph.
      * <code>null</code> indicates that it is invalid an has to be (re-)computed by calling
      * {@link #recalculateSCCs()}.
      */
@@ -119,8 +126,10 @@ public class DependencyGraph {
     /** stack used for Tarjan's algorithm */
     private final ArrayDeque<DependencyNode> stack = new ArrayDeque<>();
 
-    /** This constructor exists only to restrict visibility.
-     * Use {@link DependencyGraphBuilder#buildGraph(List, Logger)} to build a graph. */
+    /**
+     * This constructor exists only to restrict visibility.
+     * Use {@link DependencyGraphBuilder#buildGraph(List, Logger)} to build a graph.
+     */
     DependencyGraph() {
     }
 
@@ -135,6 +144,7 @@ public class DependencyGraph {
     /**
      * Adds a node to the graph if not already present. This invalidates the SCCs
      * if already computed.
+     *
      * @param node the DependencyNode to add
      */
     public void addNode(DependencyNode node) {
@@ -151,6 +161,7 @@ public class DependencyGraph {
      * Returns the strongly connected components of the graph (only considering termination
      * sensitive edges). Internally, the result is cached. Adding nodes via
      * {@link #addNode(DependencyNode)} invalidates the cache.
+     *
      * @return all SCCs of the graph
      */
     public Set<SCC> getAllSCCs() {
@@ -162,6 +173,7 @@ public class DependencyGraph {
 
     /**
      * Searches for a node with the given contract name.
+     *
      * @param contractName the contract name to search for (only exact matches will be found)
      * @return the DependencyNode for the given contractName or null, if none found
      */
@@ -196,6 +208,7 @@ public class DependencyGraph {
     /**
      * Calculates the SCC of the subgraph containing the given node
      * (as well as SCCs reachable from node).
+     *
      * @param node the node to start from
      */
     private void calculateSCCForNode(DependencyNode node) {
@@ -211,9 +224,9 @@ public class DependencyGraph {
         // calculate SCCs only from termination sensitive edges
         for (DependencyNode succ : node.getTermSensitiveDependencies()) {
             if (succ.getIndex() == -1) {
-                calculateSCCForNode(succ);          // DFS descend
+                calculateSCCForNode(succ); // DFS descend
                 node.setLowLink(Math.min(node.getLowLink(), succ.getLowLink()));
-            } else if (succ.isOnStack()) {          // cycle?
+            } else if (succ.isOnStack()) { // cycle?
                 node.setLowLink(Math.min(node.getLowLink(), succ.getIndex()));
             }
         }
@@ -234,7 +247,7 @@ public class DependencyGraph {
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        for(DependencyNode currentNode : nodes) {
+        for (DependencyNode currentNode : nodes) {
             result.append(currentNode).append("\n");
         }
         return result.toString();

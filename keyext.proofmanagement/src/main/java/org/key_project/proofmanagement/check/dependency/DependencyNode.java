@@ -1,13 +1,14 @@
 package org.key_project.proofmanagement.check.dependency;
 
-import de.uka.ilkd.key.speclang.Contract;
-import org.key_project.proofmanagement.io.Logger;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.speclang.Contract;
+
+import org.key_project.proofmanagement.io.Logger;
 
 import static org.key_project.proofmanagement.check.dependency.DependencyGraph.EdgeType.TERMINATION_SENSITIVE;
 
@@ -42,6 +43,7 @@ public class DependencyNode {
 
     /**
      * Creates a new dependency node for the given contract.
+     *
      * @param contract the contract represented by this node
      */
     public DependencyNode(Contract contract) {
@@ -82,17 +84,19 @@ public class DependencyNode {
 
     /**
      * Filters the outgoing edges for those which are termination sensitive.
+     *
      * @return all termination sensitive edges starting from this node
      */
     public Set<DependencyNode> getTermSensitiveDependencies() {
         return dependencies.keySet()
-                           .stream()
-                           .filter(n -> dependencies.get(n) == TERMINATION_SENSITIVE)
-                           .collect(Collectors.toSet());
+                .stream()
+                .filter(n -> dependencies.get(n) == TERMINATION_SENSITIVE)
+                .collect(Collectors.toSet());
     }
 
     /**
      * Adds a new edge from this node to the given target node.
+     *
      * @param targetNode the target node of the edge
      * @param edgeType the type of the edge to add
      */
@@ -109,23 +113,23 @@ public class DependencyNode {
     }
 
     // TODO: equals and hashCode needed for HashMaps?
-//    @Override
-//    public boolean equals(Object o) {
-//        if (o instanceof DependencyNode) {
-//            DependencyNode node = (DependencyNode) o;
-//            if (node.contract.equals(contract)) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
+    // @Override
+    // public boolean equals(Object o) {
+    // if (o instanceof DependencyNode) {
+    // DependencyNode node = (DependencyNode) o;
+    // if (node.contract.equals(contract)) {
+    // return true;
+    // }
+    // }
+    // return false;
+    // }
 
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
         result.append(contract.getName()).append(" -> (");
         boolean first = true;
-        for(DependencyNode currentNode : dependencies.keySet()) {
+        for (DependencyNode currentNode : dependencies.keySet()) {
             if (!first) {
                 result.append(" ");
             }

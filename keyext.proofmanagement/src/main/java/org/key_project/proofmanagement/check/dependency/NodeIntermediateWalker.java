@@ -12,30 +12,37 @@ public abstract class NodeIntermediateWalker {
     /** the root where the walker starts */
     private NodeIntermediate root;
 
-    /** create a walker starting from the given root
+    /**
+     * create a walker starting from the given root
+     *
      * @param root the root of the intermediate proof representation
      */
     public NodeIntermediateWalker(NodeIntermediate root) {
         this.root = root;
     }
 
-    /** starts the walker*/
+    /** starts the walker */
     public void start() {
         walk(root);
     }
 
-    /** walks the tree while performing specified action
+    /**
+     * walks the tree while performing specified action
+     *
      * @param node the current position of the walker in tree
      */
     protected void walk(NodeIntermediate node) {
         doAction(node);
-        
+
         for (NodeIntermediate child : node.getChildren()) {
             walk(child);
         }
     }
 
-    /** the action to be performed just before leaving the node the last time
-     * @param node the current position of the walker */
+    /**
+     * the action to be performed just before leaving the node the last time
+     *
+     * @param node the current position of the walker
+     */
     protected abstract void doAction(NodeIntermediate node);
 }

@@ -9,10 +9,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 
 import org.key_project.proofmanagement.io.ProofBundleHandler;
-
-import javax.annotation.Nonnull;
 
 /**
  * This class tests if all given proof is consistent w.r.t. the files contained.
@@ -24,7 +23,7 @@ public class FilesChecker {
     public interface CheckedFunction<T, R> {
         R apply(T t) throws IOException;
     }
-    
+
     static boolean listOfPathsConsistent(@Nonnull List<Path> paths) {
         boolean res = true;
         Path reference = paths.get(0);
@@ -46,9 +45,11 @@ public class FilesChecker {
     }
 
     private static boolean bootclasspathsConsistent(Path a, Path b) {
-        /* TODO: At the moment, we do not compare internal/implicit bcp (JavaRedux shipped with KeY)
-         *  and explicitly given bcp, i.e. we might consider the bcps mistakenly inconsistent.
-         *  We might relax that for the future. */
+        /*
+         * TODO: At the moment, we do not compare internal/implicit bcp (JavaRedux shipped with KeY)
+         * and explicitly given bcp, i.e. we might consider the bcps mistakenly inconsistent.
+         * We might relax that for the future.
+         */
         return pathsConsistent(a, b, FilesChecker::collectBcpFiles);
     }
 
@@ -62,13 +63,15 @@ public class FilesChecker {
         }
     }
 
-    /* Two paths are considered consistent if all files (recursively) inside pathA which are also
+    /*
+     * Two paths are considered consistent if all files (recursively) inside pathA which are also
      * present in b (at the same location) have the same content. However, both paths are allowed to
-     * contain additional unique files. */
+     * contain additional unique files.
+     */
     private static boolean pathsConsistent(Path a, Path b,
-                                           CheckedFunction<ProofBundleHandler, List<Path>> f) {
+            CheckedFunction<ProofBundleHandler, List<Path>> f) {
         try (ProofBundleHandler pha = ProofBundleHandler.createBundleHandler(a);
-             ProofBundleHandler phb = ProofBundleHandler.createBundleHandler(b)) {
+                ProofBundleHandler phb = ProofBundleHandler.createBundleHandler(b)) {
             List<Path> filesA = f.apply(pha);
             List<Path> filesB = f.apply(phb);
 
@@ -102,12 +105,14 @@ public class FilesChecker {
 
     /**
      * Reads the file with the given path and computes the SHA256 checksum of it.
+     *
      * @param path path of the file
      * @return md5 checksum of the file
      * @throws NoSuchAlgorithmException if the MD5 checksum is not available for some reason
      * @throws IOException if the file with the given path does not exist or can not be read
      */
-    public static byte[] createSHA256Checksum(Path path) throws NoSuchAlgorithmException, IOException {
+    public static byte[] createSHA256Checksum(Path path)
+            throws NoSuchAlgorithmException, IOException {
         MessageDigest complete = MessageDigest.getInstance("SHA-256");
         try (InputStream fis = new FileInputStream(path.toFile())) {
             byte[] buffer = new byte[1024];
@@ -124,8 +129,9 @@ public class FilesChecker {
     }
 
     /*
-    @Override
-    public CheckResult check(List<Path> proofFiles) {
-        return new CheckResult(listOfPathsConsistent(proofFiles));
-    }*/
+     * @Override
+     * public CheckResult check(List<Path> proofFiles) {
+     * return new CheckResult(listOfPathsConsistent(proofFiles));
+     * }
+     */
 }

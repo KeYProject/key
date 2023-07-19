@@ -7,15 +7,15 @@ import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.consistency.TrivialFileRepo;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.ProgressMonitor;
+
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
-//TODO: precise user feedback
+// TODO: precise user feedback
 
 /**
  * This class checks if the settings of the given proofs are consistent.
@@ -25,18 +25,18 @@ import org.key_project.proofmanagement.io.ProofBundleHandler;
  */
 public class SettingsChecker implements Checker {
 
-    //TODO: it is not checked that this is a equivalence relation, but thats probably okay.
+    // TODO: it is not checked that this is a equivalence relation, but thats probably okay.
     // Setting not explicitly listed here are assumed to be compatible iff equal
     private static final Map<String, Set<Set<String>>> choiceCompatibilityClasses = new HashMap<>();
 
     static {
-        String[] strings = {"moreSeqRules:off", "moreSeqRules:on"};
+        String[] strings = { "moreSeqRules:off", "moreSeqRules:on" };
         Set<String> inner = new HashSet<>(Arrays.asList(strings));
         Set<Set<String>> outer = Collections.singleton(inner);
         choiceCompatibilityClasses.put("moreSeqRules", outer);
     }
 
-    //TODO: Carry file info with the data to allow for good user feedback
+    // TODO: Carry file info with the data to allow for good user feedback
     @Override
     public void check(ProofBundleHandler pbh, CheckerData data) throws ProofManagementException {
         data.addCheck("settings");
@@ -68,7 +68,8 @@ public class SettingsChecker implements Checker {
         data.print(LogLevel.INFO, "Settings check completed!");
     }
 
-    /* notes:
+    /*
+     * notes:
      * - every unique set of settings gets an id
      * - id is stored inside proof entry
      * - mapping from id to set of settings is shown in a table below the proof lines
@@ -76,7 +77,7 @@ public class SettingsChecker implements Checker {
      * - settings inconsistent to the first one are marked red in proof line, others green
      */
 
-    //TODO: SMT settings ignored for now! (strategy settings should be irrelevant)
+    // TODO: SMT settings ignored for now! (strategy settings should be irrelevant)
     private static boolean consistent(List<ProofSettings> proofSettings, CheckerData data) {
 
         // TODO change to map Settings -> ProofEntry (for feedback)
@@ -89,7 +90,7 @@ public class SettingsChecker implements Checker {
     }
 
     private static boolean choicesConsistent(List<ChoiceSettings> choiceSettings,
-                                             CheckerData data) {
+            CheckerData data) {
         if (choiceSettings.isEmpty()) {
             return true;
         }
@@ -111,7 +112,7 @@ public class SettingsChecker implements Checker {
                 data.addReferenceChoices(cs);
 
                 data.print(LogLevel.DEBUG, "Found (currently) unique settings (assigned id " +
-                        data.getChoices2Id().get(cs) + "): " + cs);
+                    data.getChoices2Id().get(cs) + "): " + cs);
 
                 // at least one of the entries is different:
                 // in this case we have to check if all entries are compatible
@@ -120,17 +121,17 @@ public class SettingsChecker implements Checker {
                     // one of them has a setting with an additional key
 
                     // do not return directly to compare other settings too
-                    //return false;
+                    // return false;
                     consistent = false;
                     data.print(LogLevel.DEBUG, "Incompatible (additional key found)!");
                 }
-                for (String key: refChoices.keySet()) {
+                for (String key : refChoices.keySet()) {
                     if (!compatible(new Choice(new Name(key), refChoices.get(key)),
-                            new Choice(new Name(key), cs.get(key)))) {
+                        new Choice(new Name(key), cs.get(key)))) {
                         // found at least one different value
 
                         // do not return directly to compare other settings too
-                        //return false;
+                        // return false;
                         consistent = false;
                         data.print(LogLevel.DEBUG, "Incompatible (different values found)!");
                     }
@@ -140,7 +141,7 @@ public class SettingsChecker implements Checker {
                 data.addChoices(cs);
                 // settings from cs are identical to reference
                 data.print(LogLevel.DEBUG, "These settings already exist (with id " +
-                        data.getChoices2Id().get(cs) + "): " + cs);
+                    data.getChoices2Id().get(cs) + "): " + cs);
             }
         }
         return consistent;
@@ -156,9 +157,11 @@ public class SettingsChecker implements Checker {
 
         if (choiceCompatibilityClasses.containsKey(a.name().toString())) {
 
-            for (Set<String> compatibilityClass: choiceCompatibilityClasses.get(a.name().toString())) {
+            for (Set<String> compatibilityClass : choiceCompatibilityClasses
+                    .get(a.name().toString())) {
 
-                if (compatibilityClass.contains(a.category()) && compatibilityClass.contains(b.category())){
+                if (compatibilityClass.contains(a.category())
+                        && compatibilityClass.contains(b.category())) {
                     return true;
                 }
             }

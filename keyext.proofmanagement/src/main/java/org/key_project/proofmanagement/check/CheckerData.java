@@ -1,18 +1,5 @@
 package org.key_project.proofmanagement.check;
 
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
-import de.uka.ilkd.key.proof.io.IntermediatePresentationProofFileParser;
-import de.uka.ilkd.key.settings.ChoiceSettings;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.SLEnvInput;
-import org.key_project.proofmanagement.check.dependency.DependencyGraph;
-import org.key_project.proofmanagement.io.ProofBundleHandler;
-import org.key_project.proofmanagement.io.LogLevel;
-import org.key_project.proofmanagement.io.Logger;
-
 import java.net.URL;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -25,6 +12,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
+import de.uka.ilkd.key.proof.io.IntermediatePresentationProofFileParser;
+import de.uka.ilkd.key.settings.ChoiceSettings;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.SLEnvInput;
+
+import org.key_project.proofmanagement.check.dependency.DependencyGraph;
+import org.key_project.proofmanagement.io.LogLevel;
+import org.key_project.proofmanagement.io.Logger;
+import org.key_project.proofmanagement.io.ProofBundleHandler;
 
 /**
  * This container serves for accumulating data given to checkers and results returned by them.
@@ -42,7 +43,7 @@ public final class CheckerData implements Logger {
     }
 
     private final String checkDate = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                                                      .format(LocalDateTime.now());
+            .format(LocalDateTime.now());
 
     private final Map<String, String> checks = new HashMap<>();
 
@@ -103,6 +104,7 @@ public final class CheckerData implements Logger {
      * id. Use only if it is known that the given choices object is not yet in the map!
      * In addition, an entry in the map for id lookup is added ({@link #addChoices(Map)} is
      * called).
+     *
      * @param choices the reference choices to add
      */
     public void addReferenceChoices(Map<String, String> choices) {
@@ -117,6 +119,7 @@ public final class CheckerData implements Logger {
     /**
      * Adds a mapping to a reference choices id for the given choices. Use only if an equal
      * reference choices object has already been added via {@link #addReferenceChoices(Map)}.
+     *
      * @param choices the choices to add a mapping
      */
     public void addChoices(Map<String, String> choices) {
@@ -132,6 +135,7 @@ public final class CheckerData implements Logger {
     /**
      * Prepare short names for concise display of ChoiceSettings:
      * In the values, everything up to and including the colon is removed.
+     *
      * @return a map of choice settings to reference id, using short choice values
      */
     public Map<Map<String, String>, Integer> getShortChoices2Id() {
@@ -156,9 +160,9 @@ public final class CheckerData implements Logger {
 
     private LoadingState srcLoadingState = LoadingState.UNKNOWN;
     // we use methods to determine these states on the fly
-    //private LoadingState proofLoadingState = LoadingState.UNKNOWN;
-    //private ReplayState replayState = ReplayState.UNKNOWN;
-    //private DependencyState depState = DependencyState.UNKNOWN;
+    // private LoadingState proofLoadingState = LoadingState.UNKNOWN;
+    // private ReplayState replayState = ReplayState.UNKNOWN;
+    // private DependencyState depState = DependencyState.UNKNOWN;
     private SettingsState settingsState = SettingsState.UNKNOWN;
     private GlobalState globalState = GlobalState.UNKNOWN;
 
@@ -190,11 +194,12 @@ public final class CheckerData implements Logger {
     }
 
     public enum ReplayState {
-        ERROR("\u2718"),   // cross/xmark
+        ERROR("\u2718"), // cross/xmark
         UNKNOWN("?"),
         SUCCESS("\u2714"); // checkmark
 
         private final String shortStr;
+
         ReplayState(String shortStr) {
             this.shortStr = shortStr;
         }
@@ -206,11 +211,12 @@ public final class CheckerData implements Logger {
     }
 
     public enum LoadingState {
-        ERROR("\u2718"),   // cross/xmark
+        ERROR("\u2718"), // cross/xmark
         UNKNOWN("?"),
         SUCCESS("\u2714"); // checkmark
 
         private final String shortStr;
+
         LoadingState(String shortStr) {
             this.shortStr = shortStr;
         }
@@ -228,6 +234,7 @@ public final class CheckerData implements Logger {
         OK("\u2714"); // checkmark
 
         private final String shortStr;
+
         DependencyState(String shortStr) {
             this.shortStr = shortStr;
         }
@@ -244,6 +251,7 @@ public final class CheckerData implements Logger {
         CLOSED("closed");
 
         private final String shortStr;
+
         ProofState(String shortStr) {
             this.shortStr = shortStr;
         }
@@ -401,13 +409,13 @@ public final class CheckerData implements Logger {
         if (srcLoadingState == LoadingState.ERROR
                 || proofLoadingState == LoadingState.ERROR
                 || replayState == ReplayState.ERROR) {
-            globalState = GlobalState.ERROR;                                // error
+            globalState = GlobalState.ERROR; // error
         } else if (srcLoadingState == LoadingState.UNKNOWN
                 || proofLoadingState == LoadingState.UNKNOWN
                 || replayState == ReplayState.UNKNOWN
                 || settingsState == SettingsState.UNKNOWN
                 || depState == DependencyState.UNKNOWN) {
-            globalState = GlobalState.UNKNOWN;                              // unknown
+            globalState = GlobalState.UNKNOWN; // unknown
         } else if (srcLoadingState == LoadingState.SUCCESS
                 && proofLoadingState == LoadingState.SUCCESS
                 && replayState == ReplayState.SUCCESS
@@ -415,9 +423,9 @@ public final class CheckerData implements Logger {
                 && depState == DependencyState.OK
                 && contractsWithoutProof.isEmpty()
                 && proofEntries.stream().allMatch(p -> p.proofState == ProofState.CLOSED)) {
-            globalState = GlobalState.CLOSED;                               // closed
+            globalState = GlobalState.CLOSED; // closed
         } else {
-            globalState = GlobalState.OPEN;                                 // open
+            globalState = GlobalState.OPEN; // open
         }
     }
 

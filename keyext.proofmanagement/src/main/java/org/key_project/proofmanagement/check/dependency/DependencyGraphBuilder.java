@@ -1,15 +1,16 @@
 package org.key_project.proofmanagement.check.dependency;
 
+import java.util.List;
+import java.util.Map;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
+
 import org.key_project.proofmanagement.check.CheckerData;
 import org.key_project.proofmanagement.io.Logger;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * A builder providing a static factory method for building dependency graphs.
@@ -19,12 +20,13 @@ import java.util.Map;
 public abstract class DependencyGraphBuilder {
     /**
      * Builds a new DependencyGraph from the given proof entries.
+     *
      * @param proofEntries the proof entries to build the graph from
      * @param logger the logger to print out error messages generated during graph creation
      * @return the newly created DependencyGraph
      */
     public static DependencyGraph buildGraph(List<CheckerData.ProofEntry> proofEntries,
-                                             Logger logger) {
+            Logger logger) {
 
         DependencyGraph graph = new DependencyGraph();
 

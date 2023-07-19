@@ -20,8 +20,10 @@ public enum LogLevel {
     /** Log level for warnings. */
     WARNING("[   Warning   ] "),
 
-    /** Log level for critical errors where further checks have to be aborted.
-     * This should always be printed by the logger.*/
+    /**
+     * Log level for critical errors where further checks have to be aborted.
+     * This should always be printed by the logger.
+     */
     ERROR("[    Error    ] ");
 
     /** prefix of the log level */
@@ -29,6 +31,7 @@ public enum LogLevel {
 
     /**
      * Creates a new LogLevel with the given prefix
+     *
      * @param prefix print prefix of the log level
      */
     LogLevel(String prefix) {

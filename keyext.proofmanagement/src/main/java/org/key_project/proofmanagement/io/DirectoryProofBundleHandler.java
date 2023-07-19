@@ -1,8 +1,5 @@
 package org.key_project.proofmanagement.io;
 
-import org.key_project.proofmanagement.check.PathNode;
-import org.key_project.proofmanagement.check.ProofManagementException;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,6 +9,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.key_project.proofmanagement.check.PathNode;
+import org.key_project.proofmanagement.check.ProofManagementException;
 
 /**
  * ProofBundleHandler for a directory that respects the bundle file hierarchy.
@@ -24,6 +24,7 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
 
     /**
      * Creates a new DirectoryProofBundleHandler for a directory with the given path.
+     *
      * @param rootPath the path of the root directory of the bundle
      */
     DirectoryProofBundleHandler(Path rootPath) {
@@ -33,6 +34,7 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
     /**
      * Creates a list of those paths of files/directories inside the given directory that are
      * matched by given matcher. The method does not recursively descend into subdirectories.
+     *
      * @param directory the directory to list
      * @param matcher the matcher for filtering
      * @return the list of paths
@@ -41,10 +43,10 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
     private static List<Path> getFiles(Path directory, PathMatcher matcher) throws IOException {
         if (Files.isDirectory(directory)) {
             // IMPORTANT: use try-with-resources here to ensure the stream is closed and does not
-            //  prevent the files from deletion on Windows!
+            // prevent the files from deletion on Windows!
             try (Stream<Path> stream = Files.list(directory)) {
                 return stream.filter(matcher::matches)
-                             .collect(Collectors.toList());
+                        .collect(Collectors.toList());
             }
         }
         return Collections.emptyList();

@@ -1,5 +1,16 @@
 package org.key_project.proofmanagement.check;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.nio.file.Path;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.Services;
@@ -32,23 +43,13 @@ import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProgressMonitor;
+
 import org.key_project.proofmanagement.check.dependency.DependencyGraph;
 import org.key_project.proofmanagement.check.dependency.DependencyGraphBuilder;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 import org.key_project.util.reflection.ClassLoaderUtil;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.nio.file.Path;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
-import java.util.stream.Collectors;
 
 /**
  * This class provides static methods to access the prover (KeY).
@@ -63,13 +64,14 @@ public final class KeYFassade {
     /**
      * Ensures that the given CheckerData object has a valid DependencyGraph built.
      * Does not update an existing DependencyGraph!
+     *
      * @param data the CheckerData object to store the result
      */
     public static void ensureDependencyGraphBuilt(CheckerData data) {
         if (data.getDependencyGraph() == null) {
             // construct dependency graph from data stored in CheckerData object
             // TODO: the analysis as currently implemented assumes there is
-            //  exactly one proof for each contract!!!
+            // exactly one proof for each contract!!!
             DependencyGraph graph = DependencyGraphBuilder.buildGraph(data.getProofEntries(), data);
             data.setDependencyGraph(graph);
         }
@@ -79,6 +81,7 @@ public final class KeYFassade {
      * Ensures that the given proof files are loaded and the ASTs are stored inside the
      * CheckerData object. Does not replay the proofs! Proofs that already have been loaded
      * are not reloaded.
+     *
      * @param data the CheckerData object to store the result
      * @throws ProofManagementException
      */
@@ -87,7 +90,7 @@ public final class KeYFassade {
         try {
             // for each proof: parse and construct intermediate AST
             Iterator<Path> iterator = proofPaths.iterator();
-            //for (Path proofPath : proofPaths) {
+            // for (Path proofPath : proofPaths) {
             while (iterator.hasNext()) {
                 Path proofPath = iterator.next();
                 CheckerData.ProofEntry line = ensureProofEntryExists(proofPath, data);
@@ -97,14 +100,15 @@ public final class KeYFassade {
                         // remove invalid line (e.g. from taclet proof)
                         data.getProofEntries().remove(line);
                         // TODO: code quality (hidden side effect):
-                        //  modifies given list of paths to check
+                        // modifies given list of paths to check
                         iterator.remove();
                     }
                 }
             }
         } catch (IOException | ProofInputException e) {
             // TODO: exception handling: better not throw exceptions, but print to log and continue
-            throw new ProofManagementException("Could not load proof! " + System.lineSeparator() + e.toString());
+            throw new ProofManagementException(
+                "Could not load proof! " + System.lineSeparator() + e.toString());
         }
     }
 
@@ -140,12 +144,13 @@ public final class KeYFassade {
         }
 
         // TODO: what if poContainer contains multiple proofs?
-        //Proof proof = proofList.getProof(poContainer.getProofNum());
+        // Proof proof = proofList.getProof(poContainer.getProofNum());
         Proof proof = proofs[0];
         line.proof = proof;
 
         // parse the actual proof tree to an intermediate representation (without replay!)
-        IntermediatePresentationProofFileParser parser = new IntermediatePresentationProofFileParser(proof);
+        IntermediatePresentationProofFileParser parser =
+            new IntermediatePresentationProofFileParser(proof);
         ProblemInitializer pi = line.problemInitializer;
         KeYUserProblemFile keyFile = line.envInput;
         pi.tryReadProof(parser, keyFile);
@@ -170,15 +175,15 @@ public final class KeYFassade {
         /////////////////// comparison to AbstractProblemLoader load
         /////////////////// createEnvInput
         KeYUserProblemFile keyFile = new KeYUserProblemFile(path.getFileName().toString(),
-                path.toFile(), fileRepo, control, profile, false);
-        line.envInput = keyFile;    // store in CheckerData for later use (e.g. in ReplayChecker)
+            path.toFile(), fileRepo, control, profile, false);
+        line.envInput = keyFile; // store in CheckerData for later use (e.g. in ReplayChecker)
 
         /////////////////// createEnvInput
         // TODO: do we need this?
         profile = keyFile.getProfile() == null ? profile : keyFile.getProfile();
 
         ProblemInitializer pi = new ProblemInitializer(control, new Services(profile),
-                new DefaultUserInterfaceControl());
+            new DefaultUserInterfaceControl());
         pi.setFileRepo(fileRepo);
         line.problemInitializer = pi;
 
@@ -195,7 +200,8 @@ public final class KeYFassade {
         properties.setProperty(IPersistablePO.PROPERTY_FILENAME, path.toString());
 
         // more generic version (works e.g. for taclet proofs)
-        IPersistablePO.LoadedPOContainer poContainer = createProofObligationContainer(keyFile, initConfig, properties);
+        IPersistablePO.LoadedPOContainer poContainer =
+            createProofObligationContainer(keyFile, initConfig, properties);
 
         ProofAggregate proofList = pi.startProver(initConfig, poContainer.getProofOblInput());
         for (Proof p : proofList.getProofs()) {
@@ -230,6 +236,7 @@ public final class KeYFassade {
     /**
      * Creates a {@link IPersistablePO.LoadedPOContainer} if available which contains
      * the {@link ProofOblInput} for which a {@link Proof} should be instantiated.
+     *
      * @return The {@link IPersistablePO.LoadedPOContainer} or {@code null} if not available.
      * @throws IOException Occurred Exception.
      */
@@ -243,7 +250,7 @@ public final class KeYFassade {
 
         // Instantiate proof obligation
         if (keyFile instanceof ProofOblInput && chooseContract == null && proofObligation == null) {
-            return new IPersistablePO.LoadedPOContainer((ProofOblInput)keyFile);
+            return new IPersistablePO.LoadedPOContainer((ProofOblInput) keyFile);
         } else if (chooseContract != null && chooseContract.length() > 0) {
             int proofNum = 0;
             String baseContractName = null;
@@ -262,26 +269,34 @@ public final class KeYFassade {
                 baseContractName = chooseContract.substring(0, ind);
             }
             final Contract contract = initConfig.getServices()
-                                                .getSpecificationRepository()
-                                                .getContractByName(baseContractName);
+                    .getSpecificationRepository()
+                    .getContractByName(baseContractName);
             if (contract == null) {
                 throw new RuntimeException("Contract not found: " + baseContractName);
             } else {
-                return new IPersistablePO.LoadedPOContainer(contract.createProofObl(initConfig), proofNum);
+                return new IPersistablePO.LoadedPOContainer(contract.createProofObl(initConfig),
+                    proofNum);
             }
         } else if (proofObligation != null && proofObligation.length() > 0) {
 
             String poClass = properties.getProperty(IPersistablePO.PROPERTY_CLASS);
             if (poClass == null || poClass.isEmpty()) {
-                throw new IOException("Proof obligation class property \"" + IPersistablePO.PROPERTY_CLASS + "\" is not defined or empty.");
+                throw new IOException("Proof obligation class property \""
+                    + IPersistablePO.PROPERTY_CLASS + "\" is not defined or empty.");
             }
             try {
-                // Try to instantiate proof obligation by calling static method: public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException
+                // Try to instantiate proof obligation by calling static method: public static
+                // LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws
+                // IOException
                 Class<?> poClassInstance = ClassLoaderUtil.getClassforName(poClass);
-                Method loadMethod = poClassInstance.getMethod("loadFrom", InitConfig.class, Properties.class);
-                return (IPersistablePO.LoadedPOContainer)loadMethod.invoke(null, initConfig, properties);
+                Method loadMethod =
+                    poClassInstance.getMethod("loadFrom", InitConfig.class, Properties.class);
+                return (IPersistablePO.LoadedPOContainer) loadMethod.invoke(null, initConfig,
+                    properties);
             } catch (Exception e) {
-                throw new IOException("Can't call static factory method \"loadFrom\" on class \"" + poClass + "\".", e);
+                throw new IOException(
+                    "Can't call static factory method \"loadFrom\" on class \"" + poClass + "\".",
+                    e);
             }
         } else {
             return null;
@@ -289,9 +304,11 @@ public final class KeYFassade {
     }
 
     /**
-     * Ensures that a replay is attempted for each proof file in bundle. The replay results are stored
+     * Ensures that a replay is attempted for each proof file in bundle. The replay results are
+     * stored
      * inside the given CheckerData object. Proofs for which a replay has already been tried are not
      * replayed again.
+     *
      * @param data the CheckerData object to store the result
      * @throws ProofManagementException
      */
@@ -313,7 +330,8 @@ public final class KeYFassade {
                             // store result in CheckerData
                             line.replayResult = replayProof(line, envInput, data);
                         } catch (ProofInputException e) {
-                            throw new ProofManagementException("Could not replay proof from " + envInput
+                            throw new ProofManagementException(
+                                "Could not replay proof from " + envInput
                                     + System.lineSeparator() + e.toString());
                         }
                     }
@@ -323,7 +341,7 @@ public final class KeYFassade {
     }
 
     private static ReplayResult replayProof(CheckerData.ProofEntry line, EnvInput envInput,
-                                            Logger logger) throws ProofInputException {
+            Logger logger) throws ProofInputException {
         Proof proof = line.proof;
         logger.print(LogLevel.INFO, "Starting replay of proof " + proof.name());
 
@@ -335,9 +353,9 @@ public final class KeYFassade {
         IntermediateProofReplayer.Result replayResult = null;
 
         final String ossStatus = (String) proof.getSettings()
-                                               .getStrategySettings()
-                                               .getActiveStrategyProperties()
-                                               .get(StrategyProperties.OSS_OPTIONS_KEY);
+                .getStrategySettings()
+                .getActiveStrategyProperties()
+                .get(StrategyProperties.OSS_OPTIONS_KEY);
         ReplayResult result;
         try {
             assert envInput instanceof KeYUserProblemFile;
@@ -349,10 +367,10 @@ public final class KeYFassade {
             // able to load proofs that used it even if the user has currently
             // turned OSS off.
             StrategyProperties newProps = proof.getSettings()
-                                               .getStrategySettings()
-                                               .getActiveStrategyProperties();
+                    .getStrategySettings()
+                    .getActiveStrategyProperties();
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY,
-                                 StrategyProperties.OSS_ON);
+                StrategyProperties.OSS_ON);
             Strategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
 
@@ -365,8 +383,10 @@ public final class KeYFassade {
             lastTouchedNode = lastGoal != null ? lastGoal.node() : proof.root();
 
         } catch (Exception e) {
-            if (parserResult == null || parserResult.getErrors() == null || parserResult.getErrors().isEmpty() ||
-                replayer == null || replayResult == null || replayResult.getErrors() == null || replayResult.getErrors().isEmpty()) {
+            if (parserResult == null || parserResult.getErrors() == null
+                    || parserResult.getErrors().isEmpty() ||
+                    replayer == null || replayResult == null || replayResult.getErrors() == null
+                    || replayResult.getErrors().isEmpty()) {
                 // this exception was something unexpected
                 errors.add(e);
             }
@@ -376,7 +396,9 @@ public final class KeYFassade {
                 status = parserResult.getStatus();
                 errors.addAll(parserResult.getErrors());
             }
-            status += (status.isEmpty() ? "" : "\n\n") + (replayResult != null ? replayResult.getStatus() : "Error while loading proof.");
+            status +=
+                (status.isEmpty() ? "" : "\n\n") + (replayResult != null ? replayResult.getStatus()
+                        : "Error while loading proof.");
             if (replayResult != null) {
                 errors.addAll(replayResult.getErrors());
             }
@@ -413,6 +435,7 @@ public final class KeYFassade {
     /**
      * Ensures that the source files contained by the bundle stored in the given CheckerData object
      * are loaded. Result is stored in CheckerData object as SLEnvInput.
+     *
      * @param data the CheckerData object to store the results
      * @throws ProofManagementException
      */
@@ -443,7 +466,7 @@ public final class KeYFassade {
         } catch (IOException e) {
             data.setSrcLoadingState(CheckerData.LoadingState.ERROR);
             throw new ProofManagementException("Java sources could not be loaded."
-                    + System.lineSeparator() + e.getMessage());
+                + System.lineSeparator() + e.getMessage());
         }
     }
 }

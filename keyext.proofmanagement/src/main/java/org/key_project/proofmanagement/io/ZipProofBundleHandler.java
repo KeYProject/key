@@ -1,15 +1,15 @@
 package org.key_project.proofmanagement.io;
 
-import org.key_project.proofmanagement.check.PathNode;
-import org.key_project.proofmanagement.check.ProofManagementException;
-import org.key_project.util.java.IOUtil;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
+
+import org.key_project.proofmanagement.check.PathNode;
+import org.key_project.proofmanagement.check.ProofManagementException;
+import org.key_project.util.java.IOUtil;
 
 /**
  * A ProofBundleHandler for a proof bundle stored inside a zip file
@@ -31,9 +31,9 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
     private boolean closed = false;
 
     // TODO: using ZipFileSystem is not possible, since KeY uses File objects as input
-    //  (a Path from a ZipFileSystemProvider can not be converted to a File)
-    //  Probably this part of KeY can be rewritten using Path instead of File?
-    //private final FileSystem fs;
+    // (a Path from a ZipFileSystemProvider can not be converted to a File)
+    // Probably this part of KeY can be rewritten using Path instead of File?
+    // private final FileSystem fs;
 
     /** path of the temporary directory the bundle contents are unzipped to */
     private final Path tmpDir;
@@ -43,12 +43,13 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
 
     /**
      * Create a new ZipProofBundleHandler for the zipped bundle with the given path.
+     *
      * @param zipPath the path of the zip (usually, the file extension is "zproof")
      * @throws IOException if an I/O error occurs
      */
     ZipProofBundleHandler(Path zipPath) throws IOException {
         this.zipPath = zipPath;
-        //fs = FileSystems.newFileSystem(zipPath, null);
+        // fs = FileSystems.newFileSystem(zipPath, null);
 
         // extract to temporary directory and create a DirectoryProofBundleHandler for it
         tmpDir = Files.createTempDirectory("KeY_PM_unzip");
@@ -79,49 +80,49 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
 
     @Override
     public List<Path> getProofFiles() throws ProofManagementException {
-        //return getFiles(fs.getPath("/"), ProofBundleHandler.PROOF_MATCHER);
+        // return getFiles(fs.getPath("/"), ProofBundleHandler.PROOF_MATCHER);
         return dbh.getProofFiles();
     }
 
     @Override
     public List<Path> getKeYFiles() throws IOException {
-        //return getFiles(fs.getPath("/"), ProofBundleHandler.KEY_MATCHER);
+        // return getFiles(fs.getPath("/"), ProofBundleHandler.KEY_MATCHER);
         return dbh.getKeYFiles();
     }
 
     @Override
     public List<Path> getSourceFiles() throws IOException {
-        //return getFiles(fs.getPath("/src"), ProofBundleHandler.SRC_MATCHER);
+        // return getFiles(fs.getPath("/src"), ProofBundleHandler.SRC_MATCHER);
         return dbh.getSourceFiles();
     }
 
     @Override
     public List<Path> getClasspathFiles() throws IOException {
-        //return getFiles(fs.getPath("/classpath"), ProofBundleHandler.SRC_MATCHER);
+        // return getFiles(fs.getPath("/classpath"), ProofBundleHandler.SRC_MATCHER);
         return dbh.getClasspathFiles();
     }
 
     @Override
     public Path getBootclasspath() throws IOException {
-        //return getFiles(fs.getPath("/bootclasspath"), ProofBundleHandler.BOOTCLASSPATH_MATCHER);
+        // return getFiles(fs.getPath("/bootclasspath"), ProofBundleHandler.BOOTCLASSPATH_MATCHER);
         return dbh.getBootclasspath();
     }
 
     @Override
     public PathNode getFileTree() throws IOException {
-//        Path rootPath = fs.getPath("/");
-//        PathNode root = new PathNode(null, rootPath);
-//        Files.walkFileTree(rootPath, new TreeFileVisitor(root));
-//        // prevent double inclusion of root directory itself
-//        // TODO: check why this is necessary
-//        return (PathNode) root.getChildren().first();
+        // Path rootPath = fs.getPath("/");
+        // PathNode root = new PathNode(null, rootPath);
+        // Files.walkFileTree(rootPath, new TreeFileVisitor(root));
+        // // prevent double inclusion of root directory itself
+        // // TODO: check why this is necessary
+        // return (PathNode) root.getChildren().first();
 
         return dbh.getFileTree();
     }
 
     @Override
     public Path getPath(String entryName) {
-        //return fs.getPath(pathString);
+        // return fs.getPath(pathString);
         return dbh.getPath(entryName);
     }
 
@@ -132,14 +133,14 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
             closed = true;
             // delete temporary content from disk
             try (Stream<Path> files = Files.walk(tmpDir)) {
-                 files.sorted(Comparator.reverseOrder())
-                    .forEach(p -> {
-                        try {
-                            Files.delete(p);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    });
+                files.sorted(Comparator.reverseOrder())
+                        .forEach(p -> {
+                            try {
+                                Files.delete(p);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        });
             }
         }
     }

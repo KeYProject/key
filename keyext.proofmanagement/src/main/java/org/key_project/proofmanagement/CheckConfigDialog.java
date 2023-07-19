@@ -1,13 +1,13 @@
 package org.key_project.proofmanagement;
 
-import de.uka.ilkd.key.gui.KeYFileChooser;
-
-import javax.swing.*;
-import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
 import java.awt.event.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
+
+import de.uka.ilkd.key.gui.KeYFileChooser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +38,8 @@ class CheckConfigDialog extends JDialog {
     private class ProofManagementCheckWorker extends SwingWorker<Void, Void> {
         @Override
         protected Void doInBackground() throws Exception {
-            Path reportPath = reportFileField.getText().isEmpty() ? null :
-                Paths.get(reportFileField.getText(), "report.html");
+            Path reportPath = reportFileField.getText().isEmpty() ? null
+                    : Paths.get(reportFileField.getText(), "report.html");
             Main.check(missingProofsCheck.isSelected(),
                 settingsCheck.isSelected(),
                 replayCheck.isSelected(),

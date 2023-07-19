@@ -12,6 +12,7 @@ public class PathNode extends Node<Path> {
 
     /**
      * Creates a new PathNode with given parent and content.
+     *
      * @param parent the parent of the new node
      * @param element the Path to store at the new PathNode
      */

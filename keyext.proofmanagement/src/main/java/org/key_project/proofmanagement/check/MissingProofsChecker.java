@@ -1,5 +1,8 @@
 package org.key_project.proofmanagement.check;
 
+import java.net.URI;
+import java.util.*;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
@@ -12,11 +15,9 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
+
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
-
-import java.net.URI;
-import java.util.*;
 
 /**
  * Checks that there exists a proof for every contract.
@@ -38,13 +39,15 @@ public class MissingProofsChecker implements Checker {
         Profile profile = AbstractProfile.getDefaultProfile();
         ProgressMonitor control = ProgressMonitor.Empty.getInstance();
         ProblemInitializer pi = new ProblemInitializer(control, new Services(profile),
-                new DefaultUserInterfaceControl());
+            new DefaultUserInterfaceControl());
         pi.setFileRepo(new TrivialFileRepo());
 
         SLEnvInput slenv = data.getSlenv();
 
-        /* check that for all contracts found in Java source (in directory "src" in bundle)
-         * there is a proof */
+        /*
+         * check that for all contracts found in Java source (in directory "src" in bundle)
+         * there is a proof
+         */
         try {
             InitConfig ic = pi.prepare(slenv);
             SpecificationRepository specRepo = ic.getServices().getSpecificationRepository();
@@ -58,7 +61,7 @@ public class MissingProofsChecker implements Checker {
             reportContractsWithoutProof(contracts, data);
         } catch (ProofInputException e) {
             throw new ProofManagementException("EnvInput could not be loaded!"
-                    + System.lineSeparator() + e.getMessage());
+                + System.lineSeparator() + e.getMessage());
         }
     }
 

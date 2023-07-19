@@ -1,15 +1,15 @@
 package org.key_project.proofmanagement.merge;
 
-import org.key_project.proofmanagement.check.ProofManagementException;
-import org.key_project.proofmanagement.io.LogLevel;
-import org.key_project.proofmanagement.io.Logger;
-import org.key_project.proofmanagement.io.ProofBundleHandler;
-
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.*;
 import java.util.HashMap;
 import java.util.List;
+
+import org.key_project.proofmanagement.check.ProofManagementException;
+import org.key_project.proofmanagement.io.LogLevel;
+import org.key_project.proofmanagement.io.Logger;
+import org.key_project.proofmanagement.io.ProofBundleHandler;
 
 public class ProofBundleMerger {
     private ProofBundleMerger() {
@@ -17,12 +17,13 @@ public class ProofBundleMerger {
 
     /**
      * This method merges n proof bundles into a single one.
+     *
      * @param inputs the paths to the input bundles to merge
      * @param output the target path (will be zipped)
      * @throws ProofManagementException if any of the files can not be accessed
      */
     public static void merge(List<Path> inputs, Path output, boolean force, Logger logger)
-        throws ProofManagementException {
+            throws ProofManagementException {
 
         boolean consistent = FilesChecker.listOfPathsConsistent(inputs);
         if (consistent) {

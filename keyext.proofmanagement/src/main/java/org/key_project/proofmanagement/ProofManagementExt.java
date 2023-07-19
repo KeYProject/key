@@ -1,20 +1,19 @@
 package org.key_project.proofmanagement;
 
+import java.awt.event.*;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
-
-import javax.annotation.Nonnull;
-import javax.swing.*;
-import java.awt.event.*;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author Wolfram Pfeifer
  * @version 1 (16/09/2021)
  */
-@KeYGuiExtension.Info(name="Proof management",
+@KeYGuiExtension.Info(name = "Proof management",
     optional = true,
     description = "Allows to run soundness checks on proof bundles.",
     experimental = false)
@@ -33,7 +32,7 @@ public class ProofManagementExt implements
     private static class CheckAction extends KeyAction {
         private CheckAction() {
             putValue(NAME, "Check proof bundle ...");
-            //putValue(SMALL_ICON, IconFactory.INTERLOG_TRY_APPLY.get());
+            // putValue(SMALL_ICON, IconFactory.INTERLOG_TRY_APPLY.get());
             setMenuPath(MENU_PM);
         }
 
@@ -48,34 +47,34 @@ public class ProofManagementExt implements
 
     // TODO: not yet implemented
     /*
-    private static class MergeAction extends KeyAction {
-        private MergeAction() {
-            putValue(NAME, "Merge proof bundles ...");
-            //putValue(SMALL_ICON, IconFactory.INTERLOG_TRY_APPLY.get());
-            setMenuPath(MENU_PM);
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-
-        }
-    }
+     * private static class MergeAction extends KeyAction {
+     * private MergeAction() {
+     * putValue(NAME, "Merge proof bundles ...");
+     * //putValue(SMALL_ICON, IconFactory.INTERLOG_TRY_APPLY.get());
+     * setMenuPath(MENU_PM);
+     * }
+     *
+     * @Override
+     * public void actionPerformed(ActionEvent e) {
+     *
+     * }
+     * }
      */
 
     // TODO: not yet implemented
     /*
-    private static class BundleAction extends KeyAction {
-        private BundleAction() {
-            putValue(NAME, "Create proof bundle from directory ...");
-            //putValue(SMALL_ICON, IconFactory.INTERLOG_TRY_APPLY.get());
-            setMenuPath(MENU_PM);
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-
-        }
-    }
+     * private static class BundleAction extends KeyAction {
+     * private BundleAction() {
+     * putValue(NAME, "Create proof bundle from directory ...");
+     * //putValue(SMALL_ICON, IconFactory.INTERLOG_TRY_APPLY.get());
+     * setMenuPath(MENU_PM);
+     * }
+     *
+     * @Override
+     * public void actionPerformed(ActionEvent e) {
+     *
+     * }
+     * }
      */
 
     public static void main(String[] args) {

@@ -1,44 +1,44 @@
 package org.key_project.proofmanagement.check;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.key_project.proofmanagement.check.dependency.DependencyGraph;
 import org.key_project.proofmanagement.check.dependency.DependencyNode;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
-
-import java.util.HashSet;
-import java.util.Set;
 
 import static org.key_project.proofmanagement.check.dependency.DependencyGraph.EdgeType.TERMINATION_SENSITIVE;
 
 /**
  * Checks for illegal cyclic dependencies between proofs.<br>
  * Algorithm description:
- *  <ul>
- *      <li>create the dependency graph:<br>
- *          for each proof p
- *          <ul>
- *              <li>create a node containing the contract of p</li>
- *              <li>create edges for proofs p depends on, i.e. to all contracts applied in p
- *                  (operation contracts, dependency contracts, model method contract axioms)</li>
- *              <li>for each edge store if termination has to be proven. This is the case if:
- *                  <ul>
- *                      <li>an operation contract has been applied under diamond modality or</li>
- *                      <li>the applied contract is a dependency contract or</li>
- *                      <li>a contract axiom for a model method has been applied</li>
- *                  </ul>
- *              </li>
- *          </ul>
- *      </li>
- *      <li>calculate the strongly connected components (SCCs) of the graph (only considering
- *          termination sensitive edges</li>
- *      <li>check for each SCC that each contract has a decreases clause or all edges
- *          are termination insensitive</li>
+ * <ul>
+ * <li>create the dependency graph:<br>
+ * for each proof p
+ * <ul>
+ * <li>create a node containing the contract of p</li>
+ * <li>create edges for proofs p depends on, i.e. to all contracts applied in p
+ * (operation contracts, dependency contracts, model method contract axioms)</li>
+ * <li>for each edge store if termination has to be proven. This is the case if:
+ * <ul>
+ * <li>an operation contract has been applied under diamond modality or</li>
+ * <li>the applied contract is a dependency contract or</li>
+ * <li>a contract axiom for a model method has been applied</li>
+ * </ul>
+ * </li>
+ * </ul>
+ * </li>
+ * <li>calculate the strongly connected components (SCCs) of the graph (only considering
+ * termination sensitive edges</li>
+ * <li>check for each SCC that each contract has a decreases clause or all edges
+ * are termination insensitive</li>
  * </ul>
  *
  * Possible results are:
  * <ul>
- *      <li>no unsound dependencies</li>
- *      <li>illegal cycle (termination arguments needed for contracts ...)</li>
+ * <li>no unsound dependencies</li>
+ * <li>illegal cycle (termination arguments needed for contracts ...)</li>
  * </ul>
  *
  * <b>Note:</b> We do not check if the contract actually is applicable (i.e. no box contract is
@@ -48,8 +48,10 @@ import static org.key_project.proofmanagement.check.dependency.DependencyGraph.E
  */
 public class DependencyChecker implements Checker {
 
-    /** data container used to store checker result and share intermediate data
-     * (for example proof AST, dependency graph, ...) */
+    /**
+     * data container used to store checker result and share intermediate data
+     * (for example proof AST, dependency graph, ...)
+     */
     private CheckerData data;
 
     @Override
@@ -69,7 +71,7 @@ public class DependencyChecker implements Checker {
         // check if graph contains illegal cycles
         if (hasIllegalCycles(graph)) {
             data.print(LogLevel.WARNING, "Illegal cyclic dependency found" +
-                    " (further illegal cycles may exist but will not be reported)!");
+                " (further illegal cycles may exist but will not be reported)!");
         } else {
             data.print(LogLevel.INFO, "No illegal dependencies found.");
         }
@@ -90,7 +92,7 @@ public class DependencyChecker implements Checker {
             }
         } else {
             data.print(LogLevel.INFO, "Replay is disabled. Skipping check for unproven" +
-                    "dependencies");
+                "dependencies");
         }
 
         data.print(LogLevel.INFO, "Dependency checks completed!");
@@ -102,11 +104,12 @@ public class DependencyChecker implements Checker {
         KeYFassade.ensureProofsReplayed(data);
 
         // TODO: probably, topological sorting from Tarjan could be used for speedup ...
-        /* time complexity in O(n*n):
+        /*
+         * time complexity in O(n*n):
          * C <- find closed proofs without dependencies
          * while (C gets larger)
-         *     n <- find node that has only dependencies in C
-         *     C <- C + n
+         * n <- find node that has only dependencies in C
+         * C <- C + n
          */
         Set<DependencyNode> closed = new HashSet<>();
         boolean changed = true;
@@ -123,15 +126,15 @@ public class DependencyChecker implements Checker {
                             // update status in data object
                             entry.dependencyState = CheckerData.DependencyState.OK;
                             data.print(LogLevel.INFO, "Proof is closed and has no" +
-                                    " unproven dependencies: " + entry.proof.name());
+                                " unproven dependencies: " + entry.proof.name());
 
                             changed = true;
                         }
                     }
-                    //else {
-                    //    // These nodes have been created during intermediate proof tree traversal.
-                    //    // There is no proof for them, therefore they are not considered closed.
-                    //}
+                    // else {
+                    // // These nodes have been created during intermediate proof tree traversal.
+                    // // There is no proof for them, therefore they are not considered closed.
+                    // }
                 }
             }
         }
@@ -145,7 +148,7 @@ public class DependencyChecker implements Checker {
                     && entry.replayState == CheckerData.ReplayState.SUCCESS) {
                 entry.dependencyState = CheckerData.DependencyState.UNPROVEN_DEP;
                 data.print(LogLevel.WARNING, "Unproven dependencies found for proof "
-                        + entry.proof.name());
+                    + entry.proof.name());
                 hasUnprovenDeps = true;
             }
         }
@@ -155,6 +158,7 @@ public class DependencyChecker implements Checker {
 
     /**
      * Checks if the given graph is legal, i.e. has no unsound cyclic dependencies.
+     *
      * @param graph the graph to check
      * @return true iff the graph is legal
      */
@@ -162,8 +166,8 @@ public class DependencyChecker implements Checker {
 
         for (DependencyGraph.SCC scc : graph.getAllSCCs()) {
             // IMPORTANT: we do not check that the modalities inside a cycle match,
-            //  i.e. that from diamond modalities only "diamond" contracts are used ...
-            //  This (check that a rule is actually applicable) is the job of the replay checker!
+            // i.e. that from diamond modalities only "diamond" contracts are used ...
+            // This (check that a rule is actually applicable) is the job of the replay checker!
 
             if (!terminationInsensitive(scc) && !terminationEnsured(scc)) {
                 scc.setLegal(false);
@@ -172,19 +176,20 @@ public class DependencyChecker implements Checker {
                 for (DependencyNode n : scc.getNodes()) {
                     CheckerData.ProofEntry entry = data.getProofEntryByContract(n.getContract());
                     // TODO: entry == null can not happen
-                    //  (if node has dependencies it has been parsed,
-                    //  thus also a proof entry exists)
+                    // (if node has dependencies it has been parsed,
+                    // thus also a proof entry exists)
                     // assert entry != null;
                     entry.dependencyState = CheckerData.DependencyState.ILLEGAL_CYCLE;
                 }
-                return true;        // cycle found
+                return true; // cycle found
             }
         }
-        return false;               // no cycle
+        return false; // no cycle
     }
 
     /**
      * Checks if all edges inside the given SCC are termination insensitive.
+     *
      * @param scc the given strongly connected component
      * @return true iff all edges are termination insensitive
      */
@@ -206,6 +211,7 @@ public class DependencyChecker implements Checker {
      * <br>
      * <b>Note:</b> We do not check here that the decreases clause is actually proven/the proof
      * is actually closed.
+     *
      * @param scc the given strongly connected component
      * @return true iff termination is ensured for all contracts in SCC
      */
@@ -217,7 +223,7 @@ public class DependencyChecker implements Checker {
                 if (node.getDependencies().get(next) == TERMINATION_SENSITIVE
                         && !next.getContract().hasMby()) {
                     data.print(LogLevel.WARNING, "Illegal cycle/SCC, contract has no termination"
-                            + " argument: " + node.getContract().getName());
+                        + " argument: " + node.getContract().getName());
                     data.print(LogLevel.WARNING, "The illegal SCC is: " + scc);
                     return false;
                 }

@@ -474,7 +474,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      *
      * @author Dominic Scheurer
      */
-   public static class Result {
+    public static class Result {
         private final List<Throwable> errors;
         private final String status;
         private BranchNodeIntermediate parsedResult = null;

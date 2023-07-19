@@ -206,8 +206,8 @@ public final class CommandLine {
         CommandLine scli = subcommands.get(name);
         if (scli == null) {
             // TODO: problem when no option at all is specified,
-            //  e.g. "pm merge p1.zproof p2.zproof result.zproof"
-            //throw new IllegalArgumentException("No subcommand with name '" + name + "' exists.");
+            // e.g. "pm merge p1.zproof p2.zproof result.zproof"
+            // throw new IllegalArgumentException("No subcommand with name '" + name + "' exists.");
             return null;
         }
         return scli;
@@ -259,7 +259,7 @@ public final class CommandLine {
      */
     public void addText(String description, boolean identToDescriptionColumn) {
         AdditionalHelpText text = new AdditionalHelpText();
-        text.description = description +  "\n";
+        text.description = description + "\n";
         text.indentToDescriptionColumn = identToDescriptionColumn;
         helpElements.add(text);
     }
@@ -310,10 +310,11 @@ public final class CommandLine {
                 // parse options for subcommand
                 usedSubCommand = args[cnt];
                 subcli.parse(Arrays.copyOfRange(args, cnt + 1, args.length));
-            } /* else {
-                // continue without subcommand
-            }
-            */
+            } /*
+               * else {
+               * // continue without subcommand
+               * }
+               */
         }
 
         while (cnt < args.length && args[cnt].startsWith(MINUS)) {

@@ -1,13 +1,5 @@
 package org.key_project.proofmanagement.io;
 
-import org.key_project.proofmanagement.check.CheckerData;
-import org.key_project.proofmanagement.check.PathNode;
-import org.stringtemplate.v4.*;
-import org.stringtemplate.v4.misc.MapModelAdaptor;
-import org.stringtemplate.v4.misc.ObjectModelAdaptor;
-import org.stringtemplate.v4.misc.STMessage;
-import org.stringtemplate.v4.misc.STNoSuchPropertyException;
-
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -15,6 +7,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+
+import org.key_project.proofmanagement.check.CheckerData;
+import org.key_project.proofmanagement.check.PathNode;
+
+import org.stringtemplate.v4.*;
+import org.stringtemplate.v4.misc.MapModelAdaptor;
+import org.stringtemplate.v4.misc.ObjectModelAdaptor;
+import org.stringtemplate.v4.misc.STMessage;
+import org.stringtemplate.v4.misc.STNoSuchPropertyException;
 
 /**
  * Provides a static method to print the check results in HTML format to a given path.
@@ -28,10 +29,11 @@ public final class HTMLReport {
 
     /**
      * Prints out the given check results to a target path.
+     *
      * @param data the check results to print
      * @param target the target path of the output
      * @throws IOException if an error occurs when accessing to the target path or the string
-     * template resources
+     *         template resources
      */
     public static void print(CheckerData data, Path target) throws IOException {
 
@@ -60,6 +62,7 @@ public final class HTMLReport {
 
     /**
      * Set up StringTemplate model adaptors and listeners.
+     *
      * @return the ST object for rendering the HTML report
      * @throws IOException if an error occurs accessing the StringTemplate resources
      */
@@ -78,7 +81,7 @@ public final class HTMLReport {
         group.registerModelAdaptor(Object.class, new ObjectModelAdaptor<>() {
             @Override
             public synchronized Object getProperty(Interpreter interp, ST self, Object o,
-                                                   Object property, String propertyName)
+                    Object property, String propertyName)
                     throws STNoSuchPropertyException {
                 Method m = tryGetMethod(o.getClass(), propertyName);
                 if (m != null) {
@@ -93,12 +96,12 @@ public final class HTMLReport {
         });
 
         // provide access to entrySet property of Maps
-        Class<Map<?, ?>> mapClass = (Class<Map<?, ?>>)(Class)Map.class;
+        Class<Map<?, ?>> mapClass = (Class<Map<?, ?>>) (Class) Map.class;
         group.registerModelAdaptor(mapClass, new MapModelAdaptor() {
             @Override
             public Object getProperty(Interpreter interp, ST self, Map<?, ?> map, Object property,
-                                      String propertyName)
-                throws STNoSuchPropertyException {
+                    String propertyName)
+                    throws STNoSuchPropertyException {
                 if (property.equals("entrySet")) {
                     return map.entrySet();
                 }
@@ -106,17 +109,19 @@ public final class HTMLReport {
             }
         });
 
-        /* This additional ModelAdaptor is workaround needed for access of Node.getValue in string
+        /*
+         * This additional ModelAdaptor is workaround needed for access of Node.getValue in string
          * template, otherwise we would have to add this to build.gradle files in key.ui and
          * keyext.proofmanagement:
-         *    jvmArgs += ['--add-opens', 'java.base/java.util=ALL-UNNAMED'] */
-        Class<Map.Entry<?, ?>> mapEntryClass = (Class<Map.Entry<?, ?>>)(Class)Map.Entry.class;
+         * jvmArgs += ['--add-opens', 'java.base/java.util=ALL-UNNAMED']
+         */
+        Class<Map.Entry<?, ?>> mapEntryClass = (Class<Map.Entry<?, ?>>) (Class) Map.Entry.class;
         group.registerModelAdaptor(mapEntryClass, new ObjectModelAdaptor<>() {
             @Override
             public synchronized Object getProperty(Interpreter interp, ST self,
-                                                   Map.Entry<?, ?> entry, Object property,
-                                                   String propertyName)
-                throws STNoSuchPropertyException {
+                    Map.Entry<?, ?> entry, Object property,
+                    String propertyName)
+                    throws STNoSuchPropertyException {
                 if (property.equals("value")) {
                     return entry.getValue();
                 } else if (property.equals("key")) {
