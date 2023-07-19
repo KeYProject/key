@@ -332,6 +332,10 @@ provable: ./standard_key/java_dl/java5/for_Array.key
 provable: ./standard_key/java_dl/java5/for_Iterable.key
 provable: ./standard_key/java_dl/java5/for_ReferenceArray.key
 provable: ./standard_key/java_dl/jml-bigint/cast.key
+provable: ./standard_key/java_dl/jml-free/invFree1.key
+provable: ./standard_key/java_dl/jml-free/invFree2.key
+provable: ./standard_key/java_dl/jml-free/invFree3.key
+notprovable: ./standard_key/java_dl/jml-free/invFree4.key
 # proof gets very long
 # requires further investigations
 provable: ./standard_key/java_dl/jml-information-flow.key
