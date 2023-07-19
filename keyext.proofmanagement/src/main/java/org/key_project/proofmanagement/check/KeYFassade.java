@@ -62,7 +62,7 @@ public final class KeYFassade {
 
     /**
      * Ensures that the given CheckerData object has a valid DependencyGraph built.
-     * Does not update an existing DependencyContract!
+     * Does not update an existing DependencyGraph!
      * @param data the CheckerData object to store the result
      */
     public static void ensureDependencyGraphBuilt(CheckerData data) {

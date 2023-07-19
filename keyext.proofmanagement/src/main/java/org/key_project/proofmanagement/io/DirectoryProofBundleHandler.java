@@ -61,6 +61,11 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
     }
 
     @Override
+    public Path relativize(Path path) {
+        return rootPath.toAbsolutePath().normalize().relativize(path);
+    }
+
+    @Override
     public List<Path> getProofFiles() throws ProofManagementException {
         try {
             return getFiles(rootPath, ProofBundleHandler.PROOF_MATCHER);

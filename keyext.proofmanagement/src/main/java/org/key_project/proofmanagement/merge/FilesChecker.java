@@ -3,22 +3,21 @@ package org.key_project.proofmanagement.merge;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
 import javax.annotation.Nonnull;
 
-// IMPORTANT: difference from other checkers: works with multiple packages instead of a single
-//          bundle!
 /**
  * This class tests if all given proof is consistent w.r.t. the files contained.
+ *
+ * @author Wolfram Pfeifer
  */
 public class FilesChecker {
     @FunctionalInterface
@@ -33,7 +32,6 @@ public class FilesChecker {
             Path p = paths.get(i);
             res &= sourcesConsistent(p, reference);
             res &= classpathsConsistent(p, reference);
-            // TODO: be careful, compare with implicit bcp files!
             res &= bootclasspathsConsistent(p, reference);
         }
         return res;
@@ -48,40 +46,48 @@ public class FilesChecker {
     }
 
     private static boolean bootclasspathsConsistent(Path a, Path b) {
-        return false;
-        //return pathsConsistent(a, b, ProofBundleHandler::getBootclasspath);
+        /* TODO: At the moment, we do not compare internal/implicit bcp (JavaRedux shipped with KeY)
+         *  and explicitly given bcp, i.e. we might consider the bcps mistakenly inconsistent.
+         *  We might relax that for the future. */
+        return pathsConsistent(a, b, FilesChecker::collectBcpFiles);
     }
 
-    // two paths are considered consistent if all files (recursively) inside pathA have a
-    // counterpart in b (with same location and same content!)
-    // However, both paths may contain additional unique files.
-    private static boolean pathsConsistent(Path a, Path b, CheckedFunction<ProofBundleHandler, List<Path>> f) {
-        List<Path> filesA = new ArrayList<>();
-        List<Path> filesB = new ArrayList<>();
+    private static List<Path> collectBcpFiles(ProofBundleHandler pbh) throws IOException {
+        Path bcp = pbh.getBootclasspath();
+        if (bcp == null) {
+            return Collections.emptyList();
+        }
+        try (var files = Files.walk(pbh.getBootclasspath())) {
+            return files.collect(Collectors.toUnmodifiableList());
+        }
+    }
+
+    /* Two paths are considered consistent if all files (recursively) inside pathA which are also
+     * present in b (at the same location) have the same content. However, both paths are allowed to
+     * contain additional unique files. */
+    private static boolean pathsConsistent(Path a, Path b,
+                                           CheckedFunction<ProofBundleHandler, List<Path>> f) {
         try (ProofBundleHandler pha = ProofBundleHandler.createBundleHandler(a);
              ProofBundleHandler phb = ProofBundleHandler.createBundleHandler(b)) {
-            filesA = f.apply(pha);
-            filesB = f.apply(phb);
-
-            // does not have to be same size (a bundle may add files)
-            //if (filesA.size() != filesB.size()) {
-            //    return false;
-            //}
+            List<Path> filesA = f.apply(pha);
+            List<Path> filesB = f.apply(phb);
 
             HashMap<Path, byte[]> mapA = new HashMap<>();
             HashMap<Path, byte[]> mapB = new HashMap<>();
             try {
                 for (Path p : filesA) {
-                    mapA.put(p, createSHA256Checksum(p));
+                    Path abs = p.toAbsolutePath().normalize();
+                    mapA.put(pha.relativize(abs), createSHA256Checksum(p));
                 }
                 for (Path p : filesB) {
-                    mapB.put(p, createSHA256Checksum(p));
+                    Path abs = p.toAbsolutePath().normalize();
+                    mapB.put(phb.relativize(abs), createSHA256Checksum(p));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            // check if all files contained in both classpaths are equal
+            // check if all files contained in both paths are equal
             for (Path p : mapA.keySet()) {
                 if (mapB.containsKey(p) && !(Arrays.equals(mapA.get(p), mapB.get(p)))) {
                     return false;
@@ -89,8 +95,6 @@ public class FilesChecker {
             }
         } catch (IOException e1) {
             e1.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
         return true;

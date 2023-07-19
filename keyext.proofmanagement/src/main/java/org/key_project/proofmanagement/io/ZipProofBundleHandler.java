@@ -68,6 +68,16 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
     }
 
     @Override
+    public Path relativize(Path path) {
+        // we might need both cases
+        if (path.startsWith(zipPath)) {
+            return zipPath.relativize(path);
+        } else {
+            return tmpDir.relativize(path);
+        }
+    }
+
+    @Override
     public List<Path> getProofFiles() throws ProofManagementException {
         //return getFiles(fs.getPath("/"), ProofBundleHandler.PROOF_MATCHER);
         return dbh.getProofFiles();

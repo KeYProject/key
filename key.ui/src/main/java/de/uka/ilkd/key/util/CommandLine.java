@@ -189,7 +189,7 @@ public final class CommandLine {
 
     private final Map<String, CommandLine> subcommands = new HashMap<>();
 
-    public void addSubCommand(String name) {
+    public CommandLine addSubCommand(String name) {
         if (name.startsWith(MINUS)) {
             throw new IllegalArgumentException(
                 "Subcommands must not start with '" + MINUS + "': " + name);
@@ -197,7 +197,9 @@ public final class CommandLine {
         if (subcommands.containsKey(name)) {
             throw new IllegalArgumentException(name + " has already been registered");
         }
-        subcommands.put(name, new CommandLine());
+        CommandLine subCommand = new CommandLine();
+        subcommands.put(name, subCommand);
+        return subCommand;
     }
 
     public CommandLine getSubCommandLine(String name) {

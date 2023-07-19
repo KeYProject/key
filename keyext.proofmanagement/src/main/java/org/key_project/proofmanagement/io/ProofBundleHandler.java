@@ -59,6 +59,13 @@ public abstract class ProofBundleHandler implements Closeable {
     public abstract Path getBundlePath();
 
     /**
+     * Relativies the input path with respect to the bundle root.
+     * @param path the path to relativize, assumed to point to a file in the bundle
+     * @return the input path relative to the bundle root
+     */
+    public abstract Path relativize(Path path);
+
+    /**
      * Returns a list of all paths to *.proof files in the bundle. Only *.proof files residing
      * top-level in the bundle are considered.
      * @return a list of paths to the *.proof files

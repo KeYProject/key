@@ -1,9 +1,6 @@
 package org.key_project.proofmanagement;
-    // TODO: the checkstyle regex for package name does neither allow proof_management nor proofManagement
-    // Is this intended?
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -61,37 +58,47 @@ public final class Main {
     /** usage string for merge subcommand */
     private static final String USAGE_MERGE = STRINGS.getString("usage_merge");
 
-    /** command line of proof management */
+    /** main command line of proof management */
     private static final CommandLine CL;
+
+    /** subcommandline for the check commmand */
+    private static final CommandLine CL_MERGE;
+
+    /** subcommandline for the merge commmand */
+    private static final CommandLine CL_CHECK;
+
+    /** subcommandline of merge (used as a hack for forwarding check options) */
+    private static final CommandLine CL_MERGE_CHECK;
 
     static {
         // TODO: check todos in CommandLine class
         CL = new CommandLine();
-        CL.addSubCommand("check");
-        CommandLine check = CL.getSubCommandLine("check");
-        check.addOption("--settings", null, STRINGS.getString("check_settings_desc"));
-        check.addOption("--dependency", null, STRINGS.getString("check_dependency_desc"));
-        check.addOption("--missing", null, STRINGS.getString("check_missing_desc"));
-        check.addOption("--replay", null, STRINGS.getString("check_replay_desc"));
+        CL.setLineLength(Integer.MAX_VALUE);
+        CL.addText(USAGE, false);
+        CL_CHECK = CL.addSubCommand("check");
+        CL_CHECK.addText(USAGE_CHECK, false);
+        CL_CHECK.addOption("--settings", null, STRINGS.getString("check_settings_desc"));
+        CL_CHECK.addOption("--dependency", null, STRINGS.getString("check_dependency_desc"));
+        CL_CHECK.addOption("--missing", null, STRINGS.getString("check_missing_desc"));
+        CL_CHECK.addOption("--replay", null, STRINGS.getString("check_replay_desc"));
         //check.addOption("--auto", null, STRINGS.getString("check_auto_desc"));
         //check.addOption("--explicit", null, STRINGS.getString("check_explicit_desc"));
-        check.addOption("--report", "out_path", STRINGS.getString("check_report_desc"));
+        CL_CHECK.addOption("--report", "out_path", STRINGS.getString("check_report_desc"));
 
-        CL.addSubCommand("merge");
-        CommandLine merge = CL.getSubCommandLine("merge");
-        merge.addOption("--force", null, STRINGS.getString("merge_force_desc"));
-        merge.addOption("--check", "check_arguments", STRINGS.getString("merge_check_desc"));
+        CL_MERGE = CL.addSubCommand("merge");
+        CL_MERGE.addText(USAGE_MERGE, false);
+        CL_MERGE.addOption("--force", null, STRINGS.getString("merge_force_desc"));
+        CL_MERGE.addOption("--check", "check_arguments", STRINGS.getString("merge_check_desc"));
 
         // enable check option forwarding for merge command
-        merge.addSubCommand("check");
-        CommandLine mergeCheck = merge.getSubCommandLine("check");
-        mergeCheck.addOption("--settings", null, STRINGS.getString("check_settings_desc"));
-        mergeCheck.addOption("--dependency", null, STRINGS.getString("check_dependency_desc"));
-        mergeCheck.addOption("--missing", null, STRINGS.getString("check_missing_desc"));
-        mergeCheck.addOption("--replay", null, STRINGS.getString("check_replay_desc"));
-        //mergeCheck.addOption("--auto", null, STRINGS.getString("check_auto_desc"));
-        //mergeCheck.addOption("--explicit", null, STRINGS.getString("check_explicit_desc"));
-        mergeCheck.addOption("--report", "out_path", STRINGS.getString("check_report_desc"));
+        CL_MERGE_CHECK = CL_MERGE.addSubCommand("check");
+        CL_MERGE_CHECK.addOption("--settings", null, STRINGS.getString("check_settings_desc"));
+        CL_MERGE_CHECK.addOption("--dependency", null, STRINGS.getString("check_dependency_desc"));
+        CL_MERGE_CHECK.addOption("--missing", null, STRINGS.getString("check_missing_desc"));
+        CL_MERGE_CHECK.addOption("--replay", null, STRINGS.getString("check_replay_desc"));
+        //CL_MERGE_CHECK.addOption("--auto", null, STRINGS.getString("check_auto_desc"));
+        //CL_MERGE_CHECK.addOption("--explicit", null, STRINGS.getString("check_explicit_desc"));
+        CL_MERGE_CHECK.addOption("--report", "out_path", STRINGS.getString("check_report_desc"));
 
         // TODO: bundle subcommand
         //CL.addSubCommand("bundle");
@@ -108,42 +115,43 @@ public final class Main {
         try {
             CL.parse(args);
             if (CL.subCommandUsed("check")) {
-                check(CL.getSubCommandLine("check"));
+                check(CL_CHECK);
             } else if (CL.subCommandUsed("merge")) {
-                merge(CL.getSubCommandLine("merge"));
-            } else if (CL.subCommandUsed("bundle")) {
-                bundle(CL.getSubCommandLine("bundle"));
+                merge();
             } else {
                 CL.printUsage(System.out);
             }
         } catch (CommandLineException e) {
             if (CL.subCommandUsed("check")) {
-                System.out.println(USAGE_CHECK);
-                System.out.println();
-
-                CL.getSubCommandLine("check").printUsage(System.out);
+                CL_CHECK.printUsage(System.out);
             } else if (CL.subCommandUsed("merge")) {
-                System.out.println(USAGE_MERGE);
-            } else /*if (CL.subCommandUsed("bundle")) {
-                // TODO
-            } else */{
+                CL_MERGE.printUsage(System.out);
+            } else {
                 CL.printUsage(System.out);
             }
-            //e.printStackTrace();
-            //System.out.println(USAGE);
         }
     }
 
+    // TODO: bundle subcommand, which zips a directory into a proof bundle (and may perform checks)
     // bundle [-c|--check "check_options"] <root_dir> <bundle_path>
-    private static void bundle(CommandLine commandLine) {
-        // TODO: bundle subcommand
+    /*private static void bundle(CommandLine commandLine) {
 
         List<String> arguments = commandLine.getArguments();
         if (arguments.size() != 2) {
             commandLine.printUsage(System.out);
         }
-    }
+    }*/
 
+    /**
+     * The check subcommand applies the selected checks to the proof bundle and generates an HTML
+     * report if desired.
+     * @param missing checks if there are any unproven contracts in the bundle
+     * @param settings checks if the settings for the proofs are compatible
+     * @param replay checks whether the proofs in the bundle are replayable
+     * @param dependency checks for unsound dependencies between contracts and proofs
+     * @param bundlePath the path of the bundle (directory or zip file)
+     * @param reportPath the output path for the HTML report (if selected)
+     */
     public static void check(boolean missing, boolean settings, boolean replay, boolean dependency,
                               Path bundlePath, Path reportPath) {
 
@@ -193,10 +201,7 @@ public final class Main {
     private static void generateReport(CheckerData globalResult, Path reportPath) {
         try {
             HTMLReport.print(globalResult, reportPath);
-        } catch (IOException | URISyntaxException e) {
-            System.err.println("Error creating the report: ");
-            e.printStackTrace();
-        } catch (Throwable e) {
+        } catch (IOException e) {
             System.err.println("Error creating the report: ");
             e.printStackTrace();
         }
@@ -204,10 +209,10 @@ public final class Main {
 
     // check [--settings] [--dependency] [--missing] [--replay] [--report <out_path>] <bundle_path>
     private static void check(CommandLine commandLine) {
-
-        List<String> arguments = commandLine.getArguments();
+        List<String> arguments = CL_CHECK.getArguments();
         if (arguments.size() != 1) {
             commandLine.printUsage(System.out);
+            return;
         }
 
         Path reportPath = null;
@@ -224,14 +229,17 @@ public final class Main {
     }
 
     // merge [-f|--force] [-n|--no-check] [--check "<check_args>"] <bundle1> <bundle2> ... <output>
-    private static void merge(CommandLine commandLine) {
-        // TODO: merge subcommand
-        List<String> arguments = commandLine.getArguments();
+    private static void merge() {
+        List<String> arguments = CL_MERGE.getArguments();
 
         // at least three files!
         if (arguments.size() < 3) {
-            commandLine.printUsage(System.out);
+            CL_MERGE.printUsage(System.out);
+            return;
         }
+
+        // at the moment only used for logging
+        CheckerData logger = new CheckerData(LogLevel.DEBUG);
 
         // convert Strings to Paths (for input and output)
         List<Path> inputs = new ArrayList<>();
@@ -240,27 +248,27 @@ public final class Main {
         }
         Path output = Paths.get(arguments.get(arguments.size() - 1));
 
-        if (commandLine.isSet("--force")) {
-            // TODO:
-        }
+        // Usually, the merging process is cancelled if there are conflicting files in both bundles.
+        // This option forces merging. For the conflicting files, their versions from the first
+        // bundle are taken.
+        boolean force = CL_MERGE.isSet("--force");
 
-        // TODO: use result, print message, clean up created zips
         try {
-            ProofBundleMerger.merge(inputs, output);
+            ProofBundleMerger.merge(inputs, output, force, logger);
         } catch (ProofManagementException e) {
             System.err.println("Error when trying to merge the bundles: ");
             e.printStackTrace();
+            return;
         }
 
-        // perform a check with given commands
-        if (commandLine.isSet("--check")) {
-            String[] temp = commandLine.getString("--check", "").trim().split(" ");
+        // perform a check on the newly created bundle with given commands
+        if (CL_MERGE.isSet("--check")) {
+            String[] temp = CL_MERGE.getString("--check", "").trim().split(" ");
             String[] newArgs = Arrays.copyOfRange(temp, 0, temp.length + 1);
             newArgs[newArgs.length - 1] = output.toString();
             try {
-                CommandLine checkCommandLine = commandLine.getSubCommandLine("check");
-                checkCommandLine.parse(newArgs);
-                check(checkCommandLine);
+                CL_MERGE_CHECK.parse(newArgs);
+                check(CL_MERGE_CHECK);
             } catch (CommandLineException e) {
                 e.printStackTrace();
             }
