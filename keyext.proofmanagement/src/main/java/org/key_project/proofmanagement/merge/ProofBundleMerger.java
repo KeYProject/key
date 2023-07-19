@@ -28,8 +28,11 @@ public class ProofBundleMerger {
         if (consistent) {
             logger.print(LogLevel.INFO, "All files in the bundles are consistent. Continuing the"
                 + " merge ...");
+        } else if (force) {
+            logger.print(LogLevel.WARNING, "Some files in the bundles are inconsistent. Forcing the"
+                + " merge ...");
         } else {
-            logger.print(LogLevel.WARNING, "The files in the bundles are inconsistent. If you want "
+            logger.print(LogLevel.ERROR, "Some files in the bundles are inconsistent. If you want "
                 + "to merge nonetheless, use the \"--force\" option.");
         }
 

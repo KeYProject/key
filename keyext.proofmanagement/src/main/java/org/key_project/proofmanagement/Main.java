@@ -209,7 +209,7 @@ public final class Main {
 
     // check [--settings] [--dependency] [--missing] [--replay] [--report <out_path>] <bundle_path>
     private static void check(CommandLine commandLine) {
-        List<String> arguments = CL_CHECK.getArguments();
+        List<String> arguments = commandLine.getArguments();
         if (arguments.size() != 1) {
             commandLine.printUsage(System.out);
             return;
@@ -263,7 +263,12 @@ public final class Main {
 
         // perform a check on the newly created bundle with given commands
         if (CL_MERGE.isSet("--check")) {
-            String[] temp = CL_MERGE.getString("--check", "").trim().split(" ");
+            String checkParams = CL_MERGE.getString("--check", "");
+
+            // remove quotation marks
+            checkParams = checkParams.substring(1, checkParams.length() - 1);
+            String[] temp = checkParams.trim().split(" ");
+
             String[] newArgs = Arrays.copyOfRange(temp, 0, temp.length + 1);
             newArgs[newArgs.length - 1] = output.toString();
             try {
