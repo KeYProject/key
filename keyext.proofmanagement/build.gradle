@@ -17,8 +17,9 @@ application {
 }
 
 run {
-    //args('check', '--missing', '--settings', '--report', '../../../proofManagementReport.html', '--replay', '--dependency', '../../../../dev/pmexample2')
-    args('merge', '../../../test/proof_management_test/merge1', '../../../test/proof_management_test/merge2.zip', '../../../test/proof_management_test/output.zproof')
+    // for debugging, something like this can be used:
+    //args('check', '--missing', '--settings', '--report', 'proofManagementReport.html', '--replay', '--dependency', 'pmexample2')
+    //args('merge', 'bundle1', 'bundle2.zip', 'output.zproof')
 
     // not necessary any more with the workaround in HTMLReport
     // needed for access of Node.getValue in string template
