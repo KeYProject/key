@@ -11,9 +11,16 @@ KeY between two proofs, since changes had to be made, for example, to the specif
 
 With this workflow it is crucial to have some form of proof management, since it is very difficult for the user to
 manually track all changes and detect the proofs that have to be re-conducted after a change in the source code.
-KeY comes with a built-in proof management that partially solves the problem. However, it is only able to detect illegal
-cyclic dependencies between proofs if they are conducted in the same `Environment` (that is, without reloading the
-source code in between).
+KeY comes with a built-in proof management that partially solves the problem. However, this internal proof management
+has a few shortcomings:
+1) It only considers the proofs currently loaded in the GUI. This is often not really helpful, since usually it is not a
+   good idea to have too many proofs loaded at the same time (memory restrictions).
+2) It only considers proofs loaded in the same environment (via "File" -> "Proof Management"), which is an option that
+   is not obvious to many users. Furthermore, if the source code changes, a new environment is (and has to be, for 
+   soundness reasons) created.
+3) The current proof management does not check for compatible settings (overflows, different integer semantics, runtime
+   exceptions, ...).
+4) Some dependencies are not checked by KeY, for example cycles involving model methods or dependency contracts.
 
 The intention of this project is to provide a tool that can check a proof bundle (a directory or zip file that contains
 source code and a collection of proofs) for consistency.
@@ -40,15 +47,15 @@ The proof management tool contains the following features:
 Usage: pm <command> [<options>...] [<args>...]
   available commands:
     check: Checks a single proof bundle for consistency.
-    merge: Merges two proof bundles.
-    bundle: Creates a zipped proof bundle (file extension "zproof") from a directory following the proof bundle path rules.
+    merge: Merges multiple proof bundles.
 ```
 
-Note that only the `check` command is currently implemented, which has the following options:
+#### check
+The `check` command performs the selected consistency checks and is able to give a console or HTML report:
 ```
 pm check [--missing] [--settings] [--replay] [--dependency] [--report <out_path>] <bundle_path>
 ```
-As expected, the available options correspond to the features described in the section above.
+The available options correspond to the features described in the section above.
 `<bundle_path>` is the path of the proof bundle to check and can either denote a directory or a zip file.
 
 The directory structure of the bundle has to conform that described in
@@ -61,13 +68,13 @@ bundle.zproof
     - mypackage
       - B.java
       - C.java
-  - cp             // optional: classpath (may contain .jar files and subdirectories
+  - classpath      // optional: classpath (may contain .jar files and subdirectories
                    //           with .java and/or .class files)
     - someLibrary.java
     - otherLibrary
       - Lib.java
       - Util.class
-  - bcp            // optional: bootclasspath (system classes from the Java class library),
+  - bootclasspath  // optional: bootclasspath (system classes from the Java class library),
                    //           replaces the files shipped with KeY
     - java
       - lang
@@ -79,6 +86,19 @@ bundle.zproof
       ...
 ```
 
+#### merge
+The `merge` command merges multiple bundles in zip or directory format into a single one.
+```
+pm merge [--force] [--check "<check_args>"] <bundle1> <bundle2> ... <output>
+```
+Merging fails when two or more of the input bundles contain files with the same name (at the same path), but different
+content. This can be the case if for example different versions of the Java code were used for the proofs. To merge
+nonetheless, the `--force` flag can be set. In this case, the resulting bundle will contain the versions from the first
+given bundle.
+
+As a shortcut, the command has a `--check` option which performs the check command on the resulting bundle after the
+merge and forwards the given arguments to that command.
+
 ### KeY GUI Extension
 The project adds the `Proof Management` menu to KeY. It currently contains only a single entry which opens a dialog to
 configure the checkers to run and the path for the HTML report to generate. After a successful run, the HTML report is
@@ -87,6 +107,9 @@ opened in the system's default browser.
 ## Known Problems / Missing features
 Some features are currently not implemented:
 * It is not checked that user-defined rules (taclets included in user-provided .key files) are proven.
-* Functionality to merge two proof bundles (if there sources and proofs are consistent) is missing.
 * For the SettingsChecker, taclet settings have to be exactly identical at the moment, which could probably be relaxed a
   bit in the future.
+* An `--auto` flag could be added for the `check` command, which tries to proof contracts without explicit proofs
+  automatically. There could also be an option to save these automatically found proofs into the bundle.
+* There could be a `bundle` command that creates a proof bundle by creating the required file structure based on the
+  information provided in a `.key` file.

@@ -83,8 +83,11 @@ public class ProofBundleMerger {
                                 Path absProofFile = proofFile.toAbsolutePath().normalize();
                                 Path rel = pbh.relativize(absProofFile);
                                 Path internal = fs.getPath(rel.toString());
-                                Files.copy(proofFile, internal,
-                                    StandardCopyOption.REPLACE_EXISTING);
+                                // skip existing (we know due to our previous check that its equal)
+                                if (!Files.exists(internal)) {
+                                    Files.copy(proofFile, internal,
+                                        StandardCopyOption.REPLACE_EXISTING);
+                                }
                             }
 
                             // add .key files
@@ -92,7 +95,11 @@ public class ProofBundleMerger {
                                 Path absKeyFile = keyFile.toAbsolutePath().normalize();
                                 Path rel = pbh.relativize(absKeyFile);
                                 Path internal = fs.getPath(rel.toString());
-                                Files.copy(keyFile, internal, StandardCopyOption.REPLACE_EXISTING);
+                                // skip existing (we know due to our previous check that its equal)
+                                if (!Files.exists(internal)) {
+                                    Files.copy(keyFile, internal,
+                                        StandardCopyOption.REPLACE_EXISTING);
+                                }
                             }
                         }
                     }

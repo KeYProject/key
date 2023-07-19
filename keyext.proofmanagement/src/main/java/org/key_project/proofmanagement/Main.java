@@ -228,7 +228,7 @@ public final class Main {
             bundlePath, reportPath);
     }
 
-    // merge [-f|--force] [-n|--no-check] [--check "<check_args>"] <bundle1> <bundle2> ... <output>
+    // merge [--force] [--check "<check_args>"] <bundle1> <bundle2> ... <output>
     private static void merge() {
         List<String> arguments = CL_MERGE.getArguments();
 
