@@ -248,9 +248,6 @@ class CheckConfigDialog extends JDialog {
         setMinimumSize(new Dimension(400, 200));
         setPreferredSize(new Dimension(600, 400));
 
-        // for debugging:
-        bundleFileField.setText("/home/wolfram/Desktop/tmp/proof_management_test");
-        reportFileField.setText("/home/wolfram/Desktop");
         runButton.setEnabled(true);
 
         pack();
