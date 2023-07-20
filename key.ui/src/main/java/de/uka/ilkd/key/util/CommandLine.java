@@ -206,9 +206,10 @@ public final class CommandLine {
 
     /**
      * Adds a new subcommand with the given name. To be able to configure this subcommand (e.g., by
-     * adding options to the subcommand), the method returns the  newly created CommandLine.
+     * adding options to the subcommand), the method returns the newly created CommandLine.
+     *
      * @param name The name of the subcommand name to add. Must not start with '--' and must not
-     *             already be registered as a subcommand.
+     *        already be registered as a subcommand.
      * @return the CommandLine of the newly created subcommand.
      */
     public CommandLine addSubCommand(String name) {
@@ -226,6 +227,7 @@ public final class CommandLine {
 
     /**
      * Returns the CommandLine for the given subcommand name if existing.
+     *
      * @param name the name of the subcommand
      * @return the CommandLine for the subcommand with the given name or null
      */
@@ -235,6 +237,7 @@ public final class CommandLine {
 
     /**
      * Check if a subcommand with the given name has been used.
+     *
      * @param name the name of the subcommand
      * @return true iff the subcommand was the one given
      */
@@ -331,8 +334,10 @@ public final class CommandLine {
                 // parse options for subcommand
                 usedSubCommand = args[cnt];
                 subcli.parse(Arrays.copyOfRange(args, cnt + 1, args.length));
-                /* the main command can only see the subcommand, options given after the subcommand
-                 * are handled by the CommandLine of the subcommand */
+                /*
+                 * the main command can only see the subcommand, options given after the subcommand
+                 * are handled by the CommandLine of the subcommand
+                 */
                 return;
             } /*
                * else {
