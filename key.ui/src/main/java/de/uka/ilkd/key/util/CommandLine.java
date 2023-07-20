@@ -185,10 +185,32 @@ public final class CommandLine {
     public CommandLine() {
     }
 
+    /**
+     * It is sufficient to store a single subcommand here, since only one can be active at a time.
+     * Note that all options and parameters given after the subcommand are handled by the
+     * CommandLine corresponding to the subcommand. I.e., in the example below, the main CommandLine
+     * "sees" only "check", the rest is forwarded to the CommandLine of check and handled
+     * there. Subcommands can be nested, however, it is assumed that the subcommand is always the
+     * first token (so no options are allowed for the main CommandLine).
+     *
+     * <pre>
+     * pm check --settings --report rep.html bundle.zproof
+     * </pre>
+     */
     private String usedSubCommand = "";
 
+    /**
+     * The available subcommands that can be used with this CommandLine.
+     */
     private final Map<String, CommandLine> subcommands = new HashMap<>();
 
+    /**
+     * Adds a new subcommand with the given name. To be able to configure this subcommand (e.g., by
+     * adding options to the subcommand), the method returns the  newly created CommandLine.
+     * @param name The name of the subcommand name to add. Must not start with '--' and must not
+     *             already be registered as a subcommand.
+     * @return the CommandLine of the newly created subcommand.
+     */
     public CommandLine addSubCommand(String name) {
         if (name.startsWith(MINUS)) {
             throw new IllegalArgumentException(
@@ -202,23 +224,22 @@ public final class CommandLine {
         return subCommand;
     }
 
-    public CommandLine getSubCommandLine(String name) {
-        CommandLine scli = subcommands.get(name);
-        if (scli == null) {
-            // TODO: problem when no option at all is specified,
-            // e.g. "pm merge p1.zproof p2.zproof result.zproof"
-            // throw new IllegalArgumentException("No subcommand with name '" + name + "' exists.");
-            return null;
-        }
-        return scli;
+    /**
+     * Returns the CommandLine for the given subcommand name if existing.
+     * @param name the name of the subcommand
+     * @return the CommandLine for the subcommand with the given name or null
+     */
+    public CommandLine getSubCommand(String name) {
+        return subcommands.get(name);
     }
 
-    public String getUsedSubCommand() {
-        return usedSubCommand;
-    }
-
-    public boolean subCommandUsed(String image) {
-        return image.equals(usedSubCommand);
+    /**
+     * Check if a subcommand with the given name has been used.
+     * @param name the name of the subcommand
+     * @return true iff the subcommand was the one given
+     */
+    public boolean subCommandUsed(String name) {
+        return name.equals(usedSubCommand);
     }
 
     /**
@@ -305,11 +326,14 @@ public final class CommandLine {
         // assumption: only single subcommand, only at first position
         if (args.length > 0 && !args[cnt].startsWith(MINUS)) {
             // test for subcommand:
-            CommandLine subcli = getSubCommandLine(args[cnt]);
+            CommandLine subcli = getSubCommand(args[cnt]);
             if (subcli != null) {
                 // parse options for subcommand
                 usedSubCommand = args[cnt];
                 subcli.parse(Arrays.copyOfRange(args, cnt + 1, args.length));
+                /* the main command can only see the subcommand, options given after the subcommand
+                 * are handled by the CommandLine of the subcommand */
+                return;
             } /*
                * else {
                * // continue without subcommand
