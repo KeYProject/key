@@ -70,7 +70,8 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
 
         nextGoals = ImmutableSLList.nil();
 
-        newGoals = newGoals.filter(Goal::isAutomatic);
+        // This line interferes with proof caching. What is this needed for?
+        //newGoals = newGoals.filter(Goal::isAutomatic);
 
         // Remove "node" and goals contained within "newGoals"
         while (!selectedList.isEmpty()) {
