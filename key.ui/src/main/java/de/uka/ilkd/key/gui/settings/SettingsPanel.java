@@ -190,7 +190,11 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
             pCenter.add(comboBox);
             JLabel infoButton = createHelpLabel(info);
             pCenter.add(infoButton, new CC().wrap());
+        } else if (title != null) {
+            pCenter.add(new JLabel(title));
+            pCenter.add(comboBox, new CC().wrap());
         } else {
+            // TODO: this branch seems to always throw an exception
             add(comboBox, new CC().span(2).wrap());
         }
         return comboBox;

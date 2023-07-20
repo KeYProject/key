@@ -1,0 +1,9 @@
+github_checks:
+  annotations: false
+
+ignore:
+  - "key.ui/"  
+  - "keyext.ui.testgen/"  
+  - "key.removegenerics/"  
+  - "key.core.symbolic_execution.example/"  
+  - "key.core.example/"    

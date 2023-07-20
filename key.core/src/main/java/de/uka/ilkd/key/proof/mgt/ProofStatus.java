@@ -2,7 +2,7 @@ package de.uka.ilkd.key.proof.mgt;
 
 
 public enum ProofStatus {
-    OPEN, CLOSED_BUT_LEMMAS_LEFT, CLOSED;
+    OPEN, CLOSED_BUT_LEMMAS_LEFT, CLOSED_BY_CACHE, CLOSED;
 
     public boolean getProofClosed() {
         return this == CLOSED;
@@ -10,6 +10,10 @@ public enum ProofStatus {
 
     public boolean getProofClosedButLemmasLeft() {
         return this == CLOSED_BUT_LEMMAS_LEFT;
+    }
+
+    public boolean getProofClosedByCache() {
+        return this == CLOSED_BY_CACHE;
     }
 
     public boolean getProofOpen() {

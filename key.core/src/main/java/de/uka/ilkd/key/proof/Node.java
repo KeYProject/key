@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
@@ -40,6 +41,7 @@ public class Node implements Iterable<Node> {
     private static final String OPEN_GOAL = "OPEN GOAL";
 
     private static final String CLOSED_GOAL = "Closed goal";
+    private static final String CACHED_GOAL = "Cached goal";
 
     private static final String NODES = "nodes";
 
@@ -602,7 +604,9 @@ public class Node implements Iterable<Node> {
                     cachedName = LINKED_GOAL;
                 } else if (goal.isAutomatic()) {
                     cachedName = OPEN_GOAL;
-                } else if (goal != null) {
+                } else if (goal.node().lookup(ClosedBy.class) != null) {
+                    cachedName = CACHED_GOAL;
+                } else {
                     cachedName = INTERACTIVE_GOAL;
                 }
                 return cachedName;

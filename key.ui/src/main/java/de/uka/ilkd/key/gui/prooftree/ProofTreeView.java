@@ -32,6 +32,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
@@ -53,10 +54,21 @@ public class ProofTreeView extends JPanel implements TabPanel {
         ColorSettings.define("[proofTree]gray", "", Color.DARK_GRAY);
     public static final ColorSettings.ColorProperty LIGHT_BLUE_COLOR =
         ColorSettings.define("[proofTree]lightBlue", "", new Color(230, 254, 255));
+    /**
+     * Other green color, currently used for cached goals.
+     */
+    public static final ColorSettings.ColorProperty OTHER_GREEN_COLOR =
+        ColorSettings.define("[proofTree]otherGreen", "", new Color(0, 100, 0));
+    /**
+     * Color used for closed goals.
+     */
     public static final ColorSettings.ColorProperty DARK_GREEN_COLOR =
         ColorSettings.define("[proofTree]darkGreen", "", new Color(0, 128, 51));
     public static final ColorSettings.ColorProperty DARK_RED_COLOR =
         ColorSettings.define("[proofTree]darkRed", "", new Color(191, 0, 0));
+    /**
+     * Color used for linked goals.
+     */
     public static final ColorSettings.ColorProperty PINK_COLOR =
         ColorSettings.define("[proofTree]pink", "", new Color(255, 0, 240));
     public static final ColorSettings.ColorProperty ORANGE_COLOR =
@@ -921,6 +933,22 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 Goal selected = proof.getGoal(node);
                 if (selected != null) {
                     mediator.goalChosen(selected);
+                } else if (treeNode instanceof GUIOneStepChildTreeNode) {
+                    // One Step Simplifier child node: show a sequent modified to include
+                    // the transformed formula
+                    var ossNode = ((GUIOneStepChildTreeNode) treeNode);
+                    var pio = ossNode.getRuleApp().posInOccurrence();
+                    var ossParentNode = ((GUIProofTreeNode) ossNode.getParent());
+                    var newSequent = ossParentNode.getNode().sequent();
+                    var modifiedSequent = newSequent
+                            .replaceFormula(ossNode.getFormulaNr(), pio.sequentFormula()).sequent();
+                    mediator.getSelectionModel().setSelectedSequentAndRuleApp(
+                        ossParentNode.getNode(), modifiedSequent, ossNode.getRuleApp());
+
+                    // ensure the proper node is selected in the tree
+                    ignoreChange = true;
+                    delegateView.setSelectionPath(newTP);
+                    ignoreChange = false;
                 } else {
                     mediator.nonGoalNodeChosen(node);
                 }
@@ -1055,13 +1083,25 @@ public class ProofTreeView extends JPanel implements TabPanel {
             String toolTipText;
 
             if (goal == null || leaf.isClosed()) {
+                ClosedBy c = leaf.lookup(ClosedBy.class);
+                if (c != null) {
+                    style.icon = IconFactory.BACKREFERENCE.get(iconHeight);
+                } else {
+                    style.icon = IconFactory.keyHoleClosed(iconHeight);
+                }
                 style.foreground = DARK_GREEN_COLOR.get();
-                style.icon = IconFactory.keyHoleClosed(iconHeight);
                 toolTipText = "A closed goal";
+                if (c != null) {
+                    toolTipText += " (by reference to other proof)";
+                }
             } else if (goal.isLinked()) {
                 style.foreground = PINK_COLOR.get();
                 style.icon = IconFactory.keyHoleLinked(20, 20);
                 toolTipText = "Linked goal - no automatic rule application";
+            } else if (leaf.lookup(ClosedBy.class) != null) {
+                style.foreground = OTHER_GREEN_COLOR.get();
+                style.icon = IconFactory.BACKREFERENCE.get(16);
+                toolTipText = "Cached goal - reference to another proof";
             } else if (!goal.isAutomatic()) {
                 style.foreground = ORANGE_COLOR.get();
                 style.icon = IconFactory.keyHoleInteractive(20, 20);

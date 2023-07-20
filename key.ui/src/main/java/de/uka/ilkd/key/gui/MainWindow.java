@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -57,9 +56,11 @@ import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.gui.utilities.LruCached;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
@@ -289,6 +290,8 @@ public final class MainWindow extends JFrame {
         proofListener = new MainProofListener();
         userInterface = new WindowUserInterfaceControl(this);
         mediator = getMainWindowMediator(userInterface);
+        KeYGuiExtensionFacade.getStartupExtensions().forEach(it -> it.preInit(this, mediator));
+
         termLabelMenu = new TermLabelMenu(this);
         currentGoalView = new CurrentGoalView(this);
         emptySequent = new EmptySequent(this);
@@ -613,16 +616,6 @@ public final class MainWindow extends JFrame {
         loadPreferences(this);
     }
 
-    /*
-     * private JToggleButton createHeatmapToggle() { return new JToggleButton(new
-     * HeatmapToggleAction(this)); }
-     */
-
-    /*
-     * private JButton createHeatmapMenuOpener() { return new JButton(new
-     * HeatmapSettingsAction(this)); }
-     */
-
     private JToolBar createFileOpsToolBar() {
         JToolBar fileOperations = new JToolBar("File Operations");
         fileOperations.add(openFileAction);
@@ -652,8 +645,6 @@ public final class MainWindow extends JFrame {
         toolBar.add(new GoalBackAction(this, false));
         toolBar.add(new PruneProofAction(this));
         toolBar.addSeparator();
-        // toolBar.add(createHeatmapToggle());
-        // toolBar.add(createHeatmapMenuOpener());
 
         return toolBar;
     }
@@ -790,14 +781,9 @@ public final class MainWindow extends JFrame {
         ThreadUtilities.invokeOnEventQueue(() -> setStatusLineImmediately(str, max));
     }
 
-    @Deprecated
-    public void selectFirstTab() {
-        // weigl disable: this.mainWindowTabbedPane.setSelectedIndex(0);
-    }
-
     /**
-     * Freeze the main window by blocking all input events, except those for the status line (i.e.
-     * the abort button within the status line)
+     * Freeze the main window by blocking all input events, except those for the toolbar (i.e.
+     * the abort button within the toolbar)
      */
     public void freezeExceptAutoModeButton() {
         if (!frozen) {
@@ -837,7 +823,7 @@ public final class MainWindow extends JFrame {
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(createFileMenu());
         menuBar.add(createViewMenu());
-        menuBar.add(createProofMenu());
+        menuBar.add(createProofMenu(null));
         menuBar.add(createOptionsMenu());
         KeYGuiExtensionFacade.addExtensionsToMainMenu(this, menuBar);
         menuBar.add(Box.createHorizontalGlue());
@@ -921,40 +907,50 @@ public final class MainWindow extends JFrame {
         return goalSelection;
     }
 
-    private JMenu createProofMenu() {
+    /**
+     * Create the proof menu.
+     *
+     * @param selected a specific proof that the menu should work on, may be null
+     * @return the menu
+     */
+    public JMenu createProofMenu(Proof selected) {
         JMenu proof = new JMenu("Proof");
         proof.setMnemonic(KeyEvent.VK_P);
 
-        proof.add(autoModeAction);
-        GoalBackAction goalBack = new GoalBackAction(this, true);
-        proof.addMenuListener(new MenuListener() {
-            @Override
-            public void menuSelected(MenuEvent e) {
-                /*
-                 * we use this MenuListener to update the name only if the menu is shown since it
-                 * would be slower to update the name (which means scanning all open and closed
-                 * goals) at every selection change (via the KeYSelectionListener in GoalBackAction)
-                 */
-                goalBack.updateName();
-            }
+        if (selected == null) {
+            proof.add(autoModeAction);
+            GoalBackAction goalBack = new GoalBackAction(this, true);
+            proof.addMenuListener(new MenuListener() {
+                @Override
+                public void menuSelected(MenuEvent e) {
+                    /*
+                     * we use this MenuListener to update the name only if the menu is shown since
+                     * it
+                     * would be slower to update the name (which means scanning all open and closed
+                     * goals) at every selection change (via the KeYSelectionListener in
+                     * GoalBackAction)
+                     */
+                    goalBack.updateName();
+                }
 
-            @Override
-            public void menuDeselected(MenuEvent e) {
-            }
+                @Override
+                public void menuDeselected(MenuEvent e) {
+                }
 
-            @Override
-            public void menuCanceled(MenuEvent e) {
-            }
-        });
-        proof.add(goalBack);
-        proof.add(new PruneProofAction(this));
-        proof.add(new AbandonTaskAction(this));
-        proof.addSeparator();
-        proof.add(new SearchInProofTreeAction(this));
-        proof.add(new SearchInSequentAction(this, sequentViewSearchBar));
-        proof.add(new SearchNextAction(this, sequentViewSearchBar));
-        proof.add(new SearchPreviousAction(this, sequentViewSearchBar));
-        {
+                @Override
+                public void menuCanceled(MenuEvent e) {
+                }
+            });
+            proof.add(goalBack);
+            proof.add(new PruneProofAction(this));
+        }
+        proof.add(new AbandonTaskAction(this, selected));
+        if (selected == null) {
+            proof.addSeparator();
+            proof.add(new SearchInProofTreeAction(this));
+            proof.add(new SearchInSequentAction(this, sequentViewSearchBar));
+            proof.add(new SearchNextAction(this, sequentViewSearchBar));
+            proof.add(new SearchPreviousAction(this, sequentViewSearchBar));
             JMenu searchModeMenu = new JMenu("Search Mode");
 
             for (SequentViewSearchBar.SearchMode mode : SequentViewSearchBar.SearchMode.values()) {
@@ -964,11 +960,11 @@ public final class MainWindow extends JFrame {
             proof.add(searchModeMenu);
         }
         proof.addSeparator();
-        proof.add(new ShowUsedContractsAction(this));
-        proof.add(new ShowActiveTactletOptionsAction(this));
+        proof.add(new ShowUsedContractsAction(this, selected));
+        proof.add(new ShowActiveTactletOptionsAction(this, selected));
         proof.add(showActiveSettingsAction);
-        proof.add(new ShowProofStatistics(this));
-        proof.add(new ShowKnownTypesAction(this));
+        proof.add(new ShowProofStatistics(this, selected));
+        proof.add(new ShowKnownTypesAction(this, selected));
         return proof;
     }
 
@@ -1170,7 +1166,10 @@ public final class MainWindow extends JFrame {
                 }
                 newSequentView = currentGoalView;
             } else {
-                newSequentView = new InnerNodeView(getMediator().getSelectedNode(), this);
+                Sequent seq = getMediator().getSelectionModel().getSelectedSequent();
+                RuleApp ruleApp = getMediator().getSelectionModel().getSelectedRuleApp();
+                newSequentView = new InnerNodeView(getMediator().getSelectedProof(),
+                    getMediator().getSelectedNode(), ruleApp, seq, this);
                 if (!isPrintRunImmediately) {
                     newSequentView.printSequent();
                 }
@@ -1198,6 +1197,15 @@ public final class MainWindow extends JFrame {
             SwingUtilities.invokeLater(sequentUpdater);
         }
 
+    }
+
+    /**
+     * Scroll the sequent view to the specified y coordinate.
+     *
+     * @param y coordinate in pixels
+     */
+    public void scrollTo(int y) {
+        mainFrame.scrollTo(y);
     }
 
     void displayResults(String message) {

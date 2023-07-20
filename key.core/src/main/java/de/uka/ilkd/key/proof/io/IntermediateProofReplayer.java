@@ -827,7 +827,7 @@ public class IntermediateProofReplayer {
      * @param pos Position of interest in the given goal.
      * @return All matching rule applications at pos in g.
      */
-    protected static ImmutableSet<IBuiltInRuleApp> collectAppsForRule(String ruleName, Goal g,
+    public static ImmutableSet<IBuiltInRuleApp> collectAppsForRule(String ruleName, Goal g,
             PosInOccurrence pos) {
 
         ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.nil();
