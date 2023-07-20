@@ -62,10 +62,10 @@ public class DependencyChecker implements Checker {
         data.print("Running dependency checker ...");
 
         // for each proof: parse and construct intermediate AST
-        KeYFassade.ensureProofsLoaded(data);
+        KeYFacade.ensureProofsLoaded(data);
 
         // build dependency graph
-        KeYFassade.ensureDependencyGraphBuilt(data);
+        KeYFacade.ensureDependencyGraphBuilt(data);
         DependencyGraph graph = data.getDependencyGraph();
 
         // check if graph contains illegal cycles
@@ -101,7 +101,7 @@ public class DependencyChecker implements Checker {
     private boolean hasUnprovenDependencies(DependencyGraph graph, CheckerData data)
             throws ProofManagementException {
         // needs replay (to ensure that proof can be closed)
-        KeYFassade.ensureProofsReplayed(data);
+        KeYFacade.ensureProofsReplayed(data);
 
         // TODO: probably, topological sorting from Tarjan could be used for speedup ...
         /*

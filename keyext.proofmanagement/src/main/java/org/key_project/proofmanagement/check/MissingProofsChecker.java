@@ -33,8 +33,8 @@ public class MissingProofsChecker implements Checker {
         data.addCheck("missing_proofs");
         data.print("Running missing proofs checker ...");
 
-        KeYFassade.ensureSourceLoaded(data);
-        KeYFassade.ensureProofsLoaded(data);
+        KeYFacade.ensureSourceLoaded(data);
+        KeYFacade.ensureProofsLoaded(data);
 
         Profile profile = AbstractProfile.getDefaultProfile();
         ProgressMonitor control = ProgressMonitor.Empty.getInstance();

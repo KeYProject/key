@@ -56,9 +56,9 @@ import org.key_project.util.reflection.ClassLoaderUtil;
  *
  * @author Wolfram Pfeifer
  */
-public final class KeYFassade {
+public final class KeYFacade {
     // prevents from instantiating this class
-    private KeYFassade() {
+    private KeYFacade() {
     }
 
     /**

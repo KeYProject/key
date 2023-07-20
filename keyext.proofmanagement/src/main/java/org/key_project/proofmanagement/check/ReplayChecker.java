@@ -13,6 +13,6 @@ public class ReplayChecker implements Checker {
     public void check(ProofBundleHandler pbh, CheckerData data) throws ProofManagementException {
         data.addCheck("replay");
         data.print("Running replay checker ...");
-        KeYFassade.ensureProofsReplayed(data);
+        KeYFacade.ensureProofsReplayed(data);
     }
 }
