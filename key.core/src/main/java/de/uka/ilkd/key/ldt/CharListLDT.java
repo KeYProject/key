@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.ldt;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.Expression;

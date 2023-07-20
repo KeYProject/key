@@ -2,7 +2,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Node;
@@ -33,7 +33,7 @@ public class AppliedRuleAppsNameCache {
      * @param node the node
      * @return the value
      */
-    private @Nonnull HashMap<Name, List<RuleApp>> fillCacheForNode(Node node) {
+    private @NonNull HashMap<Name, List<RuleApp>> fillCacheForNode(Node node) {
         HashMap<Name, List<RuleApp>> nodeCache;
         try {
             writeLock.lock();
@@ -103,7 +103,7 @@ public class AppliedRuleAppsNameCache {
      * @param name the name
      * @return rule apps
      */
-    public @Nonnull List<RuleApp> get(@Nonnull Node node, @Nonnull Name name) {
+    public @NonNull List<RuleApp> get(@NonNull Node node, @NonNull Name name) {
         if (node.getAppliedRuleApp() != null || node.childrenCount() != 0) {
             throw new AssertionFailure("Expected an empty leaf node");
         }

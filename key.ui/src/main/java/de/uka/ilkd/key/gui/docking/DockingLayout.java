@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -127,9 +127,9 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
         DockingHelper.restoreMissingPanels(window);
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
+    public List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
         List<Action> actions = new ArrayList<>();
         int keypos = 0;
         for (String layout : LAYOUT_NAMES) {

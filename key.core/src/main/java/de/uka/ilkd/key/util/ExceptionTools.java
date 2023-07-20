@@ -4,8 +4,8 @@ import java.net.MalformedURLException;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
@@ -44,7 +44,7 @@ public final class ExceptionTools {
      *         given Throwable can not be successfully converted to a URL and thus no Location can
      *         be created
      */
-    public static Optional<Location> getLocation(@Nonnull Throwable exc)
+    public static Optional<Location> getLocation(@NonNull Throwable exc)
             throws MalformedURLException {
         if (exc instanceof HasLocation) {
             return Optional.ofNullable(((HasLocation) exc).getLocation());

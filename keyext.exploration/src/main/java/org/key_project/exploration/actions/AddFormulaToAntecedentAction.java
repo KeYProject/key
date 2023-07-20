@@ -1,7 +1,7 @@
 package org.key_project.exploration.actions;
 
 import java.awt.event.ActionEvent;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Term;
@@ -31,7 +31,7 @@ public class AddFormulaToAntecedentAction extends ExplorationAction {
             return;
         }
         ProofExplorationService service = ProofExplorationService.get(getMediator());
-        @Nonnull
+        @NonNull
         Node toBeSelected = service.soundAddition(getMediator().getSelectedGoal(), t, true);
         getMediator().getSelectionModel().setSelectedNode(toBeSelected);
     }

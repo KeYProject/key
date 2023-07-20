@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
@@ -84,7 +84,7 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder STRICT =
         new AbstractConditionBuilder("scrictSub", TR, TR) {
             @Override
-            public boolean isSuitableFor(@Nonnull String name) {
+            public boolean isSuitableFor(@NonNull String name) {
                 if (super.isSuitableFor(name)) {
                     return true;
                 }
@@ -157,7 +157,7 @@ public class TacletBuilderManipulators {
 
 
     static class NotFreeInTacletBuilderCommand extends AbstractTacletBuilderCommand {
-        public NotFreeInTacletBuilderCommand(@Nonnull ArgumentType... argumentsTypes) {
+        public NotFreeInTacletBuilderCommand(@NonNull ArgumentType... argumentsTypes) {
             super("notFreeIn", argumentsTypes);
         }
 
@@ -289,7 +289,7 @@ public class TacletBuilderManipulators {
     static class JavaTypeToSortConditionBuilder extends AbstractConditionBuilder {
         private final boolean elmen;
 
-        public JavaTypeToSortConditionBuilder(@Nonnull String triggerName, boolean forceElmentary) {
+        public JavaTypeToSortConditionBuilder(@NonNull String triggerName, boolean forceElmentary) {
             super(triggerName, SV, SORT);
             this.elmen = forceElmentary;
         }

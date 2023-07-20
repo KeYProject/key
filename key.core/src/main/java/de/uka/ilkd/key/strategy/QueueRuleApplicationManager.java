@@ -3,7 +3,7 @@ package de.uka.ilkd.key.strategy;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;

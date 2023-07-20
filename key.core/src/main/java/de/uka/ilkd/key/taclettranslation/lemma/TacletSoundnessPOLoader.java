@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.*;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.proof.CompoundProof;
 import de.uka.ilkd.key.proof.Proof;

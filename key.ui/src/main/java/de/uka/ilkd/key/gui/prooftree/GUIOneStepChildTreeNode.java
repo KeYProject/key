@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.gui.prooftree;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.java.Services;
@@ -69,7 +69,7 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
         // nothing to do
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getSearchString() {
         return toString();

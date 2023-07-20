@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.logic.sort;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;

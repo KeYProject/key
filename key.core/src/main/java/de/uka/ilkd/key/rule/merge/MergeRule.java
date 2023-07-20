@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -128,7 +128,7 @@ public class MergeRule implements BuiltInRule {
         return displayName();
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public final ImmutableList<Goal> apply(Goal goal, final Services services, RuleApp ruleApp)
             throws RuleAbortException {

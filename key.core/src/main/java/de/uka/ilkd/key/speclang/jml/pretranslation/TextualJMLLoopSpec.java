@@ -2,7 +2,7 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;

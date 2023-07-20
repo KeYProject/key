@@ -3,7 +3,7 @@ package de.uka.ilkd.key.logic;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -50,7 +50,7 @@ public final class TermFactory {
      * Master method for term creation. Should be the only place where terms are created in the
      * entire system.
      */
-    public Term createTerm(@Nonnull Operator op, ImmutableArray<Term> subs,
+    public Term createTerm(@NonNull Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
             ImmutableArray<TermLabel> labels) {
         if (op == null) {
@@ -71,13 +71,13 @@ public final class TermFactory {
     }
 
 
-    public Term createTerm(@Nonnull Operator op, Term[] subs,
+    public Term createTerm(@NonNull Operator op, Term[] subs,
             ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock) {
         return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, null);
     }
 
 
-    public Term createTerm(@Nonnull Operator op, Term... subs) {
+    public Term createTerm(@NonNull Operator op, Term... subs) {
         return createTerm(op, subs, null, null);
     }
 
@@ -154,7 +154,7 @@ public final class TermFactory {
      * @param junctor the left-associative operator to combine the terms together
      * @param terms a list of non-null temrs
      */
-    public @Nonnull Term createTerm(@Nonnull Operator junctor, @Nonnull List<Term> terms) {
+    public @NonNull Term createTerm(@NonNull Operator junctor, @NonNull List<Term> terms) {
         if (terms.size() == 1) {
             return terms.get(0);
         } else if (terms.size() == 2) {

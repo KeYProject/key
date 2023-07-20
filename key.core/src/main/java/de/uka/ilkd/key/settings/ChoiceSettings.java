@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.settings;
 
 import java.util.*;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
@@ -60,7 +60,7 @@ public class ChoiceSettings extends AbstractSettings {
      * <p>
      * The method name is somewhat misleading.
      */
-    @Nonnull
+    @NonNull
     public Map<String, String> getDefaultChoices() {
         return Collections.unmodifiableMap(category2Default);
     }
@@ -69,7 +69,7 @@ public class ChoiceSettings extends AbstractSettings {
     /**
      * returns the current selected choices as an immutable set
      */
-    @Nonnull
+    @NonNull
     public ImmutableSet<Choice> getDefaultChoicesAsSet() {
         return choiceMap2choiceSet(category2Default);
     }

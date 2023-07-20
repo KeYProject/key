@@ -9,7 +9,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -137,7 +137,7 @@ public class TestTacletEquality {
         Assertions.assertEquals(normalise(expected).trim(), normalise(actual).trim());
     }
 
-    @Nonnull
+    @NonNull
     private String normalise(String expected) {
         return expected.replaceAll("\\s+", "\n").replaceAll("Choices:\\s*\\{.*?\\}", "");
     }

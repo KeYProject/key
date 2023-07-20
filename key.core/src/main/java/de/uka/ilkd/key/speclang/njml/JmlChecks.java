@@ -3,7 +3,7 @@ package de.uka.ilkd.key.speclang.njml;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -43,7 +43,7 @@ class AbstractCheck extends JmlParserBaseVisitor<Void> implements JmlCheck {
     private final List<PositionedString> warnings = new LinkedList<>();
 
     @Override
-    public @Nonnull List<PositionedString> check(@Nonnull ParserRuleContext ctx) {
+    public @NonNull List<PositionedString> check(@NonNull ParserRuleContext ctx) {
         warnings.clear();
         ctx.accept(this);
         return warnings;

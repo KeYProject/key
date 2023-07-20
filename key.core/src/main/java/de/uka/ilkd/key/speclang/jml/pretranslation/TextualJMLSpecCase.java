@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import de.uka.ilkd.key.util.Triple;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -37,8 +38,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return getList(ASSIGNABLE_FREE, toString);
     }
 
-    private ImmutableList<LabeledParserRuleContext> getList(@Nonnull ClauseHd clause,
-            @Nonnull Name heap) {
+    private ImmutableList<LabeledParserRuleContext> getList(@NonNull ClauseHd clause,
+            @NonNull Name heap) {
         List<LabeledParserRuleContext> seq =
             clauses.stream().filter(it -> it.clauseType.equals(clause))
                     .filter(it -> Objects.equals(it.heap, heap)).map(it -> it.ctx)
@@ -105,7 +106,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         }
     }
 
-    public TextualJMLSpecCase(ImmutableList<JMLModifier> mods, @Nonnull Behavior behavior) {
+    public TextualJMLSpecCase(ImmutableList<JMLModifier> mods, @NonNull Behavior behavior) {
         super(mods);
         if (behavior == null) {
             throw new IllegalArgumentException();
@@ -153,14 +154,14 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
      *
      * @param other
      */
-    public @Nonnull TextualJMLSpecCase merge(@Nonnull TextualJMLSpecCase other) {
+    public @NonNull TextualJMLSpecCase merge(@NonNull TextualJMLSpecCase other) {
         TextualJMLSpecCase res = clone();
         res.clauses.addAll(other.clauses);
         return res;
     }
 
     @Override
-    public @Nonnull TextualJMLSpecCase clone() {
+    public @NonNull TextualJMLSpecCase clone() {
         TextualJMLSpecCase res = new TextualJMLSpecCase(getMods(), getBehavior());
         res.name = name;
         res.clauses = new ArrayList<>(clauses);

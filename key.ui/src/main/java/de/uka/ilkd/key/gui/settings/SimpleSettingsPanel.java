@@ -3,7 +3,7 @@ package de.uka.ilkd.key.gui.settings;
 
 import java.awt.*;
 import java.text.Format;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;

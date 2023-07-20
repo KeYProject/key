@@ -5,7 +5,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.prooftree.GUIProofTreeModel;
@@ -35,7 +35,7 @@ public class ExplorationModeModel {
     /**
      * Mode which rules to use in actions mode Default: whole application is shown
      */
-    private @Nonnull ExplorationState explorationTacletAppState = ExplorationState.WHOLE_APP;
+    private @NonNull ExplorationState explorationTacletAppState = ExplorationState.WHOLE_APP;
 
 
     /**
@@ -47,7 +47,7 @@ public class ExplorationModeModel {
     /**
      * Get the state which kind of taclet to use
      */
-    public @Nonnull ExplorationState getExplorationTacletAppState() {
+    public @NonNull ExplorationState getExplorationTacletAppState() {
         return explorationTacletAppState;
     }
 

@@ -2,14 +2,16 @@ dependencies{
 }
 
 checkerFramework {
-    checkers = [
-            "org.checkerframework.checker.nullness.NullnessChecker",
-    ]
-    extraJavacArgs = [
-            "-AonlyDefs=^org\\.key_project\\.util",
-            "-Xmaxerrs", "10000",
-            "-Astubs=$projectDir/src/main/checkerframework",
-            "-Werror",
-            "-Aversion",
-    ]
+    if(System.getProperty("ENABLE_NULLNESS")) {
+        checkers = [
+                "org.checkerframework.checker.nullness.NullnessChecker",
+        ]
+        extraJavacArgs = [
+                "-AonlyDefs=^org\\.key_project\\.util",
+                "-Xmaxerrs", "10000",
+                "-Astubs=$projectDir/src/main/checkerframework",
+                "-Werror",
+                "-Aversion",
+        ]
+    }
 }

@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -644,7 +644,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
         proofTreeSearchPanel.setVisible(true);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getTitle() {
         return "Proof";
@@ -655,7 +655,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
         return IconFactory.PROOF_TREE.get(IconFactory.DEFAULT_SIZE);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public JComponent getComponent() {
         return this;
@@ -737,7 +737,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
         return true;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public Collection<CAction> getTitleCActions() {
         return List.of(ProofTreeSettingsMenuFactory.create(this));

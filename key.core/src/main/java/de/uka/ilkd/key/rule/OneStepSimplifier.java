@@ -6,7 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -574,7 +574,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             null);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public synchronized ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
 

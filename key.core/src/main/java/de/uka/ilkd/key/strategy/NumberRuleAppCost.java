@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.strategy;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.util.Debug;
 
@@ -53,9 +53,9 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
      */
     public abstract long getValue();
 
-    @Nonnull
+    @NonNull
     @Override
-    public RuleAppCost mul(@Nonnull RuleAppCost cost) {
+    public RuleAppCost mul(@NonNull RuleAppCost cost) {
         if (cost instanceof TopRuleAppCost) {
             return cost.mul(this);
         }

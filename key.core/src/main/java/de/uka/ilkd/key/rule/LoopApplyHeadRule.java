@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.rule;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -59,7 +59,7 @@ public class LoopApplyHeadRule implements BuiltInRule {
      */
     public static final Name NAME = new Name("Loop Apply Head");
 
-    @Nonnull
+    @NonNull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp application)
             throws RuleAbortException {

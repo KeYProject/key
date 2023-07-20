@@ -2,7 +2,7 @@ package de.uka.ilkd.key.smt.communication;
 
 import java.io.IOException;
 import java.io.Writer;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -12,13 +12,13 @@ import javax.annotation.Nonnull;
  * @version 1 (10/3/21)
  */
 public class TeeWriter extends Writer {
-    @Nonnull
+    @NonNull
     private final Writer source;
 
-    @Nonnull
+    @NonNull
     private final Writer sink;
 
-    public TeeWriter(@Nonnull Writer source, @Nonnull Writer sink) {
+    public TeeWriter(@NonNull Writer source, @NonNull Writer sink) {
         this.source = source;
         this.sink = sink;
     }

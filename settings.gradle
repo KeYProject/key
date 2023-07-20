@@ -13,3 +13,6 @@ include 'recoder'
 include 'keyext.ui.testgen'
 include 'keyext.exploration'
 include 'keyext.slicing'
+
+// ENABLE NULLNESS here or on the CLI
+// System.setProperty("ENABLE_NULLNESS", "true")

@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.strategy;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Represents the costs of a rule. In the default case this is just an integral number, but in some
@@ -10,13 +10,13 @@ import javax.annotation.Nonnull;
  */
 public interface RuleAppCost extends Comparable<RuleAppCost> {
 
-    int compareTo(@Nonnull RuleAppCost o);
+    int compareTo(@NonNull RuleAppCost o);
 
     /**
      * Add the given costs to the costs that are represented by this object
      */
-    @Nonnull
-    RuleAppCost add(@Nonnull RuleAppCost cost2);
+    @NonNull
+    RuleAppCost add(@NonNull RuleAppCost cost2);
 
 
     /**
@@ -28,6 +28,6 @@ public interface RuleAppCost extends Comparable<RuleAppCost> {
      *
      * @param cost - non-null {@link RuleAppCost}
      */
-    @Nonnull
-    RuleAppCost mul(@Nonnull RuleAppCost cost);
+    @NonNull
+    RuleAppCost mul(@NonNull RuleAppCost cost);
 }

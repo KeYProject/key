@@ -3,7 +3,7 @@
 package recoder.testsuite.basic;
 
 import java.io.File;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.service.DefaultErrorHandler;
@@ -17,7 +17,7 @@ public class BasicTestsSuite {
     private static CrossReferenceServiceConfiguration config;
     private static File projectFile;
 
-    @Nonnull
+    @NonNull
     public static File getProjectFile() {
         if (projectFile == null) {
             init();
@@ -25,7 +25,7 @@ public class BasicTestsSuite {
         return projectFile;
     }
 
-    @Nonnull
+    @NonNull
     public static CrossReferenceServiceConfiguration getConfig() {
         if (config == null) {
             init();

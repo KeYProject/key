@@ -2,7 +2,7 @@ package de.uka.ilkd.key.nparser.builder;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
@@ -38,11 +38,11 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
         declarationBuilder = new DeclarationBuilder(services, nss);
     }
 
-    public @Nonnull List<Contract> getContracts() {
+    public @NonNull List<Contract> getContracts() {
         return contracts;
     }
 
-    public @Nonnull List<ClassInvariant> getInvariants() {
+    public @NonNull List<ClassInvariant> getInvariants() {
         return invariants;
     }
 

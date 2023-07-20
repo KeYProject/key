@@ -3,7 +3,7 @@ package de.uka.ilkd.key.gui.docking;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -181,7 +181,7 @@ public class DockingHelper {
             p.getComponent(), p.getPermissions(), a);
     }
 
-    public static @Nonnull CAction translateAction(@Nonnull Action action) {
+    public static @NonNull CAction translateAction(@NonNull Action action) {
         if (action.getValue(Action.SELECTED_KEY) != null) {
             return createCheckBox(action);
 
@@ -191,7 +191,7 @@ public class DockingHelper {
     }
 
     public static <A extends CommonDecoratableDockAction> void deriveBaseProperties(
-            CDecorateableAction<A> derive, @Nonnull Action action) {
+            CDecorateableAction<A> derive, @NonNull Action action) {
         derive.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
         derive.setEnabled(action.isEnabled());
 
@@ -203,7 +203,7 @@ public class DockingHelper {
         });
     }
 
-    private static @Nonnull CAction createCheckBox(@Nonnull Action action) {
+    private static @NonNull CAction createCheckBox(@NonNull Action action) {
         CCheckBox button = new CCheckBox((String) action.getValue(Action.NAME),
             (Icon) action.getValue(Action.SMALL_ICON)) {
             @Override

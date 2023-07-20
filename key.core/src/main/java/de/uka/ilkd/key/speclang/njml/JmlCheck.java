@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.speclang.njml;
 
 import java.util.List;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.speclang.PositionedString;
 
@@ -20,6 +20,6 @@ public interface JmlCheck {
      * @param ctx an arbitrary {@link ParserRuleContext} from the {@link JmlParser}
      * @return a potential empty list of warnings
      */
-    @Nonnull
-    List<PositionedString> check(@Nonnull ParserRuleContext ctx);
+    @NonNull
+    List<PositionedString> check(@NonNull ParserRuleContext ctx);
 }

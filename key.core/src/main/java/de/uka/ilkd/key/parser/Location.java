@@ -6,7 +6,7 @@ import java.net.URISyntaxException;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.util.MiscTools;
@@ -107,7 +107,7 @@ public final class Location implements Comparable<Location> {
     }
 
     @Override
-    public int compareTo(@Nonnull Location o) {
+    public int compareTo(@NonNull Location o) {
         return Comparator
                 .<Location, URI>comparing(l -> l.fileUri)
                 .thenComparing(Location::getPosition).compare(this, o);

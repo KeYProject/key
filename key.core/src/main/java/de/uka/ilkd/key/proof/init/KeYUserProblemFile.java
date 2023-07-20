@@ -3,7 +3,7 @@ package de.uka.ilkd.key.proof.init;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
@@ -239,7 +239,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @throws Exception Occurred Exception.
      */
     private Profile readProfileFromFile() throws Exception {
-        @Nonnull
+        @NonNull
         ProblemInformation pi = getProblemInformation();
         String profileName = pi.getProfile();
         if (profileName != null && !profileName.isEmpty()) {

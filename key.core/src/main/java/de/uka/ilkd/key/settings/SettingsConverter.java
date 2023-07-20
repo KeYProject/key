@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Properties;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import org.key_project.util.Streams;
 
@@ -127,7 +127,7 @@ public final class SettingsConverter {
      * @param str the String to decode
      * @return the decoded version of str
      */
-    public static String decode(@Nonnull String str) {
+    public static String decode(@NonNull String str) {
         int i = str.indexOf(PREFIX);
         if (i == 0) {
             str = str.substring(PREFIX.length());
@@ -162,7 +162,7 @@ public final class SettingsConverter {
      * @param str the String to encode
      * @return the encoded version of str
      */
-    public static String encode(@Nonnull String str) {
+    public static String encode(@NonNull String str) {
         return PREFIX + encodeString(str) + POSTFIX;
     }
 

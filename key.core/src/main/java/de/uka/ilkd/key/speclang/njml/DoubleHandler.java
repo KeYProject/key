@@ -2,7 +2,7 @@ package de.uka.ilkd.key.speclang.njml;
 
 import java.util.EnumMap;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;

@@ -8,7 +8,7 @@
 // import de.uka.ilkd.key.logic.Term;
 // import de.uka.ilkd.key.logic.TermBuilder;
 // import de.uka.ilkd.key.logic.op.Function;
-// import javax.annotation.Nonnull;
+// import org.jspecify.annotations.NonNull;
 //
 //
 /// **
@@ -82,13 +82,13 @@
 // //public interface
 // //-------------------------------------------------------------------------
 //
-// public boolean isIntegerTerm(@Nonnull SLExpression a) {
+// public boolean isIntegerTerm(@NonNull SLExpression a) {
 // assert a.isTerm();
 // return a.getTerm().sort() == integerLDT.targetSort();
 // }
 //
 //
-// public SLExpression buildPromotedOrExpression(@Nonnull SLExpression a, @Nonnull SLExpression b)
+// public SLExpression buildPromotedOrExpression(@NonNull SLExpression a, @NonNull SLExpression b)
 // throws SLTranslationException {
 // assert a != null;
 // assert b != null;

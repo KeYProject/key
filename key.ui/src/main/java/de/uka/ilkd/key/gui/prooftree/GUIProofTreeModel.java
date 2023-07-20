@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.*;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -508,13 +508,13 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
 
 
     /** stores exactly the paths that are expanded in the proof tree */
-    private @Nonnull Collection<TreePath> expansionState = Collections.emptySet();
+    private @NonNull Collection<TreePath> expansionState = Collections.emptySet();
 
-    public void setExpansionState(@Nonnull Collection<TreePath> c) {
+    public void setExpansionState(@NonNull Collection<TreePath> c) {
         expansionState = c;
     }
 
-    public @Nonnull Collection<TreePath> getExpansionState() {
+    public @NonNull Collection<TreePath> getExpansionState() {
         return expansionState;
     }
 

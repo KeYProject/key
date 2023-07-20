@@ -3,7 +3,7 @@
  */
 package de.uka.ilkd.key.rule;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -24,7 +24,7 @@ public interface Rule extends HasOrigin {
      *         application
      * @throws RuleAbortException when this rule was aborted
      */
-    @Nonnull
+    @NonNull
     ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException;
 

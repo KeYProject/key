@@ -3,7 +3,7 @@ package de.uka.ilkd.key.nparser;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
@@ -50,7 +50,7 @@ public class ProofReplayer {
      * @param source the source of the stream, used for producing exceptions with locations
      * @see #run(CharStream, IProofFileParser, int, URI)
      */
-    public static void run(@Nonnull Token token, CharStream input, IProofFileParser prl,
+    public static void run(@NonNull Token token, CharStream input, IProofFileParser prl,
             URI source) {
         input.seek(1 + token.getStopIndex()); // ends now on \proof|
         run(input, prl, token.getLine(), source);

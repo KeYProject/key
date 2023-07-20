@@ -3,8 +3,8 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -60,7 +60,7 @@ public interface EnvInput {
     /**
      * gets the classpath elements to be considered here.
      */
-    @Nonnull
+    @NonNull
     List<File> readClassPath() throws ProofInputException;
 
     /**

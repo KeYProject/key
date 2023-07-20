@@ -3,7 +3,7 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.IssueDialog;

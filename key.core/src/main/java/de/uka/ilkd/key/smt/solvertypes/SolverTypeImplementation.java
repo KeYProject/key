@@ -4,8 +4,8 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
@@ -470,7 +470,7 @@ public final class SolverTypeImplementation implements SolverType {
         return supportHasBeenChecked;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public AbstractSolverSocket getSocket(ModelExtractor query) {
         AbstractSolverSocket socket = solverSocket.copy();

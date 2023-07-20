@@ -2,7 +2,7 @@ package de.uka.ilkd.key.logic.label;
 
 import java.net.URI;
 import java.util.*;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;

@@ -2,7 +2,7 @@ package de.uka.ilkd.key.rule.merge;
 
 import java.io.File;
 import java.util.Iterator;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
@@ -309,7 +309,7 @@ public class MergeRuleTests {
      * @param proofFileName The file name of the proof file to load.
      * @return The loaded proof.
      */
-    @Nonnull
+    @NonNull
     public static Proof loadProof(File directory, String proofFileName) {
         File proofFile = new File(directory, proofFileName);
         assertTrue(proofFile.exists(),

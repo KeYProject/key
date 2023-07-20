@@ -2,7 +2,7 @@ package de.uka.ilkd.key.rule;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;

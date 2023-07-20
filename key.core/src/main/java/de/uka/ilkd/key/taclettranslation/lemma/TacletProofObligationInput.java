@@ -3,7 +3,7 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;

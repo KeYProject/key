@@ -2,7 +2,7 @@ package de.uka.ilkd.key.ldt;
 
 import java.util.Map;
 import java.util.TreeMap;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;

@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.smt;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -101,7 +101,7 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
         }
 
 
-        @Nonnull
+        @NonNull
         @Override
         public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
             if (goal.proof().getInitConfig().getJustifInfo().getJustification(RULE) == null) {

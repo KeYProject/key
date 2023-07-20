@@ -6,7 +6,7 @@ import java.awt.event.KeyEvent;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -96,10 +96,10 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
         return new TestSettingsProvider();
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public Collection<TabPanel> getPanels(@Nonnull MainWindow window,
-            @Nonnull KeYMediator mediator) {
+    public Collection<TabPanel> getPanels(@NonNull MainWindow window,
+            @NonNull KeYMediator mediator) {
         return Collections.singleton(new TabPanel() {
             @Override
             public String getTitle() {

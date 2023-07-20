@@ -9,7 +9,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.solvertypes.SolverPropertiesLoader;
@@ -173,7 +173,7 @@ public class SMTHandlerServices {
      * @throws IOException if the resources cannot be read
      */
 
-    public List<SMTHandler> getFreshHandlers(Services services, @Nonnull String[] handlerNames,
+    public List<SMTHandler> getFreshHandlers(Services services, @NonNull String[] handlerNames,
             String[] handlerOptions, MasterHandler mh) throws IOException {
 
         List<SMTHandler> result = new ArrayList<>();

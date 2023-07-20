@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
@@ -359,7 +359,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         return c;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public Collection<CAction> getTitleCActions() {
         return List.of(HelpFacade.createHelpButton("user/ProofSlicing/"));
@@ -532,7 +532,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         graphEdges.setText("Graph edges: " + graphEdgesNr);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getTitle() {
         return "Proof Slicing";
@@ -543,7 +543,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         return INFO_ICON;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public JComponent getComponent() {
         return this;

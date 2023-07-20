@@ -2,7 +2,7 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -21,7 +21,7 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
         new LinkedHashMap<>();
 
     public TextualJMLDepends(ImmutableList<JMLModifier> mods, Name[] heaps,
-            @Nonnull LabeledParserRuleContext depends) {
+            @NonNull LabeledParserRuleContext depends) {
         super(mods);
         setPosition(depends);
         for (Name hName : HeapLDT.VALID_HEAP_NAMES) {

@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import javax.tools.*;
 
 import de.uka.ilkd.key.gui.PositionedIssueString;
@@ -55,7 +55,7 @@ public class JavaCompilerCheckFacade {
      * @param javaPath the {@link String} with the path to the source of the target Java program
      * @return future providing the list of diagnostics
      */
-    @Nonnull
+    @NonNull
     public static CompletableFuture<List<PositionedIssueString>> check(
             ProblemInitializer.ProblemInitializerListener listener,
             File bootClassPath, List<File> classPath, File javaPath) {

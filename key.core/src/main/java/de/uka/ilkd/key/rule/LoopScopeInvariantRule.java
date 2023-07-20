@@ -2,7 +2,7 @@ package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
 import java.util.Optional;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -133,7 +133,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
                 && !(modality == Modality.BOX_TRANSACTION || modality == Modality.DIA_TRANSACTION);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException {

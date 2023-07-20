@@ -2,7 +2,7 @@ package de.uka.ilkd.key.java.recoderext;
 
 import java.net.URI;
 import java.util.*;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -731,7 +731,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
         final HashSet<TypeDeclaration> result = new LinkedHashSet<>();
 
-        public void walk(@Nonnull SourceElement s) {
+        public void walk(@NonNull SourceElement s) {
             s.accept(this);
             if (s instanceof NonTerminalProgramElement) {
                 NonTerminalProgramElement pe = (NonTerminalProgramElement) s;
