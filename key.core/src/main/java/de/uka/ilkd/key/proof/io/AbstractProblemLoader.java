@@ -357,6 +357,7 @@ public abstract class AbstractProblemLoader {
             }
             OneStepSimplifier.refreshOSS(proof);
             result = replayProof(proof);
+            LOGGER.info("Replay result: {}", result.getStatus());
         }
     }
 
