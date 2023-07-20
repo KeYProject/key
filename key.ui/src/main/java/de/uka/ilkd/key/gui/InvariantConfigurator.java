@@ -118,6 +118,7 @@ public class InvariantConfigurator {
 
             private Term variantTerm = null;
             private final Map<LocationVariable, Term> modifiesTerm = new LinkedHashMap<>();
+            private final Map<LocationVariable, Term> freeModifiesTerm = new LinkedHashMap<>();
             private final Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs =
                 new LinkedHashMap<>();
             private final Map<LocationVariable, Term> invariantTerm = new LinkedHashMap<>();
@@ -181,8 +182,10 @@ public class InvariantConfigurator {
 
                 final NamespaceSet nss = services.getNamespaces().copyWithParent();
                 Term self = loopInv.getInternalSelfTerm();
-                nss.programVariables()
-                        .add(new LocationVariable(new ProgramElementName("self"), self.sort()));
+                if (self != null) {
+                    nss.programVariables()
+                            .add(new LocationVariable(new ProgramElementName("self"), self.sort()));
+                }
                 parser = new KeyIO(services, nss);
                 parser.setAbbrevMap(getAbbrevMap());
 
@@ -809,7 +812,7 @@ public class InvariantConfigurator {
 
                 if (requirementsAreMet) {
                     newInvariant = loopInv.configurate(invariantTerm, freeInvariantTerm,
-                        modifiesTerm, infFlowSpecs, variantTerm);
+                        modifiesTerm, freeModifiesTerm, infFlowSpecs, variantTerm);
                     return true;
                 } else {
                     return false;

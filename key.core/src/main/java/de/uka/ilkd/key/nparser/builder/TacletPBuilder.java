@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -23,6 +25,7 @@ import de.uka.ilkd.key.parser.SchemaVariableModifierSet;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.conditions.TypeResolver;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.util.collection.*;
@@ -305,9 +308,9 @@ public class TacletPBuilder extends ExpressionBuilder {
         case TYPE_RESOLVER:
             return buildTypeResolver(ctx);
         case SORT:
-            return accept(ctx.sortId());
+            return visitSortId(ctx.term().getText(), ctx.term());
         case JAVA_TYPE:
-            return getOrCreateJavaType(ctx.sortId());
+            return getOrCreateJavaType(ctx.term().getText(), ctx);
         case VARIABLE:
             return varId(ctx, ctx.getText());
         case STRING:
@@ -319,12 +322,46 @@ public class TacletPBuilder extends ExpressionBuilder {
         return null;
     }
 
-    private KeYJavaType getOrCreateJavaType(KeYParser.SortIdContext sortId) {
-        KeYJavaType t = getJavaInfo().getKeYJavaType(sortId.getText());
+    private Sort visitSortId(String text, ParserRuleContext ctx) {
+        String primitiveName = text;
+        Type t = null;
+        if (primitiveName.equals(PrimitiveType.JAVA_BYTE.getName())) {
+            t = PrimitiveType.JAVA_BYTE;
+            primitiveName = PrimitiveType.JAVA_INT.getName();
+        } else if (primitiveName.equals(PrimitiveType.JAVA_CHAR.getName())) {
+            t = PrimitiveType.JAVA_CHAR;
+            primitiveName = PrimitiveType.JAVA_INT.getName();
+        } else if (primitiveName.equals(PrimitiveType.JAVA_SHORT.getName())) {
+            t = PrimitiveType.JAVA_SHORT;
+            primitiveName = PrimitiveType.JAVA_INT.getName();
+        } else if (primitiveName.equals(PrimitiveType.JAVA_INT.getName())) {
+            t = PrimitiveType.JAVA_INT;
+            primitiveName = PrimitiveType.JAVA_INT.getName();
+        } else if (primitiveName.equals(PrimitiveType.JAVA_LONG.getName())) {
+            t = PrimitiveType.JAVA_LONG;
+            primitiveName = PrimitiveType.JAVA_INT.getName();
+        } else if (primitiveName.equals(PrimitiveType.JAVA_BIGINT.getName())) {
+            t = PrimitiveType.JAVA_BIGINT;
+            primitiveName = PrimitiveType.JAVA_BIGINT.getName();
+        }
+        Sort s = lookupSort(primitiveName);
+        if (s == null) {
+            semanticError(ctx, "Could not find sort: %s", text);
+        }
+
+        if (text.contains("[")) {
+            var num = text.indexOf('[') - text.lastIndexOf(']') / 2 + 1;
+            return toArraySort(new Pair<>(s, t), num);
+        }
+        return s;
+    }
+
+    private KeYJavaType getOrCreateJavaType(String sortId, ParserRuleContext ctx) {
+        KeYJavaType t = getJavaInfo().getKeYJavaType(sortId);
         if (t != null) {
             return t;
         }
-        return new KeYJavaType((Sort) accept(sortId));
+        return new KeYJavaType((Sort) visitSortId(sortId, ctx));
     }
 
 
@@ -337,7 +374,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             return TypeResolver.createContainerTypeResolver(y);
         }
 
-        Sort s = accept(ctx.sortId());
+        Sort s = visitSortId(ctx.term().getText(), ctx.term());
         if (s != null) {
             if (s instanceof GenericSort) {
                 return TypeResolver.createGenericSortResolver((GenericSort) s);
@@ -373,13 +410,10 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public ChoiceExpr visitOption_list(KeYParser.Option_listContext ctx) {
-        if (ctx.option().isEmpty()) {
-            return accept(ctx.option_expr());
-        } else {
-            return ctx.option().stream()
-                    .map(it -> ChoiceExpr.variable(it.cat.getText(), it.value.getText()))
-                    .reduce(ChoiceExpr::and).orElse(ChoiceExpr.TRUE);
-        }
+        return ctx.option_expr().stream()
+                .map(it -> (ChoiceExpr) accept(it))
+                .reduce(ChoiceExpr::and)
+                .orElse(ChoiceExpr.TRUE);
     }
 
     @Override

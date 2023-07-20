@@ -1,4 +1,4 @@
-package org.key_project.action_history;
+package de.uka.ilkd.key.gui.plugins.action_history;
 
 import java.awt.event.*;
 import java.util.*;
@@ -171,7 +171,7 @@ public class UndoHistoryButton {
      *
      * @return the action
      */
-    protected MainWindowAction getAction() {
+    public MainWindowAction getAction() {
         return action;
     }
 
