@@ -112,7 +112,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
             private long runTime;
 
             @Override
-            protected Throwable doInBackground() throws Exception {
+            protected Throwable doInBackground() {
                 long currentTime = System.currentTimeMillis();
                 final Throwable message = doWork();
                 runTime = System.currentTimeMillis() - currentTime;

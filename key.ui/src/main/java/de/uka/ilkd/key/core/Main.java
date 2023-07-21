@@ -178,6 +178,8 @@ public final class Main {
         // does no harm on non macs
         System.setProperty("apple.laf.useScreenMenuBar", "true");
 
+        Watchdog.start();
+
         try {
             cl = createCommandLine();
             cl.parse(args);
