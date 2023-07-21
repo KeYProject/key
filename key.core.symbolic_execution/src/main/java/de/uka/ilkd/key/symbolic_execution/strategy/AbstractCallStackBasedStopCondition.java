@@ -126,7 +126,7 @@ public abstract class AbstractCallStackBasedStopCondition implements StopConditi
                     Iterator<Node> childIter = updatedNode.childrenIterator();
                     while (childIter.hasNext()) {
                         Node next = childIter.next();
-                        Goal nextGoal = next.proof().getGoal(next);
+                        Goal nextGoal = next.proof().getOpenGoal(next);
                         // Check if the current goal is a new one
                         if (nextGoal != goal) {
                             // New goal found, use the initial call stack size for it.

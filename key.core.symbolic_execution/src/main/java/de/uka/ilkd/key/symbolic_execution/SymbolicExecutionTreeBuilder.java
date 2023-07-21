@@ -891,7 +891,7 @@ public class SymbolicExecutionTreeBuilder {
                                                                                   // tests for
                                                                                   // unknown
                                                                                   // reasons.
-                Goal goal = proof.getGoal(node);
+                Goal goal = proof.getOpenGoal(node);
                 if (goal != null) {
                     currentOrFutureRuleApplication = goal.getRuleAppManager().peekNext();
                 }
@@ -1273,7 +1273,7 @@ public class SymbolicExecutionTreeBuilder {
                 // Check selected child
                 if (node != null) {
                     if (node.childrenCount() == 0) {
-                        Goal goal = proof.getGoal(node);
+                        Goal goal = proof.getOpenGoal(node);
                         ruleApp = goal.getRuleAppManager().peekNext();
                     } else {
                         ruleApp = node.getAppliedRuleApp();

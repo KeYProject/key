@@ -21,6 +21,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -69,7 +70,7 @@ import org.key_project.util.collection.ImmutableSet;
  * {@link de.uka.ilkd.key.rule.TacletApp TacletApp}
  * </p>
  */
-public abstract class Taclet implements Rule, Named {
+public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
 
     protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
 
@@ -158,6 +159,8 @@ public abstract class Taclet implements Rule, Named {
 
     /** Integer to cache the hashcode */
     private int hashcode = 0;
+    /** Integer to cache the hashcode */
+    private int hashcode2 = 0;
 
     private final Trigger trigger;
 
@@ -474,6 +477,43 @@ public abstract class Taclet implements Rule, Named {
     }
 
     @Override
+    public boolean equalsModProofIrrelevancy(Object o) {
+        if (o == this)
+            return true;
+
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
+
+        final Taclet t2 = (Taclet) o;
+
+        if ((ifSequent == null && t2.ifSequent != null)
+                || (ifSequent != null && t2.ifSequent == null)) {
+            return false;
+        } else {
+            ImmutableList<SequentFormula> if1 = ifSequent.asList();
+            ImmutableList<SequentFormula> if2 = t2.ifSequent.asList();
+            while (if1.head() != null && if1.head().equalsModProofIrrelevancy(if2.head())) {
+                if1 = if1.tail();
+                if2 = if2.tail();
+            }
+            if (if1.head() != null || if2.head() != null) {
+                return false;
+            }
+        }
+
+        if (!choices.equals(t2.choices)) {
+            return false;
+        }
+
+        if (!goalTemplates.equals(t2.goalTemplates)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
     public int hashCode() {
         if (hashcode == 0) {
             hashcode = 37 * name.hashCode() + 17;
@@ -482,6 +522,17 @@ public abstract class Taclet implements Rule, Named {
             }
         }
         return hashcode;
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        if (hashcode2 == 0) {
+            hashcode2 = ifSequent.getFormulabyNr(1).hashCodeModProofIrrelevancy();
+            if (hashcode2 == 0) {
+                hashcode2 = -1;
+            }
+        }
+        return hashcode2;
     }
 
     /**

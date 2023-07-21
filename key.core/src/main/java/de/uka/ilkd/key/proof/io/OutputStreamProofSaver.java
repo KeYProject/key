@@ -71,8 +71,6 @@ public class OutputStreamProofSaver {
      */
     protected final boolean saveProofSteps;
 
-    private LogicPrinter printer;
-
 
     /**
      * Extracts java source directory from {@link Proof#header()}, if it exists.
@@ -151,6 +149,7 @@ public class OutputStreamProofSaver {
     }
 
     public void save(OutputStream out) throws IOException {
+        proof.copyCachedGoals(null, null, null);
         try (var ps = new PrintWriter(out, true, StandardCharsets.UTF_8)) {
             final ProofOblInput po =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
@@ -580,7 +579,7 @@ public class OutputStreamProofSaver {
      */
     private void printSingleNode(Node node, String prefix, Appendable output) throws IOException {
         final RuleApp appliedRuleApp = node.getAppliedRuleApp();
-        if (appliedRuleApp == null && (proof.getGoal(node) != null)) {
+        if (appliedRuleApp == null && (proof.getOpenGoal(node) != null)) {
             // open goal
             output.append(prefix);
             output.append(" (opengoal \"");

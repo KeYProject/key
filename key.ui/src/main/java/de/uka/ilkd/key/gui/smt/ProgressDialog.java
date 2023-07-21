@@ -15,6 +15,8 @@ import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
 import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
 import de.uka.ilkd.key.smt.SMTFocusResults;
 
+import org.key_project.util.java.SwingUtil;
+
 /**
  * Dialog showing launched SMT processes and results.
  */
@@ -177,14 +179,7 @@ public class ProgressDialog extends JDialog {
 
     private JScrollPane getScrollPane() {
         if (scrollPane == null) {
-            scrollPane = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-
-            Dimension dim = new Dimension(table.getPreferredSize());
-            dim.width += (Integer) UIManager.get("ScrollBar.width") + 2;
-            dim.height = scrollPane.getPreferredSize().height;
-            scrollPane.setPreferredSize(dim);
-
+            scrollPane = SwingUtil.createScrollPane(table);
         }
         return scrollPane;
     }
