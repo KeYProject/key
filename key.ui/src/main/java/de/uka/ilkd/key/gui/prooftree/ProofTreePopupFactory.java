@@ -364,7 +364,7 @@ public class ProofTreePopupFactory {
             if (context.proof != null) {
                 // disable pruning for goals and disable it for closed subtrees if the command line
                 // option "--no-pruning-closed" is set (saves memory)
-                if (!context.proof.isGoal(context.invokedNode)
+                if (!context.proof.isOpenGoal(context.invokedNode)
                         && !context.proof.isClosedGoal(context.invokedNode)
                         && (context.proof.getSubtreeGoals(context.invokedNode).size() > 0
                                 || (!GeneralSettings.noPruningClosed && context.proof

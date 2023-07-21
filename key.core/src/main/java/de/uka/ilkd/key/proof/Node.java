@@ -594,7 +594,7 @@ public class Node implements Iterable<Node> {
 
             RuleApp rap = getAppliedRuleApp();
             if (rap == null) {
-                final Goal goal = proof().getGoal(this);
+                final Goal goal = proof().getOpenGoal(this);
                 if (this.isClosed() && lookup(ClosedBy.class) != null) {
                     cachedName = CACHED_GOAL;
                 } else if (this.isClosed()) {

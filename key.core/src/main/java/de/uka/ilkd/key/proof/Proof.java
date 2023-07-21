@@ -536,7 +536,7 @@ public class Proof implements Named {
         Goal goal;
 
         while (it.hasNext()) {
-            goal = getGoal(it.next());
+            goal = getOpenGoal(it.next());
             if (goal != null) {
                 b = true;
                 if (!GeneralSettings.noPruningClosed) {
@@ -715,7 +715,7 @@ public class Proof implements Named {
 
             // first leaf is closed -> add as goal and reopen
             final Goal firstGoal =
-                firstLeaf.isClosed() ? getClosedGoal(firstLeaf) : getGoal(firstLeaf);
+                firstLeaf.isClosed() ? getClosedGoal(firstLeaf) : getOpenGoal(firstLeaf);
             assert firstGoal != null;
             if (firstLeaf.isClosed()) {
                 reOpenGoal(firstGoal);
@@ -851,7 +851,7 @@ public class Proof implements Named {
 
     public synchronized ImmutableList<Node> pruneProof(Node cuttingPoint, boolean fireChanges) {
         assert cuttingPoint.proof() == this;
-        if (getGoal(cuttingPoint) != null) {
+        if (getOpenGoal(cuttingPoint) != null) {
             return null;
         }
         // abort pruning if the node is closed and pruning in closed branches is disabled
@@ -1072,8 +1072,8 @@ public class Proof implements Named {
      *
      * @return true if the given node is part of a Goal
      */
-    public boolean isGoal(Node node) {
-        return getGoal(node) != null;
+    public boolean isOpenGoal(Node node) {
+        return getOpenGoal(node) != null;
     }
 
 
@@ -1082,7 +1082,7 @@ public class Proof implements Named {
      *
      * @return the goal that belongs to the given node or null if the node is an inner one
      */
-    public Goal getGoal(Node node) {
+    public Goal getOpenGoal(Node node) {
         for (final Goal result : openGoals) {
             if (result.node() == node) {
                 return result;

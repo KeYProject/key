@@ -579,7 +579,7 @@ public class OutputStreamProofSaver {
      */
     private void printSingleNode(Node node, String prefix, Appendable output) throws IOException {
         final RuleApp appliedRuleApp = node.getAppliedRuleApp();
-        if (appliedRuleApp == null && (proof.getGoal(node) != null)) {
+        if (appliedRuleApp == null && (proof.getOpenGoal(node) != null)) {
             // open goal
             output.append(prefix);
             output.append(" (opengoal \"");

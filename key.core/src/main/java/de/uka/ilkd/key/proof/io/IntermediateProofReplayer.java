@@ -204,7 +204,7 @@ public class IntermediateProofReplayer {
             final Pair<Node, NodeIntermediate> currentP = queue.pollFirst();
             final Node currNode = currentP.first;
             final NodeIntermediate currNodeInterm = currentP.second;
-            currGoal = proof.getGoal(currNode);
+            currGoal = proof.getOpenGoal(currNode);
 
             try {
                 if (currNodeInterm instanceof BranchNodeIntermediate) {
@@ -403,7 +403,7 @@ public class IntermediateProofReplayer {
             // check in the above conjunction.
 
             Node child = children.next();
-            if (!proof.getGoal(child).isLinked()) {
+            if (!proof.getOpenGoal(child).isLinked()) {
                 queue.add(i, new Pair<>(child, intermChildren.get(i++)));
             }
         }
@@ -736,7 +736,8 @@ public class IntermediateProofReplayer {
                 try {
                     predicates =
                         AbstractionPredicate.fromString(joinAppInterm.getAbstractionPredicates(),
-                            services, services.getProof().getGoal(currNode).getLocalNamespaces());
+                            services,
+                            services.getProof().getOpenGoal(currNode).getLocalNamespaces());
                 } catch (ParserException e) {
                     errors.add(e);
                 }
@@ -815,7 +816,7 @@ public class IntermediateProofReplayer {
                     : "Cannot merge incompatible program counters";
 
             joinPartners = joinPartners.append(
-                new MergePartner(proof.getGoal(partnerNodeInfo.first), partnerNodeInfo.second));
+                new MergePartner(proof.getOpenGoal(partnerNodeInfo.first), partnerNodeInfo.second));
         }
 
         joinApp.setMergeNode(currNode);

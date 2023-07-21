@@ -925,7 +925,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 selectBranchNode((GUIBranchNode) treeNode);
             } else {
                 Node node = treeNode.getNode();
-                Goal selected = proof.getGoal(node);
+                Goal selected = proof.getOpenGoal(node);
                 if (selected != null) {
                     mediator.goalChosen(selected);
                 } else if (treeNode instanceof GUIOneStepChildTreeNode) {
@@ -1059,7 +1059,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                     @Override
                     public void visit(Proof proof, Node visitedNode) {
                         Goal g;
-                        if ((g = proof.getGoal(visitedNode)) != null && g.isLinked()) {
+                        if ((g = proof.getOpenGoal(visitedNode)) != null && g.isLinked()) {
                             this.isLinked = true;
                         }
                     }
@@ -1074,7 +1074,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         private void renderLeaf(Style style, GUIAbstractTreeNode node) {
             Node leaf = node.getNode();
-            Goal goal = proof.getGoal(leaf);
+            Goal goal = proof.getOpenGoal(leaf);
             String toolTipText;
 
             if (goal == null || leaf.isClosed()) {

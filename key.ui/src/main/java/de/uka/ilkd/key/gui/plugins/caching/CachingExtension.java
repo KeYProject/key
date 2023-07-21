@@ -27,7 +27,6 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
-import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
@@ -306,7 +305,7 @@ public class CachingExtension
                 ClosedBy c = ReferenceSearcher.findPreviousProof(
                     mediator.getCurrentlyOpenedProofs(), n);
                 if (c != null) {
-                    n.proof().closeGoal(n.proof().getGoal(n));
+                    n.proof().closeGoal(n.proof().getOpenGoal(n));
                     n.register(c, ClosedBy.class);
                 } else {
                     mismatches.add(n.serialNr());
@@ -353,12 +352,12 @@ public class CachingExtension
         @Override
         public void actionPerformed(ActionEvent e) {
             ClosedBy c = node.lookup(ClosedBy.class);
-            Goal current = node.proof().getGoal(node);
+            Goal current = node.proof().getClosedGoal(node);
             try {
                 mediator.stopInterface(true);
                 new CopyingProofReplayer(c.getProof(), node.proof()).copy(c.getNode(), current);
                 mediator.startInterface(true);
-            } catch (IntermediateProofReplayer.BuiltInConstructionException ex) {
+            } catch (Exception ex) {
                 LOGGER.error("failed to copy proof ", ex);
                 IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
             }

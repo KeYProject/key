@@ -121,7 +121,7 @@ public class ShowProofStatistics extends MainWindowAction {
 
         Iterator<Node> leavesIt = node.leavesIterator();
         while (leavesIt.hasNext()) {
-            if (node.proof().getGoal(leavesIt.next()) != null) {
+            if (node.proof().getOpenGoal(leavesIt.next()) != null) {
                 if (node.lookup(ClosedBy.class) != null) {
                     cachedGoals++;
                 } else {

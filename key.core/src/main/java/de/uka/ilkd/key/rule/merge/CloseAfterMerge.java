@@ -199,7 +199,7 @@ public class CloseAfterMerge implements BuiltInRule {
             new Function(predicateSymbName, Sort.FORMULA, new ImmutableArray<>(argSorts));
 
         final Goal mergedGoal =
-            services.getProof().getGoal(closeApp.getMergeState().getCorrespondingNode());
+            services.getProof().getOpenGoal(closeApp.getMergeState().getCorrespondingNode());
 
         isWeakeningGoal.getLocalNamespaces().functions().add(predicateSymb);
         isWeakeningGoal.getLocalNamespaces().add(mergedGoal.getLocalNamespaces());

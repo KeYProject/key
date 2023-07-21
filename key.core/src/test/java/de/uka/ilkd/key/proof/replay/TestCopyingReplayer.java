@@ -41,7 +41,8 @@ class TestCopyingReplayer {
         // clear proof2, replay proof1 on top
         proof2.pruneProof(proof2.root());
         proof2.getServices().resetCounters();
-        new CopyingProofReplayer(proof1, proof2).copy(proof1.root(), proof2.getGoal(proof2.root()));
+        new CopyingProofReplayer(proof1, proof2).copy(proof1.root(),
+            proof2.getOpenGoal(proof2.root()));
 
         Assertions.assertTrue(proof2.closed());
         Assertions.assertEquals(proof1.countNodes(), proof2.countNodes());
