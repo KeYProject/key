@@ -1131,16 +1131,23 @@ public class PrettyPrinter implements Visitor {
         beginMultilineBracket();
 
         IProgramVariable var = x.getProgramVariable();
+        var exec = x.getExecutionContext();
         if (var != null) {
             l.beginRelativeC().print("result->");
             var.visit(this);
-            l.print(",").end().brk();
+            if (exec != null) {
+                l.print(",");
+            }
+            l.end();
+            if (exec != null) {
+                l.brk();
+            }
         }
 
-        if (x.getExecutionContext() instanceof ExecutionContext) {
-            performActionOnExecutionContext((ExecutionContext) x.getExecutionContext());
-        } else {
-            performActionOnSchemaVariable((SchemaVariable) x.getExecutionContext());
+        if (exec instanceof ExecutionContext) {
+            performActionOnExecutionContext((ExecutionContext) exec);
+        } else if (exec != null) {
+            performActionOnSchemaVariable((SchemaVariable) exec);
         }
 
         endMultilineBracket();

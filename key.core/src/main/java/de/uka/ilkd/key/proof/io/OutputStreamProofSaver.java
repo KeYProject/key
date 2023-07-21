@@ -12,6 +12,7 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -69,8 +70,6 @@ public class OutputStreamProofSaver {
      * Whether the proof steps should be output (usually true).
      */
     protected final boolean saveProofSteps;
-
-    private LogicPrinter printer;
 
 
     /**
@@ -150,6 +149,7 @@ public class OutputStreamProofSaver {
     }
 
     public void save(OutputStream out) throws IOException {
+        proof.copyCachedGoals(null, null, null);
         try (var ps = new PrintWriter(out, true, StandardCharsets.UTF_8)) {
             final ProofOblInput po =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
@@ -539,6 +539,18 @@ public class OutputStreamProofSaver {
         if (appliedRuleApp.rule() instanceof UseOperationContractRule
                 || appliedRuleApp.rule() instanceof UseDependencyContractRule) {
             printRuleJustification(appliedRuleApp, output);
+
+            // for operation contract rules we add the modality under which the rule was applied
+            // -> needed for proof management tool
+            if (appliedRuleApp.rule() instanceof UseOperationContractRule) {
+                if (appliedRuleApp instanceof ContractRuleApp) {
+                    ContractRuleApp app = (ContractRuleApp) appliedRuleApp;
+                    Modality modality = (Modality) app.programTerm().op();
+                    output.append(" (modality \"");
+                    output.append(modality.toString());
+                    output.append("\")");
+                }
+            }
         }
         if (appliedRuleApp instanceof MergeRuleBuiltInRuleApp) {
             printSingleMergeRuleApp((MergeRuleBuiltInRuleApp) appliedRuleApp, node, prefix, output);
@@ -567,7 +579,7 @@ public class OutputStreamProofSaver {
      */
     private void printSingleNode(Node node, String prefix, Appendable output) throws IOException {
         final RuleApp appliedRuleApp = node.getAppliedRuleApp();
-        if (appliedRuleApp == null && (proof.getGoal(node) != null)) {
+        if (appliedRuleApp == null && (proof.getOpenGoal(node) != null)) {
             // open goal
             output.append(prefix);
             output.append(" (opengoal \"");

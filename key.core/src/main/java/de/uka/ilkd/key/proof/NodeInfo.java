@@ -6,9 +6,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -28,7 +26,6 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
-import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -266,26 +263,6 @@ public class NodeInfo {
      */
     public String getBranchLabel() {
         return branchLabel;
-    }
-
-    /**
-     * returns the name of the source file where the active statement occurs or the string
-     * <tt>NONE</tt> if the statement does not originate from a source file (e.g. created by a
-     * taclet application or part of a generated implicit method)
-     *
-     * @return name of source file as described above
-     */
-    public String getExecStatementParentClass() {
-        determineFirstAndActiveStatement();
-        if (activeStatement instanceof JavaSourceElement) {
-            PositionInfo posInf = activeStatement.getPositionInfo();
-            // extract the file path as a string if possible
-            String pathStr = MiscTools.getSourcePath(posInf);
-            if (pathStr != null) {
-                return pathStr;
-            }
-        }
-        return "<NONE>";
     }
 
     /**

@@ -187,15 +187,17 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
 
         try {
             if (origin != null) {
-                originHighlights.addAll(sourceView.addHighlightsForJMLStatement(origin.fileName,
-                    origin.line, ORIGIN_HIGHLIGHT_COLOR.get(), 20));
+                originHighlights.addAll(
+                    sourceView.addHighlightsForJMLStatement(origin.getFileName().orElse(null),
+                        origin.getLine(), ORIGIN_HIGHLIGHT_COLOR.get(), 20));
             }
 
             for (FileOrigin subtermOrigin : subtermOrigins) {
                 if (!subtermOrigin.equals(origin)) {
                     originHighlights
-                            .addAll(sourceView.addHighlightsForJMLStatement(subtermOrigin.fileName,
-                                subtermOrigin.line, SUBTERM_ORIGIN_HIGHLIGHT_COLOR.get(), 10));
+                            .addAll(sourceView.addHighlightsForJMLStatement(
+                                subtermOrigin.getFileName().orElse(null),
+                                subtermOrigin.getLine(), SUBTERM_ORIGIN_HIGHLIGHT_COLOR.get(), 10));
                 }
             }
         } catch (BadLocationException | IOException e) {

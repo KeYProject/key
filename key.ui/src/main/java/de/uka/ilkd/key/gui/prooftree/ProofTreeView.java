@@ -32,7 +32,9 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -52,10 +54,16 @@ public class ProofTreeView extends JPanel implements TabPanel {
         ColorSettings.define("[proofTree]gray", "", Color.DARK_GRAY);
     public static final ColorSettings.ColorProperty LIGHT_BLUE_COLOR =
         ColorSettings.define("[proofTree]lightBlue", "", new Color(230, 254, 255));
+    /**
+     * Color used for closed goals.
+     */
     public static final ColorSettings.ColorProperty DARK_GREEN_COLOR =
         ColorSettings.define("[proofTree]darkGreen", "", new Color(0, 128, 51));
     public static final ColorSettings.ColorProperty DARK_RED_COLOR =
         ColorSettings.define("[proofTree]darkRed", "", new Color(191, 0, 0));
+    /**
+     * Color used for linked goals.
+     */
     public static final ColorSettings.ColorProperty PINK_COLOR =
         ColorSettings.define("[proofTree]pink", "", new Color(255, 0, 240));
     public static final ColorSettings.ColorProperty ORANGE_COLOR =
@@ -70,7 +78,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
     private static final long serialVersionUID = 3732875161168302809L;
 
-    /** Whether to expand oss nodes when using expand all */
+    /**
+     * Whether to expand oss nodes when using expand all
+     */
     private boolean expandOSSNodes = false;
 
     /**
@@ -190,6 +200,32 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 }
             }
         };
+        var renderer = delegateView.getCellRenderer() instanceof DefaultTreeCellRenderer
+                ? (DefaultTreeCellRenderer) delegateView.getCellRenderer()
+                : null;
+
+        // Create a cell editor that denies editing on all nodes except for branch nodes
+        delegateView.setCellEditor(new DefaultTreeCellEditor(delegateView, renderer) {
+            @Override
+            public boolean isCellEditable(EventObject event) {
+                if (event == null || event.getSource() != delegateView
+                        || !(event instanceof MouseEvent)) {
+                    // This pass through is needed and somehow correct
+                    return super.isCellEditable(event);
+                }
+                TreePath path = tree.getPathForLocation(
+                    ((MouseEvent) event).getX(),
+                    ((MouseEvent) event).getY());
+                if (path == null) {
+                    return false;
+                }
+                var last = path.getLastPathComponent();
+                var isValidNode = last instanceof GUIBranchNode &&
+                        ((GUIBranchNode) last).getNode().parent() != null;
+                return isValidNode && super.isCellEditable(event);
+            }
+        });
+        delegateView.setEditable(true);
         iconHeight = delegateView.getFontMetrics(delegateView.getFont()).getHeight();
         delegateView.setUI(new CacheLessMetalTreeUI());
 
@@ -430,7 +466,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             // Redraw the tree in case the ProofTreeViewFilters have changed
             // since the last time the proof was loaded.
-            delegateModel.setFilterImmediately(filter, filter != null && filter.isActive());
+            delegateModel.setFilter(filter, filter != null && filter.isActive());
 
             // Expand previously visible rows.
             for (int i : rowsToExpand) {
@@ -458,6 +494,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
             expansionState = null;
         }
         proofTreeSearchPanel.reset();
+
+        for (ProofTreeViewFilter f : ProofTreeViewFilter.ALL) {
+            if (f.isActive()) {
+                setFilter(f, true);
+            }
+        }
     }
 
     public void removeProofs(Proof[] ps) {
@@ -883,17 +925,29 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 selectBranchNode((GUIBranchNode) treeNode);
             } else {
                 Node node = treeNode.getNode();
-                Goal selected = proof.getGoal(node);
+                Goal selected = proof.getOpenGoal(node);
                 if (selected != null) {
                     mediator.goalChosen(selected);
+                } else if (treeNode instanceof GUIOneStepChildTreeNode) {
+                    // One Step Simplifier child node: show a sequent modified to include
+                    // the transformed formula
+                    var ossNode = ((GUIOneStepChildTreeNode) treeNode);
+                    var pio = ossNode.getRuleApp().posInOccurrence();
+                    var ossParentNode = ((GUIProofTreeNode) ossNode.getParent());
+                    var newSequent = ossParentNode.getNode().sequent();
+                    var modifiedSequent = newSequent
+                            .replaceFormula(ossNode.getFormulaNr(), pio.sequentFormula()).sequent();
+                    mediator.getSelectionModel().setSelectedSequentAndRuleApp(
+                        ossParentNode.getNode(), modifiedSequent, ossNode.getRuleApp());
+
+                    // ensure the proper node is selected in the tree
+                    ignoreChange = true;
+                    delegateView.setSelectionPath(newTP);
+                    ignoreChange = false;
                 } else {
                     mediator.nonGoalNodeChosen(node);
                 }
             }
-
-            // catching NullPointerException occurring when renaming root node
-            delegateView.setEditable(
-                treeNode instanceof GUIBranchNode && treeNode.getNode().parent() != null);
         }
     }
 
@@ -930,6 +984,22 @@ public class ProofTreeView extends JPanel implements TabPanel {
         }
         result.append("</html>");
         return result.toString();
+    }
+
+    private static String cutIfTooLong(String str) {
+        return cutAfterNLines(str,
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getMaxTooltipLines());
+    }
+
+    private static String cutAfterNLines(final String str, final int maxLines) {
+        final String newLine = "\n";
+        int idx = 0;
+        int lines = 1;
+        while (lines <= maxLines && (idx = str.indexOf(newLine, idx)) != -1) {
+            lines++;
+            idx += newLine.length();
+        }
+        return idx == -1 ? str : str.substring(0, idx) + " ...";
     }
 
     /**
@@ -989,7 +1059,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                     @Override
                     public void visit(Proof proof, Node visitedNode) {
                         Goal g;
-                        if ((g = proof.getGoal(visitedNode)) != null && g.isLinked()) {
+                        if ((g = proof.getOpenGoal(visitedNode)) != null && g.isLinked()) {
                             this.isLinked = true;
                         }
                     }
@@ -1004,17 +1074,29 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         private void renderLeaf(Style style, GUIAbstractTreeNode node) {
             Node leaf = node.getNode();
-            Goal goal = proof.getGoal(leaf);
+            Goal goal = proof.getOpenGoal(leaf);
             String toolTipText;
 
             if (goal == null || leaf.isClosed()) {
+                ClosedBy c = leaf.lookup(ClosedBy.class);
+                if (c != null) {
+                    style.icon = IconFactory.keyCachedClosed(iconHeight, iconHeight);
+                } else {
+                    style.icon = IconFactory.keyHoleClosed(iconHeight);
+                }
                 style.foreground = DARK_GREEN_COLOR.get();
-                style.icon = IconFactory.keyHoleClosed(iconHeight);
                 toolTipText = "A closed goal";
+                if (c != null) {
+                    toolTipText += " (by reference to other proof)";
+                }
             } else if (goal.isLinked()) {
                 style.foreground = PINK_COLOR.get();
                 style.icon = IconFactory.keyHoleLinked(20, 20);
                 toolTipText = "Linked goal - no automatic rule application";
+            } else if (leaf.lookup(ClosedBy.class) != null) {
+                style.foreground = DARK_GREEN_COLOR.get();
+                style.icon = IconFactory.keyCachedClosed(iconHeight, iconHeight);
+                toolTipText = "Cached goal - reference to another proof";
             } else if (!goal.isAutomatic()) {
                 style.foreground = ORANGE_COLOR.get();
                 style.icon = IconFactory.keyHoleInteractive(20, 20);
@@ -1043,7 +1125,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             if (pio != null) {
                 String on = LogicPrinter.quickPrintTerm(
                     pio.subTerm(), node.proof().getServices());
-                style.tooltip.addAppliedOn(on);
+                style.tooltip.addAppliedOn(cutIfTooLong(on));
             }
 
             final String notes = node.getNodeInfo().getNotes();
@@ -1094,7 +1176,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                     printer.print(active);
                     info = printer.result();
                 }
-                info = info == null ? node.name() : info;
+                info = info == null ? node.name() : cutAfterNLines(info, 5);
                 style.tooltip.addAdditionalInfo("Active statement",
                     LogicPrinter.escapeHTML(info, true), true);
             }
@@ -1122,7 +1204,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             Services services = node.getNode().proof().getServices();
             String on = LogicPrinter.quickPrintTerm(app.posInOccurrence().subTerm(), services);
             style.tooltip.addRule(style.text);
-            style.tooltip.addAppliedOn(on);
+            style.tooltip.addAppliedOn(cutIfTooLong(on));
         }
 
         @Override

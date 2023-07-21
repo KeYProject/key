@@ -80,7 +80,7 @@ public class InformationWindow extends JDialog {
         this.getContentPane().add(getTabbedPane());
         this.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        this.setLocationByPlatform(true);
+        this.setLocationRelativeTo(parent);
         this.setVisible(true);
     }
 

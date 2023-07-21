@@ -81,8 +81,9 @@ public class MergeRuleMenuItem extends JMenuItem {
                             @Override
                             protected void done() {
                                 completedApp.clearProgressListeners();
-                                mediator.getUI().taskFinished(new DefaultTaskFinishedInfo(this,
-                                    goal, goal.proof(), duration, 1, 0));
+                                mediator.getUI().taskFinished(
+                                    new DefaultTaskFinishedInfo(MergeRuleMenuItem.this,
+                                        goal, goal.proof(), duration, 1, 0));
                                 mediator.startInterface(true);
                                 mediator.getSelectionModel().setSelectedGoal(goal);
                             }
