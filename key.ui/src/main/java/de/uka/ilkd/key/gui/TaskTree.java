@@ -334,10 +334,6 @@ public class TaskTree extends JPanel {
             if (value instanceof TaskTreeNode) {
                 ProofStatus ps = ((TaskTreeNode) value).getStatus();
                 if (ps != null) {
-                    if (ps.getProofClosed()) {
-                        setIcon(KEY_CLOSED_ICON);
-                        setToolTipText("Closed proof");
-                    }
                     if (ps.getProofClosedButLemmasLeft()) {
                         setIcon(KEY_ALMOST_CLOSED_ICON);
                         setToolTipText("Closed proof (depends on other contracts)");
@@ -345,6 +341,10 @@ public class TaskTree extends JPanel {
                     if (ps.getProofClosedByCache()) {
                         setIcon(KEY_CACHED_CLOSED_ICON);
                         setToolTipText("Closed proof (using proof cache)");
+                    }
+                    if (ps.getProofClosed()) {
+                        setIcon(KEY_CLOSED_ICON);
+                        setToolTipText("Closed proof");
                     }
                     if (ps.getProofOpen()) {
                         setIcon(KEY_ICON);

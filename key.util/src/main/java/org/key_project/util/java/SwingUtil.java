@@ -1,7 +1,7 @@
 package org.key_project.util.java;
 
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 /**
  * Utilities for working with Swing.
@@ -45,7 +45,7 @@ public final class SwingUtil {
      */
     public static JScrollPane createScrollPane(JTable table) {
         var scrollPane = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
         Dimension dim = new Dimension(table.getPreferredSize());
         dim.width += (Integer) UIManager.get("ScrollBar.width") + 2;

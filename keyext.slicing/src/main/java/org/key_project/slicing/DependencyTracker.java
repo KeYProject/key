@@ -146,7 +146,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 // should only happen if the formula is the initial proof obligation
                 if (!proof.root().sequent().contains(in.sequentFormula())) {
                     throw new IllegalStateException(
-                        "found formula that was not produced by any rule!");
+                        "found formula that was not produced by any rule! " + in.sequentFormula());
                 }
                 TrackedFormula formula =
                     new TrackedFormula(in.sequentFormula(), loc, in.isInAntec(),

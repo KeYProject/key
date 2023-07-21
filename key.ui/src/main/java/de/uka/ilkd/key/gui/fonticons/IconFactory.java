@@ -209,6 +209,9 @@ public final class IconFactory {
     }
 
     private static ImageIcon scaleIcon(Image im, int x, int y) {
+        if (im.getWidth(null) == x && im.getHeight(null) == y) {
+            return new ImageIcon(im);
+        }
         Image scaledim = im.getScaledInstance(x, y, Image.SCALE_SMOOTH);
         return new ImageIcon(scaledim);
     }

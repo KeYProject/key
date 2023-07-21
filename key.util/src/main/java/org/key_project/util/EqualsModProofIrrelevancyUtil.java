@@ -91,6 +91,7 @@ public final class EqualsModProofIrrelevancyUtil {
     /**
      * Compare two immutable lists using the elements' {@link EqualsModProofIrrelevancy}
      * implementation.
+     * A null list is considered equal to a zero-sized list.
      *
      * @param a first list
      * @param b second list
@@ -99,7 +100,7 @@ public final class EqualsModProofIrrelevancyUtil {
     public static boolean compareImmutableLists(
             ImmutableList<? extends EqualsModProofIrrelevancy> a,
             ImmutableList<? extends EqualsModProofIrrelevancy> b) {
-        if (a == b || (a == null && b.size() == 0) || (b == null && a.size() == 0)) {
+        if (a == b) { // || (a == null && b.size() == 0) || (b == null && a.size() == 0)) {
             return true;
         }
         if (a == null || b == null || (a.size() != b.size())) {

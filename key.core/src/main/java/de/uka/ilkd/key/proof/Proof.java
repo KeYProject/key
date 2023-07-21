@@ -320,10 +320,6 @@ public class Proof implements Named {
         return problemHeader;
     }
 
-    public void setProblemHeader(String problemHeader) {
-        this.problemHeader = problemHeader;
-    }
-
     public ProofCorrectnessMgt mgt() {
         return localMgt;
     }
@@ -565,12 +561,13 @@ public class Proof implements Named {
      * and its associated partners have been closed and the merge node is then pruned away, the
      * partners have to be reopened again. Otherwise, we have a soundness issue.
      * <p>
-     * This does not add the goal to the list of open goals, use {@link #add(Goal)} for that.
+     * This will automatically add the goal to the list of open goals.
      * </p>
      *
      * @param goal The goal to be opened again.
      */
     public void reOpenGoal(Goal goal) {
+        add(goal);
         goal.node().reopen();
         closedGoals = closedGoals.removeAll(goal);
         fireProofStructureChanged();
@@ -598,7 +595,10 @@ public class Proof implements Named {
      * adds a new goal to the list of goals
      *
      * @param goal the Goal to be added
+     *
+     * @deprecated use {@link #reOpenGoal(Goal)} when re-opening a goal
      */
+    @Deprecated // eventually, this method should be made private
     public void add(Goal goal) {
         ImmutableList<Goal> newOpenGoals = openGoals.prepend(goal);
         if (openGoals != newOpenGoals) {
@@ -704,7 +704,6 @@ public class Proof implements Named {
                         if (linkedGoal.node().isClosed()) {
                             // The partner node has already been closed; we
                             // have to add the goal again.
-                            proof.add(linkedGoal);
                             proof.reOpenGoal(linkedGoal);
                         }
 
@@ -719,7 +718,6 @@ public class Proof implements Named {
                 firstLeaf.isClosed() ? getClosedGoal(firstLeaf) : getGoal(firstLeaf);
             assert firstGoal != null;
             if (firstLeaf.isClosed()) {
-                add(firstGoal);
                 reOpenGoal(firstGoal);
             }
 
@@ -1463,7 +1461,7 @@ public class Proof implements Named {
     public void copyCachedGoals(Proof referencedFrom, Consumer<Integer> callbackTotal,
             Runnable callbackBranch) {
         // first, ensure that all cached goals are copied over
-        List<Goal> goals = openGoals().toList();
+        List<Goal> goals = closedGoals().toList();
         List<Goal> todo = new ArrayList<>();
         for (Goal g : goals) {
             Node node = g.node();
@@ -1480,6 +1478,7 @@ public class Proof implements Named {
             callbackTotal.accept(todo.size());
         }
         for (Goal g : todo) {
+            reOpenGoal(g);
             ClosedBy c = g.node().lookup(ClosedBy.class);
             g.node().deregister(c, ClosedBy.class);
             try {

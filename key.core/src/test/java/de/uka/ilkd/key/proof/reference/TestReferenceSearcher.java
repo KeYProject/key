@@ -70,7 +70,8 @@ class TestReferenceSearcher {
         // test that copying works
         foundReference.register(close, ClosedBy.class);
         p.pruneProof(foundReference);
-        assertFalse(p.closed());
+        p.closeGoal(p.getGoal(foundReference));
+        assertTrue(p.closed());
         foundReference.proof().copyCachedGoals(p2, null, null);
         assertTrue(p.closed());
 

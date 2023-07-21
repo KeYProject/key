@@ -86,7 +86,6 @@ public class ProofSMTApplyUserAction extends UserAction {
             n.setAppliedRuleApp(null);
             // re-open the goal
             Goal firstGoal = proof.getClosedGoal(n);
-            proof.add(firstGoal);
             proof.reOpenGoal(firstGoal);
         }
     }

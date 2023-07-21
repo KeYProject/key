@@ -2,7 +2,22 @@ package de.uka.ilkd.key.proof.mgt;
 
 
 public enum ProofStatus {
-    OPEN, CLOSED_BUT_LEMMAS_LEFT, CLOSED_BY_CACHE, CLOSED;
+    /**
+     * Proof is open.
+     */
+    OPEN,
+    /**
+     * Proof is closed, but depends on other contracts.
+     */
+    CLOSED_BUT_LEMMAS_LEFT,
+    /**
+     * Proof is closed, some goals are closed by reference to the cache.
+     */
+    CLOSED_BY_CACHE,
+    /**
+     * Proof is closed.
+     */
+    CLOSED;
 
     public boolean getProofClosed() {
         return this == CLOSED;

@@ -36,6 +36,7 @@ public class CopyingProofReplayer extends AbstractProofReplayer {
      */
     public void copy(Node originalNode, Goal newNode)
             throws IntermediateProofReplayer.BuiltInConstructionException {
+        newNode.proof().reOpenGoal(newNode);
         newNode.proof().register(this, CopyingProofReplayer.class);
         newNode.proof().setMutedProofCloseEvents(true);
         OneStepSimplifier.refreshOSS(newNode.proof());

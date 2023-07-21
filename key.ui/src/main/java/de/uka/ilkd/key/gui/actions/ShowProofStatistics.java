@@ -117,32 +117,31 @@ public class ShowProofStatistics extends MainWindowAction {
 
     private static String getHTMLStatisticsMessage(Node node) {
         int openGoals = 0;
-        int openCachedGoals = 0;
+        int cachedGoals = 0;
 
         Iterator<Node> leavesIt = node.leavesIterator();
         while (leavesIt.hasNext()) {
             if (node.proof().getGoal(leavesIt.next()) != null) {
                 if (node.lookup(ClosedBy.class) != null) {
-                    openCachedGoals++;
+                    cachedGoals++;
                 } else {
                     openGoals++;
                 }
             }
         }
 
-        return getHTMLStatisticsMessage(openGoals, openCachedGoals, node.statistics());
+        return getHTMLStatisticsMessage(openGoals, cachedGoals, node.statistics());
     }
 
     private static String getHTMLStatisticsMessage(Proof proof) {
         int openGoals = proof.openGoals().size();
-        int openCachedGoals =
-            (int) proof.openGoals().stream().filter(g -> g.node().lookup(ClosedBy.class) != null)
+        int cachedGoals =
+            (int) proof.closedGoals().stream().filter(g -> g.node().lookup(ClosedBy.class) != null)
                     .count();
-        openGoals -= openCachedGoals;
-        return getHTMLStatisticsMessage(openGoals, openCachedGoals, proof.getStatistics());
+        return getHTMLStatisticsMessage(openGoals, cachedGoals, proof.getStatistics());
     }
 
-    private static String getHTMLStatisticsMessage(int openGoals, int openCachedGoals,
+    private static String getHTMLStatisticsMessage(int openGoals, int cachedGoals,
             Statistics statistics) {
         StringBuilder stats = new StringBuilder("<html><head>" + "<style type=\"text/css\">"
             + "body {font-weight: normal; text-align: center;}" + "td {padding: 1px;}"
@@ -151,12 +150,12 @@ public class ShowProofStatistics extends MainWindowAction {
         // is not possible, the underline is solid...
 
         stats.append("<br>");
-        if (openCachedGoals > 0 && openGoals > 0) {
+        if (cachedGoals > 0 && openGoals > 0) {
             stats.append("<strong>").append(openGoals).append(" open goal")
-                    .append(openGoals > 1 ? "s, " : ", ").append(openCachedGoals)
-                    .append(" cached goal").append(openCachedGoals > 1 ? "s." : ".")
+                    .append(openGoals > 1 ? "s, " : ", ").append(cachedGoals)
+                    .append(" cached goal").append(cachedGoals > 1 ? "s." : ".")
                     .append("</strong>");
-        } else if (openCachedGoals > 0) {
+        } else if (cachedGoals > 0) {
             stats.append("<strong>").append("Proved (using proof cache).").append("</strong>");
         } else if (openGoals > 0) {
             stats.append("<strong>").append(openGoals).append(" open goal")
@@ -317,7 +316,8 @@ public class ShowProofStatistics extends MainWindowAction {
             buttonPane2.add(saveButton);
             buttonPane2.add(saveBundleButton);
 
-            if (proof.openGoals().stream().anyMatch(g -> g.node().lookup(ClosedBy.class) != null)) {
+            if (proof.closedGoals().stream()
+                    .anyMatch(g -> g.node().lookup(ClosedBy.class) != null)) {
                 JButton copyReferences = new JButton("Copy referenced proof");
                 copyReferences.addActionListener(e -> {
                     dispose();

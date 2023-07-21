@@ -55,11 +55,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
     public static final ColorSettings.ColorProperty LIGHT_BLUE_COLOR =
         ColorSettings.define("[proofTree]lightBlue", "", new Color(230, 254, 255));
     /**
-     * Other green color, currently used for cached goals.
-     */
-    public static final ColorSettings.ColorProperty OTHER_GREEN_COLOR =
-        ColorSettings.define("[proofTree]otherGreen", "", new Color(0, 100, 0));
-    /**
      * Color used for closed goals.
      */
     public static final ColorSettings.ColorProperty DARK_GREEN_COLOR =
@@ -1085,7 +1080,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             if (goal == null || leaf.isClosed()) {
                 ClosedBy c = leaf.lookup(ClosedBy.class);
                 if (c != null) {
-                    style.icon = IconFactory.BACKREFERENCE.get(iconHeight);
+                    style.icon = IconFactory.keyCachedClosed(iconHeight, iconHeight);
                 } else {
                     style.icon = IconFactory.keyHoleClosed(iconHeight);
                 }
@@ -1099,8 +1094,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 style.icon = IconFactory.keyHoleLinked(20, 20);
                 toolTipText = "Linked goal - no automatic rule application";
             } else if (leaf.lookup(ClosedBy.class) != null) {
-                style.foreground = OTHER_GREEN_COLOR.get();
-                style.icon = IconFactory.BACKREFERENCE.get(16);
+                style.foreground = DARK_GREEN_COLOR.get();
+                style.icon = IconFactory.keyCachedClosed(iconHeight, iconHeight);
                 toolTipText = "Cached goal - reference to another proof";
             } else if (!goal.isAutomatic()) {
                 style.foreground = ORANGE_COLOR.get();

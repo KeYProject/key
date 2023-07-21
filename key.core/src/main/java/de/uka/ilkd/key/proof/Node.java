@@ -41,7 +41,7 @@ public class Node implements Iterable<Node> {
     private static final String OPEN_GOAL = "OPEN GOAL";
 
     private static final String CLOSED_GOAL = "Closed goal";
-    private static final String CACHED_GOAL = "Cached goal";
+    private static final String CACHED_GOAL = "Closed goal (via cache)";
 
     private static final String NODES = "nodes";
 
@@ -595,7 +595,9 @@ public class Node implements Iterable<Node> {
             RuleApp rap = getAppliedRuleApp();
             if (rap == null) {
                 final Goal goal = proof().getGoal(this);
-                if (this.isClosed()) {
+                if (this.isClosed() && lookup(ClosedBy.class) != null) {
+                    cachedName = CACHED_GOAL;
+                } else if (this.isClosed()) {
                     return CLOSED_GOAL; // don't cache this
                 } else if (goal == null) {
                     // should never happen (please check)
@@ -604,8 +606,6 @@ public class Node implements Iterable<Node> {
                     cachedName = LINKED_GOAL;
                 } else if (goal.isAutomatic()) {
                     cachedName = OPEN_GOAL;
-                } else if (goal.node().lookup(ClosedBy.class) != null) {
-                    cachedName = CACHED_GOAL;
                 } else {
                     cachedName = INTERACTIVE_GOAL;
                 }

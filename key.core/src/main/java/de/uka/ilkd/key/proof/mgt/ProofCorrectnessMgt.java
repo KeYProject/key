@@ -179,8 +179,8 @@ public final class ProofCorrectnessMgt {
         ImmutableSet<Proof> presumablyClosed = DefaultImmutableSet.nil();
         for (Proof p : all) {
             if (!p.isDisposed()) {
-                if (p.openGoals().size() > 0 && p.openGoals().stream()
-                        .allMatch(goal -> goal.node().lookup(ClosedBy.class) != null)) {
+                if (p.closedGoals().size() > 0 && p.closedGoals().stream()
+                        .anyMatch(goal -> goal.node().lookup(ClosedBy.class) != null)) {
                     p.mgt().proofStatus = ProofStatus.CLOSED_BY_CACHE;
                 } else if (p.openGoals().size() > 0) {
                     p.mgt().proofStatus = ProofStatus.OPEN;

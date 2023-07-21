@@ -38,10 +38,6 @@ public final class PathConfig {
      * In which file to store the proof-independent settings.
      */
     private static String proofIndependentSettings;
-    /**
-     * In which file to store the proof cache index.
-     */
-    private static File cacheIndex;
 
     /**
      * directory where to find the KeY configuration files
@@ -52,10 +48,6 @@ public final class PathConfig {
      * Directory in which the log files are stored.
      */
     private static File logDirectory;
-    /**
-     * Directory in which cached proofs are stored.
-     */
-    private static File cacheDirectory;
 
     private PathConfig() {
     }
@@ -86,9 +78,7 @@ public final class PathConfig {
         PathConfig.recentFileStorage = getKeyConfigDir() + File.separator + "recentFiles.props";
         PathConfig.proofIndependentSettings =
             getKeyConfigDir() + File.separator + "proofIndependentSettings.props";
-        PathConfig.cacheIndex = new File(keyConfigDir, "cachedProofs.xml");
         PathConfig.logDirectory = new File(keyConfigDir, "logs");
-        PathConfig.cacheDirectory = new File(keyConfigDir, "cachedProofs");
     }
 
     /**
@@ -116,11 +106,4 @@ public final class PathConfig {
         return proofIndependentSettings;
     }
 
-    public static File getCacheIndex() {
-        return cacheIndex;
-    }
-
-    public static File getCacheDirectory() {
-        return cacheDirectory;
-    }
 }

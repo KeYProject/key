@@ -7,6 +7,7 @@ import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
+
 import org.key_project.util.java.SwingUtil;
 
 /**
@@ -86,7 +87,7 @@ public class ReferenceSearchDialog extends JDialog {
         constraints.insets.bottom = 5;
         contentPane.add(buttonBox, constraints);
 
-        if (proof.openGoals().stream().anyMatch(g -> g.node().lookup(ClosedBy.class) != null)) {
+        if (proof.closedGoals().stream().anyMatch(g -> g.node().lookup(ClosedBy.class) != null)) {
             getApplyButton().setEnabled(true);
         }
 

@@ -2,6 +2,7 @@ package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,7 +15,6 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
@@ -35,6 +35,7 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+import de.uka.ilkd.key.settings.ProofCachingSettings;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -107,7 +108,6 @@ public class CachingExtension
             ClosedBy c = ReferenceSearcher.findPreviousProof(mediator.getCurrentlyOpenedProofs(),
                 goal.node());
             if (c != null) {
-                // p.closeGoal(goal);
                 goal.setEnabled(false);
 
                 goal.node().register(c, ClosedBy.class);
@@ -175,6 +175,12 @@ public class CachingExtension
 
     @Override
     public void taskFinished(TaskFinishedInfo info) {
+        if (info.getSource() instanceof TryCloseMacro) {
+            tryToClose = true;
+        }
+        if (!tryToClose) {
+            return; // try close macro was running, no need to do anything here
+        }
         Proof p = info.getProof();
         if (p == null || p.closed() || !(info.getSource() instanceof ApplyStrategy
                 || info.getSource() instanceof ProofMacro)) {
@@ -183,11 +189,13 @@ public class CachingExtension
         // show statistics if closed by reference
         if (p.countNodes() > 1 && p.openGoals().stream()
                 .allMatch(goal -> goal.node().lookup(ClosedBy.class) != null)) {
-            SwingUtilities.invokeLater(() -> {
-                ShowProofStatistics.Window win =
-                    new ShowProofStatistics.Window(MainWindow.getInstance(), p);
-                win.setVisible(true);
-            });
+            // mark goals as automatic again
+            p.openGoals().stream().filter(goal -> goal.node().lookup(ClosedBy.class) != null)
+                    .forEach(g -> {
+                        g.setEnabled(true);
+                        g.proof().closeGoal(g);
+                    });
+            // statistics dialog is automatically shown
         }
     }
 
@@ -230,16 +238,16 @@ public class CachingExtension
                 return;
             }
             if (CachingSettingsProvider.getCachingSettings().getDispose()
-                    .equals(CachingSettingsProvider.DISPOSE_COPY)) {
+                    .equals(ProofCachingSettings.DISPOSE_COPY)) {
                 mediator.stopInterface(true);
                 newProof.copyCachedGoals(referencedProof, null, null);
                 mediator.startInterface(true);
             } else {
-                newProof.openGoals().stream()
+                newProof.closedGoals().stream()
                         .filter(x -> x.node().lookup(ClosedBy.class) != null
                                 && x.node().lookup(ClosedBy.class).getProof() == referencedProof)
                         .forEach(x -> {
-                            x.setEnabled(true);
+                            newProof.reOpenGoal(x);
                             x.node().deregister(x.node().lookup(ClosedBy.class), ClosedBy.class);
                         });
             }
@@ -276,20 +284,38 @@ public class CachingExtension
             this.mediator = mediator;
             this.node = node;
             setName("Close by reference to other proof");
-            setEnabled(node.leaf() && !node.isClosed() && node.lookup(ClosedBy.class) == null);
+            setEnabled(!node.isClosed() && node.lookup(ClosedBy.class) == null);
             setMenuPath("Proof Caching");
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            // search other proofs for matching nodes
-            ClosedBy c = ReferenceSearcher.findPreviousProof(
-                mediator.getCurrentlyOpenedProofs(), node);
-            if (c != null) {
-                node.register(c, ClosedBy.class);
+            List<Node> nodes = new ArrayList<>();
+            if (node.leaf()) {
+                nodes.add(node);
             } else {
+                node.subtreeIterator().forEachRemaining(n -> {
+                    if (n.leaf()) {
+                        nodes.add(n);
+                    }
+                });
+            }
+            List<Integer> mismatches = new ArrayList<>();
+            for (Node n : nodes) {
+                // search other proofs for matching nodes
+                ClosedBy c = ReferenceSearcher.findPreviousProof(
+                    mediator.getCurrentlyOpenedProofs(), n);
+                if (c != null) {
+                    n.proof().closeGoal(n.proof().getGoal(n));
+                    n.register(c, ClosedBy.class);
+                } else {
+                    mismatches.add(n.serialNr());
+                }
+            }
+            if (!mismatches.isEmpty()) {
                 JOptionPane.showMessageDialog((JComponent) e.getSource(),
-                    "No matching branch found", "Proof Caching error", JOptionPane.WARNING_MESSAGE);
+                    "No matching branch found for node(s) " + Arrays.toString(mismatches.toArray()),
+                    "Proof Caching error", JOptionPane.WARNING_MESSAGE);
             }
         }
     }
@@ -319,7 +345,7 @@ public class CachingExtension
             this.mediator = mediator;
             this.node = node;
             setName("Copy referenced proof steps here");
-            setEnabled(node.leaf() && !node.isClosed()
+            setEnabled(node.leaf() && node.isClosed()
                     && node.lookup(ClosedBy.class) != null);
             setMenuPath("Proof Caching");
         }
