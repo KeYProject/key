@@ -11,6 +11,7 @@ import java.nio.charset.CodingErrorAction;
 import java.nio.file.Path;
 import java.util.*;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (19.08.19)
  */
+@NullMarked
 public final class ParsingFacade {
     private static final Logger LOGGER = LoggerFactory.getLogger(ParsingFacade.class);
 
@@ -47,8 +49,7 @@ public final class ParsingFacade {
      * @param <T> parse tree type
      * @return the {@link ParserRuleContext} inside the given ast object.
      */
-    @NonNull
-    public static <T extends ParserRuleContext> T getParseRuleContext(@NonNull KeyAst<T> ast) {
+    public static <T extends ParserRuleContext> T getParseRuleContext(KeyAst<T> ast) {
         return ast.ctx;
     }
 
@@ -78,7 +79,7 @@ public final class ParsingFacade {
      *
      * @param ctxs non-null list
      */
-    public static @NonNull ChoiceInformation getChoices(@NonNull List<KeyAst.File> ctxs) {
+    public static ChoiceInformation getChoices(List<KeyAst.File> ctxs) {
         ChoiceInformation ci = new ChoiceInformation();
         ChoiceFinder finder = new ChoiceFinder(ci);
         ctxs.forEach(it -> it.accept(finder));
@@ -162,8 +163,7 @@ public final class ParsingFacade {
      * @param ctx non-null context
      * @return non-null string
      */
-    public static @NonNull String getValueDocumentation(
-            @NonNull KeYParser.String_valueContext ctx) {
+    public static String getValueDocumentation(KeYParser.String_valueContext ctx) {
         return ctx.getText().substring(1, ctx.getText().length() - 1).replace("\\\"", "\"")
                 .replace("\\\\", "\\");
     }

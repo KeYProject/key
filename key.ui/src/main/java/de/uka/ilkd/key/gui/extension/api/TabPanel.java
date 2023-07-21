@@ -38,7 +38,7 @@ public interface TabPanel {
         return Collections.emptyList();
     }
 
-    default @Nullable DefaultCDockable.Permissions getPermissions() {
+    default DefaultCDockable.@Nullable Permissions getPermissions() {
         return null;
     }
 }

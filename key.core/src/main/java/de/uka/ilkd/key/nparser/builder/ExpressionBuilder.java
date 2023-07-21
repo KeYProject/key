@@ -1550,7 +1550,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return current;
     }
 
-    private @Nullable Term[] visitArguments(@Nullable KeYParser.Argument_listContext call) {
+    private @Nullable Term[] visitArguments(KeYParser. @Nullable Argument_listContext call) {
         List<Term> arguments = accept(call);
         return arguments == null ? null : arguments.toArray(new Term[0]);
     }
