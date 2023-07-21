@@ -76,7 +76,7 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
             return;
         }
         long foundRefs =
-            p.openGoals().stream().filter(g -> g.node().lookup(ClosedBy.class) != null).count();
+            p.closedGoals().stream().filter(g -> g.node().lookup(ClosedBy.class) != null).count();
         if (foundRefs > 0) {
             setText(String.format("Proof Caching (%d)", foundRefs));
             setForeground(COLOR_FINE.get());

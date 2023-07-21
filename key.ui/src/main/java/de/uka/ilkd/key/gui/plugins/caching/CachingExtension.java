@@ -295,7 +295,7 @@ public class CachingExtension
                 nodes.add(node);
             } else {
                 node.subtreeIterator().forEachRemaining(n -> {
-                    if (n.leaf()) {
+                    if (n.leaf() && !n.isClosed()) {
                         nodes.add(n);
                     }
                 });
