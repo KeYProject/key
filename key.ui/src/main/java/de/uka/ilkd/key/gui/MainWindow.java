@@ -42,6 +42,7 @@ import de.uka.ilkd.key.gui.nodeviews.*;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.gui.plugins.action_history.ActionHistoryExtension;
 import de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
@@ -612,6 +613,7 @@ public final class MainWindow extends JFrame {
 
     private JToolBar createFileOpsToolBar() {
         JToolBar fileOperations = new JToolBar("File Operations");
+        fileOperations.setFloatable(false);
         fileOperations.add(openFileAction);
         fileOperations.add(openMostRecentFileAction);
         fileOperations.add(editMostRecentFileAction);
@@ -625,7 +627,7 @@ public final class MainWindow extends JFrame {
 
     private JToolBar createProofControlToolBar() {
         JToolBar toolBar = new JToolBar("Proof Control");
-        toolBar.setFloatable(true);
+        toolBar.setFloatable(false);
         toolBar.setRollover(true);
 
         toolBar.add(createWiderAutoModeButton());
@@ -638,6 +640,9 @@ public final class MainWindow extends JFrame {
         toolBar.addSeparator();
         toolBar.add(new GoalBackAction(this, false));
         toolBar.add(new PruneProofAction(this));
+        var act = new ActionHistoryExtension(this, mediator);
+        toolBar.add(act.getUndoButton().getAction());
+        toolBar.add(act.getUndoUptoButton());
         toolBar.addSeparator();
 
         return toolBar;
@@ -645,7 +650,7 @@ public final class MainWindow extends JFrame {
 
     private JToolBar createNavigationToolBar() {
         JToolBar toolBar = new JToolBar("Selection Navigation");
-        toolBar.setFloatable(true);
+        toolBar.setFloatable(false);
         toolBar.setRollover(true);
 
         SelectionHistory history = new SelectionHistory(mediator);

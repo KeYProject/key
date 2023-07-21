@@ -73,6 +73,8 @@ provable ./heap/block_loop_contracts/Free/assertions0.key
 provable ./heap/block_loop_contracts/Free/assertions1.key
 provable ./heap/block_loop_contracts/Free/blockContracts0.key
 provable ./heap/block_loop_contracts/Free/blockContracts1.key
+provable ./heap/block_loop_contracts/Free/blockContracts2.key
+notprovable ./heap/block_loop_contracts/Free/blockContracts3.key
 notprovable ./heap/block_loop_contracts/Finally/block_finally.key
 notprovable ./heap/block_loop_contracts/Finally/loop_finally.key
 
@@ -330,9 +332,20 @@ provable: ./standard_key/java_dl/java5/for_Array.key
 provable: ./standard_key/java_dl/java5/for_Iterable.key
 provable: ./standard_key/java_dl/java5/for_ReferenceArray.key
 provable: ./standard_key/java_dl/jml-bigint/cast.key
+provable: ./standard_key/java_dl/jml-free/invFree1.key
+provable: ./standard_key/java_dl/jml-free/invFree2.key
+provable: ./standard_key/java_dl/jml-free/invFree3.key
+notprovable: ./standard_key/java_dl/jml-free/invFree4.key
 # proof gets very long
 # requires further investigations
 provable: ./standard_key/java_dl/jml-information-flow.key
+provable: ./standard_key/java_dl/jml-free/assignableFree0.key
+provable: ./standard_key/java_dl/jml-free/assignableFree1.key
+provable: ./standard_key/java_dl/jml-free/assignableFree2.key
+provable: ./standard_key/java_dl/jml-free/assignableFree3.key
+notprovable: ./standard_key/java_dl/jml-free/assignableFree4.key
+notprovable: ./standard_key/java_dl/jml-free/assignableFreeLoopScopeRule.key
+notprovable: ./standard_key/java_dl/jml-free/assignableFreeLoopTransformationRule.key
 notprovable: ./standard_key/java_dl/jml-min/min-unprovable1.key
 notprovable: ./standard_key/java_dl/jml-min/min-unprovable2.key
 provable: ./standard_key/java_dl/methodCall.key
