@@ -69,6 +69,7 @@ public class CachingExtension
      * Proofs tracked for automatic reference search.
      */
     private final Set<Proof> trackedProofs = new HashSet<>();
+    private ReferenceSearchButton referenceSearchButton;
 
     @Override
     public void selectedProofChanged(KeYSelectionEvent e) {
@@ -156,7 +157,8 @@ public class CachingExtension
 
     @Override
     public List<JComponent> getStatusLineComponents() {
-        return List.of(new ReferenceSearchButton(mediator));
+        referenceSearchButton = new ReferenceSearchButton(mediator);
+        return List.of(referenceSearchButton);
     }
 
     @Override
@@ -263,7 +265,7 @@ public class CachingExtension
      *
      * @author Arne Keller
      */
-    static class CloseByReference extends KeyAction {
+    private final class CloseByReference extends KeyAction {
         /**
          * The mediator.
          */
@@ -310,6 +312,9 @@ public class CachingExtension
                 } else {
                     mismatches.add(n.serialNr());
                 }
+            }
+            if (!nodes.isEmpty()) {
+                referenceSearchButton.updateState(nodes.get(0).proof());
             }
             if (!mismatches.isEmpty()) {
                 JOptionPane.showMessageDialog((JComponent) e.getSource(),
