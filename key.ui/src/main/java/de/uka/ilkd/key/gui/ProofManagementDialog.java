@@ -476,7 +476,6 @@ public final class ProofManagementDialog extends JDialog {
                     env = ui.createProofEnvironmentAndRegisterProof(po, pl, initConfig);
                 } else {
                     env.registerProof(po, pl);
-
                 }
             } catch (ProofInputException exc) {
                 IssueDialog.showExceptionDialog(MainWindow.getInstance(), exc);
@@ -485,6 +484,11 @@ public final class ProofManagementDialog extends JDialog {
             mediator.setProof(proof);
         }
         startedProof = true;
+        // starting another proof will not execute the ProblemLoader again,
+        // so we have to activate the UI here
+        if (initConfig.getServices().getSpecificationRepository().getAllProofs().size() > 1) {
+            mediator.startInterface(true);
+        }
     }
 
     private void updateStartButton() {
