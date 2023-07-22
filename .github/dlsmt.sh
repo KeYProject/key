@@ -1,4 +1,4 @@
-#!/usr/bin/sh
+#!/usr/bin/bash
 
 ## Weigl's little helper to download SMT-solvers. 
 # SPDX-License-Identifier: GPL-2.0-or-later

@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [macos-latest] # ubuntu-latest, windows-latest
         java: [11, 17]
     continue-on-error: true
     runs-on: ${{ matrix.os }}
@@ -52,7 +52,7 @@ jobs:
       fail-fast: false
       matrix:
         test: [testProveRules, testRunAllFunProofs, testRunAllInfProofs]
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ macos-latest ] # ubuntu-latest, windows-latest,
         java: [11,17]
     runs-on: ${{ matrix.os }}
     steps:
