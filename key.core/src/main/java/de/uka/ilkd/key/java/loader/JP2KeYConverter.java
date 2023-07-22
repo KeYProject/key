@@ -633,14 +633,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         }
 
         var ast = target.toAst().orElseThrow();
-        var other = (VariableDeclaration) mapping.nodeToKeY(ast)
-                .orElseGet(() -> accept(ast));
+        var tmp = (VariableDeclaration) mapping.nodeToKeY(ast);
+        VariableDeclaration other = tmp == null ? accept(ast) : tmp;
 
         ProgramVariable pv = null;
         if (target instanceof JavaParserFieldDeclaration) {
             // Field declarations can have multiple variables
             var decl = ((JavaParserFieldDeclaration) target).getVariableDeclarator();
-            var keyDecl = (VariableSpecification) mapping.nodeToKeY(decl).orElseThrow();
+            var keyDecl = (VariableSpecification) mapping.nodeToKeY(decl);
             pv = (ProgramVariable) keyDecl.getProgramVariable();
         } else {
             for (VariableSpecification variable : other.getVariables()) {
@@ -691,8 +691,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     @Override
     public Object visit(FieldDeclaration n, Void arg) {
         var existing = mapping.nodeToKeY(n);
-        if (existing.isPresent()) {
-            return existing.get();
+        if (existing != null) {
+            return existing;
         }
         var pi = createPositionInfo(n);
         var c = createComments(n);
@@ -886,14 +886,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
         var ast = target.toAst().get();
         // Make sure the field is already converted
-        var other = (VariableDeclaration) mapping.nodeToKeY(ast)
-                .orElseGet(() -> accept(ast));
+        var tmp = (VariableDeclaration) mapping.nodeToKeY(ast);
+        VariableDeclaration other = tmp == null ? accept(ast) : tmp;
         var pi = createPositionInfo(n);
         var c = createComments(n);
         if (target instanceof JavaParserFieldDeclaration) {
             // Field declarations can have multiple variables
             var decl = ((JavaParserFieldDeclaration) target).getVariableDeclarator();
-            var keyDecl = (VariableSpecification) mapping.nodeToKeY(decl).orElseThrow();
+            var keyDecl = (VariableSpecification) Objects.requireNonNull(mapping.nodeToKeY(decl));
             var pv = (ProgramVariable) keyDecl.getProgramVariable();
             if (pv.isMember()) {
                 // TODO javaparser prefix null? should we add default this?
@@ -905,7 +905,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         if (target instanceof JavaParserVariableDeclaration) {
             // Variable declarations can have multiple variables
             var decl = ((JavaParserVariableDeclaration) target).getVariableDeclarator();
-            var keyDecl = (VariableSpecification) mapping.nodeToKeY(decl).orElseThrow();
+            var keyDecl = (VariableSpecification) Objects.requireNonNull(mapping.nodeToKeY(decl));
             return (ProgramVariable) keyDecl.getProgramVariable();
         }
         if (other.getVariables().size() == 1) {
@@ -1209,8 +1209,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     @Override
     public Object visit(VariableDeclarationExpr n, Void arg) {
         var existing = mapping.nodeToKeY(n);
-        if (existing.isPresent()) {
-            return existing.get();
+        if (existing != null) {
+            return existing;
         }
         TypeReference type = requireTypeReference(n.getVariable(0).getType());
         var varsList = new ArrayList<VariableSpecification>(n.getVariables().size());
@@ -1317,7 +1317,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         }
         var spec = decl.decl;
         var varSpec = mapping.nodeToKeY(spec);
-        if (varSpec.isEmpty()) {
+        if (varSpec == null) {
             var t = spec.getType().resolve();
             var classNode = findContainingClass(spec).orElseThrow();
             var classType = new ReferenceTypeImpl(classNode.resolve());
@@ -1337,7 +1337,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                     compileTimeConstant);
             }
         } else {
-            pv = (ProgramVariable) ((VariableSpecification) varSpec.get()).getProgramVariable();
+            pv = (ProgramVariable) ((VariableSpecification) varSpec).getProgramVariable();
         }
         fieldSpecificationMapping.put(decl, pv);
 

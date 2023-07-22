@@ -100,7 +100,8 @@ public class ConstructorCall extends ProgramTransformer {
             final KeYJavaType classType, SVInstantiations svInst, Services services) {
         assert (newObjectVar == null) != (newObjectSV == null);
 
-        final ProgramVariable newObject = newObjectSV == null ? newObjectVar
+        final ProgramVariable newObject = newObjectSV == null
+                ? newObjectVar
                 : (ProgramVariable) svInst.getInstantiation(newObjectSV);
         final ExecutionContext ec = svInst.getExecutionContext();
         final ImmutableArray<Expression> arguments = constructorReference.getArguments();

@@ -1,18 +1,17 @@
 package de.uka.ilkd.key.java;
 
-import java.util.*;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import de.uka.ilkd.key.java.ast.ProgramElement;
-import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.util.Debug;
-
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.util.Debug;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.*;
 
 /**
  * @author Alexander Weigl
@@ -88,8 +87,9 @@ public class KeYJPMapping {
      *
      * @param pe a recoder.ModelElement
      */
-    public Optional<KeYJavaType> resolvedTypeToKeY(ResolvedType pe) {
-        return Optional.ofNullable(typeMap.get(pe));
+    @Nullable
+    public KeYJavaType resolvedTypeToKeY(ResolvedType pe) {
+        return typeMap.get(pe);
     }
 
     public ResolvedType resolveType(KeYJavaType pe) {
@@ -98,12 +98,15 @@ public class KeYJPMapping {
         return res;
     }
 
-    public Optional<ProgramElement> nodeToKeY(Node rm) {
-        return Optional.ofNullable(map.get(rm));
+    @Nullable
+    public ProgramElement nodeToKeY(Node rm) {
+        return map.get(rm);
     }
 
-    public Optional<ProgramElement> resolvedDeclarationToKeY(ResolvedDeclaration rm) {
-        return rm.toAst().flatMap(this::nodeToKeY);
+    @Nullable
+    public ProgramElement resolvedDeclarationToKeY(ResolvedDeclaration rm) {
+        var ast = rm.toAst();
+        return ast.map(this::nodeToKeY).orElse(null);
     }
 
     @Nullable
@@ -116,7 +119,7 @@ public class KeYJPMapping {
         var formerNode = revMap.putIfAbsent(value, node);
         if (formerValue != null && formerValue != value)
             LOGGER.error("Duplicate registration of value: {}, formerValue: {}", value,
-                formerValue);
+                    formerValue);
         if (formerNode != null && formerNode != node)
             LOGGER.error("Duplicate registration of node: {}, formerNode: {}", node, formerNode);
     }
@@ -128,7 +131,7 @@ public class KeYJPMapping {
         var formerType = typeMapRev.putIfAbsent(key, rec);
         if (formerType != null && !Objects.equals(rec, formerType))
             LOGGER.error("Duplicate registration of resolved type: {}, former: {}", rec,
-                formerType);
+                    formerType);
     }
 
     public boolean mapped(Node rec) {
@@ -201,7 +204,7 @@ public class KeYJPMapping {
      * not
      *
      * @param b boolean indicating if the special classes have been
-     *        parsed in
+     *          parsed in
      */
     public void parsedSpecial(boolean b) {
         parsedSpecial = b;
