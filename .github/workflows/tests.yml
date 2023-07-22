@@ -63,6 +63,8 @@ jobs:
           path: |
             **/build/test-results/*/*.xml
             **/build/reports/
+            !jacocoTestReport.xml
+            
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
