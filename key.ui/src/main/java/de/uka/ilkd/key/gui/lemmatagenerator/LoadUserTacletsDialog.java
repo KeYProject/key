@@ -263,9 +263,9 @@ public class LoadUserTacletsDialog extends JPanel {
             textArea.setEditable(false);
             helpWindow.getContentPane().add(new JScrollPane(textArea));
             helpWindow.setMinimumSize(new Dimension(400, 200));
-            helpWindow.setLocationRelativeTo(MainWindow.getInstance());
             helpWindow.setTitle("Help");
             helpWindow.pack();
+            helpWindow.setLocationRelativeTo(MainWindow.getInstance());
 
         }
         return helpWindow;
