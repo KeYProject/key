@@ -1,23 +1,12 @@
 package de.uka.ilkd.key.scripts;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.equality.TermLabelsProperty;
 import de.uka.ilkd.key.scripts.meta.Option;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.NoFindTaclet;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.scripts.meta.Option;
 import org.jspecify.annotations.Nullable;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
@@ -77,7 +66,18 @@ public class ExpandDefCommand extends AbstractCommand {
                     getTacletAppAtAndBelow(FILTER, new PosInOccurrence(succForm, PosInTerm.getTopLevel(), false), proof.getServices()));
         }
 
-        apps = apps.filter(it -> it instanceof PosTacletApp && it.posInOccurrence().subTerm().equals(p.on));
+        if (p.on != null) {
+            apps = apps.filter(
+                    it -> it instanceof PosTacletApp &&
+                            ((JTerm)it.posInOccurrence().subTerm()).equalsModProperty(p.on, TermLabelsProperty.TERM_LABELS_PROPERTY));
+        } else if (p.formula != null) {
+            apps = apps.filter(
+                    it -> it instanceof PosTacletApp &&
+                            ((JTerm)it.posInOccurrence().sequentFormula().formula()).equalsModProperty(p.formula, TermLabelsProperty.TERM_LABELS_PROPERTY));
+        } else {
+            throw new ScriptException("Either 'formula' or 'on' must be specified");
+        }
+
 
         if(apps.isEmpty()) {
             throw new ScriptException("There is no expansion rule app that matches 'on'");
@@ -100,6 +100,9 @@ public class ExpandDefCommand extends AbstractCommand {
         public @Nullable Term on;
         @Option(value = "occ")
         public @Nullable Integer occ;
+        @Option(value = "formula")
+        public @Nullable JTerm formula;
+
     }
 
     private static class ExpansionFilter extends TacletFilter {
