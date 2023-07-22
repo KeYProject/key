@@ -6,6 +6,7 @@ import java.util.List;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -107,7 +108,8 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         chkConfirmExit = addCheckBox("Confirm program exit", "", false, emptyValidator());
         spAutoSaveProof =
             addNumberField("Auto save proof", 0, 10000000, 1000, "", emptyValidator());
-        chkMinimizeInteraction = addCheckBox("Minimise interactions", "", false, emptyValidator());
+        chkMinimizeInteraction = addCheckBox("Minimise interactions", MinimizeInteraction.TOOL_TIP,
+            false, emptyValidator());
         chkEnsureSourceConsistency =
             addCheckBox("Ensure source consistency", "", true, emptyValidator());
         chkRightClickMacros =

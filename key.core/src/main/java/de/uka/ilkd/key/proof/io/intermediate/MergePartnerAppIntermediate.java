@@ -30,7 +30,7 @@ public class MergePartnerAppIntermediate extends BuiltInAppIntermediate {
      */
     public MergePartnerAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos,
             int mergeNodeId, ImmutableList<Name> newNames) {
-        super(ruleName, pos, null, null, newNames);
+        super(ruleName, pos, null, null, null, newNames);
 
         assert ruleName.equals(CloseAfterMerge.INSTANCE.name().toString())
                 : "Check if something should be changed when implementing a new rule for merge partners.";

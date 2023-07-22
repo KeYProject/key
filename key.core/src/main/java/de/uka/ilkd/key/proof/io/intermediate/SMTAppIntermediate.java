@@ -7,7 +7,7 @@ public class SMTAppIntermediate extends BuiltInAppIntermediate {
     private final String solver;
 
     public SMTAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos, String solver) {
-        super(ruleName, pos, null, null, null);
+        super(ruleName, pos, null, null, null, null);
         this.solver = solver;
     }
 

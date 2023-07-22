@@ -26,6 +26,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
@@ -177,6 +178,11 @@ public final class DependencyAnalyzer {
         if (GeneralSettings.noPruningClosed) {
             throw new IllegalStateException("cannot analyze proof with no (recorded) closed goals, "
                 + "try disabling GeneralSettings.noPruningClosed");
+        }
+        // first check that all goals are closed without proof caching references
+        if (!proof.closedGoals().stream()
+                .allMatch(goal -> goal.node().lookup(ClosedBy.class) == null)) {
+            throw new IllegalStateException("cannot analyze proof with cached references");
         }
 
         executionTime.start(TOTAL_WORK);

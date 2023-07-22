@@ -72,7 +72,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
 
             this.getOptionTree().getParent().setMinimumSize(getOptionTree().getPreferredSize());
             this.getContentPane().setPreferredSize(computePreferredSize(model));
-            this.setLocationByPlatform(true);
+            this.setLocationRelativeTo(MainWindow.getInstance());
             this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
             setIconImage(IconFactory.keyLogo());
             this.pack();

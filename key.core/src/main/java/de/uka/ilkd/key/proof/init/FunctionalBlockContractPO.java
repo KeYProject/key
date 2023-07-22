@@ -205,9 +205,12 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final Map<LocationVariable, Term> modifiesClauses =
             conditionsAndClausesBuilder.buildModifiesClauses();
+        final Map<LocationVariable, Term> freeModifiesClauses =
+            conditionsAndClausesBuilder.buildModifiesClauses();
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term frameCondition =
-            conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
+            conditionsAndClausesBuilder.buildFrameCondition(
+                modifiesClauses, freeModifiesClauses);
         return new Term[] { postcondition, frameCondition };
     }
 

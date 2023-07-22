@@ -12,6 +12,7 @@ import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.Contract;
 
@@ -178,7 +179,10 @@ public final class ProofCorrectnessMgt {
         ImmutableSet<Proof> presumablyClosed = DefaultImmutableSet.nil();
         for (Proof p : all) {
             if (!p.isDisposed()) {
-                if (p.openGoals().size() > 0) {
+                if (p.closedGoals().size() > 0 && p.closedGoals().stream()
+                        .anyMatch(goal -> goal.node().lookup(ClosedBy.class) != null)) {
+                    p.mgt().proofStatus = ProofStatus.CLOSED_BY_CACHE;
+                } else if (p.openGoals().size() > 0) {
                     p.mgt().proofStatus = ProofStatus.OPEN;
                 } else {
                     p.mgt().proofStatus = ProofStatus.CLOSED;

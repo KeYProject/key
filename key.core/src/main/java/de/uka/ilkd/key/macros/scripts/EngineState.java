@@ -10,8 +10,13 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.parser.DefaultTermParser;
@@ -30,6 +35,13 @@ import org.key_project.util.collection.ImmutableList;
  */
 public class EngineState {
     private final static DefaultTermParser PARSER = new DefaultTermParser();
+    private static final Function ELLIPSIS_FORMULA = new Function(new Name("__"), Sort.FORMULA) ;
+    private static final SortDependingFunction ELLIPSIS;
+    static {
+        GenericSort genericSort = new GenericSort(new Name("G"));
+        ELLIPSIS = SortDependingFunction.createFirstInstance(genericSort, new Name("_"), genericSort, new Sort[0], false);
+    }
+
     // private final Map<String, Object> arbitraryVariables = new HashMap<>();
     private final Proof proof;
     private final AbbrevMap abbrevMap = new AbbrevMap();
@@ -196,8 +208,10 @@ public class EngineState {
     public Term toTerm(String string, Sort sort) throws ParserException, ScriptException {
         StringReader reader = new StringReader(string);
         Services services = proof.getServices();
-        return PARSER.parse(reader, sort, services,
-            getFirstOpenAutomaticGoal().getLocalNamespaces(), abbrevMap);
+        NamespaceSet nss = getFirstOpenAutomaticGoal().getLocalNamespaces();
+        nss.functions().addSafely(ELLIPSIS);
+        nss.functions().addSafely(ELLIPSIS_FORMULA);
+        return PARSER.parse(reader, sort, services, nss, abbrevMap);
     }
 
     public Sort toSort(String sortName) throws ParserException, ScriptException {

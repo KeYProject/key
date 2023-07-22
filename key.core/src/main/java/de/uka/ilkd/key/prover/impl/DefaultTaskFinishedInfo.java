@@ -1,6 +1,3 @@
-/**
- *
- */
 package de.uka.ilkd.key.prover.impl;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -19,6 +16,17 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
     private final int closedGoals;
 
 
+    /**
+     * Create a new info object.
+     * Make sure your source object is documented in {@link TaskFinishedInfo}!
+     *
+     * @param source source object
+     * @param result task result
+     * @param proof the proof the task worked on
+     * @param time time the task took (milliseconds)
+     * @param appliedRules how many rules were applied
+     * @param closedGoals how many goals were closed
+     */
     public DefaultTaskFinishedInfo(Object source, Object result, Proof proof, long time,
             int appliedRules, int closedGoals) {
         this.source = source;

@@ -478,8 +478,11 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         Term reachableState = null;
 
         final Map<LocationVariable, Term> mods = new LinkedHashMap<>();
-        heapContext.forEach(
-            heap -> mods.put(heap, inst.inv.getModifies(heap, inst.selfTerm, atPres, services)));
+        final Map<LocationVariable, Term> freeMods = new LinkedHashMap<>();
+        for (LocationVariable heap : heapContext) {
+            mods.put(heap, inst.inv.getModifies(heap, inst.selfTerm, atPres, services));
+            freeMods.put(heap, inst.inv.getFreeModifies(heap, inst.selfTerm, atPres, services));
+        }
 
         ImmutableList<AnonUpdateData> anonUpdateData = ImmutableSLList.nil();
         for (LocationVariable heap : heapContext) {
@@ -493,16 +496,26 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
             wellFormedAnon = and(tb, wellFormedAnon, tb.wellFormed(tAnon.anonHeap));
 
-            final Term m = mods.get(heap);
-            final Term fc;
-
-            if (tb.strictlyNothing().equalsModIrrelevantTermLabels(m)) {
-                fc = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoop.get(heap));
+            final Term mod = mods.get(heap);
+            final Term freeMod = freeMods.get(heap);
+            final Term strictlyNothing = tb.strictlyNothing();
+            final Term currentFrame;
+            if (strictlyNothing.equalsModIrrelevantTermLabels(mod)) {
+                if (strictlyNothing.equalsModIrrelevantTermLabels(freeMod)) {
+                    currentFrame = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoop.get(heap));
+                } else {
+                    currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), freeMod);
+                }
             } else {
-                fc = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), m);
+                if (strictlyNothing.equalsModIrrelevantTermLabels(freeMod)) {
+                    currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), mod);
+                } else {
+                    currentFrame = tb.frame(
+                        tb.var(heap), heapToBeforeLoop.get(heap), tb.union(mod, freeMod));
+                }
             }
 
-            frameCondition = and(tb, frameCondition, fc);
+            frameCondition = and(tb, frameCondition, currentFrame);
             reachableState = and(tb, reachableState, tb.wellFormed(heap));
         }
 

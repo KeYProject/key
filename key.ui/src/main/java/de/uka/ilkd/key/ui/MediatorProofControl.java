@@ -23,6 +23,9 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A {@link ProofControl} which performs the automode in a {@link SwingWorker}.
  *
@@ -32,6 +35,8 @@ import org.key_project.util.collection.ImmutableList;
 // KeYMediator.
 // Refactor the implementation and use events to update the user interface.
 public class MediatorProofControl extends AbstractProofControl {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MediatorProofControl.class);
+
     private final AbstractMediatorUserInterfaceControl ui;
     private AutoModeWorker worker;
 
@@ -95,6 +100,11 @@ public class MediatorProofControl extends AbstractProofControl {
      */
     @Override
     public void waitWhileAutoMode() {
+        if (SwingUtilities.isEventDispatchThread()) {
+            LOGGER.error("", new IllegalStateException(
+                "tried to block the UI thread whilst waiting for auto mode to finish"));
+            return; // do not block the UI thread
+        }
         while (ui.getMediator().isInAutoMode()) { // Wait until auto mode has stopped.
             try {
                 Thread.sleep(100);

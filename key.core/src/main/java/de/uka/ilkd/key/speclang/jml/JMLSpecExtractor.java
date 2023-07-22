@@ -413,26 +413,45 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 // for a static method translate \inv once again, otherwise use
                 // the internal symbol
                 final String invString = pm.isStatic() ? "\\inv" : "<inv>";
+                final String invFreeString = pm.isStatic() ? "\\inv_free" : "<inv_free>";
+
+                KeYJavaType classType = pm.getContainerType();
+                boolean hasFreeInvariant = services.getSpecificationRepository()
+                        .getClassInvariants(classType).stream().anyMatch(ClassInvariant::isFree);
+
                 if (!pm.isConstructor()) {
-                    final ParserRuleContext ctx = JmlFacade.parseExpr(invString);
-                    specCase.addClause(REQUIRES,
-                        new LabeledParserRuleContext(ctx, IMPL_TERM_LABEL));
+                    specCase.addClause(REQUIRES, new LabeledParserRuleContext(
+                        JmlFacade.parseExpr(invString), IMPL_TERM_LABEL));
+                    if (hasFreeInvariant) {
+                        specCase.addClause(REQUIRES_FREE, new LabeledParserRuleContext(
+                            JmlFacade.parseExpr(invFreeString), IMPL_TERM_LABEL));
+                    }
                 } else if (addInvariant) {
                     // add static invariant to constructor's precondition
-                    final ParserRuleContext ctx =
-                        JmlFacade.parseExpr(format("%s.\\inv", pm.getName()));
-                    specCase.addClause(REQUIRES,
-                        new LabeledParserRuleContext(ctx, IMPL_TERM_LABEL));
+                    specCase.addClause(REQUIRES, new LabeledParserRuleContext(
+                        JmlFacade.parseExpr(format("%s.\\inv", pm.getName())),
+                        IMPL_TERM_LABEL));
+                    if (hasFreeInvariant) {
+                        specCase.addClause(REQUIRES_FREE, new LabeledParserRuleContext(
+                            JmlFacade.parseExpr(format("%s.\\inv_free", pm.getName())),
+                            IMPL_TERM_LABEL));
+                    }
                 }
                 if (specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
-                    final ParserRuleContext ctx = JmlFacade.parseExpr(invString);
-                    specCase.addClause(ENSURES, new LabeledParserRuleContext(ctx, IMPL_TERM_LABEL));
+                    specCase.addClause(ENSURES, new LabeledParserRuleContext(
+                        JmlFacade.parseExpr(invString), IMPL_TERM_LABEL));
+                    if (hasFreeInvariant) {
+                        specCase.addClause(ENSURES_FREE, new LabeledParserRuleContext(
+                            JmlFacade.parseExpr(invFreeString), IMPL_TERM_LABEL));
+                    }
+
                 }
                 if (specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR && !pm.isModel()) {
-                    final ParserRuleContext ctx =
-                        JmlFacade.parseClause(format("signals (Throwable e) %s;", invString));
                     specCase.addClause(TextualJMLSpecCase.Clause.SIGNALS,
-                        new LabeledParserRuleContext(ctx, IMPL_TERM_LABEL));
+                        new LabeledParserRuleContext(
+                            JmlFacade.parseClause(format("signals (Throwable e) %s;", invString)),
+                            IMPL_TERM_LABEL));
+
                 }
             }
 

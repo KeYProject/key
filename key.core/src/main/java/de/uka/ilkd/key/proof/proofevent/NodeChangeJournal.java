@@ -55,7 +55,7 @@ public class NodeChangeJournal implements GoalListener {
 
         for (final ImmutableMapEntry<Node, NodeChangesHolder> entry : changes) {
             final Node newNode = entry.key();
-            final Goal newGoal = proof.getGoal(newNode);
+            final Goal newGoal = proof.getOpenGoal(newNode);
 
             if (newGoal != null) {
                 final NodeChangesHolder nc = entry.value();

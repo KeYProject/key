@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Mon Mar 20 13:56:02 CET 2023
+# Date: Fri Jul 21 14:53:13 CEST 2023
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -1832,7 +1832,7 @@ assignment_read_attribute {
 \find(==>#allmodal ( (modal operator))\[{ ..
   #v0 = #v.#a;
 ... }\] (post))
-\varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \hasSort(#a (program Variable), G), \not\isThisReference (#v (program Variable)), )
+\varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \not\isModelField(#a (program Variable)), \hasSort(#a (program Variable), G), \not\isThisReference (#v (program Variable)), )
 \add [equals(#v,null)]==>[] \replacewith([]==>[false]) ;
 \replacewith([]==>[update-application(elem-update(#v0 (program Variable))(G::select(heap,#v,#memberPVToField(#a))),#allmodal(post))]) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -1843,7 +1843,7 @@ assignment_read_attribute_this {
 \find(==>#allmodal ( (modal operator))\[{ ..
   #v0 = #v.#a;
 ... }\] (post))
-\varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \hasSort(#a (program Variable), G), \isThisReference (#v (program Variable)), )
+\varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \not\isModelField(#a (program Variable)), \hasSort(#a (program Variable), G), \isThisReference (#v (program Variable)), )
 \replacewith([]==>[update-application(elem-update(#v0 (program Variable))(G::select(heap,#v,#memberPVToField(#a))),#allmodal(post))]) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: (programRules:Java & runtimeExceptions:ban)}
@@ -4702,6 +4702,19 @@ compound_reference_cast_expression {
 \replacewith(#allmodal ( (modal operator))\[{ ..
   #typeof(#nse) #v = #nse;
   #lhs = (#npit) #v;
+... }\] (post)) 
+\heuristics(simplify_prog)
+Choices: programRules:Java}
+-----------------------------------------------------
+== compound_reference_cast_expression_primitive (cast) =========================================
+compound_reference_cast_expression_primitive {
+\find(#allmodal ( (modal operator))\[{ ..
+  #lhs = (#pit) #nse;
+... }\] (post))
+\varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
+\replacewith(#allmodal ( (modal operator))\[{ ..
+  #typeof(#nse) #v = #nse;
+  #lhs = (#pit) #v;
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}

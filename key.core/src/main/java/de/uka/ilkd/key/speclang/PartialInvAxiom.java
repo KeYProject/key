@@ -143,8 +143,8 @@ public final class PartialInvAxiom extends ClassAxiom {
                         services.getJavaInfo().objectSort());
 
             ImmutableSet<Taclet> taclets = TG.generatePartialInvTaclet(name, heapSVs, selfSV, eqSV,
-                inv.getInv(selfSV, services), inv.getKJT(), toLimit, target.isStatic(), i == 1,
-                services);
+                inv.getInv(selfSV, services), inv.getKJT(), toLimit, target.isStatic(),
+                inv.isFree(), i == 1, services);
             result = result.union(taclets);
 
             // EQ taclet (with i==1) only for non-static invariants

@@ -108,6 +108,13 @@ public class SimpleSettingsPanel extends JPanel {
         return new JScrollPane(area);
     }
 
+    protected JTextArea createTextAreaWithoutScroll(String text, Validator<String> validator) {
+        JTextArea area = new JTextArea(text);
+        area.setRows(5);
+        area.getDocument().addDocumentListener(new DocumentValidatorAdapter(area, validator));
+        return area;
+    }
+
 
     protected JTextField createTextField(String text, final @Nullable Validator<String> validator) {
         JTextField field = new JTextField(text);

@@ -55,9 +55,10 @@ public final class ProofManagementDialog extends JDialog {
     @Nullable
     private static ContractId previouslySelectedContracts;
 
-    private static final ImageIcon keyIcon = IconFactory.keyHole(20, 20);
-    private static final ImageIcon keyAlmostClosedIcon = IconFactory.keyHoleAlmostClosed(20, 20);
-    private static final Icon keyClosedIcon = IconFactory.keyHoleClosed(20);
+    private static final ImageIcon KEY_OPEN = IconFactory.keyHole(20, 20);
+    private static final ImageIcon KEY_ALMOST_CLOSED = IconFactory.keyHoleAlmostClosed(20, 20);
+    private static final ImageIcon KEY_CACHED_CLOSED = IconFactory.keyCachedClosed(20, 20);
+    private static final Icon KEY_CLOSED = IconFactory.keyHoleClosed(20);
     private boolean startedProof;
     private JTabbedPane tabbedPane;
     private Map<Pair<KeYJavaType, IObserverFunction>, Icon> targetIcons;
@@ -122,12 +123,14 @@ public final class ProofManagementDialog extends JDialog {
                     ProofStatus ps = ((ProofWrapper) value).proof.mgt().getStatus();
                     JLabel label = (JLabel) result;
                     if (ps.getProofClosed()) {
-                        label.setIcon(keyClosedIcon);
+                        label.setIcon(KEY_CLOSED);
                     } else if (ps.getProofClosedButLemmasLeft()) {
-                        label.setIcon(keyAlmostClosedIcon);
+                        label.setIcon(KEY_ALMOST_CLOSED);
+                    } else if (ps.getProofClosedByCache()) {
+                        label.setIcon(KEY_CACHED_CLOSED);
                     } else {
                         assert ps.getProofOpen();
-                        label.setIcon(keyIcon);
+                        label.setIcon(KEY_OPEN);
                     }
                 }
                 return result;
@@ -499,12 +502,12 @@ public final class ProofManagementDialog extends JDialog {
                 final ProofStatus status = proof.mgt().getStatus();
                 startButton.setText("Go to Proof");
                 if (status.getProofOpen()) {
-                    startButton.setIcon(keyIcon);
+                    startButton.setIcon(KEY_OPEN);
                 } else if (status.getProofClosedButLemmasLeft()) {
-                    startButton.setIcon(keyAlmostClosedIcon);
+                    startButton.setIcon(KEY_ALMOST_CLOSED);
                 } else {
                     assert status.getProofClosed();
-                    startButton.setIcon(keyClosedIcon);
+                    startButton.setIcon(KEY_CLOSED);
                 }
             }
             startButton.setEnabled(true);
@@ -529,7 +532,7 @@ public final class ProofManagementDialog extends JDialog {
                 pan.setContracts(contracts, "Contracts");
 
                 pan.setGrayOutAuxiliaryContracts(Objects.equals(
-                    targetIcons.get(new Pair<>(entry.kjt, entry.target)), keyClosedIcon));
+                    targetIcons.get(new Pair<>(entry.kjt, entry.target)), KEY_CLOSED));
             } else {
                 pan.setContracts(DefaultImmutableSet.nil(), "Contracts");
             }
@@ -566,6 +569,7 @@ public final class ProofManagementDialog extends JDialog {
                     boolean startedProving = false;
                     boolean allClosed = true;
                     boolean lemmasLeft = false;
+                    boolean cached = false;
                     for (Contract contract : contracts) {
                         // Skip auxiliary contracts (like block/loop contracts).
                         if (contract.isAuxiliary()) {
@@ -582,12 +586,17 @@ public final class ProofManagementDialog extends JDialog {
                             } else if (status.getProofClosedButLemmasLeft()) {
                                 lemmasLeft = true;
                             }
+                            if (status.getProofClosedByCache()) {
+                                cached = true;
+                            }
                         }
                     }
                     targetIcons.put(new Pair<>(kjt, target),
                         startedProving
-                                ? (allClosed ? (lemmasLeft ? keyAlmostClosedIcon : keyClosedIcon)
-                                        : keyIcon)
+                                ? (allClosed
+                                        ? (cached ? KEY_CACHED_CLOSED
+                                                : lemmasLeft ? KEY_ALMOST_CLOSED : KEY_CLOSED)
+                                        : KEY_OPEN)
                                 : null);
                 }
             }

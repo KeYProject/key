@@ -87,12 +87,23 @@ public final class JavaInfo {
     private ObserverFunction inv;
 
     /**
+     * caches the program variable for {@code <inv_free>}
+     */
+    private ProgramVariable invFreeProgVar;
+
+    /**
+     * caches the observer for {@code <inv_free>}
+     */
+    private ObserverFunction invFree;
+
+    /**
      * the name of the class used as default execution context
      */
     static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
     static final String DEFAULT_EXECUTION_CONTEXT_METHOD = "<defaultMethod>";
 
     private final HashMap<KeYJavaType, ObserverFunction> staticInvs = new LinkedHashMap<>();
+    private final HashMap<KeYJavaType, ObserverFunction> staticFreeInvs = new LinkedHashMap<>();
 
 
     /**
@@ -1405,7 +1416,46 @@ public final class JavaInfo {
     }
 
     /**
-     * Returns the special symbol <code>&lt;staticInv&gt;</code> which stands for the static
+     * Returns the special symbol <code>&lt;inv_free&gt;</code> which stands for the free
+     * class invariant of an object.
+     *
+     * @see #getInvProgramVar()
+     */
+    public IObserverFunction getInvFree() {
+        if (invFree == null || invFree.getHeapCount(services) != HeapContext
+                .getModHeaps(services, false).size()) {
+            invFree = (ObserverFunction) services.getNamespaces().functions()
+                    .lookup(ObserverFunction.createName("<inv_free>", getJavaLangObject()));
+            if (invFree == null) {
+                invFree = new ObserverFunction("<inv_free>", Sort.FORMULA, null,
+                    services.getTypeConverter().getHeapLDT().targetSort(), getJavaLangObject(),
+                    false, new ImmutableArray<>(), HeapContext.getModHeaps(services, false).size(),
+                    1);
+                services.getNamespaces().functions().add(invFree);
+            }
+        }
+        return invFree;
+    }
+
+    /**
+     * Returns the special program variable symbol <code>&lt;inv_free&gt;</code> which stands for
+     * the free class
+     * invariant of an object.
+     *
+     * @see #getFreeInv()
+     */
+    public ProgramVariable getFreeInvProgramVar() {
+        if (invFreeProgVar == null) {
+            ProgramElementName pen = new ProgramElementName("<inv_free>", "java.lang.Object");
+            invFreeProgVar = new LocationVariable(pen,
+                getPrimitiveKeYJavaType(PrimitiveType.JAVA_BOOLEAN), getJavaLangObject(),
+                false, true);
+        }
+        return invFreeProgVar;
+    }
+
+    /**
+     * Returns the special symbol <code>&lt;$inv&gt;</code> which stands for the static
      * invariant of a type.
      */
     public IObserverFunction getStaticInv(KeYJavaType target) {
@@ -1423,6 +1473,26 @@ public final class JavaInfo {
                 services.getNamespaces().functions().add(inv);
             }
             staticInvs.put(target, inv);
+        }
+        return inv;
+    }
+
+    /**
+     * Returns the special symbol <code>&lt$inv_free&gt;</code> which stands for the static
+     * invariant of a type.
+     */
+    public IObserverFunction getStaticInvFree(KeYJavaType target) {
+        ObserverFunction inv = staticFreeInvs.get(target);
+        if (inv == null) {
+            inv = (ObserverFunction) services.getNamespaces().functions()
+                    .lookup(ObserverFunction.createName("<$inv_free>", target));
+            if (inv == null) {
+                inv = new ObserverFunction("<$inv_free>", Sort.FORMULA, null,
+                    services.getTypeConverter().getHeapLDT().targetSort(), target, true,
+                    new ImmutableArray<>(), HeapContext.getModHeaps(services, false).size(), 1);
+                services.getNamespaces().functions().add(inv);
+            }
+            staticFreeInvs.put(target, inv);
         }
         return inv;
     }

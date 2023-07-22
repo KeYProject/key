@@ -367,7 +367,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         return result;
     }
 
-    private static StatementBlock replaceStatement(JavaBlock jb, StatementBlock replacement) {
+    public static StatementBlock replaceStatement(JavaBlock jb, StatementBlock replacement) {
         PosInProgram pos = getPosInProgram(jb);
         int lastPos = pos.last();
         ContextStatementBlockInstantiation csbi = new ContextStatementBlockInstantiation(pos,
@@ -523,6 +523,11 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         // abort if inside of transformer
         if (Transformer.inTransformer(pio)) {
+            return false;
+        }
+
+        // cannot be applied on model methods
+        if (inst.pm.isModel()) {
             return false;
         }
 

@@ -6,6 +6,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.*;
 
+import de.uka.ilkd.key.gui.MainWindow;
+
 
 /**
  * A dialog offering three buttons at the lower border: Help (optional), Okay and Cancel. The
@@ -32,7 +34,7 @@ public class StdDialog extends JDialog {
     }
 
     public StdDialog(String title, JComponent content, int strut, boolean helpButton) {
-        this.setLocationByPlatform(true);
+        this.setLocationRelativeTo(MainWindow.getInstance());
         this.setTitle(title);
         this.setModal(true);
         // content.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));

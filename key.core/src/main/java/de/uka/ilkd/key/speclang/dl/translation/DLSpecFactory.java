@@ -292,8 +292,10 @@ public final class DLSpecFactory {
                                          // not supported yet
             posts, new LinkedHashMap<>(), null, // TODO no model methods in DL
                                                 // contracts
-            mods, new LinkedHashMap<>(), hasMod, // TODO strictly pure in DL
-                                                 // contracts not supported yet
+            mods, new LinkedHashMap<>(),
+            new LinkedHashMap<>(),
+            hasMod, new LinkedHashMap<>(), // TODO strictly pure in DL
+                                           // contracts not supported yet
             selfVar, paramVars, resultVar, excVar, atPreVars, !isLibraryClass);
     }
 }

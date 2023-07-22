@@ -107,6 +107,16 @@ public interface KeYGuiExtension {
      * Can be used for registering key binding.
      */
     interface Startup {
+        /**
+         * Earliest initialization method. Called before layout of the main window.
+         *
+         * @param window main window
+         * @param mediator mediator
+         */
+        default void preInit(MainWindow window, KeYMediator mediator) {
+
+        }
+
         void init(MainWindow window, KeYMediator mediator);
     }
 

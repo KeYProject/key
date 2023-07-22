@@ -102,10 +102,14 @@ public abstract class AbstractUserInterfaceControl
      * @param info The {@link TaskFinishedInfo}.
      */
     protected void fireTaskFinished(TaskFinishedInfo info) {
-        ProverTaskListener[] listener =
-            proverTaskListener.toArray(new ProverTaskListener[0]);
-        for (ProverTaskListener l : listener) {
-            l.taskFinished(info);
+        try {
+            ProverTaskListener[] listener =
+                proverTaskListener.toArray(new ProverTaskListener[0]);
+            for (ProverTaskListener l : listener) {
+                l.taskFinished(info);
+            }
+        } catch (Exception e) {
+            LOGGER.error("failed to fire task finished event ", e);
         }
     }
 

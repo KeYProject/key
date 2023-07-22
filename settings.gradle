@@ -11,6 +11,6 @@ include "key.core.example"
 include "key.core.symbolic_execution.example"
 include 'recoder'
 include 'keyext.ui.testgen'
-include 'keyext.action_history'
+include 'keyext.proofmanagement'
 include 'keyext.exploration'
 include 'keyext.slicing'

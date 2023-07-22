@@ -17,6 +17,8 @@ import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.proof.io.RuleSource;
 
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.PredictionMode;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,7 +123,20 @@ public final class ParsingFacade {
 
     public static KeyAst.File parseFile(CharStream stream) {
         KeYParser p = createParser(stream);
-        KeYParser.FileContext ctx = p.file();
+
+        p.getInterpreter().setPredictionMode(PredictionMode.SLL);
+        // we don't want error messages or recovery during first try
+        p.removeErrorListeners();
+        p.setErrorHandler(new BailErrorStrategy());
+        KeYParser.FileContext ctx;
+        try {
+            ctx = p.file();
+        } catch (ParseCancellationException ex) {
+            LOGGER.warn("SLL was not enough");
+            p = createParser(stream);
+            ctx = p.file();
+        }
+
         p.getErrorReporter().throwException();
         return new KeyAst.File(ctx);
     }

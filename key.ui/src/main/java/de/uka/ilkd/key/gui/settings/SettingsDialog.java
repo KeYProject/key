@@ -32,7 +32,7 @@ public class SettingsDialog extends JDialog {
         setTitle("Settings");
 
         mainWindow = owner;
-        ui = new SettingsUi(owner);
+        ui = new SettingsUi(owner, this);
 
         JPanel root = new JPanel(new BorderLayout());
         root.add(ui);
@@ -43,7 +43,7 @@ public class SettingsDialog extends JDialog {
         getRootPane().registerKeyboardAction(e -> dispose(),
             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-        setSize(600, 400);
+        setSize(new Dimension(900, 600));
     }
 
     private JPanel createButtonBar() {
@@ -59,7 +59,8 @@ public class SettingsDialog extends JDialog {
 
     public void setSettingsProvider(List<SettingsProvider> providers) {
         this.providers = providers;
-        this.ui.setSettingsProvider(providers);
+        int width = this.ui.setSettingsProvider(providers);
+        setSize(new Dimension(width, 600));
     }
 
     SettingsUi getUi() {

@@ -785,6 +785,11 @@ public class OriginTermLabel implements TermLabel {
         ASSIGNABLE("assignable"),
 
         /**
+         * assignable_free
+         */
+        ASSIGNABLE_FREE("assignable_free"),
+
+        /**
          * assume
          */
         ASSUME("assume"),
@@ -803,6 +808,11 @@ public class OriginTermLabel implements TermLabel {
          * invariant
          */
         INVARIANT("invariant"),
+
+        /**
+         * invariant_free
+         */
+        INVARIANT_FREE("invariant_free"),
 
         /**
          * loop_invariant

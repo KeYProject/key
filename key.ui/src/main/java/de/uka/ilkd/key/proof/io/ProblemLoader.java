@@ -17,7 +17,7 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
 /**
  * This class extends the functionality of the {@link AbstractProblemLoader}. It allows to do the
- * loading process as {@link SwingWorker3} {@link Thread} and it opens the proof obligation browser
+ * loading process as {@link SwingWorker} {@link Thread} and it opens the proof obligation browser
  * it is not possible to instantiate a proof configured by the opened file.
  *
  * @author Martin Hentschel
@@ -112,7 +112,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
             private long runTime;
 
             @Override
-            protected Throwable doInBackground() throws Exception {
+            protected Throwable doInBackground() {
                 long currentTime = System.currentTimeMillis();
                 final Throwable message = doWork();
                 runTime = System.currentTimeMillis() - currentTime;

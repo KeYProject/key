@@ -1542,6 +1542,37 @@ public class TermBuilder {
         return func(services.getJavaInfo().getStaticInv(t), hs);
     }
 
+    public Term invFree(Term[] h, Term o) {
+        Term[] p = new Term[h.length + 1];
+        System.arraycopy(h, 0, p, 0, h.length);
+        p[h.length] = o;
+        return func(services.getJavaInfo().getInvFree(), p);
+    }
+
+    public Term invFree(Term o) {
+        List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        Term[] hs = new Term[heaps.size()];
+        int i = 0;
+        for (LocationVariable heap : heaps) {
+            hs[i++] = var(heap);
+        }
+        return invFree(hs, o);
+    }
+
+    public Term staticInvFree(Term[] h, KeYJavaType t) {
+        return func(services.getJavaInfo().getStaticInvFree(t), h);
+    }
+
+    public Term staticInvFree(KeYJavaType t) {
+        List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        Term[] hs = new Term[heaps.size()];
+        int i = 0;
+        for (LocationVariable heap : heaps) {
+            hs[i++] = var(heap);
+        }
+        return func(services.getJavaInfo().getStaticInvFree(t), hs);
+    }
+
     public Term select(Sort asSort, Term h, Term o, Term f) {
         return func(services.getTypeConverter().getHeapLDT().getSelect(asSort, services), h, o, f);
     }

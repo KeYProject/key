@@ -635,7 +635,7 @@ public class TacletGenerator {
 
     public ImmutableSet<Taclet> generatePartialInvTaclet(Name name, List<SchemaVariable> heapSVs,
             SchemaVariable selfSV, SchemaVariable eqSV, Term term, KeYJavaType kjt,
-            ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, boolean isStatic,
+            ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, boolean isStatic, boolean isFree,
             boolean eqVersion, Services services) {
         TermBuilder TB = services.getTermBuilder();
         ImmutableSet<Taclet> result = DefaultImmutableSet.nil();
@@ -669,8 +669,17 @@ public class TacletGenerator {
         }
         // create taclet
         final AntecTacletBuilder tacletBuilder = new AntecTacletBuilder();
-        final Term invTerm = isStatic ? TB.staticInv(hs, kjt)
-                : TB.inv(hs, eqVersion ? TB.var(eqSV) : TB.var(selfSV));
+        final Term invTerm;
+        if (isStatic && isFree) {
+            invTerm = TB.staticInvFree(hs, kjt);
+        } else if (isStatic) {
+            invTerm = TB.staticInv(hs, kjt);
+        } else if (isFree) {
+            invTerm = TB.invFree(hs, eqVersion ? TB.var(eqSV) : TB.var(selfSV));
+        } else {
+            invTerm = TB.inv(hs, eqVersion ? TB.var(eqSV) : TB.var(selfSV));
+        }
+
         tacletBuilder.setFind(invTerm);
         tacletBuilder.addTacletGoalTemplate(
             new TacletGoalTemplate(addedSeq, ImmutableSLList.nil()));

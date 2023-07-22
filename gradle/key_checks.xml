@@ -70,7 +70,9 @@
 	<property name="authorFormat" value="\S"/>
       </module>
 
-      <module name="JavadocVariable"/>
+      <module name="JavadocVariable">
+        <property name="ignoreNamePattern" value="LOGGER"/>
+      </module>
       <module name="JavadocStyle">
 	<property name="checkFirstSentence" value="false" />
       </module>
