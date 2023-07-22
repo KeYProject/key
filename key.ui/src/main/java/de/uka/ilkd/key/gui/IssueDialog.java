@@ -19,6 +19,7 @@ import javax.swing.text.*;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
 import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -551,6 +552,9 @@ public final class IssueDialog extends JDialog {
      * @param exception the exception to display
      */
     public static void showExceptionDialog(Window parent, Throwable exception) {
+        // make sure UI is usable after any exception
+        MainWindow.getInstance().getMediator().startInterface(true);
+
         Set<PositionedIssueString> msg = Collections.singleton(extractMessage(exception));
         IssueDialog dlg = new IssueDialog(parent, "Parser Error", msg, true, exception);
         dlg.setVisible(true);
