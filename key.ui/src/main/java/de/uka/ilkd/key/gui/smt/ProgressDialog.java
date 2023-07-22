@@ -89,7 +89,6 @@ public class ProgressDialog extends JDialog {
         table.getTableHeader().setReorderingAllowed(false);
         table.setModel(model, titles);
         this.listener = listener;
-        setLocationRelativeTo(MainWindow.getInstance());
         if (counterexample) {
             this.setTitle("SMT Counterexample Search");
         } else {
@@ -126,6 +125,8 @@ public class ProgressDialog extends JDialog {
         constraints.insets.bottom = 5;
         contentPane.add(buttonBox, constraints);
         this.pack();
+        // always set the location last, otherwise it is not centered!
+        setLocationRelativeTo(MainWindow.getInstance());
     }
 
     public void setProgress(int value) {
