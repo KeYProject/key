@@ -25,7 +25,12 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderLis
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class LemmaGenerationAction extends MainWindowAction {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LemmaGenerationAction.class);
+
     public enum Mode {
         ProveUserDefinedTaclets, ProveKeYTaclets, ProveAndAddUserDefinedTaclets
     }
@@ -53,6 +58,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
     abstract protected boolean proofIsRequired();
 
     protected final void handleException(Throwable exception) {
+        LOGGER.error("", exception);
         IssueDialog.showExceptionDialog(mainWindow, exception);
     }
 
@@ -134,6 +140,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
             LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                 @Override
                 public void doStopped(Throwable exception) {
+                    LOGGER.error("", exception);
                     IssueDialog.showExceptionDialog(ProveKeYTaclets.this.mainWindow, exception);
                 }
 
@@ -213,6 +220,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
             LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                 @Override
                 public void doStopped(Throwable exception) {
+                    LOGGER.error("", exception);
                     IssueDialog.showExceptionDialog(ProveUserDefinedTaclets.this.mainWindow,
                         exception);
                 }
@@ -287,6 +295,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
             LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                 @Override
                 public void doStopped(Throwable exception) {
+                    LOGGER.error("", exception);
                     IssueDialog.showExceptionDialog(ProveAndAddTaclets.this.mainWindow, exception);
                 }
 

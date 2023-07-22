@@ -7,7 +7,12 @@ import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ExceptionFailureNotificationDialog extends ShowDisplayPane {
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(ExceptionFailureNotificationDialog.class);
 
     public ExceptionFailureNotificationDialog(Frame parentComponent) {
         super(parentComponent);
@@ -18,6 +23,7 @@ public class ExceptionFailureNotificationDialog extends ShowDisplayPane {
         if (event instanceof ExceptionFailureEvent) {
             ExceptionFailureEvent ev = (ExceptionFailureEvent) event;
             setMessage(ev.getErrorMessage());
+            LOGGER.error(ev.getErrorMessage(), ev.getException());
             IssueDialog.showExceptionDialog(parentComponent, ev.getException());
         } else {
             setMessage("An unknown error has occured." + event);

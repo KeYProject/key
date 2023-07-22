@@ -194,6 +194,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             resetStatus(this);
             Throwable result = (Throwable) info.getResult();
             if (info.getResult() != null) {
+                LOGGER.error("", result);
                 IssueDialog.showExceptionDialog(mainWindow, result);
             } else if (getMediator().getUI().isSaveOnly()) {
                 mainWindow.displayResults("Finished Saving!");

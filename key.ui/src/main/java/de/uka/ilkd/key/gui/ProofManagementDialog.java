@@ -44,9 +44,13 @@ import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public final class ProofManagementDialog extends JDialog {
 
     private static final long serialVersionUID = 3543411893273433386L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofManagementDialog.class);
 
     /**
      * The contracts are stored by name of the {@link KeYJavaType}, method name, and contract name
@@ -478,6 +482,7 @@ public final class ProofManagementDialog extends JDialog {
                     env.registerProof(po, pl);
                 }
             } catch (ProofInputException exc) {
+                LOGGER.error("", exc);
                 IssueDialog.showExceptionDialog(MainWindow.getInstance(), exc);
             }
         } else {

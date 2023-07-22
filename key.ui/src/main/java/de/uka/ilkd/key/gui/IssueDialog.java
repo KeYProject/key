@@ -19,7 +19,6 @@ import javax.swing.text.*;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
 import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -547,6 +546,7 @@ public final class IssueDialog extends JDialog {
     /**
      * Shows the dialog with a single exception. The stacktrace is extracted and can optionally be
      * shown in the dialog.
+     * Important: make sure to also log the exception before showing the dialog!
      *
      * @param parent the parent of the dialog (will be blocked)
      * @param exception the exception to display
