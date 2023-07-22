@@ -448,8 +448,8 @@ public class LoadUserTacletsDialog extends JPanel {
             buttonPane.add(Box.createHorizontalStrut(5));
             buttonPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             pane.add(buttonPane);
-            dialog.setLocationRelativeTo(MainWindow.getInstance());
             dialog.pack();
+            dialog.setLocationRelativeTo(MainWindow.getInstance());
         }
         return dialog;
     }
