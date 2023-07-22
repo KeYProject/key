@@ -260,7 +260,8 @@ public class KeYProgModelInfo {
             List<ResolvedType> sig = signature.stream().map(this::getJavaParserType).toList();
 
             List<ResolvedConstructorDeclaration> constructors = rt.get().getConstructors();
-            constr: for (var constructor : constructors) {
+            constr:
+            for (var constructor : constructors) {
                 if (sig.size() != constructor.getNumberOfParams()) {
                     continue;
                 }
@@ -336,6 +337,10 @@ public class KeYProgModelInfo {
         List<ResolvedType> jpSignature = StreamSupport.stream(signature.spliterator(), false)
                 .map(this::getJavaParserType).toList();
         var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);
+
+        if (!method.isSolved())
+            return null;
+
         return method.getDeclaration()
                 .map(d -> (IProgramMethod) Objects.requireNonNull(mapping.resolvedDeclarationToKeY(d)))
                 .orElse(null);

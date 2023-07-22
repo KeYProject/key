@@ -73,9 +73,6 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
      */
     private void normalform(ClassOrInterfaceDeclaration cd, ConstructorDeclaration cons) {
         final var enclosingClass = getEnclosingClass(cd);
-        if (enclosingClass.isEmpty()) {
-            return; // throw reportError(cd, "No enclosing class found");
-        }
 
         NodeList<Modifier> mods = new NodeList<>();
         var et = getImplicitEnclosingThis(cd);
