@@ -73,11 +73,20 @@ public class ExpandDefCommand extends AbstractCommand<ExpandDefCommand.Parameter
                 proof.getServices()));
         }
 
-        apps = apps.filter(
-            it -> it instanceof PosTacletApp && it.posInOccurrence().subTerm().equals(p.on));
+        if (p.on != null) {
+            apps = apps.filter(
+                    it -> it instanceof PosTacletApp &&
+                          it.posInOccurrence().subTerm().equalsModTermLabels(p.on));
+        } else if (p.formula != null) {
+            apps = apps.filter(
+                    it -> it instanceof PosTacletApp &&
+                          it.posInOccurrence().sequentFormula().formula().equalsModTermLabels(p.formula));
+        } else {
+            throw new ScriptException("Either 'formula' or 'on' must be specified");
+        }
 
         if (apps.size() == 0) {
-            throw new ScriptException("There is no expansion rule app that matches 'on'");
+            throw new ScriptException("There is no matching expansion rule");
         } else if (p.occ >= 0) {
             if (p.occ >= apps.size()) {
                 throw new ScriptException(
@@ -86,7 +95,7 @@ public class ExpandDefCommand extends AbstractCommand<ExpandDefCommand.Parameter
             return apps.get(p.occ);
         } else {
             if (apps.size() != 1) {
-                throw new ScriptException("The 'on' parameter is not unique");
+                throw new ScriptException("The application is not uniquely identified");
             }
             return apps.head();
         }
@@ -98,6 +107,8 @@ public class ExpandDefCommand extends AbstractCommand<ExpandDefCommand.Parameter
         public Term on;
         @Option(value = "occ", required = false)
         public int occ = -1;
+        @Option(value = "formula", required = false)
+        public Term formula;
     }
 
     private static class ExpansionFilter extends TacletFilter {
