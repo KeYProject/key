@@ -3,6 +3,7 @@ package de.uka.ilkd.key.gui.keyshortcuts;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.lang.ref.WeakReference;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.*;
@@ -159,5 +160,14 @@ public final class KeyStrokeManager {
         } catch (HeadlessException e) {
             return 0;
         }
+    }
+
+    /**
+     * Get all the managed actions.
+     *
+     * @return all actions
+     */
+    public static Collection<WeakReference<Action>> getAllActions() {
+        return actions.values();
     }
 }
