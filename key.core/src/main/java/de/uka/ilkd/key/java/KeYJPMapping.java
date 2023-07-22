@@ -1,17 +1,18 @@
 package de.uka.ilkd.key.java;
 
-import com.github.javaparser.ast.Node;
-import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
-import com.github.javaparser.resolution.types.ResolvedType;
+import java.util.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.util.Debug;
+
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
+import com.github.javaparser.resolution.types.ResolvedType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.*;
 
 /**
  * @author Alexander Weigl
@@ -119,7 +120,7 @@ public class KeYJPMapping {
         var formerNode = revMap.putIfAbsent(value, node);
         if (formerValue != null && formerValue != value)
             LOGGER.error("Duplicate registration of value: {}, formerValue: {}", value,
-                    formerValue);
+                formerValue);
         if (formerNode != null && formerNode != node)
             LOGGER.error("Duplicate registration of node: {}, formerNode: {}", node, formerNode);
     }
@@ -131,7 +132,7 @@ public class KeYJPMapping {
         var formerType = typeMapRev.putIfAbsent(key, rec);
         if (formerType != null && !Objects.equals(rec, formerType))
             LOGGER.error("Duplicate registration of resolved type: {}, former: {}", rec,
-                    formerType);
+                formerType);
     }
 
     public boolean mapped(Node rec) {
@@ -204,7 +205,7 @@ public class KeYJPMapping {
      * not
      *
      * @param b boolean indicating if the special classes have been
-     *          parsed in
+     *        parsed in
      */
     public void parsedSpecial(boolean b) {
         parsedSpecial = b;

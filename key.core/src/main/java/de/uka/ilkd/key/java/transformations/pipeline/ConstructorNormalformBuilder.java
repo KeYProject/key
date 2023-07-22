@@ -13,6 +13,11 @@
 
 package de.uka.ilkd.key.java.transformations.pipeline;
 
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.*;
@@ -24,13 +29,6 @@ import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.VoidType;
 import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
-import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
-import de.uka.ilkd.key.java.loader.JavaParserFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Transforms the constructors of the given class to their
@@ -53,15 +51,15 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
     private void attachDefaultConstructor(ClassOrInterfaceDeclaration cd) {
         var body = new BlockStmt();
         body.addStatement(new MethodCallExpr(new SuperExpr(),
-                PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER));
+            PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER));
         var initializers = services.getInitializers(cd);
         int i = 0;
         for (Statement initializer : initializers) {
             body.addStatement(i++, initializer.clone());
         }
         MethodDeclaration def =
-                cd.addMethod(PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER,
-                        Modifier.Keyword.PUBLIC);
+            cd.addMethod(PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER,
+                Modifier.Keyword.PUBLIC);
         def.setBody(body);
     }
 
@@ -70,17 +68,18 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
      * in class cd. For a detailed description of the normalform to be
      * built see the KeY Manual.
      *
-     * @param cd   the TypeDeclaration<?> where the cons is declared
+     * @param cd the TypeDeclaration<?> where the cons is declared
      * @param cons the Constructor to be transformed
      */
-    private void normalform(@Nonnull ClassOrInterfaceDeclaration cd, @Nonnull ConstructorDeclaration cons) {
+    private void normalform(@Nonnull ClassOrInterfaceDeclaration cd,
+            @Nonnull ConstructorDeclaration cons) {
         final var enclosingClass = getEnclosingClass(cd);
         NodeList<Modifier> mods = new NodeList<>();
 
         MethodDeclaration nf = new MethodDeclaration(
-                mods,
-                new VoidType(),
-                PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER);
+            mods,
+            new VoidType(),
+            PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER);
         final NodeList<Parameter> parameters = new NodeList<>();
         nf.setParameters(parameters);
         final var body = new BlockStmt();
@@ -97,12 +96,12 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
             ClassOrInterfaceDeclaration td = enclosingClass.get();
             if (et.isPresent()) {
                 implictParameter = new Parameter(
-                        new ClassOrInterfaceType(null, td.getName().getIdentifier()),
-                        etId);
+                    new ClassOrInterfaceType(null, td.getName().getIdentifier()),
+                    etId);
                 var ca = new AssignExpr(
-                        new FieldAccessExpr(new ThisExpr(),
-                                et.get().getVariables().get(0).getName().getIdentifier()),
-                        implictParameter.getNameAsExpression(), AssignExpr.Operator.ASSIGN);
+                    new FieldAccessExpr(new ThisExpr(),
+                        et.get().getVariables().get(0).getName().getIdentifier()),
+                    implictParameter.getNameAsExpression(), AssignExpr.Operator.ASSIGN);
 
                 parameters.add(implictParameter);
                 body.addStatement(ca);
@@ -141,8 +140,8 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
             // call default constructor (super.$init())
             if (first == null || !first.isExplicitConstructorInvocationStmt()) {
                 body.addStatement(0,
-                        new MethodCallExpr(new SuperExpr(),
-                                PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER));
+                    new MethodCallExpr(new SuperExpr(),
+                        PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER));
             } else {
                 // the first statement has to be a this or super constructor call
                 // this(...) => this.$init(...)
@@ -157,45 +156,48 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
                     // On this we now, that we have to sent the implicit outer this.
 
                     var types =
-                            constructorCall
-                                    .getTypeArguments()
-                                    .map(TransformationPipelineServices::cloneList)
-                                    .orElse(new NodeList<>());
+                        constructorCall
+                                .getTypeArguments()
+                                .map(TransformationPipelineServices::cloneList)
+                                .orElse(new NodeList<>());
 
                     final NodeList<Expression> params =
-                            TransformationPipelineServices.cloneList(constructorCall.getArguments());
+                        TransformationPipelineServices.cloneList(constructorCall.getArguments());
                     if (implictParameter != null)
                         params.addFirst(implictParameter.getNameAsExpression());
 
                     var methodCall = new MethodCallExpr(new ThisExpr(),
-                            types,
-                            PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER,
-                            params);
+                        types,
+                        PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER,
+                        params);
                     body.replace(first, new ExpressionStmt(methodCall));
                 } else {
                     NodeList<Expression> args = constructorCall.getArguments();
                     /*
-                    if (constructorCall.getExpression().isPresent()) {
-                        if (args == null) args = new NodeList<>();
-                        args.add((constructorCall.getExpression().get()));
-                    } else if (!cd.resolve().getAllAncestors().isEmpty()) {
-                        if (args == null) args = new NodeList<>();
-                        args.add(new NameExpr(etId));
-                    }
-                    */
-                    // TODO weigl: detect whether super is also an inner class. This class has to be an inner class
-                    //  of the same outer class (JLS). If so, add $ENCLOSING_THIS to the parameters else not!
+                     * if (constructorCall.getExpression().isPresent()) {
+                     * if (args == null) args = new NodeList<>();
+                     * args.add((constructorCall.getExpression().get()));
+                     * } else if (!cd.resolve().getAllAncestors().isEmpty()) {
+                     * if (args == null) args = new NodeList<>();
+                     * args.add(new NameExpr(etId));
+                     * }
+                     */
+                    // TODO weigl: detect whether super is also an inner class. This class has to be
+                    // an inner class
+                    // of the same outer class (JLS). If so, add $ENCLOSING_THIS to the parameters
+                    // else not!
 
-                    var type = ((ExplicitConstructorInvocationStmt) first).resolve().declaringType();
-                    //var outer = JavaParserFacade.get().getTypeDeclaration(enclosingClass);
-                    //var outerClass = outer.getClassName();
+                    var type =
+                        ((ExplicitConstructorInvocationStmt) first).resolve().declaringType();
+                    // var outer = JavaParserFacade.get().getTypeDeclaration(enclosingClass);
+                    // var outerClass = outer.getClassName();
                     var className = type.getClassName();
 
-                    //var container = type.containerType();//?
+                    // var container = type.containerType();//?
                     var expr = new MethodCallExpr(new SuperExpr(),
-                            null,
-                            PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER,
-                            args);
+                        null,
+                        PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER,
+                        args);
                     body.replace(first, new ExpressionStmt(expr));
                 }
             }
@@ -203,15 +205,17 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
             if (outerVars != null) {
                 for (ResolvedFieldDeclaration outerVar : outerVars) {
                     final var fieldAccessExpr = new FieldAccessExpr(new ThisExpr(),
-                            PipelineConstants.FINAL_VAR_PREFIX + outerVar.getName());
+                        PipelineConstants.FINAL_VAR_PREFIX + outerVar.getName());
                     var assign = new AssignExpr(fieldAccessExpr, new NameExpr(outerVar.getName()),
-                            AssignExpr.Operator.ASSIGN);
+                        AssignExpr.Operator.ASSIGN);
                     body.addStatement(1, assign);
                 }
 
-                /*for (i = 0; i < initializers.size(); i++) {
-                    body.addStatement(i + j + 1, initializers.get(i).clone());
-                }*/
+                /*
+                 * for (i = 0; i < initializers.size(); i++) {
+                 * body.addStatement(i + j + 1, initializers.get(i).clone());
+                 * }
+                 */
             }
         }
     }
@@ -235,11 +239,11 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
 
             var type = n.getType().resolve();
             ConstructorDeclaration constructorDecl =
-                    (ConstructorDeclaration) n.resolve().toAst().get();
+                (ConstructorDeclaration) n.resolve().toAst().get();
             constructorDecl = constructorDecl.clone();
 
             final NodeList<Expression> cargs =
-                    new NodeList<>(args.stream().map(Expression::clone).collect(Collectors.toList()));
+                new NodeList<>(args.stream().map(Expression::clone).collect(Collectors.toList()));
             var sr = new MethodCallExpr(null, new NodeList<>(), new SimpleName("super"), cargs);
             constructorDecl.setBody(new BlockStmt(new NodeList<>(new ExpressionStmt(sr))));
             td.addMember(constructorDecl);

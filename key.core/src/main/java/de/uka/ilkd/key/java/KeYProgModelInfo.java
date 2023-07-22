@@ -1,5 +1,25 @@
 package de.uka.ilkd.key.java;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import de.uka.ilkd.key.java.ast.ResolvedLogicalType;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
+import de.uka.ilkd.key.java.ast.abstraction.Field;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.loader.JP2KeYTypeConverter;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+
 import com.github.javaparser.ast.AccessSpecifier;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
@@ -15,26 +35,8 @@ import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.DefaultConstructorDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserMethodDeclaration;
-import de.uka.ilkd.key.java.ast.ResolvedLogicalType;
-import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
-import de.uka.ilkd.key.java.ast.abstraction.Field;
-import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.abstraction.Type;
-import de.uka.ilkd.key.java.ast.declaration.*;
-import de.uka.ilkd.key.java.loader.JP2KeYTypeConverter;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 
 public class KeYProgModelInfo {
@@ -163,7 +165,7 @@ public class KeYProgModelInfo {
      * Checks whether subType is a subtype of superType or not.
      *
      * @return true if subType is subtype of superType,
-     * false in the other case.
+     *         false in the other case.
      */
     public boolean isSubtype(KeYJavaType subType, KeYJavaType superType) {
         return isSubtype(rec2key().resolveType(subType), rec2key().resolveType(superType));
@@ -249,7 +251,7 @@ public class KeYProgModelInfo {
      * retrieves the most specific constructor declared in the given type with
      * respect to the given signature
      *
-     * @param ct        the KeYJavyType where to look for the constructor
+     * @param ct the KeYJavyType where to look for the constructor
      * @param signature IList<KeYJavaType> representing the signature of the constructor
      * @return the most specific constructor declared in the given type
      */
@@ -260,8 +262,7 @@ public class KeYProgModelInfo {
             List<ResolvedType> sig = signature.stream().map(this::getJavaParserType).toList();
 
             List<ResolvedConstructorDeclaration> constructors = rt.get().getConstructors();
-            constr:
-            for (var constructor : constructors) {
+            constr: for (var constructor : constructors) {
                 if (sig.size() != constructor.getNumberOfParams()) {
                     continue;
                 }
@@ -281,7 +282,8 @@ public class KeYProgModelInfo {
                 var ast = constructor.toAst().get();
                 return (IProgramMethod) mapping.nodeToKeY(ast);
             }
-            //((ClassOrInterfaceDeclaration) rt.get().toAst().get()).getConstructorByParameterTypes()
+            // ((ClassOrInterfaceDeclaration)
+            // rt.get().toAst().get()).getConstructorByParameterTypes()
         }
         return null;
     }
@@ -315,16 +317,16 @@ public class KeYProgModelInfo {
      * in the given type or in a supertype where it is visible for the
      * given type, and has a signature that is compatible to the given one.
      *
-     * @param ct        the class type to get methods from.
-     * @param name      the name of the methods in question.
+     * @param ct the class type to get methods from.
+     * @param name the name of the methods in question.
      * @param signature the statical type signature of a callee.
      * @return the IProgramMethods, if one is found,
-     * null if none or more than one IProgramMethod is found (in this case
-     * a debug output is written to console).
+     *         null if none or more than one IProgramMethod is found (in this case
+     *         a debug output is written to console).
      */
     @Nullable
     public IProgramMethod getProgramMethod(@Nonnull KeYJavaType ct, String name,
-                                           Iterable<KeYJavaType> signature) {
+            Iterable<KeYJavaType> signature) {
         if (ct.getJavaType() instanceof ArrayType) {
             return getImplicitMethod(ct, name);
         }
@@ -342,7 +344,8 @@ public class KeYProgModelInfo {
             return null;
 
         return method.getDeclaration()
-                .map(d -> (IProgramMethod) Objects.requireNonNull(mapping.resolvedDeclarationToKeY(d)))
+                .map(d -> (IProgramMethod) Objects
+                        .requireNonNull(mapping.resolvedDeclarationToKeY(d)))
                 .orElse(null);
     }
 
@@ -351,12 +354,12 @@ public class KeYProgModelInfo {
      * in the given type or in a supertype where it is visible for the
      * given type, and has a signature that is compatible to the given one.
      *
-     * @param ct        the class type to get methods from.
-     * @param name      the name of the methods in question.
+     * @param ct the class type to get methods from.
+     * @param name the name of the methods in question.
      * @param signature the statical type signature of a callee.
      * @return the IProgramMethods, if one is found,
-     * null if none or more than one IProgramMethod is found (in this case
-     * a debug output is written to console).
+     *         null if none or more than one IProgramMethod is found (in this case
+     *         a debug output is written to console).
      */
     public IProgramMethod getProgramMethod(
             @Nonnull KeYJavaType ct, String name,
@@ -367,8 +370,8 @@ public class KeYProgModelInfo {
 
     private List<Field> asKeYFieldsR(Stream<ResolvedFieldDeclaration> rfl) {
         return rfl.flatMap(
-                        it -> ((FieldDeclaration) Objects.requireNonNull(mapping.resolvedDeclarationToKeY(it)))
-                                .getFieldSpecifications().stream())
+            it -> ((FieldDeclaration) Objects.requireNonNull(mapping.resolvedDeclarationToKeY(it)))
+                    .getFieldSpecifications().stream())
                 .collect(Collectors.toList());
     }
 
@@ -419,12 +422,12 @@ public class KeYProgModelInfo {
      */
     private List<Field> getVisibleArrayFields(KeYJavaType arrayType) {
         final ImmutableArray<MemberDeclaration> members =
-                ((ArrayDeclaration) arrayType.getJavaType()).getMembers();
+            ((ArrayDeclaration) arrayType.getJavaType()).getMembers();
         List<Field> result = new ArrayList<>();
         for (MemberDeclaration member : members) {
             if (member instanceof FieldDeclaration) {
                 final ImmutableArray<FieldSpecification> specs =
-                        ((FieldDeclaration) member).getFieldSpecifications();
+                    ((FieldDeclaration) member).getFieldSpecifications();
                 for (FieldSpecification spec : specs) {
                     result.add(spec);
                 }
@@ -491,12 +494,13 @@ public class KeYProgModelInfo {
      *
      * @param rctl the ASTList<ClassType> to be converted
      * @return list of KeYJavaTypes representing the given recoder types in
-     * the same order
+     *         the same order
      */
     private List<KeYJavaType> asKeYJavaTypes(
             final Stream<ResolvedReferenceTypeDeclaration> rctl) {
         return rctl
-                .map(it -> Objects.requireNonNull(rec2key().resolvedTypeToKeY(new ReferenceTypeImpl(it))))
+                .map(it -> Objects
+                        .requireNonNull(rec2key().resolvedTypeToKeY(new ReferenceTypeImpl(it))))
                 .collect(Collectors.toList());
     }
 
@@ -527,7 +531,7 @@ public class KeYProgModelInfo {
     }
 
     public ImmutableList<KeYJavaType> findImplementations(KeYJavaType ct, String name,
-                                                          ImmutableList<KeYJavaType> signature) {
+            ImmutableList<KeYJavaType> signature) {
         var type = rec2key().resolveType(ct);
         if (!type.isReferenceType()) {
             return ImmutableList.of();
@@ -571,7 +575,7 @@ public class KeYProgModelInfo {
 
 
     private ImmutableList<KeYJavaType> recFindImplementations(TypeDeclaration ct,
-                                                              String name, List<Type> signature, ImmutableList<KeYJavaType> result) {
+            String name, List<Type> signature, ImmutableList<KeYJavaType> result) {
         // TODO weigl does not compile, no idea what this should be
         // if (declaresApplicableMethods(ct, name, signature)) {
         // KeYJavaType r = (KeYJavaType) mapping.toKeY(ct);
@@ -598,15 +602,15 @@ public class KeYProgModelInfo {
 
 
     private boolean declaresApplicableMethods(MethodResolutionCapability ct, String name,
-                                              List<ResolvedType> signature) {
+            List<ResolvedType> signature) {
         var method = ct.solveMethod(name, signature, false);
         return method.isSolved();
     }
 
     private boolean isDeclaringInterface(/*
-     * recoder.abstraction.ClassType ct, String name,
-     * List<recoder.abstraction.Type> signature
-     */) {
+                                          * recoder.abstraction.ClassType ct, String name,
+                                          * List<recoder.abstraction.Type> signature
+                                          */) {
         // TODO Weigl does not compile
         // Debug.assertTrue(ct.isInterface());
         // List<recoder.abstraction.Method> list = si.getMethods(ct);

@@ -10,9 +10,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.github.javaparser.*;
-import com.github.javaparser.Position;
-import com.github.javaparser.resolution.TypeSolver;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.TypeScope;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
@@ -40,6 +37,8 @@ import de.uka.ilkd.key.util.parsing.BuildingIssue;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import com.github.javaparser.*;
+import com.github.javaparser.Position;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
@@ -54,6 +53,7 @@ import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.VoidType;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.github.javaparser.resolution.TypeSolver;
 import com.github.javaparser.resolution.model.typesystem.NullType;
 import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
 import com.github.javaparser.resolution.types.ResolvedVoidType;
@@ -294,9 +294,10 @@ public class JavaService {
         pkg = pkg.substring(0, lastDot);
         try {
             cu.setPackageDeclaration(pkg);
-        } catch(ParseProblemException ignored) {
-            LOGGER.warn("Failed to construct a package name for the java file " + relativePath + ", it might contain invalid characters. "
-            + "Add a package declaration to the file or rename its folder");
+        } catch (ParseProblemException ignored) {
+            LOGGER.warn("Failed to construct a package name for the java file " + relativePath
+                + ", it might contain invalid characters. "
+                + "Add a package declaration to the file or rename its folder");
         }
     }
 
@@ -498,7 +499,10 @@ public class JavaService {
                 transformModel(bootClasses);
                 // Process java.lang.Object first (needed to construct array classes like int[]
                 var object = bootClasses.stream()
-                        .filter(b -> b.getPrimaryType().map(t -> t.getFullyQualifiedName().orElseThrow().equals(TypeSolver.JAVA_LANG_OBJECT)).orElse(false))
+                        .filter(b -> b.getPrimaryType()
+                                .map(t -> t.getFullyQualifiedName().orElseThrow()
+                                        .equals(TypeSolver.JAVA_LANG_OBJECT))
+                                .orElse(false))
                         .findFirst()
                         .orElse(null);
                 if (object != null) {

@@ -3,13 +3,11 @@ package de.uka.ilkd.key.java.ast.reference;
 
 import java.util.List;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
-import org.key_project.util.ExtList;
 
 
 public class FieldReference extends VariableReference

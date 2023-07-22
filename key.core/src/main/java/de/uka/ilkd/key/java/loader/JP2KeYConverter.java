@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.github.javaparser.ast.expr.Name;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.KeYJPMapping;
 import de.uka.ilkd.key.java.Position;
@@ -52,6 +51,7 @@ import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.ast.expr.Name;
 import com.github.javaparser.ast.key.*;
 import com.github.javaparser.ast.key.sv.*;
 import com.github.javaparser.ast.modules.*;
@@ -644,7 +644,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             pv = (ProgramVariable) keyDecl.getProgramVariable();
         } else {
             for (VariableSpecification variable : other.getVariables()) {
-                if (variable.getName() != null && JavaDLFieldNames.split(variable.getName()).name().equals(target.getName())) {
+                if (variable.getName() != null && JavaDLFieldNames.split(variable.getName()).name()
+                        .equals(target.getName())) {
                     pv = (ProgramVariable) variable.getProgramVariable();
                     break;
                 }
@@ -703,7 +704,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var varsList = new ArrayList<FieldSpecification>(n.getVariables().size());
         for (VariableDeclarator v : n.getVariables()) {
             var isModel = n.hasModifier(Modifier.Keyword.MODEL);
-            // This is really odd, some interfaces have represents clauses. Those should be abstract classes...
+            // This is really odd, some interfaces have represents clauses. Those should be abstract
+            // classes...
             // Normal fields of interfaces are implicitly static...
             var isStatic = !isModel && n.isStatic();
             var decl = new FullVariableDeclarator(v, n.isFinal(), isStatic, isModel);
@@ -1722,7 +1724,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         IExecutionContext execContext;
         if (n.getContext().isPresent()) {
             execContext = accepto(n.getContext());
-        } else if (n.getTr().isPresent() || n.getSignature().isPresent() || n.getExpression().isPresent()) {
+        } else if (n.getTr().isPresent() || n.getSignature().isPresent()
+                || n.getExpression().isPresent()) {
             if (n.getTr().isEmpty() || n.getSignature().isEmpty()) {
                 return reportError(n, "No context type or method signature given");
             }
@@ -1732,7 +1735,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             TypeReference classContext = requireTypeReference(n.getTr().get());
             ReferencePrefix runtimeInstance = accepto(n.getExpression());
             IProgramMethod methodContext = accept(signature);
-            execContext = new ExecutionContext(execPi, execC, classContext, runtimeInstance, methodContext);
+            execContext =
+                new ExecutionContext(execPi, execC, classContext, runtimeInstance, methodContext);
         } else {
             execContext = null;
         }

@@ -1,13 +1,8 @@
 package de.uka.ilkd.key.java.loader;
 
-import com.github.javaparser.resolution.TypeSolver;
-import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
-import com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration;
-import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
-import com.github.javaparser.resolution.types.ResolvedArrayType;
-import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
-import com.github.javaparser.resolution.types.ResolvedReferenceType;
-import com.github.javaparser.resolution.types.ResolvedType;
+import java.util.Objects;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.KeYJPMapping;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
@@ -32,13 +27,20 @@ import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.util.AssertionFailure;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.*;
+
+import com.github.javaparser.resolution.TypeSolver;
+import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration;
+import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
+import com.github.javaparser.resolution.types.ResolvedArrayType;
+import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
+import com.github.javaparser.resolution.types.ResolvedReferenceType;
+import com.github.javaparser.resolution.types.ResolvedType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import java.util.Objects;
 
 /**
  * provide means to convert recoder types to the corresponding KeY type structures.
@@ -192,7 +194,7 @@ public class JP2KeYTypeConverter {
         // I may not use JavaInfo here because the classes may not yet be cached!
         Type elemType = kjt.getJavaType();
         var arraySort = ArraySort.getArraySort(kjt.getSort(), elemType, getObjectType().getSort(),
-                getCloneableType().getSort(), getSerializableType().getSort());
+            getCloneableType().getSort(), getSerializableType().getSort());
         var result = new KeYJavaType(arraySort);
         if (getSortsNamespace().lookup(arraySort.name()) == null) {
             getSortsNamespace().add(arraySort);
@@ -277,7 +279,7 @@ public class JP2KeYTypeConverter {
     /**
      * create a sort out of a recoder class
      *
-     * @param ct     classtype to create for, not null
+     * @param ct classtype to create for, not null
      * @param supers the set of (direct?) super-sorts
      * @return a freshly created Sort object
      */
@@ -330,13 +332,13 @@ public class JP2KeYTypeConverter {
             baseTypeRef = new TypeRef(baseType);
         } else {
             baseTypeRef = new TypeRef(new ProgramElementName(baseType.getSort().name().toString()),
-                    0, null, baseType);
+                0, null, baseType);
         }
 
         ExtList members = new ExtList();
         members.add(baseTypeRef);
         addImplicitArrayMembers(members, arrayType, baseType,
-                (ProgramVariable) length.getFieldSpecifications().get(0).getProgramVariable());
+            (ProgramVariable) length.getFieldSpecifications().get(0).getProgramVariable());
 
         return new ArrayDeclaration(members, baseTypeRef, sat);
     }
@@ -352,10 +354,10 @@ public class JP2KeYTypeConverter {
 
         var superArrayType = new KeYJavaType();
         var specLength =
-                new FieldSpecification(new LocationVariable(new ProgramElementName("length"),
-                        integerType, superArrayType, false, false, false, true));
-        var f = new FieldDeclaration(new Modifier[]{new Public(), new Final()},
-                new TypeRef(integerType), new FieldSpecification[]{specLength}, false);
+            new FieldSpecification(new LocationVariable(new ProgramElementName("length"),
+                integerType, superArrayType, false, false, false, true));
+        var f = new FieldDeclaration(new Modifier[] { new Public(), new Final() },
+            new TypeRef(integerType), new FieldSpecification[] { specLength }, false);
         superArrayType.setJavaType(new SuperArrayDeclaration(f));
         return superArrayType;
     }
@@ -363,18 +365,18 @@ public class JP2KeYTypeConverter {
     /**
      * Adds several implicit fields and methods to given list of members.
      *
-     * @param members  an ExtList with the members of parent
-     * @param parent   the KeYJavaType of the array to be enriched by its implicit members
+     * @param members an ExtList with the members of parent
+     * @param parent the KeYJavaType of the array to be enriched by its implicit members
      * @param baseType the KeYJavaType of the parent's element type
      */
     private void addImplicitArrayMembers(ExtList members, KeYJavaType parent, KeYJavaType baseType,
-                                         ProgramVariable len) {
+            ProgramVariable len) {
 
         Type base = baseType.getJavaType();
         int dimension = base instanceof ArrayType ? ((ArrayType) base).getDimension() + 1 : 1;
         TypeRef parentReference =
-                new TypeRef(new ProgramElementName(String.valueOf(parent.getSort().name())),
-                        dimension, null, parent);
+            new TypeRef(new ProgramElementName(String.valueOf(parent.getSort().name())),
+                dimension, null, parent);
 
         // add methods
         // the only situation where base can be null is in case of a
@@ -390,7 +392,7 @@ public class JP2KeYTypeConverter {
         }
 
         final IProgramMethod prepare =
-                arrayMethodBuilder.getPrepareArrayMethod(parentReference, length, defaultValue, fields);
+            arrayMethodBuilder.getPrepareArrayMethod(parentReference, length, defaultValue, fields);
 
         members.add(arrayMethodBuilder.getArrayInstanceAllocatorMethod(parentReference));
         members.add(prepare);
@@ -403,7 +405,7 @@ public class JP2KeYTypeConverter {
      *
      * @param field the FieldDeclaration of which the field specifications have to be extracted
      * @return a IList<Field> the includes all field specifications found int the field declaration
-     * of the given list
+     *         of the given list
      */
     private ImmutableList<Field> filterField(FieldDeclaration field) {
         ImmutableList<Field> result = ImmutableSLList.nil();
@@ -420,7 +422,7 @@ public class JP2KeYTypeConverter {
      *
      * @param list the ExtList with the members of a type declaration
      * @return a IList<Field> the includes all field specifications found int the field declaration
-     * of the given list
+     *         of the given list
      */
     private ImmutableList<Field> filterField(ExtList list) {
         ImmutableList<Field> result = ImmutableSLList.nil();
@@ -439,6 +441,6 @@ public class JP2KeYTypeConverter {
         Sort heapSort = heapLDT == null ? Sort.ANY : heapLDT.targetSort();
         int heapCount = (heapLDT == null) ? 1 : (heapLDT.getAllHeaps().size() - 1);
         arrayMethodBuilder =
-                new CreateArrayMethodBuilder(integerType, getObjectType(), heapSort, heapCount);
+            new CreateArrayMethodBuilder(integerType, getObjectType(), heapSort, heapCount);
     }
 }
