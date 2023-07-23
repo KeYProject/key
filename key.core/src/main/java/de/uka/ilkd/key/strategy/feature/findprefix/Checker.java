@@ -21,5 +21,5 @@ interface Checker {
      *
      * @param pio the initial position of occurrence
      */
-    public boolean check(PosInOccurrence pio);
+    boolean check(PosInOccurrence pio);
 }

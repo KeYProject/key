@@ -1,26 +1,26 @@
 # KeY -- Deductive Java Program Verifier
 
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=key-main&metric=bugs)](https://sonarcloud.io/dashboard?id=key-main) [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=key-main&metric=code_smells)](https://sonarcloud.io/dashboard?id=key-main) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=key-main&metric=coverage)](https://sonarcloud.io/dashboard?id=key-main) [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=key-main&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=key-main) [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=key-main&metric=ncloc)](https://sonarcloud.io/dashboard?id=key-main) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=key-main&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=key-main) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=key-main&metric=alert_status)](https://sonarcloud.io/dashboard?id=key-main) [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=key-main&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=key-main) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=key-main&metric=security_rating)](https://sonarcloud.io/dashboard?id=key-main) [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=key-main&metric=sqale_index)](https://sonarcloud.io/dashboard?id=key-main) [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=key-main&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=key-main)
+[![Tests](https://github.com/KeYProject/key/actions/workflows/tests.yml/badge.svg)](https://github.com/KeYProject/key/actions/workflows/tests.yml) [![CodeQL](https://github.com/KeYProject/key/actions/workflows/codeql.yml/badge.svg)](https://github.com/KeYProject/key/actions/workflows/codeql.yml) [![CodeQuality](https://github.com/KeYProject/key/actions/workflows/code_quality.yml/badge.svg)](https://github.com/KeYProject/key/actions/workflows/code_quality.yml) 
 
 This repository contains the interactive theorem prover "KeY" for the verification of Java programs.
 
 You can find more information about KeY on https://key-project.org or use the
-documentation in the companion repository [key-docs](https://git.key-project.org/key/key-docs).
+documentation in the companion repository [key-docs](https://github.com/KeYProject/key-docs).
 The content of the latter is also available as HTML version under https://key-project.org/docs.
 
 The current version of KeY is 2.10.0, licensed under GPL v2.
 
 
-## Requirements:
+## Requirements
 
 * Hardware: >=2 GB RAM
 * Operating System: Linux/Unix, MacOSX, Windows
-* Java SE 8 or newer
+* Java SE 11 or newer
 * Optionally, KeY can make use of the following binaries:
   * SMT Solvers:
-	* [Z3](https://github.com/Z3Prover/z3)
+    * [Z3](https://github.com/Z3Prover/z3)
     * [cvc5](https://cvc5.github.io/)
-	* [CVC4](http://cvc4.cs.stanford.edu/web/)
+    * [CVC4](http://cvc4.cs.stanford.edu/web/)
     * [Princess](http://www.philipp.ruemmer.org/princess.shtml)
 
 ## Content of the KeY folder
@@ -87,9 +87,7 @@ Assuming you are in the directory of this README file, you can create a runnable
 
 # Issues and Bug Reports
 
-If you encounter problems, please send a message to
-
-		<support@key-project.org>
+If you encounter problems, please send a message to support@key-project.org
 
 
 
@@ -100,7 +98,7 @@ This is the KeY project - Integrated Deductive Software Design
 Copyright (C) 2001-2011 Universität Karlsruhe, Germany
 						Universität Koblenz-Landau, Germany
 						and Chalmers University of Technology, Sweden
-Copyright (C) 2011-2022 Karlsruhe Institute of Technology, Germany
+Copyright (C) 2011-2023 Karlsruhe Institute of Technology, Germany
 						Technical University Darmstadt, Germany
 						Chalmers University of Technology, Sweden
 

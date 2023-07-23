@@ -5,10 +5,14 @@
  */
 package de.uka.ilkd.key.logic.op;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.ImmutableArray;
 
 
@@ -16,7 +20,7 @@ import org.key_project.util.collection.ImmutableArray;
  * All symbols acting as members of a term e.g. logical operators, predicates, functions, variables
  * etc. have to implement this interface.
  */
-public interface Operator extends Named, SVSubstitute {
+public interface Operator extends Named, SVSubstitute, EqualsModProofIrrelevancy {
 
     /**
      * the arity of this operator

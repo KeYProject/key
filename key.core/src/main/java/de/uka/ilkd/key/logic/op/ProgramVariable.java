@@ -1,37 +1,22 @@
 package de.uka.ilkd.key.logic.op;
 
-import java.io.IOException;
-
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceData;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.ReferenceSuffix;
-import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.ExtList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * The objects of this class represent program variables and program constants (resulting from
@@ -160,14 +145,8 @@ public abstract class ProgramVariable extends AbstractSortedOperator
 
 
     @Override
-    public void visit(de.uka.ilkd.key.java.visitor.Visitor v) {
+    public void visit(Visitor v) {
         v.performActionOnProgramVariable(this);
-    }
-
-
-    @Override
-    public void prettyPrint(PrettyPrinter w) throws IOException {
-        w.printProgramVariable(this);
     }
 
 
@@ -184,8 +163,8 @@ public abstract class ProgramVariable extends AbstractSortedOperator
 
 
     @Override
-    public Position getRelativePosition() {
-        return Position.UNDEFINED;
+    public recoder.java.SourceElement.Position getRelativePosition() {
+        return recoder.java.SourceElement.Position.UNDEFINED;
     }
 
 
@@ -271,8 +250,6 @@ public abstract class ProgramVariable extends AbstractSortedOperator
         if (src == this) {
             return matchCond;
         } else {
-            LOGGER.debug("Program match failed. Not same program variable (pattern {}, source {})",
-                this, src);
             return null;
         }
     }

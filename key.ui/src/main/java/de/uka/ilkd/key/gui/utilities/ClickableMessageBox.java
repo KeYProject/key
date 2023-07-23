@@ -1,12 +1,10 @@
 package de.uka.ilkd.key.gui.utilities;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
-
-import javax.swing.JTextPane;
+import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
@@ -21,33 +19,29 @@ public class ClickableMessageBox extends JTextPane {
 
     private static final long serialVersionUID = 7588093268080119674L;
 
-    public static interface ClickableMessageBoxListener {
-        public void eventMessageClicked(Object object);
+    public interface ClickableMessageBoxListener {
+        void eventMessageClicked(Object object);
     }
 
-    private ArrayList<Object> items = new ArrayList<Object>();
-    private LinkedList<ClickableMessageBoxListener> listeners =
-        new LinkedList<ClickableMessageBoxListener>();
-    private HTMLEditorKit kit = new HTMLEditorKit();
-    private HTMLDocument doc = new HTMLDocument();
+    private final ArrayList<Object> items = new ArrayList<>();
+    private final LinkedList<ClickableMessageBoxListener> listeners =
+        new LinkedList<>();
+    private final HTMLEditorKit kit = new HTMLEditorKit();
+    private final HTMLDocument doc = new HTMLDocument();
 
     public ClickableMessageBox() {
         this.setEditorKit(kit);
         this.setDocument(doc);
         this.setEditable(false);
-        this.addHyperlinkListener(new HyperlinkListener() {
-
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent e) {
-                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    int index = Integer.parseInt(e.getDescription());
-                    Object item = items.get(index);
-                    for (ClickableMessageBoxListener listener : listeners) {
-                        listener.eventMessageClicked(item);
-                    }
+        this.addHyperlinkListener(e -> {
+            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                int index = Integer.parseInt(e.getDescription());
+                Object item = items.get(index);
+                for (ClickableMessageBoxListener listener : listeners) {
+                    listener.eventMessageClicked(item);
                 }
-
             }
+
         });
     }
 

@@ -24,5 +24,5 @@ public interface ISymbolicState extends ISymbolicAssociationValueContainer {
      *
      * @return The name of this state.
      */
-    public String getName();
+    String getName();
 }

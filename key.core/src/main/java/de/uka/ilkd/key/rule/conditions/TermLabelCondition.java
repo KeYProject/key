@@ -5,8 +5,6 @@
  */
 package de.uka.ilkd.key.rule.conditions;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -15,6 +13,8 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * This variable condition checks if an instantiation for term labels contains a specific term
@@ -40,7 +40,7 @@ public class TermLabelCondition extends VariableConditionAdapter {
         assert instMap.getInstantiation(l) instanceof ImmutableArray<?>;
         ImmutableArray<?> tInsts = (ImmutableArray<?>) instMap.getInstantiation(l);
         boolean hasLabel = hasLabel(tInsts, ln);
-        return negated ? !hasLabel : hasLabel;
+        return negated != hasLabel;
     }
 
     /**

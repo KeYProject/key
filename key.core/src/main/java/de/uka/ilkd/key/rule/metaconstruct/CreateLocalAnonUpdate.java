@@ -5,8 +5,6 @@
  */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -21,6 +19,8 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Expects a loop body and creates the anonymizing update

@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.proof;
 
+import java.io.File;
+import java.util.Map;
+
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -13,15 +16,14 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.io.File;
-import java.util.Map;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -103,8 +105,9 @@ public class TestTermTacletAppIndex {
 
     @Test
     public void testIndex0WithCache() {
-        for (int i = 0; i != 3; ++i)
+        for (int i = 0; i != 3; ++i) {
             doTestIndex0(realCache);
+        }
     }
 
     private void doTestIndex0(TermTacletAppIndexCacheSet cache) {

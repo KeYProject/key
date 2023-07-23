@@ -1,12 +1,9 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import java.io.IOException;
-import java.io.StringWriter;
-
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.Switch;
+import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
@@ -38,21 +35,15 @@ public class ExecutionBranchStatement extends AbstractExecutionBlockStartNode<Br
     @Override
     protected String lazyComputeName() {
         BranchStatement bs = getActiveStatement();
-        try {
-            if (bs instanceof If) {
-                StringWriter sw = new StringWriter();
-                PrettyPrinter sb = new PrettyPrinter(sw, true);
-                sb.printIf((If) bs, false);
-                return sw.toString();
-            } else if (bs instanceof Switch) {
-                StringWriter sw = new StringWriter();
-                PrettyPrinter sb = new PrettyPrinter(sw, true);
-                sb.printSwitch((Switch) bs, false);
-                return sw.toString();
-            } else {
-                return bs.toString();
-            }
-        } catch (IOException e) {
+        if (bs instanceof If) {
+            PrettyPrinter p = PrettyPrinter.purePrinter();
+            p.performActionOnIf((If) bs, false);
+            return p.result();
+        } else if (bs instanceof Switch) {
+            PrettyPrinter p = PrettyPrinter.purePrinter();
+            p.performActionOnSwitch((Switch) bs, false);
+            return p.result();
+        } else {
             return bs.toString();
         }
     }

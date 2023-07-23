@@ -35,13 +35,13 @@ public class ToggleOriginHighlightAction extends MainWindowAction {
             + "highlight its origin in the source view.");
         putValue(KeyAction.CHECKBOX, true);
 
-        ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
-                .addSettingsListener(event -> {
-                    boolean useOriginLabels = ProofIndependentSettings.DEFAULT_INSTANCE
-                            .getTermLabelSettings().getUseOriginLabels();
+        ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().addPropertyChangeListener(
+            event -> {
+                boolean useOriginLabels = ProofIndependentSettings.DEFAULT_INSTANCE
+                        .getTermLabelSettings().getUseOriginLabels();
 
-                    setEnabled(useOriginLabels);
-                });
+                setEnabled(useOriginLabels);
+            });
     }
 
     @Override

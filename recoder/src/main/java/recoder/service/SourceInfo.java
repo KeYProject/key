@@ -7,8 +7,10 @@
 
 package recoder.service;
 
-import recoder.abstraction.Package;
+import java.util.List;
+
 import recoder.abstraction.*;
+import recoder.abstraction.Package;
 import recoder.java.Expression;
 import recoder.java.ProgramElement;
 import recoder.java.Reference;
@@ -17,8 +19,6 @@ import recoder.java.declaration.*;
 import recoder.java.reference.*;
 import recoder.java.statement.EmptyStatement;
 import recoder.util.ProgressListener;
-
-import java.util.List;
 
 /**
  * Implements queries for program model elements with concrete syntactical representations.
@@ -364,4 +364,3 @@ public interface SourceInfo extends ProgramModelInfo {
     Type getAnnotationType(AnnotationUseSpecification au);
 
 }
-

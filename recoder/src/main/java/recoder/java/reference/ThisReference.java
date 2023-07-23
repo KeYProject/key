@@ -128,8 +128,9 @@ public class ThisReference extends JavaNonTerminalProgramElement
 
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0)
+            if (index == 0) {
                 return prefix;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

@@ -5,9 +5,11 @@
  */
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.logic.sort.Sort;
+
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.logic.sort.Sort;
+import java.util.stream.Collectors;
 
 
 /**
@@ -19,5 +21,10 @@ public interface SortedOperator extends Operator {
 
     Sort argSort(int i);
 
-    public ImmutableArray<Sort> argSorts();
+    ImmutableArray<Sort> argSorts();
+
+    default String toSignatureString(){
+        return argSorts().stream().map(it -> it.name().toString())
+                .collect(Collectors.joining(",", name() + "(", ")"));
+    }
 }

@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.Arrays;
-
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.Goal;

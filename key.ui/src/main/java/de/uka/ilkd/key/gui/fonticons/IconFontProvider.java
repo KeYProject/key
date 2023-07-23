@@ -5,8 +5,8 @@
  */
 package de.uka.ilkd.key.gui.fonticons;
 
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 public class IconFontProvider extends IconProvider {
     private final IconFont iconCode;

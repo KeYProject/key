@@ -66,7 +66,7 @@ public class ClassInitializer extends JavaDeclaration
 
     public ClassInitializer(Static modifier, StatementBlock body) {
         if (modifier != null) {
-            ASTList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>(1);
+            ASTList<DeclarationSpecifier> mods = new ASTArrayList<>(1);
             mods.add(modifier);
             setDeclarationSpecifiers(mods);
         }
@@ -178,10 +178,12 @@ public class ClassInitializer extends JavaDeclaration
 
     public int getChildCount() {
         int result = 0;
-        if (declarationSpecifiers != null)
+        if (declarationSpecifiers != null) {
             result += declarationSpecifiers.size();
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -203,8 +205,9 @@ public class ClassInitializer extends JavaDeclaration
             index -= len;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

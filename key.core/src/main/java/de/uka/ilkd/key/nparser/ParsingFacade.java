@@ -1,15 +1,5 @@
 package de.uka.ilkd.key.nparser;
 
-import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
-import de.uka.ilkd.key.proof.io.RuleSource;
-import org.antlr.v4.runtime.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.antlr.v4.runtime.tree.TerminalNode;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +10,18 @@ import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
 import java.nio.file.Path;
 import java.util.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
+import de.uka.ilkd.key.proof.io.RuleSource;
+
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.PredictionMode;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.antlr.v4.runtime.tree.TerminalNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This facade provides low-level access to the ANTLR4 Parser and Lexer.
@@ -52,8 +54,8 @@ public final class ParsingFacade {
 
     public static List<KeyAst.File> parseFiles(URL url) throws IOException {
         List<KeyAst.File> ctxs = new LinkedList<>();
-        Stack<URL> queue = new Stack<>();
-        queue.add(url);
+        ArrayDeque<URL> queue = new ArrayDeque<>();
+        queue.push(url);
         Set<URL> reached = new HashSet<>();
 
         while (!queue.isEmpty()) {
@@ -64,7 +66,7 @@ public final class ParsingFacade {
             Collection<RuleSource> includes = ctx.getIncludes(url).getRuleSets();
             for (RuleSource u : includes) {
                 if (!reached.contains(u.url())) {
-                    queue.add(u.url());
+                    queue.push(u.url());
                 }
             }
         }
@@ -121,7 +123,20 @@ public final class ParsingFacade {
 
     public static KeyAst.File parseFile(CharStream stream) {
         KeYParser p = createParser(stream);
-        KeYParser.FileContext ctx = p.file();
+
+        p.getInterpreter().setPredictionMode(PredictionMode.SLL);
+        // we don't want error messages or recovery during first try
+        p.removeErrorListeners();
+        p.setErrorHandler(new BailErrorStrategy());
+        KeYParser.FileContext ctx;
+        try {
+            ctx = p.file();
+        } catch (ParseCancellationException ex) {
+            LOGGER.warn("SLL was not enough");
+            p = createParser(stream);
+            ctx = p.file();
+        }
+
         p.getErrorReporter().throwException();
         return new KeyAst.File(ctx);
     }

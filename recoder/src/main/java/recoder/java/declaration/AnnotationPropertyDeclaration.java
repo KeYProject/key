@@ -74,8 +74,9 @@ public class AnnotationPropertyDeclaration extends MethodDeclaration
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (defaultValue != null)
+        if (defaultValue != null) {
             defaultValue.setExpressionContainer(this);
+        }
     }
 
     /*
@@ -93,8 +94,9 @@ public class AnnotationPropertyDeclaration extends MethodDeclaration
      * @see recoder.java.ExpressionContainer#getExpressionAt(int)
      */
     public Expression getExpressionAt(int index) {
-        if (index == 0 && defaultValue != null)
+        if (index == 0 && defaultValue != null) {
             return defaultValue;
+        }
         throw new ArrayIndexOutOfBoundsException(index);
     }
 
@@ -107,8 +109,9 @@ public class AnnotationPropertyDeclaration extends MethodDeclaration
     }
 
     public ProgramElement getChildAt(int index) {
-        if (index == super.getChildCount() && defaultValue != null)
+        if (index == super.getChildCount() && defaultValue != null) {
             return defaultValue;
+        }
         return super.getChildAt(index); // might throw ArrayIndexOutOfBoundsException
     }
 
@@ -119,8 +122,9 @@ public class AnnotationPropertyDeclaration extends MethodDeclaration
     public int getChildPositionCode(ProgramElement child) {
         // role 0-7: see MethodDeclaration
         // role 8: default value
-        if (child == defaultValue)
+        if (child == defaultValue) {
             return 8;
+        }
         return super.getChildPositionCode(child);
     }
 
@@ -141,8 +145,9 @@ public class AnnotationPropertyDeclaration extends MethodDeclaration
     }
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null)
+        if (p == null) {
             throw new NullPointerException();
+        }
         if (p == defaultValue) {
             Expression r = (Expression) q;
             defaultValue = r;

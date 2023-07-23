@@ -1,15 +1,10 @@
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.visitor.Visitor;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ExpressionContainer;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.visitor.Visitor;
 
 /**
  * Case.
@@ -52,7 +47,7 @@ public class Case extends BranchImp implements ExpressionContainer {
      * @param body a statement mutable list.
      */
     public Case(Expression e, Statement[] body) {
-        this.body = new ImmutableArray<Statement>(body);
+        this.body = new ImmutableArray<>(body);
         this.expression = e;
     }
 
@@ -70,7 +65,7 @@ public class Case extends BranchImp implements ExpressionContainer {
     public Case(ExtList children, Expression expr, PositionInfo pos) {
         super(children, pos);
         this.expression = expr;
-        this.body = new ImmutableArray<Statement>(children.collect(Statement.class));
+        this.body = new ImmutableArray<>(children.collect(Statement.class));
     }
 
     /**
@@ -80,10 +75,12 @@ public class Case extends BranchImp implements ExpressionContainer {
      */
     public int getChildCount() {
         int result = 0;
-        if (expression != null)
+        if (expression != null) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result += body.size();
+        }
         return result;
     }
 
@@ -97,8 +94,9 @@ public class Case extends BranchImp implements ExpressionContainer {
     public ProgramElement getChildAt(int index) {
         int len;
         if (expression != null) {
-            if (index == 0)
+            if (index == 0) {
                 return expression;
+            }
             index--;
         }
         if (body != null) {
@@ -186,9 +184,5 @@ public class Case extends BranchImp implements ExpressionContainer {
      */
     public void visit(Visitor v) {
         v.performActionOnCase(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printCase(this);
     }
 }

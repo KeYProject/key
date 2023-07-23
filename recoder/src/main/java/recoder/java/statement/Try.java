@@ -125,10 +125,12 @@ public class Try extends BranchStatement implements StatementContainer {
 
     public int getChildCount() {
         int result = 0;
-        if (body != null)
+        if (body != null) {
             result++;
-        if (branches != null)
+        }
+        if (branches != null) {
             result += branches.size();
+        }
         return result;
     }
 
@@ -142,8 +144,9 @@ public class Try extends BranchStatement implements StatementContainer {
 
     public ProgramElement getChildAt(int index) {
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         if (branches != null) {

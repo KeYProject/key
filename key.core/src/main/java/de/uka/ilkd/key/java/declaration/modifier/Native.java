@@ -5,9 +5,9 @@
  */
 package de.uka.ilkd.key.java.declaration.modifier;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.declaration.Modifier;
+
+import org.key_project.util.ExtList;
 
 /**
  * Native.

@@ -35,7 +35,7 @@ public final class LocalVariableCondition extends VariableConditionAdapter {
         }
         final boolean isLocalVar =
             ((candidate instanceof ProgramVariable) && !((ProgramVariable) candidate).isMember());
-        return neg ? !isLocalVar : isLocalVar;
+        return neg != isLocalVar;
     }
 
 

@@ -23,9 +23,6 @@ public class Comment extends JavaSourceElement {
         return false;
     }
 
-    public void prettyPrint(PrettyPrinter w) {
-    }
-
     /**
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
@@ -33,6 +30,7 @@ public class Comment extends JavaSourceElement {
      * @param v the Visitor
      */
     public void visit(Visitor v) {
+        v.performActionOnComment(this);
     }
 
     public String getText() {
@@ -59,10 +57,12 @@ public class Comment extends JavaSourceElement {
     }
 
     public boolean equals(Object o) {
-        if (o == this)
+        if (o == this) {
             return true;
-        if (!(o instanceof Comment))
+        }
+        if (!(o instanceof Comment)) {
             return false;
+        }
         Comment cmp = (Comment) o;
         return (getText().equals(cmp.getText()));
     }

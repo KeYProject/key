@@ -3,10 +3,6 @@ package de.uka.ilkd.key.java.visitor;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import de.uka.ilkd.key.logic.Term;
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.ClassInitializer;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -16,19 +12,15 @@ import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.expression.operator.adt.AllFields;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqReverse;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
-import de.uka.ilkd.key.java.expression.operator.adt.SetMinus;
-import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
-import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
+import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Walks through a java AST in depth-left-fist-order.
@@ -38,7 +30,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     protected static final Boolean CHANGED = Boolean.TRUE;
 
     /**  */
-    protected Deque<ExtList> stack = new ArrayDeque<ExtList>();
+    protected final Deque<ExtList> stack = new ArrayDeque<>();
 
     boolean preservesPositionInfo = true;
 
@@ -964,7 +956,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     @Override
     public void performActionOnNewArray(NewArray x) {
         DefaultAction def = new DefaultAction(x) {
-            NewArray y = (NewArray) pe;
+            final NewArray y = (NewArray) pe;
 
             @Override
             ProgramElement createNewElement(ExtList children) {
@@ -1307,7 +1299,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     private class ParameterDeclarationAction extends DefaultAction {
-        ParameterDeclaration x;
+        final ParameterDeclaration x;
 
         ParameterDeclarationAction(ParameterDeclaration x) {
             super(x);
@@ -1551,7 +1543,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     protected abstract class DefaultAction {
-        protected ProgramElement pe;
+        protected final ProgramElement pe;
 
         protected DefaultAction(ProgramElement pe) {
             this.pe = pe;

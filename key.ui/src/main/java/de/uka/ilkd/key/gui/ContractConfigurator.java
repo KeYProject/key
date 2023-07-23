@@ -1,17 +1,9 @@
 package de.uka.ilkd.key.gui;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.Services;
@@ -83,12 +75,10 @@ public class ContractConfigurator extends JDialog {
         okButton = new JButton("OK");
         okButton.setPreferredSize(buttonDim);
         okButton.setMinimumSize(buttonDim);
-        okButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                successful = true;
-                setVisible(false);
-                dispose();
-            }
+        okButton.addActionListener(e -> {
+            successful = true;
+            setVisible(false);
+            dispose();
         });
         buttonPanel.add(okButton);
         getRootPane().setDefaultButton(okButton);
@@ -97,12 +87,10 @@ public class ContractConfigurator extends JDialog {
         cancelButton = new JButton("Cancel");
         cancelButton.setPreferredSize(buttonDim);
         cancelButton.setMinimumSize(buttonDim);
-        cancelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                successful = false;
-                setVisible(false);
-                dispose();
-            }
+        cancelButton.addActionListener(e -> {
+            successful = false;
+            setVisible(false);
+            dispose();
         });
         buttonPanel.add(cancelButton);
         GuiUtilities.attachClickOnEscListener(cancelButton);

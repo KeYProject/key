@@ -94,8 +94,8 @@ public class ImmutableFixedLengthBitSet {
     public/* @ pure @ */int getNumOfZeroBits() {
         int result = 0;
 
-        for (int i = 0; i < bitSet.length; i++) {
-            if (!bitSet[i]) {
+        for (boolean b : bitSet) {
+            if (!b) {
                 result++;
             }
         }
@@ -107,7 +107,7 @@ public class ImmutableFixedLengthBitSet {
      * @return A list of all non-zero positions in the {@link ImmutableFixedLengthBitSet}.
      */
     public ArrayList<Integer> getNonzeroPositions() {
-        ArrayList<Integer> result = new ArrayList<Integer>();
+        ArrayList<Integer> result = new ArrayList<>();
         for (int i = 0; i < bitSet.length; i++) {
             if (bitSet[i]) {
                 result.add(i);
@@ -124,7 +124,7 @@ public class ImmutableFixedLengthBitSet {
      */
     @Override
     public String toString() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
         result.append(getValue()).append(" [");
 

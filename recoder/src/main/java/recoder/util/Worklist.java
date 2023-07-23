@@ -20,7 +20,7 @@ public class Worklist {
     /**
      * should it be possible to add items to the worklist twice?
      */
-    protected boolean allowDuplicates;
+    protected final boolean allowDuplicates;
 
     /**
      * records thw maximum length of the worklist
@@ -30,7 +30,7 @@ public class Worklist {
     /**
      * the queue that implements the worklist
      */
-    Queue impl = new Queue(HashCode.IDENTITY);
+    final Queue impl = new Queue(HashCode.IDENTITY);
 
     /**
      * creates a new empty worklist

@@ -1,44 +1,20 @@
 package de.uka.ilkd.key.gui;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.MouseListener;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.DependencyContractImpl;
-import de.uka.ilkd.key.speclang.FunctionalBlockContract;
-import de.uka.ilkd.key.speclang.FunctionalLoopContract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
-import de.uka.ilkd.key.speclang.InformationFlowContractImpl;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.LinkedHashMap;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**
@@ -95,15 +71,13 @@ public class ContractSelectionPanel extends JPanel {
         add(scrollPane);
 
         // create contract list
-        contractList = new JList<Contract>();
+        contractList = new JList<>();
         contractList
                 .setSelectionMode(multipleSelection ? ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
                         : ListSelectionModel.SINGLE_SELECTION);
-        contractList.addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-                if (contractList.isSelectionEmpty()) {
-                    contractList.setSelectedIndex(e.getFirstIndex());
-                }
+        contractList.addListSelectionListener(e -> {
+            if (contractList.isSelectionEmpty()) {
+                contractList.setSelectedIndex(e.getFirstIndex());
             }
         });
         final Services serv = services;
@@ -261,30 +235,28 @@ public class ContractSelectionPanel extends JPanel {
         }
 
         // sort contracts by contract type, then by name
-        Arrays.sort(contracts, new Comparator<Contract>() {
-            public int compare(Contract c1, Contract c2) {
-                Integer o1 = CONTRACT_TYPE_ORDER.get(c1.getClass());
-                Integer o2 = CONTRACT_TYPE_ORDER.get(c2.getClass());
-                int res = 0;
+        Arrays.sort(contracts, (c1, c2) -> {
+            Integer o1 = CONTRACT_TYPE_ORDER.get(c1.getClass());
+            Integer o2 = CONTRACT_TYPE_ORDER.get(c2.getClass());
+            int res = 0;
 
-                if (o1 != null && o2 != null) {
-                    res = o1 - o2;
-                } else if (o1 != null) {
-                    return -1;
-                } else if (o2 != null) {
-                    return 1;
-                }
+            if (o1 != null && o2 != null) {
+                res = o1 - o2;
+            } else if (o1 != null) {
+                return -1;
+            } else if (o2 != null) {
+                return 1;
+            }
 
-                if (res != 0) {
-                    return res;
-                }
-
-                res = c1.getDisplayName().compareTo(c2.getDisplayName());
-                if (res == 0) {
-                    return c1.id() - c2.id();
-                }
+            if (res != 0) {
                 return res;
             }
+
+            res = c1.getDisplayName().compareTo(c2.getDisplayName());
+            if (res == 0) {
+                return c1.id() - c2.id();
+            }
+            return res;
         });
 
         this.contracts = contracts;
@@ -334,7 +306,7 @@ public class ContractSelectionPanel extends JPanel {
             return selection.get(0);
         } else {
             ImmutableSet<FunctionalOperationContract> contracts =
-                DefaultImmutableSet.<FunctionalOperationContract>nil();
+                DefaultImmutableSet.nil();
             for (Contract contract : selection) {
                 if (contract instanceof FunctionalOperationContract) {
                     contracts = contracts.add((FunctionalOperationContract) contract);

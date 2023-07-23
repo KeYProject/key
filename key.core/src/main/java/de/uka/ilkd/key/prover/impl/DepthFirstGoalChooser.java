@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.prover.impl;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Helper class for managing a list of goals on which rules are applied. The class provides methods
@@ -20,8 +20,9 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
         Goal result;
 
         if (allGoalsSatisfiable) {
-            if (nextGoals.isEmpty())
+            if (nextGoals.isEmpty()) {
                 nextGoals = selectedList;
+            }
 
             if (nextGoals.isEmpty()) {
                 result = null;
@@ -57,10 +58,10 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
     }
 
     protected void updateGoalListHelp(Node node, ImmutableList<Goal> newGoals) {
-        ImmutableList<Goal> prevGoalList = ImmutableSLList.<Goal>nil();
+        ImmutableList<Goal> prevGoalList = ImmutableSLList.nil();
         boolean newGoalsInserted = false;
 
-        nextGoals = ImmutableSLList.<Goal>nil();
+        nextGoals = ImmutableSLList.nil();
 
         // Remove "node" and goals contained within "newGoals"
         while (!selectedList.isEmpty()) {

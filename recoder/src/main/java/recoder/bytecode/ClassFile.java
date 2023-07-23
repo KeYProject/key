@@ -7,10 +7,10 @@
 
 package recoder.bytecode;
 
-import recoder.abstraction.Package;
-import recoder.abstraction.*;
-
 import java.util.List;
+
+import recoder.abstraction.*;
+import recoder.abstraction.Package;
 
 public class ClassFile extends ByteCodeElement implements ClassType {
 
@@ -238,4 +238,3 @@ public class ClassFile extends ByteCodeElement implements ClassType {
     }
 
 }
-

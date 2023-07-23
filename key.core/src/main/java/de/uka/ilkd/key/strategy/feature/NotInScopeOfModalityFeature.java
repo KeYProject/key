@@ -33,11 +33,13 @@ public class NotInScopeOfModalityFeature extends BinaryFeature {
         while (it.next() != -1) {
             final Operator op = it.getSubTerm().op();
 
-            if (op instanceof Modality)
+            if (op instanceof Modality) {
                 return true;
+            }
             if (op instanceof UpdateApplication) {
-                if (it.getChild() == UpdateApplication.targetPos())
+                if (it.getChild() == UpdateApplication.targetPos()) {
                     return true;
+                }
             }
         }
 

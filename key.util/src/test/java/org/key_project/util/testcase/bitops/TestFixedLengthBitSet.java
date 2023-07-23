@@ -5,10 +5,11 @@
  */
 package org.key_project.util.testcase.bitops;
 
-import org.junit.jupiter.api.Test;
+import java.util.ArrayList;
+
 import org.key_project.util.bitops.ImmutableFixedLengthBitSet;
 
-import java.util.ArrayList;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;

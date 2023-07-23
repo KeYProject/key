@@ -7,12 +7,12 @@
 
 package recoder.java.declaration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.java.*;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Formal parameters require a VariableSpecificationList of size() <= 1 (size() == 0 for abstract
@@ -119,7 +119,7 @@ public class ParameterDeclaration extends VariableDeclaration {
     }
 
     public List<VariableSpecification> getVariables() {
-        List<VariableSpecification> res = new ArrayList<VariableSpecification>(1);
+        List<VariableSpecification> res = new ArrayList<>(1);
         res.add(varSpec);
         return res;
     }
@@ -142,12 +142,15 @@ public class ParameterDeclaration extends VariableDeclaration {
 
     public int getChildCount() {
         int result = 0;
-        if (declarationSpecifiers != null)
+        if (declarationSpecifiers != null) {
             result += declarationSpecifiers.size();
-        if (typeReference != null)
+        }
+        if (typeReference != null) {
             result++;
-        if (varSpec != null)
+        }
+        if (varSpec != null) {
             result++;
+        }
         return result;
     }
 
@@ -169,13 +172,15 @@ public class ParameterDeclaration extends VariableDeclaration {
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
             index--;
         }
         if (varSpec != null) {
-            if (index == 0)
+            if (index == 0) {
                 return varSpec;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

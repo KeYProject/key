@@ -37,4 +37,3 @@ public class NameConflict extends Conflict {
         return reason;
     }
 }
-

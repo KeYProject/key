@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.proof.mgt;
 
+import java.net.URI;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.UnaryOperator;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -26,16 +31,14 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.UnaryOperator;
 
 /**
  * Central storage for all specification elements, such as contracts, class axioms, and loop
@@ -72,9 +75,9 @@ public final class SpecificationRepository {
     private final Map<ProofOblInput, ImmutableSet<Proof>> proofs = new LinkedHashMap<>();
     private final Map<Pair<LoopStatement, Integer>, LoopSpecification> loopInvs =
         new LinkedHashMap<>();
-    private final Map<Triple<StatementBlock, String, Integer>, ImmutableSet<BlockContract>> blockContracts =
+    private final Map<Triple<StatementBlock, URI, Integer>, ImmutableSet<BlockContract>> blockContracts =
         new LinkedHashMap<>();
-    private final Map<Triple<StatementBlock, String, Integer>, ImmutableSet<LoopContract>> loopContracts =
+    private final Map<Triple<StatementBlock, URI, Integer>, ImmutableSet<LoopContract>> loopContracts =
         new LinkedHashMap<>();
     /**
      * A map which relates each loop statement its starting line number and set of loop contracts.
@@ -298,7 +301,7 @@ public final class SpecificationRepository {
             final String name = kjt.getJavaType().getFullName();
 
             if (name.contains(".")) {
-                final String enclosingName = name.substring(0, name.lastIndexOf("."));
+                final String enclosingName = name.substring(0, name.lastIndexOf('.'));
                 return services.getJavaInfo().getTypeByName(enclosingName);
             } else {
                 return null;
@@ -367,7 +370,7 @@ public final class SpecificationRepository {
 
     private void registerContract(Contract contract,
             Pair<KeYJavaType, IObserverFunction> targetPair) {
-        LOGGER.debug("Contract registered {}", contract);
+        LOGGER.trace("Contract registered {}", contract);
         if (!WellDefinednessCheck.isOn() && contract instanceof WellDefinednessCheck) {
             return;
         }
@@ -1048,20 +1051,38 @@ public final class SpecificationRepository {
 
                 Term invDef = tb.tt();
                 Term staticInvDef = tb.tt();
+                Term freeInvDef = tb.tt();
+                Term freeStaticInvDef = tb.tt();
 
                 for (ClassInvariant inv : myInvs) {
-                    invDef = tb.and(invDef, inv.getInv(selfVar, services));
+                    if (!inv.isFree()) {
+                        invDef = tb.and(invDef, inv.getInv(selfVar, services));
+                    } else {
+                        freeInvDef = tb.and(freeInvDef, inv.getInv(selfVar, services));
+                    }
 
                     if (inv.isStatic()) {
-                        staticInvDef = tb.and(staticInvDef, inv.getInv(null, services));
+                        if (!inv.isFree()) {
+                            staticInvDef = tb.and(staticInvDef, inv.getInv(null, services));
+                        } else {
+                            freeStaticInvDef =
+                                tb.and(freeStaticInvDef, inv.getInv(selfVar, services));
+                        }
                     }
                 }
 
                 invDef = tb.tf().createTerm(Equality.EQV, tb.inv(tb.var(selfVar)), invDef);
                 staticInvDef = tb.tf().createTerm(Equality.EQV, tb.staticInv(kjt), staticInvDef);
+                freeInvDef = tb.tf().createTerm(Equality.EQV,
+                    tb.invFree(tb.var(selfVar)), freeInvDef);
+                freeStaticInvDef = tb.tf().createTerm(Equality.EQV,
+                    tb.staticInvFree(kjt), freeStaticInvDef);
 
                 final IObserverFunction invSymbol = services.getJavaInfo().getInv();
                 final IObserverFunction staticInvSymbol = services.getJavaInfo().getStaticInv(kjt);
+                final IObserverFunction freeInvSymbol = services.getJavaInfo().getInvFree();
+                final IObserverFunction freeStaticInvSymbol = services.getJavaInfo()
+                        .getStaticInvFree(kjt);
 
                 final ClassAxiom invRepresentsAxiom =
                     new RepresentsAxiom("Class invariant axiom for " + kjt.getFullName(), invSymbol,
@@ -1072,6 +1093,18 @@ public final class SpecificationRepository {
                     "Static class invariant axiom for " + kjt.getFullName(), staticInvSymbol, kjt,
                     new Private(), null, staticInvDef, null, ImmutableSLList.nil(), null);
                 result = result.add(staticInvRepresentsAxiom);
+
+                final ClassAxiom invFreeRepresentsAxiom = new RepresentsAxiom(
+                    "Free class invariant axiom for " + kjt.getFullName(), freeInvSymbol, kjt,
+                    new Private(), null, freeInvDef, selfVar, ImmutableSLList.nil(), null);
+                result = result.add(invFreeRepresentsAxiom);
+
+                final ClassAxiom staticFreeInvRepresentsAxiom = new RepresentsAxiom(
+                    "Free static class invariant axiom for " + kjt.getFullName(),
+                    freeStaticInvSymbol, kjt, new Private(), null, freeStaticInvDef, null,
+                    ImmutableSLList.nil(), null);
+                result = result.add(staticFreeInvRepresentsAxiom);
+
             }
             // add query axioms for own class
             for (IProgramMethod pm : services.getJavaInfo().getAllProgramMethods(selfKjt)) {
@@ -1316,7 +1349,7 @@ public final class SpecificationRepository {
      */
     public ContractPO getContractPOForProof(Proof proof) {
         ProofOblInput po = getProofOblInput(proof);
-        if (po != null && po instanceof ContractPO) {
+        if (po instanceof ContractPO) {
             return (ContractPO) po;
         } else {
             return null;
@@ -1401,7 +1434,7 @@ public final class SpecificationRepository {
      * Returns the registered loop invariant for the passed loop, or null.
      */
     public LoopSpecification getLoopSpec(LoopStatement loop) {
-        final int line = loop.getStartPosition().getLine();
+        final int line = loop.getStartPosition().line();
         Pair<LoopStatement, Integer> l = new Pair<>(loop, line);
         LoopSpecification inv = loopInvs.get(l);
         if (inv == null && line != -1) {
@@ -1433,7 +1466,7 @@ public final class SpecificationRepository {
      */
     public void addLoopInvariant(final LoopSpecification inv) {
         final LoopStatement loop = inv.getLoop();
-        final int line = loop.getStartPosition().getLine();
+        final int line = loop.getStartPosition().line();
         Pair<LoopStatement, Integer> l = new Pair<>(loop, line);
         loopInvs.put(l, inv);
         if (line != -1) {
@@ -1449,8 +1482,8 @@ public final class SpecificationRepository {
      * @return all block contracts for the specified block.
      */
     public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
-        final Triple<StatementBlock, String, Integer> b =
-            new Triple<>(block, block.getParentClass(), block.getStartPosition().getLine());
+        final Triple<StatementBlock, URI, Integer> b =
+            new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
         final ImmutableSet<BlockContract> contracts = blockContracts.get(b);
         if (contracts == null) {
             return DefaultImmutableSet.nil();
@@ -1466,8 +1499,8 @@ public final class SpecificationRepository {
      * @return all loop contracts for the specified block.
      */
     public ImmutableSet<LoopContract> getLoopContracts(StatementBlock block) {
-        final Triple<StatementBlock, String, Integer> b =
-            new Triple<>(block, block.getParentClass(), block.getStartPosition().getLine());
+        final Triple<StatementBlock, URI, Integer> b =
+            new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
         final ImmutableSet<LoopContract> contracts = loopContracts.get(b);
         if (contracts == null) {
             return DefaultImmutableSet.nil();
@@ -1483,7 +1516,7 @@ public final class SpecificationRepository {
      * @return all loop contracts for the specified loop.
      */
     public ImmutableSet<LoopContract> getLoopContracts(LoopStatement loop) {
-        final Pair<LoopStatement, Integer> b = new Pair<>(loop, loop.getStartPosition().getLine());
+        final Pair<LoopStatement, Integer> b = new Pair<>(loop, loop.getStartPosition().line());
         final ImmutableSet<LoopContract> contracts = loopContractsOnLoops.get(b);
         if (contracts == null) {
             return DefaultImmutableSet.nil();
@@ -1572,8 +1605,8 @@ public final class SpecificationRepository {
      */
     public void addBlockContract(final BlockContract contract, boolean addFunctionalContract) {
         final StatementBlock block = contract.getBlock();
-        final Triple<StatementBlock, String, Integer> b =
-            new Triple<>(block, block.getParentClass(), block.getStartPosition().getLine());
+        final Triple<StatementBlock, URI, Integer> b =
+            new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
         blockContracts.put(b, getBlockContracts(block).add(contract));
 
         if (addFunctionalContract) {
@@ -1594,8 +1627,8 @@ public final class SpecificationRepository {
      */
     public void removeBlockContract(final BlockContract contract) {
         final StatementBlock block = contract.getBlock();
-        final Triple<StatementBlock, String, Integer> b =
-            new Triple<>(block, block.getParentClass(), block.getStartPosition().getLine());
+        final Triple<StatementBlock, URI, Integer> b =
+            new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
 
         ImmutableSet<BlockContract> set = blockContracts.get(b);
         blockContracts.put(b, set.remove(contract));
@@ -1620,13 +1653,13 @@ public final class SpecificationRepository {
     public void addLoopContract(final LoopContract contract, boolean addFunctionalContract) {
         if (contract.isOnBlock()) {
             final StatementBlock block = contract.getBlock();
-            final Triple<StatementBlock, String, Integer> b =
-                new Triple<>(block, block.getParentClass(), block.getStartPosition().getLine());
+            final Triple<StatementBlock, URI, Integer> b =
+                new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
             loopContracts.put(b, getLoopContracts(block).add(contract));
         } else {
             final LoopStatement loop = contract.getLoop();
             final Pair<LoopStatement, Integer> b =
-                new Pair<>(loop, loop.getStartPosition().getLine());
+                new Pair<>(loop, loop.getStartPosition().line());
             loopContractsOnLoops.put(b, getLoopContracts(loop).add(contract));
         }
 
@@ -1653,15 +1686,15 @@ public final class SpecificationRepository {
     public void removeLoopContract(final LoopContract contract) {
         if (contract.isOnBlock()) {
             final StatementBlock block = contract.getBlock();
-            final Triple<StatementBlock, String, Integer> b =
-                new Triple<>(block, block.getParentClass(), block.getStartPosition().getLine());
+            final Triple<StatementBlock, URI, Integer> b =
+                new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
 
             ImmutableSet<LoopContract> set = loopContracts.get(b);
             loopContracts.put(b, set.remove(contract));
         } else {
             final LoopStatement loop = contract.getLoop();
             final Pair<LoopStatement, Integer> b =
-                new Pair<>(loop, loop.getStartPosition().getLine());
+                new Pair<>(loop, loop.getStartPosition().line());
 
             ImmutableSet<LoopContract> set = loopContractsOnLoops.get(b);
             loopContractsOnLoops.put(b, set.remove(contract));

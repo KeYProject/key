@@ -5,9 +5,9 @@
  */
 package de.uka.ilkd.key.suite.util;
 
-import org.key_project.util.helper.FindResources;
-
 import java.io.File;
+
+import org.key_project.util.helper.FindResources;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 

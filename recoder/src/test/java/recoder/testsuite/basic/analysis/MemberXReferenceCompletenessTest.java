@@ -5,6 +5,8 @@
  */
 package recoder.testsuite.basic.analysis;
 
+import java.util.List;
+
 import junit.framework.Assert;
 import org.junit.Test;
 import recoder.abstraction.ClassType;
@@ -19,8 +21,6 @@ import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.NameInfo;
 import recoder.testsuite.basic.BasicTestsSuite;
 
-import java.util.List;
-
 public class MemberXReferenceCompletenessTest extends XReferenceCompletenessTest {
 
     @Test
@@ -29,15 +29,12 @@ public class MemberXReferenceCompletenessTest extends XReferenceCompletenessTest
         NameInfo ni = BasicTestsSuite.getConfig().getNameInfo();
 
         List<? extends ClassType> classTypes = ni.getClassTypes();
-        for (int i = 0; i < classTypes.size(); i += 1) {
-            ClassType t = classTypes.get(i);
-
+        for (ClassType t : classTypes) {
             List<? extends Method> methods = t.getMethods();
-            for (int j = 0; j < methods.size(); j += 1) {
-                Method x = methods.get(j);
+            for (Method x : methods) {
                 List<? extends MemberReference> list = xrsi.getReferences(x);
-                for (int k = 0; k < list.size(); k += 1) {
-                    MethodReference r = (MethodReference) list.get(k);
+                for (MemberReference memberReference : list) {
+                    MethodReference r = (MethodReference) memberReference;
                     Method y = xrsi.getMethod(r);
                     if (x != y) {
                         Assert.fail(makeResolutionError(r, x, y));
@@ -46,11 +43,9 @@ public class MemberXReferenceCompletenessTest extends XReferenceCompletenessTest
             }
 
             List<? extends Constructor> constructors = t.getConstructors();
-            for (int j = 0; j < constructors.size(); j += 1) {
-                Constructor x = constructors.get(j);
+            for (Constructor x : constructors) {
                 List<ConstructorReference> list = xrsi.getReferences(x);
-                for (int k = 0; k < list.size(); k += 1) {
-                    ConstructorReference r = list.get(k);
+                for (ConstructorReference r : list) {
                     Constructor y = xrsi.getConstructor(r);
                     if (x != y) {
                         Assert.fail(makeResolutionError(r, x, y));
@@ -59,11 +54,9 @@ public class MemberXReferenceCompletenessTest extends XReferenceCompletenessTest
             }
 
             List<? extends Field> fields = t.getFields();
-            for (int j = 0; j < fields.size(); j += 1) {
-                Field x = fields.get(j);
+            for (Field x : fields) {
                 List<FieldReference> list = xrsi.getReferences(x);
-                for (int k = 0; k < list.size(); k += 1) {
-                    FieldReference r = list.get(k);
+                for (FieldReference r : list) {
                     Field y = xrsi.getField(r);
                     if (x != y) {
                         Assert.fail(makeResolutionError(r, x, y));

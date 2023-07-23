@@ -22,6 +22,6 @@ interface TacletMenuItem {
      *
      * @return the attached Taclet
      */
-    abstract TacletApp connectedTo();
+    TacletApp connectedTo();
 
 }

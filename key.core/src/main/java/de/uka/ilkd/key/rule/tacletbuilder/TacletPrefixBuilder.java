@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.rule.tacletbuilder;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.*;
-import org.key_project.util.collection.*;
 
-import java.util.Iterator;
+import org.key_project.util.collection.*;
 
 public class TacletPrefixBuilder {
 
@@ -16,11 +17,11 @@ public class TacletPrefixBuilder {
      * set of all schemavariables that are only allowed to be matched with quantifiable variables.
      */
     private ImmutableSet<SchemaVariable> currentlyBoundVars =
-        DefaultImmutableSet.<SchemaVariable>nil();
-    private TacletBuilder<? extends Taclet> tacletBuilder;
+        DefaultImmutableSet.nil();
+    private final TacletBuilder<? extends Taclet> tacletBuilder;
 
     protected ImmutableMap<SchemaVariable, TacletPrefix> prefixMap =
-        DefaultImmutableMap.<SchemaVariable, TacletPrefix>nilMap();
+        DefaultImmutableMap.nilMap();
 
     public TacletPrefixBuilder(TacletBuilder<? extends Taclet> tacletBuilder) {
         this.tacletBuilder = tacletBuilder;
@@ -160,8 +161,9 @@ public class TacletPrefixBuilder {
                     count++;
                 }
             }
-            if (count > 1)
+            if (count > 1) {
                 return false;
+            }
         }
         return true;
     }

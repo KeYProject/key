@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -23,7 +24,7 @@ public class SymbolicExecutionBreakpointStopCondition extends
     /**
      * The used {@link IBreakpoint}s.
      */
-    private final Set<IBreakpoint> breakpoints = new HashSet<IBreakpoint>();
+    private final Set<IBreakpoint> breakpoints = new HashSet<>();
 
     /**
      * Creates a new {@link SymbolicExecutionBreakpointStopCondition}.
@@ -33,9 +34,7 @@ public class SymbolicExecutionBreakpointStopCondition extends
     public SymbolicExecutionBreakpointStopCondition(IBreakpoint... breakpoints) {
         super(Integer.MAX_VALUE);
         if (breakpoints != null) {
-            for (IBreakpoint breakpoint : breakpoints) {
-                this.breakpoints.add(breakpoint);
-            }
+            Collections.addAll(this.breakpoints, breakpoints);
         }
     }
 
@@ -71,7 +70,7 @@ public class SymbolicExecutionBreakpointStopCondition extends
             goal, node, ruleApp, executedNumberOfSetNodes);
         SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
         if (isBreakpointHit(activeStatement, ruleApp, proof, node)) {
-            setMaximalNumberOfSetNodesToExecutePerGoal(executedNumberOfSetNodes.intValue());
+            setMaximalNumberOfSetNodesToExecutePerGoal(executedNumberOfSetNodes);
         }
     }
 

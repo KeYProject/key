@@ -7,11 +7,11 @@
 
 package recoder.service;
 
-import recoder.Service;
-import recoder.abstraction.Package;
-import recoder.abstraction.*;
-
 import java.util.List;
+
+import recoder.Service;
+import recoder.abstraction.*;
+import recoder.abstraction.Package;
 
 /**
  * Manages the global name mapping.
@@ -413,4 +413,3 @@ public interface NameInfo extends Service {
      */
     AnnotationProperty getUnknownAnnotationProperty();
 }
-

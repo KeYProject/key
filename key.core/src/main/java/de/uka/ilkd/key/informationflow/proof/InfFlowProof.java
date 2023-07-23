@@ -5,8 +5,6 @@
  */
 package de.uka.ilkd.key.informationflow.proof;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.informationflow.po.InfFlowProofSymbols;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Sequent;
@@ -19,6 +17,8 @@ import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The proof object used by Information Flow Proofs.

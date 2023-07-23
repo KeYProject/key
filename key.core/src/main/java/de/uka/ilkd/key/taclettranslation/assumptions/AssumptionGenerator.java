@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -12,10 +14,9 @@ import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletTranslator;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.*;
 
 interface VariablePool {
     LogicVariable getInstantiationOfLogicVar(Sort instantiation, LogicVariable lv);
@@ -25,9 +26,9 @@ interface VariablePool {
 
 
 public class AssumptionGenerator implements TacletTranslator, VariablePool {
-    protected Map<String, LogicVariable> usedVariables = new LinkedHashMap<>();
+    protected final Map<String, LogicVariable> usedVariables = new LinkedHashMap<>();
 
-    protected Collection<TranslationListener> listener = new LinkedList<>();
+    protected final Collection<TranslationListener> listener = new LinkedList<>();
 
     protected TacletConditions conditions;
     private final Services services;
@@ -124,8 +125,9 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
     }
 
     public static boolean isAbstractOrInterface(Sort sort, Services services) {
-        if (!isReferenceSort(sort, services))
+        if (!isReferenceSort(sort, services)) {
             return false;
+        }
         return sort.isAbstract();
 
     }
@@ -215,8 +217,9 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         for (int r = 0; r < referenceTable.length; r++) {
             for (int c = 0; c < referenceTable[r].length; c++) {
                 int index = referenceTable[r][c];
-                if (referenceTable[r][0] == -1)
+                if (referenceTable[r][0] == -1) {
                     break;
+                }
 
                 final var a = conditions.containsIsReferenceCondition(genericTable[c]) > 0
                         && !isReferenceSort(instTable[index], services);
@@ -260,7 +263,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
                     final var b8 = conditions.containsComparisionCondition(genericTable[c],
                         genericTable[c2], Mode.NOT_IS_SUBTYPE)
                             && instTable[index].extendsTrans(instTable[index2]);
-                    if (b1 || b2 || b3 || b4 || b5 || b8 || b7 || b2 || b6) {
+                    if (b1 || b2 || b3 || b4 || b5 || b8 || b7 || b6) {
                         referenceTable[r][0] = -1;
                         break;
                     }

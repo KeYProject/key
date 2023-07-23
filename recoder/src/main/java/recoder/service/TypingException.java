@@ -50,4 +50,3 @@ public class TypingException extends ModelException {
         return expression;
     }
 }
-

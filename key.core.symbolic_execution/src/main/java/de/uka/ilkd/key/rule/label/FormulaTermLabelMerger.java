@@ -1,9 +1,8 @@
 package de.uka.ilkd.key.rule.label;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
-import org.key_project.util.java.CollectionUtil;
 
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -27,20 +26,18 @@ public class FormulaTermLabelMerger implements TermLabelMerger {
             FormulaTermLabel fExisting = (FormulaTermLabel) existingLabel;
             FormulaTermLabel fRejected = (FormulaTermLabel) rejectedLabel;
             // Compute new label
-            List<String> newBeforeIds = new LinkedList<String>();
-            CollectionUtil.addAll(newBeforeIds, fExisting.getBeforeIds());
-            CollectionUtil.addAll(newBeforeIds, fRejected.getId());
-            CollectionUtil.addAll(newBeforeIds, fRejected.getBeforeIds());
+            List<String> newBeforeIds = new ArrayList<>(Arrays.asList(fExisting.getBeforeIds()));
+            newBeforeIds.add(fRejected.getId());
+            newBeforeIds.addAll(Arrays.asList(fRejected.getBeforeIds()));
             FormulaTermLabel newLabel =
                 new FormulaTermLabel(fExisting.getMajorId(), fExisting.getMinorId(), newBeforeIds);
             // Remove existing label
             mergedLabels.remove(existingLabel);
             // Add new label
             mergedLabels.add(newLabel);
-            return true;
         } else {
             mergedLabels.add(rejectedLabel);
-            return true;
         }
+        return true;
     }
 }

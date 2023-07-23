@@ -5,11 +5,9 @@
  */
 package de.uka.ilkd.key.java;
 
-import java.io.IOException;
+import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.visitor.Visitor;
 
 /**
  * A "\Continue label" parameter declaration of a ccatch clause.
@@ -36,8 +34,9 @@ public class CcatchContinueLabelParameterDeclaration extends CcatchNonstandardPa
     @Override
     public ProgramElement getChildAt(int index) {
         if (label != null) {
-            if (index == 0)
+            if (index == 0) {
                 return label;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -45,11 +44,6 @@ public class CcatchContinueLabelParameterDeclaration extends CcatchNonstandardPa
     @Override
     public void visit(Visitor v) {
         v.performActionOnCCcatchContinueLabelParameterDeclaration(this);
-    }
-
-    @Override
-    public void prettyPrint(PrettyPrinter w) throws IOException {
-        w.printCcatchContinueLabelParameterDeclaration(this);
     }
 
 }

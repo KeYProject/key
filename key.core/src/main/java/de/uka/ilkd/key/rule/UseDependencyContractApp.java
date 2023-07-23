@@ -2,22 +2,21 @@ package de.uka.ilkd.key.rule;
 
 import java.util.List;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.HeapContext;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 public class UseDependencyContractApp extends AbstractContractRuleApp {
 
@@ -30,7 +29,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
     public UseDependencyContractApp(BuiltInRule builtInRule, PosInOccurrence pio,
             Contract instantiation, PosInOccurrence step) {
-        this(builtInRule, pio, ImmutableSLList.<PosInOccurrence>nil(), instantiation, step);
+        this(builtInRule, pio, ImmutableSLList.nil(), instantiation, step);
     }
 
     public UseDependencyContractApp(BuiltInRule rule, PosInOccurrence pio,
@@ -67,7 +66,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     }
 
 
-    public PosInOccurrence step(Sequent seq, TermServices services) {
+    public PosInOccurrence step() {
         return step;
     }
 
@@ -109,9 +108,11 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     public UseDependencyContractApp tryToInstantiateContract(final Services services) {
         final Term focus = posInOccurrence().subTerm();
         if (!(focus.op() instanceof IObserverFunction))
-            // TODO: find more appropriate exception
+        // TODO: find more appropriate exception
+        {
             throw new RuntimeException(
                 "Dependency contract rule is not applicable to term " + focus);
+        }
         final IObserverFunction target = (IObserverFunction) focus.op();
 
         final Term selfTerm;

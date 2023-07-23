@@ -5,7 +5,6 @@
  */
 package org.key_project.util.collection;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -13,10 +12,13 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import javax.annotation.Nullable;
 
 /**
  * implementation of a persistent set using the SLListOf<T> implementation with all its implications
- * (means e.g. O(n) for adding an element and so on.
+ * (means e.g. O(n) for adding an element, searching for an element and so on).
+ *
+ * @param <T> type of object to store
  */
 public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
@@ -40,7 +42,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     }
 
     protected DefaultImmutableSet() {
-        elementList = ImmutableSLList.<T>nil();
+        elementList = ImmutableSLList.nil();
     }
 
     /**
@@ -92,7 +94,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         if (elementList.contains(element)) {
             return this;
         }
-        return new DefaultImmutableSet<T>(elementList.prepend(element));
+        return new DefaultImmutableSet<>(elementList.prepend(element));
     }
 
     /**
@@ -107,7 +109,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         if (elementList.contains(element)) {
             throw new NotUniqueException(element);
         } else {
-            return new DefaultImmutableSet<T>(elementList.prepend(element));
+            return new DefaultImmutableSet<>(elementList.prepend(element));
         }
     }
 
@@ -124,7 +126,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     private DefaultImmutableSet<T> newUnion(DefaultImmutableSet<? extends T> set) {
         ImmutableList<? extends T> otherList = set.elementList;
         ImmutableList<T> clean = Immutables.concatDuplicateFreeLists(this.elementList, otherList);
-        return new DefaultImmutableSet<T>(clean);
+        return new DefaultImmutableSet<>(clean);
     }
 
     private DefaultImmutableSet<T> originalUnion(ImmutableSet<? extends T> set) {
@@ -138,7 +140,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
                 unionElements = unionElements.prepend(otherEl);
             }
         }
-        return new DefaultImmutableSet<T>(unionElements);
+        return new DefaultImmutableSet<>(unionElements);
     }
 
     /** @return intersection of this set with set */
@@ -151,7 +153,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
             return (ImmutableSet<T>) set;
         }
 
-        ImmutableList<T> intersectElements = ImmutableSLList.<T>nil();
+        ImmutableList<T> intersectElements = ImmutableSLList.nil();
         for (T el : set) {
             if (contains(el)) {
                 intersectElements = intersectElements.prepend(el);
@@ -159,9 +161,9 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         }
 
         if (intersectElements.isEmpty()) {
-            return DefaultImmutableSet.<T>nil();
+            return DefaultImmutableSet.nil();
         } else {
-            return new DefaultImmutableSet<T>(intersectElements);
+            return new DefaultImmutableSet<>(intersectElements);
         }
     }
 
@@ -224,7 +226,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     @Override
     public ImmutableSet<T> remove(T element) {
         final ImmutableList<T> list = elementList.removeFirst(element);
-        return list.isEmpty() ? DefaultImmutableSet.<T>nil() : new DefaultImmutableSet<T>(list);
+        return list.isEmpty() ? DefaultImmutableSet.nil() : new DefaultImmutableSet<>(list);
     }
 
     /**
@@ -254,7 +256,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     @Override
     public Set<T> toSet() {
         Set<T> result = new HashSet<>();
-        elementList.forEach(el -> result.add(el));
+        elementList.forEach(result::add);
         return result;
     }
 
@@ -290,7 +292,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         if (list.isEmpty()) {
             return nil();
         } else {
-            return new DefaultImmutableSet<T>(Immutables.removeDuplicates(list));
+            return new DefaultImmutableSet<>(Immutables.removeDuplicates(list));
         }
     }
 
@@ -301,8 +303,9 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
      * @return a fresh immutable set with all the elements in set
      */
     public static <T> ImmutableSet<T> fromSet(@Nullable Set<T> set) {
-        if (set == null)
+        if (set == null) {
             return null;
+        }
         if (set.isEmpty()) {
             return nil();
         } else {
@@ -310,14 +313,15 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
             for (T element : set) {
                 backerList = backerList.prepend(element);
             }
-            return new DefaultImmutableSet<T>(backerList);
+            return new DefaultImmutableSet<>(backerList);
         }
     }
 
 
     public static <T> ImmutableSet<T> fromCollection(@Nullable Collection<T> seq) {
-        if (seq == null)
+        if (seq == null) {
             return null;
+        }
         return fromSet(new HashSet<>(seq));
     }
 
@@ -325,7 +329,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     @Override
     public String toString() {
         Iterator<T> it = this.iterator();
-        StringBuffer str = new StringBuffer("{");
+        StringBuilder str = new StringBuilder("{");
         while (it.hasNext()) {
             str.append(it.next());
             if (it.hasNext()) {
@@ -358,13 +362,13 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         /** adds an element */
         @Override
         public ImmutableSet<T> add(T element) {
-            return new DefaultImmutableSet<T>(element);
+            return new DefaultImmutableSet<>(element);
         }
 
         /** adds an element (which is unique, since the set was empty) */
         @Override
         public ImmutableSet<T> addUnique(T element) {
-            return new DefaultImmutableSet<T>(element);
+            return new DefaultImmutableSet<>(element);
         }
 
         /** @return union of this set with set */

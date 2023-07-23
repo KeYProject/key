@@ -185,8 +185,9 @@ public class MethodReference extends JavaNonTerminalProgramElement
             }
         }
         if (typeArguments != null) {
-            for (TypeArgumentDeclaration ta : typeArguments)
+            for (TypeArgumentDeclaration ta : typeArguments) {
                 ta.setParent(this);
+            }
         }
     }
 
@@ -305,14 +306,18 @@ public class MethodReference extends JavaNonTerminalProgramElement
 
     public int getChildCount() {
         int result = 0;
-        if (accessPath != null)
+        if (accessPath != null) {
             result++;
-        if (name != null)
+        }
+        if (name != null) {
             result++;
-        if (arguments != null)
+        }
+        if (arguments != null) {
             result += arguments.size();
-        if (typeArguments != null)
+        }
+        if (typeArguments != null) {
             result += typeArguments.size();
+        }
         return result;
     }
 
@@ -326,25 +331,29 @@ public class MethodReference extends JavaNonTerminalProgramElement
 
     public ProgramElement getChildAt(int index) {
         if (accessPath != null) {
-            if (index == 0)
+            if (index == 0) {
                 return accessPath;
+            }
             index--;
         }
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (arguments != null) {
             int len = arguments.size();
-            if (len > index)
+            if (len > index) {
                 return arguments.get(index);
+            }
             index -= len;
         }
         if (typeArguments != null) {
             int len = typeArguments.size();
-            if (len > index)
+            if (len > index) {
                 return typeArguments.get(index);
+            }
             index -= len;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -468,8 +477,9 @@ public class MethodReference extends JavaNonTerminalProgramElement
 
     public int getExpressionCount() {
         int result = 0;
-        if (accessPath instanceof Expression)
+        if (accessPath instanceof Expression) {
             result += 1;
+        }
         if (arguments != null) {
             result += arguments.size();
         }

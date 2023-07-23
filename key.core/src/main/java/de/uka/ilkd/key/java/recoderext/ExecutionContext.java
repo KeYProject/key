@@ -1,17 +1,11 @@
 package de.uka.ilkd.key.java.recoderext;
 
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.JavaNonTerminalProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.PrettyPrinter;
-import recoder.java.ProgramElement;
-import recoder.java.Reference;
-import recoder.java.SourceVisitor;
+import de.uka.ilkd.key.java.recoderext.adt.MethodSignature;
+
+import recoder.java.*;
 import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.TypeReferenceContainer;
-import de.uka.ilkd.key.java.recoderext.adt.MethodSignature;
 
 public class ExecutionContext extends JavaNonTerminalProgramElement
         implements Reference, TypeReferenceContainer, ExpressionContainer {
@@ -65,12 +59,15 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int count = 0;
-        if (runtimeInstance != null)
+        if (runtimeInstance != null) {
             count++;
-        if (classContext != null)
+        }
+        if (classContext != null) {
             count++;
-        if (methodContext != null)
+        }
+        if (methodContext != null) {
             count++;
+        }
         return count;
     }
 
@@ -83,18 +80,21 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (classContext != null) {
-            if (index == 0)
+            if (index == 0) {
                 return classContext;
+            }
             index--;
         }
         if (methodContext != null) {
-            if (index == 0)
+            if (index == 0) {
                 return methodContext;
+            }
             index--;
         }
         if (runtimeInstance != null) {
-            if (index == 0)
+            if (index == 0) {
                 return runtimeInstance;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -109,18 +109,21 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
     public int getChildPositionCode(ProgramElement child) {
         int idx = 0;
         if (classContext != null) {
-            if (child == classContext)
+            if (child == classContext) {
                 return idx;
+            }
             idx++;
         }
         if (methodContext != null) {
-            if (child == methodContext)
+            if (child == methodContext) {
                 return idx;
+            }
             idx++;
         }
         if (runtimeInstance != null) {
-            if (child == runtimeInstance)
+            if (child == runtimeInstance) {
                 return idx;
+            }
         }
         return -1;
     }
@@ -220,6 +223,6 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
         return runtimeInstance;
     }
 
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
+    public void prettyPrint(PrettyPrinter p) {
     }
 }

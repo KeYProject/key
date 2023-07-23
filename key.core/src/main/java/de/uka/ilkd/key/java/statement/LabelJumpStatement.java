@@ -6,12 +6,12 @@
 package de.uka.ilkd.key.java.statement;
 
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.NameReference;
 import de.uka.ilkd.key.logic.ProgramElementName;
+
+import org.key_project.util.ExtList;
 
 /**
  * Label jump statement.
@@ -108,8 +108,9 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
      */
     public ProgramElement getChildAt(int index) {
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

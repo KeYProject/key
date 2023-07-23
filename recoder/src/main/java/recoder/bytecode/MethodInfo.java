@@ -7,19 +7,19 @@
 
 package recoder.bytecode;
 
-import recoder.abstraction.Package;
-import recoder.abstraction.*;
-import recoder.convenience.Naming;
-
 import java.util.List;
+
+import recoder.abstraction.*;
+import recoder.abstraction.Package;
+import recoder.convenience.Naming;
 
 public class MethodInfo extends MemberInfo implements Method {
 
-    protected String[] paramtypes;
+    protected final String[] paramtypes;
 
     protected String returntype;
 
-    protected String[] exceptions;
+    protected final String[] exceptions;
 
     protected AnnotationUseInfo[][] paramAnnotations;
 
@@ -50,20 +50,23 @@ public class MethodInfo extends MemberInfo implements Method {
     }
 
     public final AnnotationUseInfo[] getAnnotationsForParam(int paramNum) {
-        if (paramAnnotations == null)
+        if (paramAnnotations == null) {
             return null;
+        }
         return paramAnnotations[paramNum];
     }
 
     public final List<TypeArgumentInfo> getTypeArgumentsForParam(int paramNum) {
-        if (paramTypeArgs == null)
+        if (paramTypeArgs == null) {
             return null;
+        }
         return paramTypeArgs[paramNum];
     }
 
     public final List<TypeArgumentInfo> getTypeArgumentsForReturnType() {
-        if (paramTypeArgs == null)
+        if (paramTypeArgs == null) {
             return null;
+        }
         return paramTypeArgs[paramTypeArgs.length - 1];
     }
 

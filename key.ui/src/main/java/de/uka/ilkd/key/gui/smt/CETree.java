@@ -2,25 +2,14 @@ package de.uka.ilkd.key.gui.smt;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-
-import javax.swing.JTree;
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import de.uka.ilkd.key.smt.model.Heap;
-import de.uka.ilkd.key.smt.model.Location;
-import de.uka.ilkd.key.smt.model.LocationSet;
-import de.uka.ilkd.key.smt.model.Model;
-import de.uka.ilkd.key.smt.model.ObjectVal;
-import de.uka.ilkd.key.smt.model.Sequence;
+import de.uka.ilkd.key.smt.model.*;
 import de.uka.ilkd.key.util.Pair;
 
 public class CETree {
@@ -28,13 +17,10 @@ public class CETree {
      * A comparator that sort ignoRiNG cASe. Used to sort labels.
      */
     private static final Comparator<? super Pair<? super String, ? super String>> IGNORECASE_COMPARATOR =
-        new Comparator<Pair<? super String, ? super String>>() {
-            public int compare(Pair<? super String, ? super String> o1,
-                    Pair<? super String, ? super String> o2) {
-                String first = o1.first + "=" + o1.second;
-                String second = o2.first + "=" + o2.second;
-                return first.compareToIgnoreCase(second);
-            }
+        (Comparator<Pair<? super String, ? super String>>) (o1, o2) -> {
+            String first = o1.first + "=" + o1.second;
+            String second = o2.first + "=" + o2.second;
+            return first.compareToIgnoreCase(second);
         };
 
     /**
@@ -44,7 +30,7 @@ public class CETree {
     /**
      * The SMT model.
      */
-    private Model model;
+    private final Model model;
 
 
 
@@ -69,7 +55,7 @@ public class CETree {
 
     public JTree getTreeComponent() {
         return tree;
-    };
+    }
 
 
     private DefaultMutableTreeNode constructTree() {
@@ -151,15 +137,15 @@ public class CETree {
     }
 
     public static List<Pair<String, String>> computeFunctions(ObjectVal ov) {
-        List<Pair<String, String>> result = new LinkedList<Pair<String, String>>();
+        List<Pair<String, String>> result = new LinkedList<>();
         for (Entry<String, String> e : ov.getFunValues().entrySet()) {
-            result.add(new Pair<String, String>(Model.removePipes(e.getKey()), e.getValue()));
+            result.add(new Pair<>(Model.removePipes(e.getKey()), e.getValue()));
         }
         return result;
     }
 
     public static List<String> computeArrayFields(ObjectVal ov) {
-        List<String> result = new LinkedList<String>();
+        List<String> result = new LinkedList<>();
         for (int i = 0; i < ov.getLength(); ++i) {
             result.add("[" + i + "]=" + ov.getArrayValue(i));
         }
@@ -176,30 +162,30 @@ public class CETree {
 
     public static List<Pair<String, String>> computeObjectProperties(ObjectVal ov,
             String sortName) {
-        List<Pair<String, String>> result = new LinkedList<Pair<String, String>>();
+        List<Pair<String, String>> result = new LinkedList<>();
         // Type
         sortName = Model.removePipes(sortName);
-        result.add(new Pair<String, String>("Type", sortName));
+        result.add(new Pair<>("Type", sortName));
 
         // Exact Instance
         boolean ei = ov.isExactInstance();
-        result.add(new Pair<String, String>("Exact Instance", ei + ""));
+        result.add(new Pair<>("Exact Instance", String.valueOf(ei)));
 
         // Length
         int l = ov.getLength();
-        result.add(new Pair<String, String>("Length", l + ""));
+        result.add(new Pair<>("Length", String.valueOf(l)));
         return result;
     }
 
     public static List<Pair<String, String>> computeFields(ObjectVal ov) {
-        List<Pair<String, String>> labels = new ArrayList<Pair<String, String>>();
+        List<Pair<String, String>> labels = new ArrayList<>();
 
         for (Entry<String, String> e : ov.getFieldvalues().entrySet()) {
-            labels.add(new Pair<String, String>(Model.removePipes(e.getKey()), e.getValue()));
+            labels.add(new Pair<>(Model.removePipes(e.getKey()), e.getValue()));
         }
 
         // sort the labels alphabetically
-        Collections.sort(labels, IGNORECASE_COMPARATOR);
+        labels.sort(IGNORECASE_COMPARATOR);
         return labels;
     }
 
@@ -228,7 +214,7 @@ public class CETree {
     }
 
     public static List<String> computeLocationSetProperties(LocationSet ls) {
-        List<String> result = new LinkedList<String>();
+        List<String> result = new LinkedList<>();
         for (int i = 0; i < ls.size(); ++i) {
             Location l = ls.get(i);
             String locationName = "(" + Model.removePipes(l.getObjectID()) + ", "
@@ -266,7 +252,7 @@ public class CETree {
     }
 
     public static List<String> computeSequenceProperties(Sequence s) {
-        List<String> result = new LinkedList<String>();
+        List<String> result = new LinkedList<>();
         result.add("Length=" + s.getLength());
 
         for (int i = 0; i < s.getLength(); ++i) {
@@ -288,14 +274,14 @@ public class CETree {
 
     public static List<Pair<String, String>> computeConstantLabels(Model model) {
         Map<String, String> map = model.getConstants();
-        List<Pair<String, String>> labels = new ArrayList<Pair<String, String>>();
+        List<Pair<String, String>> labels = new ArrayList<>();
 
         for (Entry<String, String> e : map.entrySet()) {
-            labels.add(new Pair<String, String>(Model.removePipes(e.getKey()), e.getValue()));
+            labels.add(new Pair<>(Model.removePipes(e.getKey()), e.getValue()));
         }
 
         // sort the labels alphabetically
-        Collections.sort(labels, IGNORECASE_COMPARATOR);
+        labels.sort(IGNORECASE_COMPARATOR);
 
         return labels;
     }
@@ -325,8 +311,9 @@ public class CETree {
                         }
 
                         String value = node.getUserObject().toString();
-                        if (value.contains("="))
+                        if (value.contains("=")) {
                             value = value.substring(value.indexOf('=') + 1);
+                        }
 
                         if (value.startsWith("#o")) {
 
@@ -347,8 +334,9 @@ public class CETree {
                                         break;
                                     }
                                 }
-                                if (heap == null)
+                                if (heap == null) {
                                     return;
+                                }
 
 
                                 // search for object
@@ -359,8 +347,9 @@ public class CETree {
                                         break;
                                     }
                                 }
-                                if (val == null)
+                                if (val == null) {
                                     return;
+                                }
                                 addObjectProperties(val, node);
 
                             }

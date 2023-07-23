@@ -5,8 +5,14 @@
  */
 package de.uka.ilkd.key.java;
 
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.nio.file.Paths;
+import java.util.Optional;
+import javax.annotation.Nullable;
+
+import recoder.java.SourceElement;
 
 /**
  * represents a group of three Positions: relativePosition, startPosition, endPosition
@@ -14,16 +20,13 @@ import java.nio.file.Paths;
  * 2019-09-10 Wolfram Pfeifer: work with URIs instead of Strings -> more robust, more general
  */
 public class PositionInfo {
-    /** Unknown URI (enables us to always have a non-null value for fileURI) */
-    public static final URI UNKNOWN_URI = URI.create("UNKNOWN://unknown");
-
     /** PositionInfo with undefined positions. */
     public static final PositionInfo UNDEFINED = new PositionInfo();
 
     /**
      * TODO: What is the purpose of this? To which position is this one relative?
      */
-    private final Position relPos;
+    private final SourceElement.Position relPos;
 
     /** The start position. */
     private final Position startPos;
@@ -32,22 +35,23 @@ public class PositionInfo {
     private final Position endPos;
 
     /**
-     * The URI of the resource this location refers to. Either a meaningful value or
-     * {@link #UNKNOWN_URI}, but never null.
+     * The URI of the resource this location refers to. Either a meaningful value or null.
      */
+    @Nullable
     private final URI fileURI;
 
     /**
      * The URI of the parent class of this location (the class the statement originates from). May
      * be null.
      */
+    @Nullable
     private URI parentClassURI;
 
     private PositionInfo() {
-        this.relPos = Position.UNDEFINED;
+        this.relPos = SourceElement.Position.UNDEFINED;
         this.startPos = Position.UNDEFINED;
         this.endPos = Position.UNDEFINED;
-        fileURI = UNKNOWN_URI;
+        fileURI = null;
     }
 
     /**
@@ -57,11 +61,11 @@ public class PositionInfo {
      * @param startPos the start position
      * @param endPos the end position
      */
-    public PositionInfo(Position relPos, Position startPos, Position endPos) {
+    public PositionInfo(SourceElement.Position relPos, Position startPos, Position endPos) {
         this.relPos = relPos;
         this.startPos = startPos;
         this.endPos = endPos;
-        fileURI = UNKNOWN_URI;
+        fileURI = null;
     }
 
     /**
@@ -72,12 +76,13 @@ public class PositionInfo {
      * @param endPos the end position
      * @param fileURI the resource the PositionInfo refers to
      */
-    public PositionInfo(Position relPos, Position startPos, Position endPos, URI fileURI) {
+    public PositionInfo(SourceElement.Position relPos, Position startPos, Position endPos,
+            URI fileURI) {
         this.relPos = relPos;
         this.startPos = startPos;
         this.endPos = endPos;
         if (fileURI == null) {
-            this.fileURI = UNKNOWN_URI; // fileURI must not be null!
+            this.fileURI = null;
         } else {
             this.fileURI = fileURI.normalize();
         }
@@ -94,22 +99,6 @@ public class PositionInfo {
     }
 
     /**
-     * Returns the path of the parent file the PositionInfo refers to (the class the statement
-     * originates from).
-     *
-     * @deprecated This method should no longer be used, as PositionInfo can now be used with
-     *             resources other than files. Use {@link #getParentClassURI()} instead.
-     * @return the filename as a string if parentClass uses the "file" protocol or null otherwise
-     */
-    @Deprecated // only kept for compatibility reasons
-    public String getParentClass() {
-        if (parentClassURI != null && parentClassURI.getScheme().equals("file")) {
-            return Paths.get(parentClassURI).toString();
-        }
-        return null;
-    }
-
-    /**
      * Returns the path of the file the PositionInfo refers to.
      *
      * @deprecated This method should no longer be used, as PositionInfo can now be used with
@@ -118,21 +107,26 @@ public class PositionInfo {
      */
     @Deprecated // only kept for compatibility reasons
     public String getFileName() {
-        if (fileURI.getScheme().equals("file")) {
+        if (fileURI != null && fileURI.getScheme().equals("file")) {
             return Paths.get(fileURI).toString();
         }
         return null;
     }
 
+    @Nullable
     public URI getParentClassURI() {
         return parentClassURI;
     }
 
-    public URI getURI() {
-        return fileURI;
+    public Optional<URI> getURI() {
+        return Optional.ofNullable(fileURI);
     }
 
-    public Position getRelativePosition() {
+    public Optional<URL> getURL() throws MalformedURLException {
+        return fileURI == null ? Optional.empty() : Optional.of(fileURI.toURL());
+    }
+
+    public SourceElement.Position getRelativePosition() {
         return relPos;
     }
 
@@ -146,7 +140,7 @@ public class PositionInfo {
 
     /**
      * Creates a new PositionInfo from joining the intervals of the given PositionInfos. The file
-     * informations have to match, otherwise null is returned.
+     * information have to match, otherwise null is returned.
      *
      * @param p1 the first PositionInfo
      * @param p2 the second PositionInfo
@@ -185,7 +179,8 @@ public class PositionInfo {
             end = p2.endPos;
         }
         // TODO: join relative position as well
-        return new PositionInfo(Position.UNDEFINED, start, end, p1.getURI());
+        return new PositionInfo(SourceElement.Position.UNDEFINED, start, end,
+            p1.getURI().orElse(null));
     }
 
     /**
@@ -203,7 +198,7 @@ public class PositionInfo {
         if (this == PositionInfo.UNDEFINED) {
             return "UNDEFINED";
         } else {
-            return ((fileURI == UNKNOWN_URI ? "" : fileURI) + " rel. Pos: " + relPos
+            return ((fileURI == null ? "" : fileURI) + " rel. Pos: " + relPos
                 + " start Pos: " + startPos + " end Pos: " + endPos);
         }
     }

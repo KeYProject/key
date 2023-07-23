@@ -7,7 +7,6 @@ import java.awt.Dimension;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
@@ -208,7 +207,7 @@ public class LoadUserTacletsDialog extends JPanel {
                         changedToNotSelected();
                         lemmaCheckbox.setSelected(false);
                         ProofIndependentSettings.DEFAULT_INSTANCE.getLemmaGeneratorSettings()
-                                .showDialogUsingAxioms(
+                                .setShowDialogUsingAxioms(
                                     showDialogUsingAxioms && infoDialog.showThisDialogNextTime());
                     }
                 } else {
@@ -264,7 +263,7 @@ public class LoadUserTacletsDialog extends JPanel {
             textArea.setEditable(false);
             helpWindow.getContentPane().add(new JScrollPane(textArea));
             helpWindow.setMinimumSize(new Dimension(400, 200));
-            helpWindow.setLocationByPlatform(true);
+            helpWindow.setLocationRelativeTo(MainWindow.getInstance());
             helpWindow.setTitle("Help");
             helpWindow.pack();
 
@@ -317,7 +316,7 @@ public class LoadUserTacletsDialog extends JPanel {
                     firstTimeAddingAxioms =
                         !infoDialog.showDialog(INFO_TEXT, LoadUserTacletsDialog.this);
                     ProofIndependentSettings.DEFAULT_INSTANCE.getLemmaGeneratorSettings()
-                            .showDialogAddingAxioms(infoDialog.showThisDialogNextTime());
+                            .setShowDialogAddingAxioms(infoDialog.showThisDialogNextTime());
                     if (firstTimeAddingAxioms) {
                         return;
                     }
@@ -449,7 +448,7 @@ public class LoadUserTacletsDialog extends JPanel {
             buttonPane.add(Box.createHorizontalStrut(5));
             buttonPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             pane.add(buttonPane);
-            dialog.setLocationByPlatform(true);
+            dialog.setLocationRelativeTo(MainWindow.getInstance());
             dialog.pack();
         }
         return dialog;

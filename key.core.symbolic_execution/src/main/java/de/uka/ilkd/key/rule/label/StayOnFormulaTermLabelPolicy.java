@@ -4,10 +4,6 @@ import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -15,16 +11,15 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SubstOp;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * This {@link TermLabelPolicy} maintains a {@link FormulaTermLabel} on predicates.
@@ -51,7 +46,7 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
                 originalLabel != null ? originalLabel : formulaLabel;
             // May change sub ID if logical operators like junctors are used
             boolean newLabelIdRequired = false;
-            Set<String> originalLabelIds = new LinkedHashSet<String>();
+            Set<String> originalLabelIds = new LinkedHashSet<>();
             if (hint instanceof TacletLabelHint) {
                 TacletLabelHint tacletHint = (TacletLabelHint) hint;
                 if (isBelowIfThenElse(tacletHint.getTacletTermStack())) {
@@ -142,12 +137,8 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
      */
     protected boolean isBelowIfThenElse(Deque<Term> visitStack) {
         if (visitStack != null) {
-            return CollectionUtil.search(visitStack, new IFilter<Term>() {
-                @Override
-                public boolean select(Term element) {
-                    return element.op() == IfThenElse.IF_THEN_ELSE;
-                }
-            }) != null;
+            return CollectionUtil.search(visitStack,
+                element -> element.op() == IfThenElse.IF_THEN_ELSE) != null;
         } else {
             return false;
         }
@@ -160,12 +151,8 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
      * @return The found {@link FormulaTermLabel} or {@code null} if not available.
      */
     public static FormulaTermLabel searchFormulaTermLabel(ImmutableArray<TermLabel> labels) {
-        TermLabel result = CollectionUtil.search(labels, new IFilter<TermLabel>() {
-            @Override
-            public boolean select(TermLabel element) {
-                return element instanceof FormulaTermLabel;
-            }
-        });
+        TermLabel result =
+            CollectionUtil.search(labels, element -> element instanceof FormulaTermLabel);
         return (FormulaTermLabel) result;
     }
 

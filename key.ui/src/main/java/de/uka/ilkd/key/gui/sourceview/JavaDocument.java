@@ -1,13 +1,12 @@
 package de.uka.ilkd.key.gui.sourceview;
 
-import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
-
 import java.awt.Color;
+import java.beans.PropertyChangeListener;
 import java.util.*;
 import java.util.regex.Pattern;
-
 import javax.swing.text.*;
+
+import de.uka.ilkd.key.gui.colors.ColorSettings;
 
 import static de.uka.ilkd.key.speclang.jml.JMLUtils.isJmlCommentStarter;
 
@@ -73,7 +72,7 @@ public class JavaDocument extends DefaultStyledDocument {
         /** parser is currently inside a JML annotation (starting with "&#47;&#42;&#64;") */
         JML,
         /** parser is currently inside a JML keyword */
-        JML_KEYWORD;
+        JML_KEYWORD
     }
 
     /**
@@ -103,7 +102,7 @@ public class JavaDocument extends DefaultStyledDocument {
          */
         JML_ANNOTATION_LINE,
         /** last processed char was "&#42;" */
-        MAYBEEND;
+        MAYBEEND
     }
 
     /**
@@ -173,21 +172,22 @@ public class JavaDocument extends DefaultStyledDocument {
         "\\working_space", "\\values", "\\inv",
         // clause keywords:
         "accessible", "accessible_redundantly", "assert", "assert_redundantly", "assignable",
-        "assignable_redundantly", "assume", "assume_redudantly", "breaks", "breaks_redundantly",
-        "\\by", "callable", "callable_redundantly", "captures", "captures_redundantly", "continues",
-        "continues_redundantly", "debug", "\\declassifies", "decreases", "decreases_redundantly",
-        "decreasing", "decreasing_redundantly", "diverges", "determines", "diverges_redundantly",
-        "duration", "duration_redundantly", "ensures", "ensures_redundantly", "\\erases", "forall",
-        "for_example", "hence_by", "implies_that", "in", "in_redundantly", "\\into",
-        "loop_invariant", "loop_invariant_redundantly", "measured_by", "measured_by_redundantly",
-        "maintaining", "maintaining_redundantly", "maps", "maps_redundantly", "\\new_objects",
-        "old", "refining", "represents", "requires", "set", "signals", "signals_only",
-        "\\such_that", "unreachable", "when", "working_space",
+        "assignable_free", "assignable_redundantly", "assume", "assume_redudantly", "breaks",
+        "breaks_redundantly", "\\by", "callable", "callable_redundantly", "captures",
+        "captures_redundantly", "continues", "continues_redundantly", "debug", "\\declassifies",
+        "decreases", "decreases_redundantly", "decreasing", "decreasing_redundantly", "diverges",
+        "determines", "diverges_redundantly", "duration", "duration_redundantly", "ensures",
+        "ensures_free", "ensures_redundantly", "\\erases", "forall", "for_example", "hence_by",
+        "implies_that", "in", "in_redundantly", "\\into", "loop_invariant", "loop_invariant_free",
+        "loop_invariant_redundantly", "measured_by", "measured_by_redundantly", "maintaining",
+        "maintaining_redundantly", "maps", "maps_redundantly", "\\new_objects", "old", "refining",
+        "represents", "requires", "requires_free", "set", "signals", "signals_only", "\\such_that",
+        "unreachable", "when", "working_space",
         // "invariant-like" keywords
         "abrupt_behavior", "abrupt_behaviour", "also", "axiom", "behavior", "behaviour",
         "constraint", "exceptional_behavior", "exceptional_behaviour", "initially", "invariant",
-        "model_behavior", "model_behaviour", "monitors_for", "normal_behavior", "normal_behaviour",
-        "readable", "writable",
+        "invariant_free", "model_behavior", "model_behaviour", "monitors_for", "normal_behavior",
+        "normal_behaviour", "readable", "writable",
         // ADT functions:
         "\\seq_empty", "\\seq_def", "\\seq_singleton", "\\seq_get", "\\seq_put", "\\seq_reverse",
         "\\seq_length", "\\index_of", "\\seq_concat", "\\empty", "\\singleton", "\\set_union",
@@ -252,7 +252,7 @@ public class JavaDocument extends DefaultStyledDocument {
     /**
      * The settings listener of this document (registered in the static listener list).
      */
-    private final transient SettingsListener listener = e -> updateStyles();
+    private final transient PropertyChangeListener listener = e -> updateStyles();
 
     /**
      * Creates a new JavaDocument and sets the syntax highlighting styles (as in eclipse default
@@ -260,7 +260,7 @@ public class JavaDocument extends DefaultStyledDocument {
      */
     public JavaDocument() {
         updateStyles();
-        ColorSettings.getInstance().addSettingsListener(listener);
+        ColorSettings.getInstance().addPropertyChangeListener(listener);
         // workaround for #1641: typing "enter" key shall insert only "\n", even on Windows
         putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
 
@@ -273,7 +273,7 @@ public class JavaDocument extends DefaultStyledDocument {
      * Dispose this object.
      */
     public void dispose() {
-        ColorSettings.getInstance().removeSettingsListener(listener);
+        ColorSettings.getInstance().removePropertyChangeListener(listener);
     }
 
     private void updateStyles() {

@@ -4,9 +4,7 @@ import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
-
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -15,12 +13,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Element;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.Utilities;
+import javax.swing.text.*;
 
 /**
  * This class will display line numbers for a related text component. The text component must use
@@ -42,7 +35,7 @@ public class TextLineNumber extends JPanel
 
     // Text component this TextTextLineNumber component is in sync with
 
-    private JTextComponent component;
+    private final JTextComponent component;
 
     // Properties that can be changed
 
@@ -295,7 +288,7 @@ public class TextLineNumber extends JPanel
         } else {
             // We need to check all the attributes for font changes
             if (fonts == null) {
-                fonts = new HashMap<String, FontMetrics>();
+                fonts = new HashMap<>();
             }
 
             Element root = component.getDocument().getDefaultRootElement();
@@ -369,21 +362,18 @@ public class TextLineNumber extends JPanel
         // View of the component has not been updated at the time
         // the DocumentEvent is fired
 
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    int endPos = component.getDocument().getLength();
-                    Rectangle rect = component.modelToView(endPos);
+        SwingUtilities.invokeLater(() -> {
+            try {
+                int endPos = component.getDocument().getLength();
+                Rectangle rect = component.modelToView(endPos);
 
-                    if (rect != null && rect.y != lastHeight) {
-                        setPreferredWidth();
-                        repaint();
-                        lastHeight = rect.y;
-                    }
-                } catch (BadLocationException ex) {
-                    /* nothing to do */ }
-            }
+                if (rect != null && rect.y != lastHeight) {
+                    setPreferredWidth();
+                    repaint();
+                    lastHeight = rect.y;
+                }
+            } catch (BadLocationException ex) {
+                /* nothing to do */ }
         });
     }
 

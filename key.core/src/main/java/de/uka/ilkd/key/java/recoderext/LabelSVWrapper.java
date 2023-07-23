@@ -5,8 +5,9 @@
  */
 package de.uka.ilkd.key.java.recoderext;
 
-import recoder.java.Identifier;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+
+import recoder.java.Identifier;
 
 public class LabelSVWrapper extends Identifier implements KeYRecoderExtension, SVWrapper {
 

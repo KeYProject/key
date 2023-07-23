@@ -11,7 +11,7 @@ import java.util.stream.Stream;
  * @version 1 (21.04.17)
  */
 public class ScriptResults implements List<ScriptResult> {
-    private List<ScriptResult> delegated = new ArrayList<>();
+    private final List<ScriptResult> delegated = new ArrayList<>();
 
     @Override
     public int size() {

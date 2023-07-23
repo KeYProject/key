@@ -5,9 +5,9 @@
  */
 package de.uka.ilkd.key.proof.io.intermediate;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.Name;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Represents an intermediate rule / taclet application.
@@ -33,7 +33,7 @@ public abstract class AppIntermediate {
      * @return The line number of this application in the loaded proof file.
      */
     public String getLineNr() {
-        return "" + lineNr;
+        return String.valueOf(lineNr);
     }
 
     /**

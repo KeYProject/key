@@ -5,18 +5,14 @@
  */
 package de.uka.ilkd.key.java.statement;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ExpressionContainer;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 
 public class Assert extends JavaStatement implements ExpressionContainer {
 
-    private Expression condition;
-    private Expression message;
+    private final Expression condition;
+    private final Expression message;
 
     public Assert(Expression condition, Expression message, PositionInfo pos) {
         super(pos);
@@ -61,9 +57,5 @@ public class Assert extends JavaStatement implements ExpressionContainer {
 
     public Expression getMessage() {
         return message;
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printAssert(this);
     }
 }

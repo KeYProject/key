@@ -20,11 +20,21 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         return (DefaultImmutableMap<S, T>) NILMap.EMPTY_MAP;
     }
 
+    /**
+     * The map this map builds on. Lookups will also consider entries in this map if the key
+     * does not match {@link #entry}.
+     */
     private final DefaultImmutableMap<S, T> parent;
 
-    /** list of pairs (key,value) */
+    /**
+     * The (key, value) mapping last inserted into this map.
+     */
     private final ImmutableMapEntry<S, T> entry;
 
+    /**
+     * Number of entries in the map. Equal to <code>1 + parent.size</code> if entry is not null,
+     * <code>parent.size</code> otherwise.
+     */
     private final int size;
 
     /** only for use by NILMap */
@@ -37,17 +47,19 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
 
     /** creates new map with mapping entry */
     protected DefaultImmutableMap(ImmutableMapEntry<S, T> entry) {
-        if (entry == null)
+        if (entry == null) {
             throw new RuntimeException("'null' is not allowed as entry");
+        }
         this.entry = entry;
-        this.parent = DefaultImmutableMap.<S, T>nilMap();
+        this.parent = DefaultImmutableMap.nilMap();
         this.size = 1;
     }
 
     /** creates new map with mapping entry and parent map */
     protected DefaultImmutableMap(ImmutableMapEntry<S, T> entry, DefaultImmutableMap<S, T> parent) {
-        if (entry == null)
+        if (entry == null) {
             throw new IllegalArgumentException("'null' is not allowed as entry");
+        }
         this.entry = entry;
         this.parent = parent;
         this.size = parent.size + 1;
@@ -64,7 +76,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
      *         with keys different from the given key
      */
     public ImmutableMap<S, T> put(S key, T value) {
-        return new DefaultImmutableMap<S, T>(new MapEntry<S, T>(key, value), this.remove(key));
+        return new DefaultImmutableMap<>(new MapEntry<>(key, value), this.remove(key));
     }
 
 
@@ -129,7 +141,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
             DefaultImmutableMap<S, T> p_parent) {
         DefaultImmutableMap<S, T> result = p_parent;
         for (int i = 0; i < counter; i++) {
-            result = new DefaultImmutableMap<S, T>(stack[i], result);
+            result = new DefaultImmutableMap<>(stack[i], result);
         }
         return result;
     }
@@ -187,30 +199,30 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         }
 
         return counter < stack.length
-                ? createMap(stack, counter, DefaultImmutableMap.<S, T>nilMap())
+                ? createMap(stack, counter, DefaultImmutableMap.nilMap())
                 : this;
     }
 
     /** @return iterator for all keys */
     public Iterator<S> keyIterator() {
-        return new MapKeyIterator<S, T>(this);
+        return new MapKeyIterator<>(this);
     }
 
     /** @return iterator for all values */
     public Iterator<T> valueIterator() {
-        return new MapValueIterator<S, T>(this);
+        return new MapValueIterator<>(this);
     }
 
     /** @return iterator for entries */
     public Iterator<ImmutableMapEntry<S, T>> iterator() {
-        return new MapEntryIterator<S, T>(this);
+        return new MapEntryIterator<>(this);
     }
 
     public String toString() {
-        final StringBuffer sb = new StringBuffer("[");
+        final StringBuilder sb = new StringBuilder("[");
         final Iterator<ImmutableMapEntry<S, T>> it = iterator();
         while (it.hasNext()) {
-            sb.append("" + it.next());
+            sb.append(it.next());
             if (it.hasNext()) {
                 sb.append(",");
             }
@@ -221,8 +233,9 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
 
     @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
-        if (!(o instanceof ImmutableMap))
+        if (!(o instanceof ImmutableMap)) {
             return false;
+        }
         if (o == this) {
             return true;
         }
@@ -230,16 +243,15 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         ImmutableMap<S, T> o1 = null;
         try {
             o1 = (ImmutableMap<S, T>) o;
-            if (o1.size() != size())
+            if (o1.size() != size()) {
                 return false;
+            }
         } catch (ClassCastException cce) {
             return false;
         }
 
 
-        final Iterator<ImmutableMapEntry<S, T>> p = iterator();
-        while (p.hasNext()) {
-            final ImmutableMapEntry<S, T> e = p.next();
+        for (ImmutableMapEntry<S, T> e : this) {
             if (!e.value().equals(o1.get(e.key()))) {
                 return false;
             }
@@ -250,9 +262,8 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
 
     public int hashCode() {
         int hashCode = 1;
-        final Iterator<ImmutableMapEntry<S, T>> p = iterator();
-        while (p.hasNext()) {
-            hashCode += 7 * p.next().hashCode();
+        for (ImmutableMapEntry<S, T> stImmutableMapEntry : this) {
+            hashCode += 7 * stImmutableMapEntry.hashCode();
         }
         return hashCode;
     }
@@ -272,7 +283,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         }
 
         public ImmutableMap<S, T> put(S key, T value) {
-            return new DefaultImmutableMap<S, T>(new MapEntry<S, T>(key, value));
+            return new DefaultImmutableMap<>(new MapEntry<>(key, value));
         }
 
         public T get(S key) {
@@ -418,7 +429,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         }
 
         /** @return next value in list */
-        public final ImmutableMapEntry<S, T> next() {
+        public ImmutableMapEntry<S, T> next() {
             return nextEntry();
         }
     }
@@ -432,7 +443,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         }
 
         /** @return next value in list */
-        public final T next() {
+        public T next() {
             return nextEntry().value();
         }
     }

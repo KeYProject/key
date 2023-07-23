@@ -26,7 +26,7 @@ public class AttachChange extends TreeChange {
     }
 
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         if (isMinor()) {
             buf.append("Minor ");
         }

@@ -5,6 +5,8 @@
  */
 package recoder.testsuite.basic.analysis;
 
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import recoder.abstraction.Field;
@@ -16,8 +18,6 @@ import recoder.java.ProgramElement;
 import recoder.java.reference.VariableReference;
 import recoder.service.CrossReferenceSourceInfo;
 import recoder.testsuite.basic.BasicTestsSuite;
-
-import java.util.List;
 
 public class LocalVariableXReferenceCompletenessTest extends XReferenceCompletenessTest {
     @Test

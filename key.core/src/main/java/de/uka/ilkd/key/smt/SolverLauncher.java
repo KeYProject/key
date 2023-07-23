@@ -5,14 +5,14 @@
  */
 package de.uka.ilkd.key.smt;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
-import de.uka.ilkd.key.smt.solvertypes.SolverType;
-
 import java.util.*;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 /**
  * IN ORDER TO START THE SOLVERS USE THIS CLASS.<br>

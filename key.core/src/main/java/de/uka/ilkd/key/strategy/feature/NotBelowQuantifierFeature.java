@@ -41,8 +41,9 @@ public class NotBelowQuantifierFeature extends BinaryFeature {
             final Term t = it.getSubTerm();
             final Operator op = t.op();
 
-            if (op instanceof Quantifier)
+            if (op instanceof Quantifier) {
                 return true;
+            }
         }
 
         return false;

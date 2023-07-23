@@ -81,10 +81,12 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int res = 0;
-        if (reference != null)
+        if (reference != null) {
             res++;
-        if (elementValuePairs != null)
+        }
+        if (elementValuePairs != null) {
             res += elementValuePairs.size();
+        }
         return res;
     }
 
@@ -95,8 +97,9 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (reference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return reference;
+            }
             index--; // correct offset
         }
         return elementValuePairs.get(index);// may throw IndexOutOfBoundsException
@@ -108,16 +111,19 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement
      * @see recoder.java.NonTerminalProgramElement#getChildPositionCode(recoder.java.ProgramElement)
      */
     public int getChildPositionCode(ProgramElement child) {
-        if (child == null)
+        if (child == null) {
             throw new NullPointerException();
+        }
         // role 0: reference
         // role 1 (idx): element value pair
-        if (child == reference)
+        if (child == reference) {
             return 0;
+        }
         if (elementValuePairs != null) {
             int idx = elementValuePairs.indexOf(child);
-            if (idx >= -1)
+            if (idx >= -1) {
                 return (idx << 4) | 1;
+            }
         }
         return -1;
     }
@@ -129,11 +135,14 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement
      */
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (reference != null)
+        if (reference != null) {
             reference.setParent(this);
-        if (elementValuePairs != null)
-            for (int i = 0, max = elementValuePairs.size(); i < max; i++)
-                elementValuePairs.get(i).setParent(this);
+        }
+        if (elementValuePairs != null) {
+            for (AnnotationElementValuePair elementValuePair : elementValuePairs) {
+                elementValuePair.setParent(this);
+            }
+        }
     }
 
     /*
@@ -149,8 +158,9 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement
         if (p == reference) {
             TypeReference tr = (TypeReference) q;
             reference = tr;
-            if (tr != null)
+            if (tr != null) {
                 tr.setParent(this);
+            }
             return true;
         }
         for (int i = 0; i < elementValuePairs.size(); i++) {
@@ -225,8 +235,9 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement
      * @see recoder.java.reference.TypeReferenceContainer#getTypeReferenceAt(int)
      */
     public TypeReference getTypeReferenceAt(int index) {
-        if (index == 0 && reference != null)
+        if (index == 0 && reference != null) {
             return reference;
+        }
         throw new ArrayIndexOutOfBoundsException(index);
     }
 

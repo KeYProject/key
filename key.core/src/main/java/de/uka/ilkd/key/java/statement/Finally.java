@@ -5,14 +5,10 @@
  */
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 /**
  * Finally.
@@ -23,7 +19,7 @@ public class Finally extends BranchImp {
     /**
      * Body.
      */
-    protected StatementBlock body;
+    protected final StatementBlock body;
 
     /**
      * Finally.
@@ -60,8 +56,9 @@ public class Finally extends BranchImp {
      */
     public int getChildCount() {
         int result = 0;
-        if (body != null)
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -74,8 +71,9 @@ public class Finally extends BranchImp {
      */
     public ProgramElement getChildAt(int index) {
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -111,7 +109,7 @@ public class Finally extends BranchImp {
      *
      * @return the statement.
      */
-    public Statement getBody() {
+    public StatementBlock getBody() {
         return body;
     }
 
@@ -127,9 +125,5 @@ public class Finally extends BranchImp {
      */
     public void visit(Visitor v) {
         v.performActionOnFinally(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printFinally(this);
     }
 }

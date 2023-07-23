@@ -5,8 +5,6 @@
  */
 package de.uka.ilkd.key.informationflow.macros;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.InfFlowContractPO;
@@ -25,6 +23,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 
+import org.key_project.util.collection.ImmutableList;
+
 /**
  *
  * @author christoph
@@ -36,9 +36,7 @@ public class FinishAuxiliaryMethodComputationMacro extends AbstractFinishAuxilia
         if (proof != null && proof.getServices() != null) {
             final ProofOblInput poForProof =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
-            if (poForProof instanceof SymbolicExecutionPO) {
-                return true;
-            }
+            return poForProof instanceof SymbolicExecutionPO;
         }
         return false;
     }

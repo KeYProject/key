@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.Contract;
+
 import org.key_project.util.collection.ImmutableSet;
 
 /**

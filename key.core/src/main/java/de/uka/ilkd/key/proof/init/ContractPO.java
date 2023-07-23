@@ -14,7 +14,7 @@ import de.uka.ilkd.key.speclang.Contract;
  */
 public interface ContractPO extends ProofOblInput {
 
-    public Contract getContract();
+    Contract getContract();
 
-    public Term getMbyAtPre();
+    Term getMbyAtPre();
 }

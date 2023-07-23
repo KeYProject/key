@@ -58,25 +58,26 @@ public abstract class ScaleFeature implements Feature {
             RuleAppCost img0, RuleAppCost img1) {
         Debug.assertFalse(dom0.equals(dom1),
             "Two different points are needed to define the " + "affine transformation");
-        if (img0.equals(img1))
+        if (img0.equals(img1)) {
             return ConstFeature.createConst(img0);
+        }
 
         // now the two points of the domain (resp. of the image) are distinct
 
         if (dom0 instanceof TopRuleAppCost) {
             return firstDomInfty(f, dom1, img0, img1);
         } else {
-            if (dom1 instanceof TopRuleAppCost)
+            if (dom1 instanceof TopRuleAppCost) {
                 return firstDomInfty(f, dom0, img1, img0);
-            else {
+            } else {
 
                 // the points of the domain are finite
                 if (img0 instanceof TopRuleAppCost) {
                     return firstImgInfty(f, dom0, dom1, img1);
                 } else {
-                    if (img1 instanceof TopRuleAppCost)
+                    if (img1 instanceof TopRuleAppCost) {
                         return firstImgInfty(f, dom1, dom0, img0);
-                    else {
+                    } else {
                         return realAffine(f, dom0, dom1, img0, img1);
                     }
                 }
@@ -92,11 +93,12 @@ public abstract class ScaleFeature implements Feature {
             final long dom1Val = getValue(dom1);
             return createAffine(f, 1.0, img1Val - dom1Val);
         } else {
-            if (img1 instanceof TopRuleAppCost)
+            if (img1 instanceof TopRuleAppCost) {
                 return ShannonFeature.createConditional(f, TopRuleAppCost.INSTANCE, img0,
                     TopRuleAppCost.INSTANCE);
-            else
+            } else {
                 return ShannonFeature.createConditional(f, TopRuleAppCost.INSTANCE, img0, img1);
+            }
         }
     }
 
@@ -121,8 +123,9 @@ public abstract class ScaleFeature implements Feature {
      * @param cost
      */
     private static long getValue(RuleAppCost cost) {
-        if (!(cost instanceof NumberRuleAppCost))
+        if (!(cost instanceof NumberRuleAppCost)) {
             illegalCostError(cost);
+        }
         return ((NumberRuleAppCost) cost).getValue();
     }
 
@@ -155,10 +158,11 @@ public abstract class ScaleFeature implements Feature {
             long costVal;
 
             if (cost instanceof TopRuleAppCost) {
-                if (isZero(coeff))
+                if (isZero(coeff)) {
                     costVal = 0;
-                else
+                } else {
                     return TopRuleAppCost.INSTANCE;
+                }
             } else if (cost instanceof NumberRuleAppCost) {
                 costVal = ((NumberRuleAppCost) cost).getValue();
             } else {

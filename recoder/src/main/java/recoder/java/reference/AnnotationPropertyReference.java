@@ -79,8 +79,9 @@ public class AnnotationPropertyReference extends JavaNonTerminalProgramElement
     }
 
     public ProgramElement getChildAt(int index) {
-        if (ident != null && index == 0)
+        if (ident != null && index == 0) {
             return ident;
+        }
         throw new ArrayIndexOutOfBoundsException(index);
     }
 
@@ -92,8 +93,9 @@ public class AnnotationPropertyReference extends JavaNonTerminalProgramElement
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         if (p == ident) {
             ident = (Identifier) q;
-            if (ident != null)
+            if (ident != null) {
                 ident.setParent(this);
+            }
             return true;
         }
         return false;
@@ -109,8 +111,9 @@ public class AnnotationPropertyReference extends JavaNonTerminalProgramElement
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (ident != null)
+        if (ident != null) {
             ident.setParent(this);
+        }
     }
 
     public int getExpressionCount() {

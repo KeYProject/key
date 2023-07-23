@@ -1,32 +1,16 @@
 package de.uka.ilkd.key.gui.proofdiff;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.FlowLayout;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.LinkedList;
-
-import javax.swing.JButton;
-import javax.swing.JEditorPane;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.UIManager;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.proofdiff.diff_match_patch.Diff;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -136,12 +120,7 @@ public class ProofDiffFrame extends JFrame {
             {
                 JButton go = new JButton("Show Diff");
                 go.setToolTipText("Show difference between the two nodes specified here.");
-                go.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        showDiff();
-                    }
-                });
+                go.addActionListener(e -> showDiff());
                 bottom.add(go);
                 getRootPane().setDefaultButton(go);
             }
@@ -149,23 +128,15 @@ public class ProofDiffFrame extends JFrame {
                 JButton last = new JButton("Show Selected Node");
                 last.setToolTipText(
                     "Show difference introduced by the rule application leading to the selected node");
-                last.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        setSelectedNode();
-                        showDiff();
-                    }
+                last.addActionListener(e -> {
+                    setSelectedNode();
+                    showDiff();
                 });
                 bottom.add(last);
             }
             {
                 JButton close = new JButton("Close");
-                close.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        ProofDiffFrame.this.setVisible(false);
-                    }
-                });
+                close.addActionListener(e -> ProofDiffFrame.this.setVisible(false));
                 bottom.add(close);
             }
             cp.add(bottom, BorderLayout.SOUTH);
@@ -187,7 +158,6 @@ public class ProofDiffFrame extends JFrame {
             to.setText(Integer.toString(node.serialNr()));
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            return;
         }
     }
 
@@ -328,12 +298,7 @@ public class ProofDiffFrame extends JFrame {
             throw new IllegalArgumentException(nodeNumber + " does not denote a valid node");
         }
 
-        LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(null), new NotationInfo(),
-            proof.getServices(), true);
-
-        logicPrinter.printSequent(node.sequent());
-
-        return logicPrinter.result().toString();
+        return LogicPrinter.quickPrintSequent(node.sequent(), proof.getServices());
     }
 
 
@@ -357,8 +322,9 @@ public class ProofDiffFrame extends JFrame {
             Node n = it.next();
             if (n.serialNr() <= number) {
                 Node result = findNode(n, number);
-                if (result != null)
+                if (result != null) {
                     return result;
+                }
             }
         }
 

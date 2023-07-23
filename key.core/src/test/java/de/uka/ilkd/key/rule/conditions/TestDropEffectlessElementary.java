@@ -10,6 +10,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -71,7 +72,7 @@ public class TestDropEffectlessElementary {
             term = tb.apply(t3, t2, null);
         }
         assertEquals("{{i:=i + 1}i:=i}(i = 0)",
-            LogicPrinter.quickPrintTerm(term, TacletForTests.services).trim());
+            LogicPrinter.quickPrintTerm(term, TacletForTests.services));
 
         Term result = applyDrop(term);
         assertEquals(term, result);

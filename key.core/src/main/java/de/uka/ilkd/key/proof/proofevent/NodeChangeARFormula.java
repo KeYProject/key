@@ -13,7 +13,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
  */
 public abstract class NodeChangeARFormula implements NodeChange {
 
-    PosInOccurrence pos;
+    final PosInOccurrence pos;
 
     public NodeChangeARFormula(PosInOccurrence p_pos) {
         pos = p_pos;

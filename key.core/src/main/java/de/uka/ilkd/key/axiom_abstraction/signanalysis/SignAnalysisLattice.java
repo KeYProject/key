@@ -120,7 +120,7 @@ public class SignAnalysisLattice extends AbstractDomainLattice {
 
     @Override
     public Iterator<AbstractDomainElement> iterator() {
-        return new Iterator<AbstractDomainElement>() {
+        return new Iterator<>() {
 
             int pos = 0;
             final int size = ABSTRACT_DOMAIN_ELEMS.length;
@@ -136,7 +136,8 @@ public class SignAnalysisLattice extends AbstractDomainLattice {
             }
 
             @Override
-            public void remove() {}
+            public void remove() {
+            }
         };
     }
 

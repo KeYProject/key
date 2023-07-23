@@ -1,37 +1,14 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -57,6 +34,11 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 import de.uka.ilkd.key.util.Triple;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * Provides utility methods for side proofs.
@@ -129,13 +111,13 @@ public final class SymbolicExecutionSideProofUtil {
             methodTreatment, loopTreatment, queryTreatment, splittingOption);
         try {
             // Extract results and conditions from side proof
-            List<Pair<Term, Node>> conditionsAndResultsMap = new LinkedList<Pair<Term, Node>>();
+            List<Pair<Term, Node>> conditionsAndResultsMap = new LinkedList<>();
             for (Goal resultGoal : info.getProof().openGoals()) {
                 if (SymbolicExecutionUtil.hasApplicableRules(resultGoal)) {
                     throw new IllegalStateException("Not all applicable rules are applied.");
                 }
                 Sequent sequent = resultGoal.sequent();
-                List<Term> results = new LinkedList<Term>();
+                List<Term> results = new LinkedList<>();
                 for (SequentFormula sf : sequent.antecedent()) {
                     if (sf.formula().containsLabel(label)) {
                         Term result = sf.formula();
@@ -155,7 +137,7 @@ public final class SymbolicExecutionSideProofUtil {
                 } else {
                     result = services.getTermBuilder().or(results);
                 }
-                conditionsAndResultsMap.add(new Pair<Term, Node>(result, resultGoal.node()));
+                conditionsAndResultsMap.add(new Pair<>(result, resultGoal.node()));
             }
             return conditionsAndResultsMap;
         } finally {
@@ -198,14 +180,14 @@ public final class SymbolicExecutionSideProofUtil {
                 extractRelevantThings(info.getProof().getServices(), sequentToProve);
             // Extract results and conditions from side proof
             List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap =
-                new LinkedList<Triple<Term, Set<Term>, Node>>();
+                new LinkedList<>();
             for (Goal resultGoal : info.getProof().openGoals()) {
                 if (SymbolicExecutionUtil.hasApplicableRules(resultGoal)) {
                     throw new IllegalStateException("Not all applicable rules are applied.");
                 }
                 Sequent sequent = resultGoal.sequent();
                 boolean newPredicateIsSequentFormula = isOperatorASequentFormula(sequent, operator);
-                Set<Term> resultConditions = new LinkedHashSet<Term>();
+                Set<Term> resultConditions = new LinkedHashSet<>();
                 Term result = null;
                 for (SequentFormula sf : sequent.antecedent()) {
                     if (newPredicateIsSequentFormula) {
@@ -261,7 +243,7 @@ public final class SymbolicExecutionSideProofUtil {
                     result = services.getTermBuilder().ff();
                 }
                 conditionsAndResultsMap.add(
-                    new Triple<Term, Set<Term>, Node>(result, resultConditions, resultGoal.node()));
+                    new Triple<>(result, resultConditions, resultGoal.node()));
             }
             return conditionsAndResultsMap;
         } finally {
@@ -286,7 +268,7 @@ public final class SymbolicExecutionSideProofUtil {
                 i++;
             }
             if (result != null) {
-                List<Term> newSubs = new LinkedList<Term>();
+                List<Term> newSubs = new LinkedList<>();
                 for (int j = 0; j < term.arity(); j++) {
                     if (j == i - 1) {
                         newSubs.add(result);
@@ -295,7 +277,7 @@ public final class SymbolicExecutionSideProofUtil {
                     }
                 }
                 result = services.getTermFactory().createTerm(term.op(),
-                    new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(),
+                    new ImmutableArray<>(newSubs), term.boundVars(), term.javaBlock(),
                     term.getLabels());
             }
             return result;
@@ -303,12 +285,8 @@ public final class SymbolicExecutionSideProofUtil {
     }
 
     private static boolean isOperatorASequentFormula(Sequent sequent, final Operator operator) {
-        return CollectionUtil.search(sequent, new IFilter<SequentFormula>() {
-            @Override
-            public boolean select(SequentFormula element) {
-                return element.formula().op() == operator;
-            }
-        }) != null;
+        return CollectionUtil.search(sequent,
+            element -> element.formula().op() == operator) != null;
     }
 
     /**
@@ -402,7 +380,7 @@ public final class SymbolicExecutionSideProofUtil {
      */
     public static Set<Operator> extractRelevantThings(final Services services,
             Sequent sequentToProve) {
-        final Set<Operator> result = new HashSet<Operator>();
+        final Set<Operator> result = new HashSet<>();
         for (SequentFormula sf : sequentToProve) {
             sf.formula().execPreOrder(new DefaultVisitor() {
                 @Override
@@ -428,7 +406,7 @@ public final class SymbolicExecutionSideProofUtil {
      * @param term The {@link Term} to check.
      * @return {@code true} is relevant thing, {@code false} is not relevant.
      */
-    protected static boolean isRelevantThing(Services services, Term term) {
+    private static boolean isRelevantThing(Services services, Term term) {
         if (term.op() instanceof IProgramVariable) {
             return true;
         } else if (term.op() instanceof Function) {
@@ -517,12 +495,12 @@ public final class SymbolicExecutionSideProofUtil {
         /**
          * The {@link Services} to use.
          */
-        private Services services;
+        private final Services services;
 
         /**
          * The relevant things.
          */
-        private Set<Operator> relevantThings;
+        private final Set<Operator> relevantThings;
 
         /**
          * The result.
@@ -718,13 +696,10 @@ public final class SymbolicExecutionSideProofUtil {
     public static Term extractOperatorTerm(Node node, final Operator operator) {
         assert node != null;
         // Search formula with the given operator in sequent (or in some cases below the updates)
-        SequentFormula sf = CollectionUtil.search(node.sequent(), new IFilter<SequentFormula>() {
-            @Override
-            public boolean select(SequentFormula element) {
-                Term term = element.formula();
-                term = TermBuilder.goBelowUpdates(term);
-                return ObjectUtil.equals(term.op(), operator);
-            }
+        SequentFormula sf = CollectionUtil.search(node.sequent(), element -> {
+            Term term = element.formula();
+            term = TermBuilder.goBelowUpdates(term);
+            return Objects.equals(term.op(), operator);
         });
         if (sf != null) {
             Term term = sf.formula();

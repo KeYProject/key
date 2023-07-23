@@ -28,5 +28,5 @@ public interface IExecutionConstraint extends IExecutionElement {
      *
      * @return The {@link Term} representing the constraint.
      */
-    public Term getTerm();
+    Term getTerm();
 }

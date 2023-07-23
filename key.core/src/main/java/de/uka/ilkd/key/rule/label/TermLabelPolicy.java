@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.rule.label;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -15,6 +13,8 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * <p>
@@ -60,7 +60,7 @@ public interface TermLabelPolicy {
      * @return The {@link TermLabel} to keep which might be a different one (e.g. with changed
      *         parameters) or {@code null} if the {@link TermLabel} should be dropped.
      */
-    public TermLabel keepLabel(TermLabelState state, Services services,
+    TermLabel keepLabel(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs,
             ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock,

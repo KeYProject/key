@@ -1,19 +1,19 @@
 package de.uka.ilkd.key.java.visitor;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This visitor is used to collect all appearing SchemaVariables in a java program
  */
 public class ProgramSVCollector extends JavaASTWalker {
 
-    private ImmutableList<SchemaVariable> result = ImmutableSLList.<SchemaVariable>nil();
+    private ImmutableList<SchemaVariable> result = ImmutableSLList.nil();
 
     /** the instantiations needed for unwind loop constructs */
     private SVInstantiations instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;

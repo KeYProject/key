@@ -2,10 +2,10 @@ package de.uka.ilkd.key.util;
 
 import java.util.function.UnaryOperator;
 
+import de.uka.ilkd.key.logic.Term;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.logic.Term;
 
 
 /**
@@ -42,8 +42,8 @@ public class InfFlowSpec {
     }
 
     private InfFlowSpec() {
-        this.preExpressions = ImmutableSLList.<Term>nil();
-        this.postExpressions = ImmutableSLList.<Term>nil();
-        this.newObjects = ImmutableSLList.<Term>nil();
+        this.preExpressions = ImmutableSLList.nil();
+        this.postExpressions = ImmutableSLList.nil();
+        this.newObjects = ImmutableSLList.nil();
     }
 }

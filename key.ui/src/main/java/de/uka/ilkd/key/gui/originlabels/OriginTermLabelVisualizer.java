@@ -1,31 +1,9 @@
 package de.uka.ilkd.key.gui.originlabels;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
+import java.awt.*;
+import java.awt.event.*;
 import java.util.Objects;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTree;
-import javax.swing.SwingConstants;
-import javax.swing.ToolTipManager;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
@@ -35,44 +13,26 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.NodeInfoVisualizer;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.IntIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
-import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
-import de.uka.ilkd.key.pp.InitialPositionTable;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
-import de.uka.ilkd.key.pp.SequentPrintFilterEntry;
-import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
-import de.uka.ilkd.key.pp.ShowSelectedSequentPrintFilter;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.ProofTreeListener;
-import de.uka.ilkd.key.proof.RuleAppListener;
+import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import bibliothek.gui.dock.common.DefaultSingleCDockable;
 
 /**
  * This UI component visualizes the {@link OriginTermLabel}s of a term and its sub-terms.
@@ -139,7 +99,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
      *
      * @see #updateNodeLink()
      */
-    private Action nodeLinkAction = new AbstractAction() {
+    private final Action nodeLinkAction = new AbstractAction() {
         private static final long serialVersionUID = -5322782759362752086L;
 
         @Override
@@ -168,9 +128,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     /**
      * Listens to rule application to call {@link #updateNodeLink()}.
      */
-    private RuleAppListener ruleAppListener = event -> {
-        updateNodeLink();
-    };
+    private RuleAppListener ruleAppListener = event -> updateNodeLink();
 
     /**
      * Listens to changes to the proof to call {@link #updateNodeLink()}.
@@ -547,7 +505,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             final int n = prefixPath.size();
 
             for (int i = 0; i < n; ++i) {
-                assert path.head() == prefixPath.head();
+                assert Objects.equals(path.head(), prefixPath.head());
 
                 path = path.tail();
                 prefixPath = prefixPath.tail();
@@ -591,7 +549,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         return "<html>Origin of selected term: <b>" + (origin == null ? "" : origin)
             + "</b><hr>Origin of (former) sub-terms:<br>"
             + (label == null ? ""
-                    : label.getSubtermOrigins().stream().map(o -> "" + o + "<br>").reduce("",
+                    : label.getSubtermOrigins().stream().map(o -> o + "<br>").reduce("",
                         String::concat));
     }
 
@@ -656,19 +614,19 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
                 text = LogicPrinter.quickPrintTerm(term, services);
             }
 
-            int endIndex = text.indexOf("\n");
+            int endIndex = text.indexOf('\n');
 
-            if (endIndex != text.length() - 1) {
-                return text.replaceAll("\\s+", " ") + " ...";
+            if (endIndex != text.length() - 1 && endIndex != -1) {
+                return text.substring(0, endIndex).replaceAll("\\s+", " ") + " ...";
             } else {
-                return text.substring(0, endIndex).replaceAll("\\s+", " ");
+                return text.replaceAll("\\s+", " ");
             }
         }
     }
 
-    private class TreeNode extends DefaultMutableTreeNode {
+    private static class TreeNode extends DefaultMutableTreeNode {
         private static final long serialVersionUID = -406981141537547226L;
-        private PosInOccurrence pos;
+        private final PosInOccurrence pos;
         private Term term;
 
         private TreeNode(PosInOccurrence pos) {
@@ -681,10 +639,44 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         }
     }
 
+    private static class TermViewLogicPrinter extends SequentViewLogicPrinter {
+        private final PosInOccurrence pos;
+
+        TermViewLogicPrinter(PosInOccurrence pos, NotationInfo ni, Services services) {
+            super(ni, services, PosTableLayouter.positionTable(), new TermLabelVisibilityManager());
+            this.pos = pos;
+        }
+
+        @Override
+        public void printFilteredSequent(SequentPrintFilter filter) {
+            try {
+                ImmutableList<SequentPrintFilterEntry> antec = filter.getFilteredAntec();
+                ImmutableList<SequentPrintFilterEntry> succ = filter.getFilteredSucc();
+                layouter.markStartSub();
+                layouter.startTerm(antec.size() + succ.size());
+                layouter.beginC(1).ind();
+                printSemisequent(antec);
+
+                if (pos == null) {
+                    layouter.brk(1, -1);
+                    printSequentArrow();
+                    layouter.brk();
+                }
+
+                printSemisequent(succ);
+
+                layouter.markEndSub();
+                layouter.end();
+            } catch (UnbalancedBlocksException e) {
+                throw new RuntimeException("Unbalanced blocks in pretty printer:\n" + e);
+            }
+        }
+    }
+
     private class TermView extends SequentView {
         private static final long serialVersionUID = -8328975160581938309L;
         private InitialPositionTable posTable = new InitialPositionTable();
-        private Node node;
+        private final Node node;
 
         TermView(PosInOccurrence pos, Node node, MainWindow mainWindow) {
             super(mainWindow);
@@ -696,38 +688,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
                     NotationInfo.DEFAULT_UNICODE_ENABLED);
             }
 
-            setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(), ni, services,
-                new TermLabelVisibilityManager()) {
-
-                @Override
-                public void printSequent(SequentPrintFilter filter, boolean finalbreak) {
-                    try {
-                        ImmutableList<SequentPrintFilterEntry> antec = filter.getFilteredAntec();
-                        ImmutableList<SequentPrintFilterEntry> succ = filter.getFilteredSucc();
-                        markStartSub();
-                        startTerm(antec.size() + succ.size());
-                        layouter.beginC(1).ind();
-                        printSemisequent(antec);
-
-                        if (pos == null) {
-                            layouter.brk(1, -1);
-                            printSequentArrow();
-                            layouter.brk(1);
-                        }
-
-                        printSemisequent(succ);
-                        if (finalbreak) {
-                            layouter.brk(0);
-                        }
-                        markEndSub();
-                        layouter.end();
-                    } catch (IOException e) {
-                        throw new RuntimeException("IO Exception in pretty printer:\n" + e);
-                    } catch (UnbalancedBlocksException e) {
-                        throw new RuntimeException("Unbalanced blocks in pretty printer:\n" + e);
-                    }
-                }
-            });
+            setLogicPrinter(new TermViewLogicPrinter(pos, ni, services));
 
             if (pos != null) {
                 setFilter(new ShowSelectedSequentPrintFilter(pos), true);
@@ -752,11 +713,6 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             }
 
             return OriginTermLabelVisualizer.this.getTooltipText(pis.getPosInOccurrence());
-        }
-
-        @Override
-        public SequentPrintFilter getFilter() {
-            return super.getFilter();
         }
 
         @Override
@@ -792,9 +748,8 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
         @Override
         public final synchronized void printSequent() {
-            getLogicPrinter().update(getFilter(), computeLineWidth());
-            setText(getSyntaxHighlighter().process(getLogicPrinter().toString(), node));
-            posTable = getLogicPrinter().getInitialPositionTable();
+            updateSequent(node);
+            posTable = getInitialPositionTable();
 
             updateHidingProperty();
         }

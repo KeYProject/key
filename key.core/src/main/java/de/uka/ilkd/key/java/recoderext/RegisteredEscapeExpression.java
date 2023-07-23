@@ -5,11 +5,12 @@
  */
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.List;
+
 import de.uka.ilkd.key.speclang.njml.JmlTermFactory;
 import de.uka.ilkd.key.util.MiscTools;
-import recoder.java.Expression;
 
-import java.util.List;
+import recoder.java.Expression;
 
 /**
  * This class handles all escape expressions in set-statements, that are registered in

@@ -106,10 +106,12 @@ public class Sorting {
             int j = ri;
             Object x = median(a[le], a[ri], a[(le + ri) / 2], ord);
             do {
-                while (ord.less(a[i], x))
+                while (ord.less(a[i], x)) {
                     ++i;
-                while (ord.less(x, a[j]))
+                }
+                while (ord.less(x, a[j])) {
                     --j;
+                }
                 if (i <= j) {
                     Object h = a[i];
                     a[i] = a[j];
@@ -170,4 +172,3 @@ public class Sorting {
      */
 
 }
-

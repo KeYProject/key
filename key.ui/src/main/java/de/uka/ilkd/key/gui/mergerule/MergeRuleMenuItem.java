@@ -1,11 +1,7 @@
 package de.uka.ilkd.key.gui.mergerule;
 
 import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JMenuItem;
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
@@ -66,9 +62,8 @@ public class MergeRuleMenuItem extends JMenuItem {
                                     completedApp.getMergePartners().size()));
                         mediator.getUI().taskProgress(0);
 
-                        completedApp.registerProgressListener(progress -> {
-                            mediator.getUI().setProgress(progress);
-                        });
+                        completedApp.registerProgressListener(
+                            progress -> mediator.getUI().setProgress(progress));
 
                         new SwingWorker<Void, Void>() {
                             private long duration;
@@ -92,9 +87,7 @@ public class MergeRuleMenuItem extends JMenuItem {
                                 mediator.getSelectionModel().setSelectedGoal(goal);
                             }
                         }.execute();
-                    } catch (final Exception exc) {
-                        signalError(exc, mediator);
-                    } catch (final AssertionError exc) {
+                    } catch (final Exception | AssertionError exc) {
                         signalError(exc, mediator);
                     }
                 }
@@ -103,12 +96,8 @@ public class MergeRuleMenuItem extends JMenuItem {
     }
 
     private void signalError(final Throwable e, final KeYMediator mediator) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                mediator.notify(new ExceptionFailureEvent(e.getMessage(), e));
-            }
-        });
+        SwingUtilities
+                .invokeLater(() -> mediator.notify(new ExceptionFailureEvent(e.getMessage(), e)));
     }
 
     @Override

@@ -27,5 +27,5 @@ public @interface HelpInfo {
      *
      * @return non-null string
      */
-    public String path() default "";
+    String path() default "";
 }

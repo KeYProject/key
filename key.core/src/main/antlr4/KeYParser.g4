@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 parser grammar KeYParser;
 
 @header {
@@ -14,13 +11,11 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 
 options { tokenVocab=KeYLexer; } // use tokens from STLexer.g4
 
-file: DOC_COMMENT* (decls problem? proof?) EOF;
+file: DOC_COMMENT* (profile? preferences? decls problem? proof?) EOF;
 
 decls
 :
-    ( profile                // for problems
-    | pref=preferences       // for problems
-    | bootClassPath          // for problems
+    ( bootClassPath          // for problems
     | stlist=classPaths      // for problems
     | string=javaSource      // for problems
     | one_include_statement
@@ -31,7 +26,6 @@ decls
     | schema_var_decls
     | pred_decls
     | func_decls
-    | adt_decls
     | transform_decls
     | ruleset_decls
     | contracts             // for problems
@@ -105,7 +99,7 @@ one_sort_decl
 
 simple_ident_dots
 :
-  simple_ident (DOT simple_ident)* | INT_LITERAL
+  simple_ident (DOT simple_ident)*
 ;
 
 simple_ident_dots_comma_list
@@ -237,42 +231,18 @@ func_decl
   SEMI
 ;
 
-/**
- \datatypes {
-    List = Nil | Cons(any, List);
- }
- */
-adt_decl
-:
-  doc=DOC_COMMENT? (UNIQUE)?
-  name=funcpred_name
-  EQUALS
-  adt_constructor (OR adt_constructor)*
-  SEMI
-;
-
-adt_constructor
-:
-    doc=DOC_COMMENT? funcpred_name                                      #adt_constructor_base
-  | doc=DOC_COMMENT? funcpred_name LPAREN sortId (COMMA sortId)* RPAREN #adt_constructor_recursion
-;
 
 functionMetaData
 :
-    INFIX LPAREN op=(PLUS|STAR|SLASH|MINUS|EXP|PERCENT|LESS|LESSEQUAL|GREATER|GREATEREQUAL|LGUILLEMETS) RPAREN
-  | PREFIX LPAREN op=(MINUS|TILDE) RPAREN
-  | POSTFIX LPAREN (/*currently no overloaded operator*/) RPAREN
+    INFIX LPAREN (opComparison|op100|opEqualities|op90|op80) RPAREN
+  | PREFIX LPAREN op=(MINUS|TILDE|NOT) RPAREN
+  | POSTFIX LPAREN (AT) RPAREN
   | SHORTCUT LPAREN IDENT RPAREN
 ;
 
 func_decls
 :
     FUNCTIONS LBRACE (func_decl)* RBRACE
-;
-
-adt_decls
-:
-  DATATYPES LBRACE adt_decl* RBRACE
 ;
 
 
@@ -340,7 +310,7 @@ id_declaration
 
 funcpred_name
 :
-  (sortId DOUBLECOLON)? name=simple_ident_dots
+  (sortId DOUBLECOLON)? (name=simple_ident_dots|num=INT_LITERAL)
 ;
 
 
@@ -363,9 +333,43 @@ literals:
   | integer
   | floatnum
   | string_literal
+  | emptyset
 ;
 
-term: parallel_term;
+opEqualities : NOT_EQUALS | EQUALS | APPROXIMATELY_BUT_NOT_ACTUALLY_EQUAL_TO
+             | NEITHER_APPROXIMATELY_NOR_ACTUALLY_EQUAL_TO
+             | NOT_IDENTICAL_TO | IDENTICAL_TO | CIRCLED_EQUALS
+             | NOT_PARALLEL_TO | PARALLEL_TO | NOT_DIVIDES | DIVIDES
+             | NOT_ASYMPTOTICALLY_EQUAL_TO | ASYMPTOTICALLY_EQUAL_TO
+             ;
+opComparison: LESS | LESSEQUAL | GREATER | GREATEREQUAL | PRECEDES | SUBSEQ | SET_IN
+            | LESS_THAN_WITH_DOT | VERY_MUCH_LESS_THAN | LESS_THAN_EQUAL_TO_OR_GREATER_THAN | EQUAL_TO_OR_LESS_THAN
+            | EQUAL_TO_OR_PRECEDES |DOES_NOT_PRECEDE_OR_EQUAL | NOT_SQUARE_IMAGE_OF_OR_EQUAL_TO
+            | SQUARE_IMAGE_OF_OR_NOT_EQUAL_TO | PRECEDES| PRECEDES_OR_EQUAL_TO | PRECEDES_OR_EQUIVALENT_TO
+            | NOT_A_SUBSET_OF | SUBSET_OF_OR_EQUAL_TO | SQUARE_ORIGINAL | SQUARE_ORIGINAL_OF_OR_EQUAL_TO
+            | GREATER_THAN_WITH_DOT | VERY_MUCH_GREATER_THAN | GREATER_THAN_EQUAL_TO_OR_LESS_THAN
+            | EQUAL_TO_OR_GREATER_THAN | EQUAL_TO_OR_SUCCEEDS| DOES_NOT_SUCCEED_OR_EQUAL
+            | NOT_SQUARE_ORIGINAL_OF_OR_EQUAL_TO | SQUARE_ORIGINAL_OF_OR_NOT_EQUAL_TO | SUCCEEDS
+            | SUCCEEDS_OR_EQUAL_TO | SUCCEEDS_OR_EQUIVALENT_TO | DOES_NOT_PRECEDE | DOES_NOT_SUCCEED | SUPERSET_OF
+            | NOT_A_SUPERSET_OF | SUPERSET_OF_OR_EQUAL_TO | SQUARE_IMAGE_OF| SQUARE_IMAGE_OF_OR_EQUAL_TO
+            ;
+
+op100 : PLUS|MINUS|UNION|INTERSECT|SETMINUS
+      | CIRCLED_DASH | SQUARED_MINUS | CIRCLED_MINUS
+      | CIRCLED_PLUS | SQUARED_PLUS | MINUS_TILDE | NOT_TILDE
+      | MINUS_OR_PLUS | DOT_PLUS
+      ;
+
+
+op90    : STAR | CIRCLED_TIMES | CIRCLED_DOT_OPERATOR |  CIRCLED_ASTERISK_OPERATOR |  SQUARED_TIMES |  SQUARED_DOT_OPERATOR
+        | WREATH_PRODUCT | SINE_WAVE | INVERTED_LAZY_S | REVERSE_TILDE | HOMOTHETIC | GEOMETRIC_PROPORTION | EXCESS
+        | DOT_MINUS | PROPORTION | RATION | BECAUSE | THEREFORE | ASTERISK
+        ;
+
+op80  : PERCENT | SLASH | CIRCLED_DIVISION_SLASH | CIRCLED_RING_OPERATOR | CDOT | RING;
+
+emptyset: EMPTY;
+term: parallel_term; // weigl: should normally be equivalence_term
 //labeled_term: a=parallel_term (LGUILLEMETS labels=label RGUILLEMETS)?;
 parallel_term: a=elementary_update_term (PARALLEL b=elementary_update_term)*;
 elementary_update_term: a=equivalence_term (ASSIGN b=equivalence_term)?;
@@ -379,12 +383,13 @@ unary_formula:
   | (FORALL | EXISTS) bound_variables sub=term60  #quantifierterm
   | MODALITY sub=term60                           #modality_term
 ;
-equality_term: a=comparison_term ((NOT_EQUALS|EQUALS) b=comparison_term)?;
-comparison_term: a=weak_arith_term (op=(LESS|LESSEQUAL|GREATER|GREATEREQUAL) b=weak_arith_term)?;
-weak_arith_term: a=strong_arith_term_1 (op+=(PLUS|MINUS) b+=strong_arith_term_1)*;
-strong_arith_term_1: a=strong_arith_term_2 (STAR b+=strong_arith_term_2)*;
-strong_arith_term_2: a=atom_prefix (op=(PERCENT|SLASH) b=strong_arith_term_2)?;
-update_term: (LBRACE u=term RBRACE) (atom_prefix | unary_formula);
+equality_term: left=comparison_term (op=opEqualities right=comparison_term)?;
+comparison_term: left=weak_arith_term (op=opComparison right=weak_arith_term)?;
+weak_arith_term: a=strong_arith_term_1 (op+=op100 others+=strong_arith_term_1)*;
+strong_arith_term_1: a=strong_arith_term_2 (op+=op90 others+=strong_arith_term_2)*;
+strong_arith_term_2: a=atom_prefix (op+=op80 b+=atom_prefix)*;
+update_term: (LBRACE u=parallel_term RBRACE) (atom_prefix | unary_formula);
+
 substitution_term:
  LBRACE SUBST  bv=one_bound_variable SEMI
      replacement=comparison_term RBRACE
@@ -419,7 +424,7 @@ primitive_term:
   | abbreviation
   | accessterm
   | literals
-;
+  ;
 
 /*
 weigl, 2021-03-12:
@@ -478,8 +483,16 @@ term
  */
 accessterm
 :
+  // OLD
   (sortId DOUBLECOLON)?
   firstName=simple_ident
+
+  /*Faster version
+  simple_ident_dots
+  ( EMPTYBRACKETS*
+    DOUBLECOLON
+    simple_ident
+  )?*/
   call?
   ( attribute )*
 ;
@@ -558,8 +571,9 @@ argument_list
     RPAREN
 ;
 
+integer_with_minux: MINUS? integer;
 integer:
-  (MINUS)? (INT_LITERAL | HEX_LITERAL | BIN_LITERAL)
+  (INT_LITERAL | HEX_LITERAL | BIN_LITERAL)
 ;
 
 floatnum: // called floatnum because "float" collide with the Java language
@@ -701,8 +715,9 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
 
 varexp_argument
 :
-    sortId //also covers possible varId
-  | TYPEOF LPAREN y=varId RPAREN
+    //weigl: Ambguity between term (which can also contain simple_ident_dots and sortId)
+    //       suggestion add an explicit keyword to request the sort by name or manually resolve later in builder
+    TYPEOF LPAREN y=varId RPAREN
   | CONTAINERTYPE LPAREN y=varId RPAREN
   | DEPENDINGON LPAREN y=varId RPAREN
   | term
@@ -727,8 +742,7 @@ option
 option_list
 :
   LPAREN
-    ( (option (COMMA option)*)
-      | option_expr)
+    (option_expr (COMMA option_expr)*)
   RPAREN
 ;
 

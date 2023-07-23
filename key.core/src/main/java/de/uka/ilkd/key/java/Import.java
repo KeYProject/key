@@ -1,13 +1,9 @@
 package de.uka.ilkd.key.java;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.reference.PackageReference;
-import de.uka.ilkd.key.java.reference.PackageReferenceContainer;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
-import de.uka.ilkd.key.java.reference.TypeReferenceInfix;
+import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 /**
  * Import.
@@ -91,8 +87,9 @@ public class Import extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int result = 0;
-        if (reference != null)
+        if (reference != null) {
             result++;
+        }
         return result;
     }
 
@@ -105,8 +102,9 @@ public class Import extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (reference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return reference;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -177,9 +175,5 @@ public class Import extends JavaNonTerminalProgramElement
      */
     public void visit(Visitor v) {
         v.performActionOnImport(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printImport(this);
     }
 }

@@ -55,7 +55,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
         private final Modifier modifier;
 
 
-        private PositionModifier(Modifier modifier) {
+        PositionModifier(Modifier modifier) {
             this.modifier = modifier;
         }
 

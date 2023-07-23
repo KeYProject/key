@@ -240,4 +240,3 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
         v.visitArrayInitializer(this);
     }
 }
-

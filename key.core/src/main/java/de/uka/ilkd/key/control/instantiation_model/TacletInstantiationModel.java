@@ -1,34 +1,19 @@
 package de.uka.ilkd.key.control.instantiation_model;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Vector;
+
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.inst.SortException;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IfMismatchException;
-import de.uka.ilkd.key.proof.MissingInstantiationException;
-import de.uka.ilkd.key.proof.ModelChangeListener;
-import de.uka.ilkd.key.proof.ModelEvent;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.SVInstantiationException;
-import de.uka.ilkd.key.proof.SVInstantiationParserException;
-import de.uka.ilkd.key.proof.SortMismatchException;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.SortException;
 
 public class TacletInstantiationModel {
 
@@ -49,7 +34,7 @@ public class TacletInstantiationModel {
     private final Sequent seq;
 
     /** listeners of this model */
-    private final Vector<ModelChangeListener> listeners = new Vector<ModelChangeListener>();
+    private final ArrayList<ModelChangeListener> listeners = new ArrayList<>();
     /** the change event that is sent */
     private final ModelEvent changeEvent = new ModelEvent(this);
 
@@ -159,7 +144,7 @@ public class TacletInstantiationModel {
             SVInstantiationParserException, MissingInstantiationException, SortMismatchException {
 
         ImmutableList<IfFormulaInstantiation> instList =
-            ImmutableSLList.<IfFormulaInstantiation>nil();
+            ImmutableSLList.nil();
 
         for (int i = ifChoiceModel.length - 1; i >= 0; --i) {
             instList = instList.prepend(ifChoiceModel[i].getSelection(i));
@@ -168,7 +153,7 @@ public class TacletInstantiationModel {
         try {
             tacletApp = tacletApp.setIfFormulaInstantiations(instList, services);
         } catch (SortException e) {
-            throw new SortMismatchException("'\\assumes'-sequent", null, 0, 0);
+            throw new SortMismatchException("'\\assumes'-sequent", null, Position.UNDEFINED);
         }
 
         if (tacletApp == null) {
@@ -206,9 +191,9 @@ public class TacletInstantiationModel {
     }
 
     private void informListenerAboutModelChange() {
-        for (Object listener : listeners) {
+        for (ModelChangeListener listener : listeners) {
             if (listener != null) {
-                ((ModelChangeListener) listener).modelChanged(changeEvent);
+                listener.modelChanged(changeEvent);
             }
         }
     }

@@ -5,11 +5,10 @@
  */
 package recoder.list.generic;
 
-import recoder.java.SourceElement;
-
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
+
+import recoder.java.SourceElement;
 
 public class ASTArrayList<E extends SourceElement> extends ArrayList<E> implements ASTList<E> {
 
@@ -36,11 +35,10 @@ public class ASTArrayList<E extends SourceElement> extends ArrayList<E> implemen
     }
 
     public ASTArrayList<E> deepClone() {
-        ASTArrayList<E> result = new ASTArrayList<E>(size());
-        Iterator<E> i = iterator();
-        while (i.hasNext()) {
+        ASTArrayList<E> result = new ASTArrayList<>(size());
+        for (E e : this) {
             @SuppressWarnings("unchecked")
-            E deepClone = (E) i.next().deepClone();
+            E deepClone = (E) e.deepClone();
             result.add(deepClone);
         }
         return result;

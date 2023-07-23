@@ -5,16 +5,16 @@
  */
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.key_project.util.ExtList;
+
 public class Guard extends JavaNonTerminalProgramElement implements IGuard {
 
-    Expression expr;
+    final Expression expr;
 
     public Guard(Expression expression) {
         expr = expression;
@@ -37,8 +37,9 @@ public class Guard extends JavaNonTerminalProgramElement implements IGuard {
     }
 
     public ProgramElement getChildAt(int index) {
-        if (index == 0)
+        if (index == 0) {
             return expr;
+        }
         return null;
     }
 

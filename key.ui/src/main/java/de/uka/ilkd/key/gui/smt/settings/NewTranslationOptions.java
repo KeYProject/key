@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.gui.smt.settings;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
@@ -13,12 +19,6 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.StringProperty;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerPropertyVisitor;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerServices;
 import de.uka.ilkd.key.util.Pair;
-
-import javax.swing.*;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Collection;
 
 /**
  * This is the dialog for the new smt translation mechnism (newsmt2) which aims at a higher degree
@@ -115,7 +115,8 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
         }
     }
 
-    private class SetVisitor implements SMTHandlerPropertyVisitor<Pair<String, JComponent>, Void> {
+    private static class SetVisitor
+            implements SMTHandlerPropertyVisitor<Pair<String, JComponent>, Void> {
 
         @Override
         public Void visit(EnumProperty<?> enumProp, Pair<String, JComponent> arg) {
@@ -146,7 +147,7 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
         }
     }
 
-    private class ApplyVisitor implements SMTHandlerPropertyVisitor<JComponent, Void> {
+    private static class ApplyVisitor implements SMTHandlerPropertyVisitor<JComponent, Void> {
         private final NewSMTTranslationSettings settings;
 
         public ApplyVisitor(NewSMTTranslationSettings newSMTSettings) {

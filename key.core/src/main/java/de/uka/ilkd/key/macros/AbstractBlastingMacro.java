@@ -9,8 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -45,6 +43,8 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+
+import org.key_project.util.collection.ImmutableList;
 
 public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
@@ -100,7 +100,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     }
 
     private List<SequentFormula> createFormulae(Services services, Set<Sort> sorts) {
-        List<SequentFormula> result = new LinkedList<SequentFormula>();
+        List<SequentFormula> result = new LinkedList<>();
 
         JavaInfo info = services.getJavaInfo();
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);

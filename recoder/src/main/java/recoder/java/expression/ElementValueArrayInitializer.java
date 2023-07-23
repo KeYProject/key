@@ -33,8 +33,9 @@ public class ElementValueArrayInitializer extends JavaNonTerminalProgramElement
      */
     protected ElementValueArrayInitializer(ElementValueArrayInitializer proto) {
         super(proto);
-        if (proto.elementValues != null)
+        if (proto.elementValues != null) {
             this.elementValues = proto.elementValues.deepClone();
+        }
     }
 
     /*
@@ -97,8 +98,9 @@ public class ElementValueArrayInitializer extends JavaNonTerminalProgramElement
      * @see recoder.java.ExpressionContainer#getExpressionAt(int)
      */
     public Expression getExpressionAt(int index) {
-        if (elementValues != null)
+        if (elementValues != null) {
             return elementValues.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -127,11 +129,13 @@ public class ElementValueArrayInitializer extends JavaNonTerminalProgramElement
      */
     public int getChildPositionCode(ProgramElement child) {
         // 0(IDX): elementValues
-        if (elementValues == null)
+        if (elementValues == null) {
             return -1;
+        }
         int idx = elementValues.indexOf(child);
-        if (idx != -1)
+        if (idx != -1) {
             return idx << 4;
+        }
         return -1;
     }
 

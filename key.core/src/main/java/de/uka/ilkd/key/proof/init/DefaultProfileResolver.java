@@ -15,12 +15,12 @@ public interface DefaultProfileResolver {
      *
      * @return The profile name.
      */
-    public String getProfileName();
+    String getProfileName();
 
     /**
      * Returns the default {@link Profile} instance.
      *
      * @return The default {@link Profile} instance.
      */
-    public Profile getDefaultProfile();
+    Profile getDefaultProfile();
 }

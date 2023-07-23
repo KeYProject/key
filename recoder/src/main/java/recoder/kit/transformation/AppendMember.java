@@ -7,6 +7,8 @@
 
 package recoder.kit.transformation;
 
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Constructor;
 import recoder.abstraction.Method;
@@ -14,8 +16,6 @@ import recoder.abstraction.Type;
 import recoder.java.declaration.*;
 import recoder.kit.ProblemReport;
 import recoder.kit.TwoPassTransformation;
-
-import java.util.List;
 
 /**
  * Syntactic transformation that adds the given MemberDeclaration to the list in the given

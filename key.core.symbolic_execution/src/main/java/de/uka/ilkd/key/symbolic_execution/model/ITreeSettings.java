@@ -13,21 +13,21 @@ public interface ITreeSettings {
      *         contains another branch condition or {@code false} allow that branch conditions
      *         contains branch conditions.
      */
-    public boolean isMergeBranchConditions();
+    boolean isMergeBranchConditions();
 
     /**
      * Checks if unicode characters are used.
      *
      * @return {@code true} use unicode characters, {@code false} do not use unicode characters.
      */
-    public boolean isUseUnicode();
+    boolean isUseUnicode();
 
     /**
      * Checks if pretty printing is used or not.
      *
      * @return {@code true} use pretty printing, {@code false} do not use pretty printing.
      */
-    public boolean isUsePrettyPrinting();
+    boolean isUsePrettyPrinting();
 
     /**
      * Checks how variables are computed.
@@ -36,12 +36,12 @@ public interface ITreeSettings {
      *         {@link IExecutionVariable}s are computed according to the type structure of the
      *         visible memory.
      */
-    public boolean isVariablesAreOnlyComputedFromUpdates();
+    boolean isVariablesAreOnlyComputedFromUpdates();
 
     /**
      * Checks if conditions should be simplified or not.
      *
      * @return {@code true} simplify conditions, {@code false} do not simplify conditions.
      */
-    public boolean isSimplifyConditions();
+    boolean isSimplifyConditions();
 }

@@ -5,12 +5,12 @@
  */
 package de.uka.ilkd.key.gui.keyshortcuts;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.*;
 
 /**
  * Manager of the configurable {@link KeyStroke}s for proof macros and GUI actions.
@@ -166,4 +166,3 @@ public final class KeyStrokeManager {
         }
     }
 }
-

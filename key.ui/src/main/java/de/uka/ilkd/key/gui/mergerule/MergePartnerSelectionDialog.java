@@ -1,64 +1,32 @@
 package de.uka.ilkd.key.gui.mergerule;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.swing.AbstractButton;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.html.HTMLDocument;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.utilities.WrapLayout;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
-import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * JDialog for selecting a subset of candidate goals as partners for a {@link MergeRule}
@@ -94,19 +62,15 @@ public class MergePartnerSelectionDialog extends JDialog {
     private final static MainWindow MAIN_WINDOW_INSTANCE = MainWindow.getInstance();
 
     /** Comparator for goals; sorts by serial nr. of the node */
-    private static Comparator<MergePartner> GOAL_COMPARATOR = new Comparator<MergePartner>() {
-        @Override
-        public int compare(MergePartner o1, MergePartner o2) {
-            return o1.getGoal().node().serialNr() - o2.getGoal().node().serialNr();
-        }
-    };
+    private static final Comparator<MergePartner> GOAL_COMPARATOR =
+        Comparator.comparingInt(o -> o.getGoal().node().serialNr());
 
     private LinkedList<MergePartner> candidates = null;
     private Services services = null;
     private Pair<Goal, PosInOccurrence> mergeGoalPio = null;
 
     /** The chosen goals. */
-    private SortedSet<MergePartner> chosenGoals = new TreeSet<MergePartner>(GOAL_COMPARATOR);
+    private SortedSet<MergePartner> chosenGoals = new TreeSet<>(GOAL_COMPARATOR);
 
     /** The chosen merge method. */
     private MergeProcedure chosenRule = MergeProcedure.getMergeProcedures().head();
@@ -147,22 +111,15 @@ public class MergePartnerSelectionDialog extends JDialog {
         scrpPartner2 = new JScrollPane(txtPartner2);
 
         // Goal selection dropdown field and checkbox
-        cmbCandidates = new JComboBox<String>();
+        cmbCandidates = new JComboBox<>();
         cmbCandidates.setMaximumSize(new Dimension(Integer.MAX_VALUE, 20));
-        cmbCandidates.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                MergePartner selectedCandidate = getSelectedCandidate();
+        cmbCandidates.addItemListener(e -> {
+            MergePartner selectedCandidate = getSelectedCandidate();
 
-                setHighlightedSequentForArea(selectedCandidate.getGoal(),
-                    selectedCandidate.getPio(), txtPartner2);
+            setHighlightedSequentForArea(selectedCandidate.getGoal(),
+                selectedCandidate.getPio(), txtPartner2);
 
-                if (chosenGoals.contains(selectedCandidate)) {
-                    cbSelectCandidate.setSelected(true);
-                } else {
-                    cbSelectCandidate.setSelected(false);
-                }
-            }
+            cbSelectCandidate.setSelected(chosenGoals.contains(selectedCandidate));
         });
 
         addComponentListener(new ComponentAdapter() {
@@ -178,17 +135,14 @@ public class MergePartnerSelectionDialog extends JDialog {
 
         cbSelectCandidate = new JCheckBox();
         cbSelectCandidate.setToolTipText(CB_SELECT_CANDIDATE_HINT);
-        cbSelectCandidate.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (cbSelectCandidate.isSelected()) {
-                    chosenGoals.add(getSelectedCandidate());
-                } else {
-                    chosenGoals.remove(getSelectedCandidate());
-                }
-
-                checkApplicable();
+        cbSelectCandidate.addActionListener(e -> {
+            if (cbSelectCandidate.isSelected()) {
+                chosenGoals.add(getSelectedCandidate());
+            } else {
+                chosenGoals.remove(getSelectedCandidate());
             }
+
+            checkApplicable();
         });
 
         bgMergeMethods = new ButtonGroup();
@@ -196,13 +150,10 @@ public class MergePartnerSelectionDialog extends JDialog {
             JRadioButton rb = new JRadioButton(rule.toString());
             rb.setSelected(true);
 
-            rb.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    chosenRule = rule;
+            rb.addActionListener(e -> {
+                chosenRule = rule;
 
-                    checkApplicable();
-                }
+                checkApplicable();
             });
             bgMergeMethods.add(rb);
         }
@@ -294,30 +245,19 @@ public class MergePartnerSelectionDialog extends JDialog {
         okButton.setToolTipText(OK_BTN_TOOLTIP_TXT);
         chooseAllButton.setToolTipText(CHOOSE_ALL_BTN_TOOLTIP_TXT);
 
-        okButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-                dispose();
-            }
+        okButton.addActionListener(e -> {
+            setVisible(false);
+            dispose();
         });
 
-        chooseAllButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                for (MergePartner candidate : candidates) {
-                    chosenGoals.add(candidate);
-                }
-                setVisible(false);
-            }
+        chooseAllButton.addActionListener(e -> {
+            chosenGoals.addAll(candidates);
+            setVisible(false);
         });
 
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                chosenGoals = null;
-                setVisible(false);
-            }
+        cancelButton.addActionListener(e -> {
+            chosenGoals = null;
+            setVisible(false);
         });
 
         JPanel ctrlBtnsContainer = new JPanel();
@@ -362,8 +302,8 @@ public class MergePartnerSelectionDialog extends JDialog {
         this();
         this.services = services;
 
-        this.candidates = new LinkedList<MergePartner>();
-        this.mergeGoalPio = new Pair<Goal, PosInOccurrence>(mergeGoal, pio);
+        this.candidates = new LinkedList<>();
+        this.mergeGoalPio = new Pair<>(mergeGoal, pio);
 
         for (MergePartner candidate : candidates) {
             int insPos = Collections.binarySearch(this.candidates, candidate, GOAL_COMPARATOR);
@@ -496,13 +436,9 @@ public class MergePartnerSelectionDialog extends JDialog {
             }
         }
 
-        if (!MergeRuleUtils.isProvable(
+        return MergeRuleUtils.isProvable(
             Sequent.createSequent(antecedent, new Semisequent(new SequentFormula(formulaToProve))),
-            services, 1000)) {
-            return false;
-        }
-
-        return true;
+            services, 1000);
     }
 
     /**

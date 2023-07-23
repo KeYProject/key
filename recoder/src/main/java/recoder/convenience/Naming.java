@@ -7,6 +7,10 @@
 
 package recoder.convenience;
 
+import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
+
 import recoder.abstraction.ClassType;
 import recoder.abstraction.ClassTypeContainer;
 import recoder.abstraction.Field;
@@ -17,10 +21,6 @@ import recoder.java.PackageSpecification;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.java.reference.*;
 import recoder.util.Debug;
-
-import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Utility class to obtain or transform Identifiers obeying a set of naming conventions. There
@@ -43,7 +43,7 @@ import java.util.Set;
 
 public abstract class Naming {
 
-    private final static Set<String> KEYWORDS = new HashSet<String>();
+    private final static Set<String> KEYWORDS = new HashSet<>();
 
     static {
         KEYWORDS.add("abstract");
@@ -345,14 +345,16 @@ public abstract class Naming {
             int lastDot = dataLocStr.lastIndexOf('.');
             int lastSlash = Math.max(dataLocStr.lastIndexOf('/'), dataLocStr.lastIndexOf('\\'));
             String possibleFileName;
-            if (lastDot >= lastSlash)
+            if (lastDot >= lastSlash) {
                 possibleFileName = dataLocStr.substring(lastSlash + 1, lastDot);
-            else
+            } else {
                 possibleFileName = dataLocStr.substring(lastSlash + 1);
+            }
             // TODO check if filename is correct
             name = possibleFileName;
-        } else
+        } else {
             name = m.getName();
+        }
         String pname = getPackageName(cu);
         if (pname.length() == 0) {
             return name;
@@ -438,4 +440,3 @@ public abstract class Naming {
     }
 
 }
-

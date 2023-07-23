@@ -21,4 +21,3 @@ public class Identity extends Equivalence {
         super();
     }
 }
-

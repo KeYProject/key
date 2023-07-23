@@ -211,10 +211,12 @@ public class LabeledStatement extends JavaStatement
 
     public int getChildCount() {
         int result = 0;
-        if (name != null)
+        if (name != null) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -228,13 +230,15 @@ public class LabeledStatement extends JavaStatement
 
     public ProgramElement getChildAt(int index) {
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();

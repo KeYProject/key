@@ -5,8 +5,6 @@
  */
 package de.uka.ilkd.key.ldt;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -18,6 +16,8 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
+
+import org.key_project.util.ExtList;
 
 /**
  * LDT for maps.
@@ -80,7 +80,7 @@ public final class MapLDT extends LDT {
     }
 
     @Override
-    public final Type getType(Term t) {
+    public Type getType(Term t) {
         assert false;
         return null;
     }

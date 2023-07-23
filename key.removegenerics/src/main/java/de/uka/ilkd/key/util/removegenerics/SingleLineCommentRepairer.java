@@ -34,7 +34,7 @@ public class SingleLineCommentRepairer {
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
             List<Comment> comments = pe.getComments();
-            if (comments != null)
+            if (comments != null) {
                 for (Comment comment : comments) {
                     if (comment instanceof SingleLineComment && comment.isPrefixed()) {
                         SourceElement first = pe.getFirstElement();
@@ -47,6 +47,7 @@ public class SingleLineCommentRepairer {
                         first.setRelativePosition(relpos);
                     }
                 }
+            }
         }
     }
 

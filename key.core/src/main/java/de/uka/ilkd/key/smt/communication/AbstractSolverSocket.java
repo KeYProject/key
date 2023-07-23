@@ -5,11 +5,11 @@
  */
 package de.uka.ilkd.key.smt.communication;
 
+import java.io.IOException;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
-
-import javax.annotation.Nonnull;
-import java.io.IOException;
 
 /**
  * The SolverSocket class describes the communication between the KeY and the SMT solver process.

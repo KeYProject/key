@@ -7,8 +7,6 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
@@ -16,6 +14,8 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.util.InfFlowSpec;
+
+import org.key_project.util.collection.ImmutableList;
 
 
 
@@ -25,14 +25,14 @@ import de.uka.ilkd.key.util.InfFlowSpec;
  */
 public interface InformationFlowContract extends Contract {
 
-    public String getBaseName();
+    String getBaseName();
 
 
     @Override
-    public IProgramMethod getTarget();
+    IProgramMethod getTarget();
 
 
-    public KeYJavaType getSpecifiedIn();
+    KeYJavaType getSpecifiedIn();
 
 
     /**
@@ -41,7 +41,7 @@ public interface InformationFlowContract extends Contract {
      *
      * @return whether this contract is strictly pure.
      */
-    public boolean hasModifiesClause();
+    boolean hasModifiesClause();
 
 
     /**
@@ -76,34 +76,34 @@ public interface InformationFlowContract extends Contract {
      *
      * @return used exception-variable
      */
-    public Term getExc();
+    Term getExc();
 
-    public Term getAtPre();
+    Term getAtPre();
 
 
-    public boolean isReadOnlyContract();
+    boolean isReadOnlyContract();
 
 
     /**
      * Returns the modality of the contract.
      */
-    public Modality getModality();
+    Modality getModality();
 
 
-    public InformationFlowContract setName(String name);
+    InformationFlowContract setName(String name);
 
 
-    public InformationFlowContract setModality(Modality modality);
+    InformationFlowContract setModality(Modality modality);
 
 
-    public InformationFlowContract setModifies(Term modifies);
+    InformationFlowContract setModifies(Term modifies);
 
 
     /**
      * Return a new contract which equals this contract except that the id is set to the new id.
      */
     @Override
-    public InformationFlowContract setID(int newId);
+    InformationFlowContract setID(int newId);
 
 
     /**
@@ -127,7 +127,7 @@ public interface InformationFlowContract extends Contract {
      * ObserverFunction are set to the new values.
      */
     @Override
-    public InformationFlowContract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
+    InformationFlowContract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
 
 
     /**
@@ -138,7 +138,7 @@ public interface InformationFlowContract extends Contract {
     Term getResult();
 
 
-    public boolean equals(Contract c);
+    boolean equals(Contract c);
 
 
     /**
@@ -146,7 +146,7 @@ public interface InformationFlowContract extends Contract {
      *
      * @return String "Method Contract"
      */
-    public String getPODisplayName();
+    String getPODisplayName();
 
 
     /**
@@ -161,8 +161,8 @@ public interface InformationFlowContract extends Contract {
     ImmutableList<InfFlowSpec> getInfFlowSpecs();
 
 
-    public boolean hasInfFlowSpec();
+    boolean hasInfFlowSpec();
 
     @Override
-    public InformationFlowContract map(UnaryOperator<Term> op, Services services);
+    InformationFlowContract map(UnaryOperator<Term> op, Services services);
 }

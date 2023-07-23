@@ -7,10 +7,10 @@
 
 package recoder.io;
 
+import java.util.List;
+
 import recoder.Service;
 import recoder.bytecode.ClassFile;
-
-import java.util.List;
 
 /**
  * Retrieval and storage of parsed bytecode files.

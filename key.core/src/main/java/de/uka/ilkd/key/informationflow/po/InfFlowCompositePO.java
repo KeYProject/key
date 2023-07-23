@@ -12,6 +12,6 @@ package de.uka.ilkd.key.informationflow.po;
  */
 public interface InfFlowCompositePO extends InfFlowPO {
 
-    public AbstractInfFlowPO getChildPO();
+    AbstractInfFlowPO getChildPO();
 
 }

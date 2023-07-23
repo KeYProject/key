@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.smt.test;
 
+import java.io.File;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
@@ -14,13 +19,9 @@ import de.uka.ilkd.key.smt.SMTTestSettings;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Tag;
-
-import java.io.File;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,15 +31,16 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @Tag("slow")
 public abstract class TestCommons {
-    protected static String folder = HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "smt"
-        + File.separator + "tacletTranslation" + File.separator;
+    protected static final String folder =
+        HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "smt"
+            + File.separator + "tacletTranslation" + File.separator;
     /**
      * The set of taclets
      */
     private final Collection<Taclet> taclets = new LinkedList<>();
     InitConfig initConfig = null;
     static protected ProblemInitializer initializer = null;
-    static protected Profile profile = init();
+    static protected final Profile profile = init();
 
     static Profile init() {
         return new JavaProfile();
@@ -178,4 +180,3 @@ public abstract class TestCommons {
         return result;
     }
 }
-

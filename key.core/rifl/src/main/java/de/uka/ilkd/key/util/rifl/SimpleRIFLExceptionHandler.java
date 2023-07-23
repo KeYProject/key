@@ -7,7 +7,9 @@ package de.uka.ilkd.key.util.rifl;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+
 import org.slf4j.LoggerFactory;
 
 

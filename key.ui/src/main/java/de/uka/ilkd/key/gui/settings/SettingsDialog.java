@@ -1,15 +1,15 @@
 package de.uka.ilkd.key.gui.settings;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.KeyAction;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.KeyAction;
 
 /**
  * The settings dialog.
@@ -22,9 +22,9 @@ public class SettingsDialog extends JDialog {
     private static final long serialVersionUID = -3204453471778351602L;
     private final MainWindow mainWindow;
     private final SettingsUi ui;
-    private Action actionCancel = new CancelAction();
-    private Action actionAccept = new AcceptAction();
-    private Action actionApply = new ApplyAction();
+    private final Action actionCancel = new CancelAction();
+    private final Action actionAccept = new AcceptAction();
+    private final Action actionApply = new ApplyAction();
     private List<SettingsProvider> providers;
 
     public SettingsDialog(MainWindow owner) {
@@ -32,7 +32,7 @@ public class SettingsDialog extends JDialog {
         setTitle("Settings");
 
         mainWindow = owner;
-        ui = new SettingsUi(owner);
+        ui = new SettingsUi(owner, this);
 
         JPanel root = new JPanel(new BorderLayout());
         root.add(ui);
@@ -40,11 +40,10 @@ public class SettingsDialog extends JDialog {
         root.add(buttonBar, BorderLayout.SOUTH);
         setContentPane(root);
 
-        getRootPane().registerKeyboardAction(e -> {
-            dispose();
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().registerKeyboardAction(e -> dispose(),
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-        setSize(600, 400);
+        setSize(new Dimension(900, 600));
     }
 
     private JPanel createButtonBar() {
@@ -60,7 +59,8 @@ public class SettingsDialog extends JDialog {
 
     public void setSettingsProvider(List<SettingsProvider> providers) {
         this.providers = providers;
-        this.ui.setSettingsProvider(providers);
+        int width = this.ui.setSettingsProvider(providers);
+        setSize(new Dimension(width, 600));
     }
 
     SettingsUi getUi() {
@@ -79,7 +79,6 @@ public class SettingsDialog extends JDialog {
                 it.applySettings(mainWindow);
                 apply(it.getChildren(), exceptions);
             } catch (Exception e) {
-                e.printStackTrace();
                 exceptions.add(e);
             }
         }

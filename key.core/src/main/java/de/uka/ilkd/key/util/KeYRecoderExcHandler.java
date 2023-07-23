@@ -13,7 +13,7 @@ import java.util.List;
 
 public class KeYRecoderExcHandler implements recoder.service.ErrorHandler {
 
-    private List<Throwable> exceptions = new LinkedList<Throwable>();
+    private final List<Throwable> exceptions = new LinkedList<>();
     private int errorThreshold;
 
     public void reportException(Throwable e) {
@@ -38,10 +38,11 @@ public class KeYRecoderExcHandler implements recoder.service.ErrorHandler {
 
 
     public List<Throwable> getExceptions() {
-        List<Throwable> result = new LinkedList<Throwable>();
+        List<Throwable> result = new LinkedList<>();
 
-        if (exceptions != null)
+        if (exceptions != null) {
             result.addAll(exceptions);
+        }
 
         return result;
     }

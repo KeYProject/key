@@ -4,9 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.java.ArrayUtil;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.Field;
@@ -24,6 +21,9 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.ArrayUtil;
 
 /**
  * The default implementation of {@link IExecutionValue}.
@@ -124,7 +124,7 @@ public class ExecutionValue extends AbstractExecutionValue {
      * @throws ProofInputException Occurred Exception.
      */
     protected IExecutionVariable[] lazyComputeChildVariables() throws ProofInputException {
-        List<IExecutionVariable> children = new LinkedList<IExecutionVariable>();
+        List<IExecutionVariable> children = new LinkedList<>();
         if (!isDisposed()) {
             final Services services = getServices();
             Term value = getValue();
@@ -219,7 +219,7 @@ public class ExecutionValue extends AbstractExecutionValue {
                 }
             }
         }
-        return children.toArray(new IExecutionVariable[children.size()]);
+        return children.toArray(new IExecutionVariable[0]);
     }
 
     /**

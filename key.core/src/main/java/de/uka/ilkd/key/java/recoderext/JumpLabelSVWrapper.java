@@ -24,7 +24,7 @@ public class JumpLabelSVWrapper implements SVWrapper {
     }
 
     public String toString() {
-        return "" + label;
+        return String.valueOf(label);
     }
 
 }

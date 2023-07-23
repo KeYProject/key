@@ -12,19 +12,19 @@ public interface IExecutionContext extends Reference {
      *
      * @return the type reference to the next enclosing class
      */
-    public TypeReference getTypeReference();
+    TypeReference getTypeReference();
 
     /**
      * returns the program method which is currently active
      *
      * @return the currently active method
      */
-    public IProgramMethod getMethodContext();
+    IProgramMethod getMethodContext();
 
     /**
      * returns the runtime instance object
      *
      * @return the runtime instance object
      */
-    public ReferencePrefix getRuntimeInstance();
+    ReferencePrefix getRuntimeInstance();
 }

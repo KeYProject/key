@@ -13,18 +13,13 @@ public interface IDefaultStrategyPropertiesFactory {
     /**
      * The default implementation.
      */
-    public static IDefaultStrategyPropertiesFactory DEFAULT_FACTORY =
-        new IDefaultStrategyPropertiesFactory() {
-            @Override
-            public StrategyProperties createDefaultStrategyProperties() {
-                return new StrategyProperties();
-            }
-        };
+    IDefaultStrategyPropertiesFactory DEFAULT_FACTORY =
+        StrategyProperties::new;
 
     /**
      * Creates new default {@link StrategyProperties}.
      *
      * @return The new default {@link StrategyProperties}.
      */
-    public StrategyProperties createDefaultStrategyProperties();
+    StrategyProperties createDefaultStrategyProperties();
 }

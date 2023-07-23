@@ -8,7 +8,6 @@ package de.uka.ilkd.key.gui.nodeviews;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-
 import javax.swing.JPanel;
 
 /**

@@ -58,8 +58,9 @@ public class RKeYMetaConstructExpression extends Literal
      */
     public int getChildCount() {
         int result = 0;
-        if (child != null)
+        if (child != null) {
             result++;
+        }
         return result;
     }
 
@@ -72,8 +73,9 @@ public class RKeYMetaConstructExpression extends Literal
      */
     public ProgramElement getChildAt(int index) {
         if (child != null) {
-            if (index == 0)
+            if (index == 0) {
                 return child;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -103,8 +105,9 @@ public class RKeYMetaConstructExpression extends Literal
     }
 
     public int getRoleOfChild(int i) {
-        if (i == 0)
+        if (i == 0) {
             return getChildPositionCode(child);
+        }
         return -1;
     }
 

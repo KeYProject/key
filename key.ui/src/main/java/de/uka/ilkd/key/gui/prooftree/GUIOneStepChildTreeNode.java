@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui.prooftree;
 
+import javax.annotation.Nonnull;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.java.Services;
@@ -7,7 +8,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.RuleApp;
 
 /**
- * A special kind of gui proof tree node to show intermediate intermediate steps of the
+ * A special kind of gui proof tree node to show intermediate steps of the
  * {@link de.uka.ilkd.key.rule.OneStepSimplifier}.
  *
  * These nodes are leaves.
@@ -15,13 +16,15 @@ import de.uka.ilkd.key.rule.RuleApp;
 public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
 
     private final RuleApp app;
+    private final int formulaNr;
     private final GUIAbstractTreeNode parent;
 
     public GUIOneStepChildTreeNode(GUIProofTreeModel tree, GUIAbstractTreeNode parent,
-            RuleApp app) {
+            RuleApp app, int formulaNr) {
         super(tree, parent.getNode());
         this.parent = parent;
         this.app = app;
+        this.formulaNr = formulaNr;
     }
 
     @Override
@@ -53,8 +56,22 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
         return app.rule().name() + " ON " + prettySubTerm;
     }
 
+    public RuleApp getRuleApp() {
+        return app;
+    }
+
+    public int getFormulaNr() {
+        return formulaNr;
+    }
+
     @Override
     public void flushCache() {
         // nothing to do
+    }
+
+    @Nonnull
+    @Override
+    public String getSearchString() {
+        return toString();
     }
 }

@@ -5,14 +5,14 @@
  */
 package de.uka.ilkd.key.gui.actions;
 
+import java.awt.event.ActionEvent;
+
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.HeatmapOptionsDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
-
-import java.awt.event.ActionEvent;
 
 /**
  * Action for invoking the heatmap options dialog.

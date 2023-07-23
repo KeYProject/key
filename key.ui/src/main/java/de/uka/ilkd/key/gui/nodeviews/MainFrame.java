@@ -5,7 +5,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.AncestorEvent;
@@ -13,7 +12,6 @@ import javax.swing.event.AncestorListener;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.CopyToClipboardAction;
-import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 
 /**
  * Central part of MainWindow. Its main purpose is to serve as container for SequentView instances.
@@ -24,7 +22,6 @@ public final class MainFrame extends JPanel {
 
     private static final long serialVersionUID = -2412537422601138379L;
 
-    private final MainWindow mainWindow;
     private final JScrollPane scrollPane = new JScrollPane();
     private Component content;
     private boolean showTacletInfo = false;
@@ -51,7 +48,6 @@ public final class MainFrame extends JPanel {
     }
 
     public MainFrame(final MainWindow mainWindow, EmptySequent emptySequent) {
-        this.mainWindow = mainWindow;
         setBorder(new EmptyBorder(0, 0, 0, 0));
         scrollPane.getVerticalScrollBar().setUnitIncrement(30);
         scrollPane.getHorizontalScrollBar().setUnitIncrement(30);
@@ -106,5 +102,14 @@ public final class MainFrame extends JPanel {
 
     public boolean isShowTacletInfo() {
         return showTacletInfo;
+    }
+
+    /**
+     * Scroll the sequent view to the specified y coordinate.
+     *
+     * @param y coordinate in pixels
+     */
+    public void scrollTo(int y) {
+        scrollPane.getVerticalScrollBar().setValue(y);
     }
 }

@@ -125,9 +125,10 @@ public enum Typicons implements IconFont {
 
     @Override
     public Font getFont() throws IOException, FontFormatException {
-        if (font == null)
+        if (font == null) {
             font = Font.createFont(Font.TRUETYPE_FONT,
                 getClass().getResourceAsStream("/fonts/typicons.ttf"));
+        }
         return font;
 
     }

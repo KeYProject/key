@@ -1,18 +1,8 @@
 package de.uka.ilkd.key.proof.init;
 
-import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
-
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -39,6 +29,12 @@ import de.uka.ilkd.key.rule.metaconstruct.PostWork;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
+
 /**
  * <p>
  * The proof obligation for operation contracts.
@@ -62,9 +58,10 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
  * </p>
  */
 public class FunctionalOperationContractPO extends AbstractOperationPO implements ContractPO {
-    public static Map<Boolean, String> TRANSACTION_TAGS = new LinkedHashMap<Boolean, String>();
+    public static final Map<Boolean, String> TRANSACTION_TAGS =
+        new LinkedHashMap<Boolean, String>();
 
-    private FunctionalOperationContract contract;
+    private final FunctionalOperationContract contract;
 
     protected Term mbyAtPre;
 
@@ -232,11 +229,21 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         for (LocationVariable heap : modHeaps) {
             final Term ft;
             if (!getContract().hasModifiesClause(heap)) {
-                // strictly pure have a different contract.
-                ft = tb.frameStrictlyEmpty(tb.var(heap), heapToAtPre);
+                if (!getContract().hasFreeModifiesClause(heap)) {
+                    ft = tb.frameStrictlyEmpty(tb.var(heap), heapToAtPre);
+                } else {
+                    ft = tb.frame(tb.var(heap), heapToAtPre,
+                        getContract().getFreeMod(heap, selfVar, paramVars, services));
+                }
             } else {
-                ft = tb.frame(tb.var(heap), heapToAtPre,
-                    getContract().getMod(heap, selfVar, paramVars, services));
+                if (!getContract().hasFreeModifiesClause(heap)) {
+                    ft = tb.frame(tb.var(heap), heapToAtPre,
+                        getContract().getMod(heap, selfVar, paramVars, services));
+                } else {
+                    ft = tb.frame(tb.var(heap), heapToAtPre, tb.union(
+                        getContract().getMod(heap, selfVar, paramVars, services),
+                        getContract().getFreeMod(heap, selfVar, paramVars, services)));
+                }
             }
 
             if (frameTerm == null) {
@@ -344,7 +351,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    public void fillSaveProperties(Properties properties) throws IOException {
+    public void fillSaveProperties(Properties properties) {
         super.fillSaveProperties(properties);
         properties.setProperty("contract", contract.getName());
     }

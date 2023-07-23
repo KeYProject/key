@@ -14,7 +14,7 @@ import de.uka.ilkd.key.rule.match.vm.TermNavigator;
  */
 public interface MatchInstruction {
 
-    public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
+    MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
             Services services);
 
 }

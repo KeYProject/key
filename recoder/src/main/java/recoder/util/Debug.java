@@ -31,10 +31,10 @@ public class Debug {
      */
     // protected static PrintWriter output = new PrintWriter(System.err);
     protected static PrintStream output = System.err;
-    static String ERROR_MESSAGE = "Error: ";
-    static String RESTRICTION_MESSAGE = "Restriction: ";
-    static String INFO_MESSAGE = "Info: ";
-    static String ASSERTION_MESSAGE = "Assertion failed: ";
+    static final String ERROR_MESSAGE = "Error: ";
+    static final String RESTRICTION_MESSAGE = "Restriction: ";
+    static final String INFO_MESSAGE = "Info: ";
+    static final String ASSERTION_MESSAGE = "Assertion failed: ";
     /**
      * Debugging print functions. Maintains an option table to steer debug printout.
      */
@@ -61,8 +61,8 @@ public class Debug {
         if (value == null) {
             return false;
         }
-        for (int i = 0; i < NEGATIVE_VALUES.length; i++) {
-            if (NEGATIVE_VALUES[i].equalsIgnoreCase(value)) {
+        for (String negativeValue : NEGATIVE_VALUES) {
+            if (negativeValue.equalsIgnoreCase(value)) {
                 return false;
             }
         }

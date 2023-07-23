@@ -1,25 +1,24 @@
 package de.uka.ilkd.key.java.statement;
 
+import java.util.Map;
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.TermReplacementMap;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
-import org.key_project.util.ExtList;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Objects;
+import org.key_project.util.ExtList;
 
 /**
  * A JML assert statement.
@@ -47,7 +46,7 @@ public class JmlAssert extends JavaStatement {
     /**
      * services (needed for pretty printing)
      */
-    private Services services;
+    private final Services services;
 
     /**
      *
@@ -181,11 +180,6 @@ public class JmlAssert extends JavaStatement {
     @Override
     public ProgramElement getChildAt(int index) {
         throw new IndexOutOfBoundsException("JmlAssert has no program children");
-    }
-
-    @Override
-    public void prettyPrint(PrettyPrinter w) throws IOException {
-        w.printJmlAssert(this);
     }
 
     @Override

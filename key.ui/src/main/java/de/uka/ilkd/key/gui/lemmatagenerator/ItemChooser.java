@@ -1,23 +1,10 @@
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListSelectionModel;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.RowFilter;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -49,12 +36,12 @@ class ItemChooser<T> extends JPanel {
     private JPanel contentPanel;
     private JButton leftButton;
     private JButton rightButton;
-    private List<TableItem<T>> items = new LinkedList<TableItem<T>>();
+    private List<TableItem<T>> items = new LinkedList<>();
     private final List<ItemFilter<T>> filtersForMovingItems =
-        new LinkedList<ItemChooser.ItemFilter<T>>();
+        new LinkedList<>();
     private final String searchTitle;
     // this data structure is shared with suppliedList and selectedList.
-    private final List<ItemFilter<T>> userFilter = new LinkedList<ItemFilter<T>>();
+    private final List<ItemFilter<T>> userFilter = new LinkedList<>();
 
 
     public interface ItemFilter<T> {
@@ -113,13 +100,7 @@ class ItemChooser<T> extends JPanel {
     private JButton getLeftButton() {
         if (leftButton == null) {
             leftButton = new JButton("<");
-            leftButton.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cut(getSelectedList(), getSuppliedList());
-                }
-            });
+            leftButton.addActionListener(e -> cut(getSelectedList(), getSuppliedList()));
         }
         return leftButton;
 
@@ -128,14 +109,7 @@ class ItemChooser<T> extends JPanel {
     private JButton getRightButton() {
         if (rightButton == null) {
             rightButton = new JButton(">");
-            rightButton.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cut(getSuppliedList(), getSelectedList());
-
-                }
-            });
+            rightButton.addActionListener(e -> cut(getSuppliedList(), getSelectedList()));
         }
         return rightButton;
 
@@ -167,14 +141,14 @@ class ItemChooser<T> extends JPanel {
 
     private SelectionPanel<T> getSuppliedList() {
         if (suppliedList == null) {
-            suppliedList = new SelectionPanel<T>("Choice", searchTitle, Side.LEFT, userFilter);
+            suppliedList = new SelectionPanel<>("Choice", searchTitle, Side.LEFT, userFilter);
         }
         return suppliedList;
     }
 
     private SelectionPanel<T> getSelectedList() {
         if (selectedList == null) {
-            selectedList = new SelectionPanel<T>("Selection", searchTitle, Side.RIGHT, userFilter);
+            selectedList = new SelectionPanel<>("Selection", searchTitle, Side.RIGHT, userFilter);
         }
         return selectedList;
     }
@@ -182,10 +156,10 @@ class ItemChooser<T> extends JPanel {
 
     public void setItems(List<T> dataForItems, String columnName) {
 
-        items = new LinkedList<TableItem<T>>();
+        items = new LinkedList<>();
 
         for (T info : dataForItems) {
-            items.add(new TableItem<T>(info, Side.LEFT));
+            items.add(new TableItem<>(info, Side.LEFT));
 
         }
         ItemModel model = new ItemModel(columnName);
@@ -205,7 +179,7 @@ class ItemChooser<T> extends JPanel {
 
     public List<T> getDataOfSelectedItems() {
 
-        List<T> list = new LinkedList<T>();
+        List<T> list = new LinkedList<>();
         for (TableItem<T> item : items) {
             if (item.getSide() == Side.RIGHT) {
                 list.add(item.getData());
@@ -260,7 +234,7 @@ class ItemChooser<T> extends JPanel {
 
 
 class SelectionPanel<T> extends JPanel {
-    static enum Side {
+    enum Side {
         LEFT, RIGHT
     }
 
@@ -370,7 +344,7 @@ class SelectionPanel<T> extends JPanel {
 
     List<T> getSelectedValues() {
 
-        LinkedList<T> infoList = new LinkedList<T>();
+        LinkedList<T> infoList = new LinkedList<>();
         for (int i : getList().getSelectedRows()) {
             @SuppressWarnings("unchecked")
             TableItem<T> item = (TableItem<T>) getList().getValueAt(i, 0);
@@ -381,7 +355,7 @@ class SelectionPanel<T> extends JPanel {
 
     List<TableItem<T>> getSelectedItems() {
 
-        LinkedList<TableItem<T>> infoList = new LinkedList<TableItem<T>>();
+        LinkedList<TableItem<T>> infoList = new LinkedList<>();
         for (int i : getList().getSelectedRows()) {
             @SuppressWarnings("unchecked")
             TableItem<T> item = ((TableItem<T>) getList().getValueAt(i, 0));
@@ -396,7 +370,7 @@ class SelectionPanel<T> extends JPanel {
 
 
     void createFilter() {
-        filter = new RowFilter<ItemModel, Integer>() {
+        filter = new RowFilter<>() {
 
             @Override
             public boolean include(
@@ -411,8 +385,8 @@ class SelectionPanel<T> extends JPanel {
                     }
                 }
 
-                if (findPattern != "") {
-                    if (item.getNameLowerCase().indexOf(findPattern) == -1) {
+                if (!findPattern.isEmpty()) {
+                    if (!item.getNameLowerCase().contains(findPattern)) {
                         return false;
                     }
                 }
@@ -429,21 +403,15 @@ class SelectionPanel<T> extends JPanel {
 
 
         getList().setSelectionModel(new DefaultListSelectionModel());
-        TableRowSorter<ItemModel> sorter = new TableRowSorter<ItemModel>(model);
+        TableRowSorter<ItemModel> sorter = new TableRowSorter<>(model);
         getList().setModel(model);
         sorter.setMaxSortKeys(1);
         sorter.setSortsOnUpdates(true);
 
 
         sorter.setRowFilter(filter);
-        sorter.setComparator(0, new Comparator<TableItem<T>>() {
-
-            @Override
-            public int compare(TableItem<T> o1, TableItem<T> o2) {
-
-                return o1.getNameLowerCase().compareTo(o2.getNameLowerCase());
-            }
-        });
+        sorter.setComparator(0, Comparator
+                .comparing((TableItem<T> o) -> o.getNameLowerCase()));
 
         getList().setRowSorter(sorter);
         sorter.toggleSortOrder(0);

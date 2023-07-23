@@ -5,11 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.MapUtil;
-
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -23,6 +18,11 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.MapUtil;
 
 /**
  * Default implementation of {@link BlockContract}.
@@ -50,10 +50,12 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
      * @param measuredBy this contract's measured-by term.
      * @param postconditions this contract's postconditions on every heap.
      * @param modifiesClauses this contract's modifies clauses on every heap.
+     * @param freeModifiesClauses this contract's free modifies clauses on every heap.
      * @param infFlowSpecs this contract's information flow specifications.
      * @param variables this contract's variables.
      * @param transactionApplicable whether or not this contract is applicable for transactions.
      * @param hasMod a map specifying on which heaps this contract has a modified clause.
+     * @param hasFreeMod a map specifying on which heaps this contract has a free modified clause.
      * @param functionalContracts the functional contracts corresponding to this contract.
      */
     public BlockContractImpl(final String baseName, final StatementBlock block,
@@ -63,12 +65,15 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             final Map<LocationVariable, Term> postconditions,
             final Map<LocationVariable, Term> freePostconditions,
             final Map<LocationVariable, Term> modifiesClauses,
+            final Map<LocationVariable, Term> freeModifiesClauses,
             final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
             final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
+            final Map<LocationVariable, Boolean> hasFreeMod,
             ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts) {
-        super(baseName, block, labels, method, modality, preconditions, freePreconditions,
-            measuredBy, postconditions, freePostconditions, modifiesClauses, infFlowSpecs,
-            variables, transactionApplicable, hasMod, functionalContracts);
+        super(baseName, block, labels, method, modality,
+            preconditions, freePreconditions, measuredBy, postconditions, freePostconditions,
+            modifiesClauses, freeModifiesClauses, infFlowSpecs, variables, transactionApplicable,
+            hasMod, hasFreeMod, functionalContracts);
     }
 
     /**
@@ -123,10 +128,10 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
     @Override
     public String getUniqueName() {
         if (getTarget() != null) {
-            return "Block Contract " + getBlock().getStartPosition().getLine() + " "
+            return "Block Contract " + getBlock().getStartPosition().line() + " "
                 + getTarget().getUniqueName();
         } else {
-            return "Block Contract " + getBlock().getStartPosition().getLine() + " "
+            return "Block Contract " + getBlock().getStartPosition().line() + " "
                 + Math.abs(getBlock().hashCode());
         }
     }
@@ -148,10 +153,12 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<LocationVariable, Term> newModifiesClauses = modifiesClauses.entrySet().stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, Term> newFreeModifiesClauses = freeModifiesClauses.entrySet().stream()
+                .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Term newMeasuredBy = op.apply(measuredBy);
 
         return update(block, newPreconditions, newFreePreconditions, newPostconditions,
-            newFreePostconditions, newModifiesClauses,
+            newFreePostconditions, newModifiesClauses, newFreeModifiesClauses,
             infFlowSpecs.stream().map(spec -> spec.map(op)).collect(ImmutableList.collector()),
             variables, newMeasuredBy);
     }
@@ -163,12 +170,13 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             final Map<LocationVariable, Term> newPostconditions,
             final Map<LocationVariable, Term> newFreePostconditions,
             final Map<LocationVariable, Term> newModifiesClauses,
+            final Map<LocationVariable, Term> newFreeModifiesClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
             Term newMeasuredBy) {
         BlockContractImpl result = new BlockContractImpl(baseName, newBlock, labels, method,
             modality, newPreconditions, newFreePreconditions, newMeasuredBy, newPostconditions,
-            newFreePostconditions, newModifiesClauses, newinfFlowSpecs, newVariables,
-            transactionApplicable, hasMod, getFunctionalContracts());
+            newFreePostconditions, newModifiesClauses, newFreeModifiesClauses, newinfFlowSpecs,
+            newVariables, transactionApplicable, hasMod, hasFreeMod, getFunctionalContracts());
         result.setLoopContract(loopContract);
         return result;
     }
@@ -176,7 +184,8 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
     @Override
     public BlockContract setBlock(StatementBlock newBlock) {
         return update(newBlock, preconditions, freePreconditions, postconditions,
-            freePostconditions, modifiesClauses, infFlowSpecs, variables, measuredBy);
+            freePostconditions, modifiesClauses, freeModifiesClauses, infFlowSpecs,
+            variables, measuredBy);
     }
 
     @Override
@@ -185,8 +194,8 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
         assert newKJT.equals(newPM.getContainerType());
         BlockContractImpl result = new BlockContractImpl(baseName, block, labels,
             (IProgramMethod) newPM, modality, preconditions, freePreconditions, measuredBy,
-            postconditions, freePostconditions, modifiesClauses, infFlowSpecs, variables,
-            transactionApplicable, hasMod, getFunctionalContracts());
+            postconditions, freePostconditions, modifiesClauses, freeModifiesClauses, infFlowSpecs,
+            variables, transactionApplicable, hasMod, hasFreeMod, getFunctionalContracts());
         result.setLoopContract(loopContract);
         return result;
     }
@@ -241,10 +250,13 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 Map<LocationVariable, Term> ensuresFree, ImmutableList<InfFlowSpec> infFlowSpecs,
                 Map<Label, Term> breaks, Map<Label, Term> continues, Term returns, Term signals,
                 Term signalsOnly, Term diverges, Map<LocationVariable, Term> assignables,
-                Map<LocationVariable, Boolean> hasMod, Services services) {
-            super(baseName, block, labels, method, behavior, variables, requires, requiresFree,
-                measuredBy, ensures, ensuresFree, infFlowSpecs, breaks, continues, returns, signals,
-                signalsOnly, diverges, assignables, hasMod, services);
+                Map<LocationVariable, Term> assignablesFree,
+                Map<LocationVariable, Boolean> hasMod, Map<LocationVariable, Boolean> hasFreeMod,
+                Services services) {
+            super(baseName, block, labels, method, behavior, variables,
+                requires, requiresFree, measuredBy, ensures, ensuresFree,
+                infFlowSpecs, breaks, continues, returns, signals, signalsOnly,
+                diverges, assignables, assignablesFree, hasMod, hasFreeMod, services);
         }
 
         @Override
@@ -254,11 +266,14 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 Map<LocationVariable, Term> postconditions,
                 Map<LocationVariable, Term> freePostconditions,
                 Map<LocationVariable, Term> modifiesClauses,
+                Map<LocationVariable, Term> freeModifiesClauses,
                 ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
-                boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod) {
-            return new BlockContractImpl(baseName, block, labels, method, modality, preconditions,
-                freePreconditions, measuredBy, postconditions, freePostconditions, modifiesClauses,
-                infFlowSpecs, variables, transactionApplicable, hasMod, null);
+                boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod,
+                Map<LocationVariable, Boolean> hasFreeMod) {
+            return new BlockContractImpl(baseName, block, labels, method, modality,
+                preconditions, freePreconditions, measuredBy,
+                postconditions, freePostconditions, modifiesClauses, freeModifiesClauses,
+                infFlowSpecs, variables, transactionApplicable, hasMod, hasFreeMod, null);
         }
     }
 
@@ -286,13 +301,13 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             }
 
             final BlockContract head = contracts[0];
-            String baseName = head.getBaseName();
+            StringBuilder baseName = new StringBuilder(head.getBaseName());
 
             for (int i = 1; i < contracts.length; i++) {
                 assert contracts[i].getBlock().equals(head.getBlock());
 
-                baseName += SpecificationRepository.CONTRACT_COMBINATION_MARKER
-                        + contracts[i].getBaseName();
+                baseName.append(SpecificationRepository.CONTRACT_COMBINATION_MARKER)
+                        .append(contracts[i].getBaseName());
             }
 
             placeholderVariables = head.getPlaceholderVariables();
@@ -306,21 +321,29 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 functionalContracts = functionalContracts.union(contract.getFunctionalContracts());
             }
 
-            Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<LocationVariable, Boolean>();
+            Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<>();
+            Map<LocationVariable, Boolean> hasFreeMod =
+                new LinkedHashMap<LocationVariable, Boolean>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 boolean hm = false;
+                boolean hfm = false;
 
-                for (int i = 1; i < contracts.length && !hm; i++) {
-                    hm = contracts[i].hasModifiesClause(heap);
+                for (int i = 1; i < contracts.length && !hm && !hfm; i++) {
+                    hm |= contracts[i].hasModifiesClause(heap);
+                    hfm |= contracts[i].hasFreeModifiesClause(heap);
                 }
                 hasMod.put(heap, hm);
+                hasFreeMod.put(heap, hm);
             }
 
-            BlockContractImpl result = new BlockContractImpl(baseName, head.getBlock(),
-                head.getLabels(), head.getMethod(), head.getModality(), preconditions,
-                freePreconditions, contracts[0].getMby(), postconditions, freePostconditions,
-                modifiesClauses, head.getInfFlowSpecs(), placeholderVariables,
-                head.isTransactionApplicable(), hasMod, functionalContracts);
+
+            BlockContractImpl result = new BlockContractImpl(baseName.toString(), head.getBlock(),
+                head.getLabels(), head.getMethod(), head.getModality(),
+                preconditions, freePreconditions,
+                contracts[0].getMby(), postconditions, freePostconditions,
+                modifiesClauses, freeModifiesClauses, head.getInfFlowSpecs(),
+                placeholderVariables, head.isTransactionApplicable(), hasMod, hasFreeMod,
+                functionalContracts);
 
             return result;
         }

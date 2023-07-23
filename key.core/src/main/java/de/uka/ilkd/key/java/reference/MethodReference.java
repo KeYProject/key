@@ -1,18 +1,6 @@
 package de.uka.ilkd.key.java.reference;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
@@ -23,6 +11,11 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Method reference.
@@ -53,7 +46,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
         this.prefix = p;
         name = n;
         Debug.assertTrue(name != null, "Tried to reference unnamed method.");
-        this.arguments = new ImmutableArray<Expression>(args.collect(Expression.class));
+        this.arguments = new ImmutableArray<>(args.collect(Expression.class));
     }
 
     public MethodReference(ImmutableArray<? extends Expression> args, MethodName n,
@@ -76,20 +69,21 @@ public class MethodReference extends JavaNonTerminalProgramElement
     }
 
     public MethodReference(ExtList children, MethodName n, ReferencePrefix p) {
-        this(new ImmutableArray<Expression>(children.collect(Expression.class)), n, p,
+        this(new ImmutableArray<>(children.collect(Expression.class)), n, p,
             children.get(PositionInfo.class));
     }
 
     public MethodReference(ExtList children, MethodName n, ReferencePrefix p, PositionInfo pos,
             String scope) {
-        this(new ImmutableArray<Expression>(children.collect(Expression.class)), n, p, pos);
+        this(new ImmutableArray<>(children.collect(Expression.class)), n, p, pos);
     }
 
     protected void checkArguments() {
         ImmutableArray<? extends Expression> args = getArguments();
         for (Expression arg : args) {
-            if (arg == null)
+            if (arg == null) {
                 throw new NullPointerException();
+            }
         }
     }
 
@@ -122,12 +116,15 @@ public class MethodReference extends JavaNonTerminalProgramElement
 
     public int getChildCount() {
         int result = 0;
-        if (prefix != null)
+        if (prefix != null) {
             result++;
-        if (name != null)
+        }
+        if (name != null) {
             result++;
-        if (arguments != null)
+        }
+        if (arguments != null) {
             result += arguments.size();
+        }
         return result;
     }
 
@@ -140,13 +137,15 @@ public class MethodReference extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0)
+            if (index == 0) {
                 return prefix;
+            }
             index--;
         }
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (arguments != null) {
@@ -191,8 +190,9 @@ public class MethodReference extends JavaNonTerminalProgramElement
      */
     public int getExpressionCount() {
         int result = 0;
-        if (prefix instanceof Expression)
+        if (prefix instanceof Expression) {
             result += 1;
+        }
         if (arguments != null) {
             result += arguments.size();
         }
@@ -240,8 +240,9 @@ public class MethodReference extends JavaNonTerminalProgramElement
             return (ProgramElementName) name;
         } else if (name instanceof SchemaVariable) {
             return (((ProgramSV) name).getProgramElementName());
-        } else
+        } else {
             return null;
+        }
     }
 
     /**
@@ -270,7 +271,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * determines the arguments types and constructs a signature of the current method
      */
     public ImmutableList<KeYJavaType> getMethodSignature(Services services, ExecutionContext ec) {
-        ImmutableList<KeYJavaType> signature = ImmutableSLList.<KeYJavaType>nil();
+        ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
         if (arguments != null) {
             final TypeConverter typeConverter = services.getTypeConverter();
             for (int i = arguments.size() - 1; i >= 0; i--) {
@@ -347,10 +348,6 @@ public class MethodReference extends JavaNonTerminalProgramElement
      */
     public void visit(Visitor v) {
         v.performActionOnMethodReference(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printMethodReference(this);
     }
 
     public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {

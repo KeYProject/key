@@ -288,4 +288,3 @@ public interface Order extends Equality {
     }
 
 }
-

@@ -6,16 +6,18 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
-import org.antlr.v4.runtime.RuleContext;
+
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.antlr.v4.runtime.RuleContext;
 
 /**
  * A JML assert/assume statement.
  */
 public class TextualJMLAssertStatement extends TextualJMLConstruct {
 
-    private LabeledParserRuleContext context;
-    private Kind kind;
+    private final LabeledParserRuleContext context;
+    private final Kind kind;
 
     public TextualJMLAssertStatement(Kind kind, LabeledParserRuleContext clause) {
         super(ImmutableSLList.nil(), kind.toString() + " " + clause);
@@ -61,12 +63,12 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
         return kind;
     }
 
-    public static enum Kind {
+    public enum Kind {
         ASSERT("assert"), ASSUME("assume");
 
-        private String name;
+        private final String name;
 
-        private Kind(String name) {
+        Kind(String name) {
             this.name = name;
         }
 
@@ -74,5 +76,5 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
         public String toString() {
             return name;
         }
-    };
+    }
 }

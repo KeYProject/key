@@ -1,30 +1,28 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
-import javax.annotation.Nullable;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.ASSIGNABLE;
-
 
 /**
  * A JML loop specification (invariant, assignable clause, decreases clause, ...) in textual form.
  */
 public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     private LabeledParserRuleContext variant = null;
-    private ArrayList<Entry> clauses = new ArrayList<>(16);
+    private final ArrayList<Entry> clauses = new ArrayList<>(16);
 
     /**
      * Heap-dependent clauses
      */
     public enum ClauseHd {
-        INFORMATION_FLOW, ASSIGNABLE, INVARIANT, INVARIANT_FREE
+        INFORMATION_FLOW, ASSIGNABLE, ASSIGNABLE_FREE, INVARIANT, INVARIANT_FREE
     }
 
     public TextualJMLLoopSpec(ImmutableList<JMLModifier> mods) {
@@ -42,8 +40,12 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
 
     public TextualJMLLoopSpec addClause(ClauseHd clause, @Nullable Name heapName,
             LabeledParserRuleContext ctx) {
-        if (heapName == null)
+        if (heapName == null) {
             heapName = HeapLDT.BASE_HEAP_NAME;
+        }
+        if (clauses.isEmpty()) {
+            setPosition(ctx);
+        }
         clauses.add(new Entry(clause, ctx, heapName));
         return this;
     }
@@ -62,13 +64,8 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     }
 
     public ImmutableList<LabeledParserRuleContext> getAssignable() {
-        return getList(ASSIGNABLE);
+        return getList(ClauseHd.ASSIGNABLE);
     }
-
-    /*
-     * public ImmutableList<LabeledParserRuleContext> getAssignable(String hName) { return
-     * getList(ClauseHd.ASSIGNABLE); }
-     */
 
     public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignables() {
         return getMap(ClauseHd.ASSIGNABLE);
@@ -78,6 +75,17 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return getMapInit(ClauseHd.ASSIGNABLE);
     }
 
+    public ImmutableList<LabeledParserRuleContext> getAssignableFree() {
+        return getList(ClauseHd.ASSIGNABLE_FREE);
+    }
+
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignablesFree() {
+        return getMap(ClauseHd.ASSIGNABLE_FREE);
+    }
+
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignablesFreeInit() {
+        return getMapInit(ClauseHd.ASSIGNABLE_FREE);
+    }
 
     public ImmutableList<LabeledParserRuleContext> getInfFlowSpecs() {
         return getList(ClauseHd.INFORMATION_FLOW);
@@ -160,10 +168,12 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
         TextualJMLLoopSpec that = (TextualJMLLoopSpec) o;
         return variant.equals(that.variant) && clauses.equals(that.clauses);
     }

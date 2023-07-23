@@ -68,6 +68,7 @@ public class NewVarcond {
 
     @Override
     public String toString() {
-        return "\\new(" + sv + ", " + (type != null ? "" + type : "\\typeof(" + peerSV + ")") + ")";
+        return "\\new(" + sv + ", "
+            + (type != null ? String.valueOf(type) : "\\typeof(" + peerSV + ")") + ")";
     }
 }

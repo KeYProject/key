@@ -8,13 +8,14 @@ package de.uka.ilkd.key.gui.prooftree;
  * this class implements a TreeModel that can be displayed using the JTree class framework
  */
 
+import javax.annotation.Nonnull;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.Node;
 
 class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
 
-    private Object label;
+    private final Object label;
 
     public GUIBranchNode(GUIProofTreeModel tree, Node subTree, Object label) {
         super(tree, subTree);
@@ -59,8 +60,9 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
             childrenCache[count] = getProofTreeModel().getProofTreeNode(n);
             count++;
             final Node nextN = findChild(n);
-            if (nextN == null)
+            if (nextN == null) {
                 break;
+            }
             n = nextN;
         }
 
@@ -77,9 +79,16 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         childrenCache = null;
     }
 
+    @Nonnull
+    @Override
+    public String getSearchString() {
+        return toString();
+    }
+
     public int getChildCount() {
-        if (childrenCache == null)
+        if (childrenCache == null) {
             createChildrenCache();
+        }
         return childrenCache.length;
     }
 
@@ -94,8 +103,9 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         while (true) {
             count++;
             final Node nextN = findChild(n);
-            if (nextN == null)
+            if (nextN == null) {
                 break;
+            }
             n = nextN;
         }
 
@@ -111,8 +121,9 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
 
     public TreeNode getParent() {
         Node self = getNode();
-        if (self == null)
+        if (self == null) {
             return null;
+        }
         Node n = self.parent();
         if (n == null) {
             return null;
@@ -141,8 +152,9 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         String res;
         if (n != null) {
             res = n.getNodeInfo().getBranchLabel();
-            if (res == null)
+            if (res == null) {
                 return label.toString();
+            }
         } else {
             res = "null";
         }

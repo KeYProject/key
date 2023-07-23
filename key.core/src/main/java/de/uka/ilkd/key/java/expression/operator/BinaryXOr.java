@@ -5,10 +5,9 @@
  */
 package de.uka.ilkd.key.java.expression.operator;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 /**
  * Binary X or.
@@ -59,9 +58,5 @@ public class BinaryXOr extends BinaryOperator {
      */
     public void visit(Visitor v) {
         v.performActionOnBinaryXOr(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printBinaryXOr(this);
     }
 }

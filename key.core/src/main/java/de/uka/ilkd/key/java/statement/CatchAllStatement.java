@@ -1,25 +1,17 @@
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+
+import org.key_project.util.ExtList;
 
 
 
 public class CatchAllStatement extends JavaNonTerminalProgramElement
-        implements Statement, NonTerminalProgramElement,
-        // Desugarable,
-        StatementContainer {
-    private StatementBlock body;
-    private LocationVariable param;
+        implements Statement, NonTerminalProgramElement, StatementContainer {
+    private final StatementBlock body;
+    private final LocationVariable param;
 
     public CatchAllStatement(StatementBlock body, LocationVariable param) {
         this.body = body;
@@ -51,10 +43,12 @@ public class CatchAllStatement extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int i = 0;
-        if (body != null)
+        if (body != null) {
             i++;
-        if (param != null)
+        }
+        if (param != null) {
             i++;
+        }
         return i;
     }
 
@@ -95,11 +89,6 @@ public class CatchAllStatement extends JavaNonTerminalProgramElement
      */
     public void visit(Visitor v) {
         v.performActionOnCatchAllStatement(this);
-    }
-
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printCatchAllStatement(this);
     }
 
 

@@ -16,19 +16,13 @@ import de.uka.ilkd.key.strategy.definition.IDefaultStrategyPropertiesFactory;
 import de.uka.ilkd.key.strategy.definition.OneOfStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
-import de.uka.ilkd.key.strategy.feature.BinaryFeature;
-import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
-import de.uka.ilkd.key.strategy.feature.CountBranchFeature;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
-import de.uka.ilkd.key.strategy.feature.ScaleFeature;
+import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.feature.instantiator.OneOfCP;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termfeature.ContainsLabelFeature;
 import de.uka.ilkd.key.symbolic_execution.rule.ModalitySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.util.Triple;
 
 /**
  * {@link Strategy} to use for symbolic execution.
@@ -42,14 +36,9 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     /**
      * The default factory.
      */
-    public static IDefaultStrategyPropertiesFactory DEFAULT_FACTORY =
-        new IDefaultStrategyPropertiesFactory() {
-            @Override
-            public StrategyProperties createDefaultStrategyProperties() {
-                return SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false,
-                    false, false, false, false);
-            }
-        };
+    public static final IDefaultStrategyPropertiesFactory DEFAULT_FACTORY =
+        () -> SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false,
+            false, false, false, false);
 
     /**
      * Constructor.
@@ -327,7 +316,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
             // Model
             return new StrategySettingsDefinition(false, null, 1000, "Symbolic Execution Options",
                 SymbolicExecutionStrategy.DEFAULT_FACTORY,
-                new ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>>(),
+                new ArrayList<>(),
                 methodTreatment, loopTreatment, blockTreatment, branchHiding, aliasChecks);
         }
     }

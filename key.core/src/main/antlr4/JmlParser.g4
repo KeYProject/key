@@ -53,7 +53,7 @@ class_invariant: INVARIANT expression SEMI_TOPLEVEL;
 method_specification: (also_keyword)* spec_case ((also_keyword)+ spec_case)*;
 also_keyword: (ALSO | FOR_EXAMPLE | IMPLIES_THAT);
 spec_case:
-  (modifier)?
+  (modifiers)?
   behavior=(BEHAVIOR | NORMAL_BEHAVIOR | MODEL_BEHAVIOUR | EXCEPTIONAL_BEHAVIOUR
            | BREAK_BEHAVIOR | CONTINUE_BEHAVIOR | RETURN_BEHAVIOR )?
   spec_body
@@ -264,6 +264,7 @@ primaryexpr
   : constant
   | ident
   | inv
+  | inv_free
   | true_
   | false_
   | null_
@@ -274,13 +275,14 @@ primaryexpr
 this_: THIS;
 ident: IDENT | JML_IDENT | SPECIAL_IDENT | THIS | SUPER;
 inv:INV;
+inv_free:INV_FREE;
 true_:TRUE;
 false_:FALSE;
 null_:NULL;
 transactionUpdated: TRANSACTIONUPDATED LPAREN expression RPAREN;
 
 primarysuffix
-  : DOT (IDENT | TRANSIENT | THIS | INV | MULT)
+  : DOT (IDENT | TRANSIENT | THIS | INV | INV_FREE | MULT)
     (LPAREN (expressionlist)? RPAREN)? #primarySuffixAccess
   | (LPAREN (expressionlist)? RPAREN)  #primarySuffixCall
   | LBRACKET (from=expression (DOTDOT to=expression)? | MULT) RBRACKET #primarySuffixArray
@@ -339,7 +341,9 @@ jmlprimary
   | LOCKSET                                                                           #primaryLockset
   | IS_INITIALIZED LPAREN referencetype RPAREN                                        #primaryIsInitialised
   | INVARIANT_FOR LPAREN expression RPAREN                                            #primaryInvFor
+  | INVARIANT_FREE_FOR LPAREN expression RPAREN                                       #primaryInvFreeFor
   | STATIC_INVARIANT_FOR LPAREN referencetype RPAREN                                  #primaryStaticInv
+  | STATIC_INVARIANT_FREE_FOR LPAREN referencetype RPAREN                             #primaryStaticInvFree
   | LPAREN LBLNEG IDENT expression RPAREN                                             #primaryLblNeg
   | LPAREN LBLPOS IDENT expression RPAREN                                             #primaryLblPos
   | INDEX                                                                             #primaryIndex
@@ -364,7 +368,7 @@ jmlprimary
 
 fieldarrayaccess: (ident|this_|super_) (fieldarrayaccess_suffix)*;
 fieldarrayaccess_suffix
-    : DOT (ident | inv | this_ | super_ | TRANSIENT | INV)
+    : DOT (ident | inv | inv_free | this_ | super_ | TRANSIENT | INV | INV_FREE)
     | LBRACKET (expression) RBRACKET
 ;
 

@@ -5,6 +5,8 @@
  */
 package recoder.testsuite.basic.syntax;
 
+import java.util.List;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import recoder.convenience.Format;
@@ -15,15 +17,12 @@ import recoder.java.ProgramElement;
 import recoder.java.SourceElement.Position;
 import recoder.testsuite.basic.BasicTestsSuite;
 
-import java.util.List;
-
 public class WalkPositionTest extends TestCase {
 
     public void testWalkPosition() {
         SourceFileRepository sfr = BasicTestsSuite.getConfig().getSourceFileRepository();
         List<CompilationUnit> units = sfr.getCompilationUnits();
-        for (int i = 0; i < units.size(); i += 1) {
-            CompilationUnit u = units.get(i);
+        for (CompilationUnit u : units) {
             ProgramElement oldPe = u;
             Position oldPos = u.getFirstElement().getStartPosition();
             TreeWalker tw = new TreeWalker(u);
@@ -45,4 +44,3 @@ public class WalkPositionTest extends TestCase {
         }
     }
 }
-

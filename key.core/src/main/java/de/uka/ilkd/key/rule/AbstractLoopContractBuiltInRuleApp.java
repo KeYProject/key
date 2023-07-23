@@ -2,10 +2,6 @@ package de.uka.ilkd.key.rule;
 
 import java.util.List;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -14,6 +10,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopContractImpl;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Application of {@link AbstractLoopContractRule}.
@@ -61,13 +61,13 @@ public abstract class AbstractLoopContractBuiltInRuleApp
         final ImmutableSet<LoopContract> contracts =
             AbstractLoopContractRule.getApplicableContracts(instantiation, goal, services);
         setStatement(instantiation.statement);
-        ImmutableSet<LoopContract> cons = DefaultImmutableSet.<LoopContract>nil();
+        ImmutableSet<LoopContract> cons = DefaultImmutableSet.nil();
         for (LoopContract cont : contracts) {
-            if (cont.isOnBlock() && cont.getBlock().getStartPosition().getLine() == getStatement()
-                    .getStartPosition().getLine()) {
+            if (cont.isOnBlock() && cont.getBlock().getStartPosition().line() == getStatement()
+                    .getStartPosition().line()) {
                 cons = cons.add(cont);
             } else if (!cont.isOnBlock() && cont.getLoop().getStartPosition()
-                    .getLine() == getStatement().getStartPosition().getLine()) {
+                    .line() == getStatement().getStartPosition().line()) {
                 cons = cons.add(cont);
             }
         }

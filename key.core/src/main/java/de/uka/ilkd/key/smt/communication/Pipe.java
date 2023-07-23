@@ -5,9 +5,9 @@
  */
 package de.uka.ilkd.key.smt.communication;
 
+import java.io.IOException;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.IOException;
 
 /**
  * This interface describes a pipe for sending messages to or receiving them from an external SMT

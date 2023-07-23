@@ -5,12 +5,13 @@
  */
 package de.uka.ilkd.key.macros.scripts.meta;
 
-import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.Properties;
+
+import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This facade is used to load documentation for {@link ProofScriptCommand} and
@@ -50,7 +51,7 @@ public final class DescriptionFacade {
                     DescriptionFacade.class.getResourceAsStream(COMMANDS_DESCRIPTION));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to load properties", e);
         }
         return properties;
     }

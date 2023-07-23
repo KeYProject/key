@@ -5,11 +5,10 @@
  */
 package de.uka.ilkd.key.java.expression.operator;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 /**
  * Pre increment.
@@ -67,9 +66,5 @@ public class PreIncrement extends Assignment {
      */
     public void visit(Visitor v) {
         v.performActionOnPreIncrement(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printPreIncrement(this);
     }
 }

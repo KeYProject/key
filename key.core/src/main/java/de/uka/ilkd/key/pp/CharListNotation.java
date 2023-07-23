@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.pp;
 
-import java.io.IOException;
-
 import de.uka.ilkd.key.logic.Term;
 
 
@@ -11,7 +9,7 @@ public final class CharListNotation extends Notation {
     }
 
     @Override
-    public void print(Term t, LogicPrinter sp) throws IOException {
+    public void print(Term t, LogicPrinter sp) {
         if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
             sp.printTerm(t);
         } else {
@@ -34,19 +32,21 @@ public final class CharListNotation extends Notation {
     private String translateCharTerm(Term t) {
         char charVal = 0;
         int intVal = 0;
-        if (t.op().arity() == 0)
+        if (t.op().arity() == 0) {
             throw new IllegalArgumentException("Term is not a value!");
+        }
         String result = printlastfirst(t.sub(0)).toString();
         try {
             intVal = Integer.parseInt(result);
             charVal = (char) intVal;
-            if (intVal - charVal != 0)
+            if (intVal - charVal != 0) {
                 throw new NumberFormatException(); // overflow!
+            }
 
         } catch (NumberFormatException ex) {
             throw new IllegalArgumentException(result + " is not of type char");
         }
-        return "" + charVal;
+        return String.valueOf(charVal);
     }
 
     /**
@@ -54,11 +54,12 @@ public final class CharListNotation extends Notation {
      * quotation marks
      */
     private String translateTerm(Term t) {
-        final StringBuffer result = new StringBuffer("");
+        final StringBuilder result = new StringBuilder();
         Term term = t;
         while (!term.op().name().toString().equals("clEmpty")) {
-            if (!term.op().name().toString().equals("clCons"))
+            if (!term.op().name().toString().equals("clCons")) {
                 throw new IllegalArgumentException("Term does not represent a String Literal!");
+            }
             result.append(translateCharTerm(term.sub(0)));
             term = term.sub(1);
         }

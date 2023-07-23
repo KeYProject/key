@@ -5,7 +5,6 @@
  */
 package de.uka.ilkd.key.proof.join;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,9 +28,8 @@ public enum LateApplicationCheck {
     }
 
     private List<String> check(ApplicationCheck check, Sequent sequent, Node cutNode) {
-        List<String> conflicts = new LinkedList<String>();
-        for (Iterator<SequentFormula> it = sequent.iterator(); it.hasNext();) {
-            SequentFormula sf = it.next();
+        List<String> conflicts = new LinkedList<>();
+        for (SequentFormula sf : sequent) {
             String result = check.check(cutNode, sf.formula());
             if (result != null) {
                 conflicts.add(result);

@@ -5,11 +5,10 @@
  */
 package de.uka.ilkd.key.java.expression.operator;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 /**
  * Less than.
@@ -56,9 +55,5 @@ public class LessThan extends ComparativeOperator {
      */
     public void visit(Visitor v) {
         v.performActionOnLessThan(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printLessThan(this);
     }
 }

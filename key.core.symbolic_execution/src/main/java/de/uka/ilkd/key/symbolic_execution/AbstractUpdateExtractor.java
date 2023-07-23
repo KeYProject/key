@@ -1,41 +1,13 @@
 package de.uka.ilkd.key.symbolic_execution;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -49,6 +21,11 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionAllArrayIndicesVar
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * Provides the basic functionality to extract values from updates.
@@ -95,7 +72,7 @@ public abstract class AbstractUpdateExtractor {
     protected Term removeImplicitSubTermsFromPathCondition(Term pathCondition) {
         if (Junctor.AND == pathCondition.op()) {
             // Path condition with multiple terms combined via AND
-            List<Term> newTerms = new LinkedList<Term>();
+            List<Term> newTerms = new LinkedList<>();
             for (Term sub : pathCondition.subs()) {
                 if (!containsImplicitProgramVariable(sub)) {
                     newTerms.add(sub);
@@ -158,7 +135,7 @@ public abstract class AbstractUpdateExtractor {
      */
     protected Set<Term> computeInitialObjectsToIgnore(boolean ignoreExceptionVariable,
             boolean ignoreOldStateVariables) {
-        Set<Term> result = new LinkedHashSet<Term>();
+        Set<Term> result = new LinkedHashSet<>();
         if (ignoreExceptionVariable) {
             // Add exception variable to the ignore list because it is not part of the source code.
             IProgramVariable excVar = SymbolicExecutionUtil.extractExceptionVariable(getProof());
@@ -454,7 +431,7 @@ public abstract class AbstractUpdateExtractor {
      */
     protected Set<ExtractLocationParameter> extractLocationsFromSequent(Sequent sequent,
             Set<Term> objectsToIgnore) throws ProofInputException {
-        Set<ExtractLocationParameter> result = new LinkedHashSet<ExtractLocationParameter>();
+        Set<ExtractLocationParameter> result = new LinkedHashSet<>();
         for (SequentFormula sf : sequent) {
             result.addAll(extractLocationsFromTerm(
                 OriginTermLabel.removeOriginLabels(sf.formula(), getServices()), objectsToIgnore));
@@ -475,7 +452,7 @@ public abstract class AbstractUpdateExtractor {
      */
     protected Set<ExtractLocationParameter> extractLocationsFromTerm(Term term,
             Set<Term> objectsToIgnore) throws ProofInputException {
-        Set<ExtractLocationParameter> result = new LinkedHashSet<ExtractLocationParameter>();
+        Set<ExtractLocationParameter> result = new LinkedHashSet<>();
         collectLocationsFromTerm(result, term, objectsToIgnore);
         return result;
     }
@@ -576,7 +553,7 @@ public abstract class AbstractUpdateExtractor {
      */
     protected Term createLocationPredicateAndTerm(
             Set<ExtractLocationParameter> valueSelectParameter) {
-        List<Term> argumentsList = new LinkedList<Term>();
+        List<Term> argumentsList = new LinkedList<>();
         int argumentIndex = -1;
         for (ExtractLocationParameter param : valueSelectParameter) {
             argumentsList.add(param.createPreParentTerm());
@@ -584,7 +561,7 @@ public abstract class AbstractUpdateExtractor {
             argumentsList.add(param.createPreValueTerm());
             param.setValueTermIndexInStatePredicate(++argumentIndex);
         }
-        Term[] arguments = argumentsList.toArray(new Term[argumentsList.size()]);
+        Term[] arguments = argumentsList.toArray(new Term[0]);
         Sort[] sorts = new Sort[arguments.length];
         for (int i = 0; i < sorts.length; i++) {
             sorts[i] = arguments[i].sort();
@@ -1069,10 +1046,10 @@ public abstract class AbstractUpdateExtractor {
         public boolean equals(Object obj) {
             if (obj instanceof ExtractLocationParameter) {
                 ExtractLocationParameter other = (ExtractLocationParameter) obj;
-                return ObjectUtil.equals(arrayIndex, other.arrayIndex)
+                return Objects.equals(arrayIndex, other.arrayIndex)
                         && stateMember == other.stateMember
-                        && ObjectUtil.equals(parentTerm, other.parentTerm)
-                        && ObjectUtil.equals(programVariable, other.programVariable);
+                        && Objects.equals(parentTerm, other.parentTerm)
+                        && Objects.equals(programVariable, other.programVariable);
             } else {
                 return false;
             }
@@ -1119,7 +1096,7 @@ public abstract class AbstractUpdateExtractor {
         // Get original updates
         ImmutableList<Term> originalUpdates = computeOriginalUpdates(modalityPio, currentLayout);
         // Combine memory layout with original updates
-        Map<LocationVariable, Term> preUpdateMap = new HashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> preUpdateMap = new HashMap<>();
         ImmutableList<Term> additionalUpdates = ImmutableSLList.nil();
         for (ExtractLocationParameter evp : locations) {
             additionalUpdates = additionalUpdates.append(evp.createPreUpdate());
@@ -1156,7 +1133,7 @@ public abstract class AbstractUpdateExtractor {
                     for (ExtractLocationParameter param : locations) {
                         Map<Term, Set<Goal>> valueMap = paramValueMap[i];
                         if (valueMap == null) {
-                            valueMap = new LinkedHashMap<Term, Set<Goal>>();
+                            valueMap = new LinkedHashMap<>();
                             paramValueMap[i] = valueMap;
                         }
                         Term value = resultTerm.sub(param.getValueTermIndexInStatePredicate());
@@ -1180,19 +1157,16 @@ public abstract class AbstractUpdateExtractor {
                             }
                         }
                         // Update value list
-                        Set<Goal> valueList = valueMap.get(value);
-                        if (valueList == null) {
-                            valueList = new LinkedHashSet<Goal>();
-                            valueMap.put(value, valueList);
-                        }
+                        Set<Goal> valueList =
+                            valueMap.computeIfAbsent(value, k -> new LinkedHashSet<>());
                         valueList.add(goal);
                         i++;
                     }
                 }
                 // Compute values including conditions
-                Map<Node, Term> branchConditionCache = new HashMap<Node, Term>();
+                Map<Node, Term> branchConditionCache = new HashMap<>();
                 Set<ExecutionVariableValuePair> pairs =
-                    new LinkedHashSet<ExecutionVariableValuePair>();
+                    new LinkedHashSet<>();
                 int i = 0;
                 for (ExtractLocationParameter param : locations) {
                     for (Entry<Term, Set<Goal>> valueEntry : paramValueMap[i].entrySet()) {
@@ -1330,24 +1304,21 @@ public abstract class AbstractUpdateExtractor {
     protected Map<Goal, Term> computeValueConditions(Set<Goal> valueGoals,
             Map<Node, Term> branchConditionCache, boolean simplifyConditions)
             throws ProofInputException {
-        Comparator<NodeGoal> comparator = new Comparator<NodeGoal>() {
-            @Override
-            public int compare(NodeGoal o1, NodeGoal o2) {
-                return o2.getSerialNr() - o1.getSerialNr(); // Descending order
-            }
+        Comparator<NodeGoal> comparator = (o1, o2) -> {
+            return o2.getSerialNr() - o1.getSerialNr(); // Descending order
         };
         // Initialize condition for each goal with true
-        Set<Node> untriedRealGoals = new HashSet<Node>();
-        Map<Goal, Set<Term>> goalConditions = new HashMap<Goal, Set<Term>>();
-        List<NodeGoal> sortedBranchLeafs = new LinkedList<NodeGoal>();
+        Set<Node> untriedRealGoals = new HashSet<>();
+        Map<Goal, Set<Term>> goalConditions = new HashMap<>();
+        List<NodeGoal> sortedBranchLeafs = new LinkedList<>();
         for (Goal goal : valueGoals) {
             CollectionUtil.binaryInsert(sortedBranchLeafs, new NodeGoal(goal), comparator);
-            goalConditions.put(goal, new LinkedHashSet<Term>());
+            goalConditions.put(goal, new LinkedHashSet<>());
             untriedRealGoals.add(goal.node());
         }
         // Compute branch conditions
-        List<NodeGoal> waitingBranchLeafs = new LinkedList<NodeGoal>();
-        Map<Node, List<NodeGoal>> splitMap = new HashMap<Node, List<NodeGoal>>();
+        List<NodeGoal> waitingBranchLeafs = new LinkedList<>();
+        Map<Node, List<NodeGoal>> splitMap = new HashMap<>();
         while (!sortedBranchLeafs.isEmpty()) {
             // Go back to parent with at least two open goals on maximum outer leaf
             NodeGoal maximumOuterLeaf = sortedBranchLeafs.remove(0); // List is sorted in descending
@@ -1356,11 +1327,8 @@ public abstract class AbstractUpdateExtractor {
                 !untriedRealGoals.remove(maximumOuterLeaf.getCurrentNode()));
             if (childGoal != null) { // Root is not reached
                 waitingBranchLeafs.add(childGoal);
-                List<NodeGoal> childGoals = splitMap.get(childGoal.getParent());
-                if (childGoals == null) {
-                    childGoals = new LinkedList<NodeGoal>();
-                    splitMap.put(childGoal.getParent(), childGoals);
-                }
+                List<NodeGoal> childGoals =
+                    splitMap.computeIfAbsent(childGoal.getParent(), k -> new LinkedList<>());
                 childGoals.add(childGoal);
                 // Check if parent is reached on all child nodes
                 if (isParentReachedOnAllChildGoals(childGoal.getParent(), sortedBranchLeafs)) {
@@ -1386,7 +1354,7 @@ public abstract class AbstractUpdateExtractor {
             }
         }
         // Compute final condition (redundant path conditions are avoided)
-        Map<Goal, Term> pathConditionsMap = new LinkedHashMap<Goal, Term>();
+        Map<Goal, Term> pathConditionsMap = new LinkedHashMap<>();
         for (Entry<Goal, Set<Term>> entry : goalConditions.entrySet()) {
             Term pathCondition = getServices().getTermBuilder().and(entry.getValue());
             pathConditionsMap.put(entry.getKey(), pathCondition);
@@ -1533,7 +1501,7 @@ public abstract class AbstractUpdateExtractor {
          */
         @Override
         public String toString() {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append(currentNode.serialNr());
             sb.append(" starting from goals ");
             boolean afterFirst = false;

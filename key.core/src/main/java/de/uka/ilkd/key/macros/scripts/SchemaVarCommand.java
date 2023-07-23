@@ -5,6 +5,8 @@
  */
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -12,8 +14,6 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.pp.AbbrevMap;
-
-import java.util.Map;
 
 /**
  *

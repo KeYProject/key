@@ -76,4 +76,3 @@ public abstract class Modifier extends JavaProgramElement
     }
 
 }
-

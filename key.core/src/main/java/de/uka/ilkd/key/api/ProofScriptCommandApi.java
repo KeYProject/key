@@ -5,12 +5,12 @@
  */
 package de.uka.ilkd.key.api;
 
-import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
+
+import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 
 /**
  * This class provides access to the proof script commands.
@@ -19,7 +19,7 @@ import java.util.ServiceLoader;
  * @version 1 (21.04.17)
  */
 public class ProofScriptCommandApi {
-    private Map<String, ProofScriptCommand> commandMap = new HashMap<>();
+    private final Map<String, ProofScriptCommand> commandMap = new HashMap<>();
 
     public ProofScriptCommandApi() {
         initialize();

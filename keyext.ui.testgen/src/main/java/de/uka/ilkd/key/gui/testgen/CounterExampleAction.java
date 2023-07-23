@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.gui.testgen;
 
+import java.awt.event.ActionEvent;
+import javax.swing.*;
+
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.InterruptListener;
@@ -20,9 +23,6 @@ import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.counterexample.AbstractCounterExampleGenerator;
 import de.uka.ilkd.key.smt.counterexample.AbstractSideProofCounterExampleGenerator;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
 
 public class CounterExampleAction extends MainWindowAction {
     private static final long serialVersionUID = -1931682474791981751L;

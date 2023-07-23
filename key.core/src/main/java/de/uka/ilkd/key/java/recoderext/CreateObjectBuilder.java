@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.Expression;
 import recoder.java.Identifier;
@@ -16,9 +19,6 @@ import recoder.kit.ProblemReport;
 import recoder.kit.TypeKit;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * If an allocation expression <code>new Class(...)</code> occurs, a new object has to be created,
@@ -93,10 +93,11 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
      */
     private TypeReference makeTyRef(ClassDeclaration recoderClass) {
         Identifier id = recoderClass.getIdentifier();
-        if (id instanceof ImplicitIdentifier)
+        if (id instanceof ImplicitIdentifier) {
             return new TypeReference(id);
-        else
+        } else {
             return TypeKit.createTypeReference(getProgramFactory(), recoderClass);
+        }
     }
 
 

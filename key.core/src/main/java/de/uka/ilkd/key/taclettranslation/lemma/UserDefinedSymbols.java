@@ -1,39 +1,24 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
-import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.util.pp.StringBackend;
+
+import org.key_project.util.collection.ImmutableSet;
 
 public class UserDefinedSymbols {
     static class NamedComparator implements Comparator<Named> {
-        static NamedComparator INSTANCE = new NamedComparator();
+        static final NamedComparator INSTANCE = new NamedComparator();
 
         @Override
         public int compare(Named o1, Named o2) {
@@ -42,15 +27,14 @@ public class UserDefinedSymbols {
     }
 
     final UserDefinedSymbols parent;
-    final Set<Function> usedExtraFunctions = new TreeSet<Function>(NamedComparator.INSTANCE);
-    final Set<Function> usedExtraPredicates = new TreeSet<Function>(NamedComparator.INSTANCE);
-    final Set<Sort> usedExtraSorts = new TreeSet<Sort>(NamedComparator.INSTANCE);
+    final Set<Function> usedExtraFunctions = new TreeSet<>(NamedComparator.INSTANCE);
+    final Set<Function> usedExtraPredicates = new TreeSet<>(NamedComparator.INSTANCE);
+    final Set<Sort> usedExtraSorts = new TreeSet<>(NamedComparator.INSTANCE);
     final Set<QuantifiableVariable> usedExtraVariables =
-        new TreeSet<QuantifiableVariable>(NamedComparator.INSTANCE);
-    final Set<Named> usedSchemaVariables = new TreeSet<Named>(NamedComparator.INSTANCE);
+        new TreeSet<>(NamedComparator.INSTANCE);
+    final Set<Named> usedSchemaVariables = new TreeSet<>(NamedComparator.INSTANCE);
     final ImmutableSet<Taclet> axioms;
     private final NamespaceSet referenceNamespaces;
-    private String ruleHeader = null;
 
 
     public UserDefinedSymbols(NamespaceSet referenceNamespaces, ImmutableSet<Taclet> axioms) {
@@ -94,8 +78,6 @@ public class UserDefinedSymbols {
         addUserDefiniedSymbol(symbol, usedExtraPredicates, referenceNamespaces.functions());
     }
 
-
-
     public void addSort(Named symbol) {
         if (symbol != Sort.FORMULA) {
             Sort sort = (Sort) symbol;
@@ -132,45 +114,8 @@ public class UserDefinedSymbols {
         }
     }
 
-    public String getRuleHeader(Services services) {
-        if (parent == null) {
-            if (ruleHeader == null) {
-                ruleHeader = createRuleHeader(services);
-            }
-            return ruleHeader;
-        } else {
-            return parent.getRuleHeader(services);
-        }
-    }
-
-    private String createRuleHeader(Services services) {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("\\rules{");
-        for (Taclet taclet : axioms) {
-            buffer.append("\n\n");
-            buffer.append(createHeaderFor(taclet, services));
-        }
-        buffer.append("\n}");
-        String result = buffer.toString();
-        result = result.replaceAll("\\[", "");
-        result = result.replaceAll("\\]", "");
-        return result;
-
-    }
-
-    private StringBuffer createHeaderFor(Taclet taclet, Services services) {
-        NotationInfo info = new NotationInfo();
-        StringBackend backend = new StringBackend(80);
-        LogicPrinter printer =
-            new LogicPrinter(new ProgramPrinter(), info, backend, services, true);
-        printer.printTaclet(taclet);
-
-        return new StringBuffer(backend.getString() + ";");
-    }
-
-
     public void replaceGenericByProxySorts() {
-        Set<Sort> result = new HashSet<Sort>();
+        Set<Sort> result = new HashSet<>();
         for (Sort sort : usedExtraSorts) {
             if (sort instanceof GenericSort) {
                 GenericSort genSort = (GenericSort) sort;
@@ -185,175 +130,24 @@ public class UserDefinedSymbols {
         usedExtraSorts.addAll(result);
     }
 
-
-    public String createHeader(Services services) {
-        StringBuffer result = new StringBuffer();
-
-        result.append("\n\n\\sorts{\n");
-        createHeaderForSorts(result);
-        result.append("}\n\n\\predicates{\n");
-        createHeaderForPredicates(result);
-        result.append("}\n\n\\functions{\n");
-        createHeaderForFunctions(result);
-        result.append("}\n\n\\schemaVariables{\n");
-        createHeaderForSchemaVariables(result);
-        result.append("}\n\n");
-        result.append(getRuleHeader(services));
-        result.append("\n\n");
-        return result.toString();
-    }
-
-    private LinkedList<Named> ensureRightOrderOfSorts(LinkedList<Named> list) {
-        LinkedList<TreeSet<Named>> sortContainers = new LinkedList<TreeSet<Named>>();
-        for (Named sort : list) {
-            boolean added = false;
-            for (TreeSet<Named> container : sortContainers) {
-                if (container.add(sort)) {
-                    added = true;
-                    break;
-                }
-            }
-            if (!added) {
-                sortContainers.add(new TreeSet<Named>(new Comparator<Named>() {
-
-                    @Override
-                    public int compare(Named o1, Named o2) {
-                        Sort s1 = (Sort) o1;
-                        Sort s2 = (Sort) o2;
-                        if (s1.extendsTrans(s2)) {
-                            return 1;
-                        }
-                        if (s2.extendsTrans(s1)) {
-                            return -1;
-                        }
-                        return 0;
-                    }
-                }));
-                sortContainers.getLast().add(sort);
-            }
-        }
-        LinkedList<Named> sorts = new LinkedList<Named>();
-        for (TreeSet<Named> container : sortContainers) {
-            sorts.addAll(container);
-        }
-        return sorts;
-    }
-
-    private void getAllSorts(LinkedList<Named> resultingSorts) {
-        resultingSorts.addAll(usedExtraSorts);
-        if (parent != null) {
-            parent.getAllSorts(resultingSorts);
-        }
-
-    }
-
-    public Map<Name, Sort> getExtraSorts() {
-        Map<Name, Sort> result = new HashMap<Name, Sort>();
-        for (Named sort : usedExtraSorts) {
-            result.put(sort.name(), (Sort) sort);
-        }
-        return result;
-    }
-
-    private void createHeaderForSorts(StringBuffer result) {
-        LinkedList<Named> sorts = new LinkedList<Named>();
-        getAllSorts(sorts);
-        sorts = ensureRightOrderOfSorts(sorts);
-
-        for (Named symbol : sorts) {
-            result.append(symbol.name());
-            Sort sort = (Sort) symbol;
-            if (!sort.extendsSorts().isEmpty()) {
-                String res = "\\extends ";
-                boolean extendsAtLeastOneSort = false;
-                for (Sort sortParent : sort.extendsSorts()) {
-                    if (sortParent != Sort.ANY) {
-                        res += sortParent.name() + ", ";
-                        extendsAtLeastOneSort = true;
-                    }
-                }
-                if (extendsAtLeastOneSort) {
-                    int index = res.lastIndexOf(", ");
-                    res = res.substring(0, index == -1 ? res.length() : index);
-                    result.append(res);
-                }
-            }
-            result.append(";\n");
-        }
-    }
-
-    private void createHeaderForFunctions(StringBuffer result) {
-        if (parent != null) {
-            parent.createHeaderForFunctions(result);
-        }
-        for (Named symbol : usedExtraFunctions) {
-            Function op = (Function) symbol;
-            result.append(op.sort().name() + " ");
-            result.append(symbol.name());
-            result.append(createSignature(op));
-            result.append(";\n");
-        }
-    }
-
-    private void createHeaderForPredicates(StringBuffer result) {
-        if (parent != null) {
-            parent.createHeaderForPredicates(result);
-        }
-        for (Named symbol : usedExtraPredicates) {
-            Function op = (Function) symbol;
-            result.append(symbol.name());
-            result.append(createSignature(op));
-            result.append(";\n");
-        }
-    }
-
-    private void createHeaderForSchemaVariables(StringBuffer result) {
-        if (parent != null) {
-            parent.createHeaderForSchemaVariables(result);
-        }
-        for (Named symbol : usedSchemaVariables) {
-            SchemaVariable sv = (SchemaVariable) symbol;
-            String prefix = sv instanceof FormulaSV ? "\\formula "
-                    : sv instanceof TermSV ? "\\term " : "\\variables ";
-            result.append(prefix);
-            result.append(sv.sort().name() + " ");
-            result.append(symbol.name());
-            result.append(";\n");
-        }
-    }
-
-    private String createSignature(Function op) {
-        String s = "";
-        for (int i = 0; i < op.arity(); i++) {
-            s += (i == 0 ? "(" : ",");
-            s += (op.argSort(i));
-            s += (i == op.arity() - 1 ? ")" : "");
-        }
-
-        return s;
-    }
-
-
-
     public String toString() {
-
-        String symbols = "functions:\n";
+        StringBuilder symbols = new StringBuilder("functions:\n");
         for (Named named : usedExtraFunctions) {
-            symbols += named.name() + ", ";
+            symbols.append(named.name()).append(", ");
         }
-        symbols += "\npredicates:\n";
+        symbols.append("\npredicates:\n");
         for (Named named : usedExtraPredicates) {
-            symbols += named.name() + ", ";
+            symbols.append(named.name()).append(", ");
         }
-        symbols += "\nsorts:\n";
+        symbols.append("\nsorts:\n");
         for (Named named : usedExtraSorts) {
-            symbols += named.name() + ", ";
+            symbols.append(named.name()).append(", ");
         }
-        symbols += "\nschema variables:\n";
+        symbols.append("\nschema variables:\n");
         for (Named named : usedSchemaVariables) {
-            symbols += named.name() + ", ";
+            symbols.append(named.name()).append(", ");
         }
-        symbols += parent != null ? "\n\n Parent: " + parent.toString() : "";
-        return symbols;
+        symbols.append(parent != null ? "\n\n Parent: " + parent : "");
+        return symbols.toString();
     }
 }

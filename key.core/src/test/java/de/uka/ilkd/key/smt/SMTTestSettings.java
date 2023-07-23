@@ -84,13 +84,13 @@ public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings {
     @Override
     public long getMaximumInteger() {
 
-        return ProofDependentSMTSettings.getDefaultSettingsData().maxInteger;
+        return ProofDependentSMTSettings.getDefaultSettingsData().getMaxInteger();
     }
 
     @Override
     public long getMinimumInteger() {
 
-        return ProofDependentSMTSettings.getDefaultSettingsData().minInteger;
+        return ProofDependentSMTSettings.getDefaultSettingsData().getMinInteger();
     }
 
     @Override

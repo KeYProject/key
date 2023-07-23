@@ -4,7 +4,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 public class OracleType implements OracleTerm {
 
-    private Sort s;
+    private final Sort s;
 
     public OracleType(Sort s) {
         super();

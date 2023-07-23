@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.smt.communication;
 
+import java.io.IOException;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.SMTSolverResult;
-
-import javax.annotation.Nonnull;
-import java.io.IOException;
 
 public class Z3Socket extends AbstractSolverSocket {
 
@@ -36,7 +36,7 @@ public class Z3Socket extends AbstractSolverSocket {
                 // with the legacy Z3 translation (proof-production not enabled) and also not
                 // really needed
                 // pipe.sendMessage("(get-proof)");
-
+                pipe.sendMessage("(get-unsat-core)");
                 pipe.sendMessage("(exit)");
                 sc.setState(WAIT_FOR_DETAILS);
             }

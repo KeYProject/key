@@ -6,13 +6,12 @@
 package de.uka.ilkd.key.speclang;
 
 import java.util.function.UnaryOperator;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
-
-import javax.annotation.Nullable;
 
 
 /**
@@ -24,24 +23,25 @@ public interface SpecificationElement {
     /**
      * Returns the unique internal name of the specification element.
      */
-    public String getName();
+    String getName();
 
     /**
      * Returns the displayed name.
      */
-    public String getDisplayName();
+    String getDisplayName();
 
     /**
      * Returns the visibility of the invariant (null for default visibility)
      */
-    public @Nullable VisibilityModifier getVisibility();
+    @Nullable
+    VisibilityModifier getVisibility();
 
 
     /**
      * Returns the KeYJavaType representing the class/interface to which the specification element
      * belongs.
      */
-    public KeYJavaType getKJT();
+    KeYJavaType getKJT();
 
     /**
      * Applies a unary operator to every term in this specification element.
@@ -50,5 +50,5 @@ public interface SpecificationElement {
      * @param services services.
      * @return this specification element with the operator applied.
      */
-    public SpecificationElement map(UnaryOperator<Term> op, Services services);
+    SpecificationElement map(UnaryOperator<Term> op, Services services);
 }

@@ -2,7 +2,7 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call self.main(a)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="a++;" pathCondition="true" pathConditionChanged="false">
-         <statement name="this.x=this.callee.main(a);" pathCondition="true" pathConditionChanged="false">
+         <statement name="this.x = this.callee.main(a);" pathCondition="true" pathConditionChanged="false">
             <branchCondition name="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="true" branchCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <methodCall name="&lt;call b.main(a_1)&gt;" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false">
                </methodCall>

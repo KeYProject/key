@@ -2,10 +2,7 @@ package de.uka.ilkd.key.rule;
 
 import java.util.List;
 import java.util.Map;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.ArrayUtil;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
@@ -29,6 +26,10 @@ import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.VariablesCreatorAndRegistr
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.ArrayUtil;
 
 /**
  * <p>
@@ -208,6 +209,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
         return new BlockContractInternalBuiltInRuleApp(this, occurrence);
     }
 
+    @Nonnull
     @Override
     public ImmutableList<Goal> apply(final Goal goal, final Services services,
             final RuleApp ruleApp) throws RuleAbortException {
@@ -241,8 +243,11 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
         final Term freePrecondition = conditionsAndClausesBuilder.buildFreePrecondition();
         final Map<LocationVariable, Term> modifiesClauses =
             conditionsAndClausesBuilder.buildModifiesClauses();
+        final Map<LocationVariable, Term> freeModifiesClauses =
+            conditionsAndClausesBuilder.buildFreeModifiesClauses();
         final Term frameCondition =
-            conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
+            conditionsAndClausesBuilder.buildFrameCondition(
+                modifiesClauses, freeModifiesClauses);
         final Term[] assumptions =
             createAssumptions(localOutVariables, anonymisationHeaps, conditionsAndClausesBuilder);
         final Term freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();

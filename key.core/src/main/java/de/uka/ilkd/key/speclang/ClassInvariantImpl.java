@@ -4,8 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -19,6 +17,8 @@ import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
+
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -55,6 +55,10 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * &lt;inv&gt;).
      */
     private final boolean isStatic;
+    /**
+     * Whether the class invariant is free.
+     */
+    private final boolean isFree;
 
 
     // -------------------------------------------------------------------------
@@ -73,6 +77,23 @@ public final class ClassInvariantImpl implements ClassInvariant {
      */
     public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
             VisibilityModifier visibility, Term inv, ParsableVariable selfVar) {
+        this(name, displayName, kjt, visibility, inv, selfVar, false);
+    }
+
+    /**
+     * Creates a class invariant.
+     *
+     * @param name the unique internal name of the invariant
+     * @param displayName the displayed name of the invariant
+     * @param kjt the KeYJavaType to which the invariant belongs
+     * @param visibility the visibility of the invariant (null for default visibility)
+     * @param inv the invariant formula itself
+     * @param selfVar the variable used for the receiver object
+     * @param free whether this contract is free.
+     */
+    public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
+            VisibilityModifier visibility, Term inv, ParsableVariable selfVar,
+            boolean free) {
         assert name != null && !name.equals("");
         assert displayName != null && !displayName.equals("");
         assert kjt != null;
@@ -86,7 +107,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
         final OpCollector oc = new OpCollector();
         originalInv.execPostOrder(oc);
         this.isStatic = selfVar == null;
-        // assert isStatic == !oc.contains(originalSelfVar);
+        this.isFree = free;
     }
 
 
@@ -95,7 +116,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     // -------------------------------------------------------------------------
 
     private Map<Operator, Operator> getReplaceMap(ParsableVariable selfVar, TermServices services) {
-        Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
+        Map<Operator, Operator> result = new LinkedHashMap<>();
 
         if (selfVar != null && originalSelfVar != null) {
             assert selfVar.sort().extendsTrans(originalSelfVar.sort());
@@ -114,7 +135,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     @Override
     public ClassInvariant map(UnaryOperator<Term> op, Services services) {
         return new ClassInvariantImpl(name, displayName, kjt, visibility, op.apply(originalInv),
-            originalSelfVar);
+            originalSelfVar, isFree);
     }
 
     @Override
@@ -156,6 +177,11 @@ public final class ClassInvariantImpl implements ClassInvariant {
         return isStatic;
     }
 
+    @Override
+    public boolean isFree() {
+        return isFree;
+    }
+
 
     @Override
     public VisibilityModifier getVisibility() {
@@ -187,7 +213,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
             self = null;
         }
         return new OriginalVariables(self, null, null,
-            new LinkedHashMap<LocationVariable, ProgramVariable>(),
-            ImmutableSLList.<ProgramVariable>nil());
+            new LinkedHashMap<>(),
+            ImmutableSLList.nil());
     }
 }

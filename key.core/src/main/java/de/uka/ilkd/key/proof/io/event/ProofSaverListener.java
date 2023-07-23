@@ -20,5 +20,5 @@ public interface ProofSaverListener extends EventListener {
      *
      * @param e The {@link ProofSaverEvent}.
      */
-    public void proofSaved(ProofSaverEvent e);
+    void proofSaved(ProofSaverEvent e);
 }

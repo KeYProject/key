@@ -16,7 +16,7 @@ public interface BasicPOSnippetFactory {
     /**
      * The snippets which can be produced by this factory.
      */
-    public static enum Snippet {
+    enum Snippet {
         // free precondition (the "general assumption")
         FREE_PRE(BasicFreePreSnippet.class),
 
@@ -91,9 +91,9 @@ public interface BasicPOSnippetFactory {
         Snippet(Class<?> c) {
             this.c = c;
         }
-    };
+    }
 
 
-    public Term create(Snippet snippet) throws UnsupportedOperationException;
+    Term create(Snippet snippet) throws UnsupportedOperationException;
 
 }

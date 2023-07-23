@@ -7,6 +7,8 @@
 
 package recoder.java.declaration;
 
+import java.util.List;
+
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Field;
 import recoder.convenience.Naming;
@@ -15,8 +17,6 @@ import recoder.java.Identifier;
 import recoder.java.SourceVisitor;
 import recoder.list.generic.ASTList;
 import recoder.util.Debug;
-
-import java.util.List;
 
 public class FieldSpecification extends VariableSpecification implements Field {
 

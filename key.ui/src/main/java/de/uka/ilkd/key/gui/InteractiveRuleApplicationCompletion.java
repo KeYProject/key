@@ -24,7 +24,7 @@ public interface InteractiveRuleApplicationCompletion {
      *        unique or can be chosen in a reasonable way as if unique
      * @return the completed app or null if completion was not possible
      */
-    public abstract IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced);
+    IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced);
 
     /**
      * checks if this instance is responsible for the given app
@@ -32,6 +32,6 @@ public interface InteractiveRuleApplicationCompletion {
      * @param app the rule app
      * @return true iff this instance might be able to complete the app
      */
-    public abstract boolean canComplete(IBuiltInRuleApp app);
+    boolean canComplete(IBuiltInRuleApp app);
 
 }

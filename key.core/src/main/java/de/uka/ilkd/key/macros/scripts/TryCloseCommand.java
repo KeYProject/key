@@ -2,13 +2,13 @@ package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The script command tryclose" has two optional arguments:

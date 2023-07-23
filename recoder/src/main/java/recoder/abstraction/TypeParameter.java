@@ -6,9 +6,9 @@
  */
 package recoder.abstraction;
 
-import recoder.service.ProgramModelInfo;
-
 import java.util.List;
+
+import recoder.service.ProgramModelInfo;
 
 /**
  * @author Tobias Gutzmann
@@ -33,27 +33,32 @@ public interface TypeParameter extends ClassType {
      */
     class EqualsImplementor {
         public static boolean equals(TypeParameter t1, Object o) {
-            if (t1 == o)
+            if (t1 == o) {
                 return true;
-            if (!(o instanceof TypeParameter))
+            }
+            if (!(o instanceof TypeParameter)) {
                 return false;
+            }
             TypeParameter t2 = (TypeParameter) o;
             ClassType c1 = t1.getContainingClassType();
             ClassType c2 = t2.getContainingClassType();
 
-            if (c1 == null || c2 == null)
+            if (c1 == null || c2 == null) {
                 return false; // generic method; covered by direct comparison!
-            if (c1 == c2)
+            }
+            if (c1 == c2) {
                 return false; // otherwise, t1 == t2, too
+            }
             ProgramModelInfo pmi = c1.getProgramModelInfo();
             if (pmi.isSubtype(c1, c2)) {
                 List<ClassType> tl = c1.getSupertypes();
-                for (int i = 0, s = tl.size(); i < s; i++) {
-                    ClassType superCT = tl.get(i);
-                    if (superCT.getTypeParameters() == null)
+                for (ClassType superCT : tl) {
+                    if (superCT.getTypeParameters() == null) {
                         continue;
-                    if (!(superCT instanceof ParameterizedType))
+                    }
+                    if (!(superCT instanceof ParameterizedType)) {
                         continue;
+                    }
                     TypeParameter tryUpwards = null;
                     {
                         // find ridx
@@ -67,12 +72,14 @@ public interface TypeParameter extends ClassType {
                                 break;
                             }
                         }
-                        if (ridx == -1)
+                        if (ridx == -1) {
                             continue;
+                        }
                         tryUpwards = superCT.getTypeParameters().get(ridx);
                     }
-                    if (equals(tryUpwards, t2))
+                    if (equals(tryUpwards, t2)) {
                         return true;
+                    }
                 }
             } else if (pmi.isSubtype(c2, c1)) {
                 return equals((TypeParameter) o, t1);

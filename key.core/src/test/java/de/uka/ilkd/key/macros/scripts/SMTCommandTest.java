@@ -5,10 +5,10 @@
  */
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.HashMap;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.util.HashMap;
 
 /**
  * @author Alexander Weigl

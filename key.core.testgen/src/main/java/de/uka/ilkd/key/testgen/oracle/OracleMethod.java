@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.testgen.oracle;
 
+import java.util.List;
+
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
-
-import java.util.List;
 
 public class OracleMethod {
 

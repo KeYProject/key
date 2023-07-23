@@ -1,15 +1,14 @@
 package de.uka.ilkd.key.gui.smt.settings;
 
+import java.math.RoundingMode;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
-
-import javax.swing.*;
-
-import java.math.RoundingMode;
 
 import static de.uka.ilkd.key.gui.smt.settings.SMTSettingsProvider.BUNDLE;
 
@@ -55,14 +54,13 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         createCheckSupportButton();
     }
 
-    private static final String versionInfo(String info, String versionString) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(info);
-        builder.append(" ");
-        builder.append("(");
-        builder.append(versionString);
-        builder.append(")");
-        return builder.toString();
+    private static String versionInfo(String info, String versionString) {
+        String builder = info +
+            " " +
+            "(" +
+            versionString +
+            ")";
+        return builder;
     }
 
     protected JButton createDefaultButton() {
@@ -74,9 +72,8 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     private String createSupportedVersionText() {
-        StringBuilder result = new StringBuilder("The following minimal version is supported: ");
-        result.append(solverType.getMinimumSupportedVersion());
-        return result.toString();
+        return "The following minimal version is supported: "
+            + solverType.getMinimumSupportedVersion();
     }
 
     private String getSolverSupportText() {
@@ -88,12 +85,21 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         }
     }
 
-    private JTextField createSolverInformation() {
+    private JTextArea createSolverInformation() {
         String info = solverType.getInfo();
         if (info != null && !info.equals("")) {
-            JTextField solverInfo =
-                addTextField("Info", info, BUNDLE.getString(INFO_SOLVER_INFO), null);
+            JTextArea solverInfo =
+                addTextAreaWithoutScroll("Info", info, BUNDLE.getString(INFO_SOLVER_INFO), null);
+            solverInfo.setLineWrap(true);
+            solverInfo.setWrapStyleWord(true);
             solverInfo.setEditable(false);
+
+            // text field to copy style from
+            JTextField textField = new JTextField();
+            textField.setEditable(false);
+            solverInfo.setBackground(textField.getBackground());
+            solverInfo.setBorder(textField.getBorder());
+
             return solverInfo;
         }
         return null;

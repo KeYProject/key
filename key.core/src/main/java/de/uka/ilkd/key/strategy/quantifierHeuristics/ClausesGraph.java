@@ -4,15 +4,15 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * This class describes the relation between different clauses in a CNF. If two clauses have the
@@ -26,7 +26,7 @@ public class ClausesGraph {
      * Map from <code>Term</code> to <code>ImmutableSet<Term></code>
      */
     private final Map<Term, ImmutableSet<Term>> connections =
-        new LinkedHashMap<Term, ImmutableSet<Term>>();
+        new LinkedHashMap<>();
 
     private final ImmutableSet<Term> clauses;
 
@@ -72,8 +72,9 @@ public class ClausesGraph {
     }
 
     private ImmutableSet<Term> getTransitiveConnections(ImmutableSet<Term> formulas) {
-        for (Term formula : formulas)
+        for (Term formula : formulas) {
             formulas = formulas.union(getConnections(formula));
+        }
         return formulas;
     }
 
@@ -86,8 +87,9 @@ public class ClausesGraph {
     boolean connected(Term formula0, Term formula1) {
         final ImmutableSet<Term> subFormulas1 = computeClauses(formula1);
         for (Term term : computeClauses(formula0)) {
-            if (intersect(getConnections(term), subFormulas1).size() > 0)
+            if (intersect(getConnections(term), subFormulas1).size() > 0) {
                 return true;
+            }
         }
         return false;
     }
@@ -95,8 +97,7 @@ public class ClausesGraph {
     boolean isFullGraph() {
         final Iterator<Term> it = clauses.iterator();
         if (it.hasNext()) {
-            if (getConnections(it.next()).size() < clauses.size())
-                return false;
+            return getConnections(it.next()).size() >= clauses.size();
         }
         return true;
     }
@@ -127,11 +128,12 @@ public class ClausesGraph {
      * @return set of term that connect to formula.
      */
     private ImmutableSet<Term> directConnections(Term formula) {
-        ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();
+        ImmutableSet<Term> res = DefaultImmutableSet.nil();
         for (Term clause1 : clauses) {
             final Term clause = clause1;
-            if (directlyConnected(clause, formula))
+            if (directlyConnected(clause, formula)) {
                 res = res.add(clause);
+            }
         }
         return res;
     }
@@ -161,9 +163,9 @@ public class ClausesGraph {
 
     private ImmutableSet<Term> computeClauses(Term formula) {
         final Operator op = formula.op();
-        if (op == Junctor.NOT)
+        if (op == Junctor.NOT) {
             return computeClauses(formula.sub(0));
-        else if (op == Junctor.AND) {
+        } else if (op == Junctor.AND) {
             return computeClauses(formula.sub(0)).union(computeClauses(formula.sub(1)));
         } else {
             return DefaultImmutableSet.<Term>nil().add(formula);
@@ -175,11 +177,13 @@ public class ClausesGraph {
      */
     private ImmutableSet<QuantifiableVariable> existentialVars(Term formula) {
         final Operator op = formula.op();
-        if (op == Quantifier.ALL)
+        if (op == Quantifier.ALL) {
             return existentialVars(formula.sub(0));
-        if (op == Quantifier.EX)
+        }
+        if (op == Quantifier.EX) {
             return existentialVars(formula.sub(0)).add(formula.varsBoundHere(0).last());
-        return DefaultImmutableSet.<QuantifiableVariable>nil();
+        }
+        return DefaultImmutableSet.nil();
     }
 
     /**
@@ -198,13 +202,15 @@ public class ClausesGraph {
      * @return a set of terms which are belonged to both set0 and set1.
      */
     private ImmutableSet<Term> intersect(ImmutableSet<Term> set0, ImmutableSet<Term> set1) {
-        ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();
-        if (set0 == null || set1 == null)
+        ImmutableSet<Term> res = DefaultImmutableSet.nil();
+        if (set0 == null || set1 == null) {
             return res;
+        }
         for (Term aSet0 : set0) {
             final Term el = aSet0;
-            if (set1.contains(el))
+            if (set1.contains(el)) {
                 res = res.add(el);
+            }
         }
         return res;
     }

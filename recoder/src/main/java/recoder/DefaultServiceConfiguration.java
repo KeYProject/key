@@ -53,4 +53,3 @@ public class DefaultServiceConfiguration extends ServiceConfiguration {
         return new DefaultConstantEvaluator(this);
     }
 }
-

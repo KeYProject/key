@@ -5,15 +5,13 @@
  */
 package de.uka.ilkd.key.java;
 
-import java.io.IOException;
-
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A "\Return int v" parameter declaration of a ccatch clause.
@@ -70,11 +68,6 @@ public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParame
     @Override
     public void visit(Visitor v) {
         v.performActionOnCcatchReturnValParameterDeclaration(this);
-    }
-
-    @Override
-    public void prettyPrint(PrettyPrinter w) throws IOException {
-        w.printCcatchReturnValParameterDeclaration(this);
     }
 
     @Override

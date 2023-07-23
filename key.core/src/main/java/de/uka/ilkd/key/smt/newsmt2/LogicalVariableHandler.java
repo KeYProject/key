@@ -5,6 +5,8 @@
  */
 package de.uka.ilkd.key.smt.newsmt2;
 
+import java.util.Properties;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
@@ -12,8 +14,6 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
-
-import java.util.Properties;
 
 /**
  * This simple SMT translation handler takes care of logical variables.

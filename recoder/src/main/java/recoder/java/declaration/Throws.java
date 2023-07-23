@@ -53,7 +53,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      */
 
     public Throws(TypeReference exception) {
-        exceptions = new ASTArrayList<TypeReference>(1);
+        exceptions = new ASTArrayList<>(1);
         exceptions.add(exception);
         makeParentRoleValid();
     }
@@ -131,8 +131,9 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
 
     public int getChildCount() {
         int result = 0;
-        if (exceptions != null)
+        if (exceptions != null) {
             result += exceptions.size();
+        }
         return result;
     }
 

@@ -1,30 +1,25 @@
 package de.uka.ilkd.key.testgen;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
+import java.util.Set;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.PosTableLayouter;
+import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Set;
 
 public class ProofInfo {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofInfo.class);
@@ -95,24 +90,16 @@ public class ProofInfo {
     }
 
     public String getCode() {
-
         Term f = getPO();
         JavaBlock block = getJavaBlock(f);
 
-        // getUpdate(f);
-        StringWriter sw = new StringWriter();
-        sw.write("   " + getUpdate(f) + "\n");
-        PrettyPrinter pw = new CustomPrettyPrinter(sw, false);
-
-        try {
-            block.program().prettyPrint(pw);
-            return sw.getBuffer().toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-
+        PosTableLayouter l = PosTableLayouter.pure();
+        l.beginC(0);
+        l.print(" ").print(getUpdate(f)).nl();
+        PrettyPrinter p = new PrettyPrinter(l);
+        block.program().visit(p);
+        l.end();
+        return p.result();
     }
 
     public void getProgramVariables(Term t, Set<Term> vars) {
@@ -143,11 +130,7 @@ public class ProofInfo {
             return false;
         }
 
-        if (s.extendsTrans(objSort) || s.equals(intSort) || s.equals(boolSort)) {
-            return true;
-        }
-
-        return false;
+        return s.extendsTrans(objSort) || s.equals(intSort) || s.equals(boolSort);
 
     }
 

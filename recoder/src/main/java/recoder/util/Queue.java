@@ -24,7 +24,7 @@ public class Queue {
     /**
      * the equality relation to be used for element comparison
      */
-    protected Equality equality;
+    protected final Equality equality;
 
     /**
      * the data array

@@ -4,30 +4,19 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * <p>
@@ -75,7 +64,7 @@ public class DelayedCutProcessor implements Runnable {
     private static final String CUT_TACLET = "cut";
     private static final int DEC_PRED_INDEX = 0;
 
-    private final LinkedList<DelayedCutListener> listeners = new LinkedList<DelayedCutListener>();
+    private final LinkedList<DelayedCutListener> listeners = new LinkedList<>();
     private final Proof proof;
     private final Node node;
     private final Term descisionPredicate;
@@ -91,7 +80,7 @@ public class DelayedCutProcessor implements Runnable {
     }
 
     public static List<ApplicationCheck> getApplicationChecks() {
-        List<ApplicationCheck> list = new LinkedList<ApplicationCheck>();
+        List<ApplicationCheck> list = new LinkedList<>();
         list.add(new ApplicationCheck.NoNewSymbolsCheck());
         return list;
     }
@@ -181,7 +170,7 @@ public class DelayedCutProcessor implements Runnable {
         };
 
         ImmutableList<NoPosTacletApp> apps =
-            goal.ruleAppIndex().getFindTaclet(filter, pio, goal.proof().getServices());
+            goal.ruleAppIndex().getFindTaclet(filter, pio);
         assert apps.size() == 1;
         NoPosTacletApp app = apps.head();
 
@@ -241,8 +230,8 @@ public class DelayedCutProcessor implements Runnable {
      * Rebuilds the subtree pruned by the process, that is the rules are replayed.
      */
     private List<NodeGoalPair> rebuildSubTrees(DelayedCut cut, Goal goal) {
-        LinkedList<NodeGoalPair> pairs = new LinkedList<NodeGoalPair>();
-        LinkedList<NodeGoalPair> openLeaves = new LinkedList<NodeGoalPair>();
+        LinkedList<NodeGoalPair> pairs = new LinkedList<>();
+        LinkedList<NodeGoalPair> openLeaves = new LinkedList<>();
 
         add(pairs, openLeaves, cut.getSubtrees().iterator(),
             apply(cut.getNode(), goal, cut.getFirstAppliedRuleApp(), cut.getServices()));
@@ -294,7 +283,7 @@ public class DelayedCutProcessor implements Runnable {
             }
         }
 
-        LinkedList<Goal> goals = new LinkedList<Goal>();
+        LinkedList<Goal> goals = new LinkedList<>();
         ImmutableList<Goal> childs = goal.apply(app);
 
         // if the rule is a SMT rule, <code>childs</code> can be null.
@@ -437,7 +426,7 @@ public class DelayedCutProcessor implements Runnable {
      * This function uncovers the decision predicate that is hidden after applying the cut rule.
      */
     private void uncoverDecisionPredicate(DelayedCut cut, List<NodeGoalPair> openLeaves) {
-        ImmutableList<NodeGoalPair> list = ImmutableSLList.<NodeGoalPair>nil();
+        ImmutableList<NodeGoalPair> list = ImmutableSLList.nil();
         for (NodeGoalPair pair : openLeaves) {
             list =
                 list.append(new NodeGoalPair(pair.node, pair.goal.apply(cut.getHideApp()).head()));

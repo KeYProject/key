@@ -52,7 +52,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
 
     public Operator(Expression unaryChild) {
-        children = new ASTArrayList<Expression>(getArity());
+        children = new ASTArrayList<>(getArity());
         children.add(unaryChild);
         // makeParentRoleValid() called by subclasses' constructors
     }
@@ -65,7 +65,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
 
     public Operator(Expression lhs, Expression rhs) {
-        children = new ASTArrayList<Expression>(getArity());
+        children = new ASTArrayList<>(getArity());
         children.add(lhs);
         children.add(rhs);
         // makeParentRoleValid() called by subclasses' constructors

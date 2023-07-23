@@ -5,15 +5,16 @@
  */
 package de.uka.ilkd.key.gui.prooftree;
 
-import java.util.Vector;
-
-import javax.swing.event.DocumentEvent;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Nonnull;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.text.Position;
 import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.SearchBar;
+import de.uka.ilkd.key.util.Pair;
 
 class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
 
@@ -48,7 +49,8 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
         search(searchField.getText(), Position.Bias.Backward);
     }
 
-    public boolean search(String searchString) {
+    public boolean search(@Nonnull String searchString) {
+        fillCache();
         return search(searchString, Position.Bias.Forward);
     }
 
@@ -60,28 +62,16 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
         GUIAbstractTreeNode node = null;
         TreePath tp = null;
         if (currentRow != -1) {
-            node = cache.get(currentRow);
+            node = cache.get(currentRow).first;
             tp = new TreePath(node.getPath());
         }
-        if (node != null && node instanceof GUIBranchNode) {
+        if (node instanceof GUIBranchNode) {
             this.proofTreeView.selectBranchNode((GUIBranchNode) node);
         } else {
             this.proofTreeView.delegateView.scrollPathToVisible(tp);
             this.proofTreeView.delegateView.setSelectionPath(tp);
         }
-        return (currentRow != -1);
-    }
-
-    public void changedUpdate(DocumentEvent e) {
-        search();
-    }
-
-    public void insertUpdate(DocumentEvent e) {
-        search();
-    }
-
-    public void removeUpdate(DocumentEvent e) {
-        search();
+        return currentRow != -1;
     }
 
     public void treeNodesChanged(TreeModelEvent e) {
@@ -100,73 +90,83 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
         reset();
     }
 
-    private Vector<GUIAbstractTreeNode> cache;
+    private List<Pair<GUIAbstractTreeNode, String>> cache;
 
     public synchronized void reset() {
         cache = null;
     }
 
+    private void addNodeToCache(GUIAbstractTreeNode node) {
+        cache.add(new Pair<>(node, node.getSearchString().toLowerCase()));
+    }
+
     private void fillCache() {
         if (cache == null) {
-            cache = new Vector<GUIAbstractTreeNode>();
+            cache = new ArrayList<>();
             if (this.proofTreeView.delegateModel.getRoot() != null) {
-                cache.add((GUIAbstractTreeNode) this.proofTreeView.delegateModel.getRoot());
+                addNodeToCache((GUIAbstractTreeNode) this.proofTreeView.delegateModel.getRoot());
                 fillCacheHelp((GUIBranchNode) this.proofTreeView.delegateModel.getRoot());
             }
         }
     }
 
     private void fillCacheHelp(GUIBranchNode branch) {
-        if (branch == null)
+        if (branch == null) {
             return;
+        }
         GUIAbstractTreeNode n;
         for (int i = 0; i < this.proofTreeView.delegateModel.getChildCount(branch); i++) {
             n = (GUIAbstractTreeNode) this.proofTreeView.delegateModel.getChild(branch, i);
-            cache.add(n);
-            if (n instanceof GUIBranchNode)
+            addNodeToCache(n);
+            if (n instanceof GUIBranchNode) {
                 fillCacheHelp((GUIBranchNode) n);
+            }
         }
     }
 
-    private int getNextMatch(String searchString, int startingRow, Position.Bias bias) {
-        fillCache();
+    private int getNextMatch(@Nonnull String searchString, int startingRow, Position.Bias bias) {
         String s = searchString.toLowerCase();
 
         if (bias == Position.Bias.Forward) {
-            if (startingRow < 0)
+            if (startingRow < 0) {
                 startingRow = 0;
+            }
             for (int i = startingRow; i < cache.size(); i++) {
-                if (containsString(cache.get(i).toString().toLowerCase(), s))
+                if (nodeContainsString(i, s)) {
                     return i;
+                }
             }
             for (int i = 0; i < startingRow && i < cache.size(); i++) {
-                if (containsString(cache.get(i).toString().toLowerCase(), s))
+                if (nodeContainsString(i, s)) {
                     return i;
+                }
             }
         } else {
-            if (startingRow > cache.size() - 1)
+            if (startingRow > cache.size() - 1) {
                 startingRow = cache.size() - 1;
+            }
             for (int i = startingRow; i >= 0; i--) {
-                if (containsString(cache.get(i).toString().toLowerCase(), s))
+                if (nodeContainsString(i, s)) {
                     return i;
+                }
             }
             for (int i = cache.size() - 1; i > startingRow && i > 0; i--) {
-                if (containsString(cache.get(i).toString().toLowerCase(), s))
+                if (nodeContainsString(i, s)) {
                     return i;
+                }
             }
         }
         return -1;
     }
 
     /**
-     * returns true if <tt>searchString</tt> is a substring of <tt>string</tt>
+     * returns true if <tt>searchString</tt> is contained in the lowercase search string of the node
      *
-     * @param string the String where to search for an occurrence of <tt>searchString</tt>
+     * @param node the node index in the cache
      * @param searchString the String to be looked for
      * @return true if a match has been found
      */
-    private boolean containsString(String string, String searchString) {
-        assert string != null && searchString != null;
-        return string.indexOf(searchString) != -1;
+    private boolean nodeContainsString(int node, @Nonnull String searchString) {
+        return cache.get(node).second.contains(searchString);
     }
 }

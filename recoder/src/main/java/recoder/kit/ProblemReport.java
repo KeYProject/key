@@ -18,4 +18,3 @@ package recoder.kit;
 public interface ProblemReport {
     // nothing here
 }
-

@@ -5,13 +5,14 @@
  */
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.List;
+
 import de.uka.ilkd.key.speclang.njml.JmlIO;
+
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
 import recoder.list.generic.ASTArrayList;
-
-import java.util.List;
 
 /**
  * Handles JML expressions that begin with an escape character '\'.
@@ -40,7 +41,7 @@ public abstract class EscapeExpression extends Operator {
 
     protected EscapeExpression(String functionName, List<Expression> arguments) {
         this.functionName = functionName;
-        children = new ASTArrayList<Expression>(arguments);
+        children = new ASTArrayList<>(arguments);
     }
 
     public static EscapeExpression getEscapeExpression(String functionName,

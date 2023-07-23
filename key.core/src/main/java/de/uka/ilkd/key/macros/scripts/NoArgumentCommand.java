@@ -5,12 +5,12 @@
  */
 package de.uka.ilkd.key.macros.scripts;
 
-import de.uka.ilkd.key.macros.scripts.meta.DescriptionFacade;
-import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import de.uka.ilkd.key.macros.scripts.meta.DescriptionFacade;
+import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
 
 /**
  * @author Alexander Weigl
@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public abstract class NoArgumentCommand implements ProofScriptCommand<Void> {
     @Override
-    public List<ProofScriptArgument> getArguments() {
+    public List<ProofScriptArgument<Void>> getArguments() {
         return new ArrayList<>();
     }
 

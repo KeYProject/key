@@ -2,10 +2,6 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -20,6 +16,10 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 
 /**
  *
@@ -30,7 +30,7 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod implements Fac
     @Override
     public Term produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        ImmutableList<Term> posts = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> posts = ImmutableSLList.nil();
         if (poVars.post.self != null) {
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
         }
@@ -95,7 +95,7 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod implements Fac
 
         // create block call
         final Label[] labelsArray = (Label[]) d.get(BasicSnippetData.Key.LABELS);
-        final ImmutableArray<Label> labels = new ImmutableArray<Label>(labelsArray);
+        final ImmutableArray<Label> labels = new ImmutableArray<>(labelsArray);
         final AuxiliaryContract.Variables variables =
             (AuxiliaryContract.Variables) d.get(BasicSnippetData.Key.BLOCK_VARS);
         final StatementBlock block = (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);

@@ -5,16 +5,11 @@
  */
 package de.uka.ilkd.key.java.declaration;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.modifier.Static;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 
 
@@ -79,10 +74,12 @@ public class ClassInitializer extends JavaDeclaration
 
     public int getChildCount() {
         int result = 0;
-        if (modArray != null)
+        if (modArray != null) {
             result += modArray.size();
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -104,8 +101,9 @@ public class ClassInitializer extends JavaDeclaration
             index -= len;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -169,9 +167,5 @@ public class ClassInitializer extends JavaDeclaration
      */
     public void visit(Visitor v) {
         v.performActionOnClassInitializer(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printClassInitializer(this);
     }
 }

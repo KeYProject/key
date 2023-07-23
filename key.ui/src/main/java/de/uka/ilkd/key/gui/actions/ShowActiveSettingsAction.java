@@ -1,18 +1,18 @@
 package de.uka.ilkd.key.gui.actions;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.smt.OptionContentNode;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
-
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 /**
  * for debugging - opens a window with the settings from current Proof and the default settings
@@ -72,7 +72,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
 
             this.getOptionTree().getParent().setMinimumSize(getOptionTree().getPreferredSize());
             this.getContentPane().setPreferredSize(computePreferredSize(model));
-            this.setLocationByPlatform(true);
+            this.setLocationRelativeTo(MainWindow.getInstance());
             this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
             setIconImage(IconFactory.keyLogo());
             this.pack();
@@ -117,7 +117,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
 
                     if (path != null) {
                         Object node = path.getLastPathComponent();
-                        if (node != null && node instanceof OptionContentNode) {
+                        if (node instanceof OptionContentNode) {
                             getSplitPane()
                                     .setRightComponent(((OptionContentNode) node).getComponent());
 

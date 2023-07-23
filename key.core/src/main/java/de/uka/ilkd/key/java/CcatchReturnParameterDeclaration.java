@@ -5,11 +5,9 @@
  */
 package de.uka.ilkd.key.java;
 
-import java.io.IOException;
+import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.visitor.Visitor;
 
 /**
  * A "\Return" parameter declaration of a ccatch clause.
@@ -33,11 +31,6 @@ public class CcatchReturnParameterDeclaration extends CcatchNonstandardParameter
     @Override
     public void visit(Visitor v) {
         v.performActionOnCcatchReturnParameterDeclaration(this);
-    }
-
-    @Override
-    public void prettyPrint(PrettyPrinter w) throws IOException {
-        w.printCcatchReturnParameterDeclaration(this);
     }
 
 }

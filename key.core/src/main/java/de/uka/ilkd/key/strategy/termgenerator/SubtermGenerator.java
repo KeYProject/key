@@ -7,9 +7,6 @@ package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -18,6 +15,9 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Term generator that enumerates the subterms or subformulas of a given term. Similarly to
@@ -66,7 +66,7 @@ public abstract class SubtermGenerator implements TermGenerator {
         return !(cond.compute(t, services) instanceof TopRuleAppCost);
     }
 
-    abstract class SubIterator implements Iterator<Term> {
+    abstract static class SubIterator implements Iterator<Term> {
         protected ImmutableList<Term> termStack;
 
         protected final Services services;
@@ -91,8 +91,9 @@ public abstract class SubtermGenerator implements TermGenerator {
             termStack = termStack.tail();
 
             if (descendFurther(res, services)) {
-                for (int i = res.arity() - 1; i >= 0; --i)
+                for (int i = res.arity() - 1; i >= 0; --i) {
                     termStack = termStack.prepend(res.sub(i));
+                }
             }
 
             return res;
@@ -117,8 +118,9 @@ public abstract class SubtermGenerator implements TermGenerator {
             termStack = termStack.tail();
 
             if (descendFurther(res, services)) {
-                for (int i = 0; i != res.arity(); ++i)
+                for (int i = 0; i != res.arity(); ++i) {
                     termStack = termStack.prepend(res.sub(i));
+                }
             }
 
             return res;

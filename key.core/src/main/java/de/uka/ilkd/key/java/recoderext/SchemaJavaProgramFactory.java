@@ -8,13 +8,13 @@ import java.io.Reader;
 import java.util.List;
 
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.parser.schemajava.ParseException;
 import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
+
 import recoder.ParserException;
 import recoder.convenience.TreeWalker;
 import recoder.java.*;
@@ -43,7 +43,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     /**
      * The singleton instance of the program factory.
      */
-    private static SchemaJavaProgramFactory theFactory = new SchemaJavaProgramFactory();
+    private static final SchemaJavaProgramFactory theFactory = new SchemaJavaProgramFactory();
 
     /**
      * Returns the single instance of this class.
@@ -135,11 +135,12 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 
 
     public boolean lookupSchemaVariableType(String s, ProgramSVSort sort) {
-        if (svns == null)
+        if (svns == null) {
             return false;
-        Named n = svns.lookup(new Name(s));
-        if (n != null && n instanceof SchemaVariable) {
-            return ((SchemaVariable) n).sort() == sort;
+        }
+        SchemaVariable n = svns.lookup(new Name(s));
+        if (n instanceof SchemaVariable) {
+            return n.sort() == sort;
         }
         return false;
     }
@@ -147,9 +148,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 
     public SchemaVariable lookupSchemaVariable(String s) throws ParseException {
         SchemaVariable sv = null;
-        Named n = svns.lookup(new Name(s));
-        if (n != null && n instanceof SchemaVariable) {
-            sv = (SchemaVariable) n;
+        SchemaVariable n = svns.lookup(new Name(s));
+        if (n instanceof SchemaVariable) {
+            sv = n;
         } else {
             throw new ParseException("Schema variable not declared: " + s);
         }
@@ -277,7 +278,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
         }
         ASTList<Comment> cml = dest.getComments();
         if (cml == null) {
-            dest.setComments(cml = new ASTArrayList<Comment>());
+            dest.setComments(cml = new ASTArrayList<>());
         }
         cml.add(c);
     }
@@ -319,7 +320,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
             }
             ASTList<Comment> cml = pe.getComments();
             if (cml == null) {
-                pe.setComments(cml = new ASTArrayList<Comment>());
+                pe.setComments(cml = new ASTArrayList<>());
             }
             do {
                 current = comments.get(commentIndex);
@@ -520,8 +521,8 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
             try {
                 SchemaJavaParser.initialize(in);
                 ASTList<Statement> res = SchemaJavaParser.GeneralizedStatements();
-                for (int i = 0; i < res.size(); i += 1) {
-                    postWork(res.get(i));
+                for (Statement re : res) {
+                    postWork(re);
                 }
                 return res;
             } catch (ParseException e) {

@@ -7,9 +7,9 @@
 
 package recoder.io;
 
-import recoder.ServiceConfiguration;
-
 import java.io.IOException;
+
+import recoder.ServiceConfiguration;
 
 /**
  * Facility to import and export project settings in various project files.
@@ -51,4 +51,3 @@ public abstract class ProjectFileIO {
      */
     public abstract void save() throws IOException;
 }
-

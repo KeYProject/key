@@ -117,7 +117,7 @@ public final class CreateFrameCond extends AbstractTermTransformer {
             boolean isPermissions, ProgramVariable heapBeforePV, ProgramVariable savedHeapBeforePV,
             ProgramVariable permissionsHeapBeforePV, Services services) {
         final Map<LocationVariable, Map<Term, Term>> result = //
-            new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+            new LinkedHashMap<>();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final TermBuilder tb = services.getTermBuilder();
 
@@ -138,9 +138,7 @@ public final class CreateFrameCond extends AbstractTermTransformer {
 
     private static void put(Map<LocationVariable, Map<Term, Term>> map, LocationVariable key,
             Term t1, Term t2) {
-        if (map.get(key) == null) {
-            map.put(key, new LinkedHashMap<>());
-        }
+        map.computeIfAbsent(key, k -> new LinkedHashMap<>());
         map.get(key).put(t1, t2);
     }
 }

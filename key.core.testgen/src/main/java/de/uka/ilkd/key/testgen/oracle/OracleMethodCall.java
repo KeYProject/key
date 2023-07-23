@@ -4,9 +4,9 @@ import java.util.List;
 
 public class OracleMethodCall implements OracleTerm {
 
-    private OracleMethod method;
-    private List<? extends OracleTerm> args;
-    private OracleTerm caller;
+    private final OracleMethod method;
+    private final List<? extends OracleTerm> args;
+    private final OracleTerm caller;
 
     public OracleMethodCall(OracleMethod method, List<? extends OracleTerm> args) {
         super();
@@ -25,12 +25,12 @@ public class OracleMethodCall implements OracleTerm {
 
     public String toString() {
         String methodName = method.getMethodName();
-        String aString = "";
+        StringBuilder aString = new StringBuilder();
         for (OracleTerm arg : args) {
-            aString += " " + arg.toString() + ",";
+            aString.append(" ").append(arg.toString()).append(",");
         }
         if (!args.isEmpty()) {
-            aString = aString.substring(0, aString.length() - 1);
+            aString = new StringBuilder(aString.substring(0, aString.length() - 1));
         }
         if (caller != null) {
             return caller + "." + methodName + "(" + aString + ")";

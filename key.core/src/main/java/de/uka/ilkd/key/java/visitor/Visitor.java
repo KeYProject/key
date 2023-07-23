@@ -368,7 +368,7 @@ public interface Visitor {
 
     void performActionOnTransactionStatement(TransactionStatement transSt);
 
-    public void performActionOnEmptyMapLiteral(EmptyMapLiteral aThis);
+    void performActionOnEmptyMapLiteral(EmptyMapLiteral aThis);
 
     void performActionOnExec(Exec exec);
 

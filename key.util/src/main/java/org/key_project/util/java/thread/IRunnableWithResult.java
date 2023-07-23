@@ -22,12 +22,12 @@ public interface IRunnableWithResult<T> extends IRunnableWithException {
      *
      * @return The result.
      */
-    public T getResult();
+    T getResult();
 
     /**
      * Returns an occurred exception.
      *
      * @return An occurred exception.
      */
-    public Exception getException();
+    Exception getException();
 }

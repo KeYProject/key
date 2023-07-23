@@ -5,9 +5,9 @@
  */
 package de.uka.ilkd.key.smt.communication;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.Writer;
+import javax.annotation.Nonnull;
 
 
 /**

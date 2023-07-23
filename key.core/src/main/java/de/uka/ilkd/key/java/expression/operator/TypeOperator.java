@@ -5,8 +5,6 @@
  */
 package de.uka.ilkd.key.java.expression.operator;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
@@ -15,6 +13,8 @@ import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
+
+import org.key_project.util.ExtList;
 
 /**
  * Type operator.

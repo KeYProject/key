@@ -2,10 +2,6 @@ package de.uka.ilkd.key.rule.label;
 
 import java.util.Set;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -19,6 +15,10 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Makes sure that {@link SymbolicExecutionUtil#LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL} is introduced
@@ -46,9 +46,7 @@ public class LoopInvariantNormalBehaviorTermLabelUpdate implements TermLabelUpda
             JavaBlock newTermJavaBlock, Set<TermLabel> labels) {
         if (rule instanceof WhileInvariantRule && "LoopBodyImplication".equals(hint)
                 && SymbolicExecutionUtil.hasSymbolicExecutionLabel(modalityTerm)) {
-            if (!labels.contains(SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL)) {
-                labels.add(SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL);
-            }
+            labels.add(SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL);
         }
     }
 }

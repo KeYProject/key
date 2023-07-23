@@ -7,14 +7,14 @@
 
 package recoder.io;
 
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.List;
+
 import recoder.ParserException;
 import recoder.Service;
 import recoder.java.CompilationUnit;
 import recoder.util.ProgressListener;
-
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Retrieval, storage and write back of abstract syntax trees.
@@ -146,4 +146,3 @@ public interface SourceFileRepository extends Service {
     void removeProgressListener(ProgressListener l);
 
 }
-

@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.speclang;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.UnaryOperator;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -8,12 +12,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import de.uka.ilkd.key.proof.OpReplacer;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.function.UnaryOperator;
+import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 
 /**
@@ -92,7 +92,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     // -------------------------------------------------------------------------
 
     private Map<Operator, Operator> getReplaceMap(ParsableVariable selfVar, TermServices services) {
-        Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
+        Map<Operator, Operator> result = new LinkedHashMap<>();
 
         if (selfVar != null && originalSelfVar != null) {
             assert selfVar.sort().extendsTrans(originalSelfVar.sort());

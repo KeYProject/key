@@ -1,4 +1,3 @@
-seqEmpty + seqEmpty
 (bprod{int y;}(1, 2, y) = 0)
 1 = 1 -> 2 = 2
 \< { int x = 1; } \> x=1
@@ -26,3 +25,12 @@ aa%bb*cc < -123
 1.d + 1d <= 20e+1d * .01d
 1f <= 2f
 2d > 1d
+seqEmpty + seqEmpty
+\emptyset
+∅
+∅ ∪ ∅
+∅ ∪ ∅ ∩ ∅ = (∅ ∪ ∅) ∩ ∅
+\emptyset ∪ ∅ \cap ∅ = (∅ \cup ∅) ∩ ∅
+∅ ⊆ \emptyset
+\emptyset ∖ \emptyset
+(∅ ∊ ∅) & true

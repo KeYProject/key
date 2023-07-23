@@ -99,10 +99,12 @@ public class Assert extends JavaStatement implements ExpressionContainer {
      */
     public int getChildCount() {
         int result = 0;
-        if (condition != null)
+        if (condition != null) {
             result++;
-        if (message != null)
+        }
+        if (message != null) {
             result++;
+        }
         return result;
     }
 
@@ -116,13 +118,15 @@ public class Assert extends JavaStatement implements ExpressionContainer {
 
     public ProgramElement getChildAt(int index) {
         if (condition != null) {
-            if (index == 0)
+            if (index == 0) {
                 return condition;
+            }
             index--;
         }
         if (message != null) {
-            if (index == 0)
+            if (index == 0) {
                 return message;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -193,10 +197,12 @@ public class Assert extends JavaStatement implements ExpressionContainer {
      */
     public int getExpressionCount() {
         int c = 0;
-        if (condition != null)
+        if (condition != null) {
             c++;
-        if (message != null)
+        }
+        if (message != null) {
             c++;
+        }
         return c;
     }
 

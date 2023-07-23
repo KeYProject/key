@@ -5,6 +5,8 @@
  */
 package recoder.java.statement;
 
+import java.util.List;
+
 import recoder.java.LoopInitializer;
 import recoder.java.SourceVisitor;
 import recoder.java.Statement;
@@ -12,8 +14,6 @@ import recoder.java.VariableScope;
 import recoder.java.declaration.LocalVariableDeclaration;
 import recoder.java.declaration.VariableSpecification;
 import recoder.util.Debug;
-
-import java.util.List;
 
 /**
  * @author gutzmann
@@ -85,8 +85,9 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
      */
     public VariableSpecification getVariableInScope(String name) {
         VariableSpecification var = getVariablesInScope().get(0);
-        if (var.getName().equals(name))
+        if (var.getName().equals(name)) {
             return var;
+        }
         /* else */
         return null;
     }
@@ -99,8 +100,9 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
      */
     public void addVariableToScope(VariableSpecification var) {
         Debug.assertNonnull(var);
-        if (var != getVariablesInScope().get(0))
+        if (var != getVariablesInScope().get(0)) {
             throw new IllegalArgumentException();
+        }
     }
 
     /*

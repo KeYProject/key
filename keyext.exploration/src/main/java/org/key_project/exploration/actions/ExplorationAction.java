@@ -1,16 +1,17 @@
 package org.key_project.exploration.actions;
 
+import java.awt.event.ActionEvent;
+import java.util.Objects;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.util.parsing.BuildingException;
-import org.key_project.exploration.ExplorationModeModel;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.util.Objects;
+import org.key_project.exploration.ExplorationModeModel;
 
 /**
  * Common functionalities for proof exploration actions.
@@ -35,8 +36,9 @@ public abstract class ExplorationAction extends MainWindowAction {
 
         while (result == null) {
             String input = JOptionPane.showInputDialog(window, "Input a formula:", initialValue);
-            if (input == null)
+            if (input == null) {
                 return null;
+            }
 
             KeyIO io = new KeyIO(window.getMediator().getServices());
             try {

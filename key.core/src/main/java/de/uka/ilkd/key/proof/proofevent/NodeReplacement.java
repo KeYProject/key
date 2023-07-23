@@ -3,9 +3,6 @@ package de.uka.ilkd.key.proof.proofevent;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -15,6 +12,9 @@ import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Node;
 
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 
 /**
  * Information about a node replacing its parent after a rule application, currently giving
@@ -22,8 +22,8 @@ import de.uka.ilkd.key.proof.Node;
  */
 public class NodeReplacement {
 
-    Node node;
-    Node parent;
+    final Node node;
+    final Node parent;
     ImmutableList<SequentChangeInfo> rawChanges;
     ImmutableList<NodeChange> changes = null;
 
@@ -57,51 +57,61 @@ public class NodeReplacement {
 
         // ---
         it = p_sci.removedFormulas(true).iterator();
-        while (it.hasNext())
+        while (it.hasNext()) {
             addRemovedChange(it.next(), true);
+        }
 
         it = p_sci.removedFormulas(false).iterator();
-        while (it.hasNext())
+        while (it.hasNext()) {
             addRemovedChange(it.next(), false);
+        }
 
         // Information about modified formulas is currently not used
         it2 = p_sci.modifiedFormulas(true).iterator();
-        while (it2.hasNext())
+        while (it2.hasNext()) {
             addRemovedChange(it2.next().getPositionOfModification().sequentFormula(), true);
+        }
 
         // Information about modified formulas is currently not used
         it2 = p_sci.modifiedFormulas(false).iterator();
-        while (it2.hasNext())
+        while (it2.hasNext()) {
             addRemovedChange(it2.next().getPositionOfModification().sequentFormula(), false);
+        }
 
         it = p_sci.addedFormulas(true).iterator();
-        while (it.hasNext())
+        while (it.hasNext()) {
             addAddedChange(it.next(), true);
+        }
 
         it = p_sci.addedFormulas(false).iterator();
-        while (it.hasNext())
+        while (it.hasNext()) {
             addAddedChange(it.next(), false);
+        }
 
         // Information about modified formulas is currently not used
         it2 = p_sci.modifiedFormulas(true).iterator();
-        while (it2.hasNext())
+        while (it2.hasNext()) {
             addAddedChange(it2.next().getNewFormula(), true);
+        }
 
         // Information about modified formulas is currently not used
         it2 = p_sci.modifiedFormulas(false).iterator();
-        while (it2.hasNext())
+        while (it2.hasNext()) {
             addAddedChange(it2.next().getNewFormula(), false);
+        }
 
         // Information about formulas that have not been added as equal or more general
         // formulas are already on the sequent
         it = p_sci.rejectedFormulas(true).iterator();
-        while (it.hasNext())
+        while (it.hasNext()) {
             addAddedRedundantChange(it.next(), true);
+        }
 
 
         it = p_sci.rejectedFormulas(false).iterator();
-        while (it.hasNext())
+        while (it.hasNext()) {
             addAddedRedundantChange(it.next(), false);
+        }
 
 
     }
@@ -154,7 +164,7 @@ public class NodeReplacement {
 
     private void removeNodeChanges(SequentFormula p_cf, boolean p_inAntec) {
         Iterator<NodeChange> it = changes.iterator();
-        changes = ImmutableSLList.<NodeChange>nil();
+        changes = ImmutableSLList.nil();
         NodeChange oldNC;
         PosInOccurrence oldPio;
 
@@ -162,9 +172,10 @@ public class NodeReplacement {
             oldNC = it.next();
 
             if (oldNC instanceof NodeChangeARFormula) {
-                oldPio = ((NodeChangeARFormula) oldNC).getPos();
-                if (oldPio.isInAntec() == p_inAntec && oldPio.sequentFormula().equals(p_cf))
+                oldPio = oldNC.getPos();
+                if (oldPio.isInAntec() == p_inAntec && oldPio.sequentFormula().equals(p_cf)) {
                     continue;
+                }
             }
 
             addNodeChange(oldNC);
@@ -180,7 +191,7 @@ public class NodeReplacement {
      */
     public Iterator<NodeChange> getNodeChanges() {
         if (changes == null) {
-            changes = ImmutableSLList.<NodeChange>nil();
+            changes = ImmutableSLList.nil();
             addNodeChanges();
         }
         return changes.iterator();

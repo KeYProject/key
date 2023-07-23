@@ -22,7 +22,7 @@ public interface StrategyFactory extends Named {
      * @param strategyProperties the StrategyProperties to customize the strategy
      * @return the newly created strategy
      */
-    public Strategy create(Proof proof, StrategyProperties strategyProperties);
+    Strategy create(Proof proof, StrategyProperties strategyProperties);
 
     /**
      * Returns the {@link StrategySettingsDefinition} which describes how an user interface has to
@@ -30,5 +30,5 @@ public interface StrategyFactory extends Named {
      *
      * @return The {@link StrategySettingsDefinition} which describes the user interface.
      */
-    public StrategySettingsDefinition getSettingsDefinition();
+    StrategySettingsDefinition getSettingsDefinition();
 }

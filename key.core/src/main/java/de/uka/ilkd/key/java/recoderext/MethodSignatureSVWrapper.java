@@ -27,6 +27,6 @@ public class MethodSignatureSVWrapper extends MethodSignature implements SVWrapp
     }
 
     public String toString() {
-        return "" + method;
+        return String.valueOf(method);
     }
 }

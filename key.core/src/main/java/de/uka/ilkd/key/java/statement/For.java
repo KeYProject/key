@@ -1,18 +1,12 @@
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.LoopInitializer;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.VariableScope;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * For.
@@ -22,7 +16,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 public class For extends LoopStatement implements VariableScope {
 
     private static final ImmutableArray<VariableSpecification> EMPTY_VARSPECS =
-        new ImmutableArray<VariableSpecification>(new VariableSpecification[0]);
+        new ImmutableArray<>(new VariableSpecification[0]);
 
     /**
      * For.
@@ -113,9 +107,5 @@ public class For extends LoopStatement implements VariableScope {
      */
     public void visit(Visitor v) {
         v.performActionOnFor(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printFor(this);
     }
 }

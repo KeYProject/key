@@ -3,7 +3,6 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -25,11 +24,15 @@ public class ShowKnownTypesAction extends MainWindowAction {
      */
     private static final long serialVersionUID = 4368162229726580799L;
 
-    public ShowKnownTypesAction(MainWindow mainWindow) {
+    private final Proof proof;
+
+    public ShowKnownTypesAction(MainWindow mainWindow, Proof proof) {
         super(mainWindow);
         setName("Show Known Types");
 
         getMediator().enableWhenProofLoaded(this);
+
+        this.proof = proof;
     }
 
     @Override
@@ -38,7 +41,7 @@ public class ShowKnownTypesAction extends MainWindowAction {
     }
 
     private void showTypeHierarchy() {
-        Proof currentProof = getMediator().getSelectedProof();
+        Proof currentProof = proof == null ? getMediator().getSelectedProof() : proof;
         if (currentProof == null) {
             mainWindow.notify(new GeneralInformationEvent("No Type Hierarchy available.",
                 "If you wish to see the types " + "for a proof you have to load one first"));

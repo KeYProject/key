@@ -1,12 +1,10 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.core.KeYMediator;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import javax.swing.*;
+
+import de.uka.ilkd.key.core.KeYMediator;
 
 public class MaxRuleAppSlider extends JSlider {
     /**
@@ -14,7 +12,8 @@ public class MaxRuleAppSlider extends JSlider {
      */
     private static final long serialVersionUID = 5810499328583797609L;
     private static final int MAX_RULE_APPS_LOG10 = 6;
-    private static LinkedList<MaxRuleAppSlider> allInstances = new LinkedList<MaxRuleAppSlider>();
+    private static final LinkedList<MaxRuleAppSlider> allInstances =
+        new LinkedList<>();
     private final String text;
     private KeYMediator mediator;
 
@@ -25,16 +24,17 @@ public class MaxRuleAppSlider extends JSlider {
         this.mediator = mediator;
 
         // set up slider labels
-        Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
+        Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
 
         for (int n = 0; n <= MAX_RULE_APPS_LOG10; n++) {
             int val = (int) Math.pow(10, n);
             String sval =
-                "" + (val >= 10000 ? val >= 1000000 ? (val / 1000000) + "M" : (val / 1000) + "k"
-                        : +val);
-            JLabel l = new JLabel("" + sval);
+                String.valueOf(
+                    val >= 10000 ? val >= 1000000 ? (val / 1000000) + "M" : (val / 1000) + "k"
+                            : +val);
+            JLabel l = new JLabel(sval);
             l.setFont(l.getFont().deriveFont(9F));
-            labelTable.put(Integer.valueOf(n * 9), l);
+            labelTable.put(n * 9, l);
         }
 
         setLabelTable(labelTable);
@@ -46,13 +46,11 @@ public class MaxRuleAppSlider extends JSlider {
         setPaintTicks(true);
 
         // add change listener
-        addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                int val = getPos();
-                MaxRuleAppSlider.this.mediator.setMaxAutomaticSteps(val);
-                setTitle(val);
-                updateAllSliders();
-            }
+        addChangeListener(e -> {
+            int val = getPos();
+            MaxRuleAppSlider.this.mediator.setMaxAutomaticSteps(val);
+            setTitle(val);
+            updateAllSliders();
         });
 
         setTitle(0);
