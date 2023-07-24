@@ -5,15 +5,13 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTRuleApp;
+import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 
@@ -57,7 +55,7 @@ public class ProofSMTApplyUserAction extends UserAction {
         for (SMTProblem problem : smtProblems) {
             if (problem.getFinalResult().isValid() == SMTSolverResult.ThreeValuedTruth.VALID) {
                 SequentFormula formula = problem.getSequent().getFormulabyNr(1);
-                IBuiltInRuleApp app = SMTRuleApp.rule.createApp(null)
+                IBuiltInRuleApp app = RuleAppSMT.rule.createApp(null)
                     .tryToInstantiate(problem.getGoal())
                     .setTitle(getTitle(problem));
                 goalsClosed.add(problem.getGoal().node());

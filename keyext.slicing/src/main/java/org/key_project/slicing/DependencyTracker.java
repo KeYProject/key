@@ -34,7 +34,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
-import de.uka.ilkd.key.smt.SMTRuleApp;
+import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.slicing.analysis.AnalysisResults;
@@ -153,7 +153,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         // SMT application: add all formulas as inputs
         if (ruleApp instanceof MergeRuleBuiltInRuleApp
                 || ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp
-                || ruleApp instanceof SMTRuleApp) {
+                || ruleApp instanceof RuleAppSMT) {
             node.sequent().antecedent().iterator().forEachRemaining(
                 it -> inputs.add(new PosInOccurrence(it, PosInTerm.getTopLevel(), true)));
             node.sequent().succedent().iterator().forEachRemaining(

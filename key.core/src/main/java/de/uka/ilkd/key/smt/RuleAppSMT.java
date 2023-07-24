@@ -16,7 +16,7 @@ import java.util.List;
  * The rule application that is used when a goal is closed by means of an external solver. So far it
  * stores the rule that that has been used and a title containing some information for the user.
  */
-public class SMTRuleApp extends AbstractBuiltInRuleApp {
+public class RuleAppSMT extends AbstractBuiltInRuleApp {
 
     public final static SMTRule rule = new SMTRule();
     private final String title;
@@ -26,23 +26,23 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
      * @param rule the SMTRule to apply
      * @param pio the pos in term to apply the rule on
      */
-    SMTRuleApp(SMTRule rule, PosInOccurrence pio) {
+    RuleAppSMT(SMTRule rule, PosInOccurrence pio) {
         this(rule, pio, null, "SMT Rule App");
     }
 
-    private SMTRuleApp(SMTRule rule, PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts,
+    private RuleAppSMT(SMTRule rule, PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts,
                        String title) {
         super(rule, pio, ifInsts);
         this.title = title;
     }
 
-    private SMTRuleApp(SMTRule rule, String title) {
+    private RuleAppSMT(SMTRule rule, String title) {
         super(rule, null);
         this.title = title;
     }
 
-    public SMTRuleApp replacePos(PosInOccurrence newPos) {
-        return new SMTRuleApp(rule, newPos, ifInsts, title);
+    public RuleAppSMT replacePos(PosInOccurrence newPos) {
+        return new RuleAppSMT(rule, newPos, ifInsts, title);
     }
 
     @Override
@@ -67,13 +67,13 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
     public static class SMTRule implements BuiltInRule {
         public static final Name name = new Name("SMTRule");
 
-        public SMTRuleApp createApp(PosInOccurrence pos) {
+        public RuleAppSMT createApp(PosInOccurrence pos) {
             return createApp(pos, null);
         }
 
         @Override
-        public SMTRuleApp createApp(PosInOccurrence pos, TermServices services) {
-            return new SMTRuleApp(this, pos);
+        public RuleAppSMT createApp(PosInOccurrence pos, TermServices services) {
+            return new RuleAppSMT(this, pos);
         }
 
 
@@ -128,12 +128,12 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
 
     }
 
-    public SMTRuleApp setTitle(String title) {
-        return new SMTRuleApp(rule, pio, ifInsts, title);
+    public RuleAppSMT setTitle(String title) {
+        return new RuleAppSMT(rule, pio, ifInsts, title);
     }
 
     @Override
-    public SMTRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public RuleAppSMT setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }
@@ -147,8 +147,8 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
      * @return a new RuleApp with the same pio and all top level formulas of the goal as ifInsts
      */
     @Override
-    public SMTRuleApp tryToInstantiate(Goal goal) {
-        SMTRuleApp app = rule.createApp(pio);
+    public RuleAppSMT tryToInstantiate(Goal goal) {
+        RuleAppSMT app = rule.createApp(pio);
         Sequent seq = goal.sequent();
         List<PosInOccurrence> ifInsts = new ArrayList<>();
         for (SequentFormula ante : seq.antecedent()) {

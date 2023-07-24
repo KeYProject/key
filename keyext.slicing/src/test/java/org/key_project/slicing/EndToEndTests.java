@@ -14,7 +14,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.smt.SMTRuleApp;
+import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.slicing.analysis.AnalysisResults;
@@ -281,7 +281,7 @@ class EndToEndTests {
             assertEquals(expectedInSlice
                     + slicedProof.closedGoals().size()
                     - slicedProof.closedGoals().stream()
-                            .filter(x -> x.node().getAppliedRuleApp() instanceof SMTRuleApp)
+                            .filter(x -> x.node().getAppliedRuleApp() instanceof RuleAppSMT)
                             .count(),
                 slicedProof.countNodes());
 

@@ -47,7 +47,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.smt.SMTRuleApp;
+import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.MiscTools;
@@ -389,8 +389,8 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
             builtinIfInsts = builtinIfInsts.append(newFormula);
         }
 
-        if (SMTRuleApp.rule.displayName().equals(ruleName)) {
-            return SMTRuleApp.rule.createApp(null, proof.getServices());
+        if (RuleAppSMT.rule.displayName().equals(ruleName)) {
+            return RuleAppSMT.rule.createApp(null, proof.getServices());
         }
 
         IBuiltInRuleApp ourApp = null;

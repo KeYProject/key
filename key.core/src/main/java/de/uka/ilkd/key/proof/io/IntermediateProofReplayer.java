@@ -39,7 +39,7 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.smt.SMTRuleApp;
+import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.SolverLauncher;
@@ -559,7 +559,7 @@ public class IntermediateProofReplayer {
             }
         }
 
-        if (SMTRuleApp.rule.name().toString().equals(ruleName)) {
+        if (RuleAppSMT.rule.name().toString().equals(ruleName)) {
             boolean error = false;
             final SMTProblem smtProblem = new SMTProblem(currGoal);
             try {
@@ -581,7 +581,7 @@ public class IntermediateProofReplayer {
                 status = SMT_NOT_RUN;
                 throw new SkipSMTRuleException();
             } else {
-                return SMTRuleApp.rule.createApp(null, proof.getServices());
+                return RuleAppSMT.rule.createApp(null, proof.getServices());
             }
         }
 
