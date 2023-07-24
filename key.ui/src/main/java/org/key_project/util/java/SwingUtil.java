@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.swing.*;
-import javax.swing.tree.TreePath;
 
 import bibliothek.gui.dock.themes.basic.BasicDockableDisplayer;
 
@@ -149,47 +148,5 @@ public final class SwingUtil {
         scrollPane.setPreferredSize(dim);
 
         return scrollPane;
-    }
-
-    /**
-     * Try to find a tree path after updating the nodes of a {@link JTree}.
-     * This will compare nodes by their string representation.
-     *
-     * @param tree the tree to search
-     * @param tp the tree path
-     * @return a tree path or null
-     */
-    public static TreePath findPathInNewTree(JTree tree, TreePath tp) {
-        TreePath root = tree.getPathForRow(0);
-        Object last = root.getLastPathComponent();
-        int pathIndex = 0;
-        if (!last.toString().equals(tp.getPathComponent(pathIndex).toString())) {
-            return null;
-        }
-        pathIndex++;
-        TreePath newPath = root;
-        if (tp.getPathCount() == 1) {
-            return newPath;
-        }
-        while (true) {
-            int c = tree.getModel().getChildCount(last);
-            boolean found = false;
-            for (int i = 0; i < c; i++) {
-                var child = tree.getModel().getChild(last, i);
-                if (child.toString().equals(tp.getPathComponent(pathIndex).toString())) {
-                    last = child;
-                    newPath = newPath.pathByAddingChild(last);
-                    pathIndex++;
-                    if (pathIndex == tp.getPathCount()) {
-                        return newPath;
-                    }
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                return null;
-            }
-        }
     }
 }

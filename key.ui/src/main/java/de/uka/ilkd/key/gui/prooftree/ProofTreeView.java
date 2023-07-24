@@ -38,7 +38,6 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.SwingUtil;
 
 import bibliothek.gui.dock.common.action.CAction;
 import org.slf4j.Logger;
@@ -749,7 +748,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         // Expand previously visible rows.
         for (TreePath tp : rowsToExpand) {
-            TreePath newTp = SwingUtil.findPathInNewTree(delegateView, tp);
+            TreePath newTp = delegateView.getPathForRow(0);
+            for (int i = 1; i < tp.getPathCount(); i++) {
+                Node n = ((GUIBranchNode) tp.getPathComponent(i)).getNode();
+                newTp = newTp.pathByAddingChild(
+                    delegateModel.getBranchNode(n, n.getNodeInfo().getBranchLabel()));
+            }
             delegateView.expandPath(newTp);
         }
         return true;
