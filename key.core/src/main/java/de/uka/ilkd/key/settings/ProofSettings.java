@@ -175,6 +175,9 @@ public class ProofSettings {
      * Loads the the former settings from configuration file.
      */
     public void loadSettings() {
+        if (!PROVER_CONFIG_FILE.exists()) {
+            return;
+        }
         try (FileReader in = new FileReader(PROVER_CONFIG_FILE, StandardCharsets.UTF_8)) {
             if (Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
                 LOGGER.warn("The settings in {} are *not* read.", PROVER_CONFIG_FILE);
