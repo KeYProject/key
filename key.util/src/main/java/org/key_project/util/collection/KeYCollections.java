@@ -1,5 +1,7 @@
 package org.key_project.util.collection;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,11 +12,9 @@ import java.util.stream.StreamSupport;
 /**
  * Utilities for Collections.
  *
- *
  * @author Alexander Weigl
  * @version 1 (29.03.19)
  */
-@SuppressWarnings("nullness")
 public class KeYCollections {
     // =======================================================
     // Methods operating on Arrays
@@ -24,7 +24,7 @@ public class KeYCollections {
      * Concatenates two arrays. The second array may have an entry type that is a subtype of the
      * first one.
      */
-    public static <S, T extends S> S[] concat(S[] s1, T[] s2) {
+    public static <S extends @Nullable Object, T extends S> S[] concat(S[] s1, T[] s2) {
         S[] res = Arrays.copyOf(s1, s1.length + s2.length);
         System.arraycopy(s2, 0, res, s1.length, s2.length);
         return res;
@@ -56,9 +56,12 @@ public class KeYCollections {
         }
 
         for (Map.Entry<S, ? extends T> e : m0.entrySet()) {
-            final U value = m1.get(e.getValue());
-            if (value != null) {
-                res.put(e.getKey(), value);
+            final T v1 = e.getValue();
+            if (v1 != null) {
+                final U value = m1.get(v1);
+                if (value != null) {
+                    res.put(e.getKey(), value);
+                }
             }
         }
         return res;

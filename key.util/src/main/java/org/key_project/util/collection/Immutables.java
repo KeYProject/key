@@ -15,7 +15,6 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Mattias Ulbrich
  */
-@NullMarked
 public final class Immutables {
 
     private Immutables() {

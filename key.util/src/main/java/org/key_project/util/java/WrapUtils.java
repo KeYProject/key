@@ -14,7 +14,6 @@ import org.jspecify.annotations.NullMarked;
  *
  * @author Mattias Ulbrich, Mar 2021
  */
-@NullMarked
 public class WrapUtils {
 
     /*

@@ -18,7 +18,6 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Martin Hentschel
  */
-@NullMarked
 public final class StringUtil {
     /** Pattern for newlines */
     private static final Pattern NEWLINE_PATTERN = Pattern.compile("(\\r\\n|\\r|\\n)");

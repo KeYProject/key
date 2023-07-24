@@ -7,7 +7,6 @@ import org.jspecify.annotations.NullMarked;
  *
  * @author Martin Hentschel
  */
-@NullMarked
 public class NumberUtil {
     /**
      * The maximal number of digits of an integer value.

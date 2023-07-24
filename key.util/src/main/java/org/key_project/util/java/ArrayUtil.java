@@ -13,7 +13,6 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Martin Hentschel
  */
-@NullMarked
 public final class ArrayUtil {
     /**
      * Forbid instances by this private constructor.

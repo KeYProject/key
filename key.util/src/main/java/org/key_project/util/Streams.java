@@ -4,9 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-@SuppressWarnings("nullness")
 public class Streams {
-
     private Streams() {
         throw new Error("do not instantiate");
     }
