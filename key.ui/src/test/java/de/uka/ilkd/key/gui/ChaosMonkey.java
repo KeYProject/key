@@ -2,10 +2,12 @@ package de.uka.ilkd.key.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
-import java.lang.ref.WeakReference;
+import java.lang.ref.Reference;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -19,7 +21,6 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import org.key_project.util.java.SwingUtil;
 
 import bibliothek.gui.dock.dockable.AbstractDockable;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +51,6 @@ final class ChaosMonkey {
     private static boolean detectedError = false;
 
     @Test
-    @Disabled
     void clickAllTheButtons() {
         new Thread(ChaosMonkey::click, "ChaosMonkey").start();
 
@@ -111,11 +111,26 @@ final class ChaosMonkey {
 
                 // now, find a random button to press >:)
                 var buttons = SwingUtil.findAllComponents(MainWindow.getInstance(), JButton.class);
+                var keyActions = KeyStrokeManager.getAllActions()
+                        .stream().map(Reference::get).filter(Objects::nonNull)
+                        .collect(Collectors.toSet());
+                var allMenuItems =
+                    SwingUtil.findAllComponents(MainWindow.getInstance(), JMenuItem.class);
                 var actions = new ArrayList<>();
                 actions.addAll(buttons);
-                actions.addAll(KeyStrokeManager.getAllActions());
+                actions.addAll(keyActions);
+                for (var menuItem : allMenuItems) {
+                    if (menuItem.getAction() != null && keyActions.contains(menuItem.getAction())) {
+                        continue;
+                    }
+                    if (!menuItem.isEnabled() || (menuItem instanceof JMenu)) {
+                        continue;
+                    }
+                    actions.add(menuItem);
+                }
                 var foundButton = false;
-                LOGGER.info("monkey chooses from {} buttons and actions ...", actions.size());
+                LOGGER.info("monkey chooses from {} buttons, actions and menu items ...",
+                    actions.size());
                 for (int i = 0; i < 100; i++) {
                     int actionIdx = rand.nextInt(actions.size());
                     var action = actions.get(actionIdx);
@@ -153,11 +168,9 @@ final class ChaosMonkey {
                         });
                         foundButton = true;
                         break;
-                    } else if (action instanceof WeakReference) {
-                        WeakReference<Action> a = (WeakReference<Action>) action;
-                        Action keyAction = a.get();
-                        if (keyAction == null
-                                || !keyAction.isEnabled()
+                    } else if (action instanceof Action) {
+                        Action keyAction = (Action) action;
+                        if (!keyAction.isEnabled()
                                 || BANNED_KEY_ACTIONS.contains(keyAction.getClass())
                                 || BANNED_KEY_ACTIONS_BY_CLASS_NAME
                                         .contains(keyAction.getClass().getName())) {
@@ -175,6 +188,19 @@ final class ChaosMonkey {
                                     }
                                 }
                                 keyAction.actionPerformed(new ActionEvent(source, 0, ""));
+                            } catch (Exception e) {
+                                LOGGER.error("detected uncaught exception ", e);
+                                detectedError = true;
+                            }
+                        });
+                        foundButton = true;
+                        break;
+                    } else if (action instanceof JMenuItem) {
+                        var menuItem = (JMenuItem) action;
+                        LOGGER.info("performing menu item {}", menuItem.getText());
+                        SwingUtilities.invokeLater(() -> {
+                            try {
+                                menuItem.doClick(50);
                             } catch (Exception e) {
                                 LOGGER.error("detected uncaught exception ", e);
                                 detectedError = true;
