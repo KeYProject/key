@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Set;
 import javax.swing.*;
 
+import bibliothek.gui.dock.themes.basic.BasicDockableDisplayer;
+
 /**
  * Utilities for working with Swing.
  *
@@ -46,7 +48,7 @@ public final class SwingUtil {
     /**
      * Find all components of the specified class in the container.
      * This will search the view hierarchy recursively and is limited
-     * to visible elements.
+     * to "visible" elements (on screen or on visible tab).
      *
      * @param container container to search in
      * @param classToFind class to look for
@@ -57,7 +59,8 @@ public final class SwingUtil {
         List<T> l = new ArrayList<>();
         for (int i = 0; i < container.getComponentCount(); i++) {
             var c = container.getComponent(i);
-            if (!c.isVisible()) {
+            // if the docking container is visible, we consider all tabs in the search
+            if (!c.isVisible() && !(c instanceof BasicDockableDisplayer)) {
                 continue;
             }
 

@@ -73,6 +73,8 @@ final class ChaosMonkey {
     }
 
     static void click() {
+        // wishlist:
+        // - interaction with dialogs/popup menus besides closing them
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
