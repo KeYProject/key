@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
@@ -86,9 +87,10 @@ public class Function extends AbstractSortedOperator {
         this(name, sort, new ImmutableArray<>(), null, false, true, isSkolemConstant, null);
     }
 
-    public Function(Name name, Sort retSort, Sort[] argSort, Boolean[] whereToBind, boolean unique,
+    public Function(Name name, Sort retSort, @Nonnull Sort[] argSort, @Nullable Boolean[] whereToBind, boolean unique,
                     @Nullable FunctionMetaData metaData) {
-        this(name, retSort, new ImmutableArray<>(argSort), new ImmutableArray<>(whereToBind),
+        this(name, retSort, new ImmutableArray<>(argSort),
+                whereToBind == null ? null : new ImmutableArray<>(whereToBind),
                 unique, false, false, metaData);
     }
 

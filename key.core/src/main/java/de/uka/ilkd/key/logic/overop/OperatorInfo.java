@@ -40,8 +40,8 @@ public enum OperatorInfo {
     /**
      * (8928)	⋠	DOES NOT PRECEDE OR EQUAL	weder vorangehend oder gleich
      */
-    DOES_NOT_PRECEDE_OR_EQUAL(KeYLexer.DOES_NOT_PRECEDE_OR_EQUAL, PRIORITY_COMPARISON,
-            OperatorInfo.PRECEDES_OR_EQUAL_TO, "⋠"),
+    DOES_NOT_PRECEDE_OR_EQUAL("⋠", KeYLexer.DOES_NOT_PRECEDE_OR_EQUAL, PRIORITY_COMPARISON,
+            OperatorInfo.PRECEDES_OR_EQUAL_TO),
     /**
      * (8849)	⊑	SQUARE IMAGE OF OR EQUAL TO	viereckiges Bild oder gleich
      */
@@ -50,8 +50,8 @@ public enum OperatorInfo {
     /**
      * (8930)	⋢	NOT SQUARE IMAGE OF OR EQUAL TO	kein viereckiges Bild oder gleich
      */
-    NOT_SQUARE_IMAGE_OF_OR_EQUAL_TO(KeYLexer.NOT_SQUARE_IMAGE_OF_OR_EQUAL_TO, PRIORITY_COMPARISON,
-            SQUARE_IMAGE_OF_OR_EQUAL_TO, "⋢"),
+    NOT_SQUARE_IMAGE_OF_OR_EQUAL_TO("⋢", KeYLexer.NOT_SQUARE_IMAGE_OF_OR_EQUAL_TO, PRIORITY_COMPARISON,
+            SQUARE_IMAGE_OF_OR_EQUAL_TO),
     /**
      * (8932)	⋤	SQUARE IMAGE OF OR NOT EQUAL TO	viereckiges Bild oder ungleich
      */
@@ -71,7 +71,7 @@ public enum OperatorInfo {
     /**
      * (8838)	⊆	SUBSET OF OR EQUAL TO	Teilmenge oder gleich
      */
-    SUBSET_OF_OR_EQUAL_TO(KeYLexer.SUBSET_OF_OR_EQUAL_TO, PRIORITY_COMPARISON, '⊆'),
+    SUBSET_OF_OR_EQUAL_TO(KeYLexer.SUBSET_OF_OR_EQUAL_TO, PRIORITY_COMPARISON, '⊆', "\\subseteq"),
 
     // (8848)	⊐	SQUARE ORIGINAL OF	viereckiges Original
     SQUARE_ORIGINAL_OF(KeYLexer.SQUARE_ORIGINAL, PRIORITY_COMPARISON, '⊐'),
@@ -163,7 +163,8 @@ public enum OperatorInfo {
 
 
     EQUALS(KeYLexer.EQUALS, PRIORITY_EQUAL, '=', "="),
-    NOT_EQUALS(KeYLexer.NOT_EQUALS, PRIORITY_EQUAL,EQUALS, "≠", "!="),
+
+    NOT_EQUALS("≠", KeYLexer.NOT_EQUALS, "!=", KeYLexer.NOT_EQUALS, PRIORITY_EQUAL, null),
 
     // (8774)	≆	APPROXIMATELY BUT NOT ACTUALLY EQUAL TO	ungefähr, aber nicht genau gleich
     APPROXIMATELY_BUT_NOT_ACTUALLY_EQUAL_TO(KeYLexer.APPROXIMATELY_BUT_NOT_ACTUALLY_EQUAL_TO, PRIORITY_EQUAL, '≆'),
@@ -172,7 +173,7 @@ public enum OperatorInfo {
     // (8801)	≡	IDENTICAL TO	ist kongruent zu
     IDENTICAL_TO(KeYLexer.IDENTICAL_TO, PRIORITY_EQUAL, '≡'),
     // (8802)	≢	NOT IDENTICAL TO	ist nicht kongruent zu
-    NOT_IDENTICAL_TO(KeYLexer.NOT_IDENTICAL_TO, PRIORITY_EQUAL, IDENTICAL_TO, "≢"),
+    NOT_IDENTICAL_TO("≢", KeYLexer.NOT_IDENTICAL_TO, PRIORITY_EQUAL, IDENTICAL_TO),
     IMPLICATION(KeYLexer.IMP, PRIORITY_IMP, '→', "->"),
     OR(KeYLexer.OR, PRIORITY_OR, '∨'),
     // (8852)	⊔	SQUARE CUP	nach oben geöffnetes Viereck
@@ -187,35 +188,51 @@ public enum OperatorInfo {
 
     // (8860)	⊜	CIRCLED EQUALS	eingekreistes Gleichheitszeichen
     CIRCLED_EQUALS(KeYLexer.CIRCLED_EQUALS, PRIORITY_EQUAL, '⊜'),
+
+    UNION(KeYLexer.UNION, PRIORITY_OR, '∪', "\\cup"),
+    INTERSECT(KeYLexer.INTERSECT, PRIORITY_AND, '∩', "\\cap"),
     ;
 
 
     private final int precedence;
     private final OperatorInfo positiveOperator;
-    private final int tokenType;
-
-    private final ImmutableArray<String> names;
+    private final int tokenTypeAlt;
+    private final int tokenTypeUtf8;
+    private final String utf8;
+    private final String alternative;
 
     OperatorInfo(int tokenType, int precedence, char operator) {
-        this(tokenType, precedence, operator, null);
+        this(String.valueOf(operator), tokenType, null, -1, precedence, null);
+    }
+
+    OperatorInfo(int tokenType, int precedence, char utf8, String longForm, int tokenTypeAlt) {
+        this(String.valueOf(utf8), tokenType, longForm, tokenTypeAlt, precedence, null);
+    }
+
+    OperatorInfo(String utf8, int tokenTypeUtf8, @Nullable String alt, int tokenTypeAlt, int precedence,
+                 OperatorInfo positiveOperator) {
+        this.tokenTypeUtf8 = tokenTypeUtf8;
+        this.precedence = precedence;
+        this.positiveOperator = positiveOperator;
+        this.tokenTypeAlt = tokenTypeAlt;
+        this.utf8 = utf8;
+        this.alternative = alt;
+    }
+
+    OperatorInfo(String utf8, int tokenType, int precedence, OperatorInfo positiveOperator) {
+        this(utf8, tokenType, null, -1, precedence, positiveOperator);
     }
 
     OperatorInfo(int tokenType, int precedence, char utf8, String longForm) {
-        this(tokenType, precedence, null, String.valueOf(utf8), longForm);
-    }
-
-    OperatorInfo(int tokenType, int precedence, OperatorInfo positiveOperator, String... names) {
-        this.tokenType = tokenType;
-        this.precedence = precedence;
-        this.positiveOperator = positiveOperator;
-        this.names = new ImmutableArray<>(names);
+        this(String.valueOf(utf8), tokenType, longForm, tokenType, precedence, null);
     }
 
 
     @Nullable
     public static OperatorInfo find(Token opToken) {
         for (OperatorInfo value : values()) {
-            if (value.tokenType == opToken.getType()) {
+            if (value.tokenTypeUtf8 == opToken.getType()
+                    || value.tokenTypeAlt == opToken.getType()) {
                 return value;
             }
         }
@@ -232,6 +249,9 @@ public enum OperatorInfo {
     }
 
     public ImmutableArray<String> getNames() {
-        return names;
+        if (alternative == null) {
+            return new ImmutableArray<>(utf8);
+        }
+        return new ImmutableArray<>(utf8, alternative);
     }
 }

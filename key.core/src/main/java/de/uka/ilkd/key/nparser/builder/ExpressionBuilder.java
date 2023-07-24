@@ -316,7 +316,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     public Object visitUnary_minus_term(KeYParser.Unary_minus_termContext ctx) {
         Term result = accept(ctx.sub);
         assert result != null;
-        if (ctx.MINUS() != null) {
+        if (ctx.opUnaryTerm().MINUS() != null) {
             Operator Z = functions().lookup("Z");
             if (result.op() == Z) {
                 // weigl: rewrite neg(Z(1(#)) to Z(neglit(1(#))
@@ -364,10 +364,16 @@ public class ExpressionBuilder extends DefaultBuilder {
             return termL;
         }
 
+        if (ctx.op.EQUALS() != null || ctx.op.NOT_EQUALS() != null) { //overloaded and built-in
+            Term eq = binaryTerm(ctx, Equality.EQUALS, termL, accept(ctx.right));
+            if (ctx.op.NOT_EQUALS() != null) {
+                return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.NOT, eq));
+            }
+            return eq;
+        }
+
         Term termR = accept(ctx.right);
-        Term eq = binaryTermWithNegationFallback(ctx, ctx.op.start, termL, termR);
-        //return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.NOT, eq));
-        return eq;
+        return binaryTermWithNegationFallback(ctx, ctx.op.start, termL, termR);
     }
 
 
@@ -385,11 +391,11 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitWeak_arith_term(KeYParser.Weak_arith_termContext ctx) {
-        Term termL = Objects.requireNonNull(accept(ctx.a));
+        Term termL = Objects.requireNonNull(accept(ctx.left));
         if (ctx.op.isEmpty()) {
             return updateOrigin(termL, ctx);
         }
-        return getBinaryOperatorChain(ctx, termL,  ctx.op, mapOf(ctx.others));
+        return getBinaryOperatorChain(ctx, termL, ctx.op, mapOf(ctx.others));
     }
 
     private Term binaryLDTSpecificTerm(ParserRuleContext ctx, String opname, Term last, Term cur) {
@@ -412,11 +418,11 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitStrong_arith_term_1(KeYParser.Strong_arith_term_1Context ctx) {
-        Term termL = accept(ctx.a);
+        Term termL = accept(ctx.left);
         if (ctx.others.isEmpty()) {
             return updateOrigin(termL, ctx);
         }
-        return getBinaryOperatorChain(ctx, termL,  ctx.op, mapOf(ctx.others));
+        return getBinaryOperatorChain(ctx, termL, ctx.op, mapOf(ctx.others));
     }
 
     private Term getBinaryOperatorChain(ParserRuleContext ctx, Term left,
@@ -430,7 +436,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             var opText = operators.get(i).getText();
             var op = lookupOperator(operators.get(i), left.sort(), cur.sort(), opText);
             if (op == null) {
-                semanticError(ctx, "Unknown operator %s for sorts [%s,%s]", operators.get(i),
+                semanticError(ctx, "Unknown operator %s for sorts [%s,%s]", operators.get(i).getText(),
                         left.sort(), cur.sort());
             }
             left = binaryTerm(ctx, op, left, cur);
@@ -446,20 +452,11 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitStrong_arith_term_2(KeYParser.Strong_arith_term_2Context ctx) {
-        if (ctx.b.isEmpty()) { // fast path
-            return accept(ctx.a);
+        Term term = accept(ctx.left);
+        if (ctx.others.isEmpty()) { // fast path
+            return term;
         }
-
-        List<Term> termL = mapOf(ctx.b);
-        // List<String> opName = ctx.op.stream().map(it -> it.getType()== KeYLexer.PERCENT ? "mod" :
-        // "div").collect(Collectors.toList());
-
-        Term term = accept(ctx.a);
-        var sort = term.sort();
-        if (sort == null) {
-            semanticError(ctx, "No sort for term '%s'", term);
-        }
-        return getBinaryOperatorChain(ctx, termL,  ctx.op, mapOf(ctx.others));
+        return getBinaryOperatorChain(ctx, term, ctx.op, mapOf(ctx.others));
     }
 
     protected Term capsulateTf(ParserRuleContext ctx, Supplier<Term> termSupplier) {

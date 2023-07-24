@@ -9,12 +9,15 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.overop.FunctionMetaData;
+import de.uka.ilkd.key.logic.overop.InfixMetaData;
+import de.uka.ilkd.key.logic.overop.OperatorInfo;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.nparser.KeYLexer;
 import de.uka.ilkd.key.nparser.KeYParser;
 
-import de.uka.ilkd.key.pp.Notation;
-import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.pp.NotationInfo;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.key_project.util.collection.ImmutableArray;
 
 
@@ -58,6 +61,11 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
         Function p = null;
 
+        FunctionMetaData metaData = null;
+        if (ctx.functionMetaData() != null) {
+            metaData = accept(ctx.functionMetaData());
+        }
+
         int separatorIndex = pred_name.indexOf("::");
         if (separatorIndex > 0) {
             String sortName = pred_name.substring(0, separatorIndex);
@@ -66,24 +74,72 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             if (genSort instanceof GenericSort) {
                 assert argSorts != null;
                 p = SortDependingFunction.createFirstInstance((GenericSort) genSort,
-                        new Name(baseName), Sort.FORMULA, argSorts.toArray(new Sort[0]), false);
+                        new Name(baseName), Sort.FORMULA, argSorts.toArray(new Sort[0]), false, metaData);
             }
         }
 
         if (p == null) {
             assert argSorts != null;
             p = new Function(new Name(pred_name), Sort.FORMULA, argSorts.toArray(new Sort[0]),
-                    whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), false);
+                    whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), false, metaData);
         }
 
-        if (ctx.functionMetaData() != null) {
-            //TODO weigl
-        }
+
 
         if (lookup(p.name()) == null) {
             functions().add(p);
         }
         return null;
+    }
+
+    @Override
+    public FunctionMetaData visitInfixMetaData(KeYParser.InfixMetaDataContext ctx) {
+        var op = or(ctx.opStrong1(), ctx.opComparison(), ctx.opWeak(), ctx.opStrong2(), ctx.opEqualities());
+        var opInfo = OperatorInfo.find(op.start);
+        if (opInfo != null) {
+            return new InfixMetaData(opInfo.getNames(), opInfo.getPrecedence());
+        } else {
+            int prec = 0;
+            if (ctx.opEqualities() != null)
+                prec = NotationInfo.PRIORITY_EQUAL;
+            if (ctx.opComparison() != null)
+                prec = NotationInfo.PRIORITY_COMPARISON;
+            if (ctx.opStrong1() != null)
+                prec = NotationInfo.PRIORITY_ARITH_STRONG;
+            if (ctx.opStrong2() != null)
+                prec = NotationInfo.PRIORITY_ARITH_STRONG;
+            if (ctx.opWeak() != null)
+                prec = NotationInfo.PRIORITY_ARITH_WEAK;
+            if (ctx.opConjunction() != null)
+                prec = NotationInfo.PRIORITY_AND;
+            if (ctx.opDisjunction() != null)
+                prec = NotationInfo.PRIORITY_OR;
+
+            return new InfixMetaData(op.getText(), prec);
+        }
+    }
+
+
+    private ParserRuleContext or(ParserRuleContext... ctxs) {
+        for (ParserRuleContext ctx : ctxs) {
+            if (ctx != null) return ctx;
+        }
+        return null;
+    }
+
+    @Override
+    public Object visitPrefixMetaData(KeYParser.PrefixMetaDataContext ctx) {
+        return super.visitPrefixMetaData(ctx);
+    }
+
+    @Override
+    public Object visitPostfixMetaData(KeYParser.PostfixMetaDataContext ctx) {
+        return super.visitPostfixMetaData(ctx);
+    }
+
+    @Override
+    public Object visitShortcutMetaData(KeYParser.ShortcutMetaDataContext ctx) {
+        return super.visitShortcutMetaData(ctx);
     }
 
     @Override

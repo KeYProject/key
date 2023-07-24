@@ -255,10 +255,10 @@ VOCAB
 
 fragment OP_SFX: ('-'|'='|'+'|'*'|'/'|'&'|'.'|'|'|'^'|'!'|':'|'>'|'<');
 
-RPAREN          : '(';
-LPAREN          : ')';
-RBRACE          : '{';
-LBRACE          : '}';
+RPAREN          : ')';
+LPAREN          : '(';
+RBRACE          : '}';
+LBRACE          : '{';
 SEMI:         ';';
 COLON:        ':';
 DOUBLECOLON:  '::';
@@ -272,7 +272,7 @@ SET_IN        : '\u220A' /*∊*/ | '\\in';
 EMPTY     : '\u2205' /*∅*/ | '\\emptyset';
 UNION     : '\u222A' /*∪*/ | '\\cup'; //(8746)	∪	UNION	Vereinigungsmengenzeichen
 INTERSECT : '\u2229' /*∩*/ | '\\cap'; //(8745)	∩	INTERSECTION	Schnittmengenzeichen
-SUBSEQ    : '\u2282' /*⊂*/ | '\\subset';
+SUBSET    : '\u2282' /*⊂*/ | '\\subset';
 SETMINUS  : '\u2216' /*∖*/ | '\\setminus';
 
 DOT_PLUS : '\u2214'; // ∔
@@ -1025,7 +1025,7 @@ PRECEDES                        : '\u227A'; // (8826)	≺	PRECEDES	vorangehend
 PRECEDES_OR_EQUAL_TO            : '\u227C'; // (8828)	≼	PRECEDES OR EQUAL TO	vorangehend oder gleich
 PRECEDES_OR_EQUIVALENT_TO       : '\u227E'; // (8830)	≾	PRECEDES OR EQUIVALENT TO	vorangehend oder äquivalent
 NOT_A_SUBSET_OF                 : '\u2284'; // (8836)	⊄	NOT A SUBSET OF	ist keine ;// (echte) Teilmenge von
-SUBSET_OF_OR_EQUAL_TO           : '\u2286'; // (8838)	⊆	SUBSET OF OR EQUAL TO	Teilmenge oder gleich
+SUBSET_OF_OR_EQUAL_TO           : '\u2286' | '\\subseteq'; // (8838)	⊆	SUBSET OF OR EQUAL TO	Teilmenge oder gleich
 
 
 GREATER                               : '>' OP_SFX?;

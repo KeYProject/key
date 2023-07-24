@@ -74,4 +74,22 @@ public interface Operator extends Named, SVSubstitute, EqualsModProofIrrelevancy
             return false;
         }
     }
+
+    @Override
+    default boolean equalsModProofIrrelevancy(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Operator)) {
+            return false;
+        }
+        Operator that = (Operator) obj;
+        // assume name and arity uniquely identifies operator
+        return arity() == that.arity() && name().equals(that.name());
+    }
+
+    @Override
+    default int hashCodeModProofIrrelevancy() {
+        return Objects.hash(arity(), name());
+    }
 }

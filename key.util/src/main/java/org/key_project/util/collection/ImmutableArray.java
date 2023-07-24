@@ -33,7 +33,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
      * @param arr the ProgrammElement array to wrap
      */
     @SuppressWarnings("unchecked")
-    public ImmutableArray(S... arr) {
+    public ImmutableArray(@Nonnull S... arr) {
         content = (S[]) Array.newInstance(arr.getClass().getComponentType(), arr.length);
         System.arraycopy(arr, 0, content, 0, arr.length);
     }

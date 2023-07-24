@@ -234,10 +234,10 @@ func_decl
 
 functionMetaData
 :
-    INFIX LPAREN (opComparison|op100|opEqualities|op90|op80) RPAREN
-  | PREFIX LPAREN op=(MINUS|TILDE|NOT) RPAREN
-  | POSTFIX LPAREN (AT) RPAREN
-  | SHORTCUT LPAREN IDENT RPAREN
+    INFIX LPAREN (opComparison|opWeak|opEqualities|opStrong1|opStrong2|opConjunction|opDisjunction) RPAREN #infixMetaData
+  | PREFIX LPAREN (opUnaryTerm) RPAREN                       #prefixMetaData
+  | POSTFIX LPAREN (AT) RPAREN                                      #postfixMetaData
+  | SHORTCUT LPAREN IDENT RPAREN                                    #shortcutMetaData
 ;
 
 func_decls
@@ -342,7 +342,7 @@ opEqualities : NOT_EQUALS | EQUALS | APPROXIMATELY_BUT_NOT_ACTUALLY_EQUAL_TO
              | NOT_PARALLEL_TO | PARALLEL_TO | NOT_DIVIDES | DIVIDES
              | NOT_ASYMPTOTICALLY_EQUAL_TO | ASYMPTOTICALLY_EQUAL_TO
              ;
-opComparison: LESS | LESSEQUAL | GREATER | GREATEREQUAL | PRECEDES | SUBSEQ | SET_IN
+opComparison: LESS | LESSEQUAL | GREATER | GREATEREQUAL | PRECEDES | SUBSET | SET_IN
             | LESS_THAN_WITH_DOT | VERY_MUCH_LESS_THAN | LESS_THAN_EQUAL_TO_OR_GREATER_THAN | EQUAL_TO_OR_LESS_THAN
             | EQUAL_TO_OR_PRECEDES |DOES_NOT_PRECEDE_OR_EQUAL | NOT_SQUARE_IMAGE_OF_OR_EQUAL_TO
             | SQUARE_IMAGE_OF_OR_NOT_EQUAL_TO | PRECEDES| PRECEDES_OR_EQUAL_TO | PRECEDES_OR_EQUIVALENT_TO
@@ -354,19 +354,22 @@ opComparison: LESS | LESSEQUAL | GREATER | GREATEREQUAL | PRECEDES | SUBSEQ | SE
             | NOT_A_SUPERSET_OF | SUPERSET_OF_OR_EQUAL_TO | SQUARE_IMAGE_OF| SQUARE_IMAGE_OF_OR_EQUAL_TO
             ;
 
-op100 : PLUS|MINUS|UNION|INTERSECT|SETMINUS
+opWeak : PLUS|MINUS|UNION|INTERSECT|SETMINUS
       | CIRCLED_DASH | SQUARED_MINUS | CIRCLED_MINUS
       | CIRCLED_PLUS | SQUARED_PLUS | MINUS_TILDE | NOT_TILDE
       | MINUS_OR_PLUS | DOT_PLUS
       ;
 
 
-op90    : STAR | CIRCLED_TIMES | CIRCLED_DOT_OPERATOR |  CIRCLED_ASTERISK_OPERATOR |  SQUARED_TIMES |  SQUARED_DOT_OPERATOR
+opStrong1    : STAR | CIRCLED_TIMES | CIRCLED_DOT_OPERATOR |  CIRCLED_ASTERISK_OPERATOR |  SQUARED_TIMES |  SQUARED_DOT_OPERATOR
         | WREATH_PRODUCT | SINE_WAVE | INVERTED_LAZY_S | REVERSE_TILDE | HOMOTHETIC | GEOMETRIC_PROPORTION | EXCESS
         | DOT_MINUS | PROPORTION | RATION | BECAUSE | THEREFORE | ASTERISK
         ;
 
-op80  : PERCENT | SLASH | CIRCLED_DIVISION_SLASH | CIRCLED_RING_OPERATOR | CDOT | RING;
+opStrong2  : PERCENT | SLASH | CIRCLED_DIVISION_SLASH | CIRCLED_RING_OPERATOR | CDOT | RING;
+opConjunction: AND;
+opDisjunction: OR;
+opUnaryTerm: MINUS | TILDE ;
 
 emptyset: EMPTY;
 term: parallel_term; // weigl: should normally be equivalence_term
@@ -375,8 +378,8 @@ parallel_term: a=elementary_update_term (PARALLEL b=elementary_update_term)*;
 elementary_update_term: a=equivalence_term (ASSIGN b=equivalence_term)?;
 equivalence_term: a=implication_term (EQV b+=implication_term)*;
 implication_term: a=disjunction_term (IMP b=implication_term)?;
-disjunction_term: a=conjunction_term (OR b+=conjunction_term)*;
-conjunction_term: a=term60 (AND b+=term60)*;
+disjunction_term: a=conjunction_term (op+=opDisjunction b+=conjunction_term)*;
+conjunction_term: a=term60 (op+=opConjunction b+=term60)*;
 term60: unary_formula | equality_term;
 unary_formula:
     NOT sub=term60                                #negation_term
@@ -385,9 +388,9 @@ unary_formula:
 ;
 equality_term: left=comparison_term (op=opEqualities right=comparison_term)?;
 comparison_term: left=weak_arith_term (op=opComparison right=weak_arith_term)?;
-weak_arith_term: a=strong_arith_term_1 (op+=op100 others+=strong_arith_term_1)*;
-strong_arith_term_1: a=strong_arith_term_2 (op+=op90 others+=strong_arith_term_2)*;
-strong_arith_term_2: a=atom_prefix (op+=op80 b+=atom_prefix)*;
+weak_arith_term: left=strong_arith_term_1 (op+=opWeak others+=strong_arith_term_1)*;
+strong_arith_term_1: left=strong_arith_term_2 (op+=opStrong1 others+=strong_arith_term_2)*;
+strong_arith_term_2: left=atom_prefix         (op+=opStrong2 others+=atom_prefix)*;
 update_term: (LBRACE u=parallel_term RBRACE) (atom_prefix | unary_formula);
 
 substitution_term:
@@ -396,7 +399,7 @@ substitution_term:
      (atom_prefix|unary_formula)
 ;
 cast_term: (LPAREN sort=sortId RPAREN) sub=atom_prefix;
-unary_minus_term: MINUS sub=atom_prefix;
+unary_minus_term: op=opUnaryTerm sub=atom_prefix;
 atom_prefix:
     update_term
   | substitution_term
