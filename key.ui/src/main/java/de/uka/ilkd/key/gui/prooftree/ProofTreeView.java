@@ -38,6 +38,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.SwingUtil;
 
 import bibliothek.gui.dock.common.action.CAction;
 import org.slf4j.Logger;
@@ -678,6 +679,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
             return false;
         }
 
+        // Save expansion state to restore.
+        List<TreePath> rowsToExpand = new ArrayList<>(expansionState);
+
+
         final TreePath branch;
         final Node invokedNode;
         if (selectedPath.getLastPathComponent() instanceof GUIProofTreeNode) {
@@ -740,6 +745,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 delegateView.scrollPathToVisible(tp);
                 delegateView.setSelectionPath(tp);
             }
+        }
+
+        // Expand previously visible rows.
+        for (TreePath tp : rowsToExpand) {
+            TreePath newTp = SwingUtil.findPathInNewTree(delegateView, tp);
+            delegateView.expandPath(newTp);
         }
         return true;
     }
