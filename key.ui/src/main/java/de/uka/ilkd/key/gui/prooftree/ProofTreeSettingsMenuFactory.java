@@ -54,16 +54,14 @@ public class ProofTreeSettingsMenuFactory {
     }
 
     private static CCheckBox createFilter(ProofTreeView view, ProofTreeViewFilter filter) {
-        CCheckBox check = new CCheckBox() {
-            @Override
-            protected void changed() {
-                final boolean selected = isSelected();
-                setEnabled(view.setFilter(filter, selected));
-            }
-        };
+        CCheckBox check = new ProofTreeSettingsCheckBox();
         check.setText(filter.name());
         check.setEnabled(view.delegateModel != null);
         check.setSelected(filter.isActive());
+        // add the selection listener *after* setting the initial value
+        // (to avoid re-applying the filter)
+        check.intern().addSelectableListener(
+            (component, selected) -> check.setEnabled(view.setFilter(filter, check.isSelected())));
         return check;
     }
 
@@ -132,4 +130,17 @@ public class ProofTreeSettingsMenuFactory {
         check.setSelected(MainWindow.getInstance().isShowTacletInfo());
         return check;
     }
+
+    /**
+     * The checkbox used in the proof tree settings.
+     *
+     * @author Arne Keller
+     */
+    private static class ProofTreeSettingsCheckBox extends CCheckBox {
+        @Override
+        protected void changed() {
+            // intentionally empty, a listener is added in the menu factory
+        }
+    }
+
 }
