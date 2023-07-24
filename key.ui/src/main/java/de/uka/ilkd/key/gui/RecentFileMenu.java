@@ -242,17 +242,20 @@ public class RecentFileMenu {
      */
     public void store(String filename) {
         File localRecentFiles = new File(filename);
-
-        Properties p = new Properties();
-        try (FileInputStream fin = new FileInputStream(localRecentFiles);
-                FileOutputStream fout = new FileOutputStream(localRecentFiles)) {
+        localRecentFiles.getParentFile().mkdirs();
+        try {
             // creates a new file if it does not exist yet
             localRecentFiles.createNewFile();
-            p.load(fin);
-            store(p);
-            p.store(fout, "recent files");
+
+            Properties p = new Properties();
+            try (FileInputStream fin = new FileInputStream(localRecentFiles);
+                    FileOutputStream fout = new FileOutputStream(localRecentFiles)) {
+                p.load(fin);
+                store(p);
+                p.store(fout, "recent files");
+            }
         } catch (IOException ex) {
-            LOGGER.info("Could not write recent files list", ex);
+            LOGGER.info("Could not write recent files list ", ex);
         }
     }
 
