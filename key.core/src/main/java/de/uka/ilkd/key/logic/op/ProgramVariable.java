@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.RuleApp;
 
 import org.key_project.util.ExtList;
 
@@ -47,10 +48,15 @@ public abstract class ProgramVariable extends AbstractSortedOperator
     // the type where this program variable is declared if and only if
     // the program variable denotes a field
     private final KeYJavaType containingType;
+    /**
+     * The "origin" of this variable. Used to indicate which
+     * {@link de.uka.ilkd.key.rule.TacletApp} created a new program variable.
+     */
+    private final RuleApp origin;
 
     protected ProgramVariable(ProgramElementName name, Sort s, KeYJavaType t,
             KeYJavaType containingType, boolean isStatic, boolean isModel, boolean isGhost,
-            boolean isFinal) {
+            boolean isFinal, RuleApp origin) {
         super(name, s == null ? t.getSort() : s, false);
         this.type = t;
         this.containingType = containingType;
@@ -59,6 +65,7 @@ public abstract class ProgramVariable extends AbstractSortedOperator
         this.isGhost = isGhost;
         assert !(isModel && isGhost) : "Program variable cannot be model and ghost";
         this.isFinal = isFinal;
+        this.origin = origin;
 
         assert sort() != Sort.FORMULA;
         assert sort() != Sort.UPDATE;
@@ -67,7 +74,19 @@ public abstract class ProgramVariable extends AbstractSortedOperator
 
     protected ProgramVariable(ProgramElementName name, Sort s, KeYJavaType t,
             KeYJavaType containingType, boolean isStatic, boolean isModel, boolean isGhost) {
-        this(name, s, t, containingType, isStatic, isModel, isGhost, false);
+        this(name, s, t, containingType, isStatic, isModel, isGhost, false, null);
+    }
+
+    protected ProgramVariable(ProgramElementName name, Sort s, KeYJavaType t,
+            KeYJavaType containingType, boolean isStatic, boolean isModel, boolean isGhost,
+            boolean isFinal) {
+        this(name, s, t, containingType, isStatic, isModel, isGhost, isFinal, null);
+    }
+
+    protected ProgramVariable(ProgramElementName name, Sort s, KeYJavaType t,
+            KeYJavaType containingType, boolean isStatic, boolean isModel, boolean isGhost,
+            RuleApp origin) {
+        this(name, s, t, containingType, isStatic, isModel, isGhost, false, origin);
     }
 
 
@@ -263,6 +282,14 @@ public abstract class ProgramVariable extends AbstractSortedOperator
      * @param name the new name
      * @return equivalent operator with the new name
      */
-    abstract public Operator rename(Name name);
+    public abstract Operator rename(Name name);
+
+    /**
+     * The "origin" of this variable. Return the rule app which created this variable, or
+     * null if it was not introduced by a rule app.
+     */
+    public RuleApp createdByRuleApp() {
+        return origin;
+    }
 
 }

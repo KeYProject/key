@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
@@ -337,6 +338,17 @@ public class NodeInfo {
                         val = TermLabel.removeIrrelevantLabels(
                             ((TermInstantiation) val).getInstantiation(),
                             node.proof().getServices());
+                    } else if (val instanceof LocationVariable) {
+                        var origin = ((LocationVariable) val).createdByRuleApp();
+                        if (origin instanceof PosTacletApp) {
+                            var tacletAppOrigin = (PosTacletApp) origin;
+                            var name = tacletAppOrigin.taclet().displayName();
+                            // TODO: make this mechanism more generic
+                            if (name.equals("ifElseUnfold") || name.equals("ifUnfold")) {
+                                val =
+                                    tacletAppOrigin.instantiations().lookupValue(new Name("#nse"));
+                            }
+                        }
                     }
                     res = ProofSaver.printAnything(val, node.proof().getServices());
                 }
