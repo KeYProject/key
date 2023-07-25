@@ -31,7 +31,6 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -274,27 +273,13 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * creates a Globals object for use with other internal methods
      */
-    protected Iterable<ProgramElementName> wrapGlobals(ImmutableList<? extends Named> globals) {
-        List<ProgramElementName> result = new ArrayList<>(globals.size());
+    protected Iterable<ProgramElementName> wrapGlobals(Iterable<? extends Named> globals) {
+        List<ProgramElementName> result = new ArrayList<>();
         for (Named named : globals) {
             result.add((ProgramElementName) named.name());
         }
         return result;
     }
-
-
-    /**
-     * creates a Globals object for use with other internal methods
-     */
-    protected Iterable<ProgramElementName> wrapGlobals(ImmutableSet<ProgramVariable> globals) {
-        List<ProgramElementName> result = new ArrayList<>(globals.size());
-        for (ProgramVariable named : globals) {
-            result.add(named.getProgramElementName());
-        }
-        return result;
-    }
-
-
 
     // -------------------------------------------------------------------------
     // interface: renaming
@@ -346,17 +331,17 @@ public abstract class VariableNamer implements InstantiationProposer {
      * proposes a unique name for the instantiation of a schema variable (like getProposal(), but
      * somewhat less nicely)
      *
-     * @param basename desired base name, or null to use default
-     * @param sv the schema variable
-     * @param posOfFind the PosInOccurrence containing the name's target program
-     * @param posOfDeclaration the PosInProgram where the name will be declared (or null to just be
-     *        pessimistic about the scope)
+     * @param basename          desired base name, or null to use default
+     * @param sv                the schema variable
+     * @param posOfFind         the PosInOccurrence containing the name's target program
+     * @param posOfDeclaration  the PosInProgram where the name will be declared (or null to just be
+     *                          pessimistic about the scope)
      * @param previousProposals list of names which should be considered taken, or null
      * @return the name proposal, or null if no proposal is available
      */
     protected ProgramElementName getNameProposalForSchemaVariable(String basename,
-            SchemaVariable sv, PosInOccurrence posOfFind, PosInProgram posOfDeclaration,
-            ImmutableList<String> previousProposals) {
+                                                                  SchemaVariable sv, PosInOccurrence posOfFind, PosInProgram posOfDeclaration,
+                                                                  ImmutableList<String> previousProposals, Services services) {
         ProgramElementName result = null;
 
         Sort svSort = sv.sort();
@@ -368,6 +353,11 @@ public abstract class VariableNamer implements InstantiationProposer {
                 getMaxCounterInProgram(basename, getProgramFromPIO(posOfFind), posOfDeclaration)
                         + 1;
 
+            Name tmpName = new Name(basename + (cnt == 0 ? "" : "_" + cnt));
+            while (services.getNamespaces().lookupLogicSymbol(tmpName)!=null) {
+                cnt++;
+                tmpName = new Name(basename + "_" + cnt);}
+
             result = createName(basename, cnt, null);
 
             // avoid using a previous proposal again
@@ -376,8 +366,7 @@ public abstract class VariableNamer implements InstantiationProposer {
                 do {
                     collision = false;
                     for (String previousProposal : previousProposals) {
-                        String s = previousProposal;
-                        if (s.equals(result.toString())) {
+                        if (previousProposal.equals(result.toString())) {
                             result = createName(basename, ++cnt, null);
                             collision = true;
                             break;
@@ -386,6 +375,7 @@ public abstract class VariableNamer implements InstantiationProposer {
                 } while (collision);
             }
         }
+
 
         return result;
     }
@@ -459,7 +449,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 
         // get the proposal
         ProgramElementName name = getNameProposalForSchemaVariable(basename, var,
-            app.posInOccurrence(), posOfDeclaration, previousProposals);
+            app.posInOccurrence(), posOfDeclaration, previousProposals, services);
         return (name == null ? null : name.toString());
     }
 
@@ -563,6 +553,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     // precondition: sv.sort()==ProgramSVSort.VARIABLE
     public String getSuggestiveNameProposalForProgramVariable(SchemaVariable sv, TacletApp app,
             Services services, ImmutableList<String> previousProposals) {
+
         if (suggestive_off) {
             return getProposal(app, sv, services, null, previousProposals);
         }
@@ -570,7 +561,7 @@ public abstract class VariableNamer implements InstantiationProposer {
         String proposal;
         try {
             Iterator<TacletGoalTemplate> templs = app.taclet().goalTemplates().iterator();
-            RewriteTacletGoalTemplate rwgt = null;
+            RewriteTacletGoalTemplate rwgt;
             String name = "";
             while (templs.hasNext()) {
                 rwgt = (RewriteTacletGoalTemplate) templs.next();
