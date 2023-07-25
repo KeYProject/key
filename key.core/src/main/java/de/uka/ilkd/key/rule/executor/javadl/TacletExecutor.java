@@ -357,10 +357,10 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             goal.addProgramVariable(renamedInst);
             services.addNameProposal(renamedInst.name());
 
-            HashMap<ProgramVariable, ProgramVariable> renamingMap = vn.getRenamingMap();
+            final HashMap<ProgramVariable, ProgramVariable> renamingMap = vn.getRenamingMap();
             if (!renamingMap.isEmpty()) {
                 // execute renaming
-                final ProgVarReplacer pvr = new ProgVarReplacer(vn.getRenamingMap(), services);
+                final ProgVarReplacer pvr = new ProgVarReplacer(renamingMap, services);
 
                 // globals
                 // we do not need to do the old assignment
