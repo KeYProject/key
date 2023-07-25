@@ -160,9 +160,7 @@ public class SideProof {
 			new ProofSaver(info.getProof(), new java.io.File("C:\\Users\\Asma\\Unprovable"+COUNTER+".key")).save();
 
 			System.out.println(COUNTER + "   " +info.getProof().closed() + " in " + time + " ms");
-			if(time > 1000){
-				System.out.println("This proof takes long!");
-			}
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -247,6 +245,9 @@ public class SideProof {
 			boolean closed = isProvable(sideSeq, services);
 			// true: Holds, false: Unknown
 //			System.out.println("Proving fml "+ fml + " is "+ closed);
+			if(left.op()==services.getTypeConverter().getLocSetLDT().getMatrixRange() && right.op()==services.getTypeConverter().getLocSetLDT().getMatrixRange()){
+				System.out.println("SUBSET IS " + closed + " for " + left + " and " + right);
+			}
 			return closed;
 		}
 		return false;
@@ -269,6 +270,21 @@ public class SideProof {
 		}
 		return false;
 	}
+
+	public boolean proofGEQ(Term left, Term right) {
+		if(left!=null && right!=null){
+			Term fml = tb.geq(left, right);
+			Sequent sideSeq = prepareSideProof(left, right,
+					sf->services.getTypeConverter().getDependenciesLDT().isDependencePredicate(sf.formula().op()));
+			sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
+			boolean closed = isProvable(sideSeq, services);
+			// true: Holds, false: Unknown
+//			System.out.println("Proving fml "+ fml + " is "+ closed);
+			return closed;
+		}
+		return false;
+	}
+
 //	public boolean proofLT(Term left, Term right) {
 //		Function pred = services.getTypeConverter().getIntegerLDT().getLessThan();
 //		return prove(pred, left, right,
@@ -282,7 +298,7 @@ public class SideProof {
 			sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
 			boolean closed = isProvable(sideSeq, services);
 			// true: Holds, false: Unknown
-//			System.out.println("Proving fml "+ fml + " is "+ closed);
+			System.out.println("Proving fml "+ fml + " is "+ closed);
 			return closed;
 		}
 		return false;

@@ -245,4 +245,9 @@ public class DependenciesLDT extends LDT {
         return op == this.noRAtHistory || op == this.noWAtHistory ||
                 op == this.noRaWAtHistory || op == this.noWaRAtHistory || op == this.noWaWAtHistory;
     }
+
+    public boolean isRelaxedDependencePred(de.uka.ilkd.key.logic.op.Operator op){
+        return op == this.relaxedNoW || op == this.relaxedNoR ||
+                op == this.relaxedNoRaW || op == this.relaxedNoWaR || op == this.relaxedNoWaW;
+    }
 }

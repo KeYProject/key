@@ -16,6 +16,8 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
+import java.util.LinkedList;
+
 
 /**
  * A feature that computes the depth of the find-position of a taclet (top-level
@@ -74,8 +76,21 @@ public class SimilarityCountFeature implements Feature {
             }
         }
 
-        int count = weightLocSets(fst, snd, app, pos, goal);
+        int count = 0;
 
+        LinkedList<Term> toCompute = new LinkedList<>();
+
+        toCompute.add(fst);
+
+        while (!toCompute.isEmpty()) {
+            final Term next = toCompute.pop();
+            if (next.op() == locsetLDT.getUnion()) {
+                toCompute.add(next.sub(0));
+                toCompute.add(next.sub(1));
+            } else {
+                count += weightLocSets(next, snd, app, pos, goal);
+            }
+        }
 
         return NumberRuleAppCost.create(count - penalty > 0 ? count - penalty : 0);
     }

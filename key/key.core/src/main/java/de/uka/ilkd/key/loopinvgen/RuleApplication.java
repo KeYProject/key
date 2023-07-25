@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.loopinvgen;
 
+import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import org.key_project.util.collection.ImmutableList;
@@ -93,22 +95,23 @@ public class RuleApplication {
 //			System.out.println("Number of Open Goals after applying NestedLoopUsecase: " + currentGoal.proof().openGoals().size());
 //			System.out.println("After NestedLoopUsecase:" + ProofSaver.printAnything(currentGoal.sequent(), services));
 //			try {
-////				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
-//
-////				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\NestedLoopUsecaseRuleApplication.key")).save();
+//////				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
+////
+//				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\NestedLoopUsecaseRuleApplication.key")).save();
 //			} catch (IOException e) {
 //				e.printStackTrace();
 //			}
-			ps.start(goals);
-//			for(Goal g: goals){
-////				System.out.println("After Start:"+g.sequent());
-//			}
+			ApplyStrategyInfo info = ps.start(goals);
+//			System.out.println("Info" + info);
+			for(Goal g: ps.getProof().getSubtreeGoals(subtreeRoot)) {
+				System.out.println("After Start:"+g.sequent());
+			}
 //			try {
-////				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
-//
-//				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\testAfterSEAfterShift.key")).save();
+//////				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
+////
+//				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\AfterSymExeOfNestedLoopUsecaseRuleApplication.key")).save();
 //			} catch (IOException e) {
-//			// TODO Auto-generated catch block
+////			// TODO Auto-generated catch block
 //				e.printStackTrace();
 //			}
 			return ps.getProof().getSubtreeGoals(subtreeRoot);
@@ -149,9 +152,9 @@ public class RuleApplication {
 		Goal currentGoal = findShiftUpdateTacletGoal(openGoals);
 
 		if (currentGoal == null) {
-			System.out.println("OPEN GOAL: " + openGoals);
-			throw new IllegalStateException("Goal for applying Shift rule is null.");
-
+			System.out.println("No shift possible. OPEN GOAL: " + openGoals);
+			//throw new IllegalStateException("Goal for applying Shift rule is null.");
+			return openGoals;
 		}
 
 		IBuiltInRuleApp app = null;
@@ -181,7 +184,7 @@ public class RuleApplication {
 			return subtreeGoals;
 
 		}
-		return null;
+		return openGoals;
 	}
 
 	Goal findShiftUpdateTacletGoal(ImmutableList<Goal> goals) {
@@ -302,6 +305,16 @@ public class RuleApplication {
 //			System.out.println("info after unwind: "+info);
 
 			return currentGoal.proof().openGoals();
+		}
+		return null;
+	}
+
+	LoopStatement getLoopStatementFromGoal(Goal g) {
+		for (SequentFormula sf : g.sequent().succedent()) {
+			ImmutableList<TacletApp> tApp = findLoopScopeLoopUnwindTaclet(sf, g);
+			if (!tApp.isEmpty()) {
+				return (LoopStatement)JavaTools.getActiveStatement(sf.formula().javaBlock());
+			}
 		}
 		return null;
 	}

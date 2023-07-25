@@ -260,7 +260,7 @@ public class TestPredicateConstruction {
 
 	public LoopInvariantGenerationResult stencil() {
 
-		Term succFormula;
+		final Term succFormula;
 
 		try {
 			succFormula = parse("{i:=1}\\<{" + "			while (i<a.length-1) {a[i] = a[i-1] + a[i+1];" + "			i++;}"
@@ -1068,7 +1068,7 @@ public LoopInvariantGenerationResult basicEx0() {//Change length of arrays in Ab
 //==================================================Correlation=========================================================
 public LoopInvariantGenerationResult correlation_init_array() {//Change length of arrays in AbstractLoopInvariantGenerator to 1
 
-	Term succFormula;
+	final Term succFormula;
 
 	try {
 		succFormula = parse("{i:=0 || j:=0}\\<{" + "		while (i<=N-1) {"
@@ -1087,8 +1087,11 @@ public LoopInvariantGenerationResult correlation_init_array() {//Change length o
 	}
 	Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 
-	String[] arrLeft = { "wellFormed(heap)", "a.<created>=TRUE", "wellFormedMatrix(a, heap)", "noW(arrayRange(a,0,a.length-1))",
-			"noW(matrixRange(heap,a,0,N-1,0,M-1))","noR(matrixRange(heap,a,0,N-1,0,M-1))",
+//	String[] arrLeft = { "wellFormed(heap)", "a.<created>=TRUE", "wellFormedMatrix(a, heap)", "noW(arrayRange(a,0,a.length-1))",
+//			"noW(matrixRange(heap,a,0,N-1,0,M-1))","noR(matrixRange(heap,a,0,N-1,0,M-1))",
+//			"a.length > N", "a[0].length > M", "N >10","M >10"};
+	String[] arrLeft = { "wellFormed(heap)", "a.<created>=TRUE", "wellFormedMatrix(a, heap)", "relaxedNoW(arrayRange(a,0,a.length-1))",
+			"relaxedNoW(matrixRange(heap,a,0,N-1,0,M-1))","relaxedNoR(matrixRange(heap,a,0,N-1,0,M-1))",
 			"a.length > N", "a[0].length > M", "N >10","M >10"};
 	String[] arrRight = { "a=null" };
 	try {
@@ -1117,7 +1120,8 @@ public LoopInvariantGenerationResult correlation_init_array() {//Change length o
 		return null;
 	}
 
-	final LIGNestedMDarr loopInvGenerator = new LIGNestedMDarr(seq, services);
+//	final LIGNestedMDarr loopInvGenerator = new LIGNestedMDarr(seq, services);
+	final NestedLIGNewRelaxed loopInvGenerator = new NestedLIGNewRelaxed(seq, succFormula, services);
 	return loopInvGenerator.generate();
 }
 //======================================================================================================================================
@@ -1152,9 +1156,12 @@ public LoopInvariantGenerationResult correlation_init_array() {//Change length o
 		}
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 
-		String[] arrLeft = { "wellFormed(heap)", "a.<created>=TRUE", "wellFormedMatrix(a, heap)", "noW(arrayRange(a,0,a.length-1))",
-				"noW(matrixRange(heap,a,0,N-1,0,M-1))","noR(matrixRange(heap,a,0,N-1,0,M-1))",
-				"a.length > N", "a[0].length > M", "N >10","M >10", "N = M"};
+//		String[] arrLeft = { "wellFormed(heap)", "a.<created>=TRUE", "wellFormedMatrix(a, heap)", "noW(arrayRange(a,0,a.length-1))",
+//				"noW(matrixRange(heap,a,0,N-1,0,M-1))","noR(matrixRange(heap,a,0,N-1,0,M-1))",
+//				"a.length > N", "a[0].length > M", "N >10","M >10", "N = M"};
+		String[] arrLeft = { "wellFormed(heap)", "a.<created>=TRUE", "wellFormedMatrix(a, heap)", "relaxedNoW(arrayRange(a,0,a.length-1))",
+				"relaxedNoW(matrixRange(heap,a,0,N-1,0,M-1))","relaxedNoR(matrixRange(heap,a,0,N-1,0,M-1))",
+				"a.length > N", "a[0].length > M", "N >10","M >10"};
 		String[] arrRight = { "a=null" };
 		try {
 			for (String fml : arrLeft) {
@@ -1182,7 +1189,8 @@ public LoopInvariantGenerationResult correlation_init_array() {//Change length o
 			return null;
 		}
 
-		final LIGNestedMDarr loopInvGenerator = new LIGNestedMDarr(seq, services);
+//		final LIGNestedMDarr loopInvGenerator = new LIGNestedMDarr(seq, services);
+		final NestedLIGNewRelaxed loopInvGenerator = new NestedLIGNewRelaxed(seq, succFormula, services);
 		return loopInvGenerator.generate();
 	}
 
@@ -1211,9 +1219,12 @@ public LoopInvariantGenerationResult correlation_init_array() {//Change length o
 		}
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 
-		String[] arrLeft = { "wellFormed(heap)", "a.<created>=TRUE", "wellFormedMatrix(a, heap)", "noW(arrayRange(a,0,a.length-1))",
-				"noW(matrixRange(heap,a,0,N-1,0,M-1))","noR(matrixRange(heap,a,0,N-1,0,M-1))",
-				"a.length > N", "a[0].length > M", "N >10","M >10", "N = M"};
+//		String[] arrLeft = { "wellFormed(heap)", "a.<created>=TRUE", "wellFormedMatrix(a, heap)", "noW(arrayRange(a,0,a.length-1))",
+//				"noW(matrixRange(heap,a,0,N-1,0,M-1))","noR(matrixRange(heap,a,0,N-1,0,M-1))",
+//				"a.length > N", "a[0].length > M", "N >10","M >10", "N = M"};
+		String[] arrLeft = { "wellFormed(heap)", "a.<created>=TRUE", "wellFormedMatrix(a, heap)", "relaxedNoW(arrayRange(a,0,a.length-1))",
+				"relaxedNoW(matrixRange(heap,a,0,N-1,0,M-1))","relaxedNoR(matrixRange(heap,a,0,N-1,0,M-1))",
+				"a.length > N", "a[0].length > M", "N >10","M >10"};
 		String[] arrRight = { "a=null" };
 		try {
 			for (String fml : arrLeft) {
@@ -1241,7 +1252,8 @@ public LoopInvariantGenerationResult correlation_init_array() {//Change length o
 			return null;
 		}
 
-		final LIGNestedMDarr loopInvGenerator = new LIGNestedMDarr(seq, services);
+//		final LIGNestedMDarr loopInvGenerator = new LIGNestedMDarr(seq, services);
+		final NestedLIGNewRelaxed loopInvGenerator = new NestedLIGNewRelaxed(seq, succFormula, services);
 		return loopInvGenerator.generate();
 	}
 
@@ -1258,7 +1270,7 @@ public LoopInvariantGenerationResult correlation_init_array() {//Change length o
 //		result = tpc.conditionWithDifferentEvents(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once. Relaxed works.
 //		result = tpc.withFunc(); //Relaxed works.
 //		result = tpc.withoutFunc(); //Relaxed works.
-		result = tpc.stencil(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once. Relaxed works.
+//		result = tpc.stencil(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once. Relaxed works.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //		result = tpc.basicEx0();//Precise Result
 //		result = tpc.basicMltpArrDiffIndex();
@@ -1266,7 +1278,7 @@ public LoopInvariantGenerationResult correlation_init_array() {//Change length o
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //		result = tpc.correlation_init_array();// 00:31
 //		result = tpc.correlation_print_array();// 26min
-//		result = tpc.gem_ver_scope_1();// 1:07
+		result = tpc.gem_ver_scope_1();// 1:07
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation took " + (end - start) + " ms");
 	}

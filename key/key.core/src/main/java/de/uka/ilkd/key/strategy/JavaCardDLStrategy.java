@@ -754,9 +754,22 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
              ifZero(MatchedIfFeature.INSTANCE,
                /* ifZero(eq(instOf("label1"), instOf("label2")),
                         longConst(-200),*/
-                    ifZero(leq("label1", "label2"), longConst(-100), longConst(0)),
+                    ifZero(leq("label1", "label2"), longConst(-100),
+                            ifZero(lt("label2", "label1"), inftyConst(),
+                                    longConst(0))),
                     longConst(-110))); // costs slightly lower than -100 to ensure that first unmatched assumes apps
                                           // get their cost computed
+
+
+        bindRuleSet(d, "accessAtSameOrEarlierTime",
+                ifZero(MatchedIfFeature.INSTANCE,
+               /* ifZero(eq(instOf("label1"), instOf("label2")),
+                        longConst(-200),*/
+                        ifZero(leq("label2", "label1"), longConst(-100),
+                                ifZero(lt("label1", "label2"), inftyConst(),
+                                        longConst(0))),
+                        longConst(-110))); // costs slightly lower than -100 to ensure that first unmatched assumes apps
+        // get their cost computed
 
 
         bindRuleSet(d, "dep_pred_known",

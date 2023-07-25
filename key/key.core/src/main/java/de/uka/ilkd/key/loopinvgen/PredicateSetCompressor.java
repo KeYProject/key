@@ -113,6 +113,9 @@ public class PredicateSetCompressor {
 						}
 						else if (depPred1.sub(0).op() == locSetLDT.getMatrixRange()
 								&& depPred2.sub(0).op() == locSetLDT.getMatrixRange()) {
+							if(sProof.proofSubSet(depPred1.sub(0),depPred2.sub(0))){
+									toDelete.add(depPred1);
+							}
 
 						}
 					}
@@ -123,21 +126,22 @@ public class PredicateSetCompressor {
 		fDepPredList.removeAll(toDelete);
 
 		toDelete.clear();
-		if (ailias) {
-			for (Term depPred1 : fDepPredList) {
-				for (Term depPred2 : fDepPredList) {
-					if (depPred1.op().equals(depPred2.op()) && depPred1.sub(0).sub(0) != depPred2.sub(0).sub(0)) {
-						if (sProof.proofEquality(depPred1.sub(0), depPred2.sub(0))) {
-							if (!toDelete.contains(depPred2)) {
-								toDelete.add(depPred1);
-								break;// depPred1 is already deleted
-							}
-						}
-					}
-				}
-			}
-		}
+//		if (ailias) {
+//			for (Term depPred1 : fDepPredList) {
+//				for (Term depPred2 : fDepPredList) {
+//					if (depPred1.op().equals(depPred2.op()) && depPred1.sub(0).sub(0) != depPred2.sub(0).sub(0)) {
+//						if (sProof.proofEquality(depPred1.sub(0), depPred2.sub(0))) {
+//							if (!toDelete.contains(depPred2)) {
+//								toDelete.add(depPred1);
+//								break;// depPred1 is already deleted
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
 
+		System.out.println("DepPreds 2 Deleted by Compressor " + fDepPredList);
 		return fDepPredList;
 	}
 
@@ -194,7 +198,7 @@ public class PredicateSetCompressor {
 		}
 
 		fDepPredList.removeAll(toDelete);
-		System.out.println("Deleted: "+toDelete);
+		System.out.println("DepPreds Deleted by Compressor: "+toDelete);
 		return fDepPredList;
 	}
 
@@ -216,18 +220,23 @@ public class PredicateSetCompressor {
 					// Y b
 					if (compPred1.op().equals(geq) && compPred2.op().equals(gt)) {
 						if (!toDelete.contains(compPred1)) {
+							System.out.println("Compression deleted: " + compPred2 + " because of " + compPred1);
 							toDelete.add(compPred2);
+
 						}
 					} else if (compPred1.op().equals(leq) && compPred2.op().equals(lt)) {
 						if (!toDelete.contains(compPred1)) {
+							System.out.println("1- Compression deleted: " + compPred2 + " because of " + compPred1);
 							toDelete.add(compPred2);
 						}
 					} else if (compPred1.op().equals(Equality.EQUALS) && compPred2.op().equals(geq)) {
 						if (!toDelete.contains(compPred2)) {
+							System.out.println("2- Compression deleted: " + compPred1 + " because of " + compPred2);
 							toDelete.add(compPred1);
 						}
 					} else if (compPred1.op().equals(Equality.EQUALS) && compPred2.op().equals(leq)) {
 						if (!toDelete.contains(compPred2)) {
+							System.out.println("3- Compression deleted: " + compPred2 + " because of " + compPred1);
 							toDelete.add(compPred1);
 						}
 					}
@@ -251,123 +260,147 @@ public class PredicateSetCompressor {
 					// a
 					if (compPred1.op().equals(gt) && compPred2.op().equals(lt)) {
 						if (!toDelete.contains(compPred2)) {
+							System.out.println("4- Compression deleted: " + compPred1 + " because of " + compPred2);
 							toDelete.add(compPred1);
 						}
 					} else if (compPred1.op().equals(geq) && compPred2.op().equals(lt)) {
 						if (!toDelete.contains(compPred1)) {
+							System.out.println("5- Compression deleted: " + compPred2 + " because of " + compPred1);
 							toDelete.add(compPred2);
 						}
 					} else if (compPred1.op().equals(leq) && compPred2.op().equals(gt)) {
 						if (!toDelete.contains(compPred1)) {
+							System.out.println("6- Compression deleted: " + compPred2 + " because of " + compPred1);
 							toDelete.add(compPred2);
 						}
 					} else if (compPred1.op().equals(geq) && compPred2.op().equals(leq)) {
 						if (!toDelete.contains(compPred2)) {
+							System.out.println("7- Compression deleted: " + compPred1 + " because of " + compPred2);
 							toDelete.add(compPred1);
 						}
 					} else if (compPred1.op().equals(Equality.EQUALS) && compPred2.op().equals(geq)) {
 						if (!toDelete.contains(compPred2)) {
+							System.out.println("8- Compression deleted: " + compPred1 + " because of " + compPred2);
 							toDelete.add(compPred1);
 						}
 					} else if (compPred1.op().equals(Equality.EQUALS) && compPred2.op().equals(leq)) {
 						if (!toDelete.contains(compPred2)) {
+							System.out.println("9- Compression deleted: " + compPred1 + " because of " + compPred2);
 							toDelete.add(compPred1);
-						}
-					}
-				} else if (leftSidesEqualityProvable && !rightSidesEqualityProvable) {
-					if ((compPred1.op() == lt && compPred2.op() == lt)
-							|| (compPred1.op() == lt && compPred2.op() == leq)) {
-						if (sProof.proofLT(compPred1.sub(1), compPred2.sub(1))) {
-							if (!toDelete.contains(compPred2)) {
-								toDelete.add(compPred1);
-							}
-						} else {
-							if (!toDelete.contains(compPred1)) {
-								toDelete.add(compPred2);
-							}
-						}
-					} else if ((compPred1.op() == gt && compPred2.op() == gt)
-							|| (compPred1.op() == gt && compPred2.op() == geq)) {
-						if (sProof.proofLT(compPred1.sub(1), compPred2.sub(1))) {
-							if (!toDelete.contains(compPred1)) {
-								toDelete.add(compPred2);
-							}
-						} else {
-							if (!toDelete.contains(compPred2)) {
-								toDelete.add(compPred1);
-							}
-						}
-					} else if ((compPred1.op() == leq && compPred2.op() == leq)
-							|| (compPred1.op() == leq && compPred2.op() == lt)) {
-						if (sProof.proofLT(compPred1.sub(1), compPred2.sub(1))) {
-							if (!toDelete.contains(compPred2)) {
-								toDelete.add(compPred1);
-							}
-						} else {
-							if (!toDelete.contains(compPred1)) {
-								toDelete.add(compPred2);
-							}
-						}
-					}
-				} else if ((compPred1.op() == geq && compPred2.op() == geq)
-						|| (compPred1.op() == gt && compPred2.op() == gt)) {
-					if (sProof.proofLT(compPred1.sub(1), compPred2.sub(1))) {
-						if (!toDelete.contains(compPred1)) {
-							toDelete.add(compPred2);
-						}
-					} else {
-						if (!toDelete.contains(compPred2)) {
-							toDelete.add(compPred1);
-						}
-					}
-
-				} else if (compPred1.op() == compPred2.op() && rightSidesEqualityProvable && !leftSidesEqualityProvable) {
-					if (compPred1.op() == lt) {
-						if (sProof.proofLT(compPred1.sub(0), compPred2.sub(0))) {
-							if (!toDelete.contains(compPred2)) {
-								toDelete.add(compPred1);
-							}
-						} else {
-							if (!toDelete.contains(compPred1)) {
-								toDelete.add(compPred2);
-							}
-						}
-					} else if (compPred1.op() == gt) {
-						if (sProof.proofLT(compPred1.sub(0), compPred2.sub(0))) {
-							if (!toDelete.contains(compPred1)) {
-								toDelete.add(compPred2);
-							}
-						} else {
-							if (!toDelete.contains(compPred2)) {
-								toDelete.add(compPred1);
-							}
-						}
-					} else if (compPred1.op() == leq) {
-						if (sProof.proofLT(compPred1.sub(0), compPred2.sub(0))) {
-							if (!toDelete.contains(compPred2)) {
-								toDelete.add(compPred1);
-							}
-						} else {
-							if (!toDelete.contains(compPred1)) {
-								toDelete.add(compPred2);
-							}
-						}
-					} else if (compPred1.op() == geq) {
-						if (sProof.proofLT(compPred1.sub(0), compPred2.sub(0))) {
-							if (!toDelete.contains(compPred1)) {
-								toDelete.add(compPred2);
-							}
-						} else {
-							if (!toDelete.contains(compPred2)) {
-								toDelete.add(compPred1);
-							}
 						}
 					}
 				}
+//				else if (leftSidesEqualityProvable && !rightSidesEqualityProvable) {
+//					if ((compPred1.op() == lt && compPred2.op() == lt)
+//							|| (compPred1.op() == lt && compPred2.op() == leq)) {
+//						if (sProof.proofLT(compPred1.sub(1), compPred2.sub(1))) {
+//							if (!toDelete.contains(compPred1)) {
+//								System.out.println("10- Compression deleted: " + compPred1 + " because of " + compPred2);
+//								toDelete.add(compPred2);
+//							}
+//						} else if(sProof.proofGEQ(compPred1.sub(1), compPred2.sub(1))) {
+//							if (!toDelete.contains(compPred1)) {
+//								System.out.println("11- Compression deleted: " + compPred2 + " because of " + compPred1);
+//								toDelete.add(compPred2);
+//							}
+//						}
+//					} else if ((compPred1.op() == gt && compPred2.op() == gt)
+//							|| (compPred1.op() == gt && compPred2.op() == geq)) {
+//						if (sProof.proofLT(compPred1.sub(1), compPred2.sub(1))) {
+//							if (!toDelete.contains(compPred1)) {
+//								System.out.println("12- Compression deleted: " + compPred2 + " because of " + compPred1);
+//								toDelete.add(compPred2);
+//							}
+//						} else {
+//							if (!toDelete.contains(compPred2)) {
+//								System.out.println("13- Compression deleted: " + compPred1 + " because of " + compPred2);
+//								toDelete.add(compPred1);
+//							}
+//						}
+//					} else if ((compPred1.op() == leq && compPred2.op() == leq)
+//							|| (compPred1.op() == leq && compPred2.op() == lt)) {
+//						if (sProof.proofLT(compPred1.sub(1), compPred2.sub(1))) {
+//							if (!toDelete.contains(compPred2)) {
+//								System.out.println("14- Compression deleted: " + compPred1 + " because of " + compPred2);
+//								toDelete.add(compPred1);
+//							}
+//						} else if(sProof.proofGEQ(compPred1.sub(1), compPred2.sub(1))) {
+//							if (!toDelete.contains(compPred1)) {
+//								System.out.println("15- Compression deleted: " + compPred2 + " because of " + compPred1);
+//								toDelete.add(compPred2);
+//							}
+//						}
+//					}
+//					else if ((compPred1.op() == geq && compPred2.op() == geq)
+//						|| (compPred1.op() == gt && compPred2.op() == gt)) {
+//						if (sProof.proofLT(compPred1.sub(1), compPred2.sub(1))) {
+//							if (!toDelete.contains(compPred1)) {
+//								System.out.println("16- Compression deleted: " + compPred2 + " because of " + compPred1);
+//								toDelete.add(compPred2);
+//							}
+//						} else if(sProof.proofGEQ(compPred1.sub(1), compPred2.sub(1))) {
+//							if (!toDelete.contains(compPred2)) {
+//								System.out.println("17- Compression deleted: " + compPred1 + " because of " + compPred2);
+//								toDelete.add(compPred1);
+//							}
+//						}
+//					}
+//				}
+//				else if (compPred1.op() == compPred2.op() && rightSidesEqualityProvable && !leftSidesEqualityProvable) {
+//					if (compPred1.op() == lt) {
+//						if (sProof.proofLT(compPred1.sub(0), compPred2.sub(0))) {
+//							if (!toDelete.contains(compPred1)) {
+//								System.out.println("18- Compression deleted: " + compPred1 + " because of " + compPred2);
+//								toDelete.add(compPred2);
+//							}
+//						} else if(sProof.proofGEQ(compPred1.sub(0), compPred2.sub(0))) {
+//							if (!toDelete.contains(compPred1)) {
+//								System.out.println("19- Compression deleted: " + compPred2 + " because of " + compPred1);
+//								toDelete.add(compPred2);
+//							}
+//						}
+//					} else if (compPred1.op() == gt) {
+//						if (sProof.proofLT(compPred1.sub(0), compPred2.sub(0))) {
+//							if (!toDelete.contains(compPred1)) {
+//								System.out.println("20- Compression deleted: " + compPred2 + " because of " + compPred1);
+//								toDelete.add(compPred2);
+//							}
+//						} else if(sProof.proofGEQ(compPred1.sub(0), compPred2.sub(0))){
+//							if (!toDelete.contains(compPred2)) {
+//								System.out.println("21- Compression deleted: " + compPred1 + " because of " + compPred2);
+//								toDelete.add(compPred1);
+//							}
+//						}
+//					} else if (compPred1.op() == leq) {
+//						if (sProof.proofLT(compPred1.sub(0), compPred2.sub(0))) {
+//							if (!toDelete.contains(compPred2)) {
+//								System.out.println("22- Compression deleted: " + compPred1 + " because of " + compPred2);
+//								toDelete.add(compPred1);
+//							}
+//						} else if(sProof.proofGEQ(compPred1.sub(0), compPred2.sub(0))) {
+//							if (!toDelete.contains(compPred1)) {
+//								System.out.println("23- Compression deleted: " + compPred2 + " because of " + compPred1);
+//								toDelete.add(compPred2);
+//							}
+//						}
+//					} else if (compPred1.op() == geq) {
+//						if (sProof.proofLT(compPred1.sub(0), compPred2.sub(0))) {
+//							if (!toDelete.contains(compPred1)) {
+//								System.out.println("24- Compression deleted: " + compPred2 + " because of " + compPred1);
+//								toDelete.add(compPred2);
+//							}
+//						} else if(sProof.proofGEQ(compPred1.sub(0), compPred2.sub(0))) {
+//							if (!toDelete.contains(compPred2)) {
+//								System.out.println("25- Compression deleted: " + compPred1 + " because of " + compPred2);
+//								toDelete.add(compPred1);
+//							}
+//						}
+//					}
+//				}
 			}
 		}
 		fCompPredList.removeAll(toDelete);
-//		System.out.println("deleted by compression: " + toDelete);
+		System.out.println("CompPreds Deleted by Compressor: " + toDelete);
 		return fCompPredList;
 	}
 

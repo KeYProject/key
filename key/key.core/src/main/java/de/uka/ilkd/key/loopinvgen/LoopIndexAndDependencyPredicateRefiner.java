@@ -1,22 +1,22 @@
 package de.uka.ilkd.key.loopinvgen;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.Pair;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Refinement of the predicates describing the loop index and the dependency predicates
  */
 public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
-	private final Term index;
-	private final Term indexOuter;
+	private final Term innerIndex;
+	private final Term outerIndex;
 	private final int itrNumber;
 	private Set<Term> depPredicates;
 	private Set<Term> compPredicates;
@@ -28,14 +28,15 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 		super(sequent, services);
 		this.depPredicates  = depPredList;
 		this.compPredicates = compPredList;
-		this.index = index;
+		this.innerIndex = index;
 		this.itrNumber = iteration;
-		this.indexOuter = outerIndex;
+		this.outerIndex = outerIndex;
 		this.locSetToPredicate = new Graph<>();
 	}
 
 	@Override
 	public Pair<Set<Term>, Set<Term>> refine() {
+
 		int inlattice = 0;
 		Set<Term> unProvenDepPreds = new HashSet<>();
 		for (Term pred : depPredicates) {
@@ -54,8 +55,16 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 						locSetToPredicate.addEdge(pred.sub(0),tb.noRaW(pred.sub(0)), false);
 						locSetToPredicate.addEdge(pred.sub(0),tb.noWaR(pred.sub(0)), false);
 						locSetToPredicate.addEdge(pred.sub(0),tb.noWaW(pred.sub(0)), false);
+					} else if(pred.op() == depLDT.getRelaxedNoR()){
+						locSetToPredicate.addEdge(pred.sub(0),tb.relaxedNoRaW(pred.sub(0),tb.empty(),tb.empty(), tb.empty()), false);
+						locSetToPredicate.addEdge(pred.sub(0),tb.relaxedNoWaR(pred.sub(0),tb.empty(),tb.empty(), tb.empty()), false);
+					} else if(pred.op() == depLDT.getRelaxedNoW()){
+						locSetToPredicate.addEdge(pred.sub(0),tb.relaxedNoRaW(pred.sub(0),tb.empty(),tb.empty(), tb.empty()), false);
+						locSetToPredicate.addEdge(pred.sub(0),tb.relaxedNoWaR(pred.sub(0),tb.empty(),tb.empty(), tb.empty()), false);
+						locSetToPredicate.addEdge(pred.sub(0),tb.relaxedNoWaW(pred.sub(0),tb.empty(),tb.empty()), false);
 					}
 				}
+
 				else {
 					unProvenDepPreds.add(pred);
 //				System.out.println("Here: 2");
@@ -88,13 +97,20 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 							locSetToPredicate.addEdge(w.sub(0), tb.noRaW(w.sub(0)), false);
 							locSetToPredicate.addEdge(w.sub(0), tb.noWaR(w.sub(0)), false);
 							locSetToPredicate.addEdge(w.sub(0), tb.noWaW(w.sub(0)), false);
+						} else if (w.op() == depLDT.getRelaxedNoR()) {
+							locSetToPredicate.addEdge(w.sub(0), tb.relaxedNoRaW(w.sub(0), tb.empty(), tb.empty(), tb.empty()), false);
+							locSetToPredicate.addEdge(w.sub(0), tb.relaxedNoWaR(w.sub(0), tb.empty(), tb.empty(), tb.empty()), false);
+						} else if (w.op() == depLDT.getRelaxedNoW()) {
+							locSetToPredicate.addEdge(w.sub(0), tb.relaxedNoRaW(w.sub(0), tb.empty(), tb.empty(), tb.empty()), false);
+							locSetToPredicate.addEdge(w.sub(0), tb.relaxedNoWaR(w.sub(0), tb.empty(), tb.empty(), tb.empty()), false);
+							locSetToPredicate.addEdge(w.sub(0), tb.relaxedNoWaW(w.sub(0), tb.empty(), tb.empty()), false);
 						}
 					}
 				}
 			}
 		}
 		System.out.println("Lattice was useful " + inlattice + " times");
-		System.out.println("DEP PREDS: " + depPredicates);
+//		System.out.println("DEP PREDS: " + depPredicates);
 		// -------------------------------------
 		Set<Term> unProvenCompPreds = new HashSet<>();
 		for (Term pred : compPredicates) {
@@ -116,6 +132,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 				compPredicates.add(w);
 			}
 		}
+//		System.out.println("COMP PREDS: " + compPredicates);
 		return new Pair<>(depPredicates, compPredicates);
 	}
 
@@ -187,6 +204,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 		if(result.isEmpty()){
 //			System.out.println("Weakening didn't succeed");
 			result.add(tb.tt());}
+//		System.out.println("WEAKENING RESULT: "+result);
 		return result;
 	}
 
@@ -221,7 +239,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 //				System.out.println("added 1");
 			}
 		}
-		System.out.println("weaken by predicate symb for " + unProven + " is "+result);
+//		System.out.println("weaken by predicate symb for " + unProven + " is "+result);
 //		System.out.println("size: " + result.size());
 		return result;
 	}
@@ -285,7 +303,8 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 	}
 
 	private Set<Term> weakenBySubSetForMatrixRange(Term unProven) {
-		Set<Term> result = new HashSet<>();
+		Set<Term> resultArr = new HashSet<>();
+
 		final Term locSet = unProven.sub(0);
 
 		final Term heap = locSet.sub(0);
@@ -316,13 +335,13 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 				}
 
 				if (depLDT.isDependencePredicate(unProven.op())) {
+
 					final Function op = (Function) unProven.op();
-					if(subLoc!=tb.empty())
-						result.add(tb.func(op, subLoc));
-					if(lowArr!=tb.empty())
-						result.add(tb.func(op, lowArr));
-					if(highArr!=tb.empty())
-						result.add(tb.func(op, highArr));
+
+					resultArr.add(buildPredicate(unProven, lowArr, op));
+					resultArr.add(buildPredicate(unProven, highArr, op));
+					resultArr.add(buildPredicate(unProven, subLoc, op));
+
 				}
 			}
 		}
@@ -342,84 +361,22 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 				}
 
 				if (depLDT.isDependencePredicate(unProven.op())) {
+
 					final Function op = (Function) unProven.op();
-					if(subLoc!=tb.empty())
-						result.add(tb.func(op, subLoc));
-					if(lowArr!=tb.empty())
-						result.add(tb.func(op, lowArr));
-					if(highArr!=tb.empty())
-						result.add(tb.func(op, highArr));
+
+					resultArr.add(buildPredicate(unProven, lowArr, op));
+					resultArr.add(buildPredicate(unProven, highArr, op));
+					resultArr.add(buildPredicate(unProven, subLoc, op));
+
 				}
 			}
 		}
 //		System.out.println("weaken by subset for " + unProven + " is " +result);
 //		System.out.println("size: " + result.size());
-		return result;
+
+		return resultArr;
 	}
 
-
-
-//	private Set<Term> weakenBySequent(Term unProven) {
-//		Operator Pred = unProven.op();
-//		Term locSet = unProven.sub(0);
-//		Set<Term> result = new HashSet<>();
-////		System.out.println("for " + unProven + " weaken by sequent added: ");
-//		for (SequentFormula sequentFormula1 : seq.antecedent()) {
-//			Term seqLocSet1 = sequentFormula1.formula().sub(0);
-//			if (sequentFormula1.formula().op() == depLDT.getRPred()) {
-////				if (Pred == depLDT.getNoR() && sProof.proofNonEmptyIntersection(locSet, seqLocSet1)) {
-////					result.add(tb.noR(tb.setMinus(locSet, seqLocSet1)));
-////				} else
-//				if (Pred == depLDT.getNoRaW() && sProof.proofNonEmptyIntersection(locSet, seqLocSet1)) {
-//					for (SequentFormula sequentFormula2 : seq.antecedent()) {
-//						Term seqLocSet2 = sequentFormula2.formula().sub(0);
-//						if (sequentFormula2.formula().op() == depLDT.getWPred()
-//								&& sProof.proofNonEmptyIntersection(tb.intersect(locSet, seqLocSet1), seqLocSet2)) {
-//							Term seqLabel1 = sequentFormula1.formula().sub(1);
-//							Term seqLabel2 = sequentFormula2.formula().sub(1);
-//							if (sProof.proofLT(seqLabel2, seqLabel1)) {
-//								result.add(tb.noRaW(tb.setMinus(locSet, tb.intersect(seqLocSet1, seqLocSet2))));
-////								System.out.println("because "+ seqLabel2 + " is less then " + " there is a " + sequentFormula1 + " after "+ sequentFormula2);
-//							}
-//						}
-//					}
-//				} else if (Pred == depLDT.getNoWaR() && sProof.proofNonEmptyIntersection(locSet, seqLocSet1)) {
-//					for (SequentFormula sequentFormula2 : seq.antecedent()) {
-//						Term seqLocSet2 = sequentFormula2.formula().sub(0);
-//						if (sequentFormula2.formula().op() == depLDT.getWPred()
-//								&& sProof.proofNonEmptyIntersection(tb.intersect(locSet, seqLocSet1), seqLocSet2)) {
-//							Term seqLabel1 = sequentFormula1.formula().sub(1);
-//							Term seqLabel2 = sequentFormula2.formula().sub(1);
-//							if (sProof.proofLT(seqLabel1, seqLabel2)) {
-//								result.add(tb.noWaR(tb.setMinus(locSet, tb.intersect(seqLocSet1, seqLocSet2))));
-//							}
-//						}
-//					}
-//				}
-//			} else if (sequentFormula1.formula().op() == depLDT.getWPred()) {
-//				if (sProof.proofNonEmptyIntersection(locSet, seqLocSet1)) {
-//					if (Pred == depLDT.getNoW()) {
-//						result.add(tb.noW(tb.setMinus(locSet, seqLocSet1)));
-//					} else if (Pred == depLDT.getNoWaW()) {
-//						for (SequentFormula sequentFormula2 : seq.antecedent()) {
-//							Term seqLocSet2 = sequentFormula2.formula().sub(0);
-//							if (sequentFormula2.formula().op() == depLDT.getWPred()
-//									&& sProof.proofNonEmptyIntersection(tb.intersect(locSet, seqLocSet1), seqLocSet2)) {
-//								Term seqLabel1 = sequentFormula1.formula().sub(1);
-//								Term seqLabel2 = sequentFormula2.formula().sub(1);
-//								if (!sProof.proofEquality(seqLabel1, seqLabel2)) {
-//									result.add(tb.noWaW(tb.setMinus(locSet, tb.intersect(seqLocSet1, seqLocSet2))));
-//								}
-//							}
-//						}
-//					}
-//				}
-//
-//			}
-//		}
-////		System.out.println(result);
-//		return result;
-//	}
 
 	private Set<Term> weakenByDividingOverIndex(Term pred) {
 		if(pred.sub(0).op()  == locsetLDT.getArrayRange())
@@ -429,9 +386,10 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 		else return new HashSet<>();
 	}
 	private Set<Term> weakenByDividingOverIndexForArrayRange(Term pred) {
-		Set<Term> result = new HashSet<>();
+
+		Set<Term> resultArr = new HashSet<>();
 		Term locSet = pred.sub(0);
-		if (locSet != null) {
+		if (locSet != null && locSet.arity() == 3) {
 //			System.out.println("Find Loc Set: "+locSet);
 			Term array = locSet.sub(0);
 			Term low = locSet.sub(1);
@@ -441,68 +399,61 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 			Term lowToIPlusOne = tb.empty();
 			Term iPlusOneToHigh = tb.empty();
 //			System.out.println("low: "+ low + ", index: "+ index + ", high: " + high);
-			if (array != null && low != null && high != null && index != null) {
-				if (!sProof.proofEquality(low, index)) {
-					if (!sProof.proofEquality(index, high)) {
-						lowToI = tb.arrayRange(array, low, index);
-						iToHigh = tb.arrayRange(array, index, high);
-						if(sProof.proofLT(tb.add(index, tb.one()), high)) {
-							lowToIPlusOne = tb.arrayRange(array, low, tb.add(index, tb.one()));
-							iPlusOneToHigh = tb.arrayRange(array, tb.add(index, tb.one()), high);
+			if (array != null && low != null && high != null && innerIndex != null) {
+				if (!sProof.proofEquality(low, innerIndex)) {
+					if (!sProof.proofEquality(innerIndex, high)) {
+						lowToI = tb.arrayRange(array, low, innerIndex);
+						iToHigh = tb.arrayRange(array, innerIndex, high);
+						if(sProof.proofLT(tb.add(innerIndex, tb.one()), high)) {
+							lowToIPlusOne = tb.arrayRange(array, low, tb.add(innerIndex, tb.one()));
+							iPlusOneToHigh = tb.arrayRange(array, tb.add(innerIndex, tb.one()), high);
 						}
 					} else {
-						lowToI = tb.arrayRange(array, low, index);
-						iToHigh = tb.singleton(array, tb.arr(index));
+						lowToI = tb.arrayRange(array, low, innerIndex);
+						iToHigh = tb.singleton(array, tb.arr(innerIndex));
 					}
 				} else {
-					if (!sProof.proofEquality(index, high)) {
-						iToHigh = tb.arrayRange(array, index, high);
-						lowToI = tb.singleton(array, tb.arr(index));
+					if (!sProof.proofEquality(innerIndex, high)) {
+						iToHigh = tb.arrayRange(array, innerIndex, high);
+						lowToI = tb.singleton(array, tb.arr(innerIndex));
 
-						if(sProof.proofLT(tb.add(index, tb.one()), high)) {
-							lowToIPlusOne = tb.arrayRange(array, low, tb.add(index, tb.one()));
-							iPlusOneToHigh = tb.arrayRange(array, tb.add(index, tb.one()), high);
+						if(sProof.proofLT(tb.add(innerIndex, tb.one()), high)) {
+							lowToIPlusOne = tb.arrayRange(array, low, tb.add(innerIndex, tb.one()));
+							iPlusOneToHigh = tb.arrayRange(array, tb.add(innerIndex, tb.one()), high);
 						}
 					} else {
-						lowToI = tb.singleton(array, tb.arr(index));
-						iToHigh = tb.singleton(array, tb.arr(index));
+						lowToI = tb.singleton(array, tb.arr(innerIndex));
+						iToHigh = tb.singleton(array, tb.arr(innerIndex));
 					}
 				}
 //				if (lowToI != null && iToHigh != null) {
 					if (depLDT.isDependencePredicate(pred.op())) {
 						final Function dependencyOp = (Function) pred.op();
-						if(dependencyOp==depLDT.getRelaxedNoRaW() || dependencyOp == depLDT.getRelaxedNoWaR()){
-							result.add(tb.func(dependencyOp, lowToI, tb.empty(), tb.empty(), tb.empty()));
-							result.add(tb.func(dependencyOp, iToHigh, tb.empty(), tb.empty(), tb.empty()));
-							result.add(tb.func(dependencyOp, lowToIPlusOne, tb.empty(), tb.empty(), tb.empty()));
-							result.add(tb.func(dependencyOp, iPlusOneToHigh, tb.empty(), tb.empty(), tb.empty()));
-						} else if(dependencyOp == depLDT.getRelaxedNoWaW()){
-							result.add(tb.func(dependencyOp, lowToI, tb.empty(), tb.empty()));
-							result.add(tb.func(dependencyOp, iToHigh, tb.empty(), tb.empty()));
-							result.add(tb.func(dependencyOp, lowToIPlusOne, tb.empty(), tb.empty()));
-							result.add(tb.func(dependencyOp, iPlusOneToHigh, tb.empty(), tb.empty()));
-						}
-						else{
-							result.add(tb.func(dependencyOp, lowToI));
-							result.add(tb.func(dependencyOp, iToHigh));
-							result.add(tb.func(dependencyOp, lowToIPlusOne));
-							result.add(tb.func(dependencyOp, iPlusOneToHigh));
-						}
+
+						resultArr.add(buildPredicate(pred, lowToI, dependencyOp));
+						resultArr = resultArr;
+						resultArr.add(buildPredicate(pred, iToHigh, dependencyOp));
+						resultArr = resultArr;
+						resultArr.add(buildPredicate(pred, lowToIPlusOne, dependencyOp));
+						resultArr = resultArr;
+						resultArr.add(buildPredicate(pred, iPlusOneToHigh, dependencyOp));
+						resultArr = resultArr;
 
 					}
 //				}
 			}
 //		System.out.println(result);
 		}
+
 //		System.out.println("weaken by index & pred symb "+ pred +" with "+ result);
-		return result;
+		return resultArr;
 
 	}
 	private Set<Term> weakenByDividingOverIndexForMatrixRange(Term pred) {
-		Set<Term> result = new HashSet<>();
+		Set<Term> resultArr = new HashSet<>();
 		Term locSet = pred.sub(0);
 
-		if (locSet != null) {
+		if (locSet != null && innerIndex != null && outerIndex != null) {
 			final Term heap = locSet.sub(0);
 			final Term arr = locSet.sub(1);
 			final Term outLow = locSet.sub(2);
@@ -510,90 +461,93 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 			final Term inLow = locSet.sub(4);
 			final Term inHigh = locSet.sub(5);
 
-			Term lowToInner, innerToHigh;
-			Term lowToOuter, outerToHigh;
-			Term lowToOuterPlusOne, outerPlusOneToHigh;
+			final Term innerIndexMinusOne = tb.sub(innerIndex, tb.one());
+			final Term innerIndexPlusOne = tb.add(innerIndex, tb.one());
 
-			if(!sProof.proofEquality(inLow, inHigh)) {
-				if (sProof.proofLEQ(inLow, index)) {
-					lowToInner = tb.matrixRange(heap, arr, outLow, outHigh, inLow, index);
-					if (sProof.proofLEQ(index, inHigh)) {
-						innerToHigh = tb.matrixRange(heap, arr, outLow, outHigh, index, inHigh);
-					} else {
-						innerToHigh = tb.empty();
-					}
-				} else {
-					lowToInner = tb.empty();
-					if (sProof.proofLEQ(index, inHigh)) {
-						innerToHigh = tb.matrixRange(heap, arr, outLow, outHigh, index, inHigh);
-					} else {
-						innerToHigh = tb.empty();
-					}
-				}
+			ArrayList<Term> innersList = new ArrayList<>();
+			innersList.add(inLow);
+			innersList.add(innerIndex);
+			innersList.add(inHigh);
 
-				if (depLDT.isDependencePredicate(pred.op())) {
-					final Function dependencyOp = (Function) pred.op();
-					if (lowToInner != null && lowToInner != tb.empty()) {
-						result.add(tb.func(dependencyOp, lowToInner));
-					}
-					if (innerToHigh != null && innerToHigh != tb.empty()) {
-						result.add(tb.func(dependencyOp, innerToHigh));
+			if (sProof.proofLEQ(inLow, innerIndexMinusOne)) {
+				innersList.add(innerIndexMinusOne);
+			}
+
+			if (sProof.proofLEQ(innerIndexPlusOne, inHigh)) {
+				innersList.add(innerIndexPlusOne);
+			}
+
+			final Term[] inners = innersList.toArray(new Term[innersList.size()]);
+
+
+			final Term outerIndexMinusOne = tb.sub(outerIndex, tb.one());
+			final Term outerIndexPlusOne = tb.add(outerIndex, tb.one());
+
+			ArrayList<Term> outersList = new ArrayList<>();
+			outersList.add(outLow);
+			outersList.add(outerIndex);
+			outersList.add(outHigh);
+
+			if (sProof.proofLEQ(outLow, outerIndexMinusOne)) {
+				outersList.add(outerIndexMinusOne);
+			}
+			if (sProof.proofLEQ(outerIndexPlusOne, outHigh)) {
+				outersList.add(outerIndexPlusOne);
+			}
+
+			final Term[] outers = outersList.toArray(new Term[outersList.size()]);
+
+
+
+			Set<Term> matrixes = new HashSet<>();
+
+			HashMap<Pair<Term,Term>, Boolean> cacheLEQ = new HashMap<>();
+
+			for(int i = 0; i < inners.length; i++){
+				for(int j = 0; j < inners.length; j++){
+					for(int k = 0; k < outers.length; k++){
+						for(int l = 0; l < outers.length; l++){
+							if(i!=j && k!=l)
+							{
+								boolean outerCond = cacheProofResult(outers, cacheLEQ, k, l);
+								boolean innerCond = cacheProofResult(inners, cacheLEQ, i, j);
+								if (outerCond && innerCond) {
+									Term right = tb.matrixRange(heap, arr, outers[k], outers[l], inners[i], inners[j]);
+									if (!locSet.equalsModRenaming(right)) {
+										matrixes.add(right);
+									}
+								}
+							}
+						}
 					}
 				}
 			}
-			Term outerIndexPlusOne = tb.add(indexOuter,tb.one());
-			if(!sProof.proofEquality(outLow, outHigh)) {
-				if (sProof.proofLEQ(outLow, indexOuter)) {
-					lowToOuter = tb.matrixRange(heap, arr, outLow, indexOuter, inLow, inHigh);
-					lowToOuterPlusOne = tb.matrixRange(heap, arr, outLow, outerIndexPlusOne, inLow, inHigh);
 
-					if (sProof.proofLEQ(indexOuter, outHigh)) {
-						outerToHigh = tb.matrixRange(heap, arr, indexOuter, outHigh, inLow, inHigh);
-					} else {
-						outerToHigh = tb.empty();
-					}
-
-					if (sProof.proofLEQ(outerIndexPlusOne, outHigh)) {
-						outerPlusOneToHigh = tb.matrixRange(heap, arr, outerIndexPlusOne, outHigh, inLow, inHigh);
-					} else {
-						outerPlusOneToHigh = tb.empty();
-					}
-				} else {
-					lowToOuter = tb.empty();
-					lowToOuterPlusOne=tb.empty();
-					if (sProof.proofLEQ(indexOuter, outHigh)) {
-						outerToHigh = tb.matrixRange(heap, arr, indexOuter, outHigh, inLow, inHigh);
-					} else {
-						outerToHigh = tb.empty();
-					}
-					if (sProof.proofLEQ(outerIndexPlusOne, outHigh)) {
-						outerPlusOneToHigh = tb.matrixRange(heap, arr, outerIndexPlusOne, outHigh, inLow, inHigh);
-					} else {
-						outerPlusOneToHigh = tb.empty();
-					}
-				}
-
-				if (depLDT.isDependencePredicate(pred.op())) {
-					final Function dependencyOp = (Function) pred.op();
-					if (lowToOuterPlusOne != null && lowToOuterPlusOne != tb.empty()) {
-						result.add(tb.func(dependencyOp, lowToOuterPlusOne));
-					}
-					if (lowToOuter != null && lowToOuter != tb.empty()) {
-						result.add(tb.func(dependencyOp, lowToOuter));
-					}
-					if (outerPlusOneToHigh != null && outerPlusOneToHigh != tb.empty()) {
-						result.add(tb.func(dependencyOp, outerPlusOneToHigh));
-					}
-					if (outerToHigh != null && outerToHigh != tb.empty()) {
-						result.add(tb.func(dependencyOp, outerToHigh));
-					}
+//			System.out.println("PRED.OP   " + pred.op());
+			if(depLDT.isDependencePredicate(pred.op())){
+				final Function dependencyOp = (Function) pred.op();
+				for(Term mtr : matrixes){
+					resultArr.add(buildPredicate(pred, mtr, dependencyOp));
 				}
 			}
+
 		}
 
-		System.out.println("weakening by dividing over index for: "+ pred + " is:"+ result);
-//		System.out.println("size: " + result.size());
-		return result;
+//		System.out.println("weakening by dividing over index for: "+ pred + " is:"+ resultArr);
+		return resultArr;
+	}
+
+	private boolean cacheProofResult(Term[] outers, HashMap<Pair<Term, Term>, Boolean> cacheLT, int k, int l) {
+		boolean cond;
+		Pair<Term, Term> pair = new Pair<>(outers[k], outers[l]);
+		Boolean result = cacheLT.get(pair);
+		if (result != null) {
+			cond = result;
+		} else {
+			cond = sProof.proofLT(outers[k], outers[l]);
+			cacheLT.put(pair, cond);
+		}
+		return cond;
 	}
 
 
@@ -611,31 +565,6 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 		return result;
 	}
 
-//	private Set<Term> compPredWeakenByIndex(Term pred) {
-//		Set<Term> result = new HashSet<>();
-//		Term left = pred.sub(0);
-//		Term right = pred.sub(1);
-//		if (left != null && right != null && index != null) {
-//			if (pred.op() == intLDT.getLessThan()) {
-//				result.add(tb.lt(left, index));
-//				result.add(tb.lt(index, right));
-//			} else if (pred.op() == intLDT.getGreaterThan()) {
-//				result.add(tb.gt(left, index));
-//				result.add(tb.gt(index, right));
-//			} else if (pred.op() == Equality.EQUALS) {
-//				result.add(tb.equals(left, index));
-//				result.add(tb.equals(index, right));
-//			} else if (pred.op() == intLDT.getLessOrEquals()) {
-//				result.add(tb.leq(left, index));
-//				result.add(tb.leq(index, right));
-//			} else if (pred.op() == intLDT.getGreaterOrEquals()) {
-//				result.add(tb.geq(left, index));
-//				result.add(tb.geq(index, right));
-//			}
-//		}
-//		return result;
-//	}
-
 	private Set<Term> compPredWeakeningByPredicates(Term pred) {
 		Set<Term> result = new HashSet<>();
 		if(pred!=null){
@@ -650,13 +579,15 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 					result.add(tb.leq(low, high));
 				} else if (pred.op() == intLDT.getGreaterThan()) {
 					result.add(tb.geq(low, high));
-				} else if (pred.op() == intLDT.getLessOrEquals()) {// Think again
-					result.add(tb.gt(low, high));
-					result.add(tb.equals(low, high));
-				} else if (pred.op() == intLDT.getGreaterOrEquals()) {// Think again
-					result.add(tb.lt(low, high));
-					result.add(tb.equals(low, high));
-				} else if (pred.op() == Equality.EQUALS) {
+				}
+//				else if (pred.op() == intLDT.getLessOrEquals()) {// Think again
+//					result.add(tb.gt(low, high));
+//					result.add(tb.equals(low, high));
+//				} else if (pred.op() == intLDT.getGreaterOrEquals()) {// Think again
+//					result.add(tb.lt(low, high));
+//					result.add(tb.equals(low, high));
+//				}
+				else if (pred.op() == Equality.EQUALS) {
 					result.add(tb.gt(low, high));
 					result.add(tb.lt(low, high));
 				}
@@ -691,4 +622,20 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 //		System.out.println(result);
 		return result;
 	}
+
+	private Term buildPredicate(Term unProven, Term locSet, Function op) {
+		final Term builtPred;
+		assert locSet!=null;
+//		if (locSet !=tb.empty()){
+			if(unProven.arity() == 1) {
+				builtPred = tb.func(op, locSet);
+			} else if(unProven.arity() == 4) {
+				builtPred =tb.func(op, locSet, tb.empty(), tb.empty(), tb.empty());
+			} else if(unProven.arity() == 3) {
+				builtPred= tb.func(op, locSet, tb.empty(), tb.empty());
+			} else throw new IllegalArgumentException("Unexpected predicate "+unProven);
+//		}
+		return builtPred;
+	}
+
 }
