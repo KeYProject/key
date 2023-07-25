@@ -149,6 +149,11 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @Override
     public void taskFinished(TaskFinishedInfo info) {
         super.taskFinished(info);
+        // ensure all UI modifying operations are done on the UI thread
+        SwingUtilities.invokeLater(() -> taskFinishedInternal(info));
+    }
+
+    private void taskFinishedInternal(TaskFinishedInfo info) {
         if (info != null && info.getSource() instanceof ProverCore) {
             if (!isAtLeastOneMacroRunning()) {
                 resetStatus(this);
