@@ -325,6 +325,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             // set row height before changing the font (since the latter repaints the component)
             delegateView.setRowHeight(rowHeight);
 
+            renderer.setFont(myFont);
             delegateView.setFont(myFont);
         } else {
             LOGGER.debug("KEY-PROOF_TREE_FONT not available, use standard font.");
