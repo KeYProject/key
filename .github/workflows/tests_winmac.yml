@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [macos-latest, ubuntu-latest, windows-latest]
         java: [11, 17]
     continue-on-error: true
     runs-on: ${{ matrix.os }}
@@ -40,9 +40,8 @@ jobs:
           path: |
             **/build/test-results/*/*.xml
             **/build/reports/
-
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
+            !**/jacocoTestReport.xml
+            
 
   integration-tests:
     env:
@@ -52,7 +51,7 @@ jobs:
       fail-fast: false
       matrix:
         test: [testProveRules, testRunAllFunProofs, testRunAllInfProofs]
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ macos-latest, ubuntu-latest, windows-latest ]
         java: [11,17]
     runs-on: ${{ matrix.os }}
     steps:
@@ -82,8 +81,10 @@ jobs:
         uses: actions/upload-artifact@v3.1.1
         if: success() || failure()        # run this step even if previous step failed
         with:
-          name: test-results
+          name: test-results-${{ matrix.os }}
           path: |
             **/build/test-results/*/*.xml
             key.core/build/reports/runallproofs/*
             **/build/reports/
+            !**/jacocoTestReport.xml
+

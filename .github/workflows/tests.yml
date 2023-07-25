@@ -63,6 +63,8 @@ jobs:
           path: |
             **/build/test-results/*/*.xml
             **/build/reports/
+            !**/jacocoTestReport.xml
+            
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
@@ -95,6 +97,8 @@ jobs:
 
       - name: Install SMT-Solvers
         run: .github/dlsmt.sh
+        shell: bash
+
 
       - name: "Running tests: ${{ matrix.test }}"
         uses: gradle/gradle-build-action@v2.4.2
