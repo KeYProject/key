@@ -183,7 +183,7 @@ public class CachingExtension
             return; // try close macro was running, no need to do anything here
         }
         Proof p = info.getProof();
-        if (p == null || p.closed() || !(info.getSource() instanceof ApplyStrategy
+        if (p == null || p.isDisposed() || p.closed() || !(info.getSource() instanceof ApplyStrategy
                 || info.getSource() instanceof ProofMacro)) {
             return;
         }

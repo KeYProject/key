@@ -156,7 +156,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             ApplyStrategyInfo result = (ApplyStrategyInfo) info.getResult();
 
             Proof proof = info.getProof();
-            if (proof != null && !proof.closed()
+            if (proof != null && !proof.isDisposed() && !proof.closed()
                     && mainWindow.getMediator().getSelectedProof() == proof) {
                 Goal g = result.nonCloseableGoal();
                 if (g == null) {

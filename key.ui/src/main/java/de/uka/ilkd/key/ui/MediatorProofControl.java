@@ -9,6 +9,8 @@ import javax.swing.*;
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.IssueDialog;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroWorker;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
@@ -205,8 +207,8 @@ public class MediatorProofControl extends AbstractProofControl {
         }
 
         private void notifyException(final Exception exception) {
-            ui.notify(new GeneralFailureEvent(
-                "An exception occurred during" + " strategy execution.\n Exception:" + exception));
+            LOGGER.error("exception during strategy ", exception);
+            IssueDialog.showExceptionDialog(MainWindow.getInstance(), exception);
         }
 
         @Override

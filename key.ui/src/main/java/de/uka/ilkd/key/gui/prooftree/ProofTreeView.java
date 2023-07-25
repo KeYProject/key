@@ -937,6 +937,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             GUIAbstractTreeNode treeNode =
                 ((GUIAbstractTreeNode) e.getNewLeadSelectionPath().getLastPathComponent());
+            if (treeNode.getNode().proof().isDisposed()) {
+                setProof(null);
+                return;
+            }
             if (treeNode instanceof GUIBranchNode) {
                 selectBranchNode((GUIBranchNode) treeNode);
             } else {
@@ -1226,7 +1230,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
                 boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            if (proof == null || !(value instanceof GUIAbstractTreeNode)) {
+            if (proof == null || proof.isDisposed() || !(value instanceof GUIAbstractTreeNode)) {
                 // print dummy tree
                 return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row,
                     hasFocus);
