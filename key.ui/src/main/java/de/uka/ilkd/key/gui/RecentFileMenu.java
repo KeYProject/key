@@ -247,6 +247,7 @@ public class RecentFileMenu {
             localRecentFiles.createNewFile();
         } catch (IOException e) {
             LOGGER.info("Could not create or access recent files", e);
+            return;
         }
 
         Properties p = new Properties();
