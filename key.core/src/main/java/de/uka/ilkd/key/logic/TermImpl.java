@@ -2,6 +2,7 @@ package de.uka.ilkd.key.logic;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
@@ -190,7 +191,7 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
 
 
     @Override
-    public JavaBlock javaBlock() {
+    public @Nonnull JavaBlock javaBlock() {
         return javaBlock;
     }
 

@@ -1206,7 +1206,6 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             if (nvc != null) {
                 KeYJavaType kjt;
                 Object o = nvc.getTypeDefiningObject();
-                JavaInfo javaInfo = services.getJavaInfo();
                 if (o instanceof SchemaVariable) {
                     final TypeConverter tc = services.getTypeConverter();
                     final SchemaVariable peerSV = (SchemaVariable) o;
