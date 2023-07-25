@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Tue Jul 25 13:54:46 CEST 2023
+# Date: Tue Jul 25 17:12:50 CEST 2023
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -12558,7 +12558,6 @@ loopScopeInvBox {
   #typeof(#heapBefore_LOOP) #heapBefore_LOOP;
   #typeof(#savedHeapBefore_LOOP) #savedHeapBefore_LOOP;
   #typeof(#permissionsBefore_LOOP) #permissionsBefore_LOOP;
-  #typeof(#permissionsBefore_LOOP) #permissionsBefore_LOOP;
 }\] (update-application(parallel-upd(parallel-upd(#createBeforeLoopUpdate(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP),#createLocalAnonUpdate(loopFormula)),#createHeapAnonUpdate(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)),imp(and(inv,freeInv),#box ( (modal operator))\[{ ..
   boolean #x;
   loop-scope (#x) {
@@ -12587,7 +12586,6 @@ loopScopeInvDia {
 \add [#wellFormedCond(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)]==>[] \replacewith(#dia ( (modal operator))\[{
   #typeof(#heapBefore_LOOP) #heapBefore_LOOP;
   #typeof(#savedHeapBefore_LOOP) #savedHeapBefore_LOOP;
-  #typeof(#permissionsBefore_LOOP) #permissionsBefore_LOOP;
   #typeof(#permissionsBefore_LOOP) #permissionsBefore_LOOP;
   #typeof(#variant) #variant;
 }\] (update-application(parallel-upd(parallel-upd(#createBeforeLoopUpdate(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP),#createLocalAnonUpdate(loopFormula)),#createHeapAnonUpdate(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)),update-application(elem-update(#variant (program Variable))(variantTerm),imp(and(inv,freeInv),#dia ( (modal operator))\[{ ..

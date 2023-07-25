@@ -66,7 +66,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst
             new ExpectedProofReferences(IProofReference.USE_AXIOM,
                 "equiv(java.lang.Object::<inv>(heap,self),true)"),
             new ExpectedProofReferences(IProofReference.USE_AXIOM,
-                "equals(test.ModelFieldTest::$f(heap,self),javaMulInt(Z(2(#)),int::select(heap,self,test.ModelFieldTest::$x)))"));
+                "equals(test.ModelFieldTest::$f(heap,self),mul(Z(2(#)),int::select(heap,self,test.ModelFieldTest::$x)))"));
     }
 
     /**
@@ -80,7 +80,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst
             new ExpectedProofReferences(IProofReference.USE_AXIOM,
                 "equiv(java.lang.Object::<inv>(heap,self),true)"),
             new ExpectedProofReferences(IProofReference.USE_AXIOM,
-                "equals(test.ModelFieldTest::$f(heap,self),javaMulInt(Z(2(#)),int::select(heap,self,test.ModelFieldTest::$x)))"));
+                "equals(test.ModelFieldTest::$f(heap,self),mul(Z(2(#)),int::select(heap,self,test.ModelFieldTest::$x)))"));
     }
 
     /**
