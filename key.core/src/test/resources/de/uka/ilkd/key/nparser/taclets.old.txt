@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Fri Jul 21 14:53:13 CEST 2023
+# Date: Tue Jul 25 13:54:46 CEST 2023
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -1223,6 +1223,14 @@ assertSafeWithMessage {
 \replacewith([]==>[#allmodal(b)]) 
 \heuristics(simplify_prog)
 Choices: (programRules:Java & assertions:safe)}
+-----------------------------------------------------
+== assignableDefinition (assignableDefinition) =========================================
+assignableDefinition {
+\find(assignable(heapNew,heapOld,locs))
+\varcond(\notFreeIn(f (variable), heapNew (Heap term)), \notFreeIn(f (variable), heapOld (Heap term)), \notFreeIn(f (variable), locs (LocSet term)), \notFreeIn(o (variable), heapNew (Heap term)), \notFreeIn(o (variable), heapOld (Heap term)), \notFreeIn(o (variable), locs (LocSet term)))
+\replacewith(all{f (variable)}(all{o (variable)}(or(or(elementOf(o,f,locs),and(not(equals(o,null)),not(equals(boolean::select(heapOld,o,java.lang.Object::<created>),TRUE)))),equals(any::select(heapNew,o,f),any::select(heapOld,o,f)))))) 
+\heuristics(delayedExpansion)
+Choices: programRules:Java}
 -----------------------------------------------------
 == assignment (assignment) =========================================
 assignment {
@@ -9220,6 +9228,34 @@ expIsZero {
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
+== expandInByte (expandInByte) =========================================
+expandInByte {
+\find(inByte(i))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== expandInChar (expandInChar) =========================================
+expandInChar {
+\find(inChar(i))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== expandInInt (expandInInt) =========================================
+expandInInt {
+\find(inInt(i))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== expandInLong (expandInLong) =========================================
+expandInLong {
+\find(inLong(i))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
 == expandInRangeByte (expandInRangeByte) =========================================
 expandInRangeByte {
 \find(inRangeByte(i))
@@ -9255,6 +9291,13 @@ expandInRangeShort {
 \heuristics(delayedExpansion, defOps_expandRanges)
 Choices: true}
 -----------------------------------------------------
+== expandInShort (expandInShort) =========================================
+expandInShort {
+\find(inShort(i))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
 == expand_addJint (expand_addJint) =========================================
 expand_addJint {
 \find(addJint(i,i1))
@@ -9282,41 +9325,6 @@ expand_divJlong {
 \replacewith(moduloLong(jdiv(i,i1))) 
 \heuristics(defOps_expandJNumericOp)
 Choices: true}
------------------------------------------------------
-== expandInByte (expandInByte) =========================================
-expandInByte {
-\find(inByte(i))
-\replacewith(true) 
-\heuristics(concrete)
-Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
------------------------------------------------------
-== expandInChar (expandInChar) =========================================
-expandInChar {
-\find(inChar(i))
-\replacewith(true) 
-\heuristics(concrete)
-Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
------------------------------------------------------
-== expandInInt (expandInInt) =========================================
-expandInInt {
-\find(inInt(i))
-\replacewith(true) 
-\heuristics(concrete)
-Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
------------------------------------------------------
-== expandInLong (expandInLong) =========================================
-expandInLong {
-\find(inLong(i))
-\replacewith(true) 
-\heuristics(concrete)
-Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
------------------------------------------------------
-== expandInShort (expandInShort) =========================================
-expandInShort {
-\find(inShort(i))
-\replacewith(true) 
-\heuristics(concrete)
-Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
 == expand_modJint (expand_modJint) =========================================
 expand_modJint {
@@ -12546,7 +12554,12 @@ loopScopeInvBox {
 }\] (post))), \varcond (\storeStmtIn(#loopStmt (program Statement), #box ( (modal operator))\[{
   while (#nse) #body
 }\] (post))), \hasInvariant(#loopStmt (program Statement)), \getInvariant(#loopStmt (program Statement), #box ( (modal operator)), inv (formula)), \getFreeInvariant(#loopStmt (program Statement), #box ( (modal operator)), freeInv (formula)), )
-\add [#wellFormedCond(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)]==>[] \replacewith(update-application(parallel-upd(parallel-upd(#createBeforeLoopUpdate(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP),#createLocalAnonUpdate(loopFormula)),#createHeapAnonUpdate(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)),imp(and(inv,freeInv),#box ( (modal operator))\[{ ..
+\add [#wellFormedCond(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)]==>[] \replacewith(#box ( (modal operator))\[{
+  #typeof(#heapBefore_LOOP) #heapBefore_LOOP;
+  #typeof(#savedHeapBefore_LOOP) #savedHeapBefore_LOOP;
+  #typeof(#permissionsBefore_LOOP) #permissionsBefore_LOOP;
+  #typeof(#permissionsBefore_LOOP) #permissionsBefore_LOOP;
+}\] (update-application(parallel-upd(parallel-upd(#createBeforeLoopUpdate(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP),#createLocalAnonUpdate(loopFormula)),#createHeapAnonUpdate(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)),imp(and(inv,freeInv),#box ( (modal operator))\[{ ..
   boolean #x;
   loop-scope (#x) {
     if (#nse) {
@@ -12556,7 +12569,7 @@ loopScopeInvBox {
       break;
     }
   }
-... }\] (and(imp(equals(#x<<loopScopeIndex>>,TRUE),post),imp(equals(#x<<loopScopeIndex>>,FALSE),and(inv,#createFrameCond(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP)))))))) ;
+... }\] (and(imp(equals(#x<<loopScopeIndex>>,TRUE),post),imp(equals(#x<<loopScopeIndex>>,FALSE),and(inv,#createFrameCond(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP))))))))) ;
 \replacewith(inv) 
 \heuristics(loop_scope_inv_taclet)
 Choices: (programRules:Java & javaLoopTreatment:efficient)}
@@ -12571,7 +12584,13 @@ loopScopeInvDia {
 }\] (post))), \varcond (\storeStmtIn(#loopStmt (program Statement), #dia ( (modal operator))\[{
   while (#nse) #body
 }\] (post))), \hasInvariant(#loopStmt (program Statement)), \getInvariant(#loopStmt (program Statement), #dia ( (modal operator)), inv (formula)), \getFreeInvariant(#loopStmt (program Statement), #dia ( (modal operator)), freeInv (formula)), \getVariant(#loopStmt (program Statement), variantTerm (any term)), )
-\add [#wellFormedCond(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)]==>[] \replacewith(update-application(parallel-upd(parallel-upd(#createBeforeLoopUpdate(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP),#createLocalAnonUpdate(loopFormula)),#createHeapAnonUpdate(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)),update-application(elem-update(#variant (program Variable))(variantTerm),imp(and(inv,freeInv),#dia ( (modal operator))\[{ ..
+\add [#wellFormedCond(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)]==>[] \replacewith(#dia ( (modal operator))\[{
+  #typeof(#heapBefore_LOOP) #heapBefore_LOOP;
+  #typeof(#savedHeapBefore_LOOP) #savedHeapBefore_LOOP;
+  #typeof(#permissionsBefore_LOOP) #permissionsBefore_LOOP;
+  #typeof(#permissionsBefore_LOOP) #permissionsBefore_LOOP;
+  #typeof(#variant) #variant;
+}\] (update-application(parallel-upd(parallel-upd(#createBeforeLoopUpdate(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP),#createLocalAnonUpdate(loopFormula)),#createHeapAnonUpdate(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)),update-application(elem-update(#variant (program Variable))(variantTerm),imp(and(inv,freeInv),#dia ( (modal operator))\[{ ..
   boolean #x;
   loop-scope (#x) {
     if (#nse) {
@@ -12581,7 +12600,7 @@ loopScopeInvDia {
       break;
     }
   }
-... }\] (and(imp(equals(#x<<loopScopeIndex>>,TRUE),post),imp(equals(#x<<loopScopeIndex>>,FALSE),and(and(inv,#createFrameCond(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP)),prec(variantTerm,#variant))))))))) ;
+... }\] (and(imp(equals(#x<<loopScopeIndex>>,TRUE),post),imp(equals(#x<<loopScopeIndex>>,FALSE),and(and(inv,#createFrameCond(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP)),prec(variantTerm,#variant)))))))))) ;
 \replacewith(inv) 
 \heuristics(loop_scope_inv_taclet)
 Choices: (programRules:Java & javaLoopTreatment:efficient)}
