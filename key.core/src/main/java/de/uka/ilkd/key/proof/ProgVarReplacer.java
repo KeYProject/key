@@ -260,7 +260,8 @@ public final class ProgVarReplacer {
         final Operator op = t.op();
         if (op instanceof ProgramVariable) {
             return replaceProgramVariable(t);
-        } else if (op instanceof ElementaryUpdate && map.containsKey(((ElementaryUpdate) op).lhs())) {
+        } else if (op instanceof ElementaryUpdate
+                && map.containsKey(((ElementaryUpdate) op).lhs())) {
             return replaceProgramVariableInLHSOfElementaryUpdate(t);
         } else {
             return standardReplace(t);
@@ -270,12 +271,14 @@ public final class ProgVarReplacer {
     /**
      * replaces a program variable on the lefthandside of an elementary update
      * requires the given term to have an elementary update operator as top level operator
+     *
      * @param t the Term where to replace renamed variables
      * @return the term with all replacements done
      */
     private Term replaceProgramVariableInLHSOfElementaryUpdate(Term t) {
-        final Term newTerm = services.getTermBuilder().
-            elementary((UpdateableOperator) map.get(((ElementaryUpdate)t.op()).lhs()), standardReplace(t.sub(0)));
+        final Term newTerm = services.getTermBuilder().elementary(
+            (UpdateableOperator) map.get(((ElementaryUpdate) t.op()).lhs()),
+            standardReplace(t.sub(0)));
         return newTerm;
     }
 

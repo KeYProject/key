@@ -208,7 +208,8 @@ public class TestVariableNamer {
         proof.getNamespaces().programVariables().addSafely(var_2);
         addGlobal(goal, var_2);
 
-        proposal = vn.getNameProposalForSchemaVariable("var", variableSV, pio, null, null, services);
+        proposal =
+            vn.getNameProposalForSchemaVariable("var", variableSV, pio, null, null, services);
         assertEquals("var_2", proposal.toString());
     }
 

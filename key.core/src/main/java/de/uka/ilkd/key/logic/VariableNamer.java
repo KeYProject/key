@@ -331,17 +331,17 @@ public abstract class VariableNamer implements InstantiationProposer {
      * proposes a unique name for the instantiation of a schema variable (like getProposal(), but
      * somewhat less nicely)
      *
-     * @param basename          desired base name, or null to use default
-     * @param sv                the schema variable
-     * @param posOfFind         the PosInOccurrence containing the name's target program
-     * @param posOfDeclaration  the PosInProgram where the name will be declared (or null to just be
-     *                          pessimistic about the scope)
+     * @param basename desired base name, or null to use default
+     * @param sv the schema variable
+     * @param posOfFind the PosInOccurrence containing the name's target program
+     * @param posOfDeclaration the PosInProgram where the name will be declared (or null to just be
+     *        pessimistic about the scope)
      * @param previousProposals list of names which should be considered taken, or null
      * @return the name proposal, or null if no proposal is available
      */
     protected ProgramElementName getNameProposalForSchemaVariable(String basename,
-                                                                  SchemaVariable sv, PosInOccurrence posOfFind, PosInProgram posOfDeclaration,
-                                                                  ImmutableList<String> previousProposals, Services services) {
+            SchemaVariable sv, PosInOccurrence posOfFind, PosInProgram posOfDeclaration,
+            ImmutableList<String> previousProposals, Services services) {
         ProgramElementName result = null;
 
         Sort svSort = sv.sort();
@@ -354,9 +354,10 @@ public abstract class VariableNamer implements InstantiationProposer {
                         + 1;
 
             Name tmpName = new Name(basename + (cnt == 0 ? "" : "_" + cnt));
-            while (services.getNamespaces().lookupLogicSymbol(tmpName)!=null) {
+            while (services.getNamespaces().lookupLogicSymbol(tmpName) != null) {
                 cnt++;
-                tmpName = new Name(basename + "_" + cnt);}
+                tmpName = new Name(basename + "_" + cnt);
+            }
 
             result = createName(basename, cnt, null);
 
