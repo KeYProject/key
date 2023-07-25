@@ -210,7 +210,7 @@ public class TestVariableNamer {
 
         proposal =
             vn.getNameProposalForSchemaVariable("var", variableSV, pio, null, null, services);
-        assertEquals("var_2", proposal.toString());
+        assertEquals("var_3", proposal.toString());
     }
 
 
