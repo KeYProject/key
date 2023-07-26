@@ -75,15 +75,15 @@ class EndToEndTests {
         Pair<Proof, File> iteration1 = sliceProofFullFilename(
             new File(testCaseDirectory,
                 "../../../../../key.ui/examples/firstTouch/05-ReverseArray/reverseArray.proof"),
-            6530, 4229, true, true);
+            6535, 4234, true, true);
         Pair<Proof, File> iteration2 =
-            sliceProofFullFilename(iteration1.second, 4229, 4222, true, true);
+            sliceProofFullFilename(iteration1.second, 4234, 4227, true, true);
         Pair<Proof, File> iteration3 =
-            sliceProofFullFilename(iteration2.second, 4222, 4213, true, true);
+            sliceProofFullFilename(iteration2.second, 4227, 4218, true, true);
         Pair<Proof, File> iteration4 =
-            sliceProofFullFilename(iteration3.second, 4213, 4202, true, true);
+            sliceProofFullFilename(iteration3.second, 4218, 4207, true, true);
         Pair<Proof, File> iteration5 =
-            sliceProofFullFilename(iteration4.second, 4202, 4190, true, true);
+            sliceProofFullFilename(iteration4.second, 4207, 4195, true, true);
         Files.delete(iteration5.second.toPath());
         Files.delete(iteration4.second.toPath());
         Files.delete(iteration3.second.toPath());
