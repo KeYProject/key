@@ -29,9 +29,6 @@ dependencies {
     runtimeOnly project(":keyext.exploration")
     runtimeOnly project(":keyext.cacheproofs")
     runtimeOnly project(":keyext.slicing")
-
-
-    runtimeOnly "io.github.wadoon:key-interactionlog:0.9-SNAPSHOT"
 }
 
 repositories {

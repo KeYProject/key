@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.LemmaJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -82,6 +83,11 @@ import org.key_project.util.collection.ImmutableSet;
 public abstract class Taclet implements Rule, Named {
 
     protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
+    /**
+     * The proof node that added this taclet to the set of available taclets.
+     * May be null if this taclet wasn't added by another proof step.
+     */
+    private Node addedBy = null;
 
     public RuleJustification getRuleJustification() {
         if (tacletAnnotations.contains(TacletAnnotation.LEMMA)) {
@@ -981,4 +987,12 @@ public abstract class Taclet implements Rule, Named {
     public String getOrigin() { return origin; }
 
     public void setOrigin(@Nullable String origin) { this.origin = origin; }
+
+    public void setAddedBy(Node addedBy) {
+        this.addedBy = addedBy;
+    }
+
+    public Node getAddedBy() {
+        return addedBy;
+    }
 }

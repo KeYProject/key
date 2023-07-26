@@ -62,22 +62,6 @@ sonarqube {
     }
 }
 
-sonarqube {
-    properties {
-        property "sonar.projectKey", "key-main"
-        property "sonar.organization", "keyproject"
-        property "sonar.host.url", "https://sonarcloud.io"
-    }
-}
-
-sonarqube {
-    properties {
-        property "sonar.projectKey", "key-main"
-        property "sonar.organization", "keyproject"
-        property "sonar.host.url", "https://sonarcloud.io"
-    }
-}
-
 subprojects {
     apply plugin: "java"
     apply plugin: "java-library"
@@ -89,8 +73,8 @@ subprojects {
     group = rootProject.group
     version = rootProject.version
 
-    sourceCompatibility = 11
-    targetCompatibility = 11
+    sourceCompatibility = 21
+    targetCompatibility = 21
 
     repositories {
         mavenCentral()
