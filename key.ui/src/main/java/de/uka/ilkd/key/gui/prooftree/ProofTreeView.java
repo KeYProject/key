@@ -393,21 +393,65 @@ public class ProofTreeView extends JPanel implements TabPanel {
         mediator.removeGUIListener(guiListener);
     }
 
+    /**
+     * Select the next goal above the currently selected node.
+     *
+     * @return whether such a goal was found
+     */
     public boolean selectAbove() {
-        return selectRelative(+1);
-    }
-
-    public boolean selectBelow() {
-        return selectRelative(-1);
-    }
-
-    private boolean selectRelative(int i) {
         TreePath path = delegateView.getSelectionPath();
+        if (path == null) {
+            return false;
+        }
         int row = delegateView.getRowForPath(path);
-        TreePath newPath = delegateView.getPathForRow(row - i);
-        if (newPath != null) {
-            delegateView.setSelectionPath(newPath);
-            return true;
+        row--;
+        while (delegateView.getPathForRow(row) != null) {
+            TreePath tp = delegateView.getPathForRow(row);
+            var treeNode = (GUIAbstractTreeNode) tp.getLastPathComponent();
+            if (treeNode instanceof GUIBranchNode && treeNode.getNode().parent() != null
+                    && treeNode.getNode().parent().childrenCount() > 1
+                    && !delegateView.isExpanded(tp)) {
+                int prevRows = delegateView.getRowCount();
+                delegateView.expandPath(tp);
+                int newRows = delegateView.getRowCount();
+                // search must continue at the end of the just expanded branch!
+                row += (newRows - prevRows);
+                continue;
+            }
+            if (treeNode.getNode().leaf()) {
+                mediator.getSelectionModel().setSelectedNode(treeNode.getNode());
+                return true;
+            }
+            row--;
+        }
+        return false;
+    }
+
+    /**
+     * Select the next goal below the currently selected node.
+     *
+     * @return whether such a goal was found
+     */
+    public boolean selectBelow() {
+        TreePath path = delegateView.getSelectionPath();
+        if (path == null) {
+            return false;
+        }
+        int row = delegateView.getRowForPath(path);
+        row++;
+        while (delegateView.getPathForRow(row) != null) {
+            TreePath tp = delegateView.getPathForRow(row);
+            var treeNode = (GUIAbstractTreeNode) tp.getLastPathComponent();
+            if (treeNode instanceof GUIBranchNode && treeNode.getNode().parent() != null
+                    && treeNode.getNode().parent().childrenCount() > 1
+                    && !delegateView.isExpanded(tp)) {
+                delegateView.expandPath(tp);
+            }
+            if (treeNode.getNode().leaf()) {
+                mediator.getSelectionModel().setSelectedNode(treeNode.getNode());
+                return true;
+            }
+            row++;
         }
         return false;
     }

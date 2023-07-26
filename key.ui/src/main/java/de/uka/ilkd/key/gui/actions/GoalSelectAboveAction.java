@@ -17,8 +17,6 @@ public final class GoalSelectAboveAction extends MainWindowAction {
      * Creates the new action.
      *
      * @param mainWindow the main window this action belongs to
-     * @param longName true iff long names (including the name of the rule to undo) shall be
-     *        displayed (e.g. in menu items)
      */
     public GoalSelectAboveAction(MainWindow mainWindow) {
         super(mainWindow, true);
