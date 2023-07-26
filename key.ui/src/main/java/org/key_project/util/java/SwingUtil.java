@@ -149,4 +149,28 @@ public final class SwingUtil {
 
         return scrollPane;
     }
+
+    /**
+     * Set the provided font on the component and recursively on all children components.
+     *
+     * @param component the component
+     * @param font the font
+     */
+    public static void setFont(JComponent component, Font font) {
+        component.setFont(font);
+        for (int i = 0; i < component.getComponentCount(); i++) {
+            Component c = component.getComponent(i);
+            if (c == null) {
+                continue;
+            }
+            c.setFont(font);
+            if (c instanceof JComponent) {
+                setFont((JComponent) c, font);
+            }
+        }
+        // JMenu hides its entries in the popup menu
+        if (component instanceof JMenu && ((JMenu) component).getPopupMenu() != null) {
+            setFont(((JMenu) component).getPopupMenu(), font);
+        }
+    }
 }
