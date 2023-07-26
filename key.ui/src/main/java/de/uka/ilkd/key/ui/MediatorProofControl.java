@@ -198,6 +198,10 @@ public class MediatorProofControl extends AbstractProofControl {
                 ui.getMediator().startInterface(true);
 
                 emitInteractiveAutoMode(initialGoals, proof, info);
+
+                if (info.getException() != null) {
+                    notifyException(info.getException());
+                }
             }
         }
 
@@ -206,7 +210,7 @@ public class MediatorProofControl extends AbstractProofControl {
             interactionListeners.forEach((l) -> l.runAutoMode(initialGoals, proof, info));
         }
 
-        private void notifyException(final Exception exception) {
+        private void notifyException(final Throwable exception) {
             LOGGER.error("exception during strategy ", exception);
             IssueDialog.showExceptionDialog(MainWindow.getInstance(), exception);
         }
