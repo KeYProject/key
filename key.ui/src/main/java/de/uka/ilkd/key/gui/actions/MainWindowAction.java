@@ -33,7 +33,7 @@ public abstract class MainWindowAction extends KeyAction {
     protected MainWindowAction(MainWindow mainWindow, boolean onlyActiveWhenProofAvailable) {
         this(mainWindow);
         if (onlyActiveWhenProofAvailable) {
-            LISTENER.actions.add(this);
+            LISTENER.addAction(this);
             this.setEnabled(getMediator().getSelectionModel().getSelectedProof() != null);
         }
     }
@@ -56,6 +56,13 @@ public abstract class MainWindowAction extends KeyAction {
 
     private static final class MainWindowActionSelectionListener implements KeYSelectionListener {
         private final Collection<MainWindowAction> actions = new ArrayList<>();
+
+        private void addAction(MainWindowAction action) {
+            if (actions.isEmpty()) {
+                action.getMediator().addKeYSelectionListener(this);
+            }
+            actions.add(action);
+        }
 
         @Override
         public void selectedNodeChanged(KeYSelectionEvent e) {
