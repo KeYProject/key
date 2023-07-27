@@ -176,16 +176,18 @@ public class ProofSettings {
      */
     public void loadSettings() {
         if (!PROVER_CONFIG_FILE.exists()) {
-            return;
-        }
-        try (FileReader in = new FileReader(PROVER_CONFIG_FILE, StandardCharsets.UTF_8)) {
-            if (Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
-                LOGGER.warn("The settings in {} are *not* read.", PROVER_CONFIG_FILE);
-            } else {
-                loadSettingsFromStream(in);
+            saveSettings();
+            LOGGER.info("No proof-settings exists. Generating default settings.");
+        } else {
+            try (FileReader in = new FileReader(PROVER_CONFIG_FILE, StandardCharsets.UTF_8)) {
+                if (Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
+                    LOGGER.warn("The settings in {} are *not* read.", PROVER_CONFIG_FILE);
+                } else {
+                    loadSettingsFromStream(in);
+                }
+            } catch (IOException e) {
+                LOGGER.warn("No proof-settings could be loaded, using defaults", e);
             }
-        } catch (IOException e) {
-            LOGGER.warn("No proof-settings could be loaded, using defaults", e);
         }
     }
 
