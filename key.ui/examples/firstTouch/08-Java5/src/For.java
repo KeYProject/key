@@ -25,6 +25,7 @@ class For implements Iterable {
     void infiniteLoop() {
         //@ maintaining \invariant_for(f);
         //@ assignable \strictly_nothing;
+        //@ diverges true;
         for (Object o: f);
     }
 
