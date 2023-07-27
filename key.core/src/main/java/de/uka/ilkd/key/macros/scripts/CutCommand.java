@@ -13,6 +13,8 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import static de.uka.ilkd.key.macros.scripts.EngineState.getGoal;
+
 /**
  * The command object CutCommand has as scriptcommand name "cut" As parameters: a formula with the
  * id "#2"
@@ -56,10 +58,9 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
         Node node = goal.node();
         goal.apply(app);
 
-
         // TODO HACK! Renaming the goals to "show" and "use" to allow for references from scripts
-        goal.proof().getGoal(node.child(0)).setBranchLabel("use");
-        goal.proof().getGoal(node.child(1)).setBranchLabel("show");
+        getGoal(goal.proof().openGoals(), node.child(0)).setBranchLabel("use");
+        getGoal(goal.proof().openGoals(), node.child(1)).setBranchLabel("show");
     }
 
     public static class Parameters {

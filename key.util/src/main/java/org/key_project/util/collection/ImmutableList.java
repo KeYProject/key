@@ -302,7 +302,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
     /**
      * Returns the element at the specified position in this list.
      *
-     * @param index index of the element to return
+     * @param index 0-based index of the element to return
      * @return the element at the specified position in this list
      * @throws IndexOutOfBoundsException if the index is out of range
      *         ({@code index < 0 || index >= size()})
@@ -365,18 +365,6 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
             remainder = remainder.tail();
         }
         return remainder.head();
-    }
-
-    /**
-     * Get the n-th element of this list.
-     *
-     * @param idx the 0-based index of the element
-     * @return the element at index idx.
-     * @throws IndexOutOfBoundsException if idx is less than 0 or at
-     *         least {@link #size()}.
-     */
-    default T get(int idx) {
-        return take(idx).head();
     }
 
 }
