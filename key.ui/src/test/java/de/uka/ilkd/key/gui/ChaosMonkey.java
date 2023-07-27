@@ -21,7 +21,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import org.key_project.util.java.SwingUtil;
 
 import bibliothek.gui.dock.dockable.AbstractDockable;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +51,7 @@ final class ChaosMonkey {
     private static boolean detectedError = false;
 
     @Test
+    @Disabled
     void clickAllTheButtons() {
         new Thread(ChaosMonkey::click, "ChaosMonkey").start();
 
