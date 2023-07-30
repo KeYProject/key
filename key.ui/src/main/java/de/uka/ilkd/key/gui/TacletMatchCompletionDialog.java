@@ -321,6 +321,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                         errorPositionKnown(exc.getMessage(), ex.getPosition().line(),
                             ex.getPosition().column(), ex.inIfSequent());
                     }
+                    LOGGER.error("", exc);
                     IssueDialog.showExceptionDialog(TacletMatchCompletionDialog.this, exc);
                     return;
                 }

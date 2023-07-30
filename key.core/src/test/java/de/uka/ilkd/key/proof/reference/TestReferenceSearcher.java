@@ -79,4 +79,50 @@ class TestReferenceSearcher {
         p.dispose();
         p2.dispose();
     }
+
+    @Test
+    void checksUserLemmas() throws Exception {
+        GeneralSettings.noPruningClosed = false;
+        // Test scenario:
+        // Proof 1 uses a user-defined lemma.
+        // Proof 2 does not.
+        // Reference searcher should not find proof 1 when considering proof 2.
+
+        KeYEnvironment<DefaultUserInterfaceControl> env =
+            KeYEnvironment.load(new File(testCaseDirectory,
+                "proofCaching/proofWithRule.proof"));
+        Proof p = env.getLoadedProof();
+        KeYEnvironment<DefaultUserInterfaceControl> env2 =
+            KeYEnvironment.load(new File(testCaseDirectory,
+                "proofCaching/proofWithoutRule.proof"));
+        Proof p2 = env2.getLoadedProof();
+        KeYEnvironment<DefaultUserInterfaceControl> env3 =
+            KeYEnvironment.load(new File(testCaseDirectory,
+                "proofCaching/proofWithRule.proof"));
+        Proof p3 = env3.getLoadedProof();
+
+        DefaultListModel<Proof> previousProofs = new DefaultListModel<>();
+        previousProofs.addElement(p);
+        DefaultListModel<Proof> newProof = new DefaultListModel<>();
+        newProof.addElement(p2);
+
+        p2.pruneProof(p2.root());
+
+        assertTrue(ReferenceSearcher.suitableForCloseByReference(p2.root()));
+        ClosedBy c = ReferenceSearcher.findPreviousProof(previousProofs, p2.root());
+        assertNull(c);
+
+        // check that result is found if the user taclet is available
+        p3.pruneProof(p3.root());
+        assertTrue(ReferenceSearcher.suitableForCloseByReference(p3.root()));
+        c = ReferenceSearcher.findPreviousProof(previousProofs, p3.root());
+        assertNotNull(c);
+        assertEquals(0, c.getNode().serialNr());
+        assertEquals(p, c.getProof());
+
+        GeneralSettings.noPruningClosed = true;
+        p.dispose();
+        p2.dispose();
+        p3.dispose();
+    }
 }

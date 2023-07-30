@@ -242,6 +242,8 @@ public class RecentFileMenu {
      */
     public void store(String filename) {
         File localRecentFiles = new File(filename);
+        localRecentFiles.getParentFile().mkdirs();
+
         // creates a new file if it does not exist yet
         try {
             localRecentFiles.createNewFile();
@@ -257,7 +259,7 @@ public class RecentFileMenu {
             store(p);
             p.store(fout, "recent files");
         } catch (IOException ex) {
-            LOGGER.info("Could not write recent files list", ex);
+            LOGGER.info("Could not write recent files list ", ex);
         }
     }
 

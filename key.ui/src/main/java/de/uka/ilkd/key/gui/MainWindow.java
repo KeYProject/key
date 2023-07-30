@@ -45,6 +45,7 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.plugins.action_history.ActionHistoryExtension;
 import de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
+import de.uka.ilkd.key.gui.settings.FontSizeFacade;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.smt.DropdownSelectionButton;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
@@ -58,6 +59,7 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
@@ -286,6 +288,9 @@ public final class MainWindow extends JFrame {
         userInterface = new WindowUserInterfaceControl(this);
         mediator = getMainWindowMediator(userInterface);
         KeYGuiExtensionFacade.getStartupExtensions().forEach(it -> it.preInit(this, mediator));
+
+        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        FontSizeFacade.resizeFonts(vs.getUIFontSizeFactor());
 
         termLabelMenu = new TermLabelMenu(this);
         currentGoalView = new CurrentGoalView(this);

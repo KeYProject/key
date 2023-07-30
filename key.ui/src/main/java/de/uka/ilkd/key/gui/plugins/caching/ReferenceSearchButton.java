@@ -69,6 +69,15 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
     @Override
     public void selectedNodeChanged(KeYSelectionEvent e) {
         Proof p = e.getSource().getSelectedProof();
+        updateState(p);
+    }
+
+    /**
+     * Update the UI state of this button.
+     *
+     * @param p the currently selected proof
+     */
+    public void updateState(Proof p) {
         if (p == null) {
             setText("Proof Caching");
             setForeground(null);
