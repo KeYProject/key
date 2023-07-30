@@ -312,21 +312,36 @@ subprojects {
         }
         repositories {
             maven {
+                /**
+                 * To be able to publish things on Maven Central, you need two things:
+                 *
+                 * (1) a JIRA account with permission on group-id `org.key-project`
+                 * (2) a keyserver-published GPG (w/o sub-keys)
+                 *
+                 * Your `$HOME/.gradle/gradle.properties` should like this:
+                 * ```
+                 * signing.keyId=YourKeyId
+                 * signing.password=YourPublicKeyPassword
+                 * ossrhUsername=your-jira-id
+                 * ossrhPassword=your-jira-password
+                 * ```
+                 *
+                 * You can test signing with `gradle sign`, and publish with `gradle publish`.
+                 * https://central.sonatype.org/publish/publish-guide/
+                 */
                 if (project.version.endsWith("-SNAPSHOT")) {
                     name = "mavenSnapshot"
                     url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
                     credentials(PasswordCredentials) {
-                        println("username: ", ossrhUsername)
-                        username = ossrhUsername
-                        password = ossrhPassword
+                        username = project.properties.getOrDefault("ossrhUsername","")
+                        password = project.properties.getOrDefault("ossrhPassword","")
                     }
                 } else {
                     name = "mavenStaging"
                     url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
                     credentials(PasswordCredentials) {
-                        println("username: " + ossrhPassword)
-                        username = ossrhUsername
-                        password = ossrhPassword
+                        username = project.properties.getOrDefault("ossrhUsername","")
+                        password = project.properties.getOrDefault("ossrhPassword","")
                     }
                 }
             }
