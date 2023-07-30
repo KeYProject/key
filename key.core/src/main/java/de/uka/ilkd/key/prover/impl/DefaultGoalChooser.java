@@ -312,7 +312,7 @@ public class DefaultGoalChooser implements GoalChooser {
 
         while (childrenIt.hasNext()) {
             final Node child = childrenIt.next();
-            final Goal goal = proof.getGoal(child);
+            final Goal goal = proof.getOpenGoal(child);
 
             if (goalList.contains(goal)) {
                 selectedList = selectedList.prepend(goal);

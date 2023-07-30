@@ -56,9 +56,8 @@ public enum FontAwesomeRegular implements IconFont {
     public Font getFont() throws IOException, FontFormatException {
         if (font == null) {
             font = Font.createFont(Font.TRUETYPE_FONT,
-                getClass().getResourceAsStream("/fonts/Font Awesome 5 Free-Regular-400.otf"));
+                getClass().getResourceAsStream("/fonts/Font Awesome 6 Free-Regular-400.otf"));
         }
-        // getClass().getResourceAsStream("/fonts/fa-regular-400.ttf"));
         return font;
     }
 

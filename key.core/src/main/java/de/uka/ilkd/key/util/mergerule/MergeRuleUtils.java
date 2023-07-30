@@ -1117,7 +1117,7 @@ public class MergeRuleUtils {
 
         // This goal
         final Collection<Operator> thisGoalSymbols = new ArrayList<>();
-        final Goal thisGoal = proof.getGoal(mergeState.getCorrespondingNode());
+        final Goal thisGoal = proof.getOpenGoal(mergeState.getCorrespondingNode());
         final NamespaceSet thisGoalNamespaces = thisGoal.getLocalNamespaces();
         thisGoalSymbols.addAll(thisGoalNamespaces.programVariables().allElements());
         thisGoalSymbols.addAll(thisGoalNamespaces.functions().allElements());
@@ -1126,7 +1126,7 @@ public class MergeRuleUtils {
 
         // Partner goal
         final Collection<Operator> partnerGoalSymbols = new ArrayList<>();
-        final Goal partnerGoal = proof.getGoal(mergePartnerState.getCorrespondingNode());
+        final Goal partnerGoal = proof.getOpenGoal(mergePartnerState.getCorrespondingNode());
         final NamespaceSet partnerGoalNamespaces = partnerGoal.getLocalNamespaces();
         partnerGoalSymbols.addAll(partnerGoalNamespaces.programVariables().allElements());
         partnerGoalSymbols.addAll(partnerGoalNamespaces.functions().allElements());
