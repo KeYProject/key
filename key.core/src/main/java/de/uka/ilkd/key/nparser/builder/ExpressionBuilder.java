@@ -260,7 +260,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return null;
     }
 
-    private final Map<String, Operator> functionLookupCache = new HashMap<>();
+    private final Map<String, Operator> functionLookupCache = new TreeMap<>();
 
     private Map<String, Operator> getFunctionCache() {
         if (functionLookupCache.isEmpty()) {
@@ -271,11 +271,13 @@ public class ExpressionBuilder extends DefaultBuilder {
                 }
 
                 if (fun.getMetaData() != null) {
-                    var md = fun.getMetaData();
-                    for (var alt : md.getAlternativeSignatures(fun)) {
-                        oldOp = functionLookupCache.put(alt, fun);
-                        if (oldOp != null) {
-                            throw new IllegalStateException("Operator collision detected!");
+                    var mds = fun.getMetaData();
+                    for (var md : mds) {
+                        for (var alt : md.getAlternativeSignatures(fun)) {
+                            oldOp = functionLookupCache.put(alt, fun);
+                            if (oldOp != null) {
+                                throw new IllegalStateException("Operator collision detected!");
+                            }
                         }
                     }
                 }
@@ -436,8 +438,9 @@ public class ExpressionBuilder extends DefaultBuilder {
             var opText = operators.get(i).getText();
             var op = lookupOperator(operators.get(i), left.sort(), cur.sort(), opText);
             if (op == null) {
-                semanticError(ctx, "Unknown operator %s for sorts [%s,%s]", operators.get(i).getText(),
-                        left.sort(), cur.sort());
+                var help = "";
+                semanticError(ctx, "Unknown operator %s for sorts [%s,%s]\n%s", operators.get(i).getText(),
+                        left.sort(), cur.sort(),help);
             }
             left = binaryTerm(ctx, op, left, cur);
         }

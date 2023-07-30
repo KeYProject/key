@@ -1,6 +1,10 @@
 package de.uka.ilkd.key.nparser.builder;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -61,7 +65,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
         Function p = null;
 
-        FunctionMetaData metaData = null;
+        ImmutableArray<FunctionMetaData> metaData = null;
         if (ctx.functionMetaData() != null) {
             metaData = accept(ctx.functionMetaData());
         }
@@ -81,9 +85,9 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         if (p == null) {
             assert argSorts != null;
             p = new Function(new Name(pred_name), Sort.FORMULA, argSorts.toArray(new Sort[0]),
-                    whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), false, metaData);
+                    whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), false,
+                    metaData);
         }
-
 
 
         if (lookup(p.name()) == null) {
@@ -93,39 +97,34 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
     }
 
     @Override
-    public FunctionMetaData visitInfixMetaData(KeYParser.InfixMetaDataContext ctx) {
-        var op = or(ctx.opStrong1(), ctx.opComparison(), ctx.opWeak(), ctx.opStrong2(), ctx.opEqualities());
-        var opInfo = OperatorInfo.find(op.start);
-        if (opInfo != null) {
-            return new InfixMetaData(opInfo.getNames(), opInfo.getPrecedence());
-        } else {
-            int prec = 0;
-            if (ctx.opEqualities() != null)
-                prec = NotationInfo.PRIORITY_EQUAL;
-            if (ctx.opComparison() != null)
-                prec = NotationInfo.PRIORITY_COMPARISON;
-            if (ctx.opStrong1() != null)
-                prec = NotationInfo.PRIORITY_ARITH_STRONG;
-            if (ctx.opStrong2() != null)
-                prec = NotationInfo.PRIORITY_ARITH_STRONG;
-            if (ctx.opWeak() != null)
-                prec = NotationInfo.PRIORITY_ARITH_WEAK;
-            if (ctx.opConjunction() != null)
-                prec = NotationInfo.PRIORITY_AND;
-            if (ctx.opDisjunction() != null)
-                prec = NotationInfo.PRIORITY_OR;
-
-            return new InfixMetaData(op.getText(), prec);
-        }
+    public ImmutableArray<FunctionMetaData> visitInfixMetaData(KeYParser.InfixMetaDataContext ctx) {
+        return ctx.infixOperator().stream()
+                .filter(Objects::nonNull)
+                .map(it -> {
+                    var opInfo = OperatorInfo.find(it.start);
+                    if (opInfo != null) {
+                        return new InfixMetaData(opInfo.getNames(), opInfo.getPrecedence());
+                    } else {
+                        int prec = 0;
+                        if (it.opEqualities() != null)
+                            prec = NotationInfo.PRIORITY_EQUAL;
+                        if (it.opComparison() != null)
+                            prec = NotationInfo.PRIORITY_COMPARISON;
+                        if (it.opStrong1() != null)
+                            prec = NotationInfo.PRIORITY_ARITH_STRONG;
+                        if (it.opStrong2() != null)
+                            prec = NotationInfo.PRIORITY_ARITH_STRONG;
+                        if (it.opWeak() != null)
+                            prec = NotationInfo.PRIORITY_ARITH_WEAK;
+                        if (it.opConjunction() != null)
+                            prec = NotationInfo.PRIORITY_AND;
+                        if (it.opDisjunction() != null)
+                            prec = NotationInfo.PRIORITY_OR;
+                        return new InfixMetaData(it.getText(), prec);
+                    }
+                }).collect(ImmutableArray.collector());
     }
 
-
-    private ParserRuleContext or(ParserRuleContext... ctxs) {
-        for (ParserRuleContext ctx : ctxs) {
-            if (ctx != null) return ctx;
-        }
-        return null;
-    }
 
     @Override
     public Object visitPrefixMetaData(KeYParser.PrefixMetaDataContext ctx) {
@@ -156,7 +155,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         }
 
 
-        FunctionMetaData metaData = null;
+        ImmutableArray<FunctionMetaData> metaData = null;
         if (ctx.functionMetaData() != null) {
             metaData = accept(ctx.functionMetaData());
         }

@@ -1,11 +1,12 @@
 package org.key_project.util.collection;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import javax.annotation.Nonnull;
@@ -49,6 +50,41 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     @SuppressWarnings("unchecked")
     public ImmutableArray(@Nonnull Collection<? extends S> list) {
         content = (S[]) list.toArray();
+    }
+
+    /**
+     * A collector for the creation of {@link ImmutableArray} from streams.
+     */
+    public static <T> Collector<T, ArrayList<T>, ImmutableArray<T>> collector() {
+        return new Collector<>() {
+            @Override
+            public Supplier<ArrayList<T>> supplier() {
+                return ArrayList::new;
+            }
+
+            @Override
+            public BiConsumer<ArrayList<T>, T> accumulator() {
+                return ArrayList::add;
+            }
+
+            @Override
+            public BinaryOperator<ArrayList<T>> combiner() {
+                return (a, b) -> {
+                    a.addAll(b);
+                    return a;
+                };
+            }
+
+            @Override
+            public Function<ArrayList<T>, ImmutableArray<T>> finisher() {
+                return ImmutableArray::new;
+            }
+
+            @Override
+            public Set<Characteristics> characteristics() {
+                return Set.of();
+            }
+        };
     }
 
     /**

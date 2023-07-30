@@ -73,6 +73,11 @@ public enum OperatorInfo {
      */
     SUBSET_OF_OR_EQUAL_TO(KeYLexer.SUBSET_OF_OR_EQUAL_TO, PRIORITY_COMPARISON, '⊆', "\\subseteq"),
 
+    /**
+     * ∖ SET MINUS
+     */
+    SET_MINUS(KeYLexer.SETMINUS, PRIORITY_ARITH_WEAK, '∖', "\\setminus"),
+
     // (8848)	⊐	SQUARE ORIGINAL OF	viereckiges Original
     SQUARE_ORIGINAL_OF(KeYLexer.SQUARE_ORIGINAL, PRIORITY_COMPARISON, '⊐'),
     // (8850)	⊒	SQUARE ORIGINAL OF OR EQUAL TO	viereckiges Original oder gleich
@@ -115,6 +120,7 @@ public enum OperatorInfo {
     SQUARE_IMAGE_OF(KeYLexer.SQUARE_IMAGE_OF, PRIORITY_COMPARISON, '⊏'),
 
 
+    GREATER(KeYLexer.GREATER, PRIORITY_COMPARISON, '>'),
     GREATER_EQUAL(KeYLexer.GREATEREQUAL, PRIORITY_COMPARISON, '≥', ">="),
 
     EQUALITY(KeYLexer.EQUALS, PRIORITY_COMPARISON, '↔', "<->"),

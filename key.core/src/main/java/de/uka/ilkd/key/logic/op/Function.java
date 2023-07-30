@@ -20,7 +20,7 @@ public class Function extends AbstractSortedOperator {
     private final boolean unique;
     private final boolean skolemConstant;
     @Nullable
-    private final FunctionMetaData metaData;
+    private final ImmutableArray<FunctionMetaData> metaData;
 
 
     // -------------------------------------------------------------------------
@@ -29,7 +29,7 @@ public class Function extends AbstractSortedOperator {
 
     Function(Name name, Sort sort, ImmutableArray<Sort> argSorts,
              ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
-             boolean isSkolemConstant, @Nullable FunctionMetaData metaData) {
+             boolean isSkolemConstant, @Nullable ImmutableArray<FunctionMetaData> metaData) {
         super(name, argSorts, sort, whereToBind, isRigid);
         this.unique = unique;
         this.skolemConstant = isSkolemConstant;
@@ -88,7 +88,7 @@ public class Function extends AbstractSortedOperator {
     }
 
     public Function(Name name, Sort retSort, @Nonnull Sort[] argSort, @Nullable Boolean[] whereToBind, boolean unique,
-                    @Nullable FunctionMetaData metaData) {
+                    @Nullable ImmutableArray<FunctionMetaData> metaData) {
         this(name, retSort, new ImmutableArray<>(argSort),
                 whereToBind == null ? null : new ImmutableArray<>(whereToBind),
                 unique, false, false, metaData);
@@ -146,7 +146,7 @@ public class Function extends AbstractSortedOperator {
     }
 
     @Nullable
-    public FunctionMetaData getMetaData() {
+    public ImmutableArray<FunctionMetaData> getMetaData() {
         return metaData;
     }
 }

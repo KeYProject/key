@@ -232,10 +232,11 @@ func_decl
 ;
 
 
+infixOperator: (opComparison|opWeak|opEqualities|opStrong1|opStrong2|opConjunction|opDisjunction);
 functionMetaData
 :
-    INFIX LPAREN (opComparison|opWeak|opEqualities|opStrong1|opStrong2|opConjunction|opDisjunction) RPAREN #infixMetaData
-  | PREFIX LPAREN (opUnaryTerm) RPAREN                       #prefixMetaData
+    INFIX LPAREN infixOperator+  RPAREN                             #infixMetaData
+  | PREFIX LPAREN (opUnaryTerm)* RPAREN                             #prefixMetaData
   | POSTFIX LPAREN (AT) RPAREN                                      #postfixMetaData
   | SHORTCUT LPAREN IDENT RPAREN                                    #shortcutMetaData
 ;

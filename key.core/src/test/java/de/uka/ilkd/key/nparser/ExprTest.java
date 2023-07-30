@@ -1,21 +1,31 @@
 package de.uka.ilkd.key.nparser;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.overop.OperatorInfo;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -25,6 +35,48 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class ExprTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExprTest.class);
+
+    @Test
+    public void printOpTable() throws IllegalAccessException {
+        var sw = new StringWriter();
+        var out = new PrintWriter(sw);
+
+        var map = new TreeMap<Integer, List<OperatorInfo>>();
+        for (OperatorInfo value : OperatorInfo.values()) {
+            if (!map.containsKey(value.getPrecedence()))
+                map.put(value.getPrecedence(), new LinkedList<>());
+            map.get(value.getPrecedence()).add(value);
+        }
+        out.println("| Level | Operators |");
+        out.println(":-: | -----------");
+        var levels = Arrays.stream(NotationInfo.class.getFields())
+                .filter(it -> it.getName().startsWith("PRIORITY_"))
+                .collect(Collectors.toList());
+
+        levels.sort(Comparator.comparing(it -> {
+            try {
+                return it.getInt(null);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }));
+
+        for (Field f : levels) {
+            int level = f.getInt(null);
+            var values = map.get(level);
+            var a = "";
+            if (values != null) a = values.stream()
+                    .flatMap(it -> it.getNames().stream())
+                    .map(it -> "`"+it+"`")
+                    .collect(Collectors.joining(" "));
+            out.format("| %d | %s | %s |\n",
+                    level, f.getName().substring(9),
+                    a
+            );
+        }
+        System.out.println(sw);
+    }
+
 
     @ParameterizedTest
     @CsvFileSource(resources = "exprs.txt", delimiter = '^')
@@ -37,7 +89,7 @@ public class ExprTest {
         LOGGER.info("Actual Term: {}", actual);
 
         LOGGER.warn("Actual Term: {}",
-            LogicPrinter.quickPrintTerm(actual, io.getServices(), true, true));
+                LogicPrinter.quickPrintTerm(actual, io.getServices(), true, true));
     }
 
     private KeyIO getIo() throws IOException {

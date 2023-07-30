@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 
 /**
@@ -40,7 +41,7 @@ public final class SortDependingFunction extends Function {
     }
 
     private SortDependingFunction(SortDependingFunctionTemplate template, Sort sortDependingOn,
-                                  @Nullable FunctionMetaData metaData) {
+                                  @Nullable ImmutableArray<FunctionMetaData> metaData) {
         super(instantiateName(template.kind, sortDependingOn),
                 instantiateResultSort(template, sortDependingOn),
                 instantiateArgSorts(template, sortDependingOn), null, template.unique,
@@ -77,7 +78,7 @@ public final class SortDependingFunction extends Function {
 
     public static SortDependingFunction createFirstInstance(
             GenericSort sortDependingOn, Name kind, Sort sort, Sort[] argSorts, boolean unique,
-            FunctionMetaData metaData) {
+            @Nullable ImmutableArray<FunctionMetaData> metaData) {
         SortDependingFunctionTemplate template = new SortDependingFunctionTemplate(sortDependingOn,
                 kind, sort, new ImmutableArray<>(argSorts), unique);
         return new SortDependingFunction(template, Sort.ANY, metaData);
