@@ -116,17 +116,9 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
             if (goal.proof().getInitConfig().getJustifInfo().getJustification(RULE) == null) {
                 goal.proof().getInitConfig().registerRule(RULE, () -> false);
             }
-
-            // SMTRuleApp app = (SMTRuleApp) ruleApp;
-            // goal.node().getNodeInfo().setBranchLabel(app.getTitle());
-            ImmutableList<Goal> newGoals = goal.split(1);
-
-            return newGoals;
+            return goal.split(1);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public boolean isApplicableOnSubTerms() {
             return false;

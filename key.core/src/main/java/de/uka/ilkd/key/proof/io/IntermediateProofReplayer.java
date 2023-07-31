@@ -622,10 +622,9 @@ public class IntermediateProofReplayer {
                 throw new SkipSMTRuleException();
             } else {
                 String name = smtProblem.getSuccessfulSolver().name();
-                Optional<ImmutableList<PosInOccurrence>> unsatCore =
-                    SMTFocusResults.getUnsatCore(smtProblem);
-                if (unsatCore.isPresent()) {
-                    return SMTRuleApp.RULE.createApp(name, unsatCore.get());
+                ImmutableList<PosInOccurrence> unsatCore = SMTFocusResults.getUnsatCore(smtProblem);
+                if (unsatCore != null) {
+                    return SMTRuleApp.RULE.createApp(name, unsatCore);
                 } else {
                     return SMTRuleApp.RULE.createApp(name);
                 }

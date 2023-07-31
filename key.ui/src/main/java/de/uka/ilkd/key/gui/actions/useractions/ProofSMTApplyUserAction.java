@@ -64,11 +64,11 @@ public class ProofSMTApplyUserAction extends UserAction {
                 continue;
             }
             goalsClosed.add(goal);
-            Optional<ImmutableList<PosInOccurrence>> unsatCore =
+            ImmutableList<PosInOccurrence> unsatCore =
                 SMTFocusResults.getUnsatCore(problem.getProblem());
             IBuiltInRuleApp app;
-            if (unsatCore.isPresent()) {
-                app = SMTRuleApp.RULE.createApp(problem.getSolver().name(), unsatCore.get());
+            if (unsatCore != null) {
+                app = SMTRuleApp.RULE.createApp(problem.getSolver().name(), unsatCore);
             } else {
                 app = SMTRuleApp.RULE.createApp(problem.getSolver().name());
             }
