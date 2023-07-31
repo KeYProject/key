@@ -4,6 +4,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -19,9 +20,12 @@ import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
+import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.merge.MergePartner;
@@ -136,6 +140,11 @@ public class Proof implements Named {
     private Lookup userData;
 
     /**
+     * Whether closing the proof should emit a {@link ProofEvent}.
+     */
+    private boolean mutedProofCloseEvents = false;
+
+    /**
      * constructs a new empty proof with name
      */
     private Proof(Name name, InitConfig initConfig) {
@@ -206,11 +215,15 @@ public class Proof implements Named {
                 (OriginTermLabel) formula.formula().getLabel(OriginTermLabel.NAME);
             if (originLabel != null) {
                 if (originLabel.getOrigin() instanceof FileOrigin) {
-                    sources.addRelevantFile(((FileOrigin) originLabel.getOrigin()).fileName);
+                    ((FileOrigin) originLabel.getOrigin())
+                            .getFileName()
+                            .ifPresent(sources::addRelevantFile);
                 }
 
-                originLabel.getSubtermOrigins().stream().filter(o -> o instanceof FileOrigin)
-                        .map(o -> (FileOrigin) o).forEach(o -> sources.addRelevantFile(o.fileName));
+                originLabel.getSubtermOrigins().stream()
+                        .filter(o -> o instanceof FileOrigin)
+                        .map(o -> (FileOrigin) o)
+                        .forEach(o -> o.getFileName().ifPresent(sources::addRelevantFile));
             }
         });
 
@@ -306,7 +319,6 @@ public class Proof implements Named {
     public String header() {
         return problemHeader;
     }
-
 
     public ProofCorrectnessMgt mgt() {
         return localMgt;
@@ -524,7 +536,7 @@ public class Proof implements Named {
 
         // close all goals below the given goalToClose
         while (it.hasNext()) {
-            goal = getGoal(it.next());
+            goal = getOpenGoal(it.next());
             if (goal != null) {
                 b = true;
                 if (!GeneralSettings.noPruningClosed) {
@@ -548,10 +560,14 @@ public class Proof implements Named {
      * This is, for instance, needed for the {@link MergeRule}: In a situation where a merge node
      * and its associated partners have been closed and the merge node is then pruned away, the
      * partners have to be reopened again. Otherwise, we have a soundness issue.
+     * <p>
+     * This will automatically add the goal to the list of open goals.
+     * </p>
      *
      * @param goal The goal to be opened again.
      */
     public void reOpenGoal(Goal goal) {
+        add(goal);
         goal.node().reopen();
         closedGoals = closedGoals.removeAll(goal);
         fireProofStructureChanged();
@@ -579,7 +595,10 @@ public class Proof implements Named {
      * adds a new goal to the list of goals
      *
      * @param goal the Goal to be added
+     *
+     * @deprecated use {@link #reOpenGoal(Goal)} when re-opening a goal
      */
+    @Deprecated // eventually, this method should be made private
     public void add(Goal goal) {
         ImmutableList<Goal> newOpenGoals = openGoals.prepend(goal);
         if (openGoals != newOpenGoals) {
@@ -685,7 +704,6 @@ public class Proof implements Named {
                         if (linkedGoal.node().isClosed()) {
                             // The partner node has already been closed; we
                             // have to add the goal again.
-                            proof.add(linkedGoal);
                             proof.reOpenGoal(linkedGoal);
                         }
 
@@ -697,10 +715,9 @@ public class Proof implements Named {
 
             // first leaf is closed -> add as goal and reopen
             final Goal firstGoal =
-                firstLeaf.isClosed() ? getClosedGoal(firstLeaf) : getGoal(firstLeaf);
+                firstLeaf.isClosed() ? getClosedGoal(firstLeaf) : getOpenGoal(firstLeaf);
             assert firstGoal != null;
             if (firstLeaf.isClosed()) {
-                add(firstGoal);
                 reOpenGoal(firstGoal);
             }
 
@@ -834,7 +851,7 @@ public class Proof implements Named {
 
     public synchronized ImmutableList<Node> pruneProof(Node cuttingPoint, boolean fireChanges) {
         assert cuttingPoint.proof() == this;
-        if (getGoal(cuttingPoint) != null) {
+        if (getOpenGoal(cuttingPoint) != null) {
             return null;
         }
         // abort pruning if the node is closed and pruning in closed branches is disabled
@@ -993,6 +1010,9 @@ public class Proof implements Named {
      * event when the last goal in list is removed.
      */
     protected void fireProofClosed() {
+        if (mutedProofCloseEvents) {
+            return;
+        }
         ProofTreeEvent e = new ProofTreeEvent(this);
         synchronized (listenerList) {
             for (ProofTreeListener listener : listenerList) {
@@ -1052,8 +1072,8 @@ public class Proof implements Named {
      *
      * @return true if the given node is part of a Goal
      */
-    public boolean isGoal(Node node) {
-        return getGoal(node) != null;
+    public boolean isOpenGoal(Node node) {
+        return getOpenGoal(node) != null;
     }
 
 
@@ -1062,7 +1082,7 @@ public class Proof implements Named {
      *
      * @return the goal that belongs to the given node or null if the node is an inner one
      */
-    public Goal getGoal(Node node) {
+    public Goal getOpenGoal(Node node) {
         for (final Goal result : openGoals) {
             if (result.node() == node) {
                 return result;
@@ -1258,6 +1278,18 @@ public class Proof implements Named {
     }
 
     /**
+     * Registers the given {@link ProofDisposedListener} to run before all previously registered
+     * listeners.
+     *
+     * @param l The {@link ProofDisposedListener} to register.
+     */
+    public void addProofDisposedListenerFirst(ProofDisposedListener l) {
+        if (l != null) {
+            proofDisposedListener.add(0, l);
+        }
+    }
+
+    /**
      * Unregisters the given {@link ProofDisposedListener}.
      *
      * @param l The {@link ProofDisposedListener} to unregister.
@@ -1412,5 +1444,51 @@ public class Proof implements Named {
             userData = new Lookup();
         }
         return userData;
+    }
+
+    public void setMutedProofCloseEvents(boolean mutedProofCloseEvents) {
+        this.mutedProofCloseEvents = mutedProofCloseEvents;
+    }
+
+    /**
+     * For each branch closed by reference to another proof,
+     * copy the relevant proof steps into this proof.
+     *
+     * @param referencedFrom filter, if not null copy only from that proof
+     * @param callbackTotal callback that gets the total number of branches to complete
+     * @param callbackBranch callback notified every time a branch has been copied
+     */
+    public void copyCachedGoals(Proof referencedFrom, Consumer<Integer> callbackTotal,
+            Runnable callbackBranch) {
+        // first, ensure that all cached goals are copied over
+        List<Goal> goals = closedGoals().toList();
+        List<Goal> todo = new ArrayList<>();
+        for (Goal g : goals) {
+            Node node = g.node();
+            ClosedBy c = node.lookup(ClosedBy.class);
+            if (c == null) {
+                continue;
+            }
+            if (referencedFrom != null && referencedFrom != c.getProof()) {
+                continue;
+            }
+            todo.add(g);
+        }
+        if (callbackTotal != null) {
+            callbackTotal.accept(todo.size());
+        }
+        for (Goal g : todo) {
+            reOpenGoal(g);
+            ClosedBy c = g.node().lookup(ClosedBy.class);
+            g.node().deregister(c, ClosedBy.class);
+            try {
+                new CopyingProofReplayer(c.getProof(), this).copy(c.getNode(), g);
+            } catch (IntermediateProofReplayer.BuiltInConstructionException e) {
+                throw new RuntimeException(e);
+            }
+            if (callbackBranch != null) {
+                callbackBranch.run();
+            }
+        }
     }
 }

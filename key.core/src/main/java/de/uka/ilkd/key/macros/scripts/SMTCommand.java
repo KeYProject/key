@@ -2,7 +2,6 @@ package de.uka.ilkd.key.macros.scripts;
 
 import java.util.*;
 
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Goal;
@@ -86,10 +85,8 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
         for (SMTProblem problem : probList) {
             SMTSolverResult finalResult = problem.getFinalResult();
             if (finalResult.isValid() == ThreeValuedTruth.VALID) {
-                SequentFormula formula = problem.getSequent().getFormulabyNr(0);
-                IBuiltInRuleApp app = RuleAppSMT.rule.createApp(null)
-                    .tryToInstantiate(problem.getGoal())
-                    .setTitle(args.solver);
+                IBuiltInRuleApp app = RuleAppSMT.RULE.createApp(args.solver);
+                app = app.tryToInstantiate(problem.getGoal());
                 problem.getGoal().apply(app);
             }
             LOGGER.info("Finished run on goal " + goal.node().serialNr() + " in "

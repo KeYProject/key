@@ -13,6 +13,9 @@ import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
 import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
+import de.uka.ilkd.key.smt.SMTFocusResults;
+
+import org.key_project.util.java.SwingUtil;
 
 /**
  * Dialog showing launched SMT processes and results.
@@ -86,7 +89,7 @@ public class ProgressDialog extends JDialog {
         table.getTableHeader().setReorderingAllowed(false);
         table.setModel(model, titles);
         this.listener = listener;
-        this.setLocationByPlatform(true);
+        setLocationRelativeTo(MainWindow.getInstance());
         if (counterexample) {
             this.setTitle("SMT Counterexample Search");
         } else {
@@ -104,8 +107,9 @@ public class ProgressDialog extends JDialog {
         buttonBox.add(getStopButton());
         buttonBox.add(Box.createHorizontalStrut(5));
         if (!counterexample) {
-            buttonBox.add(getApplyButton());
             buttonBox.add(getFocusButton());
+            buttonBox.add(Box.createHorizontalStrut(5));
+            buttonBox.add(getApplyButton());
             buttonBox.add(Box.createHorizontalStrut(5));
         }
 
@@ -117,8 +121,8 @@ public class ProgressDialog extends JDialog {
         constraints.gridy++;
         constraints.weighty = 2.0;
         contentPane.add(getScrollPane(), constraints);
-        constraints.gridy++;
-        constraints.weighty = 1.0;
+        constraints.gridy += 2;
+        constraints.weighty = 0.0;
         constraints.insets.bottom = 5;
         contentPane.add(buttonBox, constraints);
         this.pack();
@@ -175,14 +179,7 @@ public class ProgressDialog extends JDialog {
 
     private JScrollPane getScrollPane() {
         if (scrollPane == null) {
-            scrollPane = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-
-            Dimension dim = new Dimension(table.getPreferredSize());
-            dim.width += (Integer) UIManager.get("ScrollBar.width") + 2;
-            dim.height = scrollPane.getPreferredSize().height;
-            scrollPane.setPreferredSize(dim);
-
+            scrollPane = SwingUtil.createScrollPane(table);
         }
         return scrollPane;
     }

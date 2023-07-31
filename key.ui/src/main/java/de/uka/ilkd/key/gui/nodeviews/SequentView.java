@@ -98,13 +98,13 @@ public abstract class SequentView extends JEditorPane {
     public boolean refreshHighlightning = true;
 
     // the default tag of the highlight
-    private final Object defaultHighlight;
+    private Object defaultHighlight;
 
     // the current tag of the highlight
     private Object currentHighlight;
 
     // an additional highlight to mark the first active java statement
-    private final Object additionalJavaHighlight;
+    private Object additionalJavaHighlight;
 
     // Highlighting color during drag and drop action.
     public final Object dndHighlight;
@@ -477,6 +477,15 @@ public abstract class SequentView extends JEditorPane {
      * @param p the mouse pointer coordinates
      */
     public void paintHighlights(Point p) {
+        // re-initialize highlights if needed
+        if (!Arrays.asList(getHighlighter().getHighlights()).contains(additionalJavaHighlight)) {
+            additionalJavaHighlight = getColorHighlight(ADDITIONAL_HIGHLIGHT_COLOR.get());
+        }
+        if (!Arrays.asList(getHighlighter().getHighlights()).contains(defaultHighlight)) {
+            defaultHighlight = getColorHighlight(DEFAULT_HIGHLIGHT_COLOR.get());
+            currentHighlight = defaultHighlight;
+        }
+
         // Change highlight for additional Java statement ...
         paintHighlight(getFirstStatementRange(p), additionalJavaHighlight);
         // Change Highlighter for currently selected sequent part
@@ -938,17 +947,19 @@ public abstract class SequentView extends JEditorPane {
         var highlight = System.nanoTime();
         setTextCache.get(highlighted);
         var setText = System.nanoTime();
-        LOGGER.trace("updateSequent " + node.serialNr() + ": print " + (print - start) / 1e6
+        LOGGER.trace("updateSequent " + (node != null ? node.serialNr() : -1) + ": print "
+            + (print - start) / 1e6
             + "ms, highlight " + (highlight - print) / 1e6 + "ms, setText "
             + (setText - highlight) / 1e6 + "ms");
     }
 
     public void setFilter(SequentPrintFilter sequentPrintFilter, boolean forceUpdate) {
         this.filter = sequentPrintFilter;
-        Node selectedNode = getMainWindow().getMediator().getSelectedNode();
-        if (selectedNode != null) {
+        Sequent selectedSequent =
+            getMainWindow().getMediator().getSelectionModel().getSelectedSequent();
+        if (selectedSequent != null) {
             // bugfix #1458 (gitlab). The selected node may be null if no proof.
-            this.filter.setSequent(selectedNode.sequent());
+            this.filter.setSequent(selectedSequent);
         }
         if (forceUpdate) {
             printSequent();

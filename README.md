@@ -5,22 +5,22 @@
 This repository contains the interactive theorem prover "KeY" for the verification of Java programs.
 
 You can find more information about KeY on https://key-project.org or use the
-documentation in the companion repository [key-docs](https://git.key-project.org/key/key-docs).
-The content of the latter is also available as HTML version under https://key-project.org/docs.
+documentation in the companion repository [key-docs](https://github.com/KeYProject/key-docs).
+The content of the latter is also available as HTML version under https://keyproject.github.io/key-docs/.
 
 The current version of KeY is 2.10.0, licensed under GPL v2.
 
 
-## Requirements:
+## Requirements
 
 * Hardware: >=2 GB RAM
 * Operating System: Linux/Unix, MacOSX, Windows
-* Java SE 8 or newer
+* Java SE 11 or newer
 * Optionally, KeY can make use of the following binaries:
   * SMT Solvers:
-	* [Z3](https://github.com/Z3Prover/z3)
+    * [Z3](https://github.com/Z3Prover/z3#z3)
     * [cvc5](https://cvc5.github.io/)
-	* [CVC4](http://cvc4.cs.stanford.edu/web/)
+    * [CVC4](https://cvc4.github.io/)
     * [Princess](http://www.philipp.ruemmer.org/princess.shtml)
 
 ## Content of the KeY folder
@@ -40,7 +40,7 @@ if you plan to make changes here.
 Assuming you are in the directory of this README file, you can create a runnable and deployable version with one of these commands:
 
 1. With `./gradlew key.ui:run` you can run the user interface of KeY directly from the repository. 
-   Use `./gradlew key.ui:run --args='--experimantal'` to enable experimental features.
+   Use `./gradlew key.ui:run --args='--experimental'` to enable experimental features.
 
 2. Use `./gradlew classes` to compile KeY, which includes running JavaCC and Antlr.
    Likewise, use `./gradlew testClasses` if you also want to compile the JUnit test classes.
@@ -72,24 +72,20 @@ Assuming you are in the directory of this README file, you can create a runnable
 
 # Developing KeY
 
-* Quality is automatically assessed using [SonarQube](https://sonarqube.org) on each merge requests.
-  The results of the assessments can be found on
-  [SonarCloud.io](https://sonarcloud.io/dashboard?id=key-main)
-  ([Branches](https://sonarcloud.io/project/branches?id=key-main)).
+* Quality is automatically assessed using [SonarQube](https://sonarqube.org) on each pull request.
+  The results of the assessments (pass/fail) can be inspected in the checks section of the PR.
 
   The rules and quality gate are maintained by Alexander Weigl
   <weigl@kit.edu> currently.
 
 * More guideline and documentation for the KeY development can be found under
-[key-docs](https://key-project.org/docs/).
+[key-docs](https://keyproject.github.io/key-docs/devel/).
 
 
 
 # Issues and Bug Reports
 
-If you encounter problems, please send a message to
-
-		<support@key-project.org>
+If you encounter problems, please send a message to support@key-project.org
 
 
 
@@ -100,7 +96,7 @@ This is the KeY project - Integrated Deductive Software Design
 Copyright (C) 2001-2011 Universität Karlsruhe, Germany
 						Universität Koblenz-Landau, Germany
 						and Chalmers University of Technology, Sweden
-Copyright (C) 2011-2022 Karlsruhe Institute of Technology, Germany
+Copyright (C) 2011-2023 Karlsruhe Institute of Technology, Germany
 						Technical University Darmstadt, Germany
 						Chalmers University of Technology, Sweden
 

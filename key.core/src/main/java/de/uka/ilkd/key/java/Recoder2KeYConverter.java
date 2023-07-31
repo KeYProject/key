@@ -89,7 +89,7 @@ public class Recoder2KeYConverter {
 
     public CompilationUnit processCompilationUnit(recoder.java.CompilationUnit cu,
             DataLocation context) {
-        currentClassURI = MiscTools.extractURI(context);
+        currentClassURI = MiscTools.extractURI(context).orElse(null);
         Object result = process(cu);
         currentClassURI = null;
 
@@ -1467,7 +1467,7 @@ public class Recoder2KeYConverter {
                         ? ((recoder.java.CompilationUnit) tdc).getOriginalDataLocation()
                         : null;
 
-                currentClassURI = MiscTools.extractURI(loc);
+                currentClassURI = MiscTools.extractURI(loc).orElse(null);
                 pm = convert((recoder.java.declaration.MethodDeclaration) method);
                 // because of cycles when reading recursive programs
                 currentClassURI = oldCurrent;

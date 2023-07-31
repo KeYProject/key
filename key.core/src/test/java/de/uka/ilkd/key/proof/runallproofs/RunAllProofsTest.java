@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
@@ -42,12 +44,11 @@ import org.junit.jupiter.api.Tag;
  * normal "Junit test" it is required to define the system properties "key.home" and "key.lib" like:
  * {@code "-Dkey.home=D:/Forschung/GIT/KeY" "-Dkey.lib=D:/Forschung/Tools/KeY-External Libs"} .
  * </p>
- *
+ * <p>
  * This class itself does not define testcases. The class has subclasses which define test cases for
  * different run-all-proof scenarios.
  *
  * @author Martin Hentschel
- * @see ListRunAllProofsTestCases
  */
 @Tag("slow")
 public final class RunAllProofsTest {
@@ -62,20 +63,28 @@ public final class RunAllProofsTest {
      * @return The parameters. Each row will be one test case.
      * @throws IOException If an exceptions occurs while reading and parsing the index file
      */
-
     public static Stream<DynamicTest> data(ProofCollection proofCollection) throws IOException {
         /*
          * Create list of constructor parameters that will be returned by this method. Suitable
          * constructor is automatically determined by JUnit.
          */
         List<RunAllProofsTestUnit> units = proofCollection.createRunAllProofsTestUnits();
-        return units.stream().map(it -> DynamicTest.dynamicTest(it.getTestName(), () -> {
-            /*
-             * Tests each file defined by the instance variables. The tests steps are described in
-             * the constructor of this class.
-             */
-            TestResult report = it.runTest();
+        new File("build/test-results/rap/").mkdirs();
+        return units.stream()
+                .map(unit -> DynamicTest.dynamicTest(unit.getTestName(), () -> executeUnit(unit)));
+    }
+
+    private static void executeUnit(RunAllProofsTestUnit unit) throws Exception {
+        /*
+         * Tests each file defined by the instance variables. The tests steps are described in
+         * the
+         * constructor of this class.
+         */
+        String xmlFile = String.format("build/test-results/rap/%s.xml", unit.getTestName());
+        try (JunitXmlWriter xml =
+            new JunitXmlWriter(new FileWriter(xmlFile), "runallproofs." + unit.getTestName())) {
+            TestResult report = unit.runTest(xml);
             Assertions.assertTrue(report.success, report.message);
-        }));
+        }
     }
 }

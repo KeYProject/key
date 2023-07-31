@@ -7,6 +7,7 @@ import org.key_project.util.java.StringUtil;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.key_project.util.java.StringUtil.count;
 import static org.key_project.util.java.StringUtil.trim;
 
 /**
@@ -289,5 +290,26 @@ public class StringUtilTest {
             "   \n\t\fa234231hsdafhvnyxcksdaökfhsdaöfhsahövcln231847231 42310897423187sdfsdafbc\n",
             it -> true));
         assertEquals("", trim("", 'c'));
+
+        assertEquals(".", trim("\".\"", '"'));
+        assertEquals(".", trim(".", '"'));
+        assertEquals(".", trim(".", it -> false));
+    }
+
+    @Test
+    void testCount() {
+        assertEquals(3, count("AbAbA", 0, 5, 'A'));
+        assertEquals(2, count("AbAbA", 0, 4, 'A'));
+        assertEquals(2, count("AbAbA", 0, 3, 'A'));
+        assertEquals(1, count("AbAbA", 0, 2, 'A'));
+        assertEquals(1, count("AbAbA", 0, 1, 'A'));
+        assertEquals(0, count("AbAbA", 0, 0, 'A'));
+
+        assertEquals(2, count("AbAbA", 1, 5, 'A'));
+        assertEquals(2, count("AbAbA", 2, 5, 'A'));
+        assertEquals(1, count("AbAbA", 3, 5, 'A'));
+        assertEquals(1, count("AbAbA", 4, 5, 'A'));
+
+        assertEquals(0, count("AbAbA", 5, 5, 'A'));
     }
 }

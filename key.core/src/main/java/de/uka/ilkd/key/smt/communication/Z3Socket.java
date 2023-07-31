@@ -36,7 +36,7 @@ public class Z3Socket extends AbstractSolverSocket {
                 // with the legacy Z3 translation (proof-production not enabled) and also not
                 // really needed
                 // pipe.sendMessage("(get-proof)");
-
+                pipe.sendMessage("(get-unsat-core)");
                 pipe.sendMessage("(exit)");
                 sc.setState(WAIT_FOR_DETAILS);
             }

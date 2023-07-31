@@ -18,31 +18,30 @@ import java.util.List;
  */
 public class RuleAppSMT extends AbstractBuiltInRuleApp {
 
-    public final static SMTRule rule = new SMTRule();
+    public static final SMTRule RULE = new SMTRule();
     private final String title;
+    private final String successfulSolverName;
 
     /**
      * Create a new rule app without ifInsts (will be null).
      * @param rule the SMTRule to apply
      * @param pio the pos in term to apply the rule on
+     * @param successfulSolverName the name of the solver that was able to close find the proof
      */
-    RuleAppSMT(SMTRule rule, PosInOccurrence pio) {
-        this(rule, pio, null, "SMT Rule App");
+    RuleAppSMT(SMTRule rule, PosInOccurrence pio, String successfulSolverName) {
+        this(rule, pio, null, successfulSolverName);
     }
 
-    private RuleAppSMT(SMTRule rule, PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts,
-                       String title) {
-        super(rule, pio, ifInsts);
-        this.title = title;
+    RuleAppSMT(SMTRule rule, PosInOccurrence pio, ImmutableList<PosInOccurrence> unsatCore,
+               String successfulSolverName) {
+        super(rule, pio, unsatCore);
+        this.title = "SMT: " + successfulSolverName;
+        this.successfulSolverName = successfulSolverName;
     }
 
-    private RuleAppSMT(SMTRule rule, String title) {
-        super(rule, null);
-        this.title = title;
-    }
-
+    @Override
     public RuleAppSMT replacePos(PosInOccurrence newPos) {
-        return new RuleAppSMT(rule, newPos, ifInsts, title);
+        return new RuleAppSMT(RULE, newPos, ifInsts, successfulSolverName);
     }
 
     @Override
@@ -54,6 +53,10 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
         return title;
     }
 
+    public String getSuccessfulSolverName() {
+        return successfulSolverName;
+    }
+
     @Override
     public PosInOccurrence posInOccurrence() {
         return pio;
@@ -61,19 +64,36 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
 
     @Override
     public BuiltInRule rule() {
-        return rule;
+        return RULE;
+    }
+
+    @Override
+    public String displayName() {
+        return title;
     }
 
     public static class SMTRule implements BuiltInRule {
         public static final Name name = new Name("SMTRule");
 
-        public RuleAppSMT createApp(PosInOccurrence pos) {
-            return createApp(pos, null);
+        public RuleAppSMT createApp(String successfulSolverName) {
+            return new RuleAppSMT(this, null, successfulSolverName);
+        }
+
+        /**
+         * Create a new rule application with the given solver name and unsat core.
+         *
+         * @param successfulSolverName solver that produced this result
+         * @param unsatCore formulas required to prove the result
+         * @return rule application instance
+         */
+        public RuleAppSMT createApp(String successfulSolverName,
+                ImmutableList<PosInOccurrence> unsatCore) {
+            return new RuleAppSMT(this, null, unsatCore, successfulSolverName);
         }
 
         @Override
         public RuleAppSMT createApp(PosInOccurrence pos, TermServices services) {
-            return new RuleAppSMT(this, pos);
+            return new RuleAppSMT(this, null, "");
         }
 
 
@@ -93,8 +113,8 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
          */
         @Override
         public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
-            if (goal.proof().getInitConfig().getJustifInfo().getJustification(rule) == null) {
-                goal.proof().getInitConfig().registerRule(rule, () -> false);
+            if (goal.proof().getInitConfig().getJustifInfo().getJustification(RULE) == null) {
+                goal.proof().getInitConfig().registerRule(RULE, () -> false);
             }
 
             // RuleAppSMT app = (RuleAppSMT) ruleApp;
@@ -129,7 +149,7 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
     }
 
     public RuleAppSMT setTitle(String title) {
-        return new RuleAppSMT(rule, pio, ifInsts, title);
+        return new RuleAppSMT(RULE, pio, ifInsts, title);
     }
 
     @Override
@@ -148,7 +168,7 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
      */
     @Override
     public RuleAppSMT tryToInstantiate(Goal goal) {
-        RuleAppSMT app = rule.createApp(pio);
+        RuleAppSMT app = RULE.createApp(pio, goal.proof().getServices());
         Sequent seq = goal.sequent();
         List<PosInOccurrence> ifInsts = new ArrayList<>();
         for (SequentFormula ante : seq.antecedent()) {

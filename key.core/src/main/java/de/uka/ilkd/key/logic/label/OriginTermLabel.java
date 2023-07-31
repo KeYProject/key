@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.logic.label;
 
-import java.io.File;
 import java.net.URI;
 import java.util.*;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -331,7 +331,7 @@ public class OriginTermLabel implements TermLabel {
             return new Origin(SpecType.NONE);
         }
 
-        return new FileOrigin(commonSpecType, commonFileName.getPath(), commonLine);
+        return new FileOrigin(commonSpecType, commonFileName, commonLine);
     }
 
     /**
@@ -686,12 +686,13 @@ public class OriginTermLabel implements TermLabel {
         /**
          * The file the term originates from.
          */
-        public final URI fileName;
+        @Nullable
+        private final URI fileName;
 
         /**
          * The line in the file the term originates from.
          */
-        public final int line;
+        private final int line;
 
         /**
          * Creates a new {@link OriginTermLabel.Origin}.
@@ -700,20 +701,21 @@ public class OriginTermLabel implements TermLabel {
          * @param fileName the file the term originates from.
          * @param line the line in the file.
          */
-        public FileOrigin(SpecType specType, String fileName, int line) {
+        public FileOrigin(SpecType specType, @Nullable URI fileName, int line) {
             super(specType);
 
-            assert fileName != null;
             assert line >= 0;
 
-            // wrap fileName into URI
-            // bugfix #1622: do not interpret "<unknown>" as file name
-            if (fileName.equals("no file") || fileName.equals("<unknown>")) {
-                this.fileName = null;
-            } else {
-                this.fileName = new File(fileName).toURI();
-            }
+            this.fileName = fileName;
             this.line = line;
+        }
+
+        public int getLine() {
+            return line;
+        }
+
+        public Optional<URI> getFileName() {
+            return Optional.ofNullable(fileName);
         }
 
         @Override
@@ -721,7 +723,9 @@ public class OriginTermLabel implements TermLabel {
             if (fileName == null) {
                 return specType + " @ [no file]";
             } else {
-                return specType + " @ file " + new File(fileName).getName() + " @ line " + line;
+                var path = fileName.toString();
+                var name = path.substring(path.lastIndexOf('/') + 1, path.length());
+                return specType + " @ file " + name + " @ line " + line;
             }
         }
 
@@ -781,6 +785,11 @@ public class OriginTermLabel implements TermLabel {
         ASSIGNABLE("assignable"),
 
         /**
+         * assignable_free
+         */
+        ASSIGNABLE_FREE("assignable_free"),
+
+        /**
          * assume
          */
         ASSUME("assume"),
@@ -799,6 +808,11 @@ public class OriginTermLabel implements TermLabel {
          * invariant
          */
         INVARIANT("invariant"),
+
+        /**
+         * invariant_free
+         */
+        INVARIANT_FREE("invariant_free"),
 
         /**
          * loop_invariant

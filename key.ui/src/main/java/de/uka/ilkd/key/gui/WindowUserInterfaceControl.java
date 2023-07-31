@@ -123,7 +123,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void progressStopped(Object sender) {
-        mainWindow.getMediator().startInterface(true);
+        // no need to call startInterface(), will be done by ProblemLoader once loading is done
     }
 
     @Override
@@ -357,9 +357,12 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             }
             String errorMsg;
             try {
+                getMediator().stopInterface(true);
                 errorMsg = saver.save();
             } catch (IOException e) {
                 errorMsg = e.toString();
+            } finally {
+                getMediator().startInterface(true);
             }
             if (errorMsg != null) {
                 mainWindow.notify(
@@ -578,7 +581,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     public void showIssueDialog(Collection<PositionedString> issues) {
         final var set = issues.stream()
                 .map(it -> new PositionedIssueString(
-                    it.text, it.fileName, it.pos, ""))
+                    it.text, it.location, ""))
                 .collect(Collectors.toSet());
         var dialog = new IssueDialog(mainWindow, "Issues", set, true, null);
         dialog.setVisible(true);

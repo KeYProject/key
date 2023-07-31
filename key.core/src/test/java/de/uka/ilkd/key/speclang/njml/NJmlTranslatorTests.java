@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.speclang.njml;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
@@ -40,7 +42,7 @@ public class NJmlTranslatorTests {
         preParser.clearWarnings();
         String contract = "/*+KEY@ invariant x == 4; */ /*+OPENJML@ invariant x == 54; */";
         ImmutableList<TextualJMLConstruct> result =
-            preParser.parseClassLevel(contract, "Test.java", Position.newOneBased(1, 1));
+            preParser.parseClassLevel(contract, null, Position.newOneBased(1, 1));
         assertNotNull(result);
         assertEquals(1, result.size(), "Too many invariants found.");
     }
@@ -74,11 +76,11 @@ public class NJmlTranslatorTests {
     // }
 
     @Test
-    public void testWarnRequires() {
+    public void testWarnRequires() throws URISyntaxException {
         preParser.clearWarnings();
         String contract = "/*@ requires true; ensures true; requires true;";
         ImmutableList<TextualJMLConstruct> result =
-            preParser.parseClassLevel(contract, "Test.java", Position.newOneBased(5, 5));
+            preParser.parseClassLevel(contract, new URI("Test.java"), Position.newOneBased(5, 5));
         assertNotNull(result);
         ImmutableList<PositionedString> warnings = preParser.getWarnings();
         PositionedString message = warnings.head();
@@ -93,7 +95,7 @@ public class NJmlTranslatorTests {
         preParser.clearWarnings();
         String contract = "/*@ public abstract final normal_behaviour\nrequires true;";
         ImmutableList<TextualJMLConstruct> result =
-            preParser.parseClassLevel(contract, "Test.java", Position.newOneBased(5, 5));
+            preParser.parseClassLevel(contract, null, Position.newOneBased(5, 5));
         assertNotNull(result);
         assertEquals(1, result.size());
         TextualJMLConstruct jml = result.head();
@@ -110,7 +112,7 @@ public class NJmlTranslatorTests {
             "  @ requires false;\n" +
             "  @*/";
         ImmutableList<TextualJMLConstruct> result =
-            preParser.parseClassLevel(contracts, "Test.java", Position.newOneBased(5, 5));
+            preParser.parseClassLevel(contracts, null, Position.newOneBased(5, 5));
         assertNotNull(result);
         assertEquals(2, result.size());
         TextualJMLConstruct jml = result.head();
@@ -131,7 +133,7 @@ public class NJmlTranslatorTests {
             "  @ requires false;\n" +
             "  @*/";
         ImmutableList<TextualJMLConstruct> result =
-            preParser.parseClassLevel(contracts, "Test.java", Position.newOneBased(5, 5));
+            preParser.parseClassLevel(contracts, null, Position.newOneBased(5, 5));
         assertNotNull(result);
         assertEquals(2, result.size());
         TextualJMLConstruct jml = result.head();

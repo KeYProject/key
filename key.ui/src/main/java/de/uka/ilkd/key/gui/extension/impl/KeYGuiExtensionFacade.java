@@ -16,6 +16,7 @@ import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Proof;
 
 /**
  * Facade for retrieving the GUI extensions.
@@ -25,11 +26,10 @@ import de.uka.ilkd.key.pp.PosInSequent;
  */
 public final class KeYGuiExtensionFacade {
     private static final Set<String> forbiddenPlugins = new HashSet<>();
-    private static List<Extension> extensions = new LinkedList<>();
+    private static List<Extension<?>> extensions = new LinkedList<>();
     // private static Map<Class<?>, List<Object>> extensionCache = new HashMap<>();
 
     // region panel extension
-    // @SuppressWarnings("todo")
     public static Stream<TabPanel> getAllPanels(MainWindow window) {
         return getLeftPanel().stream()
                 .flatMap(it -> it.getPanels(window, window.getMediator()).stream());
@@ -81,18 +81,7 @@ public final class KeYGuiExtensionFacade {
 
     }
 
-    /*
-     * public static Optional<Action> getMainMenuExtensions(String name) {
-     * Spliterator<KeYGuiExtension.MainMenu> iter =
-     * ServiceLoader.load(KeYGuiExtension.MainMenu.class).spliterator(); return
-     * StreamSupport.stream(iter, false) .flatMap(it -> it.getMainMenuActions(mainWindow).stream())
-     * .filter(Objects::nonNull) .filter(it -> it.getValue(Action.NAME).equals(name)) .findAny(); }
-     */
-
     // region Menu Helper
-    private static void sortActionsIntoMenu(List<Action> actions, JMenuBar menuBar) {
-        actions.forEach(act -> sortActionIntoMenu(act, menuBar, new JMenu()));
-    }
 
     private static Iterator<String> getMenuPath(Action act) {
         Object path = act.getValue(KeyAction.PATH);
@@ -220,6 +209,7 @@ public final class KeYGuiExtensionFacade {
      */
     public static List<JToolBar> createToolbars(MainWindow mainWindow) {
         return getToolbarExtensions().stream().map(it -> it.getToolbar(mainWindow))
+                .peek(x -> x.setFloatable(false))
                 .collect(Collectors.toList());
     }
 
@@ -235,6 +225,12 @@ public final class KeYGuiExtensionFacade {
     public static JPopupMenu createContextMenu(ContextMenuKind kind, Object underlyingObject,
             KeYMediator mediator) {
         JPopupMenu menu = new JPopupMenu();
+        if (underlyingObject instanceof Proof) {
+            for (Component comp : MainWindow.getInstance().createProofMenu((Proof) underlyingObject)
+                    .getMenuComponents()) {
+                menu.add(comp);
+            }
+        }
         List<Action> content = getContextMenuItems(kind, underlyingObject, mediator);
         content.forEach(menu::add);
         return menu;
@@ -304,7 +300,7 @@ public final class KeYGuiExtensionFacade {
     }
     // endregion
 
-    public static List<Extension> getExtensions() {
+    public static List<Extension<?>> getExtensions() {
         if (extensions.isEmpty()) {
             loadExtensions();
         }
@@ -367,9 +363,9 @@ public final class KeYGuiExtensionFacade {
     // region Term tool tip
 
     /**
-     * Retrieves all known implementations of the {@link KeYStatusBarExtension}.
+     * Retrieves all known implementations of the {@link KeYGuiExtension.Tooltip}.
      *
-     * @return all known implementations of the {@link KeYStatusBarExtension}.
+     * @return all known implementations of the {@link KeYGuiExtension.Tooltip}.
      */
     public static List<KeYGuiExtension.Tooltip> getTooltipExtensions() {
         return getExtensionInstances(KeYGuiExtension.Tooltip.class);

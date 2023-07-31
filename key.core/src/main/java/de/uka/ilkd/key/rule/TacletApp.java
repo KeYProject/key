@@ -439,7 +439,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
 
         if (newMC == null) {
             throw new IllegalInstantiationException(
-                "Instantiation " + term + " of " + sv + "does not satisfy the variable conditions");
+                "Instantiation " + term + " of " + sv
+                    + " does not satisfy the variable conditions");
         }
 
         SVInstantiations svInst = newMC.getInstantiations();
@@ -1290,25 +1291,26 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             return false;
         }
         TacletApp that = (TacletApp) obj;
-        if ((ifInstantiations == null && that.ifInstantiations != null)
-                || (ifInstantiations != null
-                        && !EqualsModProofIrrelevancyUtil.compareImmutableLists(ifInstantiations,
-                            that.ifInstantiations))) {
+        if (!EqualsModProofIrrelevancyUtil.compareImmutableLists(ifInstantiations,
+            that.ifInstantiations)) {
             return false;
         }
-        if (!instantiations.equals(that.instantiations)) {
+        if (!instantiations.equalsModProofIrrelevancy(that.instantiations)) {
             return false;
         }
         if (!matchConditions.equalsModProofIrrelevancy(that.matchConditions)) {
             return false;
         }
-        if (!Objects.equals(missingVars, that.missingVars)) {
+        if ((missingVars != null || that.missingVars.size() != 0)
+                && (missingVars.size() != 0 || that.missingVars != null)
+                && !Objects.equals(missingVars, that.missingVars)) {
             return false;
         }
-        if (updateContextFixed != that.updateContextFixed) {
-            return false;
-        }
-        if (!rule().equals(that.rule())) {
+        if (rule() instanceof Taclet) {
+            if (!((Taclet) rule()).equalsModProofIrrelevancy(that.rule())) {
+                return false;
+            }
+        } else if (!rule().equals(that.rule())) {
             return false;
         }
         return true;

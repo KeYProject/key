@@ -247,21 +247,24 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
 
     /**
      * Set filters active or inactive and update tree if necessary.
+     * Always updates the filter and the tree.
      *
-     * @param filter
-     * @param active
+     * @param filter the filter
+     * @param active whether to activate the filter
      */
     public void setFilter(ProofTreeViewFilter filter, boolean active) {
-        if (active != filter.isActive()) {
-            if (!filter.global()) {
-                if (activeNodeFilter != null) {
-                    activeNodeFilter.setActive(false);
-                }
-                activeNodeFilter = active ? (NodeFilter) filter : null;
-            }
-            filter.setActive(active);
+        if (filter == null) {
+            activeNodeFilter = null;
             updateTree((TreeNode) null);
+            return;
         }
+        if (!filter.global()) {
+            if (activeNodeFilter != null)
+                activeNodeFilter.setActive(false);
+            activeNodeFilter = active ? (NodeFilter) filter : null;
+        }
+        filter.setActive(active);
+        updateTree((TreeNode) null);
     }
 
     /**
@@ -523,6 +526,10 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
 
     public TreePath getSelection() {
         return selection;
+    }
+
+    public NodeFilter getActiveNodeFilter() {
+        return activeNodeFilter;
     }
 
 }

@@ -30,7 +30,7 @@ public interface IProofFileParser {
         USER_INTERACTION("userinteraction"), PROOF_SCRIPT("proofscript"), NEW_NAMES("newnames"),
         AUTOMODE_TIME("autoModeTime"), KeY_LOG("keyLog"), KeY_USER("keyUser"),
         KeY_VERSION("keyVersion"), KeY_SETTINGS("keySettings"), OPEN_GOAL("opengoal"),
-        NOTES("notes");
+        NOTES("notes"), SOLVERTYPE("solverType"), MODALITY("modality");
 
         private final String rawName;
 

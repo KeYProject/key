@@ -545,9 +545,24 @@ public final class JmlTermFactory {
         Term bTerm = b.getType() == bool ? tb.convertToFormula(b.getTerm()) : b.getTerm();
 
         Term ife = tb.ife(tb.convertToFormula(result.getTerm()), aTerm, bTerm);
-        if (a.getType() != null && a.getType().equals(b.getType())) {
-            result = new SLExpression(ife, a.getType());
+        if (a.getType() != null && b.getType() != null) {
+            if (a.getType().equals(b.getType())) {
+                // same type: obvious case
+                result = new SLExpression(ife, a.getType());
+            } else {
+                KeYJavaType promotedType =
+                    services.getTypeConverter().getPromotedType(a.getType(), b.getType());
+                if (promotedType != null) {
+                    // different, put compatible types: add a cast to make sure that
+                    // an int is cast to a float e.g.
+                    result = new SLExpression(tb.cast(promotedType.getSort(), ife), promotedType);
+                } else {
+                    // TODO this is an NPE in the making
+                    result = new SLExpression(ife);
+                }
+            }
         } else {
+            // TODO this is an NPE in the making
             result = new SLExpression(ife);
         }
         return result;
@@ -781,6 +796,17 @@ public final class JmlTermFactory {
         return new SLExpression(term);
     }
 
+    public SLExpression invFreeFor(SLExpression param) {
+        Term obj = param.getTerm();
+        return new SLExpression(tb.invFree(obj));
+    }
+
+    public SLExpression staticInfFreeFor(KeYJavaType kjt) {
+        final Term term = tb.staticInvFree(kjt);
+        return new SLExpression(term);
+    }
+
+
     public SLExpression empty(JavaInfo javaInfo) {
         return createIntersect(tb.empty(), javaInfo);
     }
@@ -795,7 +821,7 @@ public final class JmlTermFactory {
     }
 
     /**
-     * Need to handle this one differently from INV_FOR since here also static invariants may occur.
+     * Need to handle this one differently from INV_FOR since here static invariants may occur too.
      * For a static invariant, take the passed type as receiver.
      */
     @Nonnull
@@ -803,6 +829,18 @@ public final class JmlTermFactory {
         final boolean isStatic = selfVar == null;
         assert targetType != null || !isStatic;
         final Term result = isStatic ? tb.staticInv(targetType) : tb.inv(selfVar);
+        return new SLExpression(result);
+    }
+
+    /**
+     * Need to handle this one differently from INV_FREE_FOR since here static invariants may occur
+     * too. For a static invariant, take the passed type as receiver.
+     */
+    @Nonnull
+    public SLExpression createInvFree(Term selfVar, KeYJavaType targetType) {
+        final boolean isStatic = selfVar == null;
+        assert targetType != null || !isStatic;
+        final Term result = isStatic ? tb.staticInvFree(targetType) : tb.invFree(selfVar);
         return new SLExpression(result);
     }
 

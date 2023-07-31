@@ -185,6 +185,11 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
             ((BuiltinRuleInformation) ruleInfo).currContract = str;
             break;
 
+        case MODALITY:
+            // (additional information which can be used in external tools such as proof management)
+            ((BuiltinRuleInformation) ruleInfo).currContractModality = str;
+            break;
+
         case ASSUMES_INST_BUILT_IN: // ifInst (for built in rules)
             BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
 
@@ -256,7 +261,9 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
                 ((AppNodeIntermediate) currNode).setNotes(ruleInfo.notes);
             }
             break;
-
+        case SOLVERTYPE:
+            ((BuiltinRuleInformation) ruleInfo).solver = str;
+            break;
         default:
             break;
         }
@@ -361,10 +368,15 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
             result = new MergePartnerAppIntermediate(builtinInfo.currRuleName,
                 new Pair<>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
                 builtinInfo.currCorrespondingMergeNodeId, builtinInfo.currNewNames);
+        } else if (builtinInfo.currRuleName.equals("SMTRule")) {
+            result = new SMTAppIntermediate(builtinInfo.currRuleName,
+                new Pair<>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
+                builtinInfo.solver);
         } else {
             result = new BuiltInAppIntermediate(builtinInfo.currRuleName,
                 new Pair<>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
-                builtinInfo.currContract, builtinInfo.builtinIfInsts, builtinInfo.currNewNames);
+                builtinInfo.currContract, builtinInfo.currContractModality,
+                builtinInfo.builtinIfInsts, builtinInfo.currNewNames);
         }
 
         return result;
@@ -439,6 +451,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         protected PosInTerm currIfInstPosInTerm;
         /* > Method Contract */
         protected String currContract = null;
+        protected String currContractModality = null;
         /* > Merge Rule */
         protected String currMergeProc = null;
         protected int currNrPartners = 0;
@@ -448,7 +461,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         protected Class<? extends AbstractPredicateAbstractionLattice> currPredAbstraLatticeType =
             null;
         protected String currAbstractionPredicates = null;
-        public String currUserChoices = null;
+        protected String currUserChoices = null;
+        protected String solver;
 
         public BuiltinRuleInformation(String ruleName) {
             super(ruleName);
@@ -460,7 +474,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      *
      * @author Dominic Scheurer
      */
-    static class Result {
+    public static class Result {
         private final List<Throwable> errors;
         private final String status;
         private BranchNodeIntermediate parsedResult = null;

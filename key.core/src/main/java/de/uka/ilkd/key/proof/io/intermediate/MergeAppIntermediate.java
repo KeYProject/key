@@ -46,7 +46,7 @@ public class MergeAppIntermediate extends BuiltInAppIntermediate {
             String distinguishingFormula,
             Class<? extends AbstractPredicateAbstractionLattice> predAbstrLatticeType,
             String abstractionPredicates, String userChoices) {
-        super(ruleName, pos, null, null, newNames);
+        super(ruleName, pos, null, null, null, newNames);
 
         String mergeRuleName = MergeRule.INSTANCE.name().toString();
         assert ruleName.equals(mergeRuleName)

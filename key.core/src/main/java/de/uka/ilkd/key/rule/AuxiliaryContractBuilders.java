@@ -838,12 +838,25 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @return the contract's modifies clause.
+         * @return the contract's modifies clauses.
          */
         public Map<LocationVariable, Term> buildModifiesClauses() {
             Map<LocationVariable, Term> result = new LinkedHashMap<>();
             for (final LocationVariable heap : heaps) {
                 result.put(heap, contract.getModifiesClause(heap, var(heap), terms.self, services));
+            }
+            return result;
+        }
+
+        /**
+         *
+         * @return the contract's free modifies clauses.
+         */
+        public Map<LocationVariable, Term> buildFreeModifiesClauses() {
+            Map<LocationVariable, Term> result = new LinkedHashMap<>();
+            for (final LocationVariable heap : heaps) {
+                result.put(heap,
+                    contract.getFreeModifiesClause(heap, var(heap), terms.self, services));
             }
             return result;
         }
@@ -901,20 +914,35 @@ public final class AuxiliaryContractBuilders {
         /**
          *
          * @param modifiesClauses the contract's modifies clauses
+         * @param freeModifiesClauses the contract's free modifies clauses
          * @return the contract's framing condition.
          */
-        public Term buildFrameCondition(final Map<LocationVariable, Term> modifiesClauses) {
+        public Term buildFrameCondition(
+                final Map<LocationVariable, Term> modifiesClauses,
+                final Map<LocationVariable, Term> freeModifiesClauses) {
             Term result = tt();
             Map<LocationVariable, Map<Term, Term>> remembranceVariables =
                 constructRemembranceVariables();
             for (LocationVariable heap : heaps) {
                 final Term modifiesClause = modifiesClauses.get(heap);
+                final Term freeModifiesClause = freeModifiesClauses.get(heap);
                 final Term frameCondition;
                 if (!contract.hasModifiesClause(heap)) {
-                    frameCondition = frameStrictlyEmpty(var(heap), remembranceVariables.get(heap));
+                    if (!contract.hasFreeModifiesClause(heap)) {
+                        frameCondition = frameStrictlyEmpty(
+                            var(heap), remembranceVariables.get(heap));
+                    } else {
+                        frameCondition =
+                            frame(var(heap), remembranceVariables.get(heap), freeModifiesClause);
+                    }
                 } else {
-                    frameCondition =
-                        frame(var(heap), remembranceVariables.get(heap), modifiesClause);
+                    if (!contract.hasFreeModifiesClause(heap)) {
+                        frameCondition = frame(
+                            var(heap), remembranceVariables.get(heap), modifiesClause);
+                    } else {
+                        frameCondition = frame(var(heap), remembranceVariables.get(heap),
+                            union(modifiesClause, freeModifiesClause));
+                    }
                 }
                 result = and(result, frameCondition);
             }
@@ -1401,7 +1429,9 @@ public final class AuxiliaryContractBuilders {
         public Term setUpLoopValidityGoal(final Goal goal, final LoopContract contract,
                 final Term context, final Term remember, final Term rememberNext,
                 final Map<LocationVariable, Function> anonOutHeaps,
-                final Map<LocationVariable, Term> modifiesClauses, final Term[] assumptions,
+                final Map<LocationVariable, Term> modifiesClauses,
+                final Map<LocationVariable, Term> freeModifiesClauses,
+                final Term[] assumptions,
                 final Term decreasesCheck, final Term[] postconditions,
                 final Term[] postconditionsNext, final ProgramVariable exceptionParameter,
                 final AuxiliaryContract.Terms terms, final AuxiliaryContract.Variables nextVars) {
