@@ -2,7 +2,6 @@ package de.uka.ilkd.key.smt;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Optional;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;

@@ -491,7 +491,7 @@ public class OutputStreamProofSaver {
     }
 
     private void printSingleSMTRuleApp(SMTRuleApp smtApp, Node node, String prefix,
-                                       Appendable output) throws IOException {
+            Appendable output) throws IOException {
         output.append(" (").append(ProofElementID.SOLVERTYPE.getRawName())
                 .append(" \"").append(smtApp.getSuccessfulSolverName()).append("\")");
     }

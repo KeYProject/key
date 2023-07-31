@@ -3,7 +3,6 @@ package de.uka.ilkd.key.gui.actions.useractions;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Optional;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.smt.SolverListener;

@@ -15,15 +15,14 @@ import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.rule.*;
-
 import de.uka.ilkd.key.smt.SMTRuleApp;
+
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -136,9 +135,11 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     private void highlightIfInsts(IBuiltInRuleApp bapp) throws BadLocationException {
         final ImmutableList<PosInOccurrence> ifs = bapp.ifInsts();
         if (bapp instanceof SMTRuleApp && ifs.isEmpty()) {
-            /* Special case for SMTRuleApp: If no unsat core is used, we highlight all formulas.
+            /*
+             * Special case for SMTRuleApp: If no unsat core is used, we highlight all formulas.
              * For the moment, we do not store all formulas as ifInstantiations, since that would
-             * clutter saved proofs very much. */
+             * clutter saved proofs very much.
+             */
             for (int i = 0; i < node.sequent().size(); i++) {
                 PosInOccurrence pio = PosInOccurrence.findInSequent(node.sequent(), i + 1,
                     PosInTerm.getTopLevel());
