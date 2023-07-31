@@ -318,7 +318,9 @@ public class ShowProofStatistics extends MainWindowAction {
 
             if (proof.closedGoals().stream()
                     .anyMatch(g -> g.node().lookup(ClosedBy.class) != null)) {
-                JButton copyReferences = new JButton("Copy referenced proof");
+                JButton copyReferences = new JButton("Realize cached branches");
+                copyReferences.setToolTipText("For each goal closed using the proof cache, copy " +
+                    "the referenced proof steps into this proof.");
                 copyReferences.addActionListener(e -> {
                     dispose();
                     ReferenceSearchDialog dialog =

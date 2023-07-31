@@ -52,7 +52,7 @@ public class DefaultReferenceSearchDialogListener implements ReferenceSearchDial
             } catch (Exception e) {
                 mediator.startInterface(true);
                 LOGGER.error("failed to copy cache ", e);
-                IssueDialog.showExceptionDialog(dialog, e);
+                IssueDialog.showExceptionDialog(dialog, new CachingException(e));
             }
         }).start();
     }
