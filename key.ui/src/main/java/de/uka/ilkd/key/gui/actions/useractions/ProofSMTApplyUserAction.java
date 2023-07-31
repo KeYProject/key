@@ -12,12 +12,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.smt.RuleAppSMT;
-import de.uka.ilkd.key.smt.SMTFocusResults;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.RuleAppSMT;
-import de.uka.ilkd.key.smt.SMTSolver;
-import de.uka.ilkd.key.smt.SMTSolverResult;
+import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.SMTRuleApp;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -72,9 +68,9 @@ public class ProofSMTApplyUserAction extends UserAction {
                 SMTFocusResults.getUnsatCore(problem.getProblem());
             IBuiltInRuleApp app;
             if (unsatCore.isPresent()) {
-                app = RuleAppSMT.RULE.createApp(problem.getSolver().name(), unsatCore.get());
+                app = SMTRuleApp.RULE.createApp(problem.getSolver().name(), unsatCore.get());
             } else {
-                app = RuleAppSMT.RULE.createApp(problem.getSolver().name());
+                app = SMTRuleApp.RULE.createApp(problem.getSolver().name());
             }
             app.tryToInstantiate(goal);
             goal.apply(app);

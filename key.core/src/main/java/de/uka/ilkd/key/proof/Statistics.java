@@ -11,7 +11,7 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
-import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.util.EnhancedStringBuffer;
 import de.uka.ilkd.key.util.Pair;
 
@@ -245,7 +245,7 @@ public class Statistics {
                 if (ruleApp instanceof de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) {
                     oss++;
                     ossCaptured += tmpOssCaptured(ruleApp);
-                } else if (ruleApp instanceof RuleAppSMT) {
+                } else if (ruleApp instanceof SMTRuleApp) {
                     smt++;
                 } else if (ruleApp instanceof UseDependencyContractApp) {
                     dep++;

@@ -16,7 +16,7 @@ import java.util.List;
  * The rule application that is used when a goal is closed by means of an external solver. So far it
  * stores the rule that that has been used and a title containing some information for the user.
  */
-public class RuleAppSMT extends AbstractBuiltInRuleApp {
+public class SMTRuleApp extends AbstractBuiltInRuleApp {
 
     public static final SMTRule RULE = new SMTRule();
     private final String title;
@@ -28,11 +28,11 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
      * @param pio the pos in term to apply the rule on
      * @param successfulSolverName the name of the solver that was able to close find the proof
      */
-    RuleAppSMT(SMTRule rule, PosInOccurrence pio, String successfulSolverName) {
+    SMTRuleApp(SMTRule rule, PosInOccurrence pio, String successfulSolverName) {
         this(rule, pio, null, successfulSolverName);
     }
 
-    RuleAppSMT(SMTRule rule, PosInOccurrence pio, ImmutableList<PosInOccurrence> unsatCore,
+    SMTRuleApp(SMTRule rule, PosInOccurrence pio, ImmutableList<PosInOccurrence> unsatCore,
                String successfulSolverName) {
         super(rule, pio, unsatCore);
         this.title = "SMT: " + successfulSolverName;
@@ -40,8 +40,8 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public RuleAppSMT replacePos(PosInOccurrence newPos) {
-        return new RuleAppSMT(RULE, newPos, ifInsts, successfulSolverName);
+    public SMTRuleApp replacePos(PosInOccurrence newPos) {
+        return new SMTRuleApp(RULE, newPos, ifInsts, successfulSolverName);
     }
 
     @Override
@@ -75,8 +75,8 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
     public static class SMTRule implements BuiltInRule {
         public static final Name name = new Name("SMTRule");
 
-        public RuleAppSMT createApp(String successfulSolverName) {
-            return new RuleAppSMT(this, null, successfulSolverName);
+        public SMTRuleApp createApp(String successfulSolverName) {
+            return new SMTRuleApp(this, null, successfulSolverName);
         }
 
         /**
@@ -86,14 +86,14 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
          * @param unsatCore formulas required to prove the result
          * @return rule application instance
          */
-        public RuleAppSMT createApp(String successfulSolverName,
-                ImmutableList<PosInOccurrence> unsatCore) {
-            return new RuleAppSMT(this, null, unsatCore, successfulSolverName);
+        public SMTRuleApp createApp(String successfulSolverName,
+                                    ImmutableList<PosInOccurrence> unsatCore) {
+            return new SMTRuleApp(this, null, unsatCore, successfulSolverName);
         }
 
         @Override
-        public RuleAppSMT createApp(PosInOccurrence pos, TermServices services) {
-            return new RuleAppSMT(this, null, "");
+        public SMTRuleApp createApp(PosInOccurrence pos, TermServices services) {
+            return new SMTRuleApp(this, null, "");
         }
 
 
@@ -117,7 +117,7 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
                 goal.proof().getInitConfig().registerRule(RULE, () -> false);
             }
 
-            // RuleAppSMT app = (RuleAppSMT) ruleApp;
+            // SMTRuleApp app = (SMTRuleApp) ruleApp;
             // goal.node().getNodeInfo().setBranchLabel(app.getTitle());
             ImmutableList<Goal> newGoals = goal.split(1);
 
@@ -148,12 +148,12 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
 
     }
 
-    public RuleAppSMT setTitle(String title) {
-        return new RuleAppSMT(RULE, pio, ifInsts, title);
+    public SMTRuleApp setTitle(String title) {
+        return new SMTRuleApp(RULE, pio, ifInsts, title);
     }
 
     @Override
-    public RuleAppSMT setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public SMTRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }
@@ -167,8 +167,8 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
      * @return a new RuleApp with the same pio and all top level formulas of the goal as ifInsts
      */
     @Override
-    public RuleAppSMT tryToInstantiate(Goal goal) {
-        RuleAppSMT app = RULE.createApp(pio, goal.proof().getServices());
+    public SMTRuleApp tryToInstantiate(Goal goal) {
+        SMTRuleApp app = RULE.createApp(pio, goal.proof().getServices());
         Sequent seq = goal.sequent();
         List<PosInOccurrence> ifInsts = new ArrayList<>();
         for (SequentFormula ante : seq.antecedent()) {

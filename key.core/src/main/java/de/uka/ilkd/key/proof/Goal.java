@@ -20,7 +20,7 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -642,7 +642,7 @@ public final class Goal {
                     // the first new goal is the one to be closed
                     proof.closeGoal(goalList.head());
                 }
-                if (ruleApp instanceof RuleAppSMT) {
+                if (ruleApp instanceof SMTRuleApp) {
                     // the first new goal is the one to be closed
                     proof.closeGoal(goalList.head());
                 }

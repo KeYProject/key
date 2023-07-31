@@ -41,12 +41,9 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactor
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.smt.RuleAppSMT;
-import de.uka.ilkd.key.smt.SMTFocusResults;
-import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
-import de.uka.ilkd.key.smt.SolverLauncher;
-import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.Pair;
@@ -581,7 +578,7 @@ public class IntermediateProofReplayer {
             }
         }
 
-        if (RuleAppSMT.RULE.name().toString().equals(ruleName)) {
+        if (SMTRuleApp.RULE.name().toString().equals(ruleName)) {
             if (!ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().isEnableOnLoad()) {
                 status = SMT_NOT_RUN;
                 throw new SkipSMTRuleException();
@@ -628,9 +625,9 @@ public class IntermediateProofReplayer {
                 Optional<ImmutableList<PosInOccurrence>> unsatCore =
                     SMTFocusResults.getUnsatCore(smtProblem);
                 if (unsatCore.isPresent()) {
-                    return RuleAppSMT.RULE.createApp(name, unsatCore.get());
+                    return SMTRuleApp.RULE.createApp(name, unsatCore.get());
                 } else {
-                    return RuleAppSMT.RULE.createApp(name);
+                    return SMTRuleApp.RULE.createApp(name);
                 }
             }
         }
