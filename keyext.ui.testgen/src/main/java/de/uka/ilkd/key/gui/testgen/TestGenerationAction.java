@@ -39,6 +39,7 @@ public class TestGenerationAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         TGInfoDialog dlg = new TGInfoDialog(mainWindow);
         dlg.setVisible(true);
+        dlg.setLocationRelativeTo(mainWindow);
     }
 
 

@@ -70,6 +70,9 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
     // display message for the status bar
     @Override
     public String toString() {
+        if (proof.isDisposed()) {
+            return "Proof disposed";
+        }
         if (appliedRules != 0) {
             StringBuilder message = new StringBuilder();
             String timeString = (timeInMillis / 1000) + "." + ((timeInMillis % 1000) / 100);

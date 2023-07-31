@@ -5,6 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.*;
 
+import de.uka.ilkd.key.gui.MainWindow;
+
+import org.key_project.util.java.SwingUtil;
+
 /**
  * @author Alexander Weigl
  * @version 1 (10.05.19)
@@ -22,14 +26,14 @@ public class FontSizeFacade {
         "Slider.font", "Spinner.font", "TabbedPane.font", "TabbedPane.smallFont", "Table.font",
         "TableHeader.font", "TextArea.font", "TextField.font", "TextPane.font", "TitledBorder.font",
         "ToggleButton.font", "ToolBar.font", "ToolTip.font", "Tree.font", "Viewport.font" };
-    private static final Map<String, Integer> originalFontSize = new HashMap<>();
+    private static final Map<String, Float> originalFontSize = new HashMap<>();
     private static double currentFactor = 1;
 
     public static void saveCurrentFontSizes() {
         for (String k : KEYS) {
             Font f = UIManager.getDefaults().getFont(k);
             if (f != null) {
-                originalFontSize.put(k, f.getSize());
+                originalFontSize.put(k, (float) f.getSize());
             }
         }
     }
@@ -56,14 +60,13 @@ public class FontSizeFacade {
             }
         });
 
-        // redraw all frames
+        // for some reason, the menu bar does not update its font on its own
+        SwingUtil.setFont(MainWindow.getInstance().getJMenuBar(),
+            UIManager.getDefaults().getFont("Menu.font"));
+
+        // redraw all frames and dialogs
         for (Window w : Window.getWindows()) {
             SwingUtilities.updateComponentTreeUI(w);
         }
-
-        for (Window w : Dialog.getWindows()) {
-            SwingUtilities.updateComponentTreeUI(w);
-        }
-
     }
 }

@@ -7,23 +7,19 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 /**
+ * Action to select the next goal below in the proof tree.
  */
 public final class GoalSelectBelowAction extends MainWindowAction {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 4574670781882014092L;
 
     /**
-     * Creates a new GoalBackAction.
+     * Creates the new action.
      *
      * @param mainWindow the main window this action belongs to
-     * @param longName true iff long names (including the name of the rule to undo) shall be
-     *        displayed (e.g. in menu items)
      */
     public GoalSelectBelowAction(MainWindow mainWindow) {
-        super(mainWindow);
+        super(mainWindow, true);
         setAcceleratorLetter(KeyEvent.VK_J);
         setName("Select Goal Below");
         setIcon(IconFactory.selectGoalBelow(MainWindow.TOOLBAR_ICON_SIZE));

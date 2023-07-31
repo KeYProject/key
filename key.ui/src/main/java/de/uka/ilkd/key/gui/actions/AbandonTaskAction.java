@@ -32,6 +32,10 @@ public final class AbandonTaskAction extends MainWindowAction {
     public synchronized void actionPerformed(ActionEvent e) {
         boolean removalConfirmed = getMediator().getUI().confirmTaskRemoval("Are you sure?");
         if (removalConfirmed) {
+            // abandon proof that is currently in auto mode: first stop auto mode
+            if (getMediator().isInAutoMode()) {
+                getMediator().getUI().getProofControl().stopAutoMode();
+            }
             if (proof == null) {
                 getMediator().getSelectedProof().dispose();
             } else {
