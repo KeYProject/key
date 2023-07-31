@@ -271,9 +271,6 @@ public class ShowProofStatistics extends MainWindowAction {
             statisticsPane.setBorder(BorderFactory.createEmptyBorder());
             statisticsPane.setCaretPosition(0);
             statisticsPane.setBackground(MainWindow.getInstance().getBackground());
-            statisticsPane.setSize(new Dimension(10, 420));
-            statisticsPane.setPreferredSize(
-                new Dimension(statisticsPane.getPreferredSize().width + 15, 420));
 
             JScrollPane scrollPane = new JScrollPane(statisticsPane);
             scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -355,10 +352,12 @@ public class ShowProofStatistics extends MainWindowAction {
             buttonsPane.add(buttonPane2);
             add(buttonsPane, BorderLayout.PAGE_END);
 
-            int w = 50 + Math.max(scrollPane.getPreferredSize().width,
-                buttonsPane.getPreferredSize().width);
-            int h =
-                scrollPane.getPreferredSize().height + buttonsPane.getPreferredSize().height + 100;
+            pack();
+            int w = Math.min(600, 50 + Math.max(scrollPane.getPreferredSize().width,
+                buttonsPane.getPreferredSize().width));
+            int h = Math.min(850,
+                50 + scrollPane.getPreferredSize().height + buttonsPane.getPreferredSize().height);
+
             setSize(w, h);
             setLocationRelativeTo(mainWindow);
         }
