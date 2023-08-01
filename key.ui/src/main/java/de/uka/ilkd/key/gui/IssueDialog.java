@@ -649,14 +649,18 @@ public final class IssueDialog extends JDialog {
             txtSource.setText("[SOURCE COULD NOT BE LOADED]");
         } else {
             URI uri = location.getFileURI().get();
+            if (uri.getScheme() == null) {
+                uri = URI.create("file:" + uri.getPath());
+            }
             fTextField.setText("URL: " + uri);
             fTextField.setVisible(true);
 
             try {
+                URI finalUri = uri;
                 String source = StringUtil.replaceNewlines(
                     fileContentsCache.computeIfAbsent(uri, fn -> {
                         try {
-                            return IOUtil.readFrom(uri).orElseThrow();
+                            return IOUtil.readFrom(finalUri).orElseThrow();
                         } catch (IOException e) {
                             LOGGER.debug("Unknown IOException!", e);
                             return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();

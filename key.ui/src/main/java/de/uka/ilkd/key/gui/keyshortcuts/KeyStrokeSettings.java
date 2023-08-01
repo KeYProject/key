@@ -104,9 +104,9 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
 
         // default mappings
         defineDefault(IncreaseFontSizeAction.class,
-                KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, KeyStrokeManager.SHORTCUT_KEY_MASK));
+            KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, KeyStrokeManager.SHORTCUT_KEY_MASK));
         defineDefault(DecreaseFontSizeAction.class,
-                KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyStrokeManager.SHORTCUT_KEY_MASK));
+            KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyStrokeManager.SHORTCUT_KEY_MASK));
         defineDefault(HelpFacade.ACTION_OPEN_HELP.getClass(), KeyStroke.getKeyStroke("F1"));
         defineDefault(OpenExampleAction.class,
             KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyStrokeManager.MULTI_KEY_MASK));
