@@ -39,10 +39,13 @@ public class FontSizeFacade {
     }
 
     /**
-     * @param factor
+     * Scale all managed fonts by the provided factor. Then attempts to redraw all components.
+     *
+     * @param window the main window
+     * @param factor the factor
      * @see SwingUtilities#updateComponentTreeUI(Component)
      */
-    public static void resizeFonts(double factor) {
+    public static void resizeFonts(MainWindow window, double factor) {
         if (Math.abs(currentFactor - factor) <= 0.1) {
             return;
         }
@@ -61,8 +64,7 @@ public class FontSizeFacade {
         });
 
         // for some reason, the menu bar does not update its font on its own
-        SwingUtil.setFont(MainWindow.getInstance().getJMenuBar(),
-            UIManager.getDefaults().getFont("Menu.font"));
+        SwingUtil.setFont(window.getJMenuBar(), UIManager.getDefaults().getFont("Menu.font"));
 
         // redraw all frames and dialogs
         for (Window w : Window.getWindows()) {
