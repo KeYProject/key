@@ -157,6 +157,9 @@ public final class SwingUtil {
      * @param font the font
      */
     public static void setFont(JComponent component, Font font) {
+        if (component == null) {
+            return;
+        }
         component.setFont(font);
         for (int i = 0; i < component.getComponentCount(); i++) {
             Component c = component.getComponent(i);

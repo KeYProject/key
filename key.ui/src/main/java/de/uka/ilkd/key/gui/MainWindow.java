@@ -290,7 +290,7 @@ public final class MainWindow extends JFrame {
         KeYGuiExtensionFacade.getStartupExtensions().forEach(it -> it.preInit(this, mediator));
 
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
-        FontSizeFacade.resizeFonts(vs.getUIFontSizeFactor());
+        FontSizeFacade.resizeFonts(this, vs.getUIFontSizeFactor());
 
         termLabelMenu = new TermLabelMenu(this);
         currentGoalView = new CurrentGoalView(this);
@@ -377,6 +377,15 @@ public final class MainWindow extends JFrame {
             LOGGER.error("Please use the --auto option to start KeY in batch mode.");
             LOGGER.error("Use the --help option for more command line options.");
             System.exit(-1);
+        }
+        // always construct MainWindow on event dispatch thread
+        if (!EventQueue.isDispatchThread()) {
+            try {
+                SwingUtilities.invokeAndWait(MainWindow::getInstance);
+            } catch (InterruptedException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+            return instance;
         }
         if (instance == null) {
             instance = new MainWindow();
