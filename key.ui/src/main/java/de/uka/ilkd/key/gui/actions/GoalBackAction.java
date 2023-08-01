@@ -20,8 +20,8 @@ import org.key_project.util.collection.ImmutableList;
 
 /**
  * This action is one part of the previous UndoLastStepAction: It undoes the last rule application
- * on the currently selected branch. It now also works on closed branches if not the flag
- * "--no-pruning-closed" is set (to save memory).
+ * on the currently selected branch. It now also works on closed branches if the flag
+ * "--no-pruning-closed" is not set (to save memory).
  *
  * The action is enabled if: 1. the proof is not empty (just the root node exists) and 2. either
  * pruning of closed branches is enabled or the selected node is open
