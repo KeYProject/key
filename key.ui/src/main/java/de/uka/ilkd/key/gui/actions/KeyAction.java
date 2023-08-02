@@ -10,6 +10,8 @@ import javax.swing.KeyStroke;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 
+import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MASK;
+
 /**
  * Common class for all "actions" (menu entries / toolbar buttons) the user can trigger.
  * If you want the keyboard shortcuts ({@link #setAcceleratorKey(KeyStroke)} to work, the action
@@ -56,12 +58,6 @@ public abstract class KeyAction extends AbstractAction {
      * The stored values are {@link KeyStroke}.
      */
     public static final String LOCAL_ACCELERATOR = "LOCAL_ACCELERATOR";
-
-
-    /**
-     * @see KeyStrokeManager#SHORTCUT_KEY_MASK
-     */
-    protected static final int SHORTCUT_KEY_MASK = KeyStrokeManager.SHORTCUT_KEY_MASK;
 
     public String getName() {
         return (String) getValue(NAME);
