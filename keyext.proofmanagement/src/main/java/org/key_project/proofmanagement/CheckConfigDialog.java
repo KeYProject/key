@@ -2,6 +2,7 @@ package org.key_project.proofmanagement;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import javax.swing.*;
@@ -29,6 +30,7 @@ class CheckConfigDialog extends JDialog {
     private final JButton cancelButton = new JButton("Cancel");
 
     private final JTextField bundleFileField = new JTextField();
+    private final JCheckBox reportCheck = new JCheckBox("Generate Report");
     private final JTextField reportFileField = new JTextField();
 
     private final Component glassPane = new BlockingGlassPane();
@@ -38,8 +40,15 @@ class CheckConfigDialog extends JDialog {
     private class ProofManagementCheckWorker extends SwingWorker<Void, Void> {
         @Override
         protected Void doInBackground() throws Exception {
-            Path reportPath = reportFileField.getText().isEmpty() ? null
-                    : Paths.get(reportFileField.getText(), "report.html");
+            Path reportPath = null;
+            if (reportCheck.isSelected()) {
+                reportPath = Paths.get(reportFileField.getText());
+                if (Files.isDirectory(reportPath)) {
+                    // add default name
+                    reportPath = reportPath.resolve("report.html");
+                }
+            }
+
             Main.check(missingProofsCheck.isSelected(),
                 settingsCheck.isSelected(),
                 replayCheck.isSelected(),
@@ -47,6 +56,7 @@ class CheckConfigDialog extends JDialog {
                 Paths.get(bundleFileField.getText()),
                 reportPath);
             if (reportPath != null) {
+                // automatically open the report in browser
                 Desktop.getDesktop().open(reportPath.toFile());
             }
             return null;
@@ -165,11 +175,12 @@ class CheckConfigDialog extends JDialog {
         Box checkersBox = Box.createHorizontalBox();
         checkersBox.setBorder(BorderFactory.createTitledBorder("Available Checkers"));
 
-        // default: run all checks
+        // default: run all checks and generate html report
         missingProofsCheck.setSelected(true);
         settingsCheck.setSelected(true);
         replayCheck.setSelected(true);
         dependencyCheck.setSelected(true);
+        reportCheck.setSelected(true);
 
         checkersBoxInner.add(missingProofsCheck);
         checkersBoxInner.add(settingsCheck);
@@ -205,27 +216,51 @@ class CheckConfigDialog extends JDialog {
         bundleBox.add(chooseBundleButton);
         centerBox.add(bundleBox);
 
-        Box reportBox = Box.createHorizontalBox();
-        reportBox.setBorder(BorderFactory.createTitledBorder("Report location"));
+        Box reportBox = Box.createVerticalBox();
+        reportBox.setBorder(BorderFactory.createTitledBorder("HTML report"));
+
+        Box innerReportBox = Box.createHorizontalBox();
         reportFileField.setMaximumSize(new Dimension(Integer.MAX_VALUE, buttonDim.height));
         reportFileField.setEditable(false);
-        reportBox.add(reportFileField);
-        reportBox.add(Box.createHorizontalStrut(5));
+        innerReportBox.add(reportFileField);
+        innerReportBox.add(Box.createHorizontalStrut(5));
         JButton chooseReportLocationButton = new JButton("Choose report location...");
+        chooseReportLocationButton.setToolTipText("Choose the location or file for the HTML report. " +
+                "By default, the filename will be \"report.html\".");
+        reportCheck.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                chooseReportLocationButton.setEnabled(true);
+                reportFileField.setEnabled(true);
+            } else if (e.getStateChange() == ItemEvent.DESELECTED) {
+                chooseReportLocationButton.setEnabled(false);
+                reportFileField.setEnabled(false);
+            }
+        });
 
         chooseReportLocationButton.addActionListener(e -> {
-            KeYFileChooser fc = KeYFileChooser.getFileChooser("Choose file");
-            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            KeYFileChooser fc = KeYFileChooser.getFileChooser("Choose file or directory");
+            fc.setFileFilter(KeYFileChooser.PROOF_MANAGEMENT_REPORT_FILTER);
+            fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
             if (fc.showOpenDialog(CheckConfigDialog.this) == JFileChooser.APPROVE_OPTION) {
                 reportFileField.setText(fc.getSelectedFile().toString());
             }
         });
         chooseReportLocationButton.setPreferredSize(buttonDim);
         chooseReportLocationButton.setMinimumSize(buttonDim);
-        reportBox.add(chooseReportLocationButton);
+        innerReportBox.add(chooseReportLocationButton);
+        Box reportCheckBoxAlignmentBox = Box.createHorizontalBox();
+        reportCheckBoxAlignmentBox.add(reportCheck);
+        reportCheckBoxAlignmentBox.add(Box.createHorizontalGlue());
+        reportBox.add(reportCheckBoxAlignmentBox);
+        reportBox.add(innerReportBox);
         centerBox.add(reportBox);
 
         runButton.addActionListener(e -> {
+            if (bundleFileField.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please choose a proof bundle to check!",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             setGlassPane(glassPane);
             glassPane.setVisible(true);
             runButton.setText("Stop");
@@ -245,7 +280,7 @@ class CheckConfigDialog extends JDialog {
         add(buttonsBox, BorderLayout.SOUTH);
         buttonsBox.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        setMinimumSize(new Dimension(400, 200));
+        setMinimumSize(new Dimension(400, 320));
         setPreferredSize(new Dimension(600, 400));
 
         runButton.setEnabled(true);
