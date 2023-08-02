@@ -188,9 +188,11 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         vs.setConfirmExit(chkConfirmExit.isSelected());
         gs.setAutoSave((Integer) spAutoSaveProof.getValue());
         gs.setTacletFilter(chkMinimizeInteraction.isSelected());
-        vs.setFontIndex(spFontSizeTreeSequent.getSelectedIndex());
-        FontSizeFacade.resizeFonts(MainWindow.getInstance(), vs.getUIFontSizeFactor());
-        Config.DEFAULT.setDefaultFonts();
+        if (vs.sizeIndex() != spFontSizeTreeSequent.getSelectedIndex()) {
+            vs.setFontIndex(spFontSizeTreeSequent.getSelectedIndex());
+            Config.DEFAULT.setDefaultFonts();
+        }
+        FontSizeFacade.resizeFonts(vs.getUIFontSizeFactor());
         Config.DEFAULT.fireConfigChange();
     }
 

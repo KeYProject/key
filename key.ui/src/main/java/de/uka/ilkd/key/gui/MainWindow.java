@@ -289,8 +289,9 @@ public final class MainWindow extends JFrame {
         mediator = getMainWindowMediator(userInterface);
         KeYGuiExtensionFacade.getStartupExtensions().forEach(it -> it.preInit(this, mediator));
 
+        Config.DEFAULT.setDefaultFonts();
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
-        FontSizeFacade.resizeFonts(this, vs.getUIFontSizeFactor());
+        FontSizeFacade.resizeFonts(vs.getUIFontSizeFactor());
 
         termLabelMenu = new TermLabelMenu(this);
         currentGoalView = new CurrentGoalView(this);
@@ -538,8 +539,6 @@ public final class MainWindow extends JFrame {
         history.addChangeListener(selectionForwardAction);
         selectionBackAction.update();
         selectionForwardAction.update();
-
-        Config.DEFAULT.setDefaultFonts();
 
         // create menubar
         JMenuBar bar = createMenuBar();

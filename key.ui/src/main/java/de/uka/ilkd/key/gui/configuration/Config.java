@@ -4,6 +4,7 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.UIManager;
+import javax.swing.plaf.FontUIResource;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
@@ -72,10 +73,12 @@ public class Config {
 
     public void setDefaultFonts() {
         int idx = readSizeIndex();
-        UIManager.put(KEY_FONT_PROOF_TREE, new Font("Default", Font.PLAIN, SIZES[idx]));
-        UIManager.put(KEY_FONT_SEQUENT_VIEW, new Font("Monospaced", Font.PLAIN, SIZES[idx]));
-        UIManager.put(KEY_FONT_GOAL_LIST_VIEW, new Font("Default", Font.PLAIN, SIZES[2]));
-        UIManager.put(KEY_FONT_PROOF_LIST_VIEW, new Font("Default", Font.PLAIN, SIZES[2]));
+        UIManager.put(KEY_FONT_PROOF_TREE, new FontUIResource("Default", Font.PLAIN, SIZES[idx]));
+        UIManager.put(KEY_FONT_SEQUENT_VIEW,
+            new FontUIResource("Monospaced", Font.PLAIN, SIZES[idx]));
+        UIManager.put(KEY_FONT_GOAL_LIST_VIEW, new FontUIResource("Default", Font.PLAIN, SIZES[2]));
+        UIManager.put(KEY_FONT_PROOF_LIST_VIEW,
+            new FontUIResource("Default", Font.PLAIN, SIZES[2]));
     }
 
 
