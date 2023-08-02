@@ -6,10 +6,6 @@ import java.util.Map;
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 
-import static de.uka.ilkd.key.gui.configuration.Config.KEY_FONT_GOAL_LIST_VIEW;
-import static de.uka.ilkd.key.gui.configuration.Config.KEY_FONT_PROOF_LIST_VIEW;
-import static de.uka.ilkd.key.gui.configuration.Config.KEY_FONT_PROOF_TREE;
-import static de.uka.ilkd.key.gui.configuration.Config.KEY_FONT_SEQUENT_VIEW;
 
 /**
  * @author Alexander Weigl
@@ -27,9 +23,7 @@ public final class FontSizeFacade {
         "RadioButtonMenuItem.acceleratorFont", "RadioButtonMenuItem.font", "ScrollPane.font",
         "Slider.font", "Spinner.font", "TabbedPane.font", "TabbedPane.smallFont", "Table.font",
         "TableHeader.font", "TextArea.font", "TextField.font", "TextPane.font", "TitledBorder.font",
-        "ToggleButton.font", "ToolBar.font", "ToolTip.font", "Tree.font", "Viewport.font",
-        KEY_FONT_PROOF_TREE, KEY_FONT_PROOF_LIST_VIEW, KEY_FONT_SEQUENT_VIEW,
-        KEY_FONT_GOAL_LIST_VIEW };
+        "ToggleButton.font", "ToolBar.font", "ToolTip.font", "Tree.font", "Viewport.font" };
     private static final Map<String, Float> ORIGINAL_FONT_SIZES = new HashMap<>();
     private static double currentFactor = 1;
 
