@@ -60,7 +60,6 @@ class SequentViewChangeListener
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        reprint();
     }
 
     @Override
