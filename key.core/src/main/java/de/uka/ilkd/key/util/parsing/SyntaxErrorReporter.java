@@ -90,6 +90,8 @@ public class SyntaxErrorReporter extends BaseErrorListener {
      */
     public void throwException() {
         if (hasErrors()) {
+            var log = LoggerFactory.getLogger(SyntaxErrorReporter.class);
+            errors.forEach(it -> log.error(it.toString()));
             throw new ParserException("", errors);
         }
     }
@@ -161,6 +163,19 @@ public class SyntaxErrorReporter extends BaseErrorListener {
 
         public String positionAsUrl() {
             return String.format("file://source:%d", line);
+        }
+
+        @Override
+        public String toString() {
+            return "SyntaxError{" +
+                    "recognizer=" + recognizer +
+                    ", line=" + line +
+                    ", offendingSymbol=" + offendingSymbol +
+                    ", charPositionInLine=" + charPositionInLine +
+                    ", msg='" + msg + '\'' +
+                    ", source=" + source +
+                    ", stack='" + stack + '\'' +
+                    '}';
         }
     }
 

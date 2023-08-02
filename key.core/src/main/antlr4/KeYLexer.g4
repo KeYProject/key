@@ -80,7 +80,7 @@ SL_COMMENT
 ;
 
 DOC_COMMENT: '/*!' -> more, pushMode(docComment);
-ML_COMMENT: '/*' OP_SFX? -> more, pushMode(COMMENT);
+ML_COMMENT: '/*' OP_SFX* -> more, pushMode(COMMENT);
 
 
 DATATYPES:'\\datatypes';
@@ -260,6 +260,10 @@ RPAREN          : ')';
 LPAREN          : '(';
 RBRACE          : '}';
 LBRACE          : '{';
+LBRACKET        : '[';
+RBRACKET        : ']';
+PARALLEL        : '||';
+
 SEMI:         ';';
 COLON:        ':';
 DOUBLECOLON:  '::';

@@ -341,8 +341,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             semanticError(ctx, "Could not find sort: %s", ctx.getText());
         }
 
-        if (!ctx.EMPTYBRACKETS().isEmpty()) {
-            return toArraySort(new Pair<>(s, t), ctx.EMPTYBRACKETS().size());
+        if (!ctx.LBRACKET().isEmpty()) {
+            return toArraySort(new Pair<>(s, t), ctx.LBRACKET().size());
         }
         return s;
     }
@@ -351,7 +351,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     public KeYJavaType visitKeyjavatype(KeYParser.KeyjavatypeContext ctx) {
         boolean array = false;
         StringBuilder type = new StringBuilder(visitSimple_ident_dots(ctx.simple_ident_dots()));
-        for (int i = 0; i < ctx.EMPTYBRACKETS().size(); i++) {
+        for (int i = 0; i < ctx.LBRACKET().size(); i++) {
             array = true;
             type.append("[]");
         }

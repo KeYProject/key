@@ -122,7 +122,7 @@ oneof_sorts
 
 keyjavatype
 :
-    type = simple_ident_dots (EMPTYBRACKETS)*
+    type = simple_ident_dots (LBRACKET RBRACKET)*
 ;
 
 prog_var_decls
@@ -279,7 +279,7 @@ transform_decls:
 ;
 
 arrayopid:
-        EMPTYBRACKETS LPAREN componentType=keyjavatype RPAREN
+        LBRACKET RBRACKET LPAREN componentType=keyjavatype RPAREN
 ;
 
 arg_sorts:
@@ -301,7 +301,7 @@ ruleset_decls
 
 sortId
 :
-    id=simple_ident_dots (EMPTYBRACKETS)*
+    id=simple_ident_dots (LBRACKET RBRACKET)*
 ;
 
 id_declaration

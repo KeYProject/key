@@ -248,6 +248,15 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (left == null || right == null) {
             semanticError(ctx, "Expected sort available on both sides");
         }
+
+        if(isMetaSort(left)) {
+            left = right;
+        }
+
+        if(isMetaSort(right)) {
+            right = left;
+        }
+
         var cache = getFunctionCache();
         var args = "(" + left.name() + "," + right.name() + ")";
         for (String opText : opTexts) {
@@ -258,6 +267,10 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
         }
         return null;
+    }
+
+    private boolean isMetaSort(Sort sort) {
+        return "Meta".equals(sort.name().toString());
     }
 
     private final Map<String, Operator> functionLookupCache = new TreeMap<>();
