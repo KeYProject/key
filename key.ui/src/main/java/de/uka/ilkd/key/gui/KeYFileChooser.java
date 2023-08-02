@@ -51,7 +51,7 @@ public final class KeYFileChooser extends JFileChooser {
 
     /** file filter for proof management reports (*.html) */
     public static final FileFilter PROOF_MANAGEMENT_REPORT_FILTER =
-            new FileNameExtensionFilter("proof management reports (.html)", "html");
+        new FileNameExtensionFilter("proof management reports (.html)", "html");
 
     /** The Constant for the filter for dot files. */
     public static final FileFilter DOT_FILTER = new FileNameExtensionFilter(

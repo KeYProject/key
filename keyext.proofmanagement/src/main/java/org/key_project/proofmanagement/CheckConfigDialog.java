@@ -225,8 +225,9 @@ class CheckConfigDialog extends JDialog {
         innerReportBox.add(reportFileField);
         innerReportBox.add(Box.createHorizontalStrut(5));
         JButton chooseReportLocationButton = new JButton("Choose report location...");
-        chooseReportLocationButton.setToolTipText("Choose the location or file for the HTML report. " +
-                "By default, the filename will be \"report.html\".");
+        chooseReportLocationButton
+                .setToolTipText("Choose the location or file for the HTML report. " +
+                    "By default, the filename will be \"report.html\".");
         reportCheck.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 chooseReportLocationButton.setEnabled(true);
@@ -258,7 +259,7 @@ class CheckConfigDialog extends JDialog {
         runButton.addActionListener(e -> {
             if (bundleFileField.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please choose a proof bundle to check!",
-                        "Error", JOptionPane.ERROR_MESSAGE);
+                    "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             setGlassPane(glassPane);
