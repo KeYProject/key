@@ -1,14 +1,18 @@
 package de.uka.ilkd.key.gui.prooftree;
-/**
- * this class implements a TreeModel that can be displayed using the JTree class framework
- */
 
+import java.util.List;
 import javax.annotation.Nonnull;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.Node;
 
+/**
+ * Branch node indicating the start of a new proof branch.
+ *
+ * @see ProofTreeView
+ */
 class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
+    private static final String NORM = "Normal Execution";
 
     private final Object label;
 
@@ -18,21 +22,15 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
     }
 
 
-    private TreeNode[] childrenCache = null;
+    private GUIAbstractTreeNode[] childrenCache = null;
 
     private void createChildrenCache() {
-        childrenCache = new TreeNode[getChildCountHelp()];
+        childrenCache = new GUIAbstractTreeNode[getChildCountHelp()];
     }
 
     public TreeNode getChildAt(int childIndex) {
         fillChildrenCache();
         return childrenCache[childIndex];
-
-        /*
-         * int count = 0; Node n = subTree; while ( childIndex != count && n.childrenCount() == 1 )
-         * { count++; n = n.child(0); } if ( childIndex == count ) { return getProofTreeModel
-         * ().getProofTreeNode(n); } else { return findBranch ( n.child(childIndex-count-1) ); }
-         */
     }
 
     private void fillChildrenCache() {
@@ -53,17 +51,34 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
 
         while (true) {
             childrenCache[count] = getProofTreeModel().getProofTreeNode(n);
+            childrenCache[count].setParent(this);
             count++;
-            final Node nextN = findChild(n);
-            if (nextN == null) {
+            List<Node> nextN = findChild(n);
+            if (nextN.isEmpty()) {
                 break;
             }
-            n = nextN;
+            if (nextN.size() > 1) {
+                if (nextN.get(0).getNodeInfo().getBranchLabel() != null
+                        && nextN.get(0).getNodeInfo().getBranchLabel().startsWith(NORM)) {
+                    n = nextN.get(0);
+                    nextN.remove(0);
+                    for (var node : nextN) {
+                        childrenCache[count] = findBranch(node);
+                        childrenCache[count].setParent(this);
+                        count++;
+                    }
+                    continue;
+                } else {
+                    break;
+                }
+            }
+            n = nextN.get(0);
         }
 
         for (int i = 0; i != n.childrenCount(); ++i) {
             if (!ProofTreeViewFilter.hiddenByGlobalFilters(n.child(i))) {
                 childrenCache[count] = findBranch(n.child(i));
+                childrenCache[count].setParent(this);
                 count++;
             }
         }
@@ -97,11 +112,21 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
 
         while (true) {
             count++;
-            final Node nextN = findChild(n);
-            if (nextN == null) {
+            List<Node> nextN = findChild(n);
+            if (nextN.isEmpty()) {
                 break;
             }
-            n = nextN;
+            if (nextN.size() > 1) {
+                if (nextN.get(0).getNodeInfo().getBranchLabel() != null
+                        && nextN.get(0).getNodeInfo().getBranchLabel().startsWith(NORM)) {
+                    n = nextN.get(0);
+                    count += nextN.size() - 1;
+                    continue;
+                } else {
+                    break;
+                }
+            }
+            n = nextN.get(0);
         }
 
         for (int i = 0; i != n.childrenCount(); ++i) {
@@ -111,23 +136,6 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         }
 
         return count;
-    }
-
-
-    public TreeNode getParent() {
-        Node self = getNode();
-        if (self == null) {
-            return null;
-        }
-        Node n = self.parent();
-        if (n == null) {
-            return null;
-        } else {
-            while (n.parent() != null && findChild(n.parent()) != null) {
-                n = n.parent();
-            }
-            return findBranch(n);
-        }
     }
 
     // signalled by GUIProofTreeModel when the user has altered the value

@@ -422,7 +422,8 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
             }
             treeNode.flushCache();
             while (true) {
-                final Node nextN = treeNode.findChild(node);
+                List<Node> nextList = treeNode.findChild(node);
+                Node nextN = nextList.size() == 1 ? nextList.get(0) : null;
                 if (nextN == null) {
                     break;
                 }

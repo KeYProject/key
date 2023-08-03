@@ -28,17 +28,6 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
         return children.length;
     }
 
-    public TreeNode getParent() {
-        Node n = getNode();
-        if (n == null) {
-            return null;
-        }
-        while (n.parent() != null && findChild(n.parent()) != null) {
-            n = n.parent();
-        }
-        return findBranch(n);
-    }
-
     public boolean isLeaf() {
         return getChildCount() == 0;
     }
@@ -72,6 +61,7 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
                         children[i] =
                             new GUIOneStepChildTreeNode(getProofTreeModel(), this, protocol.get(i),
                                 node.sequent().formulaNumberInSequent(ruleApp.posInOccurrence()));
+                        children[i].setParent(this);
                     }
                     return;
                 }

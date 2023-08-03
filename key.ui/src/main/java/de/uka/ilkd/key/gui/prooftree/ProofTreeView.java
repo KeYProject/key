@@ -1149,11 +1149,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
             }
 
             boolean isBranch = false;
-            final Node child = treeNode.findChild(node);
-            if (!(treeNode instanceof GUIOneStepChildTreeNode) && child != null
-                    && child.getNodeInfo().getBranchLabel() != null) {
+            List<Node> child = treeNode.findChild(node);
+            if (!(treeNode instanceof GUIOneStepChildTreeNode) && child.size() == 1
+                    && child.get(0).getNodeInfo().getBranchLabel() != null) {
                 isBranch = true;
-                style.text = style.text + ": " + child.getNodeInfo().getBranchLabel();
+                style.text = style.text + ": " + child.get(0).getNodeInfo().getBranchLabel();
             }
             if (isBranch && node.childrenCount() > 1) {
                 defaultIcon = getOpenIcon();
