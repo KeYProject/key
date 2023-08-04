@@ -176,10 +176,8 @@ public class CachingExtension
 
     @Override
     public void taskFinished(TaskFinishedInfo info) {
-        if (info.getSource() instanceof TryCloseMacro) {
-            tryToClose = true;
-        }
-        if (!tryToClose) {
+        tryToClose = info.getSource() instanceof TryCloseMacro;
+        if (tryToClose) {
             return; // try close macro was running, no need to do anything here
         }
         Proof p = info.getProof();
@@ -187,9 +185,9 @@ public class CachingExtension
                 || info.getSource() instanceof ProofMacro)) {
             return;
         }
-        // show statistics if closed by reference
+        // unmark interactive goals
         if (p.countNodes() > 1 && p.openGoals().stream()
-                .allMatch(goal -> goal.node().lookup(ClosedBy.class) != null)) {
+                .anyMatch(goal -> goal.node().lookup(ClosedBy.class) != null)) {
             // mark goals as automatic again
             p.openGoals().stream().filter(goal -> goal.node().lookup(ClosedBy.class) != null)
                     .forEach(g -> {
