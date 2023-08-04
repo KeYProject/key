@@ -232,8 +232,11 @@ public class RecentFileMenu {
         }
     }
 
+    /**
+     * @return the absolute path to the most recently opened file (maybe null)
+     */
     public String getMostRecent() {
-        return mostRecentFile.getAbsolutePath();
+        return mostRecentFile != null ? mostRecentFile.getAbsolutePath() : null;
     }
 
     /**
