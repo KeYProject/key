@@ -478,7 +478,7 @@ task alldoc(type: Javadoc) {
         //stylesheetFile = new File( projectDir, 'src/javadoc/stylesheet.css' )
         windowTitle = 'KeY API Documentation'
         docTitle = "KeY JavaDoc ($project.version) -- ${getDate()}"
-        bottom = "Copyright &copy; 2003-2022 <a href=\"http://key-project.org\">The KeY-Project</a>."
+        bottom = "Copyright &copy; 2003-2023 <a href=\"http://key-project.org\">The KeY-Project</a>."
         use = true
         links += "https://docs.oracle.com/en/java/javase/11/docs/api/"
         links += "http://www.antlr2.org/javadoc/"
