@@ -85,13 +85,13 @@ public class RuleStatisticsDialog extends JDialog {
                 + buttonPane.getPreferredSize().height
                 + 100;
         setSize(w, h);
-        setLocationRelativeTo(window);
 
         statisticsPane.setText(genTable(
             statistics.sortBy(
                 Comparator.comparing((Quadruple<String, Integer, Integer, Integer> it) -> it.second)
                         .reversed())));
         statisticsPane.setCaretPosition(0);
+        setLocationRelativeTo(window);
     }
 
     /**

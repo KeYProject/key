@@ -317,7 +317,9 @@ public class CachingExtension
                 referenceSearchButton.updateState(nodes.get(0).proof());
             }
             if (!mismatches.isEmpty()) {
-                JOptionPane.showMessageDialog((JComponent) e.getSource(),
+                // since e.getSource() is the popup menu, it is better to use the MainWindow
+                // instance here as a parent
+                JOptionPane.showMessageDialog(MainWindow.getInstance(),
                     "No matching branch found for node(s) " + Arrays.toString(mismatches.toArray()),
                     "Proof Caching error", JOptionPane.WARNING_MESSAGE);
             }
