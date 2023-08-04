@@ -269,8 +269,9 @@ public final class MainWindow extends JFrame {
      * This class should only be instantiated once!
      */
     private MainWindow() {
-        getRootPane().getInputMap().put(HelpFacade.ACTION_OPEN_HELP.getAcceleratorKey(),
-            HelpFacade.ACTION_OPEN_HELP);
+        InputMap inputMap =
+            getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        inputMap.put(HelpFacade.ACTION_OPEN_HELP.getAcceleratorKey(), HelpFacade.ACTION_OPEN_HELP);
         getRootPane().getActionMap().put(HelpFacade.ACTION_OPEN_HELP, HelpFacade.ACTION_OPEN_HELP);
 
         setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());

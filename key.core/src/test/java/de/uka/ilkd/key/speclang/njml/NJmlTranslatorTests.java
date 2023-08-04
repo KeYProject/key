@@ -86,7 +86,7 @@ public class NJmlTranslatorTests {
         PositionedString message = warnings.head();
         assertEquals(
             "Diverging Semantics form JML Reference: Requires does not initiate a new contract. "
-                + "See https://www.key-project.org/docs/user/JMLGrammar/#TODO (Test.java, 5/38)",
+                + "See https://keyproject.github.io/key-docs/user/JMLGrammar/#TODO (Test.java, 5/38)",
             message.toString());
     }
 

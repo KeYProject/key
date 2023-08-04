@@ -27,6 +27,7 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -72,9 +73,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
     /**
      * KeYStroke for the search panel: STRG+SHIFT+F
      */
-    public static final KeyStroke searchKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F,
-        java.awt.event.InputEvent.CTRL_DOWN_MASK | java.awt.event.InputEvent.SHIFT_DOWN_MASK
-                | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+    public static final KeyStroke SEARCH_KEY_STROKE = KeyStroke.getKeyStroke(KeyEvent.VK_F,
+        KeyStrokeManager.MULTI_KEY_MASK);
 
     private static final long serialVersionUID = 3732875161168302809L;
 
@@ -287,7 +287,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         final ActionListener keyboardAction = (ActionEvent e) -> showSearchPanel();
 
-        registerKeyboardAction(keyboardAction, searchKeyStroke,
+        registerKeyboardAction(keyboardAction, SEARCH_KEY_STROKE,
             JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this,

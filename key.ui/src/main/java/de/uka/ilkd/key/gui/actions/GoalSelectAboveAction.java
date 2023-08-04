@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
@@ -20,7 +19,6 @@ public final class GoalSelectAboveAction extends MainWindowAction {
      */
     public GoalSelectAboveAction(MainWindow mainWindow) {
         super(mainWindow, true);
-        setAcceleratorLetter(KeyEvent.VK_K);
         setName("Select Goal Above");
         setIcon(IconFactory.selectGoalAbove(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip(

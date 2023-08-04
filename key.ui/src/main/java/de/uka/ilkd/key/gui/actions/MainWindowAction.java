@@ -10,6 +10,8 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 
+import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MASK;
+
 /**
  * {@link KeyAction} extended to automatically override the accelerator key after the default is
  * set using {@link #setAcceleratorKey(KeyStroke)} / {@link #setAcceleratorLetter(int)} using the
@@ -38,10 +40,12 @@ public abstract class MainWindowAction extends KeyAction {
         }
     }
 
+    @Override
     protected void setAcceleratorLetter(int letter) {
         setAcceleratorKey(KeyStroke.getKeyStroke(letter, SHORTCUT_KEY_MASK));
     }
 
+    @Override
     protected void setAcceleratorKey(KeyStroke keyStroke) {
         boolean trigger = getAcceleratorKey() == null;
         putValue(ACCELERATOR_KEY, keyStroke);

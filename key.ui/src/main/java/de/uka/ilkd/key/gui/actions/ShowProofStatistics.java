@@ -56,7 +56,6 @@ public class ShowProofStatistics extends MainWindowAction {
         setName("Show Proof Statistics");
         setIcon(IconFactory.statistics(16));
         getMediator().enableWhenProofLoaded(this);
-        lookupAcceleratorKey();
 
         this.proof = proof;
     }

@@ -1,14 +1,12 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -54,8 +52,6 @@ public final class GoalBackAction extends MainWindowAction {
         putValue(SHORT_DESCRIPTION, "Undo the last rule application.");
         initListeners();
         updateName();
-        setAcceleratorLetter(KeyEvent.VK_Z);
-        KeyStrokeManager.lookupAndOverride(this);
     }
 
     /**
