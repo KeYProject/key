@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.nio.file.Path;
 
@@ -26,7 +25,6 @@ public final class OpenMostRecentFileAction extends MainWindowAction {
         setName("Reload");
         setIcon(IconFactory.openMostRecent(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Reload last opened file.");
-        setAcceleratorLetter(KeyEvent.VK_R);
     }
 
     public void actionPerformed(ActionEvent e) {

@@ -36,7 +36,6 @@ public final class EditMostRecentFileAction extends MainWindowAction {
                 && !desktop.isSupported(Desktop.Action.OPEN)) {
             setEnabled(false);
         }
-        lookupAcceleratorKey();
     }
 
     public void actionPerformed(ActionEvent e) {

@@ -40,10 +40,12 @@ public abstract class MainWindowAction extends KeyAction {
         }
     }
 
+    @Override
     protected void setAcceleratorLetter(int letter) {
         setAcceleratorKey(KeyStroke.getKeyStroke(letter, SHORTCUT_KEY_MASK));
     }
 
+    @Override
     protected void setAcceleratorKey(KeyStroke keyStroke) {
         boolean trigger = getAcceleratorKey() == null;
         putValue(ACCELERATOR_KEY, keyStroke);

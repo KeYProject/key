@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
@@ -20,11 +19,9 @@ public final class AbandonTaskAction extends MainWindowAction {
         super(mainWindow);
         setName("Abandon Proof");
         setIcon(IconFactory.abandon(16));
-        setAcceleratorLetter(KeyEvent.VK_W);
         setTooltip("Drop current proof.");
 
         getMediator().enableWhenProofLoaded(this);
-        lookupAcceleratorKey();
 
         this.proof = proof;
     }

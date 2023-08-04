@@ -19,7 +19,7 @@ public class SearchInProofTreeAction extends MainWindowAction {
         setIcon(IconFactory.search2(16));
         setTooltip("Search for rule names or node numbers in the proof tree.");
 
-        this.setAcceleratorKey(de.uka.ilkd.key.gui.prooftree.ProofTreeView.searchKeyStroke);
+        setAcceleratorKey(de.uka.ilkd.key.gui.prooftree.ProofTreeView.SEARCH_KEY_STROKE);
         getMediator().enableWhenProofLoaded(this);
 
     }
