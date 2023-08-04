@@ -23,11 +23,8 @@ dependencies {
     //logging implementation used by the slf4j
     implementation 'ch.qos.logback:logback-classic:1.4.8'
 
-    api 'org.dockingframes:docking-frames-common:1.1.3p1'
-    api 'org.dockingframes:docking-frames-core:1.1.3p1'
-    // change to if published on maven central
-    // api 'org.key-project:docking-frames-common:1.1.3p1'
-    // api 'org.key-project:docking-frames-core:1.1.3p1'
+    api 'org.key-project:docking-frames-common:1.1.3p1'
+    api 'org.key-project:docking-frames-core:1.1.3p1'
 
     runtimeOnly project(":keyext.ui.testgen")
     runtimeOnly project(":keyext.exploration")
