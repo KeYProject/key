@@ -40,7 +40,6 @@ public final class EditMostRecentFileAction extends MainWindowAction
         } else {
             mainWindow.getMediator().addKeYSelectionListener(this);
         }
-        lookupAcceleratorKey();
     }
 
     public void actionPerformed(ActionEvent e) {
