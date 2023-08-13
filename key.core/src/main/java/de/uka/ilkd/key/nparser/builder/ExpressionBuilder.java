@@ -604,7 +604,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         javaSchemaModeAllowed = false;
     }
 
-    private PairOfStringAndJavaBlock getJavaBlock(Token t) {
+    public PairOfStringAndJavaBlock getJavaBlock(Token t) {
         PairOfStringAndJavaBlock sjb = new PairOfStringAndJavaBlock();
         String s = t.getText().trim();
         String cleanJava = trimJavaBlock(s);
@@ -704,6 +704,8 @@ public class ExpressionBuilder extends DefaultBuilder {
             // not part of the class declaration
             // A special case is needed, hence.
             result = javaInfo.getInvProgramVar();
+        } else if (attributeName.equals("<inv_free>")) {
+            result = javaInfo.getFreeInvProgramVar();
         } else {
             final KeYJavaType prefixKJT = javaInfo.getKeYJavaType(prefixSort);
             if (prefixKJT == null) {
@@ -1848,7 +1850,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return abbrevMap;
     }
 
-    private static class PairOfStringAndJavaBlock {
+    public static class PairOfStringAndJavaBlock {
         String opName;
         JavaBlock javaBlock;
     }

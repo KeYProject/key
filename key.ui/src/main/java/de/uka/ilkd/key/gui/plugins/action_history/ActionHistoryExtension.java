@@ -1,4 +1,4 @@
-package org.key_project.action_history;
+package de.uka.ilkd.key.gui.plugins.action_history;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -15,7 +14,6 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.UserActionListener;
 import de.uka.ilkd.key.gui.actions.useractions.UserAction;
-import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.proof.Proof;
@@ -24,15 +22,11 @@ import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 
 
 /**
- * Entry point for the Action History extension.
+ * Entry point for the Action History functionality.
  *
  * @author Arne Keller
  */
-@KeYGuiExtension.Info(name = "Action History",
-    description = "GUI extension to undo actions (using a toolbar button)",
-    experimental = false, optional = true, priority = 10000)
-public class ActionHistoryExtension implements KeYGuiExtension,
-        KeYGuiExtension.Startup, KeYGuiExtension.Toolbar, UserActionListener,
+public class ActionHistoryExtension implements UserActionListener,
         ProofDisposedListener, KeYSelectionListener {
     /**
      * Icon for the undo button.
@@ -40,23 +34,15 @@ public class ActionHistoryExtension implements KeYGuiExtension,
     private static final IconFontProvider UNDO = new IconFontProvider(FontAwesomeSolid.UNDO);
 
     /**
-     * The KeY mediator.
-     */
-    private KeYMediator mediator;
-    /**
      * Tracked user actions, stored separately for each proof.
      */
     private final Map<Proof, List<UserAction>> userActions = new WeakHashMap<>();
 
     /**
-     * The toolbar area for this extension. Contains the dropdown list of performed actions and
-     * the undo button.
-     */
-    private JToolBar extensionToolbar = null;
-    /**
-     * The undo button contained in {@link #extensionToolbar}.
+     * The undo button contained in the main toolbar.
      */
     private UndoHistoryButton undoButton = null;
+    private JButton undoUptoButton = null;
     /**
      * Proofs this extension is monitoring for changes.
      */
@@ -65,23 +51,6 @@ public class ActionHistoryExtension implements KeYGuiExtension,
      * The currently shown proof.
      */
     private Proof currentProof = null;
-
-    @Nonnull
-    @Override
-    public JToolBar getToolbar(MainWindow mainWindow) {
-        if (extensionToolbar == null) {
-            extensionToolbar = new JToolBar();
-            undoButton =
-                new UndoHistoryButton(mainWindow, MainWindow.TOOLBAR_ICON_SIZE, UNDO, "Undo ",
-                    this::undoOneAction, this::undoUptoAction, this::getActions);
-            extensionToolbar.add(undoButton.getAction());
-            JButton undoUptoButton = undoButton.getSelectionButton();
-            undoUptoButton.setToolTipText(
-                "Select an action to undo, including all actions performed afterwards");
-            extensionToolbar.add(undoUptoButton);
-        }
-        return extensionToolbar;
-    }
 
     private List<UserAction> getActions() {
         List<UserAction> actions = userActions.get(currentProof);
@@ -121,12 +90,16 @@ public class ActionHistoryExtension implements KeYGuiExtension,
         }
     }
 
-    @Override
-    public void init(MainWindow window, KeYMediator mediator) {
-        this.mediator = mediator;
+    public ActionHistoryExtension(MainWindow window, KeYMediator mediator) {
         mediator.addUserActionListener(this);
         mediator.addKeYSelectionListener(this);
         new StateChangeListener(mediator);
+        undoButton =
+            new UndoHistoryButton(window, MainWindow.TOOLBAR_ICON_SIZE, UNDO, "Undo ",
+                this::undoOneAction, this::undoUptoAction, this::getActions);
+        undoUptoButton = undoButton.getSelectionButton();
+        undoUptoButton.setToolTipText(
+            "Select an action to undo, including all actions performed afterwards");
         undoButton.refreshState();
     }
 
@@ -168,5 +141,13 @@ public class ActionHistoryExtension implements KeYGuiExtension,
         }
         registeredProofs.add(p);
         p.addProofDisposedListener(this);
+    }
+
+    public JButton getUndoUptoButton() {
+        return undoUptoButton;
+    }
+
+    public UndoHistoryButton getUndoButton() {
+        return undoButton;
     }
 }

@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java.ast;
 
+import java.util.stream.Stream;
+
 /**
  * Non terminal program element. taken from COMPOST and changed to achieve an immutable structure
  */
@@ -18,8 +20,15 @@ public interface NonTerminalProgramElement extends ProgramElement {
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     ProgramElement getChildAt(int index);
 
+    default Stream<ProgramElement> stream() {
+        Stream<ProgramElement> s = Stream.<ProgramElement>empty();
+        for (int i = 0; i < getChildCount(); i++) {
+            s = Stream.concat(s, Stream.of(getChildAt(i)));
+        }
+        return s;
+    }
 }
