@@ -602,7 +602,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         javaSchemaModeAllowed = false;
     }
 
-    private PairOfStringAndJavaBlock getJavaBlock(Token t) {
+    public PairOfStringAndJavaBlock getJavaBlock(Token t) {
         PairOfStringAndJavaBlock sjb = new PairOfStringAndJavaBlock();
         String s = t.getText().trim();
         String cleanJava = trimJavaBlock(s);
@@ -1862,7 +1862,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return abbrevMap;
     }
 
-    private static class PairOfStringAndJavaBlock {
+    public static class PairOfStringAndJavaBlock {
         String opName;
         JavaBlock javaBlock;
     }
