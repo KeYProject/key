@@ -189,7 +189,7 @@ public class KeYJPMapping {
      *
      * @return true if special classes have been parsed in
      */
-    public boolean parsedSpecial() {
+    public boolean setParsedSpecial() {
         return parsedSpecial;
     }
 
@@ -207,7 +207,7 @@ public class KeYJPMapping {
      * @param b boolean indicating if the special classes have been
      *        parsed in
      */
-    public void parsedSpecial(boolean b) {
+    public void setParsedSpecial(boolean b) {
         parsedSpecial = b;
     }
 

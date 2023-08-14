@@ -187,6 +187,7 @@ public final class ProblemInitializer {
 
         // read normal includes
         reportStatus("Read Includes", in.getIncludes().size());
+        LOGGER.debug("Read Includes: {}", in.getIncludes().size());
         int i = 0;
         for (String fileName : in.getIncludes()) {
             KeYFile keyFile =
@@ -241,9 +242,11 @@ public final class ProblemInitializer {
         }
 
         reportStatus("Reading Java libraries");
+        LOGGER.debug("Reading Java libraries");
         javaService.parseSpecialClasses(fileRepo);
         if (javaPath != null) {
             reportStatus("Reading Java source");
+            LOGGER.debug("Reading Java source");
             List<Path> classes = getClasses(javaPath);
             if (envInput.isIgnoreOtherJavaFiles()) {
                 Path file = envInput.getJavaFile();
@@ -299,8 +302,10 @@ public final class ProblemInitializer {
 
             // read envInput itself
             reportStatus("Reading " + envInput.name());
+            LOGGER.info("Reading KeY file '{}'", envInput.name());
             envInput.setInitConfig(initConfig);
-            warnings = warnings.union(envInput.read());
+            ImmutableSet<PositionedString> warn = envInput.read();
+            warnings = warnings.union(warn);
 
             // reset the variables namespace
             initConfig.namespaces().setVariables(new Namespace<>());

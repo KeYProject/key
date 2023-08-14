@@ -65,8 +65,10 @@ public class KeYJavaPipeline {
                 step.apply(compilationUnit);
                 long stop = System.currentTimeMillis();
                 if (compilationUnit.getStorage().isPresent()) {
-                    LOGGER.trace("Processed in {} ms: {}", stop - start,
-                        compilationUnit.getStorage().get().getPath());
+                    LOGGER.debug("Processed {} on {} ms: {}",
+                        step.getClass().getSimpleName(),
+                        compilationUnit.getStorage().get().getPath(),
+                        stop - start);
                 }
             }
         }

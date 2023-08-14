@@ -1140,7 +1140,7 @@ public final class JavaInfo {
     public ExecutionContext getDefaultExecutionContext() {
         if (defaultExecutionContext == null) {
             // ensure that default classes are available
-            if (!kpmi.rec2key().parsedSpecial()) {
+            if (!kpmi.rec2key().setParsedSpecial()) {
                 readJavaBlock("{ {} }");
             }
             final KeYJavaType kjt = getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);

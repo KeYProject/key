@@ -90,7 +90,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
             }
             symbols.put(sym.name(), sym);
         }
-
+        LOGGER.debug("Registered {} {}", sym.getClass().getSimpleName(), sym.name());
     }
 
     public void add(Namespace<E> source) {

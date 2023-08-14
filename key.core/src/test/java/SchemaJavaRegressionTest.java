@@ -1,7 +1,17 @@
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
-import de.uka.ilkd.key.java.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
+
+import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
+import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -11,16 +21,15 @@ import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 import de.uka.ilkd.key.nparser.builder.TacletPBuilder;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import org.junit.jupiter.api.Test;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.util.parsing.BuildingException;
+import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Map;
-import java.util.TreeMap;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Alexander Weigl
@@ -28,6 +37,18 @@ import java.util.TreeMap;
  */
 public class SchemaJavaRegressionTest {
     Path rulesDir = Paths.get("../key.core/src/main/resources/de/uka/ilkd/key/proof/rules");
+
+    private final Services services;
+
+    {
+        try {
+            var env = KeYEnvironment
+                    .load(Paths.get("../key.ui/examples/standard_key/prop_log/contraposition.key"));
+            services = env.getServices();
+        } catch (ProblemLoaderException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Test
     void createOracle() throws IOException {
@@ -60,7 +81,6 @@ public class SchemaJavaRegressionTest {
     }
 
     private void findModalities(KeYParser.FileContext ctx) {
-        Services services = new Services(JavaProfile.getDefaultProfile());
         var nss = services.getNamespaces();
         Namespace<SchemaVariable> schemaVariables = new Namespace<>();
         Namespace<IProgramVariable> programVariables = new Namespace<>();
@@ -72,7 +92,10 @@ public class SchemaJavaRegressionTest {
             @Override
             public Void visitOne_schema_var_decl(KeYParser.One_schema_var_declContext ctx) {
                 if (ctx.PROGRAM() != null)
-                    ctx.accept(tpb);
+                    try {
+                        ctx.accept(tpb);
+                    } catch (BuildingException ignored) { // name clashes
+                    }
                 return null;
             }
 
@@ -86,24 +109,30 @@ public class SchemaJavaRegressionTest {
                     Object javaBlock = null;
                     for (int i = 0; i < 10; i++) {
                         try {
-                            javaBlock = parseSchemaJava(e);
+                            javaBlock = parseSchemaJava(ctx, e);
                             break;
                         } catch (Exception ignored) {
+                            javaBlock = ignored;
                         }
                     }
 
-                    modalities.put(cleaned, javaBlock);
+                    modalities.put(Objects.requireNonNull(cleaned), javaBlock);
                 }
                 return null;
             }
 
-            private Object parseSchemaJava(String cleanJava) {
-                SchemaJavaReader jr = new SchemaRecoder2KeY(services, nss);
-                jr.setSVNamespace(schemaVariables);
+            private Object parseSchemaJava(ParserRuleContext ctx, String cleanJava) {
+                var jr = services.getJavaService();
                 try {
-                    return traverse(jr.readBlockWithProgramVariables(programVariables, cleanJava));
+                    return traverse(jr.readBlockWithProgramVariables(programVariables, cleanJava,
+                        schemaVariables));
                 } catch (Exception e) {
-                    return traverse(jr.readBlockWithEmptyContext(cleanJava));
+                    try {
+                        return traverse(jr.readBlockWithEmptyContext(cleanJava, schemaVariables));
+                    } catch (BuildingExceptions e1) {
+                        throw new BuildingException(ctx,
+                            "Could not parse java: '" + cleanJava + "'", e1);
+                    }
                 }
             }
 
@@ -142,4 +171,3 @@ public class SchemaJavaRegressionTest {
         ctx.accept(new FindMods());
     }
 }
-

@@ -477,69 +477,12 @@ public class JavaService {
      * @param fileRepo the fileRepo which will store the files
      */
     public void parseSpecialClasses(FileRepo fileRepo) {
-        if (mapping.parsedSpecial()) {
+        if (mapping.setParsedSpecial())
             return;
-        }
-
-        mapping.setParsingLibraries(true);
+        mapping.setParsedSpecial(true);
         try {
-            {
-                LOGGER.debug("Parsing internal classes from {}", bootClassPath);
-                var bootClasses = parseBootClasses(fileRepo);
-
-                var defaultCu = unwrapParseResult(programFactory.parseCompilationUnit(
-                    new StringReader("public class " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS +
-                        " { public static void " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_METHOD
-                        + "() {}  }")));
-                bootClasses.add(defaultCu);
-
-                programFactory.setBootClasses(bootClasses);
-                LOGGER.debug("Finished parsing internal classes");
-
-                transformModel(bootClasses);
-                // Process java.lang.Object first (needed to construct array classes like int[]
-                var object = bootClasses.stream()
-                        .filter(b -> b.getPrimaryType()
-                                .map(t -> t.getFullyQualifiedName().orElseThrow()
-                                        .equals(TypeSolver.JAVA_LANG_OBJECT))
-                                .orElse(false))
-                        .findFirst()
-                        .orElse(null);
-                if (object != null) {
-                    converter.processCompilationUnit(object);
-                }
-
-                var obj = typeConverter.getObjectType();
-                assert obj != null && obj.getJavaType() != null
-                        : "java.lang.Object has to be available";
-
-                for (CompilationUnit cu : bootClasses) {
-                    if (cu == object) {
-                        continue;
-                    }
-                    converter.processCompilationUnit(cu);
-                }
-                LOGGER.debug("Finished processing internal classes");
-            }
-
-            {
-                LOGGER.debug("Parsing library classes");
-                var libraryClasses = parseLibraryClasses(fileRepo);
-                programFactory.setLibraryClasses(libraryClasses);
-                LOGGER.debug("Finished parsing library classes");
-
-                transformModel(libraryClasses);
-
-                /*
-                 * dynamicallyCreatedCompilationUnits = keySourceInfo.getCreatedStubClasses();
-                 * specialClasses.addAll(dynamicallyCreatedCompilationUnits);
-                 */
-
-                for (CompilationUnit cu : libraryClasses) {
-                    converter.processCompilationUnit(cu);
-                }
-                LOGGER.debug("Finished processing library classes");
-            }
+            parseBootClasspath(fileRepo);
+            parseLibraryPaths(fileRepo);
 
             // Make sure some required types are registered
             for (var type : ResolvedPrimitiveType.values()) {
@@ -547,30 +490,69 @@ public class JavaService {
             }
             typeConverter.getKeYJavaType(NullType.INSTANCE);
             typeConverter.getKeYJavaType(ResolvedVoidType.INSTANCE);
-
-            /*
-             * TODO weigl
-             * // Ensure that rec2key is complete (at least the NullType needs to be available!)
-             * if (!rec2key().mapped(getNameInfo().getNullType())) {
-             * Sort objectSort = services.getNamespaces().sorts().lookup(new
-             * Name("java.lang.Object"));
-             * assert objectSort != null;
-             * NullSort nullSort = new NullSort(objectSort);
-             * KeYJavaType result = new KeYJavaType(NullType.JAVA_NULL, nullSort);
-             * if (services.getNamespaces().sorts().lookup(nullSort.name()) == null) {
-             * services.getNamespaces().sorts().add(nullSort);
-             * }
-             * rec2key().put(servConf.getNameInfo().getNullType(), result);
-             * }
-             */
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
 
-        // tell the mapping that we have parsed the special classes
-        mapping.setParsingLibraries(false);
-        mapping.parsedSpecial(true);
+    private void parseLibraryPaths(FileRepo fileRepo) throws IOException {
+        LOGGER.debug("Parsing library classes");
+        var libraryClasses = parseLibraryClasses(fileRepo);
+        programFactory.setLibraryClasses(libraryClasses);
+        LOGGER.debug("Finished parsing library classes");
+
+        transformModel(libraryClasses);
+
+        /*
+         * dynamicallyCreatedCompilationUnits = keySourceInfo.getCreatedStubClasses();
+         * specialClasses.addAll(dynamicallyCreatedCompilationUnits);
+         */
+
+        for (CompilationUnit cu : libraryClasses) {
+            converter.processCompilationUnit(cu);
+        }
+        LOGGER.debug("Finished processing library classes");
+    }
+
+    private void parseBootClasspath(FileRepo fileRepo) throws IOException {
+        LOGGER.debug("Parsing internal classes from {}", bootClassPath);
+        var bootClasses = parseBootClasses(fileRepo);
+
+        /*
+         * var defaultCu = unwrapParseResult(programFactory.parseCompilationUnit(
+         * new StringReader("public class " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS +
+         * " { public static void " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_METHOD
+         * + "() {}  }")));
+         * bootClasses.add(defaultCu);
+         */
+
+        programFactory.setBootClasses(bootClasses);
+        LOGGER.debug("Finished parsing internal classes");
+
+        transformModel(bootClasses);
+        // Process java.lang.Object first (needed to construct array classes like int[]
+        var object = bootClasses.stream()
+                .filter(b -> b.getPrimaryType()
+                        .map(t -> t.getFullyQualifiedName().orElseThrow()
+                                .equals(TypeSolver.JAVA_LANG_OBJECT))
+                        .orElse(false))
+                .findFirst()
+                .orElse(null);
+        if (object != null) {
+            converter.processCompilationUnit(object);
+        }
+
+        var obj = typeConverter.getObjectType();
+        assert obj != null && obj.getJavaType() != null
+                : "java.lang.Object has to be available";
+
+        for (CompilationUnit cu : bootClasses) {
+            if (cu == object) {
+                continue;
+            }
+            converter.processCompilationUnit(cu);
+        }
+        LOGGER.debug("Finished processing internal classes");
     }
 
     /**

@@ -22,10 +22,9 @@ dependencies {
 
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2'
+    testImplementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2'
 }
 
-}
 
 sourceSets.main.java.srcDirs("$projectDir/build/generated-src/antlr4/main/")
 
