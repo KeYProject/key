@@ -48,7 +48,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         implements RuleCompletionHandler, ProofEnvironmentListener, ProofDisposedListener {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(AbstractMediatorUserInterfaceControl.class);
-    protected boolean saveOnly = false;
+    private boolean saveOnly = false;
 
     private final MediatorProofControl proofControl = createProofControl();
 

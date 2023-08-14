@@ -47,6 +47,10 @@ public final class IconFactory {
     public static final IconFontProvider INTERACTIVE =
         new IconFontProvider(FontAwesomeSolid.HAND_POINT_RIGHT);
     public static final IconFontProvider SCRIPT = new IconFontProvider(FontAwesomeSolid.SCROLL);
+    public static final IconFontProvider BACKREFERENCE =
+        new IconFontProvider(FontAwesomeSolid.BACKWARD);
+    public static final IconFontProvider BACKREFERENCE_ARROW =
+        new IconFontProvider(FontAwesomeSolid.ARROWS_TO_EYE);
     public static final IconFontProvider PRUNE = new IconFontProvider(FontAwesomeSolid.CUT);
     public static final IconFontProvider GOAL_BACK =
         new IconFontProvider(FontAwesomeSolid.BACKSPACE);
@@ -141,7 +145,7 @@ public final class IconFactory {
         new IconFontProvider(FontAwesomeSolid.ANGLE_DOWN);
     public static final IconFontProvider SEARCH_HIGHLIGHT =
         new IconFontProvider(FontAwesomeSolid.HIGHLIGHTER);
-    public static final IconFontProvider ABONDON = new IconFontProvider(FontAwesomeSolid.TRASH_ALT);
+    public static final IconFontProvider ABANDON = new IconFontProvider(FontAwesomeSolid.TRASH_ALT);
     public static final IconFontProvider SEARCH_HIDE =
         new IconFontProvider(FontAwesomeSolid.LOW_VISION);
     public static final IconFontProvider SEARCH_NEXT =
@@ -153,6 +157,7 @@ public final class IconFactory {
 
     private static final Image keyHole = getImage("images/ekey-mono.gif");
     private static final Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
+    private static final Image keyCachedClosed = getImage("images/closed-cached.png");
     private static final Image keyHoleInteractive = getImage("images/keyinteractive.gif");
     private static final Image keyHoleLinked = getImage("images/keylinked.gif");
     private static final Image keyLogo = getImage("images/key-color.png");
@@ -204,12 +209,15 @@ public final class IconFactory {
     }
 
     private static ImageIcon scaleIcon(Image im, int x, int y) {
+        if (im.getWidth(null) == x && im.getHeight(null) == y) {
+            return new ImageIcon(im);
+        }
         Image scaledim = im.getScaledInstance(x, y, Image.SCALE_SMOOTH);
         return new ImageIcon(scaledim);
     }
 
     public static Icon abandon(int x) {
-        return ABONDON.load(x);
+        return ABANDON.load(x);
     }
 
     public static Icon configure(int x) {
@@ -314,6 +322,10 @@ public final class IconFactory {
 
     public static ImageIcon keyHoleAlmostClosed(int x, int y) {
         return scaleIcon(keyHoleAlmostClosed, x, y);
+    }
+
+    public static ImageIcon keyCachedClosed(int x, int y) {
+        return scaleIcon(keyCachedClosed, x, y);
     }
 
     public static ImageIcon keyHoleInteractive(int x, int y) {

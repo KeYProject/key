@@ -32,6 +32,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
@@ -53,10 +54,16 @@ public class ProofTreeView extends JPanel implements TabPanel {
         ColorSettings.define("[proofTree]gray", "", Color.DARK_GRAY);
     public static final ColorSettings.ColorProperty LIGHT_BLUE_COLOR =
         ColorSettings.define("[proofTree]lightBlue", "", new Color(230, 254, 255));
+    /**
+     * Color used for closed goals.
+     */
     public static final ColorSettings.ColorProperty DARK_GREEN_COLOR =
         ColorSettings.define("[proofTree]darkGreen", "", new Color(0, 128, 51));
     public static final ColorSettings.ColorProperty DARK_RED_COLOR =
         ColorSettings.define("[proofTree]darkRed", "", new Color(191, 0, 0));
+    /**
+     * Color used for linked goals.
+     */
     public static final ColorSettings.ColorProperty PINK_COLOR =
         ColorSettings.define("[proofTree]pink", "", new Color(255, 0, 240));
     public static final ColorSettings.ColorProperty ORANGE_COLOR =
@@ -918,7 +925,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 selectBranchNode((GUIBranchNode) treeNode);
             } else {
                 Node node = treeNode.getNode();
-                Goal selected = proof.getGoal(node);
+                Goal selected = proof.getOpenGoal(node);
                 if (selected != null) {
                     mediator.goalChosen(selected);
                 } else if (treeNode instanceof GUIOneStepChildTreeNode) {
@@ -1052,7 +1059,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                     @Override
                     public void visit(Proof proof, Node visitedNode) {
                         Goal g;
-                        if ((g = proof.getGoal(visitedNode)) != null && g.isLinked()) {
+                        if ((g = proof.getOpenGoal(visitedNode)) != null && g.isLinked()) {
                             this.isLinked = true;
                         }
                     }
@@ -1067,17 +1074,29 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         private void renderLeaf(Style style, GUIAbstractTreeNode node) {
             Node leaf = node.getNode();
-            Goal goal = proof.getGoal(leaf);
+            Goal goal = proof.getOpenGoal(leaf);
             String toolTipText;
 
             if (goal == null || leaf.isClosed()) {
+                ClosedBy c = leaf.lookup(ClosedBy.class);
+                if (c != null) {
+                    style.icon = IconFactory.keyCachedClosed(iconHeight, iconHeight);
+                } else {
+                    style.icon = IconFactory.keyHoleClosed(iconHeight);
+                }
                 style.foreground = DARK_GREEN_COLOR.get();
-                style.icon = IconFactory.keyHoleClosed(iconHeight);
                 toolTipText = "A closed goal";
+                if (c != null) {
+                    toolTipText += " (by reference to other proof)";
+                }
             } else if (goal.isLinked()) {
                 style.foreground = PINK_COLOR.get();
                 style.icon = IconFactory.keyHoleLinked(20, 20);
                 toolTipText = "Linked goal - no automatic rule application";
+            } else if (leaf.lookup(ClosedBy.class) != null) {
+                style.foreground = DARK_GREEN_COLOR.get();
+                style.icon = IconFactory.keyCachedClosed(iconHeight, iconHeight);
+                toolTipText = "Cached goal - reference to another proof";
             } else if (!goal.isAutomatic()) {
                 style.foreground = ORANGE_COLOR.get();
                 style.icon = IconFactory.keyHoleInteractive(20, 20);
