@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -48,6 +49,7 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.SwingUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,9 +180,13 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                         "Couldn't close Goal Nr. " + g.node().serialNr() + " automatically");
                     dialog.show();
                 }
+                if (!isAtLeastOneMacroRunning() && !MainWindow.getInstance().isActive()) {
+                    SwingUtil.showNotification("Automated proof search", info.toString());
+                }
             }
             mainWindow.displayResults(info.toString());
         } else if (info != null && info.getSource() instanceof ProofMacro) {
+            ProofMacro macro = (ProofMacro) info.getSource();
             if (!isAtLeastOneMacroRunning()) {
                 resetStatus(this);
                 assert info instanceof ProofMacroFinishedInfo;
@@ -195,6 +201,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                         AutoDismissDialog dialog = new AutoDismissDialog(
                             "Couldn't close Goal Nr. " + g.node().serialNr() + " automatically");
                         dialog.show();
+                    }
+                    if (!isAtLeastOneMacroRunning() && !MainWindow.getInstance().isActive()) {
+                        SwingUtil.showNotification(macro.getName(), info.toString());
                     }
                 }
             }

@@ -99,7 +99,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         Strategy oldStrategy = proof.getActiveStrategy();
         proof.setActiveStrategy(createStrategy(proof, posInOcc));
 
-        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals, proof, false);
+        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals, proof);
         try {
             // find the relevant goals
             // and start

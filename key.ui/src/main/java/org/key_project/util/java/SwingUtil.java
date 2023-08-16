@@ -5,6 +5,7 @@ package org.key_project.util.java;
 
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,7 +14,11 @@ import java.util.List;
 import java.util.Set;
 import javax.swing.*;
 
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+
 import bibliothek.gui.dock.themes.basic.BasicDockableDisplayer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utilities for working with Swing.
@@ -21,6 +26,11 @@ import bibliothek.gui.dock.themes.basic.BasicDockableDisplayer;
  * @author Arne Keller
  */
 public final class SwingUtil {
+    public static final Logger LOGGER = LoggerFactory.getLogger(SwingUtil.class);
+
+    private static boolean notifySendAvailable = false;
+    private static boolean notifySendChecked = false;
+
     private SwingUtil() {
     }
 
@@ -177,6 +187,61 @@ public final class SwingUtil {
         // JMenu hides its entries in the popup menu
         if (component instanceof JMenu && ((JMenu) component).getPopupMenu() != null) {
             setFont(((JMenu) component).getPopupMenu(), font);
+        }
+    }
+
+    /**
+     * Show a desktop notification to the user.
+     *
+     * @param title title of the notification
+     * @param text text of the notification
+     */
+    public static void showNotification(String title, String text) {
+        // Linux: try notify-send first (looks better)
+        if (System.getProperty("os.name").equals("Linux")) {
+            if (!notifySendChecked) {
+                notifySendChecked = true;
+                notifySendAvailable = true;
+                try {
+                    new ProcessBuilder(
+                        "notify-send",
+                        "-?").start().waitFor();
+                } catch (IOException | InterruptedException e) {
+                    LOGGER.warn("notify-send is not available (will not display notifications!)");
+                    notifySendAvailable = false;
+                }
+            }
+            if (!notifySendAvailable) {
+                // the default Swing notification on Linux looks hideous
+                // => do not notify!
+                return;
+            }
+            try {
+                new ProcessBuilder(
+                    "notify-send",
+                    "-a", "KeY", title, text).start().waitFor();
+            } catch (IOException | InterruptedException e) {
+                // since we checked for notify-send previously, this error is unlikely
+                LOGGER.warn("failed to show notification ", e);
+            }
+        } else {
+            SystemTray tray = null;
+            TrayIcon trayIcon = null;
+            try {
+                tray = SystemTray.getSystemTray();
+
+                trayIcon = new TrayIcon(IconFactory.keyLogo(), "KeY");
+                // Let the system resize the image if needed
+                trayIcon.setImageAutoSize(true);
+                tray.add(trayIcon);
+                trayIcon.displayMessage(title, text, TrayIcon.MessageType.INFO);
+            } catch (AWTException e) {
+                LOGGER.warn("failed to show notification ", e);
+            } finally {
+                if (tray != null && trayIcon != null) {
+                    tray.remove(trayIcon);
+                }
+            }
         }
     }
 }
