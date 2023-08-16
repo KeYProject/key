@@ -206,6 +206,6 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         // Timeout can have up to 3 decimal places in seconds to still be an integer in ms.
         timeoutField.setValue(((double) this.settings.getTimeout()) / 1000);
         maxProcesses.setValue(this.settings.getMaxConcurrentProcesses());
-        enableOnLoad.setEnabled(this.settings.isEnableOnLoad());
+        enableOnLoad.setSelected(this.settings.isEnableOnLoad());
     }
 }

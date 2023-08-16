@@ -69,6 +69,7 @@ public class CachingExtension
      * Proofs tracked for automatic reference search.
      */
     private final Set<Proof> trackedProofs = new HashSet<>();
+    private ReferenceSearchButton referenceSearchButton;
 
     @Override
     public void selectedProofChanged(KeYSelectionEvent e) {
@@ -156,7 +157,8 @@ public class CachingExtension
 
     @Override
     public List<JComponent> getStatusLineComponents() {
-        return List.of(new ReferenceSearchButton(mediator));
+        referenceSearchButton = new ReferenceSearchButton(mediator);
+        return List.of(referenceSearchButton);
     }
 
     @Override
@@ -174,20 +176,18 @@ public class CachingExtension
 
     @Override
     public void taskFinished(TaskFinishedInfo info) {
-        if (info.getSource() instanceof TryCloseMacro) {
-            tryToClose = true;
-        }
-        if (!tryToClose) {
+        tryToClose = info.getSource() instanceof TryCloseMacro;
+        if (tryToClose) {
             return; // try close macro was running, no need to do anything here
         }
         Proof p = info.getProof();
-        if (p == null || p.closed() || !(info.getSource() instanceof ApplyStrategy
+        if (p == null || p.isDisposed() || p.closed() || !(info.getSource() instanceof ApplyStrategy
                 || info.getSource() instanceof ProofMacro)) {
             return;
         }
-        // show statistics if closed by reference
+        // unmark interactive goals
         if (p.countNodes() > 1 && p.openGoals().stream()
-                .allMatch(goal -> goal.node().lookup(ClosedBy.class) != null)) {
+                .anyMatch(goal -> goal.node().lookup(ClosedBy.class) != null)) {
             // mark goals as automatic again
             p.openGoals().stream().filter(goal -> goal.node().lookup(ClosedBy.class) != null)
                     .forEach(g -> {
@@ -263,7 +263,7 @@ public class CachingExtension
      *
      * @author Arne Keller
      */
-    static class CloseByReference extends KeyAction {
+    private final class CloseByReference extends KeyAction {
         /**
          * The mediator.
          */
@@ -311,8 +311,13 @@ public class CachingExtension
                     mismatches.add(n.serialNr());
                 }
             }
+            if (!nodes.isEmpty()) {
+                referenceSearchButton.updateState(nodes.get(0).proof());
+            }
             if (!mismatches.isEmpty()) {
-                JOptionPane.showMessageDialog((JComponent) e.getSource(),
+                // since e.getSource() is the popup menu, it is better to use the MainWindow
+                // instance here as a parent
+                JOptionPane.showMessageDialog(MainWindow.getInstance(),
                     "No matching branch found for node(s) " + Arrays.toString(mismatches.toArray()),
                     "Proof Caching error", JOptionPane.WARNING_MESSAGE);
             }

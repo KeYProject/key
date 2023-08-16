@@ -39,7 +39,7 @@ import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.Pair;
@@ -144,8 +144,8 @@ public abstract class AbstractProofReplayer {
             builtinIfInsts = builtinIfInsts.append(newFormula);
         }
 
-        if (RuleAppSMT.RULE.displayName().equals(ruleName)) {
-            return RuleAppSMT.RULE.createApp(null, proof.getServices());
+        if (SMTRuleApp.RULE.displayName().equals(ruleName)) {
+            return SMTRuleApp.RULE.createApp(null, proof.getServices());
         }
 
         IBuiltInRuleApp ourApp = null;

@@ -6,7 +6,6 @@ on:
 
 jobs:
   doc:
-    # later limit to master only!
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

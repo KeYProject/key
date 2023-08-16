@@ -190,9 +190,9 @@ public class InvariantConfigurator {
                 parser.setAbbrevMap(getAbbrevMap());
 
                 parse();
-                this.pack();
+                pack();
                 setLocationRelativeTo(getOwner());
-                this.setVisible(true);
+                setVisible(true);
             }
 
 

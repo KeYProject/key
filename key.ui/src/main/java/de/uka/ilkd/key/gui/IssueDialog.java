@@ -546,11 +546,15 @@ public final class IssueDialog extends JDialog {
     /**
      * Shows the dialog with a single exception. The stacktrace is extracted and can optionally be
      * shown in the dialog.
+     * Important: make sure to also log the exception before showing the dialog!
      *
      * @param parent the parent of the dialog (will be blocked)
      * @param exception the exception to display
      */
     public static void showExceptionDialog(Window parent, Throwable exception) {
+        // make sure UI is usable after any exception
+        MainWindow.getInstance().getMediator().startInterface(true);
+
         Set<PositionedIssueString> msg = Collections.singleton(extractMessage(exception));
         IssueDialog dlg = new IssueDialog(parent, "Parser Error", msg, true, exception);
         dlg.setVisible(true);
@@ -645,14 +649,18 @@ public final class IssueDialog extends JDialog {
             txtSource.setText("[SOURCE COULD NOT BE LOADED]");
         } else {
             URI uri = location.getFileURI().get();
+            if (uri.getScheme() == null) {
+                uri = URI.create("file:" + uri.getPath());
+            }
             fTextField.setText("URL: " + uri);
             fTextField.setVisible(true);
 
             try {
+                URI finalUri = uri;
                 String source = StringUtil.replaceNewlines(
                     fileContentsCache.computeIfAbsent(uri, fn -> {
                         try {
-                            return IOUtil.readFrom(uri).orElseThrow();
+                            return IOUtil.readFrom(finalUri).orElseThrow();
                         } catch (IOException e) {
                             LOGGER.debug("Unknown IOException!", e);
                             return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();

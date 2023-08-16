@@ -32,7 +32,7 @@ import org.key_project.slicing.ui.SlicingLeftPanel;
 
 /**
  * Proof slicing extension.
- * For more details see <a href="https://key-project.org/docs/user/ProofSlicing/">the user
+ * For more details see <a href="https://keyproject.github.io/key-docs/user/ProofSlicing/">the user
  * guide</a>.
  *
  * @author Arne Keller

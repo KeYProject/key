@@ -237,6 +237,15 @@ public class Proof implements Named {
         }
     }
 
+    public Proof(String name, Term problem, String header, InitConfig initConfig, File proofFile) {
+        this(name,
+            Sequent.createSuccSequent(
+                Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(problem)).semisequent()),
+            initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(), initConfig);
+        problemHeader = header;
+        this.proofFile = proofFile;
+    }
+
     public Proof(String name, Term problem, String header, InitConfig initConfig) {
         this(name,
             Sequent.createSuccSequent(
@@ -522,8 +531,7 @@ public class Proof implements Named {
 
 
     /**
-     * Add the given constraint to the closure constraint of the given goal, i.e. the given goal is
-     * closed if p_c is satisfied.
+     * Close the given goals and all goals in the subtree below it.
      *
      * @param goalToClose the goal to close.
      */
@@ -535,6 +543,7 @@ public class Proof implements Named {
         Iterator<Node> it = closedSubtree.leavesIterator();
         Goal goal;
 
+        // close all goals below the given goalToClose
         while (it.hasNext()) {
             goal = getOpenGoal(it.next());
             if (goal != null) {

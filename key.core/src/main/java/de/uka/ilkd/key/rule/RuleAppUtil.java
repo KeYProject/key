@@ -8,7 +8,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
-import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.smt.SMTRuleApp;
 
 /**
  * Utilities for working with rule applications.
@@ -59,7 +59,7 @@ public final class RuleAppUtil {
         // SMT application: add all formulas as inputs
         if (ruleApp instanceof MergeRuleBuiltInRuleApp
                 || ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp
-                || ruleApp instanceof RuleAppSMT) {
+                || ruleApp instanceof SMTRuleApp) {
             node.sequent().antecedent().iterator().forEachRemaining(
                 it -> inputs.add(new PosInOccurrence(it, PosInTerm.getTopLevel(), true)));
             node.sequent().succedent().iterator().forEachRemaining(

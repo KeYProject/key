@@ -170,6 +170,7 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
         } catch (CancellationException ex) {
             LOGGER.info("Scripting was cancelled.");
         } catch (Throwable ex) {
+            LOGGER.error("", ex);
             IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
         }
 
