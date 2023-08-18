@@ -1,0 +1,23 @@
+# .github/release.yml
+
+# Documentation:
+# https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes
+
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+    authors:
+      - octocat
+      - dependabot
+  categories:
+    - title: Core
+      labels:
+    - title: UI
+      labels:
+        - enhancement
+    - title: Proof Scripts
+
+    - title: Other Changes
+      labels:
+        - "*"
