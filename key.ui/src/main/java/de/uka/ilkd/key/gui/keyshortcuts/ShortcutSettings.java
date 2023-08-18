@@ -47,8 +47,9 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
         List<String> actionNames =
             p.keySet().stream().sorted().map(Object::toString).collect(Collectors.toList());
 
-        List<String> shortcuts =
-            actionNames.stream().map(p::getProperty).collect(Collectors.toList());
+        // for the view, we hide "pressed" to increase readability
+        List<String> shortcuts = actionNames.stream().map(p::getProperty)
+                .map(s -> s.replace("pressed ", "")).collect(Collectors.toList());
 
         List<Action> actions =
             actionNames.stream().map(KeyStrokeManager::findAction).collect(Collectors.toList());
@@ -81,7 +82,9 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
                 }
 
                 KeyStroke ks = KeyStroke.getKeyStrokeForEvent(e);
-                txtCaptureShortcut.setText(ks.toString());
+                // for the view, we hide "pressed" to increase readability
+                String shortened = ks.toString().replace("pressed ", "");
+                txtCaptureShortcut.setText(shortened);
 
                 boolean shortcutComplete =
                     ks.getModifiers() > 0 && ks.getKeyCode() != KeyEvent.VK_UNDEFINED

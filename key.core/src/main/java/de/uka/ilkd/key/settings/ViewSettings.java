@@ -2,6 +2,7 @@ package de.uka.ilkd.key.settings;
 
 import java.util.List;
 import java.util.Set;
+import javax.swing.*;
 
 /**
  * This class encapsulates information about: 1) relative font size in the prover view 2) the
@@ -141,6 +142,9 @@ public class ViewSettings extends AbstractPropertiesSettings {
      */
     private static final String USER_FOLDER_BOOKMARKS = "[View]folderBookmarks";
 
+    private static final String LOOK_AND_FEEL_DEFAULT =
+        UIManager.getCrossPlatformLookAndFeelClassName();
+
     /**
      * Show Taclet uninstantiated in tooltip -- for learning
      */
@@ -182,7 +186,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private final PropertyEntry<Boolean> showWholeTaclet =
         createBooleanProperty(SHOW_WHOLE_TACLET, false);
     private final PropertyEntry<Integer> sizeIndex = createIntegerProperty(FONT_INDEX, 2);
-    private final PropertyEntry<String> lookAndFeel = createStringProperty(LOOK_AND_FEEL, null);
+    private final PropertyEntry<String> lookAndFeel =
+        createStringProperty(LOOK_AND_FEEL, LOOK_AND_FEEL_DEFAULT);
     private final PropertyEntry<Boolean> showSequentViewTooltips =
         createBooleanProperty(SEQUENT_VIEW_TOOLTIP, true);
     private final PropertyEntry<Boolean> showSourceViewTooltips =

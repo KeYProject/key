@@ -760,9 +760,9 @@ public abstract class AbstractProblemLoader {
                 status = parserResult.getStatus();
                 errors.addAll(parserResult.getErrors());
             }
-            status +=
-                (status.isEmpty() ? "" : "\n\n") + (replayResult != null ? replayResult.getStatus()
-                        : "Error while loading proof.");
+            status += (status.isEmpty() ? "Proof replayed successfully." : "\n\n")
+                    + (replayResult != null ? replayResult.getStatus()
+                            : "Error while loading proof.");
             if (replayResult != null) {
                 errors.addAll(replayResult.getErrors());
             }

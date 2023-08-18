@@ -356,6 +356,7 @@ public class SendFeedbackAction extends AbstractAction {
                         + "e-mail to " + FEEDBACK_RECIPIENT + ".", jfc.getSelectedFile()));
             }
         } catch (Exception e) {
+            LOGGER.error("", e);
             IssueDialog.showExceptionDialog(parent, e);
         }
     }
@@ -399,6 +400,7 @@ public class SendFeedbackAction extends AbstractAction {
             }
 
         } catch (Exception e) {
+            LOGGER.error("", e);
             IssueDialog.showExceptionDialog(parent, e);
         }
     }

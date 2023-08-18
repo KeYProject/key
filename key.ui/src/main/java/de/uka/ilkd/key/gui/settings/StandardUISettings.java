@@ -28,12 +28,12 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     /**
      * Labels for the selectable look and feels. Must be kept in sync with {@link #LAF_CLASSES}.
      */
-    private static final List<String> LAF_LABELS = new ArrayList<>(List.of("System"));
+    private static final List<String> LAF_LABELS = new ArrayList<>(List.of("Metal"));
     /**
      * Classnames corresponding to the labels in {@link #LAF_LABELS}.
      */
     private static final List<String> LAF_CLASSES =
-        new ArrayList<>(List.of(UIManager.getSystemLookAndFeelClassName()));
+        new ArrayList<>(List.of(UIManager.getCrossPlatformLookAndFeelClassName()));
 
     private final JComboBox<String> lookAndFeel;
     private final JSpinner spFontSizeGlobal;
@@ -60,8 +60,10 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         // load all available look and feels
         if (LAF_LABELS.size() == 1) {
             for (UIManager.LookAndFeelInfo it : UIManager.getInstalledLookAndFeels()) {
-                LAF_LABELS.add(it.getName());
-                LAF_CLASSES.add(it.getClassName());
+                if (!LAF_LABELS.contains(it.getName())) {
+                    LAF_LABELS.add(it.getName());
+                    LAF_CLASSES.add(it.getClassName());
+                }
             }
         }
 
@@ -187,8 +189,8 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         gs.setAutoSave((Integer) spAutoSaveProof.getValue());
         gs.setTacletFilter(chkMinimizeInteraction.isSelected());
         vs.setFontIndex(spFontSizeTreeSequent.getSelectedIndex());
-        FontSizeFacade.resizeFonts(vs.getUIFontSizeFactor());
         Config.DEFAULT.setDefaultFonts();
+        FontSizeFacade.resizeFonts(vs.getUIFontSizeFactor());
         Config.DEFAULT.fireConfigChange();
     }
 

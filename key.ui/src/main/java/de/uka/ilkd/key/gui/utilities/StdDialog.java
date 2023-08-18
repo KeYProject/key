@@ -34,7 +34,6 @@ public class StdDialog extends JDialog {
     }
 
     public StdDialog(String title, JComponent content, int strut, boolean helpButton) {
-        this.setLocationRelativeTo(MainWindow.getInstance());
         this.setTitle(title);
         this.setModal(true);
         // content.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
@@ -76,6 +75,7 @@ public class StdDialog extends JDialog {
         } else {
             this.pack();
         }
+        this.setLocationRelativeTo(MainWindow.getInstance());
     }
 
     public void setContent(JComponent content) {

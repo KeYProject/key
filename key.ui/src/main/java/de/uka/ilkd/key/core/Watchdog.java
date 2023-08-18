@@ -35,7 +35,11 @@ public final class Watchdog {
      * Start the watchdog in a background thread.
      */
     public static void start() {
-        new Thread(Watchdog::run, "Watchdog").start();
+        var thread = new Thread(Watchdog::run, "Watchdog");
+        // mark as daemon
+        // (only relevant for startup exception, where this thread would prevent the JVM exiting)
+        thread.setDaemon(true);
+        thread.start();
     }
 
     private static void run() {
@@ -79,14 +83,13 @@ public final class Watchdog {
                     anyProgress = true;
                     break;
                 case WAITING:
+                case BLOCKED:
+                case TIMED_WAITING:
+                case TERMINATED:
                     if (thread.getName().equals("AWT-EventQueue-0")
                             && EventQueue.getCurrentEvent() == null) {
                         anyProgress = true; // nothing to do
                     }
-                    break;
-                case BLOCKED:
-                case TIMED_WAITING:
-                case TERMINATED:
                     break;
                 }
             }
