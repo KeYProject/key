@@ -286,12 +286,12 @@ subprojects {
                 pom {
                     name = projects.name
                     description = project.description
-                    url = 'http://key-project.org/'
+                    url = 'https://key-project.org/'
 
                     licenses {
                         license {
                             name = "GNU General Public License (GPL), Version 2"
-                            url = "http://www.gnu.org/licenses/old-licenses/gpl-2.0.html"
+                            url = "https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"
                         }
                     }
 
@@ -300,12 +300,13 @@ subprojects {
                             id = 'key'
                             name = 'KeY Developers'
                             email = 'support@key-project.org'
+                            url = "https://www.key-project.org/about/people/"
                         }
                     }
                     scm {
-                        connection = 'scm:git:git://git.key-project.org/key/key.git'
-                        developerConnection = 'scm:git:git://git.key-project.org/key/key.git'
-                        url = 'https://git.key-project.org/'
+                        connection = 'scm:git:git://github.com/keyproject/key.git'
+                        developerConnection = 'scm:git:git://github.com/keyproject/key.git'
+                        url = 'https://github.com/keyproject/key/'
                     }
                 }
             }
@@ -397,6 +398,7 @@ subprojects {
     }
 
 
+
     spotless {
         // see https://github.com/diffplug/spotless/tree/main/plugin-gradle
 
@@ -442,7 +444,11 @@ subprojects {
             // specific delimiter: normally just 'package', but spotless crashes for files in default package
             // (see https://github.com/diffplug/spotless/issues/30), therefore 'import' is needed. '//' is for files
             // with completely commented out code (which would probably better just be removed in future).
-            //licenseHeaderFile("$rootDir/gradle/header", '(package|import|//)')
+            if(project.name == 'recoder') {
+                licenseHeaderFile("$rootDir/gradle/header-recoder", '(package|import|//)')
+            }else {
+                licenseHeaderFile("$rootDir/gradle/header", '(package|import|//)')
+            }
         }
     }
 
