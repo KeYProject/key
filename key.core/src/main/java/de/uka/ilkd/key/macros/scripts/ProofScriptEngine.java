@@ -69,7 +69,7 @@ public class ProofScriptEngine {
 
     private static Map<String, ProofScriptCommand<?>> loadCommands() {
         Map<String, ProofScriptCommand<?>> result = new HashMap<>();
-        ServiceLoader<ProofScriptCommand> loader = ServiceLoader.load(ProofScriptCommand.class);
+        var loader = ServiceLoader.load(ProofScriptCommand.class);
 
         for (ProofScriptCommand<?> cmd : loader) {
             result.put(cmd.getName(), cmd);
@@ -92,9 +92,7 @@ public class ProofScriptEngine {
 
         // add the filename (if available) to the statemap.
         Optional<URI> uri = initialLocation.getFileURI();
-        if (uri.isPresent()) {
-            stateMap.setBaseFileName(Paths.get(uri.get()).toFile());
-        }
+        uri.ifPresent(value -> stateMap.setBaseFileName(Paths.get(value).toFile()));
 
         // add the observer (if installed) to the state map
         if (commandMonitor != null) {
@@ -153,9 +151,13 @@ public class ProofScriptEngine {
                 if (stateMap.isFailOnClosedOn()) {
                     throw new ScriptException(
                         String.format(
-                            "Proof already closed while trying to fetch next goal.\n"
-                                + "This error can be suppressed by setting '@failonclosed off'.\n\n"
-                                + "Command: %s\nLine:%d\n",
+                                """
+                                        Proof already closed while trying to fetch next goal.
+                                        This error can be suppressed by setting '@failonclosed off'.
+
+                                        Command: %s
+                                        Line:%d
+                                        """,
                             argMap.get(ScriptLineParser.LITERAL_KEY), start.getPosition().line()),
                         start, e);
                 } else {
@@ -196,12 +198,7 @@ public class ProofScriptEngine {
     public interface Message {
     }
 
-    public static final class EchoMessage implements Message {
-        public final String message;
-
-        public EchoMessage(String message) {
-            this.message = message;
-        }
+    public record EchoMessage(String message) implements Message {
     }
 
     public static final class ExecuteInfo implements Message {

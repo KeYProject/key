@@ -18,10 +18,17 @@ public class ScriptLineParserTest {
 
     @Test
     public void test() throws Exception {
-        String arg = "macro key1=value1 key2=\"value two\" defval3 \"long defvalue\"; "
-            + "command ; \n\n" + "# some comment\n"
-            + "multiline #comment internal\n command \n with=\"line breaks in \n values\"; \n"
-            + "select formula=\"a;b\"; \n" + "hyphened-command;\n";
+        String arg = """
+                macro key1=value1 key2="value two" defval3 "long defvalue"; command ;\s
+
+                # some comment
+                multiline #comment internal
+                 command\s
+                 with="line breaks in\s
+                 values";\s
+                select formula="a;b";\s
+                hyphened-command;
+                """;
 
         ScriptLineParser mlp = new ScriptLineParser(new StringReader(arg), null);
         ScriptLineParser.ParsedCommand command;
