@@ -197,7 +197,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             throws ScriptException {
         final List<IBuiltInRuleApp> matchingApps = //
             findBuiltInRuleApps(p, state).stream().filter(r -> r.rule().name().equals(rule.name()))
-                    .collect(Collectors.toList());
+                    .toList();
 
         if (matchingApps.isEmpty()) {
             throw new ScriptException("No matching applications.");

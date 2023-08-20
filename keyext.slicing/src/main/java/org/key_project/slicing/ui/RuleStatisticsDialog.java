@@ -3,23 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing.ui;
 
-import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import javax.swing.*;
-
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.util.Quadruple;
-
 import org.key_project.slicing.RuleStatistics;
 import org.key_project.slicing.analysis.AnalysisResults;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.List;
+import java.util.*;
 
 /**
  * Dialog that displays the results of the dependency analysis algorithm.
@@ -188,8 +183,7 @@ public class RuleStatisticsDialog extends JDialog {
             Integer.toString(uselessSteps), Integer.toString(initialUseless)));
         // next summary row
         List<Quadruple<String, Integer, Integer, Integer>> rulesBranching =
-            rules.stream().filter(it -> statistics.branches(it.first()))
-                    .collect(Collectors.toList());
+            rules.stream().filter(it -> statistics.branches(it.first())).toList();
         int uniqueRules2 = rulesBranching.size();
         totalSteps = rulesBranching.stream().mapToInt(Quadruple::second).sum();
         uselessSteps = rulesBranching.stream().mapToInt(Quadruple::third).sum();

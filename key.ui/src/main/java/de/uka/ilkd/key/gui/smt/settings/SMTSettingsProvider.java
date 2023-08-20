@@ -91,7 +91,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
          */
         for (SolverType options : solverTypes.stream().filter(
             t -> ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().containsSolver(t))
-                .collect(Collectors.toList())) {
+                .toList()) {
             getChildren().add(new SolverOptions(options));
         }
     }

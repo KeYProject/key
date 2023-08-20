@@ -62,7 +62,7 @@ public class FilesChecker {
             return Collections.emptyList();
         }
         try (var files = Files.walk(pbh.getBootclasspath())) {
-            return files.collect(Collectors.toUnmodifiableList());
+            return files.toList();
         }
     }
 

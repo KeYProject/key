@@ -213,7 +213,7 @@ public class Lookup {
      */
     protected <T> T tryToInject(Constructor<T> ctor) throws InjectionException {
         List<?> services =
-            Arrays.stream(ctor.getParameterTypes()).map(this::get).collect(Collectors.toList());
+            Arrays.stream(ctor.getParameterTypes()).map(this::get).toList();
 
         if (services.stream().allMatch(Objects::nonNull)) {
             try {

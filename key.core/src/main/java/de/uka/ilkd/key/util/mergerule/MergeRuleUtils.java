@@ -944,7 +944,7 @@ public class MergeRuleUtils {
         for (final Term t : cond1SpecificElems) {
             List<Term> distCandidates = cond2SpecificElems.stream()
                     .filter(t1 -> t1.equals(tb.not(t)) || t.equals(tb.not(t1)))
-                    .collect(Collectors.toList());
+                    .toList();
             if (!distCandidates.isEmpty()) {
                 // Just take the first, any one should be good enough, at least
                 // with the present knowledge
@@ -1142,14 +1142,14 @@ public class MergeRuleUtils {
 
             final List<Operator> problematicOps =
                 partnerGoalSymbols.parallelStream().filter(pv -> thisGoalNames.contains(pv.name()))
-                        .filter(pv -> !thisGoalSymbols.contains(pv)).collect(Collectors.toList());
+                        .filter(pv -> !thisGoalSymbols.contains(pv)).toList();
 
             // Loop over all problematic operators and rename them in the
             // partner state.
             for (Operator partnerStateOp : problematicOps) {
                 final Operator mergeStateOp = thisGoalSymbols.parallelStream()
                         .filter(s -> s.name().equals(partnerStateOp.name()))
-                        .collect(Collectors.toList()).get(0);
+                        .toList().get(0);
 
                 Operator newOp1;
                 Operator newOp2;

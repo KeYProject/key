@@ -266,7 +266,7 @@ public final class ProofManagementDialog extends JDialog {
                 // filter out library classes
                 .filter(kjtTmp -> !(kjtTmp.getJavaType() instanceof TypeDeclaration
                         && ((TypeDeclaration) kjtTmp.getJavaType()).isLibraryClass()))
-                .collect(Collectors.toList());
+                .toList();
 
         // compare: IProgramMethods by program name, otherwise prefer NOT IProgramMethod
         final Comparator<IObserverFunction> compareFunction = (o1, o2) -> {

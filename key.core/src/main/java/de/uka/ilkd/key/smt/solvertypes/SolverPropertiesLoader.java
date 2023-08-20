@@ -328,9 +328,9 @@ public class SolverPropertiesLoader {
                     Collection<Properties> props = new ArrayList<>();
                     BufferedReader reader =
                         new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
-                    List<String> propsNames = reader.lines().collect(Collectors.toList());
+                    List<String> propsNames = reader.lines().toList();
                     for (String fileName : propsNames.stream().filter(n -> n.endsWith(".props"))
-                            .collect(Collectors.toList())) {
+                            .toList()) {
                         Properties solverProp = new Properties();
                         InputStream propsFile =
                             SolverPropertiesLoader.class.getResourceAsStream(fileName);

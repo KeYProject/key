@@ -331,7 +331,7 @@ public class KeyIO {
                 throw new IllegalStateException();
             }
             List<TacletPBuilder> parsers = ctx.stream().map(it -> new TacletPBuilder(services, nss))
-                    .collect(Collectors.toList());
+                    .toList();
             long start = System.currentTimeMillis();
             List<Taclet> taclets = new ArrayList<>(2048);
             for (int i = 0; i < ctx.size(); i++) {

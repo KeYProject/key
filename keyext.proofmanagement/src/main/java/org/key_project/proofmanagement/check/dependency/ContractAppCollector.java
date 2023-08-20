@@ -149,7 +149,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
         Set<ClassAxiom> axioms = specRepo.getClassAxioms(classType).toSet();
         List<ClassAxiom> axiomList = axioms.stream()
                 .filter(a -> a.getName().equals(axiomName))
-                .collect(Collectors.toList());
+                .toList();
         /*
          * the assertions below always hold for current KeY implementation, where
          * only one model method with same name is allowed (no overloading)
