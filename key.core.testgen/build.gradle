@@ -1,8 +1,5 @@
+description "Test Case Generation based on proof attempts."
+
 dependencies {
     implementation project(":key.core")
 }
-
-/*test {
-    systemProperty "testcases", "src/test/resources/testcase"
-    filter { includeTestsMatching "AllTestGenTests" }
-}*/

@@ -3,7 +3,7 @@ plugins {
     id 'antlr'
 }
 
-//repositories { jcenter() }
+description "Core functionality (terms, rules, prover, ...) for deductive verification of Java programs"
 
 configurations { antlr4 }
 
