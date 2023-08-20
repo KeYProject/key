@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.settings;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;

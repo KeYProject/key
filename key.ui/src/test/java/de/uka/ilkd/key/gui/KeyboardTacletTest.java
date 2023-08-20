@@ -6,7 +6,6 @@ package de.uka.ilkd.key.gui;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 

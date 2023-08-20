@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.Main;
