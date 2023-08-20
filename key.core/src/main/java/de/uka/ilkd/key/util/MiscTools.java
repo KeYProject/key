@@ -816,9 +816,15 @@ public final class MiscTools {
         }
 
         try {
-            return new URI(source);
+            URI uri = new URI(source);
+            if(uri.getScheme() != null) {
+                // use this URI only if there is an explicit scheme;
+                // otherwise parse it as a filename
+                return uri;
+            }
         } catch (URISyntaxException ignored) {
         }
+
         return Path.of(source).toUri();
     }
 
