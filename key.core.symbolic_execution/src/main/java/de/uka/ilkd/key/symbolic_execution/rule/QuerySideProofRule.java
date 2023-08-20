@@ -166,8 +166,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
      * @return {@code true} is applicable, {@code false} is not applicable
      */
     private boolean isApplicableQuery(Goal goal, Term pmTerm, PosInOccurrence pio) {
-        if (pmTerm.op() instanceof IProgramMethod && pmTerm.freeVars().isEmpty()) {
-            IProgramMethod pm = (IProgramMethod) pmTerm.op();
+        if (pmTerm.op() instanceof IProgramMethod pm && pmTerm.freeVars().isEmpty()) {
             final Sort nullSort = goal.proof().getJavaInfo().nullSort();
             if (pm.isStatic()
                     || (pmTerm.sub(1).sort().extendsTrans(goal.proof().getJavaInfo().objectSort())

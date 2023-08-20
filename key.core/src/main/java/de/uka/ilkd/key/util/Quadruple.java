@@ -35,10 +35,9 @@ public class Quadruple<T1, T2, T3, T4> implements Comparable<Quadruple<T1, T2, T
 
 
     public boolean equals(Object o) {
-        if (!(o instanceof Quadruple<?, ?, ?, ?>)) {
+        if (!(o instanceof Quadruple<?, ?, ?, ?> p)) {
             return false;
         }
-        Quadruple<?, ?, ?, ?> p = (Quadruple<?, ?, ?, ?>) o;
         return (Objects.equals(first, p.first))
                 && (Objects.equals(second, p.second))
                 && (Objects.equals(third, p.third))

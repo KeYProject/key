@@ -663,12 +663,11 @@ public class ExpressionBuilder extends DefaultBuilder {
     public Term createAttributeTerm(Term prefix, Operator attribute, ParserRuleContext ctx) {
         Term result = prefix;
 
-        if (attribute instanceof SchemaVariable) {
+        if (attribute instanceof SchemaVariable sv) {
             /*
              * if (!inSchemaMode()) { semanticError(null,
              * "Schemavariables may only occur inside taclets."); }
              */
-            SchemaVariable sv = (SchemaVariable) attribute;
             if (sv.sort() instanceof ProgramSVSort
                     || sv.sort() == AbstractTermTransformer.METASORT) {
                 semanticError(null, "Cannot use schema variable " + sv + " as an attribute");
@@ -1231,10 +1230,9 @@ public class ExpressionBuilder extends DefaultBuilder {
                         : ctx.name.simple_ident(0).getText();
             op = lookupVarfuncId(ctx, firstName,
                 ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
-            if (op instanceof ProgramVariable && ctx.name.simple_ident().size() > 1) {
+            if (op instanceof ProgramVariable v && ctx.name.simple_ident().size() > 1) {
                 List<KeYParser.Simple_identContext> otherParts =
                     ctx.name.simple_ident().subList(1, ctx.name.simple_ident().size());
-                ProgramVariable v = (ProgramVariable) op;
                 Term tv = getServices().getTermFactory().createTerm(v);
                 String memberName = otherParts.get(0).getText();
                 if (v.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
@@ -1265,9 +1263,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
             // region split up package and class name
             while (startWithPackage
-                    && ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext) {
-                KeYParser.Attribute_simpleContext a =
-                    (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
+                    && ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext a) {
                 if (a.heap != null) {
                     break; // No heap on java package allowed
                 }
@@ -1281,9 +1277,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 }
             }
 
-            while (ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext) {
-                KeYParser.Attribute_simpleContext a =
-                    (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
+            while (ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext a) {
                 if (a.heap != null) {
                     break; // No heap on java Class name allowed
                 }
@@ -1310,9 +1304,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 KeYParser.AttributeContext attrib = ctx.attribute(i);
                 boolean isLast = i == ctx.attribute().size() - 1;
 
-                if (attrib instanceof KeYParser.Attribute_simpleContext) {
-                    KeYParser.Attribute_simpleContext simpleContext =
-                        (KeYParser.Attribute_simpleContext) attrib;
+                if (attrib instanceof KeYParser.Attribute_simpleContext simpleContext) {
                     boolean isCall = simpleContext.call() != null;
                     ParserRuleContext heap = simpleContext.heap; // TODO?
                     String attributeName = accept(simpleContext.id);
@@ -1333,9 +1325,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                         addWarning("");
                         return current;
                     }
-                } else if (attrib instanceof KeYParser.Attribute_complexContext) {
-                    KeYParser.Attribute_complexContext attrid =
-                        (KeYParser.Attribute_complexContext) attrib;
+                } else if (attrib instanceof KeYParser.Attribute_complexContext attrid) {
                     String className = attrid.sort.getText();
                     String attributeName = attrid.id.getText();
                     Term[] args = visitArguments(attrid.call().argument_list());

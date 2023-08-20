@@ -485,10 +485,8 @@ public class MergeRuleUtils {
             HashMap<Function, LogicVariable> replMap, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
-        if (term.op() instanceof Function && ((Function) term.op()).isSkolemConstant()
+        if (term.op() instanceof Function constant && ((Function) term.op()).isSkolemConstant()
                 && (restrictTo == null || restrictTo.contains(term.op()))) {
-
-            Function constant = (Function) term.op();
 
             if (!replMap.containsKey(constant)) {
                 LogicVariable freshVariable = getFreshVariableForPrefix(
@@ -1871,8 +1869,7 @@ public class MergeRuleUtils {
 
         @Override
         public ProgramVariable get(Object key) {
-            if (key instanceof LocationVariable) {
-                LocationVariable var = (LocationVariable) key;
+            if (key instanceof LocationVariable var) {
 
                 if (doNotRename.contains(var)) {
                     return var;

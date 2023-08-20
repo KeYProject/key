@@ -164,8 +164,7 @@ public final class EnhancedFor2For extends TwoPassTransformation {
         if (enhancedFor.getStatementCount() > 0) {
             // if statement block, go into it
             Statement s = enhancedFor.getStatementAt(0);
-            if (s instanceof StatementBlock) {
-                StatementBlock sb = (StatementBlock) s;
+            if (s instanceof StatementBlock sb) {
                 for (int i = 0; i < sb.getStatementCount(); i++) {
                     statements.add(sb.getStatementAt(i).deepClone());
                 }

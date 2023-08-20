@@ -163,8 +163,7 @@ public abstract class AbstractProofControl implements ProofControl {
                 if (ifCandidates.size() == 1 && pos != null) {
                     TacletApp a = ifCandidates.head();
                     ImmutableList<IfFormulaInstantiation> ifs = a.ifFormulaInstantiations();
-                    if (ifs != null && ifs.size() == 1 && ifs.head() instanceof IfFormulaInstSeq) {
-                        IfFormulaInstSeq ifis = (IfFormulaInstSeq) ifs.head();
+                    if (ifs != null && ifs.size() == 1 && ifs.head() instanceof IfFormulaInstSeq ifis) {
                         if (ifis.toPosInOccurrence().equals(pos.topLevel())) {
                             continue; // skip app if find and if same formula
                         }

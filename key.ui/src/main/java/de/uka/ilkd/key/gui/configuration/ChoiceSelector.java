@@ -429,8 +429,7 @@ public class ChoiceSelector extends JDialog {
          */
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof ChoiceEntry) {
-                ChoiceEntry other = (ChoiceEntry) obj;
+            if (obj instanceof ChoiceEntry other) {
                 return choice.equals(other.getChoice()) && incomplete == other.isIncomplete()
                         && unsound == other.isUnsound()
                         && Objects.equals(information, other.getInformation());

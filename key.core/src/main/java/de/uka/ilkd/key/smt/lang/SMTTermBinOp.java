@@ -282,10 +282,9 @@ public class SMTTermBinOp extends SMTTerm {
             return true;
         }
 
-        if (!(term instanceof SMTTermBinOp)) {
+        if (!(term instanceof SMTTermBinOp bt)) {
             return false;
         }
-        SMTTermBinOp bt = (SMTTermBinOp) term;
 
         return this.operator.equals(bt.operator) && this.left.equals(bt.left)
                 && this.right.equals(bt.right);
@@ -456,8 +455,7 @@ public class SMTTermBinOp extends SMTTerm {
         int i = start + 1;
         for (; i < args.size(); ++i) {
             SMTTerm arg = args.get(i);
-            if (arg instanceof SMTTermBinOp && ((SMTTermBinOp) arg).getOperator().equals(op)) {
-                SMTTermBinOp binarg = (SMTTermBinOp) arg;
+            if (arg instanceof SMTTermBinOp binarg && ((SMTTermBinOp) arg).getOperator().equals(op)) {
                 if (binarg.getLeft().equals(chain.get(chain.size() - 1))) {
                     chain.add(binarg.getRight());
                     chainables.add(arg);

@@ -546,8 +546,7 @@ public class OutputStreamProofSaver {
             // for operation contract rules we add the modality under which the rule was applied
             // -> needed for proof management tool
             if (appliedRuleApp.rule() instanceof UseOperationContractRule) {
-                if (appliedRuleApp instanceof ContractRuleApp) {
-                    ContractRuleApp app = (ContractRuleApp) appliedRuleApp;
+                if (appliedRuleApp instanceof ContractRuleApp app) {
                     Modality modality = (Modality) app.programTerm().op();
                     output.append(" (modality \"");
                     output.append(modality.toString());

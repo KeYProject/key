@@ -381,9 +381,7 @@ public abstract class AbstractProblemLoader {
     protected ProblemLoaderException recoverParserErrorMessage(Exception e) {
         // try to resolve error message
         final Throwable c0 = unwrap(e);
-        if (c0 instanceof org.antlr.runtime.RecognitionException) {
-            final org.antlr.runtime.RecognitionException re =
-                (org.antlr.runtime.RecognitionException) c0;
+        if (c0 instanceof org.antlr.runtime.RecognitionException re) {
             final org.antlr.runtime.Token occurrence = re.token; // may be null
             if (c0 instanceof org.antlr.runtime.MismatchedTokenException) {
                 if (c0 instanceof org.antlr.runtime.MissingTokenException) {
@@ -571,8 +569,7 @@ public abstract class AbstractProblemLoader {
     protected LoadedPOContainer createProofObligationContainer() throws IOException {
         final String chooseContract;
         final String proofObligation;
-        if (envInput instanceof KeYFile) {
-            KeYFile keyFile = (KeYFile) envInput;
+        if (envInput instanceof KeYFile keyFile) {
             chooseContract = keyFile.chooseContract();
             proofObligation = keyFile.getProofObligation();
         } else {
@@ -679,8 +676,7 @@ public abstract class AbstractProblemLoader {
      * @return <code>true</code> iff there is a proof script to run
      */
     public boolean hasProofScript() {
-        if (envInput instanceof KeYUserProblemFile) {
-            KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
+        if (envInput instanceof KeYUserProblemFile kupf) {
             return kupf.hasProofScript();
         }
         return false;

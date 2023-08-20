@@ -245,13 +245,12 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
                 new VariableReference(new Identifier(etId)));
         }
 
-        if (!(cons instanceof ConstructorDeclaration)) {
+        if (!(cons instanceof ConstructorDeclaration consDecl)) {
             mods.add(new Public());
             parameters = new ASTArrayList<>(j);
             recThrows = null;
             body = new StatementBlock();
         } else {
-            ConstructorDeclaration consDecl = (ConstructorDeclaration) cons;
             mods = (consDecl.getDeclarationSpecifiers() == null ? null
                     : consDecl.getDeclarationSpecifiers().deepClone());
             parameters = consDecl.getParameters().deepClone();
@@ -355,8 +354,7 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
     }
 
     private ConstructorDeclaration attachConstructorDecl(TypeDeclaration td) {
-        if (td.getASTParent() instanceof New) {
-            New n = (New) td.getASTParent();
+        if (td.getASTParent() instanceof New n) {
             if (n.getArguments() == null || n.getArguments().isEmpty()) {
                 return null;
             }

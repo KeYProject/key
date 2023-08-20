@@ -126,9 +126,8 @@ public final class ProofManagementDialog extends JDialog {
                 Component result = super.getListCellRendererComponent(list, value, index,
                     isSelected, cellHasFocus);
 
-                if (result instanceof JLabel) {
+                if (result instanceof JLabel label) {
                     ProofStatus ps = ((ProofWrapper) value).proof.mgt().getStatus();
-                    JLabel label = (JLabel) result;
                     if (ps.getProofClosed()) {
                         label.setIcon(KEY_CLOSED);
                     } else if (ps.getProofClosedButLemmasLeft()) {

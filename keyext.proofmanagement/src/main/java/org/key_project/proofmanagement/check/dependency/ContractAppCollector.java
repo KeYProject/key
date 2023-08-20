@@ -82,8 +82,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
 
     @Override
     protected void doAction(NodeIntermediate node) {
-        if (node instanceof AppNodeIntermediate) {
-            AppNodeIntermediate appNode = (AppNodeIntermediate) node;
+        if (node instanceof AppNodeIntermediate appNode) {
             AppIntermediate appIntermediate = appNode.getIntermediateRuleApp();
             String ruleName = appIntermediate.getRuleName();
 

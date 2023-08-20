@@ -609,8 +609,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
             pairIterator();
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
-            if (e.value().getInstantiation() instanceof TermLabel) {
-                TermLabel termLabel = (TermLabel) e.value().getInstantiation();
+            if (e.value().getInstantiation() instanceof TermLabel termLabel) {
                 if (!termLabel.isProofRelevant()) {
                     continue;
                 }

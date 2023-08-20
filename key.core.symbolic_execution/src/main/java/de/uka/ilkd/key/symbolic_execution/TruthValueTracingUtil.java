@@ -253,9 +253,7 @@ public final class TruthValueTracingUtil {
                         }
                     }
                 }
-            } else if (parent.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
-                OneStepSimplifierRuleApp app =
-                    (OneStepSimplifierRuleApp) parent.getAppliedRuleApp();
+            } else if (parent.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp app) {
                 PosInOccurrence parentPio = null;
                 for (RuleApp protocolApp : app.getProtocol()) {
                     if (parentPio != null) {
@@ -555,8 +553,7 @@ public final class TruthValueTracingUtil {
                         tb, results);
                 }
                 // Check if instantiations
-                if (parentRuleApp instanceof TacletApp) {
-                    TacletApp ta = (TacletApp) parentRuleApp;
+                if (parentRuleApp instanceof TacletApp ta) {
                     if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {
                         for (IfFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
                             checkForNewMinorIds(childNode, ifInst.getConstrainedFormula().formula(),
@@ -644,8 +641,7 @@ public final class TruthValueTracingUtil {
 
             private boolean hasLabelOfInterest(Term visited) {
                 TermLabel visitedLabel = visited.getLabel(labelName);
-                if (visitedLabel instanceof FormulaTermLabel) {
-                    FormulaTermLabel pLabel = (FormulaTermLabel) visitedLabel;
+                if (visitedLabel instanceof FormulaTermLabel pLabel) {
                     String[] beforeIds = pLabel.getBeforeIds();
                     return ArrayUtil.contains(beforeIds, labelId);
                 } else {

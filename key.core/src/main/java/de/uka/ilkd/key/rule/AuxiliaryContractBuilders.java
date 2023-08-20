@@ -869,11 +869,10 @@ public final class AuxiliaryContractBuilders {
          * @return the loop contract's decreases clause.
          */
         public Term buildDecreasesCheck() {
-            if (!(contract instanceof LoopContract)) {
+            if (!(contract instanceof LoopContract lc)) {
                 throw new IllegalStateException();
             }
 
-            LoopContract lc = (LoopContract) contract;
             Term decreases = lc.getDecreases(getBaseHeap(), terms.self, services);
 
             if (decreases == null) {

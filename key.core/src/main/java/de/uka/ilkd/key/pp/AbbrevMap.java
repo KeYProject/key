@@ -173,10 +173,9 @@ public class AbbrevMap {
 
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof AbbrevWrapper)) {
+            if (!(o instanceof AbbrevWrapper scw)) {
                 return false;
             }
-            AbbrevWrapper scw = (AbbrevWrapper) o;
             if (scw.getTerm() == t) {
                 return true;
             }

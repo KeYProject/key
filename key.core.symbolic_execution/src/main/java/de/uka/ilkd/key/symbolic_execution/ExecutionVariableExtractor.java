@@ -346,8 +346,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          */
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof ParentDef) {
-                ParentDef other = (ParentDef) obj;
+            if (obj instanceof ParentDef other) {
                 return Objects.equals(parent, other.parent)
                         && Objects.equals(goalNode, other.goalNode);
             } else {
@@ -401,8 +400,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          */
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof LocationDef) {
-                LocationDef other = (LocationDef) obj;
+            if (obj instanceof LocationDef other) {
                 return programVariable == other.programVariable
                         && Objects.equals(arrayIndex, other.arrayIndex);
             } else {

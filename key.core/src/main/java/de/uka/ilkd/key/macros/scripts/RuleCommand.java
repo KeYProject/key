@@ -343,8 +343,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     private List<TacletApp> filterList(Parameters p, ImmutableList<TacletApp> list) {
         List<TacletApp> matchingApps = new ArrayList<>();
         for (TacletApp tacletApp : list) {
-            if (tacletApp instanceof PosTacletApp) {
-                PosTacletApp pta = (PosTacletApp) tacletApp;
+            if (tacletApp instanceof PosTacletApp pta) {
                 boolean add =
                     p.on == null || pta.posInOccurrence().subTerm().equalsModRenaming(p.on);
 

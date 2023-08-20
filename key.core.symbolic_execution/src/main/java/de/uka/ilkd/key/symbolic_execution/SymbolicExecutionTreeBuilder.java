@@ -538,8 +538,7 @@ public class SymbolicExecutionTreeBuilder {
                     deletedBlocks.add(block);
                 }
             }
-            if (exNode instanceof AbstractExecutionNode) {
-                AbstractExecutionNode<?> exNodeCast = (AbstractExecutionNode<?>) exNode;
+            if (exNode instanceof AbstractExecutionNode<?> exNodeCast) {
                 for (IExecutionBlockStartNode<?> block : deletedBlocks) {
                     exNodeCast.removeCompletedBlock(block);
                 }
@@ -814,9 +813,7 @@ public class SymbolicExecutionTreeBuilder {
                             // Merge branch conditions if possible
                             boolean addingToParentRequired = false;
                             for (AbstractExecutionNode<?> child : conditionsChildren) {
-                                if (child instanceof ExecutionBranchCondition) {
-                                    ExecutionBranchCondition bcChild =
-                                        (ExecutionBranchCondition) child;
+                                if (child instanceof ExecutionBranchCondition bcChild) {
                                     bcChild.addMergedProofNode(condition.getProofNode());
                                     // Move child one up in hierarchy
                                     addChild(entry.getKey(), child);
@@ -1854,8 +1851,7 @@ public class SymbolicExecutionTreeBuilder {
         @Override
         public boolean equals(Object o) {
             if (super.equals(o)) {
-                if (o instanceof JavaPair) {
-                    JavaPair other = (JavaPair) o;
+                if (o instanceof JavaPair other) {
                     if (second.size() == other.second.size()) {
                         Iterator<SourceElement> iter = second.iterator();
                         Iterator<SourceElement> otherIter = other.second.iterator();

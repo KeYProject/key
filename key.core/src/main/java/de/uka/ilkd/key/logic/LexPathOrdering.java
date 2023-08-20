@@ -80,10 +80,9 @@ public class LexPathOrdering implements TermOrdering {
         }
 
         public boolean equals(Object arg0) {
-            if (!(arg0 instanceof CacheKey)) {
+            if (!(arg0 instanceof CacheKey key0)) {
                 return false;
             }
-            final CacheKey key0 = (CacheKey) arg0;
             return left.equals(key0.left) && right.equals(key0.right);
         }
 

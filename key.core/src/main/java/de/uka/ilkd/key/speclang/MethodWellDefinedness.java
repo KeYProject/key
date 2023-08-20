@@ -388,8 +388,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      */
     public boolean isPure() {
         IObserverFunction target = getTarget();
-        if (target instanceof IProgramMethod) {
-            IProgramMethod pm = (IProgramMethod) target;
+        if (target instanceof IProgramMethod pm) {
             return JMLInfoExtractor.isPure(pm);
         } else {
             return false;

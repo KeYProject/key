@@ -417,9 +417,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             ((StatementBlock) TermBuilder.goBelowUpdates(ruleApp.posInOccurrence().subTerm())
                     .javaBlock().program()).getPrefixElements();
 
-        if (prefixElems.size() > 0 && (prefixElems.last() instanceof LabeledStatement)
+        if (prefixElems.size() > 0 && (prefixElems.last() instanceof LabeledStatement lastLabeledStmt)
                 && ((LabeledStatement) prefixElems.last()).getBody().equals(whileLoop)) {
-            final LabeledStatement lastLabeledStmt = (LabeledStatement) prefixElems.last();
             loopLabel = Optional.of(lastLabeledStmt.getLabel());
             stmtToRepl = lastLabeledStmt.getBody();
         }

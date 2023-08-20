@@ -909,8 +909,7 @@ public class TacletGenerator {
 
         // top level operator
         Operator newOp = t.op();
-        if (t.op() instanceof IObserverFunction) {
-            final IObserverFunction obs = (IObserverFunction) t.op();
+        if (t.op() instanceof IObserverFunction obs) {
             for (Pair<Sort, IObserverFunction> pair : toLimit) {
                 if (pair.second.equals(t.op())
                         && (obs.isStatic() || t.sub(1).sort().extendsTrans(pair.first))) {

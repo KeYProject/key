@@ -134,8 +134,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
         public ImmutableHeap<S> insert(ImmutableHeap<S> h) {
             if (h.isEmpty()) {
                 return this;
-            } else if (h instanceof Node/* <S> */) {
-                Node<S> other = (Node<S>) h;
+            } else if (h instanceof Node<S> other/* <S> */) {
                 if (data.compareTo(other.data) <= 0) {
                     return new Node<>(data, left, (ImmutableLeftistHeap<S>) right.insert(other));
                 } else {

@@ -90,8 +90,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
     public static ImmutableSet<BlockContract> getApplicableContracts(
             final SpecificationRepository specifications, final JavaStatement statement,
             final Modality modality, final Goal goal) {
-        if (statement instanceof StatementBlock) {
-            StatementBlock block = (StatementBlock) statement;
+        if (statement instanceof StatementBlock block) {
 
             ImmutableSet<BlockContract> collectedContracts =
                 specifications.getBlockContracts(block, modality);
@@ -136,9 +135,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         Node previousNode = null;
         while (selfOrParentNode != null) {
             RuleApp app = selfOrParentNode.getAppliedRuleApp();
-            if (app instanceof BlockContractInternalBuiltInRuleApp) {
-                BlockContractInternalBuiltInRuleApp blockRuleApp =
-                    (BlockContractInternalBuiltInRuleApp) app;
+            if (app instanceof BlockContractInternalBuiltInRuleApp blockRuleApp) {
                 if (blockRuleApp.getStatement().equals(contract.getBlock())
                         && selfOrParentNode.getChildNr(previousNode) == 0) {
                     // prevent application of contract in its own check validity branch

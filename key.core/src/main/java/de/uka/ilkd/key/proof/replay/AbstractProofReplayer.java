@@ -282,8 +282,7 @@ public abstract class AbstractProofReplayer {
                 .map(x -> new Pair<>(x, true))
                 .collect(Collectors.toList());
         // add direct instantiations
-        if (tacletApp instanceof PosTacletApp) {
-            PosTacletApp posTacletApp = (PosTacletApp) tacletApp;
+        if (tacletApp instanceof PosTacletApp posTacletApp) {
             if (posTacletApp.ifFormulaInstantiations() != null) {
                 for (IfFormulaInstantiation x : posTacletApp.ifFormulaInstantiations()) {
                     if (x instanceof IfFormulaInstDirect) {

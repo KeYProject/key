@@ -706,9 +706,7 @@ public class Proof implements Named {
                 }
 
                 // Merge rule applications: Unlink all merge partners.
-                if (visitedNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
-                    final MergeRuleBuiltInRuleApp mergeApp =
-                        (MergeRuleBuiltInRuleApp) visitedNode.getAppliedRuleApp();
+                if (visitedNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp mergeApp) {
 
                     for (MergePartner mergePartner : mergeApp.getMergePartners()) {
                         final Goal linkedGoal = mergePartner.getGoal();

@@ -169,8 +169,7 @@ public class OriginTermLabel implements TermLabel {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof OriginTermLabel) {
-            OriginTermLabel other = (OriginTermLabel) obj;
+        if (obj instanceof OriginTermLabel other) {
             return other.origin.equals(origin) && other.subtermOrigins.equals(subtermOrigins);
         } else {
             return false;

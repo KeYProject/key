@@ -166,10 +166,9 @@ public final class ArraySort extends AbstractSort {
 
 
         public boolean equals(Object o) {
-            if (!(o instanceof SortKey)) {
+            if (!(o instanceof SortKey sk)) {
                 return false;
             }
-            final SortKey sk = (SortKey) o;
             return elemSort == sk.elemSort && elemType == sk.elemType
                     && javaLangObjectSort == sk.javaLangObjectSort
                     && javaLangSerializable == sk.javaLangSerializable

@@ -284,8 +284,7 @@ public class JMLSpecFactory {
                     result = result.prepend(lpv);
                     return result;
                 }
-            } else if (s instanceof BranchStatement) {
-                BranchStatement bs = (BranchStatement) s;
+            } else if (s instanceof BranchStatement bs) {
                 for (int j = 0, n = bs.getBranchCount(); j < n; j++) {
                     ImmutableList<ProgramVariable> lpv =
                         collectLocalVariables(bs.getBranchAt(j), loop);
@@ -1498,8 +1497,7 @@ public class JMLSpecFactory {
                     result = result.prepend(visibleLocalVariables);
                     return result;
                 }
-            } else if (s instanceof BranchStatement) {
-                final BranchStatement branch = (BranchStatement) s;
+            } else if (s instanceof BranchStatement branch) {
                 final int branchCount = branch.getBranchCount();
                 for (int j = 0; j < branchCount; j++) {
                     final ImmutableList<ProgramVariable> visibleLocalVariables =

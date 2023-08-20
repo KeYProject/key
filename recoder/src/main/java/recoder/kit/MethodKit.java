@@ -284,10 +284,9 @@ public class MethodKit {
         Type fieldType = si.getType(f);
         for (int i = mems.size() - 1; i >= 0; i -= 1) {
             MemberDeclaration md = mems.get(i);
-            if (!(md instanceof MethodDeclaration)) {
+            if (!(md instanceof MethodDeclaration m)) {
                 continue;
             }
-            MethodDeclaration m = (MethodDeclaration) md;
             if (fieldType instanceof PrimitiveType) {
                 if (m.getReturnType() != fieldType) {
                     continue;
@@ -310,10 +309,9 @@ public class MethodKit {
                 continue;
             }
             Expression expr = ((Return) last).getExpression();
-            if (!(expr instanceof FieldReference)) {
+            if (!(expr instanceof FieldReference fr)) {
                 continue;
             }
-            FieldReference fr = (FieldReference) expr;
             if (si.getField(fr) == f) {
                 res.add(m);
             }
@@ -649,8 +647,7 @@ public class MethodKit {
         if (members != null) {
             for (int i = members.size() - 1; i >= 0; i -= 1) {
                 MemberDeclaration md = members.get(i);
-                if (md instanceof MethodDeclaration) {
-                    MethodDeclaration m = (MethodDeclaration) md;
+                if (md instanceof MethodDeclaration m) {
                     if (m.getName().equals(name) && m.getSignature().equals(signature)) {
                         return new NameConflict(m);
                     }

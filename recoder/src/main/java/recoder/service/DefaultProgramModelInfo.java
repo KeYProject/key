@@ -240,8 +240,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                 // (!m.isPrivate() && c.getPackage() == ct.getPackage())) {
                 if (isVisibleFor(m, ct)) {
                     List<? extends Type> msig = m.getSignature();
-                    if (c instanceof ParameterizedType) {
-                        ParameterizedType pt = (ParameterizedType) c;
+                    if (c instanceof ParameterizedType pt) {
                         List<Type> tmp = new ArrayList<>(msig.size());
                         for (Type t : msig) {
                             if (t instanceof TypeParameter) {
@@ -575,9 +574,8 @@ public abstract class DefaultProgramModelInfo extends AbstractService
 
     private ClassType getClassTypeFromTypeParameter(TypeParameter tp, int i) {
         ClassType t;
-        if (tp instanceof TypeParameterDeclaration) {
+        if (tp instanceof TypeParameterDeclaration tpd) {
             // TODO split up in bytecode/sourcecode info
-            TypeParameterDeclaration tpd = (TypeParameterDeclaration) tp;
             SourceInfo si = (SourceInfo) this;
             t = (ClassType) si.getType(tpd.getBounds().get(i));
         } else {
@@ -770,8 +768,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             return getNameInfo().getJavaLangObject();
         }
         // WildcardMode.None / WildcardMode.Any
-        if (ta instanceof TypeArgumentInfo) {
-            TypeArgumentInfo tai = (TypeArgumentInfo) ta;
+        if (ta instanceof TypeArgumentInfo tai) {
             if (tai.isTypeVariable()) {
                 if (tai.getContainingMethodInfo() != null) {
                     if (tai.getContainingMethodInfo().getTypeParameters() != null) {
@@ -850,8 +847,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                     methodSig = replaceTypeArguments(methodSig, typeArguments, m);
                 } // otherwise, checks against bounds will be done
             }
-            if (context instanceof ParameterizedType) {
-                ParameterizedType pt = (ParameterizedType) context;
+            if (context instanceof ParameterizedType pt) {
                 methodSig = replaceTypeArgs(methodSig, pt.getTypeArgs(),
                     pt.getGenericType().getTypeParameters());
             }
@@ -882,8 +878,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                         methodSig = replaceTypeArguments(methodSig, typeArguments, m);
                     } // otherwise, checks against bounds will be done
                 }
-                if (context instanceof ParameterizedType) {
-                    ParameterizedType pt = (ParameterizedType) context;
+                if (context instanceof ParameterizedType pt) {
                     methodSig = replaceTypeArgs(methodSig, pt.getTypeArgs(),
                         pt.getGenericType().getTypeParameters());
                 }

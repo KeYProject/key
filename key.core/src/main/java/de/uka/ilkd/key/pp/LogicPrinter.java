@@ -920,8 +920,7 @@ public class LogicPrinter {
             String name = t.op().name().toString();
             layouter.startTerm(t.arity());
             boolean alreadyPrinted = false;
-            if (t.op() instanceof SortDependingFunction) {
-                SortDependingFunction op = (SortDependingFunction) t.op();
+            if (t.op() instanceof SortDependingFunction op) {
                 if (op.getKind().compareTo(AbstractSort.EXACT_INSTANCE_NAME) == 0) {
                     layouter.print(op.getSortDependingOn().declarationString());
                     layouter.print("::");
@@ -972,8 +971,7 @@ public class LogicPrinter {
     protected boolean printEmbeddedHeapConstructorTerm(Term t) {
 
         Notation notation = notationInfo.getNotation(t.op());
-        if (notation instanceof HeapConstructorNotation) {
-            HeapConstructorNotation heapNotation = (HeapConstructorNotation) notation;
+        if (notation instanceof HeapConstructorNotation heapNotation) {
             heapNotation.printEmbeddedHeap(t, this);
             return true;
         } else {
@@ -1041,8 +1039,7 @@ public class LogicPrinter {
 
     protected void printEmbeddedObserver(final Term heapTerm, final Term objectTerm) {
         Notation notation = notationInfo.getNotation(objectTerm.op());
-        if (notation instanceof ObserverNotation) {
-            ObserverNotation obsNotation = (ObserverNotation) notation;
+        if (notation instanceof ObserverNotation obsNotation) {
             Term innerheap = objectTerm.sub(0);
             boolean paren = !heapTerm.equals(innerheap);
             if (paren) {

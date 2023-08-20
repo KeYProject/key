@@ -34,9 +34,7 @@ public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions
 
     private void addVarsToKeep() {
         for (IBreakpoint breakpoint : breakpointStopCondition.getBreakpoints()) {
-            if (breakpoint instanceof AbstractConditionalBreakpoint) {
-                AbstractConditionalBreakpoint conditionalBreakpoint =
-                    (AbstractConditionalBreakpoint) breakpoint;
+            if (breakpoint instanceof AbstractConditionalBreakpoint conditionalBreakpoint) {
                 if (conditionalBreakpoint.getToKeep() != null) {
                     for (LocationVariable sub : conditionalBreakpoint.getToKeep()) {
                         if (sub instanceof LocationVariable) {

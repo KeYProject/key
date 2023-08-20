@@ -102,11 +102,9 @@ public class SMTTacletTranslator {
         }
 
         List<QuantifiableVariable> qvars = new ArrayList<>();
-        if (op instanceof Quantifier) {
-            Quantifier q = (Quantifier) op;
+        if (op instanceof Quantifier q) {
             for (QuantifiableVariable boundVar : term.boundVars()) {
-                if (boundVar instanceof SchemaVariable) {
-                    SchemaVariable sv = (SchemaVariable) boundVar;
+                if (boundVar instanceof SchemaVariable sv) {
                     LogicVariable lv =
                         variables.computeIfAbsent(sv, x -> new LogicVariable(x.name(), x.sort()));
                     qvars.add(lv);
