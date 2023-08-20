@@ -1111,70 +1111,66 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         return getConstructors(ct, signature, null);
     }
 
-    static class ResolvedTypeArgument implements TypeArgument {
-        final WildcardMode wm;
-        final Type type;
-        final List<? extends TypeArgument> typeArgs;
-
-        public ResolvedTypeArgument(WildcardMode wm, Type type,
-                List<? extends TypeArgument> typeArgs) {
+    record ResolvedTypeArgument(WildcardMode wm, Type type,
+                                List<? extends TypeArgument> typeArgs) implements TypeArgument {
+        ResolvedTypeArgument {
             if (!(type instanceof ArrayType || type instanceof ClassType)) {
                 throw new IllegalArgumentException();
             }
-            this.wm = wm;
-            this.type = type;
-            this.typeArgs = typeArgs;
         }
 
-        public WildcardMode getWildcardMode() {
-            return wm;
-        }
-
-        public String getTypeName() {
-            return type.getFullName();
-        }
-
-        public List<? extends TypeArgument> getTypeArguments() {
-            return typeArgs;
-        }
-
+    public WildcardMode getWildcardMode() {
+        return wm;
     }
 
-    static class ClassTypeCacheEntry {
-        List<ClassType> supertypes; // used in specialized services only
-
-        Set<ClassType> subtypes;
-
-        List<ClassType> allSupertypes;
-
-        List<ClassType> allMemberTypes;
-
-        List<Field> allFields;
-
-        List<Method> allMethods;
+    public String getTypeName() {
+        return type.getFullName();
     }
 
-    static class SuperTypeTopSort extends ClassTypeTopSort {
-
-        protected final List<ClassType> getAdjacent(ClassType c) {
-            return c.getSupertypes();
-        }
+    public List<? extends TypeArgument> getTypeArguments() {
+        return typeArgs;
     }
 
-    static class ReplaceTypeArgResult {
-        final Type baseType;
-        final WildcardMode wildcardMode;
+}
 
-        ReplaceTypeArgResult(Type t, WildcardMode wm) {
-            this.baseType = t;
-            this.wildcardMode = wm;
-        }
-    }
 
-    class SubTypeTopSort extends ClassTypeTopSort {
+static class ClassTypeCacheEntry {
+    List<ClassType> supertypes; // used in specialized services only
 
-        protected final List<ClassType> getAdjacent(ClassType c) {
-            return getSubtypes(c);
-        }
+    Set<ClassType> subtypes;
+
+    List<ClassType> allSupertypes;
+
+    List<ClassType> allMemberTypes;
+
+    List<Field> allFields;
+
+    List<Method> allMethods;
+}
+
+
+static class SuperTypeTopSort extends ClassTypeTopSort {
+
+    protected final List<ClassType> getAdjacent(ClassType c) {
+        return c.getSupertypes();
     }
 }
+
+
+static class ReplaceTypeArgResult {
+    final Type baseType;
+    final WildcardMode wildcardMode;
+
+    ReplaceTypeArgResult(Type t, WildcardMode wm) {
+        this.baseType = t;
+        this.wildcardMode = wm;
+    }
+}
+
+
+class SubTypeTopSort extends ClassTypeTopSort {
+
+    protected final List<ClassType> getAdjacent(ClassType c) {
+        return getSubtypes(c);
+    }
+}}

@@ -54,16 +54,16 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         r2k.parseSpecialClasses();
 
         parseDecls(
-                """
-                        \\sorts { srt; }
-                        \\functions {
-                          srt f(srt);
-                          srt g(srt,srt);
-                        }
-                        \\predicates {
-                          p(srt);
-                          q(srt,srt);
-                        }""");
+            """
+                    \\sorts { srt; }
+                    \\functions {
+                      srt f(srt);
+                      srt g(srt,srt);
+                    }
+                    \\predicates {
+                      p(srt);
+                      q(srt,srt);
+                    }""");
 
         srt = lookup_sort("srt");
 

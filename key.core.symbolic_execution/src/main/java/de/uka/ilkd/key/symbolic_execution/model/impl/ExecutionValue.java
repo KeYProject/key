@@ -151,7 +151,7 @@ public class ExecutionValue extends AbstractExecutionValue {
                                 if (!ArrayUtil.isEmpty(lengthValues)) {
                                     for (ExecutionValue lengthValue : lengthValues) {
                                         try {
-                                            int length = getSettings().isUsePrettyPrinting()
+                                            int length = getSettings().usePrettyPrinting()
                                                     ? Integer.valueOf(lengthValue.getValueString())
                                                     : Integer.valueOf(SymbolicExecutionUtil
                                                             .formatTerm(lengthValue.getValue(),

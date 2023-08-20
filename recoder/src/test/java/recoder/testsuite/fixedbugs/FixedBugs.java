@@ -32,15 +32,15 @@ public class FixedBugs {
         ServiceConfiguration sc = new CrossReferenceServiceConfiguration();
         ProgramFactory f = sc.getProgramFactory();
         CompilationUnit cu = f.parseCompilationUnit(
-                """
-                        public class Test
-                        {
-                        Test s;
-                        public Test(Test s)
-                        {
-                        this.s = s;
-                        }
-                        }""");
+            """
+                    public class Test
+                    {
+                    Test s;
+                    public Test(Test s)
+                    {
+                    this.s = s;
+                    }
+                    }""");
         sc.getChangeHistory().attached(cu);
         assertEquals(4, ((ConstructorDeclaration) sc.getNameInfo().getClassType("Test")
                 .getConstructors().get(0)).getStartPosition().getLine());

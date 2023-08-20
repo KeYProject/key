@@ -75,7 +75,7 @@ public class MatchSortDependingFunctionInstruction extends Instruction<SortDepen
     public final MatchConditions match(Term instantiationCandidate, MatchConditions matchConditions,
             Services services) {
         MatchConditions result = null;
-        if (instantiationCandidate.op() instanceof SortDependingFunction sdp) {
+        if (instantiationCandidate.op()instanceof SortDependingFunction sdp) {
             if (op.isSimilar(sdp)) {
                 result = matchSorts(sdp.getSortDependingOn(), matchConditions, services);
             }

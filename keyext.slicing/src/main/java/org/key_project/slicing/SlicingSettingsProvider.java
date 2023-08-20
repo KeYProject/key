@@ -35,10 +35,10 @@ public class SlicingSettingsProvider extends SettingsPanel implements SettingsPr
      * Explanatory text for first option.
      */
     private static final String AGGRESSIVE_DEDUPLICATE_INFO =
-            """
-                    If enabled, the analysis algorithm will de-duplicate more than one duplicate pair at once.
-                    This may attempt to combine duplicates in impossible ways.
-                    Disable if you're having trouble slicing a proof using the de-duplication algorithm.""";
+        """
+                If enabled, the analysis algorithm will de-duplicate more than one duplicate pair at once.
+                This may attempt to combine duplicates in impossible ways.
+                Disable if you're having trouble slicing a proof using the de-duplication algorithm.""";
     private static final String DOT_EXECUTABLE = "Graphviz dot executable";
     private static final String DOT_EXECUTABLE_INFO =
         "Path to dot executable from the graphviz package.";

@@ -16,26 +16,26 @@ import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 public class TacletTranslationOptions extends SettingsPanel implements SettingsProvider {
     private static final long serialVersionUID = 5273966151509876358L;
     private static final String infoFileChooserPanel =
-            """
-                    Activate this option to store the translations of taclets that are handed over to the externals solvers:
-                    1. Choose the folder.
-                    2. Specify the filename:
-                    \t%s: the solver's name
-                    \t%d: date
-                    \t%t: time
-                    \t%i: the goal's number
+        """
+                Activate this option to store the translations of taclets that are handed over to the externals solvers:
+                1. Choose the folder.
+                2. Specify the filename:
+                \t%s: the solver's name
+                \t%d: date
+                \t%t: time
+                \t%i: the goal's number
 
 
-                    Example: ./home/translations/Taclet%d_%t_%i_%s.txt
+                Example: ./home/translations/Taclet%d_%t_%i_%s.txt
 
-                    Note: After every restart of KeY this option is deactivated.""";
+                Note: After every restart of KeY this option is deactivated.""";
     private static final String infoMaxNumberOfGenerics =
-            """
-                    This option specifies how many different generic sorts are allowed within a taclet.
+        """
+                This option specifies how many different generic sorts are allowed within a taclet.
 
-                    Be aware of the fact that too many different generic sorts can overwhelm the external solvers. On the other side there are taclets that use a certain amount of different generic sorts (see: taclet selection).
+                Be aware of the fact that too many different generic sorts can overwhelm the external solvers. On the other side there are taclets that use a certain amount of different generic sorts (see: taclet selection).
 
-                    Rule of thumb: Most of the taclets can be translated by using 2-3 different generic sorts.""";
+                Rule of thumb: Most of the taclets can be translated by using 2-3 different generic sorts.""";
     private final JTextField fileChooserPanel;
     private final JSpinner maxNumberOfGenerics;
 

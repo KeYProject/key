@@ -485,7 +485,7 @@ public class MergeRuleUtils {
             HashMap<Function, LogicVariable> replMap, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
-        if (term.op() instanceof Function constant && ((Function) term.op()).isSkolemConstant()
+        if (term.op()instanceof Function constant && ((Function) term.op()).isSkolemConstant()
                 && (restrictTo == null || restrictTo.contains(term.op()))) {
 
             if (!replMap.containsKey(constant)) {
@@ -1697,74 +1697,56 @@ public class MergeRuleUtils {
     }
 
     /**
-     *
      * TODO
      *
      * @author Dominic Scheurer
      */
-    private static class CommonAndSpecificSubformulasResult {
-        public final LinkedHashSet<Term> specific1, specific2, common;
-
-        public CommonAndSpecificSubformulasResult(LinkedHashSet<Term> specific1,
-                LinkedHashSet<Term> specific2, LinkedHashSet<Term> common) {
-            this.specific1 = specific1;
-            this.specific2 = specific2;
-            this.common = common;
-        }
+    private record CommonAndSpecificSubformulasResult(LinkedHashSet<Term> specific1,
+            LinkedHashSet<Term> specific2,
+            LinkedHashSet<Term> common) {
     }
 
     /**
-     * Simple term wrapper for comparing terms modulo renaming.
-     *
-     * @author Dominic Scheurer
-     * @see TermWrapperFactory
-     */
-    static class TermWrapper {
-        private final Term term;
-        private final int hashcode;
-
-        public TermWrapper(Term term, int hashcode) {
-            this.term = term;
-            this.hashcode = hashcode;
-        }
-
-        public Term getTerm() {
-            return term;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return obj instanceof TermWrapper
-                    && term.equalsModRenaming(((TermWrapper) obj).getTerm());
-        }
-
-        @Override
-        public int hashCode() {
-            return hashcode;
-        }
-
-        @Override
-        public String toString() {
-            return term.toString();
-        }
-
-        /**
-         * Adds the wrapped content of the Iterable object into the given target collection.
+         * Simple term wrapper for comparing terms modulo renaming.
          *
-         * @param target The collection to insert the wrapped terms into.
-         * @param wrappedCollection Iterable to transform.
-         * @return The target collection with inserted terms.
+         * @author Dominic Scheurer
+         * @see TermWrapperFactory
          */
-        public static <T extends Collection<Term>> T toTermList(T target,
-                Iterable<TermWrapper> wrappedCollection) {
+        record TermWrapper(Term term, int hashcode) {
 
-            for (TermWrapper termWrapper : wrappedCollection) {
-                target.add(termWrapper.getTerm());
+        @Override
+            public boolean equals(Object obj) {
+                return obj instanceof TermWrapper
+                        && term.equalsModRenaming(((TermWrapper) obj).term());
             }
 
-            return target;
+            @Override
+            public int hashCode() {
+                return hashcode;
+            }
+
+            @Override
+            public String toString() {
+                return term.toString();
+            }
+
+            /**
+             * Adds the wrapped content of the Iterable object into the given target collection.
+             *
+             * @param target            The collection to insert the wrapped terms into.
+             * @param wrappedCollection Iterable to transform.
+             * @return The target collection with inserted terms.
+             */
+            public static <T extends Collection<Term>> T toTermList(T target,
+                                                                    Iterable<TermWrapper> wrappedCollection) {
+
+                for (TermWrapper termWrapper : wrappedCollection) {
+                    target.add(termWrapper.term());
+                }
+
+                return target;
+            }
         }
-    }
 
     /**
      * Visitor for collecting program locations in a Java block.

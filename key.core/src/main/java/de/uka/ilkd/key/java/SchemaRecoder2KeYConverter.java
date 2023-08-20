@@ -413,7 +413,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     public MethodReference convert(recoder.java.reference.MethodReference mr) {
         // convert reference prefix
         final ReferencePrefix prefix;
-        if (mr.getReferencePrefix() instanceof recoder.java.reference.UncollatedReferenceQualifier uncoll) {
+        if (mr.getReferencePrefix()instanceof recoder.java.reference.UncollatedReferenceQualifier uncoll) {
             // type references would be allowed
             prefix = convert(new recoder.java.reference.TypeReference(uncoll.getReferencePrefix(),
                 uncoll.getIdentifier()));

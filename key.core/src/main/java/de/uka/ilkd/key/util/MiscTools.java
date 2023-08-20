@@ -237,7 +237,7 @@ public final class MiscTools {
      */
     public static ImmutableSet<Pair<Sort, IObserverFunction>> collectObservers(Term t) {
         ImmutableSet<Pair<Sort, IObserverFunction>> result = DefaultImmutableSet.nil();
-        if (t.op() instanceof IObserverFunction obs) {
+        if (t.op()instanceof IObserverFunction obs) {
             final Sort s = obs.isStatic() ? obs.getContainerType().getSort() : t.sub(1).sort();
             result = result.add(new Pair<>(s, obs));
         }
@@ -735,7 +735,7 @@ public final class MiscTools {
         try {
             switch (loc.getType()) {
             case "URL": // URLDataLocation
-                return Optional.of(((URLDataLocation) loc).getUrl().toURI());
+                return Optional.of(((URLDataLocation) loc).url().toURI());
             case "ARCHIVE": // ArchiveDataLocation
                 // format: "ARCHIVE:<filename>?<itemname>"
                 ArchiveDataLocation adl = (ArchiveDataLocation) loc;

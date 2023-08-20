@@ -219,7 +219,7 @@ public final class JavaInfo {
         name2KJTCache = new LinkedHashMap<>();
         for (final Object o : kpmi.allElements()) {
             if (o instanceof KeYJavaType oKJT) {
-                if (oKJT.getJavaType() instanceof ArrayType at) {
+                if (oKJT.getJavaType()instanceof ArrayType at) {
                     name2KJTCache.put(at.getFullName(), oKJT);
                     name2KJTCache.put(at.getAlternativeNameRepresentation(), oKJT);
                 } else {

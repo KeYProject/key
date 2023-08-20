@@ -645,50 +645,29 @@ public final class ProofManagementDialog extends JDialog {
     // -------------------------------------------------------------------------
     // inner classes
     // -------------------------------------------------------------------------
-    private static final class ProofWrapper {
-
-        public final Proof proof;
-
-        public ProofWrapper(Proof proof) {
-            this.proof = proof;
-        }
+    private record ProofWrapper(Proof proof) {
 
         @Override
-        public String toString() {
-            return proof.name().toString();
-        }
+            public String toString() {
+                return proof.name().toString();
+            }
 
-        @Override
-        public boolean equals(Object o) {
-            return o instanceof ProofWrapper && proof.equals(((ProofWrapper) o).proof);
-        }
+            @Override
+            public boolean equals(Object o) {
+                return o instanceof ProofWrapper && proof.equals(((ProofWrapper) o).proof);
+            }
 
-        @Override
-        public int hashCode() {
-            return proof.hashCode();
-        }
     }
 
 
     /**
      * Stores the identification of a {@link Contract}, i.e. type, method, contract name.
+     *
+     * @param keyJavaTypeName The key java type name.
+     * @param methodName The method name.
+     * @param contractName The contract name.
      */
-    private static final class ContractId {
-        /** The key java type name. */
-        @Nullable
-        public final String keyJavaTypeName;
-        /** The method name. */
-        @Nullable
-        public final String methodName;
-        /** The contract name. */
-        @Nullable
-        public final String contractName;
-
-        private ContractId(@Nullable String keyJavaTypeName, @Nullable String methodName,
-                @Nullable String contractName) {
-            this.keyJavaTypeName = keyJavaTypeName;
-            this.methodName = methodName;
-            this.contractName = contractName;
-        }
+    private record ContractId(@Nullable String keyJavaTypeName, @Nullable String methodName,
+            @Nullable String contractName) {
     }
 }

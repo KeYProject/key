@@ -354,7 +354,7 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
     }
 
     private ConstructorDeclaration attachConstructorDecl(TypeDeclaration td) {
-        if (td.getASTParent() instanceof New n) {
+        if (td.getASTParent()instanceof New n) {
             if (n.getArguments() == null || n.getArguments().isEmpty()) {
                 return null;
             }

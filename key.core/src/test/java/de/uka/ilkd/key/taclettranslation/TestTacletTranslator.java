@@ -88,14 +88,14 @@ public class TestTacletTranslator {
     @Test
     public void testPropositional1() {
         testTaclet(
-                """
-                        propositional1 {\s
-                        \\assumes( assume_left ==> assume_right )\s
-                        \\find( const1 )\s
-                        \\replacewith( const2 )\s
-                        \\add( add_left ==> add_right )\s
-                        ;\s
-                        \\add( psi ==> ) }""",
+            """
+                    propositional1 {\s
+                    \\assumes( assume_left ==> assume_right )\s
+                    \\find( const1 )\s
+                    \\replacewith( const2 )\s
+                    \\add( add_left ==> add_right )\s
+                    ;\s
+                    \\add( psi ==> ) }""",
 
             // second case first. no replace means const1=const1
 
@@ -106,16 +106,16 @@ public class TestTacletTranslator {
     @Test
     public void testPropositional2() {
         testTaclet(
-                """
-                        propositionalLeft {\s
-                        \\assumes( assume_left ==> assume_right )\s
-                        \\find( phi ==> )\s
-                        \\replacewith( psi ==> )\s
-                        \\add( add_left ==> add_right )\s
-                        ;\s
-                        \\add( tau ==> )\s
-                        ;\s
-                        \\replacewith( ==> psi )}""",
+            """
+                    propositionalLeft {\s
+                    \\assumes( assume_left ==> assume_right )\s
+                    \\find( phi ==> )\s
+                    \\replacewith( psi ==> )\s
+                    \\add( add_left ==> add_right )\s
+                    ;\s
+                    \\add( tau ==> )\s
+                    ;\s
+                    \\replacewith( ==> psi )}""",
 
             // last case first.
 
@@ -126,12 +126,12 @@ public class TestTacletTranslator {
     @Test
     public void testNoPolarity() {
         testTaclet(
-                """
-                        noPolarity {\s
-                        \\assumes( assume_left ==> assume_right )\s
-                        \\find( phi  )\s
-                        \\replacewith( psi );\s
-                        \\replacewith( tau )}""",
+            """
+                    noPolarity {\s
+                    \\assumes( assume_left ==> assume_right )\s
+                    \\find( phi  )\s
+                    \\replacewith( psi );\s
+                    \\replacewith( tau )}""",
 
             // last case first.
 
@@ -141,13 +141,13 @@ public class TestTacletTranslator {
     @Test
     public void testPositivePolarity() {
         testTaclet(
-                """
-                        positivePolarity {\s
-                        \\assumes( assume_left ==> assume_right )\s
-                        \\find( phi  )\s
-                        \\succedentPolarity\s
-                        \\replacewith( psi );\s
-                        \\replacewith( tau )}""",
+            """
+                    positivePolarity {\s
+                    \\assumes( assume_left ==> assume_right )\s
+                    \\find( phi  )\s
+                    \\succedentPolarity\s
+                    \\replacewith( psi );\s
+                    \\replacewith( tau )}""",
 
             // last case first.
             // for positive polarity w/o assumption,
@@ -159,13 +159,13 @@ public class TestTacletTranslator {
     @Test
     public void testNegativePolarity() {
         testTaclet(
-                """
-                        negativePolarity {\s
-                        \\assumes( assume_left ==> assume_right )\s
-                        \\find( phi  )\s
-                        \\antecedentPolarity\s
-                        \\replacewith( psi );\s
-                        \\replacewith( tau )}""",
+            """
+                    negativePolarity {\s
+                    \\assumes( assume_left ==> assume_right )\s
+                    \\find( phi  )\s
+                    \\antecedentPolarity\s
+                    \\replacewith( psi );\s
+                    \\replacewith( tau )}""",
 
             // last case first.
             // for negative polarity w/o assumption,

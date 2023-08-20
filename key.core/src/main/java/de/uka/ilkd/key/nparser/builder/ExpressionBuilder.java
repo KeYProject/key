@@ -1869,15 +1869,5 @@ public class ExpressionBuilder extends DefaultBuilder {
 }
 
 
-class JavaQuery {
-    final String packageName, className;
-    final List<String> attributeNames;
-    final KeYJavaType kjt;
-
-    JavaQuery(String packageName, String className, List<String> attributeNames, KeYJavaType kjt) {
-        this.packageName = packageName;
-        this.className = className;
-        this.attributeNames = attributeNames;
-        this.kjt = kjt;
-    }
+record JavaQuery(String packageName, String className, List<String> attributeNames, KeYJavaType kjt) {
 }

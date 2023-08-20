@@ -286,7 +286,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         if ((context instanceof VariableReference
                 || context instanceof UncollatedReferenceQualifier)
                 && context.getASTParent() instanceof Case && getType(((Case) context.getASTParent())
-                .getParent().getExpression()) instanceof EnumClassDeclaration ecd) {
+                        .getParent().getExpression())instanceof EnumClassDeclaration ecd) {
             /*
              * is it an enum class constant (after transformation)? Possible iff: 1) parent is
              * "case" and 2) switch-selector is an enum type (that way, the selector specifies the

@@ -410,7 +410,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
         Set<SequentFormula> sfSet =
             (Set<SequentFormula>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
         if (sfSet == null) {
-            sfSet = new LinkedHashSet<SequentFormula>();
+            sfSet = new LinkedHashSet<>();
             labelState.put(SEQUENT_FORMULA_REFACTORING_REQUIRED, sfSet);
         }
         sfSet.add(sf);

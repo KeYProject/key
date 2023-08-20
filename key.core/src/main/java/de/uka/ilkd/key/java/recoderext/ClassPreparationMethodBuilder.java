@@ -120,7 +120,7 @@ public class ClassPreparationMethodBuilder extends RecoderModelTransformer {
         for (final CompilationUnit cu : getUnits()) {
             final int typeCount = cu.getTypeDeclarationCount();
             for (int i = 0; i < typeCount; i++) {
-                if (cu.getTypeDeclarationAt(i) instanceof ClassDeclaration cd) {
+                if (cu.getTypeDeclarationAt(i)instanceof ClassDeclaration cd) {
                     if (cd.getTypeDeclarationCount() > 0) {
                         LOGGER.debug("clPrepBuilder: Inner Class detected. "
                             + "Reject building class initialisation methods.");

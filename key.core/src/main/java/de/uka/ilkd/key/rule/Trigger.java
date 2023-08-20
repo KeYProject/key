@@ -8,35 +8,20 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 import org.key_project.util.collection.ImmutableList;
 
-public class Trigger {
+/**
+ * @param trigger trigger related information
+ */
+public record Trigger(SchemaVariable triggerVar, Term trigger, ImmutableList<Term> avoidConditions) {
 
-    /** trigger related information */
-    private final Term trigger;
-    private final ImmutableList<Term> avoidConditions;
-    private final SchemaVariable triggerVar;
-
-
-    public Trigger(SchemaVariable triggerVar, Term trigger, ImmutableList<Term> avoidConditions) {
+    public Trigger {
         assert triggerVar != null;
         assert trigger != null;
         assert avoidConditions != null;
 
-        this.triggerVar = triggerVar;
-        this.trigger = trigger;
-        this.avoidConditions = avoidConditions;
-    }
-
-
-    public SchemaVariable getTriggerVar() {
-        return triggerVar;
     }
 
     public Term getTerm() {
         return trigger;
-    }
-
-    public ImmutableList<Term> getAvoidConditions() {
-        return avoidConditions;
     }
 
     public boolean hasAvoidConditions() {

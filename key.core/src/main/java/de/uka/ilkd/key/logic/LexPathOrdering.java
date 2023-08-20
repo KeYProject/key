@@ -70,25 +70,7 @@ public class LexPathOrdering implements TermOrdering {
     };
 
 
-    private final static class CacheKey {
-        public final Term left;
-        public final Term right;
-
-        public CacheKey(final Term left, final Term right) {
-            this.left = left;
-            this.right = right;
-        }
-
-        public boolean equals(Object arg0) {
-            if (!(arg0 instanceof CacheKey key0)) {
-                return false;
-            }
-            return left.equals(key0.left) && right.equals(key0.right);
-        }
-
-        public int hashCode() {
-            return left.hashCode() + 2 * right.hashCode();
-        }
+    private record CacheKey(Term left, Term right) {
     }
 
 

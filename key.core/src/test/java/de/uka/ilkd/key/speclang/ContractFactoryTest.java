@@ -65,7 +65,8 @@ public class ContractFactoryTest {
     }
 
     /**
-     * Checks that two equal assignable clauses are combined correctly, i.e., without if-expressions.
+     * Checks that two equal assignable clauses are combined correctly, i.e., without
+     * if-expressions.
      *
      * @throws SLTranslationException is not thrown if the test succeeds
      */

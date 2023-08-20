@@ -20,7 +20,7 @@ class BasicParamsOkSnippet implements FactoryMethod {
             throws UnsupportedOperationException {
         Term paramsOK = d.tb.tt();
         for (Term param : poVars.pre.localVars) {
-            if (!(param.op() instanceof ProgramVariable pv)) {
+            if (!(param.op()instanceof ProgramVariable pv)) {
                 throw new UnsupportedOperationException(
                     "Tried to produce " + "PARAMS_OK for a term " + "which is no ProgramVariable.");
             }
@@ -28,7 +28,7 @@ class BasicParamsOkSnippet implements FactoryMethod {
                 d.tb.reachableValue(poVars.pre.heap, param, pv.getKeYJavaType()));
         }
         if (poVars.pre.guard != null) {
-            if (!(poVars.pre.guard.op() instanceof ProgramVariable pv)) {
+            if (!(poVars.pre.guard.op()instanceof ProgramVariable pv)) {
                 throw new UnsupportedOperationException(
                     "Tried to produce " + "PARAMS_OK for a term " + "which is no ProgramVariable.");
             }

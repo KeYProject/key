@@ -83,7 +83,6 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
     /**
      *
      * @param contract the contract being applied.
-     * @param self the self term.
      * @param heaps the heaps.
      * @param localInVariables all free program variables in the block.
      * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
@@ -101,7 +100,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
         final Term reachableInCondition =
             conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
         final Term selfConditions = conditionsAndClausesBuilder.buildSelfConditions(heaps,
-            contract.getMethod(), contract.getKJT(), instantiation.self, services);
+            contract.getMethod(), contract.getKJT(), instantiation.self(), services);
         return new Term[] { precondition, wellFormedHeapsCondition, reachableInCondition,
             selfConditions };
     }
@@ -133,7 +132,6 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
      * @param heaps the heaps.
      * @param anonymisationHeaps the anonymization heaps.
      * @param variables the variables.
-     * @param modifiesClauses the modified clauses.
      * @param services services.
      * @return the updates.
      */
@@ -204,29 +202,29 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
         final Instantiation instantiation =
             instantiate(application.posInOccurrence().subTerm(), goal, services);
         final BlockContract contract = application.getContract();
-        contract.setInstantiationSelf(instantiation.self);
-        assert contract.getBlock().equals(instantiation.statement);
+        contract.setInstantiationSelf(instantiation.self());
+        assert contract.getBlock().equals(instantiation.statement());
 
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<ProgramVariable> localInVariables =
-            MiscTools.getLocalIns(instantiation.statement, services);
+            MiscTools.getLocalIns(instantiation.statement(), services);
         final ImmutableSet<ProgramVariable> localOutVariables =
-            MiscTools.getLocalOuts(instantiation.statement, services);
+            MiscTools.getLocalOuts(instantiation.statement(), services);
         final Map<LocationVariable, Function> anonymisationHeaps =
             createAndRegisterAnonymisationVariables(heaps, contract, services);
         final BlockContract.Variables variables =
             new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables(), services)
-                    .createAndRegister(instantiation.self, true);
+                    .createAndRegister(instantiation.self(), true);
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
-            new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self,
+            new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self(),
                 services);
         final Term[] preconditions = createPreconditions(instantiation, contract, heaps,
             localInVariables, conditionsAndClausesBuilder, services);
         final Term[] assumptions =
             createAssumptions(localOutVariables, anonymisationHeaps, conditionsAndClausesBuilder);
         final Term freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
-        final Term[] updates = createUpdates(instantiation.update, heaps, anonymisationHeaps,
+        final Term[] updates = createUpdates(instantiation.update(), heaps, anonymisationHeaps,
             variables, conditionsAndClausesBuilder, services);
 
         final ImmutableList<Goal> result;

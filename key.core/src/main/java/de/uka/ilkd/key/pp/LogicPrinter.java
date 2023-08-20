@@ -455,11 +455,11 @@ public class LogicPrinter {
         }
         layouter.nl().beginC().print("\\trigger {");
         Trigger trigger = taclet.getTrigger();
-        printSchemaVariable(trigger.getTriggerVar());
+        printSchemaVariable(trigger.triggerVar());
         layouter.print("} ");
         printTerm(trigger.getTerm());
         if (trigger.hasAvoidConditions()) {
-            Iterator<Term> itTerms = trigger.getAvoidConditions().iterator();
+            Iterator<Term> itTerms = trigger.avoidConditions().iterator();
             layouter.brk(1, 2);
             layouter.print(" \\avoid ");
             while (itTerms.hasNext()) {
@@ -920,7 +920,7 @@ public class LogicPrinter {
             String name = t.op().name().toString();
             layouter.startTerm(t.arity());
             boolean alreadyPrinted = false;
-            if (t.op() instanceof SortDependingFunction op) {
+            if (t.op()instanceof SortDependingFunction op) {
                 if (op.getKind().compareTo(AbstractSort.EXACT_INSTANCE_NAME) == 0) {
                     layouter.print(op.getSortDependingOn().declarationString());
                     layouter.print("::");

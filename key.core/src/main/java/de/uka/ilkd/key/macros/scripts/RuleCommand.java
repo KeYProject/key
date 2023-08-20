@@ -71,7 +71,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         final Proof proof = state.getProof();
         final Optional<BuiltInRule> maybeBuiltInRule =
-            proof.getInitConfig().getProfile().getStandardRules().getStandardBuiltInRules().stream()
+            proof.getInitConfig().getProfile().getStandardRules().standardBuiltInRules().stream()
                     .filter(r -> r.name().toString().equals(p.rulename)).findAny();
 
         final Optional<Taclet> maybeTaclet = Optional.ofNullable(

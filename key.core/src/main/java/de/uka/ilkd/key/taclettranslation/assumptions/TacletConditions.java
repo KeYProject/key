@@ -109,7 +109,7 @@ class TacletConditions {
     private boolean containsAbstractInterfaceCondition(Sort s, boolean negated) {
         for (AbstractOrInterfaceType cond : abstractInterfaceCondition) {
             if ((negated && cond.isNegated()) || (!negated && !cond.isNegated())) {
-                if (cond.getTypeResolver() instanceof GenericSortResolver res) {
+                if (cond.getTypeResolver()instanceof GenericSortResolver res) {
 
                     if (res.getGenericSort().equals(s)) {
                         return true;
@@ -205,7 +205,7 @@ class TacletConditions {
         for (TypeComparisonCondition tcc : comparisionCondition) {
             if (tcc.getMode() == mode) {
                 if (tcc.getSecondResolver() instanceof NonGenericSortResolver
-                        && tcc.getFirstResolver() instanceof GenericSortResolver first) {
+                        && tcc.getFirstResolver()instanceof GenericSortResolver first) {
 
                     if (first.getGenericSort().equals(gen)) {
                         Sort superType =

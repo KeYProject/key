@@ -250,7 +250,7 @@ public class OracleGenerator {
         else if (op == Junctor.NOT) {
             OracleTerm sub = generateOracle(term.sub(0), initialSelect);
             if (sub instanceof OracleUnaryTerm neg) {
-                return neg.getSub();
+                return neg.sub();
             }
             return new OracleUnaryTerm(sub, Op.Neg);
         }
@@ -679,7 +679,7 @@ public class OracleGenerator {
     private static OracleTerm neg(OracleTerm t) {
 
         if (t instanceof OracleUnaryTerm) {
-            return ((OracleUnaryTerm) t).getSub();
+            return ((OracleUnaryTerm) t).sub();
         } else {
             return new OracleUnaryTerm(t, Op.Neg);
         }

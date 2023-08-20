@@ -167,8 +167,8 @@ public class VMTacletMatcher implements TacletMatcher {
             if (formula.op() instanceof UpdateApplication) {
                 final Term update = UpdateApplication.getUpdate(formula);
                 final UpdateLabelPair ulp = curContext.head();
-                if (ulp.getUpdate().equalsModRenaming(update)
-                        && ulp.getUpdateApplicationlabels().equals(update.getLabels())) {
+                if (ulp.update().equalsModRenaming(update)
+                        && ulp.updateApplicationlabels().equals(update.getLabels())) {
                     curContext = curContext.tail();
                     formula = UpdateApplication.getTarget(formula);
                     continue;

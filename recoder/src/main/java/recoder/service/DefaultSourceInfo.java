@@ -295,7 +295,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     }
 
     private void processIdentifierChanged(TreeChange tc) {
-        if (!(getNameInfo() instanceof DefaultNameInfo dni)) {
+        if (!(getNameInfo()instanceof DefaultNameInfo dni)) {
             return;
         }
 
@@ -824,7 +824,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         Type result = getType(tr);
         if (result != null) {
             int d = vs.getDimensions();
-            if (vs.getASTParent() instanceof ParameterDeclaration pd) {
+            if (vs.getASTParent()instanceof ParameterDeclaration pd) {
                 if (pd.isVarArg()) {
                     d++;
                 }
@@ -1860,7 +1860,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             // context (b)";
             return null;
         }
-        if (mr.getReferencePrefix() instanceof SuperReference sr) {
+        if (mr.getReferencePrefix()instanceof SuperReference sr) {
             if (m.isAbstract()) {
                 // System.out.println(m.getContainingClassType().getFullName());
                 // return "cannot access super method because it is abstract";

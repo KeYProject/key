@@ -237,16 +237,16 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         register(vars, proofServices);
         final POTerms po = check.replace(check.createPOTerms(), vars);
         final TermAndFunc preCond =
-            check.getPre(po.pre, vars.self, vars.heap, vars.params, false, proofServices);
-        final Term wdPre = tb.wd(preCond.term);
-        final Term wdMod = tb.wd(po.mod);
-        final Term wdRest = tb.and(tb.wd(po.rest));
-        register(preCond.func, proofServices);
-        mbyAtPre = preCond.func != null ? check.replace(tb.func(preCond.func), vars) : null;
-        final Term post = check.getPost(po.post, vars.result, proofServices);
-        final Term pre = preCond.term;
+            check.getPre(po.pre(), vars.self, vars.heap, vars.params, false, proofServices);
+        final Term wdPre = tb.wd(preCond.term());
+        final Term wdMod = tb.wd(po.mod());
+        final Term wdRest = tb.and(tb.wd(po.rest()));
+        register(preCond.func(), proofServices);
+        mbyAtPre = preCond.func() != null ? check.replace(tb.func(preCond.func()), vars) : null;
+        final Term post = check.getPost(po.post(), vars.result, proofServices);
+        final Term pre = preCond.term();
         final Term updates =
-            check.getUpdates(po.mod, vars.heap, vars.heapAtPre, vars.anonHeap, proofServices);
+            check.getUpdates(po.mod(), vars.heap, vars.heapAtPre, vars.anonHeap, proofServices);
         final Term wfAnon = tb.wellFormed(vars.anonHeap);
         final Term uPost =
             check instanceof ClassWellDefinedness ? tb.tt() : tb.apply(updates, tb.wd(post));

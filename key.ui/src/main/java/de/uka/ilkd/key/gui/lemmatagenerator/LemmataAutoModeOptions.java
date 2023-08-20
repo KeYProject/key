@@ -205,12 +205,12 @@ public class LemmataAutoModeOptions {
 
     public String toString() {
         return String.format(
-                """
-                        path of rule file: %s
-                        path of result: %s
-                        maximum number of rules: %s
-                        timeout: %s
-                        save proof to file: %s""",
+            """
+                    path of rule file: %s
+                    path of result: %s
+                    maximum number of rules: %s
+                    timeout: %s
+                    save proof to file: %s""",
             pathOfRuleFile, pathOfResult, maxRules, timeout, saveResultsToFile);
     }
 

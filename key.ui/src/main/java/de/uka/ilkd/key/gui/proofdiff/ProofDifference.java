@@ -203,31 +203,11 @@ public class ProofDifference {
         }
     }
 
-    static class Matching {
-        final String left, right;
-        final int distance;
-
-        Matching(String left, String right, int distance) {
-            this.left = left;
-            this.right = right;
-            this.distance = distance;
-        }
-
-        public String getLeft() {
-            return left;
-        }
-
-        public String getRight() {
-            return right;
-        }
-
-        public int getDistance() {
-            return distance;
-        }
+    record Matching(String left, String right, int distance) {
 
         @Override
-        public String toString() {
-            return String.format("(%s, %s)", left, right);
+            public String toString() {
+                return String.format("(%s, %s)", left, right);
+            }
         }
-    }
 }

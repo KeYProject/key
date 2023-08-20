@@ -111,9 +111,9 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
             Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
                 createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm, elseTerm, services);
 
-            cond = distFormAndRightSidesForITEUpd.first;
-            ifForm = distFormAndRightSidesForITEUpd.second;
-            elseForm = distFormAndRightSidesForITEUpd.third;
+            cond = distFormAndRightSidesForITEUpd.first();
+            ifForm = distFormAndRightSidesForITEUpd.second();
+            elseForm = distFormAndRightSidesForITEUpd.third();
         } else {
             cond = distinguishingFormula;
             ifForm = ifTerm;
@@ -217,16 +217,18 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
         // left); this
         // should be allowed (although they are of course indistinguishable).
         assert distinguishingFormula != null || distinguishingFormula2 != null
-                : String.format("""
+                : String.format(
+                    """
 
-                A computed distinguishing formula is trivial ("true"); please verify that everything is OK. Symbolic execution states were:
+                            A computed distinguishing formula is trivial ("true"); please verify that everything is OK. Symbolic execution states were:
 
-                --- State 1 ---
-                %s
+                            --- State 1 ---
+                            %s
 
-                ---State 2---
-                %s
-                """, state1, state2);
+                            ---State 2---
+                            %s
+                            """,
+                    state1, state2);
 
         boolean commuteSides = false;
         if (distinguishingFormula == null) {

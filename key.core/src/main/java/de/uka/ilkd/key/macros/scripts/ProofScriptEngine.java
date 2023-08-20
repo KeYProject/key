@@ -110,8 +110,8 @@ public class ProofScriptEngine {
                 // EOF reached
                 break;
             }
-            final Map<String, String> argMap = parsed.args;
-            final Location start = parsed.start;
+            final Map<String, String> argMap = parsed.args();
+            final Location start = parsed.start();
 
             String cmd = "'" + argMap.get(ScriptLineParser.LITERAL_KEY) + "'";
             if (cmd.length() > MAX_CHARS_PER_COMMAND) {
@@ -141,7 +141,7 @@ public class ProofScriptEngine {
                 Object o = command.evaluateArguments(stateMap, argMap);
                 if (!name.startsWith(SYSTEM_COMMAND_PREFIX) && stateMap.isEchoOn()) {
                     LOGGER.debug("[{}] goal: {}, source line: {}, command: {}", ++cnt,
-                        firstNode.serialNr(), parsed.start.getPosition().line(), cmd);
+                        firstNode.serialNr(), parsed.start().getPosition().line(), cmd);
                 }
                 command.execute(uiControl, o, stateMap);
                 firstNode.getNodeInfo().setScriptRuleApplication(true);
@@ -151,13 +151,13 @@ public class ProofScriptEngine {
                 if (stateMap.isFailOnClosedOn()) {
                     throw new ScriptException(
                         String.format(
-                                """
-                                        Proof already closed while trying to fetch next goal.
-                                        This error can be suppressed by setting '@failonclosed off'.
+                            """
+                                    Proof already closed while trying to fetch next goal.
+                                    This error can be suppressed by setting '@failonclosed off'.
 
-                                        Command: %s
-                                        Line:%d
-                                        """,
+                                    Command: %s
+                                    Line:%d
+                                    """,
                             argMap.get(ScriptLineParser.LITERAL_KEY), start.getPosition().line()),
                         start, e);
                 } else {
@@ -201,15 +201,6 @@ public class ProofScriptEngine {
     public record EchoMessage(String message) implements Message {
     }
 
-    public static final class ExecuteInfo implements Message {
-        public final String command;
-        public final Location location;
-        public final int nodeSerial;
-
-        public ExecuteInfo(String command, Location location, int nodeSerial) {
-            this.command = command;
-            this.location = location;
-            this.nodeSerial = nodeSerial;
-        }
+    public record ExecuteInfo(String command, Location location, int nodeSerial) implements Message {
     }
 }

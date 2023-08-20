@@ -76,7 +76,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             return DefaultImmutableSet.nil();
         }
         return getApplicableContracts(services.getSpecificationRepository(),
-            instantiation.statement, instantiation.modality, goal);
+            instantiation.statement(), instantiation.modality(), goal);
     }
 
     /**
@@ -435,14 +435,14 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         final ProofObligationVars instantiationVars = generateProofObligationVariables(variables,
             exceptionParameter, baseHeap, localVarsAtPre, localVarsAtPost, services, tb);
         final IFProofObligationVars ifVars = new IFProofObligationVars(instantiationVars, services);
-        application.update(ifVars, instantiation.context);
+        application.update(ifVars, instantiation.context());
 
         // generate information flow contract application predicate
         // and associated taclet
         final InfFlowBlockContractTacletBuilder ifContractBuilder =
             new InfFlowBlockContractTacletBuilder(services);
         ifContractBuilder.setContract(contract);
-        ifContractBuilder.setExecutionContext(instantiation.context);
+        ifContractBuilder.setExecutionContext(instantiation.context());
         ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
         ifContractBuilder.setProofObligationVars(instantiationVars);
         final Term contractApplTerm = ifContractBuilder.buildContractApplPredTerm();
@@ -453,7 +453,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             localOutsAtPre, tb.var(baseHeap), tb);
         final Term infFlowPostAssumption = buildInfFlowPostAssumption(instantiationVars, localOuts,
             localOutsAtPost, tb.var(baseHeap), contractApplTerm, tb);
-        addProofObligation(infFlowGoal, proof, contract, ifVars, instantiation.context, services);
+        addProofObligation(infFlowGoal, proof, contract, ifVars, instantiation.context(), services);
 
         proof.addIFSymbol(contractApplTerm);
         proof.addIFSymbol(informationFlowContractApp);

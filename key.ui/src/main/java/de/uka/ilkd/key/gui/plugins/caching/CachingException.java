@@ -11,15 +11,15 @@ package de.uka.ilkd.key.gui.plugins.caching;
  */
 public class CachingException extends Exception {
     private static final String EXPLANATION_TEXT =
-            """
-                    Proof caching error: failed to realize cached branch
+        """
+                Proof caching error: failed to realize cached branch
 
-                    The replay system failed to reconstruct the referenced proof. Possible reasons:
-                    1) the referenced proof has different \\include directives than the new proof
-                    2) the referenced proof uses a different (bootstrap) classpath
-                    3) an unknown error occurred
+                The replay system failed to reconstruct the referenced proof. Possible reasons:
+                1) the referenced proof has different \\include directives than the new proof
+                2) the referenced proof uses a different (bootstrap) classpath
+                3) an unknown error occurred
 
-                    Try saving and reloading all currently opened proofs. Please also report this bug to the KeY team.""";
+                Try saving and reloading all currently opened proofs. Please also report this bug to the KeY team.""";
 
     public CachingException(Exception e) {
         super(EXPLANATION_TEXT, e);

@@ -196,7 +196,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 Term t = occ.subTerm();
                 createAbbrevSection(t, control);
 
-                if (t.op() instanceof ProgramVariable var) {
+                if (t.op()instanceof ProgramVariable var) {
                     if (var.getProgramElementName().getCreationInfo() != null) {
                         createNameCreationInfoSection(control);
                     }
@@ -504,7 +504,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             if (e.getSource() instanceof TacletMenuItem) {
                 ((CurrentGoalView) (getPopupMenu().getInvoker()))
                         .selectedTaclet(((TacletMenuItem) e.getSource()).connectedTo(), getPos());
-            } else if (e.getSource() instanceof SMTMenuItem item) {
+            } else if (e.getSource()instanceof SMTMenuItem item) {
                 final SolverTypeCollection solverUnion = item.getSolverUnion();
                 final Goal goal = mediator.getSelectedGoal();
                 assert goal != null;
@@ -521,7 +521,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                     launcher.launch(solverUnion.getTypes(), list, goal.proof().getServices());
                 }, "SMTRunner");
                 thread.start();
-            } else if (e.getSource() instanceof BuiltInRuleMenuItem birmi) {
+            } else if (e.getSource()instanceof BuiltInRuleMenuItem birmi) {
 
                 // This method delegates the request only to the UserInterfaceControl which
                 // implements the functionality.

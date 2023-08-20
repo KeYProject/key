@@ -81,14 +81,14 @@ public class TestJMLPreTranslator {
     @Test
     public void testLexer6() {
         lex("""
-                        //@ normal_behaviour
-                        //@  ensures false
-                        //@          || true;
-                        //@  assignable \\nothing;
-                        //@ also exceptional_behaviour
-                        //@  requires o == null;
-                        //@  signals Exception;
-                        """, JML_SL_START, WS,
+                //@ normal_behaviour
+                //@  ensures false
+                //@          || true;
+                //@  assignable \\nothing;
+                //@ also exceptional_behaviour
+                //@  requires o == null;
+                //@  signals Exception;
+                """, JML_SL_START, WS,
             NORMAL_BEHAVIOR, WS, JML_SL_START, WS, ENSURES, WS);
     }
 
@@ -200,15 +200,15 @@ public class TestJMLPreTranslator {
     @Test
     public void testMultipleSpecs() {
         ImmutableList<TextualJMLConstruct> constructs = parseMethodSpec(
-                """
-                        //@ normal_behaviour
-                        //@  ensures false
-                        //@          || true;
-                        //@  assignable \\nothing;
-                        //@ also exceptional_behaviour
-                        //@  requires o == null;
-                        //@  signals (Exception) e;
-                        """);
+            """
+                    //@ normal_behaviour
+                    //@  ensures false
+                    //@          || true;
+                    //@  assignable \\nothing;
+                    //@ also exceptional_behaviour
+                    //@  requires o == null;
+                    //@  signals (Exception) e;
+                    """);
 
         Assertions.assertNotNull(constructs);
         Assertions.assertEquals(2, constructs.size());
@@ -265,9 +265,9 @@ public class TestJMLPreTranslator {
     @Test
     public void testFailure2() {
         assertThrows(Exception.class, () -> parseMethodSpec(
-                """
-                        /*@ behaviour
-                          @  requires (;((;;);();();(();;;(;)));
-                          @*/"""));
+            """
+                    /*@ behaviour
+                      @  requires (;((;;);();();(();;;(;)));
+                      @*/"""));
     }
 }

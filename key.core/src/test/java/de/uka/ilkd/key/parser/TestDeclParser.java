@@ -241,12 +241,12 @@ public class TestDeclParser {
     @Test
     public void testArrayDecl() {
         evaluateDeclarations(
-                """
-                        \\sorts { aSort;}
-                        \\functions {
-                          aSort[][] f(aSort);
-                        }
-                        """);
+            """
+                    \\sorts { aSort;}
+                    \\functions {
+                      aSort[][] f(aSort);
+                    }
+                    """);
         Sort aSort = nss.sorts().lookup(new Name("aSort"));
         Sort objectSort = serv.getJavaInfo().objectSort();
         Sort cloneableSort = serv.getJavaInfo().cloneableSort();
@@ -392,15 +392,16 @@ public class TestDeclParser {
     @Disabled("weigl: nparser handles the parsing differently. No Exception is thrown.")
     public void testAmbiguousDecls() {
         try {
-            evaluateDeclarations("""
-                    \\sorts { elem; list; }
-                    \\functions {elem x;elem fn;elem p;}\\predicates {fn(elem);y;p;}\\schemaVariables {
-                      \\program Statement #s ;\s
-                      \\term elem x,y ;
-                      \\variables list lv ;
-                      \\formula b;
-                    }
-                    """);
+            evaluateDeclarations(
+                """
+                        \\sorts { elem; list; }
+                        \\functions {elem x;elem fn;elem p;}\\predicates {fn(elem);y;p;}\\schemaVariables {
+                          \\program Statement #s ;\s
+                          \\term elem x,y ;
+                          \\variables list lv ;
+                          \\formula b;
+                        }
+                        """);
             fail("Ambiguous declaration successfully parsed. Error was expected.");
             // FIXME nparser It seems that the nparser does not check for conflicting declarations
         } catch (RuntimeException e) {

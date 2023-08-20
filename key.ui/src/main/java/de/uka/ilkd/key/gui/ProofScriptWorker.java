@@ -126,18 +126,18 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
         for (ProofScriptEngine.Message info : chunks) {
             var message = new StringBuilder("\n---\n");
             if (info instanceof ProofScriptEngine.EchoMessage echo) {
-                message.append(echo.message);
+                message.append(echo.message());
             } else {
                 var exec = (ProofScriptEngine.ExecuteInfo) info;
-                if (exec.command.startsWith("'echo ")) {
+                if (exec.command().startsWith("'echo ")) {
                     continue;
                 }
-                if (exec.location.getFileURI().isPresent()) {
-                    message.append(exec.location.getFileURI().get()).append(":");
+                if (exec.location().getFileURI().isPresent()) {
+                    message.append(exec.location().getFileURI().get()).append(":");
                 }
-                message.append(exec.location.getPosition().line())
-                        .append(": Executing on goal ").append(exec.nodeSerial).append('\n')
-                        .append(exec.command);
+                message.append(exec.location().getPosition().line())
+                        .append(": Executing on goal ").append(exec.nodeSerial()).append('\n')
+                        .append(exec.command());
             }
             try {
                 doc.insertString(doc.getLength(), message.toString(), null);

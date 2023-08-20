@@ -17,18 +17,18 @@ public interface TaskStartedInfo {
      *
      * @return the kind of the task
      */
-    TaskKind getKind();
+    TaskKind kind();
 
     /**
      * returns a message with a description of the task, example: "Processing Strategy"
      */
-    String getMessage();
+    String message();
 
     /**
      * returns measure for the total size of the task. The number indicates the amount of work
      * needed to complete the task, mostly used by the GUI to display a progress bar. A returned
      * value of 0 means unknown size.
      */
-    int getSize();
+    int size();
 
 }

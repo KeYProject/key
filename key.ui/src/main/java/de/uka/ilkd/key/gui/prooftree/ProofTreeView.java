@@ -974,7 +974,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             // catching ClassCastException occurring when clicking on
             // "No proof loaded"
             if (!(e.getNewLeadSelectionPath()
-                    .getLastPathComponent() instanceof GUIAbstractTreeNode treeNode)) {
+                    .getLastPathComponent()instanceof GUIAbstractTreeNode treeNode)) {
                 return;
             }
 
@@ -1274,7 +1274,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
                 boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            if (proof == null || proof.isDisposed() || !(value instanceof GUIAbstractTreeNode node)) {
+            if (proof == null || proof.isDisposed()
+                    || !(value instanceof GUIAbstractTreeNode node)) {
                 // print dummy tree
                 return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row,
                     hasFocus);

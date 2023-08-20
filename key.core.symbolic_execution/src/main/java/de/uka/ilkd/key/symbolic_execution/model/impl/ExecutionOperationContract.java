@@ -87,7 +87,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
         if (!isDisposed()) {
             final Services services = getServices();
             // Make sure that the contract is compatible
-            if (!(getContract() instanceof FunctionalOperationContract contract)) {
+            if (!(getContract()instanceof FunctionalOperationContract contract)) {
                 throw new ProofInputException("Unsupported contract: " + getContract());
             }
             // Compute instantiation
@@ -131,7 +131,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
             // Compute contract text
             return FunctionalOperationContractImpl.getText(contract, contractParams, resultTerm,
                 selfTerm, exceptionTerm, baseHeap, baseHeapTerm, heapContext, atPres, false,
-                services, getSettings().isUsePrettyPrinting(), getSettings().isUseUnicode()).trim();
+                services, getSettings().usePrettyPrinting(), getSettings().useUnicode()).trim();
         } else {
             return null;
         }

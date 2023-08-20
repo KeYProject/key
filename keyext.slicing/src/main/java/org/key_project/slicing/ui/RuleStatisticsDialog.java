@@ -91,7 +91,8 @@ public class RuleStatisticsDialog extends JDialog {
 
         statisticsPane.setText(genTable(
             statistics.sortBy(
-                Comparator.comparing((Quadruple<String, Integer, Integer, Integer> it) -> it.second)
+                Comparator
+                        .comparing((Quadruple<String, Integer, Integer, Integer> it) -> it.second())
                         .reversed())));
         statisticsPane.setCaretPosition(0);
         setLocationRelativeTo(window);
@@ -114,7 +115,7 @@ public class RuleStatisticsDialog extends JDialog {
         JButton sortButton1 = new JButton("Sort by name");
         sortButton1.addActionListener(event -> {
             statisticsPane.setText(genTable(
-                statistics.sortBy(Comparator.comparing(it -> it.first))));
+                statistics.sortBy(Comparator.comparing(Quadruple::first))));
             statisticsPane.setCaretPosition(0);
         });
         JButton sortButton2 = new JButton("Sort by total");
@@ -123,7 +124,7 @@ public class RuleStatisticsDialog extends JDialog {
                 statistics.sortBy(
                     Comparator
                             .comparing(
-                                (Quadruple<String, Integer, Integer, Integer> it) -> it.second)
+                                (Quadruple<String, Integer, Integer, Integer> it) -> it.second())
                             .reversed())));
             statisticsPane.setCaretPosition(0);
         });
@@ -133,7 +134,7 @@ public class RuleStatisticsDialog extends JDialog {
                 statistics.sortBy(
                     Comparator
                             .comparing(
-                                (Quadruple<String, Integer, Integer, Integer> it) -> it.third)
+                                (Quadruple<String, Integer, Integer, Integer> it) -> it.third())
                             .reversed())));
             statisticsPane.setCaretPosition(0);
         });
@@ -143,7 +144,7 @@ public class RuleStatisticsDialog extends JDialog {
                 statistics.sortBy(
                     Comparator
                             .comparing(
-                                (Quadruple<String, Integer, Integer, Integer> it) -> it.fourth)
+                                (Quadruple<String, Integer, Integer, Integer> it) -> it.fourth())
                             .reversed())));
             statisticsPane.setCaretPosition(0);
         });
@@ -180,26 +181,27 @@ public class RuleStatisticsDialog extends JDialog {
         List<Collection<String>> rows = new ArrayList<>();
         // summary row
         int uniqueRules = rules.size();
-        int totalSteps = rules.stream().mapToInt(it -> it.second).sum();
-        int uselessSteps = rules.stream().mapToInt(it -> it.third).sum();
-        int initialUseless = rules.stream().mapToInt(it -> it.fourth).sum();
+        int totalSteps = rules.stream().mapToInt(Quadruple::second).sum();
+        int uselessSteps = rules.stream().mapToInt(Quadruple::third).sum();
+        int initialUseless = rules.stream().mapToInt(Quadruple::fourth).sum();
         rows.add(List.of(String.format("(all %d rules)", uniqueRules), Integer.toString(totalSteps),
             Integer.toString(uselessSteps), Integer.toString(initialUseless)));
         // next summary row
         List<Quadruple<String, Integer, Integer, Integer>> rulesBranching =
-            rules.stream().filter(it -> statistics.branches(it.first)).collect(Collectors.toList());
+            rules.stream().filter(it -> statistics.branches(it.first()))
+                    .collect(Collectors.toList());
         int uniqueRules2 = rulesBranching.size();
-        totalSteps = rulesBranching.stream().mapToInt(it -> it.second).sum();
-        uselessSteps = rulesBranching.stream().mapToInt(it -> it.third).sum();
-        initialUseless = rulesBranching.stream().mapToInt(it -> it.fourth).sum();
+        totalSteps = rulesBranching.stream().mapToInt(Quadruple::second).sum();
+        uselessSteps = rulesBranching.stream().mapToInt(Quadruple::third).sum();
+        initialUseless = rulesBranching.stream().mapToInt(Quadruple::fourth).sum();
         rows.add(List.of(String.format("(%d branching rules)", uniqueRules2),
             Integer.toString(totalSteps), Integer.toString(uselessSteps),
             Integer.toString(initialUseless)));
         rules.forEach(a -> {
-            String name = a.first;
-            Integer all = a.second;
-            Integer useless = a.third;
-            Integer iua = a.fourth;
+            String name = a.first();
+            Integer all = a.second();
+            Integer useless = a.third();
+            Integer iua = a.fourth();
             rows.add(List.of(name, all.toString(), useless.toString(), iua.toString()));
         });
 

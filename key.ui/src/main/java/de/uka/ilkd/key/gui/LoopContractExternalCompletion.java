@@ -51,11 +51,11 @@ public class LoopContractExternalCompletion implements InteractiveRuleApplicatio
             new AuxiliaryContractConfigurator<>("Loop Contract Configurator",
                 new LoopContractSelectionPanel(services, true), mainWindow, services,
                 contracts.toArray(new LoopContract[contracts.size()]),
-                "Contracts for Block: " + instantiation.statement);
+                "Contracts for Block: " + instantiation.statement());
         if (configurator.wasSuccessful()) {
             final List<LocationVariable> heaps =
                 HeapContext.getModHeaps(services, instantiation.isTransactional());
-            result.update(instantiation.statement, configurator.getContract(), heaps);
+            result.update(instantiation.statement(), configurator.getContract(), heaps);
         }
         return result;
     }
