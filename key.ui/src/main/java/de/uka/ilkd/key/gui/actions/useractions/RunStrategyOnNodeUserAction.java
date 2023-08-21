@@ -39,7 +39,7 @@ public class RunStrategyOnNodeUserAction extends ProofModifyingUserAction {
 
     @Override
     protected void apply() {
-        Goal invokedGoal = proof.getGoal(invokedNode);
+        Goal invokedGoal = proof.getOpenGoal(invokedNode);
         KeYMediator r = mediator;
         // is the node a goal?
         if (invokedGoal == null) {

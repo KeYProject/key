@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
+import java.awt.event.ActionEvent;
+import java.util.*;
+import javax.annotation.Nonnull;
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -31,14 +36,10 @@ import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.StringUtil;
-
-import javax.annotation.Nonnull;
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.util.*;
 
 /**
  * The menu shown by a {@link CurrentGoalViewListener} when the user clicks on a
@@ -70,7 +71,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     private final Action actionEnableAbbreviation = new EnableAbbreviationAction();
     private final Action actionChangeAbbreviation = new ChangeAbbreviationAction();
     private final KeyAction actionFocussedAutoMode = new FocussedRuleApplicationAction();
-    private final Comparator<? super TacletApp> sortTacletByName = Comparator.comparing(it -> it.taclet().displayName());
+    private final Comparator<? super TacletApp> sortTacletByName =
+        Comparator.comparing(it -> it.taclet().displayName());
 
 
     /**
@@ -84,15 +86,15 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * Creates a new menu that displays all applicable actions and rules at the given position
      *
      * @param sequentView the SequentView that is the parent of this menu
-     * @param findList    with all applicable FindTaclets
+     * @param findList with all applicable FindTaclets
      * @param rewriteList with all applicable RewriteTaclets
-     * @param noFindList  with all applicable noFindTaclets
+     * @param noFindList with all applicable noFindTaclets
      * @param builtInList with all applicable BuiltInRules
-     * @param pos         the PosInSequent
+     * @param pos the PosInSequent
      */
     CurrentGoalViewMenu(CurrentGoalView sequentView, ImmutableList<TacletApp> findList,
-                        ImmutableList<TacletApp> rewriteList, ImmutableList<TacletApp> noFindList,
-                        ImmutableList<BuiltInRule> builtInList, PosInSequent pos) {
+            ImmutableList<TacletApp> rewriteList, ImmutableList<TacletApp> noFindList,
+            ImmutableList<BuiltInRule> builtInList, PosInSequent pos) {
         super(sequentView, pos);
         this.mediator = sequentView.getMediator();
 
@@ -101,7 +103,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         // delete RewriteTaclet from findList because they will be in
         // the rewrite list and concatenate both lists
         createMenu(removeRewrites(findList).prepend(rewriteList),
-                removeIntroduceAxiomTaclet(noFindList), builtInList);
+            removeIntroduceAxiomTaclet(noFindList), builtInList);
     }
 
     /**
@@ -147,8 +149,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * Creates the menu by adding all sub-menus and items.
      */
     private void createMenu(ImmutableList<TacletApp> find,
-                            ImmutableList<TacletApp> noFind,
-                            ImmutableList<BuiltInRule> builtInList) {
+            ImmutableList<TacletApp> noFind,
+            ImmutableList<BuiltInRule> builtInList) {
         ImmutableList<TacletApp> toAdd = sort(find, comp);
         boolean rulesAvailable = find.size() > 0;
 
@@ -243,9 +245,9 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      */
     private void createMergeRuleMenu() {
         if (MergeRule.isOfAdmissibleForm(mediator.getSelectedGoal(), getPos().getPosInOccurrence(),
-                true)) {
+            true)) {
             JMenuItem item = new MergeRuleMenuItem(mediator.getSelectedGoal(),
-                    getPos().getPosInOccurrence(), mediator);
+                getPos().getPosInOccurrence(), mediator);
             add(item);
         }
     }
@@ -257,33 +259,33 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         if (builtInRule == WhileInvariantRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             addBuiltInRuleItem(builtInRule, APPLY_RULE,
-                    "Applies a known and complete loop specification immediately.",
-                    ENTER_LOOP_SPECIFICATION,
-                    "Allows to modify an existing or to enter a new loop specification.");
+                "Applies a known and complete loop specification immediately.",
+                ENTER_LOOP_SPECIFICATION,
+                "Allows to modify an existing or to enter a new loop specification.");
         } else if (builtInRule == BlockContractInternalRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             addBuiltInRuleItem(builtInRule, APPLY_RULE,
-                    "Applies a known and complete block specification immediately.",
-                    CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.");
+                "Applies a known and complete block specification immediately.",
+                CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.");
         } else if (builtInRule == BlockContractExternalRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             addBuiltInRuleItem(builtInRule, APPLY_RULE,
-                    "All available contracts of the block are combined and applied.",
-                    CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.");
+                "All available contracts of the block are combined and applied.",
+                CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.");
         } else if (builtInRule == LoopContractInternalRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             addBuiltInRuleItem(builtInRule, APPLY_RULE,
-                    "Applies a known and complete loop block specification immediately.",
-                    CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.");
+                "Applies a known and complete loop block specification immediately.",
+                CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.");
         } else if (builtInRule == LoopContractExternalRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             addBuiltInRuleItem(builtInRule, APPLY_RULE,
-                    "All available contracts of the loop block are combined and applied.",
-                    CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.");
+                "All available contracts of the loop block are combined and applied.",
+                CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.");
         } else if (builtInRule == UseOperationContractRule.INSTANCE) {
             addBuiltInRuleItem(builtInRule, APPLY_CONTRACT,
-                    "All available contracts of the method are combined and applied.",
-                    CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.");
+                "All available contracts of the method are combined and applied.",
+                CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.");
         }
         if (builtInRule != MergeRule.INSTANCE && builtInRule != LoopScopeInvariantRule.INSTANCE) {
             add(new ApplyBuiltInAction(builtInRule, builtInRule.toString(), ""));
@@ -291,13 +293,15 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     }
 
     private void addBuiltInRuleItem(BuiltInRule builtInRule,
-                                    String actionTextForForcedMode,
-                                    String tooltipForcedMode,
-                                    String actionTextForInteractiveMode,
-                                    String tooltipInteractiveMode) {
+            String actionTextForForcedMode,
+            String tooltipForcedMode,
+            String actionTextForInteractiveMode,
+            String tooltipInteractiveMode) {
         var menu = new JMenu(builtInRule.displayName());
-        menu.add(new ApplyBuiltInForcelyAction(builtInRule, actionTextForForcedMode, tooltipForcedMode));
-        menu.add(new ApplyBuiltInAction(builtInRule, actionTextForInteractiveMode, tooltipInteractiveMode));
+        menu.add(
+            new ApplyBuiltInForcelyAction(builtInRule, actionTextForForcedMode, tooltipForcedMode));
+        menu.add(new ApplyBuiltInAction(builtInRule, actionTextForInteractiveMode,
+            tooltipInteractiveMode));
         add(menu);
     }
 
@@ -310,7 +314,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * This method is also used by the KeY ide has to be static and public.
      */
     public static ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds,
-                                                TacletAppComparator comp) {
+            TacletAppComparator comp) {
         ImmutableList<TacletApp> result = ImmutableSLList.nil();
 
         List<TacletApp> list = new ArrayList<>(finds.size());
@@ -422,7 +426,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         var m = new JMenu("Insert Class Invariant");
         insSystemInvItem.sort(sortTacletByName);
         for (TacletApp app : insSystemInvItem) {
-            //    return displayName.replaceFirst("Insert invariants of ", "");
+            // return displayName.replaceFirst("Insert invariants of ", "");
             m.add(new TacletAppAction(app));
         }
         return m;
@@ -436,7 +440,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * @return the sequent with the formulas to be added or null
      */
     private boolean isHiddenTaclet(Taclet taclet) {
-        if (!(taclet instanceof NoFindTaclet) || !taclet.displayName().startsWith("insert_hidden")) {
+        if (!(taclet instanceof NoFindTaclet)
+                || !taclet.displayName().startsWith("insert_hidden")) {
             return false;
         }
         final ImmutableList<TacletGoalTemplate> goalTemplates = taclet.goalTemplates();
@@ -467,15 +472,15 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         public FocussedRuleApplicationAction() {
             setName("Apply rules automatically here");
             setTooltip("<html>Initiates and restricts automatic rule applications on the "
-                    + "highlighted formula, term or sequent.<br> "
-                    + "'Shift + left mouse click' on the highlighted "
-                    + "entity does the same.</html>");
+                + "highlighted formula, term or sequent.<br> "
+                + "'Shift + left mouse click' on the highlighted "
+                + "entity does the same.</html>");
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             new FocussedAutoModeUserAction(mediator, mediator.getSelectedProof(),
-                    getPos().getPosInOccurrence()).actionPerformed(e);
+                getPos().getPosInOccurrence()).actionPerformed(e);
         }
     }
 
@@ -548,8 +553,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 String s2 = it2.next().getKey();
                 if (!s1.equals(s2)) {
                     throw new IllegalStateException(
-                            "A decision should have been made on a higher level ( " + s1 + "<->" + s2
-                                    + ")");
+                        "A decision should have been made on a higher level ( " + s1 + "<->" + s2
+                            + ")");
                 }
                 int v1 = map1.get(s1);
                 int v2 = map2.get(s2);
@@ -626,7 +631,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         if (s == null || s.isBlank()) {
             return true;
         }
-        return !s.chars().allMatch(it -> Character.isAlphabetic(it) || Character.isDigit(it) || it == '_');
+        return !s.chars()
+                .allMatch(it -> Character.isAlphabetic(it) || Character.isDigit(it) || it == '_');
     }
 
     abstract class PIOAction extends KeyAction {
@@ -652,24 +658,26 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             final String oldTerm = occ.subTerm().toString();
             final String term = oldTerm.length() > 200 ? oldTerm.substring(0, 200) : oldTerm;
             String abbreviation = (String) JOptionPane.showInputDialog(CurrentGoalViewMenu.this,
-                    "Enter abbreviation for term: \n" + term, "New Abbreviation",
-                    JOptionPane.QUESTION_MESSAGE, null, null, "");
+                "Enter abbreviation for term: \n" + term, "New Abbreviation",
+                JOptionPane.QUESTION_MESSAGE, null, null, "");
 
-            if (abbreviation == null) return;
+            if (abbreviation == null)
+                return;
             try {
                 if (invalidAbbreviation(abbreviation)) {
                     JOptionPane.showMessageDialog(CurrentGoalViewMenu.this,
-                            "Only letters, numbers and '_' are allowed for Abbreviations",
-                            "Sorry", JOptionPane.INFORMATION_MESSAGE);
+                        "Only letters, numbers and '_' are allowed for Abbreviations",
+                        "Sorry", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     final var map = mediator.getNotationInfo().getAbbrevMap();
                     if (map.containsAbbreviation(abbreviation)) {
                         var newAbbreviation = "old_" + abbreviation;
                         int answer = JOptionPane.showConfirmDialog(CurrentGoalViewMenu.this,
-                                String.format("Abbreviation %s already bound. Do want to rename the previous binding to %s and proceed?",
-                                        abbreviation, newAbbreviation),
-                                "Name collision resolution", JOptionPane.OK_CANCEL_OPTION,
-                                JOptionPane.QUESTION_MESSAGE);
+                            String.format(
+                                "Abbreviation %s already bound. Do want to rename the previous binding to %s and proceed?",
+                                abbreviation, newAbbreviation),
+                            "Name collision resolution", JOptionPane.OK_CANCEL_OPTION,
+                            JOptionPane.QUESTION_MESSAGE);
 
                         if (answer == JOptionPane.CANCEL_OPTION) {
                             return;
@@ -685,7 +693,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 }
             } catch (AbbrevException sce) {
                 JOptionPane.showMessageDialog(CurrentGoalViewMenu.this, sce.getMessage(), "Sorry",
-                        JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.INFORMATION_MESSAGE);
             }
         }
     }
@@ -723,17 +731,17 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         @Override
         protected void apply(@Nonnull PosInOccurrence occ) {
             String abbreviation = (String) JOptionPane.showInputDialog(CurrentGoalViewMenu.this,
-                    "Enter abbreviation for term: \n" + occ.subTerm().toString(),
-                    "Change Abbreviation", JOptionPane.QUESTION_MESSAGE, null, null,
-                    mediator.getNotationInfo().getAbbrevMap().getAbbrev(occ.subTerm())
-                            .substring(1));
+                "Enter abbreviation for term: \n" + occ.subTerm().toString(),
+                "Change Abbreviation", JOptionPane.QUESTION_MESSAGE, null, null,
+                mediator.getNotationInfo().getAbbrevMap().getAbbrev(occ.subTerm())
+                        .substring(1));
             try {
                 if (abbreviation != null) {
                     if (invalidAbbreviation(abbreviation)) {
                         JOptionPane.showMessageDialog(CurrentGoalViewMenu.this,
-                                "Only letters, numbers and '_'"
-                                        + "are allowed for Abbreviations",
-                                "Sorry", JOptionPane.INFORMATION_MESSAGE);
+                            "Only letters, numbers and '_'"
+                                + "are allowed for Abbreviations",
+                            "Sorry", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         mediator.getNotationInfo().getAbbrevMap()
                                 .changeAbbrev(occ.subTerm(), abbreviation);
@@ -742,7 +750,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 }
             } catch (AbbrevException sce) {
                 JOptionPane.showMessageDialog(CurrentGoalViewMenu.this, sce.getMessage(), "Sorry",
-                        JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -761,9 +769,9 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             assert goal != null;
             Thread thread = new Thread(() -> {
                 DefaultSMTSettings settings =
-                        new DefaultSMTSettings(goal.proof().getSettings().getSMTSettings(),
-                                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                                goal.proof().getSettings().getNewSMTSettings(), goal.proof());
+                    new DefaultSMTSettings(goal.proof().getSettings().getSMTSettings(),
+                        ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                        goal.proof().getSettings().getNewSMTSettings(), goal.proof());
                 SolverLauncher launcher = new SolverLauncher(settings);
                 launcher.addListener(new SolverListener(settings, goal.proof()));
                 Collection<SMTProblem> list = new LinkedList<>();
@@ -782,23 +790,24 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             setName(tacletApp.displayName());
 
             SVInstantiations instantiations;
-            if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowUninstantiatedTaclet()) {
+            if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                    .getShowUninstantiatedTaclet()) {
                 instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
             } else {
                 instantiations = tacletApp.instantiations();
             }
 
             var tp = SequentViewLogicPrinter.purePrinter(68,
-                    mediator.getNotationInfo(),
-                    mediator.getServices(),
-                    MainWindow.getInstance().getVisibleTermLabels());
+                mediator.getNotationInfo(),
+                mediator.getServices(),
+                MainWindow.getInstance().getVisibleTermLabels());
 
             tp.printTaclet(tacletApp.taclet(), instantiations,
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),
-                    false);
+                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),
+                false);
 
             int maxTooltipLines =
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getMaxTooltipLines();
+                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getMaxTooltipLines();
 
             // replaced the old code here to fix #1340. (MU)
             String w = tp.result();
@@ -821,7 +830,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             taclet_sb.append("</pre>");
             if (truncated) {
                 taclet_sb.append("\n<b>!!</b><i> Message has been truncated. "
-                        + "See View &rarr; ToolTip Options.</i>");
+                    + "See View &rarr; ToolTip Options.</i>");
             }
 
             this.setTooltip(taclet_sb.toString());
@@ -832,7 +841,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 ImmutableList<TacletGoalTemplate> templates = tacletApp.taclet().goalTemplates();
                 if (templates.size() == 1) {
                     var printer = LogicPrinter.purePrinter(
-                            mediator.getNotationInfo(), mediator.getServices());
+                        mediator.getNotationInfo(), mediator.getServices());
                     printer.setInstantiation(tacletApp.instantiations());
                     printer.printSequent(templates.head().sequent());
                     String s = printer.result();
@@ -862,7 +871,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         @Override
         public void actionPerformed(ActionEvent e) {
             mediator.getUI().getProofControl().selectedBuiltInRule(mediator.getSelectedGoal(),
-                    rule, getPos().getPosInOccurrence(), false, true);
+                rule, getPos().getPosInOccurrence(), false, true);
         }
     }
 
@@ -874,7 +883,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         @Override
         public void actionPerformed(ActionEvent e) {
             mediator.getUI().getProofControl().selectedBuiltInRule(mediator.getSelectedGoal(),
-                    rule, getPos().getPosInOccurrence(), true, true);
+                rule, getPos().getPosInOccurrence(), true, true);
         }
     }
 }

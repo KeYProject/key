@@ -462,20 +462,20 @@ public final class StringUtil {
         int sbl = asb.length();
         for (int i = 0; i < sbl; i++) {
             switch (asb.charAt(i)) {
-                case '<':
-                    nsb.append("&lt;");
-                    break;
-                case '>':
-                    nsb.append("&gt;");
-                    break;
-                case '&':
-                    nsb.append("&amp;");
-                    break;
-                case '\n':
-                    nsb.append("<br>");
-                    break;
-                default:
-                    nsb.append(asb.charAt(i));
+            case '<':
+                nsb.append("&lt;");
+                break;
+            case '>':
+                nsb.append("&gt;");
+                break;
+            case '&':
+                nsb.append("&amp;");
+                break;
+            case '\n':
+                nsb.append("<br>");
+                break;
+            default:
+                nsb.append(asb.charAt(i));
             }
         }
         return nsb;

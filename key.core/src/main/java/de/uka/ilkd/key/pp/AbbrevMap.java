@@ -1,16 +1,17 @@
 package de.uka.ilkd.key.pp;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.util.Pair;
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.util.Pair;
+
 /**
  * This class realizes a 1:1 map for term abbreviations.
- * A term abbreviation is a label for a (complex) term structure that should be used for pretty printing instead.
+ * A term abbreviation is a label for a (complex) term structure that should be used for pretty
+ * printing instead.
  * Abbreviations are also supported during parsing.
  * Use {@code @label} to access to a previous defined abbreviation
  * with label {@code label}.
@@ -39,10 +40,10 @@ public class AbbrevMap {
     /**
      * Associates a Term and its abbreviation in this map.
      *
-     * @param t            a term
+     * @param t a term
      * @param abbreviation the abbreviation for of this term
-     * @param enabled      true if the abbreviation should be used (e.g., when printing the term), false
-     *                     otherwise.
+     * @param enabled true if the abbreviation should be used (e.g., when printing the term), false
+     *        otherwise.
      */
     public void put(Term t, String abbreviation, boolean enabled) throws AbbrevException {
         AbbrevWrapper scw;
@@ -53,7 +54,7 @@ public class AbbrevMap {
 
         if (containsAbbreviation(abbreviation)) {
             throw new AbbrevException("The abbreviation " + abbreviation + " is already"
-                    + " in use for: " + getTerm(abbreviation), false);
+                + " in use for: " + getTerm(abbreviation), false);
         }
         forcePut(abbreviation, t);
     }
@@ -69,7 +70,7 @@ public class AbbrevMap {
             AbbrevWrapper scw;
             if (containsAbbreviation(abbreviation)) {
                 throw new AbbrevException("The abbreviation " + abbreviation + " is already"
-                        + " in use for: " + getTerm(abbreviation), false);
+                    + " in use for: " + getTerm(abbreviation), false);
             }
             scw = new AbbrevWrapper(t);
             final var old = term2String.get(scw);
@@ -145,19 +146,22 @@ public class AbbrevMap {
     /**
      * Sets the mapping of the term t to its abbreviation enabled or disabled
      *
-     * @param t       a Term
+     * @param t a Term
      * @param enabled true if the abbreviation of t may be used.
      */
     public void setEnabled(Term t, boolean enabled) {
         var oldEnabled = isEnabled(t);
         var scw = new AbbrevWrapper(t);
-        if (enabled) isTermEnabled.add(scw);
-        else isTermEnabled.remove(scw);
+        if (enabled)
+            isTermEnabled.add(scw);
+        else
+            isTermEnabled.remove(scw);
         changeSupport.firePropertyChange("enabled", oldEnabled, enabled);
     }
 
     /**
-     * Exports the current abbreviation map as a sequence of pairs of the terms and its abbreviation.
+     * Exports the current abbreviation map as a sequence of pairs of the terms and its
+     * abbreviation.
      * Note, this will allocate a new data structure each time.
      */
     public Collection<Pair<Term, String>> export() {
@@ -179,7 +183,7 @@ public class AbbrevMap {
      * Sets the given abbreviation to term without checking of previous assignment.
      *
      * @param abbreviation the label of the abbreviation
-     * @param t            a term
+     * @param t a term
      */
     public void forcePut(String abbreviation, Term t) {
         var scw = new AbbrevWrapper(t);

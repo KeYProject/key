@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import de.uka.ilkd.key.pp.PosInSequent;
-
+import java.awt.event.MouseEvent;
 import javax.annotation.Nullable;
 import javax.swing.*;
-import java.awt.event.MouseEvent;
+
+import de.uka.ilkd.key.pp.PosInSequent;
 
 /**
  * Listener for an {@link InnerNodeView}
@@ -34,7 +34,8 @@ public class InnerNodeViewListener extends SequentViewListener<InnerNodeView> {
         if (Math.abs(System.currentTimeMillis() - getLastPopupCloseTime()) >= POPUP_DELAY) {
             PosInSequent mousePos = getSequentView().getPosInSequent(me.getPoint());
             if (mousePos != null) {
-                if (!me.isShiftDown() && !me.isControlDown() && SwingUtilities.isLeftMouseButton(me)) {
+                if (!me.isShiftDown() && !me.isControlDown()
+                        && SwingUtilities.isLeftMouseButton(me)) {
                     menu = new SequentViewMenu<>(this.getSequentView(), mousePos);
                     showPopup(me, menu);
                 }

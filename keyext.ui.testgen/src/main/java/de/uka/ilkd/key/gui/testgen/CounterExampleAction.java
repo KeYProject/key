@@ -170,7 +170,7 @@ public class CounterExampleAction extends MainWindowAction {
             SpecificationRepository spec = proof.getServices().getSpecificationRepository();
             spec.registerProof(spec.getProofOblInput(oldProof), proof);
 
-            mediator.goalChosen(proof.getGoal(proof.root()));
+            mediator.goalChosen(proof.getOpenGoal(proof.root()));
 
             return proof;
         }

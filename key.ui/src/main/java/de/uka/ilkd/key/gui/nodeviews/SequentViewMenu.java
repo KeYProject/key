@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
+import java.awt.event.ActionEvent;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
@@ -9,11 +14,6 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.PosInSequent;
-
-import javax.annotation.Nonnull;
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.util.List;
 
 /**
  * The menu shown by a {@link SequentViewListener} when the user clicks on a {@link SequentView}.
@@ -46,7 +46,7 @@ public class SequentViewMenu<T extends SequentView> extends JMenu {
      * Creates a new menu that displays all applicable actions at the given position.
      *
      * @param sequentView the SequentView that is the parent of this menu
-     * @param pos         the PosInSequent
+     * @param pos the PosInSequent
      */
     SequentViewMenu(@Nonnull T sequentView, @Nonnull PosInSequent pos) {
         super();
@@ -77,8 +77,8 @@ public class SequentViewMenu<T extends SequentView> extends JMenu {
      */
     protected void addExtensionMenu() {
         List<Action> actions =
-                KeYGuiExtensionFacade.getContextMenuItems(DefaultContextMenuKind.SEQUENT_VIEW, getPos(),
-                        getSequentView().getMainWindow().getMediator());
+            KeYGuiExtensionFacade.getContextMenuItems(DefaultContextMenuKind.SEQUENT_VIEW, getPos(),
+                getSequentView().getMainWindow().getMediator());
 
         for (Action action : actions) {
             add(action);
@@ -129,7 +129,7 @@ public class SequentViewMenu<T extends SequentView> extends JMenu {
                 message = "No information available.";
             }
             JOptionPane.showMessageDialog(null, message, "Name creation info",
-                    JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.INFORMATION_MESSAGE);
         }
     }
 }

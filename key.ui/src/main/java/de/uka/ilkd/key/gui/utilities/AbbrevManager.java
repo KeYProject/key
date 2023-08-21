@@ -1,5 +1,21 @@
 package de.uka.ilkd.key.gui.utilities;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.nio.file.Files;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -18,24 +34,9 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.parsing.BuildingException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.nio.file.Files;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This is a small extension that add the abbreviation widget to KeY.
@@ -46,10 +47,10 @@ import java.util.stream.Collectors;
  * @version 1 (14.07.23)
  */
 @KeYGuiExtension.Info(name = "Abbreviation Manager",
-        description = "A widget for the management of abbreviation in proofs. " +
-                "Allows storing and loading abbreviations of text files.",
-        disabled = false,
-        experimental = false)
+    description = "A widget for the management of abbreviation in proofs. " +
+        "Allows storing and loading abbreviations of text files.",
+    disabled = false,
+    experimental = false)
 public class AbbrevManager implements KeYGuiExtension, KeYGuiExtension.LeftPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbbrevManager.class);
 
@@ -57,8 +58,10 @@ public class AbbrevManager implements KeYGuiExtension, KeYGuiExtension.LeftPanel
 
     @Nonnull
     @Override
-    public Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
-        if (panel == null) panel = new AbbrevManagerPanel(window, mediator);
+    public Collection<TabPanel> getPanels(@Nonnull MainWindow window,
+            @Nonnull KeYMediator mediator) {
+        if (panel == null)
+            panel = new AbbrevManagerPanel(window, mediator);
         return Collections.singleton(panel);
     }
 
@@ -93,10 +96,13 @@ public class AbbrevManager implements KeYGuiExtension, KeYGuiExtension.LeftPanel
             listAbbrev.setModel(modelAbbrev);
             listAbbrev.setCellRenderer(new DefaultListCellRenderer() {
                 @Override
-                public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                public Component getListCellRendererComponent(JList<?> list, Object value,
+                        int index, boolean isSelected, boolean cellHasFocus) {
                     var v = (Pair<Term, String>) value;
-                    var s = v.second + " : " + LogicPrinter.quickPrintTerm(v.first, mediator.getServices());
-                    return super.getListCellRendererComponent(list, s, index, isSelected, cellHasFocus);
+                    var s = v.second + " : "
+                        + LogicPrinter.quickPrintTerm(v.first, mediator.getServices());
+                    return super.getListCellRendererComponent(list, s, index, isSelected,
+                        cellHasFocus);
                 }
             });
             add(listAbbrev);
@@ -172,16 +178,17 @@ public class AbbrevManager implements KeYGuiExtension, KeYGuiExtension.LeftPanel
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                KeYFileChooser fc = KeYFileChooser.getFileChooser("Select file to store abbreviation map.");
+                KeYFileChooser fc =
+                    KeYFileChooser.getFileChooser("Select file to store abbreviation map.");
                 int result = fc.showOpenDialog(window);
                 if (result == JFileChooser.APPROVE_OPTION) {
                     var abbrevMap = mediator.getNotationInfo().getAbbrevMap().export();
                     var file = fc.getSelectedFile().toPath();
                     try {
                         Files.writeString(file,
-                                abbrevMap.stream().map(it -> it.second + SEPERATOR_ABBREV_FILE +
-                                                LogicPrinter.quickPrintTerm(it.first, mediator.getServices()))
-                                        .collect(Collectors.joining("\n")));
+                            abbrevMap.stream().map(it -> it.second + SEPERATOR_ABBREV_FILE +
+                                    LogicPrinter.quickPrintTerm(it.first, mediator.getServices()))
+                                    .collect(Collectors.joining("\n")));
                     } catch (IOException ex) {
                         LOGGER.error("File I/O error", ex);
                         JOptionPane.showMessageDialog(window, "I/O Error:" + ex.getMessage());
@@ -199,7 +206,8 @@ public class AbbrevManager implements KeYGuiExtension, KeYGuiExtension.LeftPanel
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                KeYFileChooser fc = KeYFileChooser.getFileChooser("Select file to load proof or problem");
+                KeYFileChooser fc =
+                    KeYFileChooser.getFileChooser("Select file to load proof or problem");
                 var mainWindow = window;
                 int result = fc.showOpenDialog(mainWindow);
                 if (result == JFileChooser.APPROVE_OPTION) {
@@ -218,7 +226,8 @@ public class AbbrevManager implements KeYGuiExtension, KeYGuiExtension.LeftPanel
                                     try {
                                         abbrevMap.put(term, abbrevName.trim(), true);
                                     } catch (AbbrevException ex) {
-                                        LOGGER.error("Could not add {} with {} to abbrevMap", abbrevName, term, ex);
+                                        LOGGER.error("Could not add {} with {} to abbrevMap",
+                                            abbrevName, term, ex);
                                     }
                                 }
                             }
@@ -292,8 +301,10 @@ public class AbbrevManager implements KeYGuiExtension, KeYGuiExtension.LeftPanel
             public void actionPerformed(ActionEvent e) {
                 var selected = listAbbrev.getSelectedValue();
                 var answer =
-                        JOptionPane.showInputDialog(window, "Set new label for term: " + selected.first, selected.second);
-                if (answer == null) return;
+                    JOptionPane.showInputDialog(window, "Set new label for term: " + selected.first,
+                        selected.second);
+                if (answer == null)
+                    return;
                 try {
                     mediator.getNotationInfo().getAbbrevMap().changeAbbrev(selected.first, answer);
                     window.makePrettyView();
@@ -315,23 +326,29 @@ public class AbbrevManager implements KeYGuiExtension, KeYGuiExtension.LeftPanel
             @Override
             public void actionPerformed(ActionEvent e) {
                 var selected = listAbbrev.getSelectedValue();
-                var prettyPrinted = LogicPrinter.quickPrintTerm(selected.first, mediator.getServices());
+                var prettyPrinted =
+                    LogicPrinter.quickPrintTerm(selected.first, mediator.getServices());
 
-                while (true) { // abort if the user abort the input dialog, or the expression was successfully changed.
+                while (true) { // abort if the user abort the input dialog, or the expression was
+                               // successfully changed.
                     var answer =
-                            JOptionPane.showInputDialog(window,
-                                    "Set a new term for abbreviation " + selected.second + ":", prettyPrinted);
-                    if (answer == null) return;
+                        JOptionPane.showInputDialog(window,
+                            "Set a new term for abbreviation " + selected.second + ":",
+                            prettyPrinted);
+                    if (answer == null)
+                        return;
                     var kio = new KeyIO(mediator.getServices());
                     kio.setAbbrevMap(mediator.getNotationInfo().getAbbrevMap());
                     try {
                         var term = kio.parseExpression(answer);
-                        mediator.getNotationInfo().getAbbrevMap().changeAbbrev(selected.second, term, true);
+                        mediator.getNotationInfo().getAbbrevMap().changeAbbrev(selected.second,
+                            term, true);
                         window.makePrettyView();
                         return;
                     } catch (BuildingException ex) {
                         LOGGER.error("Error during parsing of user entered term {}", answer, ex);
-                        JOptionPane.showMessageDialog(window, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(window, ex.getMessage(), "Error",
+                            JOptionPane.ERROR_MESSAGE);
                         prettyPrinted = answer;
                     } catch (AbbrevException ex) {
                         throw new RuntimeException(ex);
@@ -341,33 +358,38 @@ public class AbbrevManager implements KeYGuiExtension, KeYGuiExtension.LeftPanel
         }
 
         private class TransferAbbrevAction extends KeyAction {
-            private final IconFontProvider TRANSFER_ICON = new IconFontProvider(FontAwesomeSolid.ANGLE_DOUBLE_DOWN,
+            private final IconFontProvider TRANSFER_ICON =
+                new IconFontProvider(FontAwesomeSolid.ANGLE_DOUBLE_DOWN,
                     Color.black);
 
             public TransferAbbrevAction() {
                 setName("Transfer abbreviation from...");
                 setIcon(TRANSFER_ICON.get());
-                setTooltip("Transfers all abbreviation from the selected proof to this proof. Best effort. No guarantees!");
+                setTooltip(
+                    "Transfers all abbreviation from the selected proof to this proof. Best effort. No guarantees!");
             }
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 var selected = mediator.getSelectedProof();
-                if (selected == null) return;
+                if (selected == null)
+                    return;
 
                 var proofs = window.getProofList().getModel().getLoadedProofs()
                         .stream().filter(it -> it != selected)
                         .toArray(Proof[]::new);
                 var from = (Proof) JOptionPane.showInputDialog(window,
-                        "Select a proof to import from. ", "Import Abbreviations",
-                        JOptionPane.PLAIN_MESSAGE, null, proofs, null);
-                if (from == null) return;
+                    "Select a proof to import from. ", "Import Abbreviations",
+                    JOptionPane.PLAIN_MESSAGE, null, proofs, null);
+                if (from == null)
+                    return;
                 var kio = new KeyIO(mediator.getServices());
                 kio.setAbbrevMap(selected.abbreviations());
 
                 for (Pair<Term, String> pair : from.abbreviations().export()) {
                     // print and parse to ensure the different namespace
-                    var term = kio.parseExpression(LogicPrinter.quickPrintTerm(pair.first, from.getServices()));
+                    var term = kio.parseExpression(
+                        LogicPrinter.quickPrintTerm(pair.first, from.getServices()));
                     selected.abbreviations().forcePut(pair.second, term);
                 }
                 window.makePrettyView();

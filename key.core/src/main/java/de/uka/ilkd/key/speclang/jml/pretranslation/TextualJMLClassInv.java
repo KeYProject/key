@@ -12,20 +12,21 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public final class TextualJMLClassInv extends TextualJMLConstruct {
     private final ParserRuleContext inv;
+    private final boolean free;
 
-    public TextualJMLClassInv(ImmutableList<JMLModifier> mods, ParserRuleContext inv, String name) {
-        super(mods);
+    public TextualJMLClassInv(ImmutableList<JMLModifier> mods, ParserRuleContext inv, String name,
+            boolean free) {
+        super(mods, name);
         assert inv != null;
         this.inv = inv;
         this.name = name;
+        this.free = free;
         setPosition(inv);
     }
 
     public TextualJMLClassInv(ImmutableList<JMLModifier> mods,
-            JmlParser.Class_invariantContext ctx) {
-        super(mods, null);
-        inv = ctx;
-        setPosition(ctx);
+            JmlParser.Class_invariantContext inv, boolean free) {
+        this(mods, inv, null, free);
     }
 
     public ParserRuleContext getInv() {
@@ -57,4 +58,9 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
     public String getName() {
         return name;
     }
+
+    public boolean isFree() {
+        return free;
+    }
+
 }
