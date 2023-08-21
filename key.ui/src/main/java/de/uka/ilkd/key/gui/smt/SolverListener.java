@@ -206,12 +206,14 @@ public class SolverListener implements SolverLauncherListener {
 
     private void applyResults() {
         KeYMediator mediator = MainWindow.getInstance().getMediator();
-        // To ensure that the next goal is selected correctly, do not fully stop the interface here!
-        mediator.stopInterface(false);
+        // ensure that the goal closing does not lag the UI
+        mediator.stopInterface(true);
         try {
             new ProofSMTApplyUserAction(mediator, smtProof, problems).actionPerformed(null);
         } finally {
-            mediator.startInterface(false);
+            mediator.startInterface(true);
+            // switch to new open goal
+            mediator.getSelectionModel().defaultSelection();
         }
 
     }
