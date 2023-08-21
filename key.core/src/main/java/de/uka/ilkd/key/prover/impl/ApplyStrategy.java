@@ -24,6 +24,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Applies rules in an automated fashion. The caller should ensure that the strategy runs in its own
  * thread
+ * <a href="http://java.sun.com/products/jfc/tsc/articles/threads/threads2.html">Uses code by Hans
+ * Muller
+ * and Kathy Walrath</a>
  *
  * @author Richard Bubel
  */

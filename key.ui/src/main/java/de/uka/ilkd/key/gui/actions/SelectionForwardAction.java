@@ -4,8 +4,6 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.SelectionHistory;
@@ -37,8 +35,6 @@ public class SelectionForwardAction extends MainWindowAction
         setName("Forward");
         setIcon(IconFactory.NEXT.get(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Redo last undone navigation operation.");
-        setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT,
-            java.awt.event.InputEvent.CTRL_DOWN_MASK | java.awt.event.InputEvent.ALT_DOWN_MASK));
     }
 
     /**

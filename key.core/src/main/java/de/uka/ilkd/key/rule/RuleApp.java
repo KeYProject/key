@@ -13,6 +13,9 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.ImmutableList;
 
+/**
+ * rule application with specific information how and where the rule has to be applied
+ */
 public interface RuleApp extends EqualsModProofIrrelevancy {
 
     /**

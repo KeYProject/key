@@ -4,7 +4,9 @@
 package de.uka.ilkd.key.rule;
 
 
-
+/**
+ * class contains optional attributes of a Taclet.
+ */
 public final class TacletAttributes {
 
     private String displayName;

@@ -121,9 +121,10 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
             while (previous != null && (previous.proof().isDisposed()
                     || !previous.proof().find(previous)
                     || previous == currentSelection)) {
-                previous = selectionHistoryForward.removeLast();
+                previous = !selectionHistoryForward.isEmpty() ? selectionHistoryForward.removeLast()
+                        : null;
             }
-            // this is a query method, re-instantiate previous state
+            // this is a query method (modulo fixing up the history), re-instantiate previous state
             if (previous != null) {
                 selectionHistoryForward.addLast(previous);
             }

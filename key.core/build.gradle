@@ -2,7 +2,7 @@ plugins {
     id 'antlr'
 }
 
-//repositories { jcenter() }
+description "Core functionality (terms, rules, prover, ...) for deductive verification of Java programs"
 
 configurations { antlr4 }
 
@@ -74,6 +74,7 @@ task generateSolverPropsList {
                 list.add(file.name)
             }
         })
+        list.sort()
         if (!file("$outputDir/$pack/solvers.txt").exists()) {
             String files = ''
             for (String propsFile : list) {
@@ -220,4 +221,4 @@ task generateRAPUnitTests(type: JavaExec) {
 }
 sourceSets.test.java.srcDirs("$buildDir/generated-src/rap/")
 
-sourcesJar.dependsOn( "runAntlr4Key", "runAntlr4Jml", "generateGrammarSource")
+sourcesJar.dependsOn(runAntlr4Jml, runAntlr4Key, compileJavacc, generateGrammarSource)

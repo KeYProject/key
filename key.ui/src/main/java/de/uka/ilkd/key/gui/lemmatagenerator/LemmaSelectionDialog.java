@@ -51,10 +51,8 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
         this.getContentPane().add(getContentPanel());
         this.getContentPane().add(Box.createHorizontalStrut(10));
         this.setMinimumSize(new Dimension(300, 300));
-        this.setLocationRelativeTo(MainWindow.getInstance());
-
         this.pack();
-
+        this.setLocationRelativeTo(MainWindow.getInstance());
     }
 
     public ImmutableSet<Taclet> showModal(List<TacletInfo> taclets) {

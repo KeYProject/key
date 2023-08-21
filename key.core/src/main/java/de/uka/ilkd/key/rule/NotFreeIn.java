@@ -6,6 +6,12 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 
+/**
+ * Class contains a pair of SchemaVariables.
+ * The first part has to match a {@link de.uka.ilkd.key.logic.op.QuantifiableVariable},
+ * the second one has to match a Term in order to model a pair of the not-free-in relation of a
+ * Taclet.
+ */
 public class NotFreeIn {
 
     private final SchemaVariable first;

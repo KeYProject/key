@@ -38,6 +38,11 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalR
 
 import org.key_project.util.collection.ImmutableArray;
 
+/**
+ * visitor for <t> execPostOrder </t> of {@link de.uka.ilkd.key.logic.Term}. Called with that method
+ * on a term, the visitor builds a new term replacing SchemaVariables with their instantiations that
+ * are given as a SVInstantiations object.
+ */
 public class SyntacticalReplaceVisitor extends DefaultVisitor {
     public static final String SUBSTITUTION_WITH_LABELS_HINT = "SUBSTITUTION_WITH_LABELS";
     protected final SVInstantiations svInst;

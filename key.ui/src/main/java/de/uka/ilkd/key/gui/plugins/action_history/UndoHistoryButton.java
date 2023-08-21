@@ -255,7 +255,7 @@ public class UndoHistoryButton {
     /**
      * The main purpose of this GUI component: the undo button / action.
      */
-    private final class UndoAction extends MainWindowAction {
+    public final class UndoAction extends MainWindowAction {
 
         /**
          * Calling this function should perform the undo operation.
@@ -272,7 +272,6 @@ public class UndoHistoryButton {
             super(mainWindow);
             setIcon(actionIcon.get(iconSize));
             setTooltip("Undo the last action performed on the proof");
-            setAcceleratorLetter(KeyEvent.VK_U);
             this.callback = callback;
         }
 

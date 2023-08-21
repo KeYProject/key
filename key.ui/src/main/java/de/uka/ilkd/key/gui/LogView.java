@@ -119,6 +119,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
             });
             dialog.setContentPane(ui);
             dialog.setSize(800, 600);
+            dialog.setLocationRelativeTo(MainWindow.getInstance());
             dialog.setVisible(true);
         }
     }

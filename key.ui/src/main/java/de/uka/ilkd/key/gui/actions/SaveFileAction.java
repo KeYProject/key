@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
@@ -25,10 +24,7 @@ public final class SaveFileAction extends MainWindowAction {
         setName("Save...");
         setIcon(IconFactory.saveFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Save current proof.");
-        setAcceleratorLetter(KeyEvent.VK_S);
-
         mainWindow.getMediator().enableWhenProofLoaded(this);
-        lookupAcceleratorKey();
     }
 
     public void actionPerformed(ActionEvent e) {

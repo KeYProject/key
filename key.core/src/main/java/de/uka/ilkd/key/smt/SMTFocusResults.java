@@ -5,7 +5,6 @@ package de.uka.ilkd.key.smt;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Optional;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -51,11 +50,10 @@ public final class SMTFocusResults {
      */
     public static boolean focus(SMTProblem smtProblem, Services services) {
 
-        Optional<ImmutableList<PosInOccurrence>> unsatCoreFormulas = getUnsatCore(smtProblem);
-        if (unsatCoreFormulas.isEmpty()) {
+        ImmutableList<PosInOccurrence> unsatCore = getUnsatCore(smtProblem);
+        if (unsatCore == null) {
             return false;
         }
-        ImmutableList<PosInOccurrence> unsatCore = unsatCoreFormulas.get();
 
         Goal goal = smtProblem.getGoal();
         // cache the goal node, because we will apply rules on the goal
@@ -113,14 +111,14 @@ public final class SMTFocusResults {
      * solver.
      *
      * @param problem SMT solver results
-     * @return formula collection
+     * @return formula collection or null if the solver did not produce an unsat core
      */
-    public static Optional<ImmutableList<PosInOccurrence>> getUnsatCore(SMTProblem problem) {
+    public static ImmutableList<PosInOccurrence> getUnsatCore(SMTProblem problem) {
 
         SMTSolver solver = problem.getSuccessfulSolver();
 
         if (solver.getFinalResult().isValid() != ThreeValuedTruth.VALID) {
-            return Optional.empty();
+            return null;
         }
 
         String[] lines = solver.getRawSolverOutput().split("\n");
@@ -137,7 +135,7 @@ public final class SMTFocusResults {
             numbers = parseCVC5Format(lines);
         } else {
             // unknown format / no unsat core produced
-            return Optional.empty();
+            return null;
         }
 
         Node goalNode = problem.getNode();
@@ -164,7 +162,7 @@ public final class SMTFocusResults {
             i++;
         }
 
-        return Optional.of(unsatCoreFormulas);
+        return unsatCoreFormulas;
     }
 
     /**

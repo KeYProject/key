@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
+/** this exception is shown if an assertion has failed */
 public class AssertionFailure extends RuntimeException {
 
 

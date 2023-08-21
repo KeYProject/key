@@ -39,8 +39,8 @@ class TestUnsatCore {
         Assertions.assertTrue(env.getLoadedProof().closed());
         // find the SMT rule app
         Proof p = env.getLoadedProof();
-        Node n = p.findAny(node -> node.getAppliedRuleApp() instanceof RuleAppSMT);
-        RuleAppSMT app = ((RuleAppSMT) n.getAppliedRuleApp());
+        Node n = p.findAny(node -> node.getAppliedRuleApp() instanceof SMTRuleApp);
+        SMTRuleApp app = ((SMTRuleApp) n.getAppliedRuleApp());
         Assertions.assertEquals("Z3", app.getSuccessfulSolverName());
         ImmutableList<PosInOccurrence> ifs = app.ifInsts();
         Assertions.assertTrue(

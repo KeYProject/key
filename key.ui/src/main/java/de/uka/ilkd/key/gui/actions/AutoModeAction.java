@@ -72,7 +72,6 @@ public final class AutoModeAction extends MainWindowAction {
         setName(getStartCommand());
         setTooltip(MainWindow.AUTO_MODE_TEXT);
         setIcon(startLogo);
-        setAcceleratorKey(START_KEY);
 
         enable();
 

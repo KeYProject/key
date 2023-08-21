@@ -231,6 +231,9 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
             filename = MiscTools.removeFileExtension(currentProof.getProofFile().toString());
         } else {
             filename = MiscTools.removeFileExtension(currentProof.name().toString());
+            // make sure that no special chars are in name (e.g., "Taclet: seqPerm ..." for taclet
+            // proofs)
+            filename = MiscTools.toValidFileName(filename);
         }
         int prevSlice = filename.indexOf("_slice");
         if (prevSlice != -1) {

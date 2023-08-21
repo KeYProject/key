@@ -30,7 +30,6 @@ public class IncreaseFontSizeAction extends MainWindowAction implements ConfigCh
         setIcon(IconFactory.plus(16));
 
         Config.DEFAULT.addConfigChangeListener(this);
-        lookupAcceleratorKey();
     }
 
     @Override

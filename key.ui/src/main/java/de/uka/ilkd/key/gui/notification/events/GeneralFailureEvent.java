@@ -9,8 +9,10 @@ import de.uka.ilkd.key.gui.notification.NotificationEventID;
  * A notification event caused by a general unexpected failure (usually caused by a bug of the
  * system)
  *
+ * @deprecated use {@link de.uka.ilkd.key.gui.IssueDialog}
  * @author bubel
  */
+@Deprecated
 public class GeneralFailureEvent extends NotificationEvent {
 
     private String errorMessage = "Unknown Error.";

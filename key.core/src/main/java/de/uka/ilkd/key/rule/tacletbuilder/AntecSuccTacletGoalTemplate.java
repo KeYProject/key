@@ -13,6 +13,11 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+/**
+ * this class inherits from TacletGoalTemplate. It is used if there is a replacewith in the
+ * ruleGoals that replaces a sequent with a sequent. The replacewith for terms/formulae is realized
+ * in another class calles RewriteTacletGoalTemplate.
+ */
 public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
     /** sequent that replaces another one */
     private Sequent replacewith = Sequent.EMPTY_SEQUENT;

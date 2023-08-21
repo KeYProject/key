@@ -14,6 +14,9 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofScriptWorker;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The Class ProofScriptFromFileAction.
  *
@@ -21,6 +24,7 @@ import de.uka.ilkd.key.proof.Proof;
  */
 public class ProofScriptFromFileAction extends AbstractAction {
     private static final long serialVersionUID = -3181592516055470032L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofScriptFromFileAction.class);
 
     private final KeYMediator mediator;
 
@@ -69,6 +73,7 @@ public class ProofScriptFromFileAction extends AbstractAction {
                 psw.execute();
             }
         } catch (Exception ex) {
+            LOGGER.error("", ex);
             IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
         }
     }

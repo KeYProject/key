@@ -35,7 +35,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
-import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.slicing.DependencyNodeData;
@@ -231,7 +231,7 @@ public final class DependencyAnalyzer {
         executionTime.start(STATISTICS);
         int steps = proof.countNodes() - proof.closedGoals().size()
                 + (int) proof.closedGoals()
-                        .stream().filter(it -> it.node().getAppliedRuleApp() instanceof RuleAppSMT)
+                        .stream().filter(it -> it.node().getAppliedRuleApp() instanceof SMTRuleApp)
                         .count();
         // gather statistics on useful/useless rules
         RuleStatistics rules = getRuleStatistics();

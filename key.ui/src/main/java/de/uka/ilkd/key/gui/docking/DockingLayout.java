@@ -164,7 +164,7 @@ final class SaveLayoutAction extends MainWindowAction {
         setMenuPath("View.Layout");
         if (key != null) {
             setAcceleratorKey(KeyStroke.getKeyStroke(key,
-                InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+                KeyStrokeManager.SHORTCUT_KEY_MASK | InputEvent.SHIFT_DOWN_MASK));
         }
         KeyStrokeManager.lookupAndOverride(this, getClass().getName() + "$" + layoutName);
     }

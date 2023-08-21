@@ -52,6 +52,10 @@ public final class KeYFileChooser extends JFileChooser {
     public static final FileFilter STATISTICS_FILTER =
         new FileNameExtensionFilter("proof statistics files (.csv, .html)", "csv", "html");
 
+    /** file filter for proof management reports (*.html) */
+    public static final FileFilter PROOF_MANAGEMENT_REPORT_FILTER =
+        new FileNameExtensionFilter("proof management reports (.html)", "html");
+
     /** The Constant for the filter for dot files. */
     public static final FileFilter DOT_FILTER = new FileNameExtensionFilter(
         "dot graphviz files (.dot)", "dot");
@@ -105,6 +109,7 @@ public final class KeYFileChooser extends JFileChooser {
         // for simplicity, we always show all filters
         addChoosableFileFilter(DEFAULT_FILTER);
         addChoosableFileFilter(STATISTICS_FILTER);
+        addChoosableFileFilter(PROOF_MANAGEMENT_REPORT_FILTER);
         addChoosableFileFilter(JAVA_FILTER);
         addChoosableFileFilter(COMPRESSED_FILTER);
         addChoosableFileFilter(INTERACTION_LOG_FILTER);

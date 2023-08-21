@@ -29,6 +29,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.help.HelpFacade;
+import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
@@ -52,6 +53,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Keller
  */
+@HelpInfo(path = "/user/ProofSlicing/")
 public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionListener,
         ProofTreeListener {
     /**

@@ -31,9 +31,9 @@ public class SearchModeChangeAction extends MainWindowAction {
         if (mode == SequentViewSearchBar.SearchMode.HIGHLIGHT) {
             setAcceleratorLetter(KeyEvent.VK_H);
         } else if (mode == SequentViewSearchBar.SearchMode.HIDE) {
-            setAcceleratorLetter(KeyEvent.VK_ESCAPE);
-        } else if (mode == SequentViewSearchBar.SearchMode.REGROUP) {
             setAcceleratorLetter(KeyEvent.VK_I);
+        } else if (mode == SequentViewSearchBar.SearchMode.REGROUP) {
+            setAcceleratorLetter(KeyEvent.VK_G);
         }
 
         this.searchBar = searchBar;

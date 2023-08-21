@@ -46,13 +46,8 @@ public class TestgenExtension
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
         init(window);
-        if (KeyStrokeManager.FKEY_MACRO_SCHEME) {
-            KeyStrokeSettings.defineDefault(TestGenMacro.class,
-                KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
-        } else {
-            KeyStrokeSettings.defineDefault(TestGenMacro.class,
-                KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyStrokeManager.MULTI_KEY_MASK));
-        }
+        KeyStrokeSettings.defineDefault(TestGenMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_T,
+            KeyStrokeManager.MULTI_KEY_MASK));
     }
 
     @Override

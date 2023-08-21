@@ -27,8 +27,8 @@
        Sweden
 
 
-       WWW: http://key-project.org
-       e-mail: key@ira.uka.de	
+       WWW: https://www.key-project.org/
+       e-mail: support@key-project.org
      
        The KeY system is protected by the GNU General Public License.
     

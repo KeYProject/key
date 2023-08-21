@@ -14,6 +14,9 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The settings dialog.
  *
@@ -23,6 +26,8 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
  */
 public class SettingsDialog extends JDialog {
     private static final long serialVersionUID = -3204453471778351602L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SettingsDialog.class);
+
     private final MainWindow mainWindow;
     private final SettingsUi ui;
     private final Action actionCancel = new CancelAction();
@@ -89,6 +94,9 @@ public class SettingsDialog extends JDialog {
 
     private boolean showErrors(List<Exception> apply) {
         if (!apply.isEmpty()) {
+            for (Exception e : apply) {
+                LOGGER.error("", e);
+            }
             String msg = apply.stream().map(Throwable::getMessage)
                     .collect(Collectors.joining("<br>", "<html>", "</html>"));
             JOptionPane.showMessageDialog(this, msg, "Error in Settings",

@@ -2,8 +2,6 @@
  * This file is part of KeY since 2021 - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.bytecode;
 
 import java.io.DataInput;
@@ -567,7 +565,7 @@ public class ByteCodeParser {
     MethodInfo readMethodInfo() throws IOException, ByteCodeFormatException {
         int methAccessFlags = in.readUnsignedShort();
         String name = pool[in.readUnsignedShort()];
-        boolean isConstructor = "$init".equals(name);
+        boolean isConstructor = "<init>".equals(name);
         boolean isInitializer = false;
         if (isConstructor) {
             name = shortName;

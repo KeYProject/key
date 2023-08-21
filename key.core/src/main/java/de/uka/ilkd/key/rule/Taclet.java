@@ -1006,9 +1006,13 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
 
     @Override
     @Nullable
-    public String getOrigin() { return origin; }
+    public String getOrigin() {
+        return origin;
+    }
 
-    public void setOrigin(@Nullable String origin) { this.origin = origin; }
+    public void setOrigin(@Nullable String origin) {
+        this.origin = origin;
+    }
 
     public void setAddedBy(Node addedBy) {
         this.addedBy = addedBy;

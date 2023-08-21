@@ -103,7 +103,6 @@ public class TGInfoDialog extends JDialog {
         setTitle("Test Suite Generation");
         setSize(1000, 700);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(MainWindow.getInstance());
         setLayout(new BorderLayout());
 
         final JScrollPane scrollpane = new JScrollPane(textArea);

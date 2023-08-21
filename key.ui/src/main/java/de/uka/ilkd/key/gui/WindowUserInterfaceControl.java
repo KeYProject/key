@@ -153,6 +153,11 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @Override
     public void taskFinished(TaskFinishedInfo info) {
         super.taskFinished(info);
+        // ensure all UI modifying operations are done on the UI thread
+        SwingUtilities.invokeLater(() -> taskFinishedInternal(info));
+    }
+
+    private void taskFinishedInternal(TaskFinishedInfo info) {
         if (info != null && info.getSource() instanceof ProverCore) {
             if (!isAtLeastOneMacroRunning()) {
                 resetStatus(this);
@@ -160,7 +165,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             ApplyStrategyInfo result = (ApplyStrategyInfo) info.getResult();
 
             Proof proof = info.getProof();
-            if (proof != null && !proof.closed()
+            if (proof != null && !proof.isDisposed() && !proof.closed()
                     && mainWindow.getMediator().getSelectedProof() == proof) {
                 Goal g = result.nonCloseableGoal();
                 if (g == null) {
@@ -198,6 +203,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             resetStatus(this);
             Throwable result = (Throwable) info.getResult();
             if (info.getResult() != null) {
+                LOGGER.error("", result);
                 IssueDialog.showExceptionDialog(mainWindow, result);
             } else if (getMediator().getUI().isSaveOnly()) {
                 mainWindow.displayResults("Finished Saving!");

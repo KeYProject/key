@@ -43,7 +43,6 @@ public final class PruneProofAction extends MainWindowAction {
         putValue(NAME, "Prune Proof");
         putValue(SMALL_ICON, IconFactory.pruneLogo(MainWindow.TOOLBAR_ICON_SIZE));
         putValue(SHORT_DESCRIPTION, "Prune the tree below the selected node.");
-        lookupAcceleratorKey();
     }
 
     /**

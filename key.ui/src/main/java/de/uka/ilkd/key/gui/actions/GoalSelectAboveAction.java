@@ -4,30 +4,24 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 /**
+ * Action to select the next goal above in the proof tree.
  */
 public final class GoalSelectAboveAction extends MainWindowAction {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 4574670781882014092L;
 
     /**
-     * Creates a new GoalBackAction.
+     * Creates the new action.
      *
      * @param mainWindow the main window this action belongs to
-     * @param longName true iff long names (including the name of the rule to undo) shall be
-     *        displayed (e.g. in menu items)
      */
     public GoalSelectAboveAction(MainWindow mainWindow) {
-        super(mainWindow);
-        setAcceleratorLetter(KeyEvent.VK_K);
+        super(mainWindow, true);
         setName("Select Goal Above");
         setIcon(IconFactory.selectGoalAbove(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip(

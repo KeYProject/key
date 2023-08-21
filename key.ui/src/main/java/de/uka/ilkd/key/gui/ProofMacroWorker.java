@@ -121,6 +121,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
             if (!isCancelled() && exception != null) { // user cancelled task is fine, we do not
                                                        // report this
                 // This should actually never happen.
+                LOGGER.error("", exception);
                 IssueDialog.showExceptionDialog(MainWindow.getInstance(), exception);
             }
 
