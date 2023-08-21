@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.core;
 
 import java.awt.*;
@@ -35,7 +38,11 @@ public final class Watchdog {
      * Start the watchdog in a background thread.
      */
     public static void start() {
-        new Thread(Watchdog::run, "Watchdog").start();
+        var thread = new Thread(Watchdog::run, "Watchdog");
+        // mark as daemon
+        // (only relevant for startup exception, where this thread would prevent the JVM exiting)
+        thread.setDaemon(true);
+        thread.start();
     }
 
     private static void run() {
@@ -79,14 +86,13 @@ public final class Watchdog {
                     anyProgress = true;
                     break;
                 case WAITING:
+                case BLOCKED:
+                case TIMED_WAITING:
+                case TERMINATED:
                     if (thread.getName().equals("AWT-EventQueue-0")
                             && EventQueue.getCurrentEvent() == null) {
                         anyProgress = true; // nothing to do
                     }
-                    break;
-                case BLOCKED:
-                case TIMED_WAITING:
-                case TERMINATED:
                     break;
                 }
             }

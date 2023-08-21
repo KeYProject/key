@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.*;
@@ -17,12 +20,17 @@ import de.uka.ilkd.key.smt.SMTFocusResults;
 
 import org.key_project.util.java.SwingUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Dialog showing launched SMT processes and results.
  */
 public class ProgressDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProgressDialog.class);
+
     private final ProgressTable table;
     /**
      * Button to apply the results of running the SMT solver.
@@ -89,7 +97,6 @@ public class ProgressDialog extends JDialog {
         table.getTableHeader().setReorderingAllowed(false);
         table.setModel(model, titles);
         this.listener = listener;
-        setLocationRelativeTo(MainWindow.getInstance());
         if (counterexample) {
             this.setTitle("SMT Counterexample Search");
         } else {
@@ -126,6 +133,8 @@ public class ProgressDialog extends JDialog {
         constraints.insets.bottom = 5;
         contentPane.add(buttonBox, constraints);
         this.pack();
+        // always set the location last, otherwise it is not centered!
+        setLocationRelativeTo(MainWindow.getInstance());
     }
 
     public void setProgress(int value) {
@@ -151,6 +160,7 @@ public class ProgressDialog extends JDialog {
                 try {
                     listener.focusButtonClicked();
                 } catch (Exception exception) {
+                    LOGGER.error("", exception);
                     // There may be exceptions during rule application that should not be lost.
                     IssueDialog.showExceptionDialog(ProgressDialog.this, exception);
                 }
@@ -170,6 +180,7 @@ public class ProgressDialog extends JDialog {
                     listener.applyButtonClicked();
                 } catch (Exception exception) {
                     // There may be exceptions during rule application that should not be lost.
+                    LOGGER.error("", exception);
                     IssueDialog.showExceptionDialog(ProgressDialog.this, exception);
                 }
             });

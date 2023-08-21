@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.awt.*;
@@ -27,6 +30,7 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -72,9 +76,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
     /**
      * KeYStroke for the search panel: STRG+SHIFT+F
      */
-    public static final KeyStroke searchKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F,
-        java.awt.event.InputEvent.CTRL_DOWN_MASK | java.awt.event.InputEvent.SHIFT_DOWN_MASK
-                | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+    public static final KeyStroke SEARCH_KEY_STROKE = KeyStroke.getKeyStroke(KeyEvent.VK_F,
+        KeyStrokeManager.MULTI_KEY_MASK);
 
     private static final long serialVersionUID = 3732875161168302809L;
 
@@ -287,7 +290,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         final ActionListener keyboardAction = (ActionEvent e) -> showSearchPanel();
 
-        registerKeyboardAction(keyboardAction, searchKeyStroke,
+        registerKeyboardAction(keyboardAction, SEARCH_KEY_STROKE,
             JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this,
@@ -325,7 +328,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
             // set row height before changing the font (since the latter repaints the component)
             delegateView.setRowHeight(rowHeight);
 
-            delegateView.setFont(myFont);
+            // convert any FontUIResource to Font, so the font is actually updated
+            renderer.setFont(myFont.deriveFont((float) myFont.getSize()));
+            delegateView.setFont(myFont.deriveFont((float) myFont.getSize()));
         } else {
             LOGGER.debug("KEY-PROOF_TREE_FONT not available, use standard font.");
             delegateView.setRowHeight(rowHeight);
@@ -392,21 +397,65 @@ public class ProofTreeView extends JPanel implements TabPanel {
         mediator.removeGUIListener(guiListener);
     }
 
+    /**
+     * Select the next goal above the currently selected node.
+     *
+     * @return whether such a goal was found
+     */
     public boolean selectAbove() {
-        return selectRelative(+1);
-    }
-
-    public boolean selectBelow() {
-        return selectRelative(-1);
-    }
-
-    private boolean selectRelative(int i) {
         TreePath path = delegateView.getSelectionPath();
+        if (path == null) {
+            return false;
+        }
         int row = delegateView.getRowForPath(path);
-        TreePath newPath = delegateView.getPathForRow(row - i);
-        if (newPath != null) {
-            delegateView.setSelectionPath(newPath);
-            return true;
+        row--;
+        while (delegateView.getPathForRow(row) != null) {
+            TreePath tp = delegateView.getPathForRow(row);
+            var treeNode = (GUIAbstractTreeNode) tp.getLastPathComponent();
+            if (treeNode instanceof GUIBranchNode && treeNode.getNode().parent() != null
+                    && treeNode.getNode().parent().childrenCount() > 1
+                    && !delegateView.isExpanded(tp)) {
+                int prevRows = delegateView.getRowCount();
+                delegateView.expandPath(tp);
+                int newRows = delegateView.getRowCount();
+                // search must continue at the end of the just expanded branch!
+                row += (newRows - prevRows);
+                continue;
+            }
+            if (treeNode.getNode().leaf()) {
+                mediator.getSelectionModel().setSelectedNode(treeNode.getNode());
+                return true;
+            }
+            row--;
+        }
+        return false;
+    }
+
+    /**
+     * Select the next goal below the currently selected node.
+     *
+     * @return whether such a goal was found
+     */
+    public boolean selectBelow() {
+        TreePath path = delegateView.getSelectionPath();
+        if (path == null) {
+            return false;
+        }
+        int row = delegateView.getRowForPath(path);
+        row++;
+        while (delegateView.getPathForRow(row) != null) {
+            TreePath tp = delegateView.getPathForRow(row);
+            var treeNode = (GUIAbstractTreeNode) tp.getLastPathComponent();
+            if (treeNode instanceof GUIBranchNode && treeNode.getNode().parent() != null
+                    && treeNode.getNode().parent().childrenCount() > 1
+                    && !delegateView.isExpanded(tp)) {
+                delegateView.expandPath(tp);
+            }
+            if (treeNode.getNode().leaf()) {
+                mediator.getSelectionModel().setSelectedNode(treeNode.getNode());
+                return true;
+            }
+            row++;
         }
         return false;
     }
@@ -678,6 +727,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
             return false;
         }
 
+        // Save expansion state to restore.
+        List<TreePath> rowsToExpand = new ArrayList<>(expansionState);
+
+
         final TreePath branch;
         final Node invokedNode;
         if (selectedPath.getLastPathComponent() instanceof GUIProofTreeNode) {
@@ -740,6 +793,17 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 delegateView.scrollPathToVisible(tp);
                 delegateView.setSelectionPath(tp);
             }
+        }
+
+        // Expand previously visible rows.
+        for (TreePath tp : rowsToExpand) {
+            TreePath newTp = delegateView.getPathForRow(0);
+            for (int i = 1; i < tp.getPathCount(); i++) {
+                Node n = ((GUIBranchNode) tp.getPathComponent(i)).getNode();
+                newTp = newTp.pathByAddingChild(
+                    delegateModel.getBranchNode(n, n.getNodeInfo().getBranchLabel()));
+            }
+            delegateView.expandPath(newTp);
         }
         return true;
     }
@@ -921,6 +985,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             GUIAbstractTreeNode treeNode =
                 ((GUIAbstractTreeNode) e.getNewLeadSelectionPath().getLastPathComponent());
+            if (treeNode.getNode().proof().isDisposed()) {
+                setProof(null);
+                return;
+            }
             if (treeNode instanceof GUIBranchNode) {
                 selectBranchNode((GUIBranchNode) treeNode);
             } else {
@@ -1210,7 +1278,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
                 boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            if (proof == null || !(value instanceof GUIAbstractTreeNode)) {
+            if (proof == null || proof.isDisposed() || !(value instanceof GUIAbstractTreeNode)) {
                 // print dummy tree
                 return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row,
                     hasFocus);

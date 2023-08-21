@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing.ui;
 
 import java.awt.*;
@@ -85,13 +88,13 @@ public class RuleStatisticsDialog extends JDialog {
                 + buttonPane.getPreferredSize().height
                 + 100;
         setSize(w, h);
-        setLocationRelativeTo(window);
 
         statisticsPane.setText(genTable(
             statistics.sortBy(
                 Comparator.comparing((Quadruple<String, Integer, Integer, Integer> it) -> it.second)
                         .reversed())));
         statisticsPane.setCaretPosition(0);
+        setLocationRelativeTo(window);
     }
 
     /**

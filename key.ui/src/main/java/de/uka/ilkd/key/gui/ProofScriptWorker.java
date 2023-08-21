@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -170,6 +173,7 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
         } catch (CancellationException ex) {
             LOGGER.info("Scripting was cancelled.");
         } catch (Throwable ex) {
+            LOGGER.error("", ex);
             IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
         }
 
