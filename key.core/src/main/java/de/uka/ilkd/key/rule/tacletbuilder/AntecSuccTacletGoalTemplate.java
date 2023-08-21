@@ -1,8 +1,6 @@
-/**
- * this class inherits from TacletGoalTemplate. It is used if there is a replacewith in the
- * ruleGoals that replaces a sequent with a sequent. The replacewith for terms/formulae is realized
- * in another class calles RewriteTacletGoalTemplate.
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.logic.BoundVarsVisitor;

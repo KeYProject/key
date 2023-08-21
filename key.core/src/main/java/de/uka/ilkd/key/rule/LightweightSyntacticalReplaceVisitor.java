@@ -1,8 +1,6 @@
-/**
- * visitor for <t> execPostOrder </t> of {@link de.uka.ilkd.key.logic.Term}. Called with that method
- * on a term, the visitor builds a new term replacing SchemaVariables with their instantiations that
- * are given as a SVInstantiations object.
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayDeque;
