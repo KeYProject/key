@@ -1,7 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
@@ -22,10 +24,7 @@ public final class SaveFileAction extends MainWindowAction {
         setName("Save...");
         setIcon(IconFactory.saveFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Save current proof.");
-        setAcceleratorLetter(KeyEvent.VK_S);
-
         mainWindow.getMediator().enableWhenProofLoaded(this);
-        lookupAcceleratorKey();
     }
 
     public void actionPerformed(ActionEvent e) {

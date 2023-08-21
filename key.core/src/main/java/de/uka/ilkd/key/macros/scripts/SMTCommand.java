@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.*;
@@ -85,7 +88,8 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
         for (SMTProblem problem : probList) {
             SMTSolverResult finalResult = problem.getFinalResult();
             if (finalResult.isValid() == ThreeValuedTruth.VALID) {
-                IBuiltInRuleApp app = RuleAppSMT.RULE.createApp(args.solver);
+                IBuiltInRuleApp app = SMTRuleApp.RULE.createApp(args.solver);
+                app = app.tryToInstantiate(problem.getGoal());
                 problem.getGoal().apply(app);
             }
             LOGGER.info("Finished run on goal " + goal.node().serialNr() + " in "

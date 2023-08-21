@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ui;
 
 import java.util.List;
@@ -9,6 +12,8 @@ import javax.swing.*;
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.IssueDialog;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroWorker;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
@@ -23,6 +28,9 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A {@link ProofControl} which performs the automode in a {@link SwingWorker}.
  *
@@ -32,6 +40,8 @@ import org.key_project.util.collection.ImmutableList;
 // KeYMediator.
 // Refactor the implementation and use events to update the user interface.
 public class MediatorProofControl extends AbstractProofControl {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MediatorProofControl.class);
+
     private final AbstractMediatorUserInterfaceControl ui;
     private AutoModeWorker worker;
 
@@ -95,6 +105,11 @@ public class MediatorProofControl extends AbstractProofControl {
      */
     @Override
     public void waitWhileAutoMode() {
+        if (SwingUtilities.isEventDispatchThread()) {
+            LOGGER.error("", new IllegalStateException(
+                "tried to block the UI thread whilst waiting for auto mode to finish"));
+            return; // do not block the UI thread
+        }
         while (ui.getMediator().isInAutoMode()) { // Wait until auto mode has stopped.
             try {
                 Thread.sleep(100);
@@ -186,6 +201,10 @@ public class MediatorProofControl extends AbstractProofControl {
                 ui.getMediator().startInterface(true);
 
                 emitInteractiveAutoMode(initialGoals, proof, info);
+
+                if (info.getException() != null) {
+                    notifyException(info.getException());
+                }
             }
         }
 
@@ -194,9 +213,9 @@ public class MediatorProofControl extends AbstractProofControl {
             interactionListeners.forEach((l) -> l.runAutoMode(initialGoals, proof, info));
         }
 
-        private void notifyException(final Exception exception) {
-            ui.notify(new GeneralFailureEvent(
-                "An exception occurred during" + " strategy execution.\n Exception:" + exception));
+        private void notifyException(final Throwable exception) {
+            LOGGER.error("exception during strategy ", exception);
+            IssueDialog.showExceptionDialog(MainWindow.getInstance(), exception);
         }
 
         @Override

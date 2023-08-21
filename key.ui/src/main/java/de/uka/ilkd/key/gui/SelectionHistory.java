@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.lang.ref.WeakReference;
@@ -118,9 +121,10 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
             while (previous != null && (previous.proof().isDisposed()
                     || !previous.proof().find(previous)
                     || previous == currentSelection)) {
-                previous = selectionHistoryForward.removeLast();
+                previous = !selectionHistoryForward.isEmpty() ? selectionHistoryForward.removeLast()
+                        : null;
             }
-            // this is a query method, re-instantiate previous state
+            // this is a query method (modulo fixing up the history), re-instantiate previous state
             if (previous != null) {
                 selectionHistoryForward.addLast(previous);
             }

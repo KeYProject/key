@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.replay;
 
 import java.util.ArrayList;
@@ -39,7 +42,7 @@ import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.Pair;
@@ -144,8 +147,8 @@ public abstract class AbstractProofReplayer {
             builtinIfInsts = builtinIfInsts.append(newFormula);
         }
 
-        if (RuleAppSMT.RULE.displayName().equals(ruleName)) {
-            return RuleAppSMT.RULE.createApp(null, proof.getServices());
+        if (SMTRuleApp.RULE.displayName().equals(ruleName)) {
+            return SMTRuleApp.RULE.createApp(null, proof.getServices());
         }
 
         IBuiltInRuleApp ourApp = null;

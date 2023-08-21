@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -44,9 +47,13 @@ import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public final class ProofManagementDialog extends JDialog {
 
     private static final long serialVersionUID = 3543411893273433386L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofManagementDialog.class);
 
     /**
      * The contracts are stored by name of the {@link KeYJavaType}, method name, and contract name
@@ -476,15 +483,20 @@ public final class ProofManagementDialog extends JDialog {
                     env = ui.createProofEnvironmentAndRegisterProof(po, pl, initConfig);
                 } else {
                     env.registerProof(po, pl);
-
                 }
             } catch (ProofInputException exc) {
+                LOGGER.error("", exc);
                 IssueDialog.showExceptionDialog(MainWindow.getInstance(), exc);
             }
         } else {
             mediator.setProof(proof);
         }
         startedProof = true;
+        // starting another proof will not execute the ProblemLoader again,
+        // so we have to activate the UI here
+        if (initConfig.getServices().getSpecificationRepository().getAllProofs().size() > 1) {
+            mediator.startInterface(true);
+        }
     }
 
     private void updateStartButton() {

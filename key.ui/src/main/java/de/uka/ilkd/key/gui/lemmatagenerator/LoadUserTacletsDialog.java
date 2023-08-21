@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
 import java.awt.CardLayout;
@@ -263,9 +266,9 @@ public class LoadUserTacletsDialog extends JPanel {
             textArea.setEditable(false);
             helpWindow.getContentPane().add(new JScrollPane(textArea));
             helpWindow.setMinimumSize(new Dimension(400, 200));
-            helpWindow.setLocationRelativeTo(MainWindow.getInstance());
             helpWindow.setTitle("Help");
             helpWindow.pack();
+            helpWindow.setLocationRelativeTo(MainWindow.getInstance());
 
         }
         return helpWindow;
@@ -448,8 +451,8 @@ public class LoadUserTacletsDialog extends JPanel {
             buttonPane.add(Box.createHorizontalStrut(5));
             buttonPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             pane.add(buttonPane);
-            dialog.setLocationRelativeTo(MainWindow.getInstance());
             dialog.pack();
+            dialog.setLocationRelativeTo(MainWindow.getInstance());
         }
         return dialog;
     }

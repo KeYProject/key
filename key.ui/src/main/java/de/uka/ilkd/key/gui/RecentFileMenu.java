@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.event.ActionListener;
@@ -207,8 +210,11 @@ public class RecentFileMenu {
         }
     }
 
+    /**
+     * @return the absolute path to the most recently opened file (maybe null)
+     */
     public String getMostRecent() {
-        return mostRecentFile.getAbsolutePath();
+        return mostRecentFile != null ? mostRecentFile.getAbsolutePath() : null;
     }
 
     /**
@@ -226,7 +232,7 @@ public class RecentFileMenu {
         try (var fin = new BufferedWriter(new FileWriter(localRecentFiles))) {
             c.save(fin, "");
         } catch (IOException ex) {
-            LOGGER.info("Could not write recent files list", ex);
+            LOGGER.info("Could not write recent files list ", ex);
         }
     }
 

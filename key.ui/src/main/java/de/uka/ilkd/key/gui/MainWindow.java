@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -45,6 +48,7 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.plugins.action_history.ActionHistoryExtension;
 import de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
+import de.uka.ilkd.key.gui.settings.FontSizeFacade;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.smt.DropdownSelectionButton;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
@@ -58,6 +62,7 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
@@ -267,8 +272,9 @@ public final class MainWindow extends JFrame {
      * This class should only be instantiated once!
      */
     private MainWindow() {
-        getRootPane().getInputMap().put(HelpFacade.ACTION_OPEN_HELP.getAcceleratorKey(),
-            HelpFacade.ACTION_OPEN_HELP);
+        InputMap inputMap =
+            getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        inputMap.put(HelpFacade.ACTION_OPEN_HELP.getAcceleratorKey(), HelpFacade.ACTION_OPEN_HELP);
         getRootPane().getActionMap().put(HelpFacade.ACTION_OPEN_HELP, HelpFacade.ACTION_OPEN_HELP);
 
         setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
@@ -286,6 +292,10 @@ public final class MainWindow extends JFrame {
         userInterface = new WindowUserInterfaceControl(this);
         mediator = getMainWindowMediator(userInterface);
         KeYGuiExtensionFacade.getStartupExtensions().forEach(it -> it.preInit(this, mediator));
+
+        Config.DEFAULT.setDefaultFonts();
+        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        FontSizeFacade.resizeFonts(vs.getUIFontSizeFactor());
 
         termLabelMenu = new TermLabelMenu(this);
         currentGoalView = new CurrentGoalView(this);
@@ -372,6 +382,15 @@ public final class MainWindow extends JFrame {
             LOGGER.error("Please use the --auto option to start KeY in batch mode.");
             LOGGER.error("Use the --help option for more command line options.");
             System.exit(-1);
+        }
+        // always construct MainWindow on event dispatch thread
+        if (!EventQueue.isDispatchThread()) {
+            try {
+                SwingUtilities.invokeAndWait(MainWindow::getInstance);
+            } catch (InterruptedException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+            return instance;
         }
         if (instance == null) {
             instance = new MainWindow();
@@ -524,8 +543,6 @@ public final class MainWindow extends JFrame {
         history.addChangeListener(selectionForwardAction);
         selectionBackAction.update();
         selectionForwardAction.update();
-
-        Config.DEFAULT.setDefaultFonts();
 
         // create menubar
         JMenuBar bar = createMenuBar();

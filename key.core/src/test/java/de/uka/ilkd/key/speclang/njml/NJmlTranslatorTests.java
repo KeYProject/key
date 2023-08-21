@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
 import java.io.File;
@@ -86,7 +89,7 @@ public class NJmlTranslatorTests {
         PositionedString message = warnings.head();
         assertEquals(
             "Diverging Semantics form JML Reference: Requires does not initiate a new contract. "
-                + "See https://www.key-project.org/docs/user/JMLGrammar/#TODO (Test.java, 5/38)",
+                + "See https://keyproject.github.io/key-docs/user/JMLGrammar/#TODO (Test.java, 5/38)",
             message.toString());
     }
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.LinkedHashMap;
@@ -367,7 +370,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         return result;
     }
 
-    private static StatementBlock replaceStatement(JavaBlock jb, StatementBlock replacement) {
+    public static StatementBlock replaceStatement(JavaBlock jb, StatementBlock replacement) {
         PosInProgram pos = getPosInProgram(jb);
         int lastPos = pos.last();
         ContextStatementBlockInstantiation csbi = new ContextStatementBlockInstantiation(pos,
@@ -523,6 +526,11 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         // abort if inside of transformer
         if (Transformer.inTransformer(pio)) {
+            return false;
+        }
+
+        // cannot be applied on model methods
+        if (inst.pm.isModel()) {
             return false;
         }
 

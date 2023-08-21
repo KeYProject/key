@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
@@ -26,7 +29,7 @@ public final class MemberPVToField extends AbstractTermTransformer {
 
         Operator op = term.sub(0).op();
         if (op instanceof LocationVariable) {
-            LocationVariable fieldPV = (LocationVariable) term.sub(0).op();
+            LocationVariable fieldPV = (LocationVariable) op;
             Function fieldSymbol = heapLDT.getFieldSymbolForPV(fieldPV, services);
             return services.getTermBuilder().func(fieldSymbol);
         } else if (heapLDT.getSortOfSelect(op) != null) {

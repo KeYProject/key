@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.ByteArrayInputStream;
@@ -706,9 +709,8 @@ public abstract class AbstractProblemLoader {
         }
     }
 
-    private ReplayResult replayProof(Proof proof)
-            throws ProofInputException, ProblemLoaderException {
-        LOGGER.info("Replaying proof " + proof.name());
+    private ReplayResult replayProof(Proof proof) {
+        LOGGER.info("Replaying proof {}", proof.name());
         String status = "";
         List<Throwable> errors = new LinkedList<>();
         Node lastTouchedNode = proof.root();
@@ -761,9 +763,9 @@ public abstract class AbstractProblemLoader {
                 status = parserResult.getStatus();
                 errors.addAll(parserResult.getErrors());
             }
-            status +=
-                (status.isEmpty() ? "" : "\n\n") + (replayResult != null ? replayResult.getStatus()
-                        : "Error while loading proof.");
+            status += (status.isEmpty() ? "Proof replayed successfully." : "\n\n")
+                    + (replayResult != null ? replayResult.getStatus()
+                            : "Error while loading proof.");
             if (replayResult != null) {
                 errors.addAll(replayResult.getErrors());
             }
