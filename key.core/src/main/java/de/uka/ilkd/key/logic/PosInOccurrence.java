@@ -189,6 +189,10 @@ public final class PosInOccurrence {
         return subTermCache;
     }
 
+    public boolean subTermExists() {
+        return posInTerm.existsSubTerm(sequentFormula.formula());
+    }
+
     /**
      * Ascend to the top node of the formula this object points to
      */

@@ -234,6 +234,17 @@ public final class PosInTerm {
         return sub;
     }
 
+    public boolean existsSubTerm(Term t) {
+        Term sub = t;
+        for (int i = 0; i < size; i++) {
+            if (positions[i] >= sub.subs().size()) {
+                return false;
+            }
+            sub = sub.sub(positions[i]);
+        }
+        return true;
+    }
+
     public int hashCode() {
         if (hash == (char) -1) {
             char localHash = 13;
