@@ -83,6 +83,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     private static final boolean[] bottomUp = { false, false, true, true, true, false };
     private final Map<SequentFormula, Boolean> applicabilityCache =
         new LRUCache<>(APPLICABILITY_CACHE_SIZE);
+    private boolean applicableCheck = false;
 
     private Proof lastProof;
     private ImmutableList<NoPosTacletApp> appsTakenOver;
@@ -274,10 +275,12 @@ public final class OneStepSimplifier implements BuiltInRule {
      * @param protocol
      */
     private SequentFormula simplifySub(Goal goal, Services services, PosInOccurrence pos,
-            int indexNr, Protocol protocol) {
+            int indexNr, Protocol protocol, Map<TermReplacementKey, PosInOccurrence> context,
+            /* out */ Set<PosInOccurrence> ifInsts, RuleApp ruleApp) {
         for (int i = 0, n = pos.subTerm().arity(); i < n; i++) {
             SequentFormula result =
-                simplifyPosOrSub(goal, services, pos.down(i), indexNr, protocol);
+                simplifyPosOrSub(goal, services, pos.down(i), indexNr, protocol, context, ifInsts,
+                    ruleApp);
             if (result != null) {
                 return result;
             }
@@ -293,7 +296,8 @@ public final class OneStepSimplifier implements BuiltInRule {
      * @param protocol
      */
     private SequentFormula simplifyPosOrSub(Goal goal, Services services, PosInOccurrence pos,
-            int indexNr, Protocol protocol) {
+            int indexNr, Protocol protocol, Map<TermReplacementKey, PosInOccurrence> context,
+            /* out */ Set<PosInOccurrence> ifInsts, RuleApp ruleApp) {
         final Term term = pos.subTerm();
         if (notSimplifiableCaches[indexNr].get(term) != null) {
             return null;
@@ -301,14 +305,60 @@ public final class OneStepSimplifier implements BuiltInRule {
 
         SequentFormula result;
         if (bottomUp[indexNr]) {
-            result = simplifySub(goal, services, pos, indexNr, protocol);
-            if (result == null) {
-                result = simplifyPos(goal, services, pos, indexNr, protocol);
+            result = simplifySub(goal, services, pos, indexNr, protocol, context, ifInsts, ruleApp);
+            while (result != null && !applicableCheck) {
+                var result3 = replaceKnownHelper(context, result.formula(), pos.isInAntec(),
+                    ifInsts, protocol, services, goal, ruleApp);
+                if (result3 != null) {
+                    result = new SequentFormula(result3);
+                }
+                var p = new PosInOccurrence(result, pos.posInTerm(), pos.isInAntec());
+                if (!p.subTermExists()) {
+                    break;
+                }
+                var result2 =
+                    simplifySub(goal, services, p, indexNr, protocol, context, ifInsts, ruleApp);
+                if (result2 != null) {
+                    result = result2;
+                } else {
+                    break;
+                }
+            }
+            var p = result != null ? new PosInOccurrence(result, pos.posInTerm(), pos.isInAntec())
+                    : pos;
+            if (p.subTermExists()) {
+                var result2 = simplifyPos(goal, services, p, indexNr, protocol);
+                if (result2 != null) {
+                    result = result2;
+                }
             }
         } else {
             result = simplifyPos(goal, services, pos, indexNr, protocol);
-            if (result == null) {
-                result = simplifySub(goal, services, pos, indexNr, protocol);
+            while (result != null && !applicableCheck) {
+                var result3 = replaceKnownHelper(context, result.formula(), pos.isInAntec(),
+                    ifInsts, protocol, services, goal, ruleApp);
+                if (result3 != null) {
+                    result = new SequentFormula(result3);
+                }
+                var p = new PosInOccurrence(result, pos.posInTerm(), pos.isInAntec());
+                if (!p.subTermExists()) {
+                    break;
+                }
+                var result2 = simplifyPos(goal, services, p, indexNr, protocol);
+                if (result2 != null) {
+                    result = result2;
+                } else {
+                    break;
+                }
+            }
+            var p = result != null ? new PosInOccurrence(result, pos.posInTerm(), pos.isInAntec())
+                    : pos;
+            if (p.subTermExists()) {
+                var result2 =
+                    simplifySub(goal, services, p, indexNr, protocol, context, ifInsts, ruleApp);
+                if (result2 != null) {
+                    result = result2;
+                }
             }
         }
 
@@ -327,7 +377,7 @@ public final class OneStepSimplifier implements BuiltInRule {
      * @param services TODO
      */
     private Term replaceKnownHelper(Map<TermReplacementKey, PosInOccurrence> map, Term in,
-            boolean inAntecedent, /* out */ List<PosInOccurrence> ifInsts, Protocol protocol,
+            boolean inAntecedent, /* out */ Set<PosInOccurrence> ifInsts, Protocol protocol,
             Services services, Goal goal, RuleApp ruleApp) {
         final PosInOccurrence pos = map.get(new TermReplacementKey(in));
         if (pos != null) {
@@ -375,12 +425,11 @@ public final class OneStepSimplifier implements BuiltInRule {
      * (hardcoded here). The context formulas available for replace-known are passed in as
      * "context". The positions of the actually used context formulas are passed out as "ifInsts".
      *
-     * @param proof
      * @param protocol
      */
     private SequentFormula replaceKnown(Services services, SequentFormula cf, boolean inAntecedent,
             Map<TermReplacementKey, PosInOccurrence> context,
-            /* out */ List<PosInOccurrence> ifInsts, Protocol protocol, Goal goal,
+            /* out */ Set<PosInOccurrence> ifInsts, Protocol protocol, Goal goal,
             RuleApp ruleApp) {
         if (context == null) {
             return null;
@@ -433,7 +482,7 @@ public final class OneStepSimplifier implements BuiltInRule {
      */
     private SequentFormula simplifyConstrainedFormula(Services services, SequentFormula cf,
             boolean inAntecedent, Map<TermReplacementKey, PosInOccurrence> context,
-            /* out */ List<PosInOccurrence> ifInsts, Protocol protocol, Goal goal,
+            /* out */ Set<PosInOccurrence> ifInsts, Protocol protocol, Goal goal,
             RuleApp ruleApp) {
         SequentFormula result =
             replaceKnown(services, cf, inAntecedent, context, ifInsts, protocol, goal, ruleApp);
@@ -443,7 +492,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 
         for (int i = 0; i < indices.length; i++) {
             PosInOccurrence pos = new PosInOccurrence(cf, PosInTerm.getTopLevel(), inAntecedent);
-            result = simplifyPosOrSub(goal, services, pos, i, protocol);
+            result = simplifyPosOrSub(goal, services, pos, i, protocol, context, ifInsts, ruleApp);
             if (result != null) {
                 return result;
             }
@@ -476,7 +525,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                     new PosInOccurrence(succ, PosInTerm.getTopLevel(), false));
             }
         }
-        final List<PosInOccurrence> ifInsts = new ArrayList<>(seq.size());
+        final Set<PosInOccurrence> ifInsts = new HashSet<>();
 
         // simplify as long as possible
         ImmutableList<SequentFormula> list = ImmutableSLList.nil();
@@ -509,8 +558,10 @@ public final class OneStepSimplifier implements BuiltInRule {
             return b;
         } else {
             // try one simplification step without replace-known
+            applicableCheck = true;
             final SequentFormula simplifiedCf = simplifyConstrainedFormula(services, cf,
                 inAntecedent, null, null, null, goal, ruleApp);
+            applicableCheck = false;
             final boolean result = simplifiedCf != null && !simplifiedCf.equals(cf);
             applicabilityCache.put(cf, result);
             return result;
