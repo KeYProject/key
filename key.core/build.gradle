@@ -3,7 +3,7 @@ plugins {
     id 'antlr'
 }
 
-//repositories { jcenter() }
+description "Core functionality (terms, rules, prover, ...) for deductive verification of Java programs"
 
 configurations { antlr4 }
 
@@ -99,6 +99,7 @@ task generateSolverPropsList {
                 list.add(file.name)
             }
         })
+        list.sort()
         if (!file("$outputDir/$pack/solvers.txt").exists()) {
             String files = ''
             for (String propsFile : list) {
@@ -245,7 +246,4 @@ task generateRAPUnitTests(type: JavaExec) {
 }
 sourceSets.test.java.srcDirs("$buildDir/generated-src/rap/")
 
-
-// @AW: Delete? weigl: depends: If want that gradle check validates everything then not.
-// check.dependsOn << testProofRules << testRunAllProofs
-
+sourcesJar.dependsOn(runAntlr4Jml, runAntlr4Key, compileJavacc, generateGrammarSource)

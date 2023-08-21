@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing;
 
 import java.util.ArrayList;
@@ -32,7 +35,7 @@ import org.key_project.slicing.ui.SlicingLeftPanel;
 
 /**
  * Proof slicing extension.
- * For more details see <a href="https://key-project.org/docs/user/ProofSlicing/">the user
+ * For more details see <a href="https://keyproject.github.io/key-docs/user/ProofSlicing/">the user
  * guide</a>.
  *
  * @author Arne Keller

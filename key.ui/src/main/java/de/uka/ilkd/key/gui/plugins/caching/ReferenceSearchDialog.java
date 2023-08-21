@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.awt.*;
@@ -10,6 +13,9 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
 
 import org.key_project.util.java.SwingUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Dialog showing reference search information.
  *
@@ -18,6 +24,8 @@ import org.key_project.util.java.SwingUtil;
 public class ReferenceSearchDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceSearchDialog.class);
+
     /**
      * The table of reference search results.
      */
@@ -107,6 +115,7 @@ public class ReferenceSearchDialog extends JDialog {
                     listener.copyButtonClicked(this);
                 } catch (Exception exception) {
                     // There may be exceptions during rule application that should not be lost.
+                    LOGGER.error("", exception);
                     IssueDialog.showExceptionDialog(ReferenceSearchDialog.this, exception);
                 }
             });

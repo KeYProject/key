@@ -4,7 +4,7 @@
         <file>key.log</file>
         <append>false</append>
         <encoder>
-            <pattern>%-10relative %-5level %-15thread %-25logger{5} %msg %ex{short}%n</pattern>
+            <pattern>%-10relative %-5level %-15thread %-25logger{5} %msg %ex%n</pattern>
         </encoder>
     </appender>
 

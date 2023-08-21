@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.testgen;
 
 import java.awt.event.KeyEvent;
@@ -43,13 +46,8 @@ public class TestgenExtension
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
         init(window);
-        if (KeyStrokeManager.FKEY_MACRO_SCHEME) {
-            KeyStrokeSettings.defineDefault(TestGenMacro.class,
-                KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
-        } else {
-            KeyStrokeSettings.defineDefault(TestGenMacro.class,
-                KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyStrokeManager.MULTI_KEY_MASK));
-        }
+        KeyStrokeSettings.defineDefault(TestGenMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_T,
+            KeyStrokeManager.MULTI_KEY_MASK));
     }
 
     @Override

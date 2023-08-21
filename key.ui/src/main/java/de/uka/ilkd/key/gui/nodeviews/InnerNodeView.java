@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.*;
@@ -21,6 +24,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.smt.SMTRuleApp;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -133,8 +137,21 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
 
     private void highlightIfInsts(IBuiltInRuleApp bapp) throws BadLocationException {
         final ImmutableList<PosInOccurrence> ifs = bapp.ifInsts();
-        for (PosInOccurrence pio : ifs) {
-            highlightPos(pio, IF_FORMULA_HIGHLIGHTER);
+        if (bapp instanceof SMTRuleApp && ifs.isEmpty()) {
+            /*
+             * Special case for SMTRuleApp: If no unsat core is used, we highlight all formulas.
+             * For the moment, we do not store all formulas as ifInstantiations, since that would
+             * clutter saved proofs very much.
+             */
+            for (int i = 0; i < node.sequent().size(); i++) {
+                PosInOccurrence pio = PosInOccurrence.findInSequent(node.sequent(), i + 1,
+                    PosInTerm.getTopLevel());
+                highlightPos(pio, IF_FORMULA_HIGHLIGHTER);
+            }
+        } else {
+            for (PosInOccurrence pio : ifs) {
+                highlightPos(pio, IF_FORMULA_HIGHLIGHTER);
+            }
         }
     }
 

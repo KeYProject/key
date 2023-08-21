@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.awt.*;
@@ -69,6 +72,15 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
     @Override
     public void selectedNodeChanged(KeYSelectionEvent e) {
         Proof p = e.getSource().getSelectedProof();
+        updateState(p);
+    }
+
+    /**
+     * Update the UI state of this button.
+     *
+     * @param p the currently selected proof
+     */
+    public void updateState(Proof p) {
         if (p == null) {
             setText("Proof Caching");
             setForeground(null);
