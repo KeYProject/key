@@ -38,6 +38,14 @@ public final class PosInTerm {
         copy = false;
     }
 
+    public PosInTerm sub() {
+        int[] pathMinusHead = new int[size - 1];
+        for (int i = 1; i < size; i++) {
+            pathMinusHead[i - 1] = positions[i];
+        }
+        return new PosInTerm(pathMinusHead);
+    }
+
     /**
      * create a position from the string
      *

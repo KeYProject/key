@@ -309,7 +309,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             result = simplifySub(goal, services, pos, indexNr, protocol, context, ifInsts, ruleApp);
             while (result != null && !applicableCheck) {
                 var result3 = replaceKnownHelper(context, result.formula(), pos.isInAntec(),
-                    ifInsts, protocol, services, goal, ruleApp);
+                    ifInsts, protocol, services, goal, ruleApp, pos.posInTerm());
                 if (result3 != null) {
                     result = new SequentFormula(result3);
                 }
@@ -337,7 +337,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             result = simplifyPos(goal, services, pos, indexNr, protocol);
             while (result != null && !applicableCheck) {
                 var result3 = replaceKnownHelper(context, result.formula(), pos.isInAntec(),
-                    ifInsts, protocol, services, goal, ruleApp);
+                    ifInsts, protocol, services, goal, ruleApp, pos.posInTerm());
                 if (result3 != null) {
                     result = new SequentFormula(result3);
                 }
@@ -379,7 +379,10 @@ public final class OneStepSimplifier implements BuiltInRule {
      */
     private Term replaceKnownHelper(Map<TermReplacementKey, PosInOccurrence> map, Term in,
             boolean inAntecedent, /* out */ Set<PosInOccurrence> ifInsts, Protocol protocol,
-            Services services, Goal goal, RuleApp ruleApp) {
+            Services services, Goal goal, RuleApp ruleApp, PosInTerm pio) {
+        if (pio == PosInTerm.getTopLevel()) {
+            pio = null;
+        }
         final PosInOccurrence pos = map.get(new TermReplacementKey(in));
         if (pos != null) {
             ifInsts.add(pos);
@@ -405,8 +408,12 @@ public final class OneStepSimplifier implements BuiltInRule {
             Term[] subs = new Term[in.arity()];
             boolean changed = false;
             for (int i = 0; i < subs.length; i++) {
+                if (pio != null && pio.getIndex() != i) {
+                    subs[i] = in.sub(i);
+                    continue;
+                }
                 subs[i] = replaceKnownHelper(map, in.sub(i), inAntecedent, ifInsts, protocol,
-                    services, goal, ruleApp);
+                    services, goal, ruleApp, pio != null ? pio.sub() : null);
                 if (subs[i] != in.sub(i)) {
                     changed = true;
                 }
@@ -437,7 +444,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
         final Term formula = cf.formula();
         final Term simplifiedFormula = replaceKnownHelper(context, formula, inAntecedent, ifInsts,
-            protocol, services, goal, ruleApp);
+            protocol, services, goal, ruleApp, PosInTerm.getTopLevel());
         if (simplifiedFormula.equals(formula)) {
             return null;
         } else {
