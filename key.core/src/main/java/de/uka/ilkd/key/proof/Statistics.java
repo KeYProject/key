@@ -179,6 +179,10 @@ public class Statistics {
         summaryList.add(new Pair<>("Merge Rule apps", String.valueOf(stat.mergeRuleApps)));
         summaryList.add(new Pair<>("Total rule apps",
             EnhancedStringBuffer.format(stat.totalRuleApps).toString()));
+        if (stat.totalRuleApps > 0) {
+            String avgTime = String.valueOf((time * 1000) / stat.totalRuleApps);
+            summaryList.add(new Pair<>("Avg. time per app", avgTime + "μs"));
+        }
     }
 
 
