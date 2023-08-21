@@ -4,10 +4,12 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
 
@@ -478,13 +480,15 @@ public final class OneStepSimplifier implements BuiltInRule {
         final List<PosInOccurrence> ifInsts = new ArrayList<>(seq.size());
 
         // simplify as long as possible
-        ImmutableList<SequentFormula> list = ImmutableSLList.nil();
+        Set<SequentFormula> list = new HashSet<>();
         SequentFormula simplifiedCf = cf;
+        SequentFormula lastCf = null;
         while (true) {
             simplifiedCf = simplifyConstrainedFormula(services, simplifiedCf, ossPIO.isInAntec(),
                 context, ifInsts, protocol, goal, ruleApp);
             if (simplifiedCf != null && !list.contains(simplifiedCf)) {
-                list = list.prepend(simplifiedCf);
+                list.add(simplifiedCf);
+                lastCf = simplifiedCf;
             } else {
                 break;
             }
@@ -494,7 +498,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         PosInOccurrence[] ifInstsArr = ifInsts.toArray(new PosInOccurrence[0]);
         ImmutableList<PosInOccurrence> immutableIfInsts =
             ImmutableSLList.<PosInOccurrence>nil().append(ifInstsArr);
-        return new Instantiation(list.head(), list.size(), immutableIfInsts);
+        return new Instantiation(lastCf, list.size(), immutableIfInsts);
     }
 
 
@@ -737,8 +741,8 @@ public final class OneStepSimplifier implements BuiltInRule {
          */
         @Override
         public int hashCode() {
-            return term.op().hashCode(); // Allow more conflicts to ensure that naming and term
-                                         // labels are ignored.
+            // intentionally generate hash collisions to ensure equalsModRenaming is used
+            return Objects.hash(term.op(), term.depth());
         }
 
         /**
