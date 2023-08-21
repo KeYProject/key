@@ -492,12 +492,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             boolean inAntecedent, Map<TermReplacementKey, PosInOccurrence> context,
             /* out */ Set<PosInOccurrence> ifInsts, Protocol protocol, Goal goal,
             RuleApp ruleApp) {
-        SequentFormula result =
-            replaceKnown(services, cf, inAntecedent, context, ifInsts, protocol, goal, ruleApp);
-        if (result != null) {
-            return result;
-        }
-
+        SequentFormula result;
         for (int i = 0; i < indices.length; i++) {
             PosInOccurrence pos = new PosInOccurrence(cf, PosInTerm.getTopLevel(), inAntecedent);
             result = simplifyPosOrSub(goal, services, pos, i, protocol, context, ifInsts, ruleApp);
@@ -520,7 +515,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         // collect context formulas (potential if-insts for replace-known)
         final Map<TermReplacementKey, PosInOccurrence> context =
             new LinkedHashMap<>();
-        final SequentFormula cf = ossPIO.sequentFormula();
+        SequentFormula cf = ossPIO.sequentFormula();
         for (SequentFormula ante : seq.antecedent()) {
             if (!ante.equals(cf) && ante.formula().op() != Junctor.TRUE) {
                 context.put(new TermReplacementKey(ante.formula()),
@@ -535,10 +530,18 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
         final Set<PosInOccurrence> ifInsts = new HashSet<>();
 
+        SequentFormula lastCf = null;
+        SequentFormula result =
+            replaceKnown(services, cf, ossPIO.isInAntec(), context, ifInsts, protocol, goal,
+                ruleApp);
+        if (result != null) {
+            cf = result;
+            lastCf = cf;
+        }
+
         // simplify as long as possible
         Set<SequentFormula> list = new HashSet<>();
         SequentFormula simplifiedCf = cf;
-        SequentFormula lastCf = null;
         while (true) {
             simplifiedCf = simplifyConstrainedFormula(services, simplifiedCf, ossPIO.isInAntec(),
                 context, ifInsts, protocol, goal, ruleApp);
@@ -554,7 +557,8 @@ public final class OneStepSimplifier implements BuiltInRule {
         PosInOccurrence[] ifInstsArr = ifInsts.toArray(new PosInOccurrence[0]);
         ImmutableList<PosInOccurrence> immutableIfInsts =
             ImmutableSLList.<PosInOccurrence>nil().append(ifInstsArr);
-        return new Instantiation(lastCf, list.size(), immutableIfInsts);
+        return new Instantiation(lastCf, protocol != null ? protocol.size() : list.size(),
+            immutableIfInsts);
     }
 
 
