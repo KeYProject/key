@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.rule.tacletbuilder.branchlabel;
 
+import java.nio.file.Paths;
+import java.util.List;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
@@ -9,11 +12,9 @@ import de.uka.ilkd.key.logic.label.SpecNameLabel;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.TacletApp;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.nio.file.Paths;
-import java.util.List;
 
 /**
  * {@code NameLabelOf} tries to find a the {@link de.uka.ilkd.key.logic.label.TermLabel}
@@ -36,10 +37,10 @@ public class NameLabelOf implements BranchNamingFunction {
 
     @Override
     public String getName(Services services, SequentChangeInfo currentSequent,
-                          TacletApp tacletApp,
-                          MatchConditions matchConditions) {
+            TacletApp tacletApp,
+            MatchConditions matchConditions) {
         var sv = matchConditions.getInstantiations().lookupVar(
-                new Name(matchedSchemaVariableName));
+            new Name(matchedSchemaVariableName));
         var value = matchConditions.getInstantiations().getInstantiation(sv);
         try {
             var term = (Term) value;
@@ -58,7 +59,7 @@ public class NameLabelOf implements BranchNamingFunction {
                             .map(it -> Paths.get(it).getFileName().toString())
                             .orElse("");
                     return origin.specType.toString() + ": " + filename
-                            + "@" + ((OriginTermLabel.FileOrigin) origin).getLine();
+                        + "@" + ((OriginTermLabel.FileOrigin) origin).getLine();
                 }
             }
             return LogicPrinter.quickPrintTerm(term, services);

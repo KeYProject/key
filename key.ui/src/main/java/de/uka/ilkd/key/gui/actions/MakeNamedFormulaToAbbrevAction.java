@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.SpecNameLabel;
 import de.uka.ilkd.key.pp.AbbrevException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +21,8 @@ import org.slf4j.LoggerFactory;
  * @version 1 (1/16/22)
  */
 public class MakeNamedFormulaToAbbrevAction extends MainWindowAction {
-    private final static Logger LOGGER = LoggerFactory.getLogger(MakeNamedFormulaToAbbrevAction.class);
+    private final static Logger LOGGER =
+        LoggerFactory.getLogger(MakeNamedFormulaToAbbrevAction.class);
 
     public MakeNamedFormulaToAbbrevAction(MainWindow mainWindow) {
         super(mainWindow);

@@ -78,7 +78,7 @@ fragment Pfree: '_free'?;       //suffix
 ACCESSIBLE: 'accessible' Pred -> pushMode(expr);
 ASSERT: 'assert' Pred  -> pushMode(expr);
 ASSUME: 'assume' Pred -> pushMode(expr);
-ASSIGNABLE: 'assignable' Pred -> pushMode(expr);
+ASSIGNABLE: 'assignable' Pfree -> pushMode(expr);
 ASSIGNS: 'assigns' Pred -> pushMode(expr);
 AXIOM: 'axiom' -> pushMode(expr);
 BREAKS: 'breaks' -> pushMode(expr);
@@ -99,7 +99,7 @@ IMPLIES_THAT: 'implies_that' -> pushMode(expr);
 IN: 'in' Pred -> pushMode(expr);
 INITIALLY: 'initially' -> pushMode(expr);
 INSTANCE: 'instance';
-INVARIANT: 'invariant' Pred -> pushMode(expr);
+INVARIANT: 'invariant' (Pfree|Pred) -> pushMode(expr);
 LOOP_CONTRACT: 'loop_contract';
 LOOP_INVARIANT: ('loop_invariant' (Pfree|Pred) | 'maintaining' Pred) -> pushMode(expr);
 LOOP_DETERMINES: 'loop_determines';  // internal translation for 'determines' in loop invariants
@@ -235,7 +235,9 @@ INDEXOF: '\\seq_indexOf';  //KeY extension, not official JML
 INTERSECT: '\\intersect';  //KeY extension, not official JML
 INTO: '\\into';
 INV: '\\inv';  //KeY extension, not official JML
+INV_FREE: '\\inv_free';  //KeY extension, not official JML
 INVARIANT_FOR: '\\invariant_for';
+INVARIANT_FREE_FOR: '\\invariant_free_for';  //KeY extension, not official JML
 IN_DOMAIN: '\\in_domain';  //KeY extension, not official JML
 IS_FINITE: '\\is_finite';  //KeY extension, not official JML
 IS_INITIALIZED: '\\is_initialized';
@@ -291,6 +293,7 @@ SETMINUS: '\\set_minus';  //KeY extension, not official JML
 SINGLETON: '\\singleton';  //KeY extension, not official JML
 SPACE: '\\space';
 STATIC_INVARIANT_FOR: '\\static_invariant_for';  //KeY extension, not official JML
+STATIC_INVARIANT_FREE_FOR: '\\static_invariant_free_for';  //KeY extension, not official JML
 STRICTLY_NOTHING: '\\strictly_nothing';  //KeY extension, not official JML
 STRING_EQUAL: '\\string_equal';  //KeY extension, not official JML
 SUBSET: '\\subset';

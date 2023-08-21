@@ -502,7 +502,7 @@ public abstract class AbstractPO implements IPersistablePO {
             }
             proofs[i] = createProof(poNames != null ? poNames[i] : name, poTerms[i], ic);
             if (taclets != null) {
-                proofs[i].getGoal(proofs[i].root()).indexOfTaclets().addTaclets(taclets);
+                proofs[i].getOpenGoal(proofs[i].root()).indexOfTaclets().addTaclets(taclets);
             }
         }
 

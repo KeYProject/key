@@ -15,12 +15,20 @@ import org.key_project.util.collection.ImmutableList;
  */
 public final class TextualJMLClassInv extends TextualJMLConstruct {
     private final JmlParser.Class_invariantContext inv;
+    private final boolean free;
 
     public TextualJMLClassInv(ImmutableList<JMLModifier> mods,
-            JmlParser.Class_invariantContext ctx) {
+            JmlParser.Class_invariantContext ctx, String name, boolean free) {
         super(mods, null);
         inv = Objects.requireNonNull(ctx);
         setPosition(ctx);
+        this.name = name;
+        this.free = free;
+    }
+
+    public TextualJMLClassInv(ImmutableList<JMLModifier> mods,
+            JmlParser.Class_invariantContext inv, boolean free) {
+        this(mods, inv, null, free);
     }
 
     public String getName() {
@@ -57,4 +65,9 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
     public int hashCode() {
         return Objects.hash(mods, inv);
     }
+
+    public boolean isFree() {
+        return free;
+    }
+
 }

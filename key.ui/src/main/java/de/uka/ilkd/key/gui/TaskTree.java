@@ -73,6 +73,7 @@ public class TaskTree extends JPanel {
         delegateView.setShowsRootHandles(false);
         delegateView.setRootVisible(false);
         delegateView.putClientProperty("JTree.lineStyle", "Horizontal");
+        ToolTipManager.sharedInstance().registerComponent(delegateView);
     }
 
     public void addProof(de.uka.ilkd.key.proof.ProofAggregate plist) {
@@ -306,18 +307,19 @@ public class TaskTree extends JPanel {
     } // end of prooftreelistener
 
 
-    static class TaskTreeIconCellRenderer extends DefaultTreeCellRenderer
+    private static final class TaskTreeIconCellRenderer extends DefaultTreeCellRenderer
             implements java.io.Serializable {
         private static final long serialVersionUID = 2423935787625012908L;
-        static final Icon keyIcon = IconFactory.keyHole(20, 20);
-        static final Icon keyClosedIcon = IconFactory.keyHoleClosed(20);
-        static final Icon keyAlmostClosedIcon = IconFactory.keyHoleAlmostClosed(20, 20);
+        private static final Icon KEY_ICON = IconFactory.keyHole(20, 20);
+        private static final Icon KEY_CLOSED_ICON = IconFactory.keyHoleClosed(20);
+        private static final Icon KEY_ALMOST_CLOSED_ICON = IconFactory.keyHoleAlmostClosed(20, 20);
+        private static final Icon KEY_CACHED_CLOSED_ICON = IconFactory.keyCachedClosed(20, 20);
 
 
-        public TaskTreeIconCellRenderer() {
-            setToolTipText("Task");
+        private TaskTreeIconCellRenderer() {
         }
 
+        @Override
         public Component getTreeCellRendererComponent(JTree list, Object value, boolean selected,
                 boolean expanded, boolean leaf, int row, boolean hasFocus) {
             Object newValue;
@@ -326,26 +328,32 @@ public class TaskTree extends JPanel {
             } else {
                 newValue = value;
             }
-            DefaultTreeCellRenderer sup =
-                (DefaultTreeCellRenderer) super.getTreeCellRendererComponent(list, newValue,
-                    selected, expanded, leaf, row, hasFocus);
-            sup.setIcon(null);
+            super.getTreeCellRendererComponent(list, newValue, selected, expanded, leaf, row,
+                hasFocus);
+            setIcon(null);
             if (value instanceof TaskTreeNode) {
                 ProofStatus ps = ((TaskTreeNode) value).getStatus();
                 if (ps != null) {
-                    if (ps.getProofClosed()) {
-                        sup.setIcon(keyClosedIcon);
-                    }
                     if (ps.getProofClosedButLemmasLeft()) {
-                        sup.setIcon(keyAlmostClosedIcon);
+                        setIcon(KEY_ALMOST_CLOSED_ICON);
+                        setToolTipText("Closed proof (depends on other contracts)");
+                    }
+                    if (ps.getProofClosedByCache()) {
+                        setIcon(KEY_CACHED_CLOSED_ICON);
+                        setToolTipText("Closed proof (using proof cache)");
+                    }
+                    if (ps.getProofClosed()) {
+                        setIcon(KEY_CLOSED_ICON);
+                        setToolTipText("Closed proof");
                     }
                     if (ps.getProofOpen()) {
-                        sup.setIcon(keyIcon);
+                        setIcon(KEY_ICON);
+                        setToolTipText("Open proof");
                     }
                 }
 
             }
-            return sup;
+            return this;
         }
     }
 
