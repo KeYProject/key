@@ -347,9 +347,9 @@ subprojects {
             // (see https://github.com/diffplug/spotless/issues/30), therefore 'import' is needed. '//' is for files
             // with completely commented out code (which would probably better just be removed in future).
             if(project.name == 'recoder') {
-                licenseHeaderFile("$rootDir/gradle/header-recoder", '(package|import|//)')
+                licenseHeaderFile("$rootDir/gradle/header-recoder", '(package|import|public|class|module|//)')
             }else {
-                licenseHeaderFile("$rootDir/gradle/header", '(package|import|//)')
+                licenseHeaderFile("$rootDir/gradle/header", '(package|import|public|class|module|//)')
             }
         }
     }

@@ -221,4 +221,4 @@ task generateRAPUnitTests(type: JavaExec) {
 }
 sourceSets.test.java.srcDirs("$buildDir/generated-src/rap/")
 
-sourcesJar.dependsOn(runAntlr4Jml, runAntlr4Key, compileJavacc, generateGrammarSource)
+sourcesJar.dependsOn(runAntlr4Jml, runAntlr4Key, generateGrammarSource)
