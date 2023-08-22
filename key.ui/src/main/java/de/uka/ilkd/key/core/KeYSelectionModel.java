@@ -147,12 +147,15 @@ public class KeYSelectionModel {
      * @param g the Goal that contains the selected node
      */
     public void setSelectedGoal(Goal g) {
+        Node previousNode = selectedNode;
         goalIsValid = true;
         selectedGoal = g;
         selectedNode = g.node();
         selectedSequent = selectedNode.sequent();
         selectedRuleApp = selectedNode.getAppliedRuleApp();
-        fireSelectedNodeChanged();
+        if (previousNode != selectedNode) {
+            fireSelectedNodeChanged();
+        }
     }
 
     /**

@@ -132,7 +132,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
             }
 
             mediator.setInteractive(true);
-            mediator.startInterface(true);
+            mediator.startInterface(true, info.getAppliedRules() != 0);
 
             emitProofMacroFinished(node, macro, posInOcc, info);
         }

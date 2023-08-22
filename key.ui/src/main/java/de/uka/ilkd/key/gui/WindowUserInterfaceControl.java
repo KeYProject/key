@@ -371,7 +371,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             } catch (IOException e) {
                 errorMsg = e.toString();
             } finally {
-                getMediator().startInterface(true);
+                getMediator().startInterface(true, false);
             }
             if (errorMsg != null) {
                 mainWindow.notify(

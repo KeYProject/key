@@ -609,21 +609,26 @@ public class KeYMediator {
     }
 
     public void startInterface(boolean fullStop) {
+        startInterface(fullStop, true);
+    }
+
+    /**
+     * Make the interface interactive again.
+     *
+     * @param fullStop whether automode was active
+     * @param fireSelectionChanged if true, <code>fireSelectedProofChanged</code> will be called
+     */
+    public void startInterface(boolean fullStop, boolean fireSelectionChanged) {
         final boolean b = fullStop;
         Runnable interfaceSignaller = () -> {
             if (b) {
                 inAutoMode = false;
                 getUI().getProofControl()
-                        .fireAutoModeStopped(new ProofEvent(getSelectedProof())); // TODO: Is
-                                                                                  // this
-                                                                                  // wrong use
-                                                                                  // of
-                                                                                  // auto mode
-                                                                                  // really
-                                                                                  // required?
+                        .fireAutoModeStopped(new ProofEvent(getSelectedProof()));
+                // TODO: Is this wrong use of auto mode really required?
             }
             ui.notifyAutomodeStopped();
-            if (getSelectedProof() != null) {
+            if (getSelectedProof() != null && fireSelectionChanged) {
                 keySelectionModel.fireSelectedProofChanged();
             }
         };
@@ -744,11 +749,6 @@ public class KeYMediator {
                 Node sel_node = getSelectedNode();
                 if (!p.find(sel_node)) {
                     keySelectionModel.defaultSelection();
-                } else {
-                    // %%% hack does need to be done proper
-                    // needed top update that the selected node nay have
-                    // changed its status
-                    keySelectionModel.setSelectedNode(sel_node);
                 }
             }
         }
