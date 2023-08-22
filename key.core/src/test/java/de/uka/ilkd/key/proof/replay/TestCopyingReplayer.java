@@ -51,5 +51,8 @@ class TestCopyingReplayer {
         Assertions.assertEquals(proof1.countNodes(), proof2.countNodes());
 
         GeneralSettings.noPruningClosed = true;
+
+        env.dispose();
+        env2.dispose();
     }
 }

@@ -23,9 +23,10 @@ public class TestOneStepSimplifier {
         // file to instantiate assumptions
         // (if more rules are added to the OSS set, this restriction may increase the chances that
         // old proofs still load)
-        KeYEnvironment<DefaultUserInterfaceControl> env =
-            KeYEnvironment.load(new File(testCaseDirectory, "ossRestriction.proof"));
-        Assertions.assertNotNull(env.getLoadedProof());
-        Assertions.assertTrue(env.getLoadedProof().closed());
+        try (KeYEnvironment<DefaultUserInterfaceControl> env =
+            KeYEnvironment.load(new File(testCaseDirectory, "ossRestriction.proof"))) {
+            Assertions.assertNotNull(env.getLoadedProof());
+            Assertions.assertTrue(env.getLoadedProof().closed());
+        }
     }
 }
