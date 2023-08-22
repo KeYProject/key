@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.core;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;

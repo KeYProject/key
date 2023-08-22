@@ -241,7 +241,7 @@ public class Proof implements Named {
         }
     }
 
-    public Proof(String name, Term problem, String header, InitConfig initConfig, File proofFile) {
+    public Proof(String name, Term problem, String header, InitConfig initConfig, Path proofFile) {
         this(name,
             Sequent.createSuccSequent(
                 Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(problem)).semisequent()),

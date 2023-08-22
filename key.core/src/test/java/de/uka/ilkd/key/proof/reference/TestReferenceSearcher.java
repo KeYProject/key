@@ -95,15 +95,15 @@ class TestReferenceSearcher {
 
         KeYEnvironment<DefaultUserInterfaceControl> env =
             KeYEnvironment.load(new File(testCaseDirectory,
-                "proofCaching/proofWithRule.proof"));
+                "proofCaching/proofWithRule.proof").toPath());
         Proof p = env.getLoadedProof();
         KeYEnvironment<DefaultUserInterfaceControl> env2 =
             KeYEnvironment.load(new File(testCaseDirectory,
-                "proofCaching/proofWithoutRule.proof"));
+                "proofCaching/proofWithoutRule.proof").toPath());
         Proof p2 = env2.getLoadedProof();
         KeYEnvironment<DefaultUserInterfaceControl> env3 =
             KeYEnvironment.load(new File(testCaseDirectory,
-                "proofCaching/proofWithRule.proof"));
+                "proofCaching/proofWithRule.proof").toPath());
         Proof p3 = env3.getLoadedProof();
 
         DefaultListModel<Proof> previousProofs = new DefaultListModel<>();
