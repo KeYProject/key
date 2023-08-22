@@ -32,16 +32,6 @@ idea {
     }
 }
 
-// Helper function that calls "git rev-parse" to
-// find names/SHAs for commits
-static def gitRevParse(String args) {
-    try {
-        return "git rev-parse $args".execute().text.trim()
-    } catch (Exception e) {
-        return ""
-    }
-}
-
 static def getDate() {
     return new Date().format('yyyyMMdd')
 }

@@ -172,6 +172,7 @@ task generateVersionFiles() {
     def branch = new File(outputFolder, "branch")
     def versionf = new File(outputFolder, "version")
 
+    inputs.files "$project.rootDir/.git/HEAD"
     outputs.files sha1, branch, versionf
 
     def gitRevision = gitRevParse('HEAD')
@@ -181,6 +182,16 @@ task generateVersionFiles() {
         sha1.text = gitRevision
         branch.text = gitBranch
         versionf.text = rootProject.version
+    }
+}
+
+// Helper function that calls "git rev-parse" to
+// find names/SHAs for commits
+static def gitRevParse(String args) {
+    try {
+        return "git rev-parse $args".execute().text.trim()
+    } catch (Exception e) {
+        return ""
     }
 }
 
