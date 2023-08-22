@@ -110,7 +110,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
     public UseDependencyContractApp tryToInstantiateContract(final Services services) {
         final Term focus = posInOccurrence().subTerm();
-        if (!(focus.op()instanceof IObserverFunction target))
+        if (!(focus.op() instanceof IObserverFunction target))
         // TODO: find more appropriate exception
         {
             throw new RuntimeException(

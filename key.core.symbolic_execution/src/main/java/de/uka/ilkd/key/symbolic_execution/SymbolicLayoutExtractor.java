@@ -466,7 +466,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
         while (!(goalnode.serialNr() == root.serialNr())) {
             final Node oldNode = goalnode;
             goalnode = goalnode.parent();
-            if (goalnode.getAppliedRuleApp()instanceof NoPosTacletApp npta) {
+            if (goalnode.getAppliedRuleApp() instanceof NoPosTacletApp npta) {
                 if ("CUT".equalsIgnoreCase(npta.taclet().name().toString())) {
                     Term inst = (Term) npta.instantiations()
                             .lookupEntryForSV(new Name("cutFormula")).value().getInstantiation();

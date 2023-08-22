@@ -175,7 +175,7 @@ public abstract class AbstractUpdateExtractor {
             for (int i = 0; i < term.arity(); i++) {
                 fillInitialObjectsToIgnoreRecursively(term.sub(i), toFill);
             }
-        } else if (term.op()instanceof ElementaryUpdate eu) {
+        } else if (term.op() instanceof ElementaryUpdate eu) {
             if (eu.lhs() instanceof ProgramVariable) {
                 toFill.add(term.sub(0));
             }
@@ -254,11 +254,11 @@ public abstract class AbstractUpdateExtractor {
                 collectLocationsFromTerm(sub, locationsToFill, updateCreatedObjectsToFill,
                     updateValueObjectsToFill, objectsToIgnore);
             }
-        } else if (updateTerm.op()instanceof ElementaryUpdate eu) {
+        } else if (updateTerm.op() instanceof ElementaryUpdate eu) {
             if (SymbolicExecutionUtil.isHeapUpdate(getServices(), updateTerm)) {
                 collectLocationsFromHeapUpdate(updateTerm.sub(0), locationsToFill,
                     updateCreatedObjectsToFill, updateValueObjectsToFill);
-            } else if (eu.lhs()instanceof ProgramVariable var) {
+            } else if (eu.lhs() instanceof ProgramVariable var) {
                 final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
                 if (!SymbolicExecutionUtil.isHeap(var, heapLDT)) {
                     if (!isImplicitProgramVariable(var)

@@ -920,7 +920,7 @@ public class LogicPrinter {
             String name = t.op().name().toString();
             layouter.startTerm(t.arity());
             boolean alreadyPrinted = false;
-            if (t.op()instanceof SortDependingFunction op) {
+            if (t.op() instanceof SortDependingFunction op) {
                 if (op.getKind().compareTo(AbstractSort.EXACT_INSTANCE_NAME) == 0) {
                     layouter.print(op.getSortDependingOn().declarationString());
                     layouter.print("::");

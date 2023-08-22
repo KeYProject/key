@@ -266,7 +266,7 @@ public class TaskTree extends JPanel {
         private void checkPopup(MouseEvent e) {
             if (e.isPopupTrigger()) {
                 TreePath selPath = delegateView.getPathForLocation(e.getX(), e.getY());
-                if (selPath != null && selPath.getLastPathComponent()instanceof BasicTask task) {
+                if (selPath != null && selPath.getLastPathComponent() instanceof BasicTask task) {
                     mediator.setProof(task.proof());
                     JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
                         DefaultContextMenuKind.PROOF_LIST, mediator.getSelectedProof(), mediator);

@@ -173,7 +173,7 @@ public final class TypeConverter {
             return convertArrayReference((ArrayReference) prefix, ec);
         } else if (prefix instanceof ThisReference) {
             if (prefix.getReferencePrefix() != null
-                    && (prefix.getReferencePrefix()instanceof TypeReference tr)) {
+                    && (prefix.getReferencePrefix() instanceof TypeReference tr)) {
                 KeYJavaType kjt = tr.getKeYJavaType();
                 return findThisForSortExact(kjt.getSort(), ec);
             }
@@ -520,7 +520,7 @@ public final class TypeConverter {
         assert term != null;
         if (term.op() == heapLDT.getNull()) {
             return NullLiteral.NULL;
-        } else if (term.op()instanceof Function function) {
+        } else if (term.op() instanceof Function function) {
             for (LDT model : LDTs.values()) {
                 if (model.hasLiteralFunction(function)) {
                     return model.translateTerm(term, null, services);
@@ -535,7 +535,7 @@ public final class TypeConverter {
 
         if (term.op() instanceof ProgramInLogic) {
             return ((ProgramInLogic) term.op()).convertToProgram(term, children);
-        } else if (term.op()instanceof Function function) {
+        } else if (term.op() instanceof Function function) {
             for (LDT model : LDTs.values()) {
                 if (model.containsFunction(function)) {
                     return model.translateTerm(term, children, services);
@@ -552,7 +552,7 @@ public final class TypeConverter {
 
 
     private Expression translateJavaCast(Term term, ExtList children) {
-        if (term.op()instanceof Function function) {
+        if (term.op() instanceof Function function) {
             if (function instanceof SortDependingFunction sdf) {
                 SortDependingFunction castFunction =
                     SortDependingFunction.getFirstInstance(Sort.CAST_NAME, services);

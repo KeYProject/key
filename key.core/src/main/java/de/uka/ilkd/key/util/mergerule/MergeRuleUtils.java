@@ -485,7 +485,7 @@ public class MergeRuleUtils {
             HashMap<Function, LogicVariable> replMap, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
-        if (term.op()instanceof Function constant && ((Function) term.op()).isSkolemConstant()
+        if (term.op() instanceof Function constant && ((Function) term.op()).isSkolemConstant()
                 && (restrictTo == null || restrictTo.contains(term.op()))) {
 
             if (!replMap.containsKey(constant)) {

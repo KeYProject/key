@@ -170,7 +170,7 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
             for (Term sub : term.subs()) {
                 collectRemembranceVariables(sub, remembranceHeaps, remembranceLocalVariables);
             }
-        } else if (term.op()instanceof ElementaryUpdate eu) {
+        } else if (term.op() instanceof ElementaryUpdate eu) {
             if (SymbolicExecutionUtil.isHeap(eu.lhs(),
                 getServices().getTypeConverter().getHeapLDT())) {
                 remembranceHeaps.put((LocationVariable) term.sub(0).op(),

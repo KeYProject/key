@@ -417,7 +417,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     @Override
     public void subtreeLeft(Term subtreeRoot) {
         tacletTermStack.pop();
-        if (subtreeRoot.op()instanceof TermTransformer mop) {
+        if (subtreeRoot.op() instanceof TermTransformer mop) {
             final Term newTerm = mop.transform((Term) subStack.pop(), svInst, services);
             final Term labeledTerm = TermLabelManager.label(services, termLabelState,
                 applicationPosInOccurrence, rule, ruleApp, goal, labelHint, subtreeRoot, newTerm);

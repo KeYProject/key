@@ -480,7 +480,7 @@ public class ChangeHistory extends AbstractService {
         }
         while (reportCount > position) {
             reportCount -= 1;
-            if (reportStack[reportCount]instanceof TreeChange lastChange) {
+            if (reportStack[reportCount] instanceof TreeChange lastChange) {
                 TreeChange undoChange = undo(lastChange);
                 if (lastChange == getTailChange()) {
                     // if the change is still in the update queue, remove it

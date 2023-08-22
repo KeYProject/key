@@ -470,7 +470,7 @@ public final class IssueDialog extends JDialog {
     private static Element getHyperlinkElement(MouseEvent event) {
         JEditorPane editor = (JEditorPane) event.getSource();
         int pos = editor.getUI().viewToModel(editor, event.getPoint());
-        if (pos >= 0 && editor.getDocument()instanceof HTMLDocument hdoc) {
+        if (pos >= 0 && editor.getDocument() instanceof HTMLDocument hdoc) {
             Element elem = hdoc.getCharacterElement(pos);
             if (elem.getAttributes().getAttribute(HTML.Tag.A) != null) {
                 return elem;

@@ -87,7 +87,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
         if (!isDisposed()) {
             final Services services = getServices();
             // Make sure that the contract is compatible
-            if (!(getContract()instanceof FunctionalOperationContract contract)) {
+            if (!(getContract() instanceof FunctionalOperationContract contract)) {
                 throw new ProofInputException("Unsupported contract: " + getContract());
             }
             // Compute instantiation

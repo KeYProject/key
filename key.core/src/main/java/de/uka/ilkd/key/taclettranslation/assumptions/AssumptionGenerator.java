@@ -149,7 +149,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
     private static void collectGenerics(Term term, HashSet<GenericSort> genericSorts) {
 
-        if (term.op()instanceof SortDependingFunction func) {
+        if (term.op() instanceof SortDependingFunction func) {
             if (func.getSortDependingOn() instanceof GenericSort) {
                 genericSorts.add((GenericSort) func.getSortDependingOn());
             }

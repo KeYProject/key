@@ -55,7 +55,7 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
                         new LinkedHashSet<>();
                     result.add(reference);
                     return result;
-                } else if (info.getActiveStatement()instanceof Assignment assignment) {
+                } else if (info.getActiveStatement() instanceof Assignment assignment) {
                     ExecutionContext context = extractContext(node, services);
                     LinkedHashSet<IProofReference<?>> result =
                         new LinkedHashSet<>();
@@ -109,7 +109,7 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
             IProgramMethod pm = mr.method(services, refPrefixType, context);
             return new DefaultProofReference<>(IProofReference.CALL_METHOD, node, pm);
         } else {
-            if (!(node.getAppliedRuleApp()instanceof PosTacletApp app)) {
+            if (!(node.getAppliedRuleApp() instanceof PosTacletApp app)) {
                 throw new IllegalArgumentException("PosTacletApp expected.");
             }
             if (!"staticMethodCallStaticWithAssignmentViaTypereference"

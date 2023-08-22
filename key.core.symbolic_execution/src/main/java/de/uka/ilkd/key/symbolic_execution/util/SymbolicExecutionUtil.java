@@ -776,7 +776,7 @@ public final class SymbolicExecutionUtil {
             Node callNode = findMethodCallNode(proofNode, modalityPIO);
             if (callNode != null
                     && callNode.getNodeInfo()
-                            .getActiveStatement()instanceof MethodBodyStatement mbs) {
+                            .getActiveStatement() instanceof MethodBodyStatement mbs) {
                 for (Expression e : mbs.getArguments()) {
                     if (e instanceof IProgramVariable) {
                         variables.add((IProgramVariable) e);
@@ -911,7 +911,7 @@ public final class SymbolicExecutionUtil {
     public static ProgramVariable getProgramVariable(Services services, HeapLDT heapLDT,
             Term locationTerm) {
         ProgramVariable result = null;
-        if (locationTerm.op()instanceof Function function) {
+        if (locationTerm.op() instanceof Function function) {
             // Make sure that the function is not an array
             if (heapLDT.getArr() != function) {
                 String typeName = HeapLDT.getClassName(function);
@@ -2480,7 +2480,7 @@ public final class SymbolicExecutionUtil {
      */
     private static Term computeTacletAppBranchCondition(Node parent, Node node, boolean simplify,
             boolean improveReadability) throws ProofInputException {
-        if (!(parent.getAppliedRuleApp()instanceof TacletApp app)) {
+        if (!(parent.getAppliedRuleApp() instanceof TacletApp app)) {
             throw new ProofInputException(
                 "Only TacletApp is allowed in branch computation but rule \""
                     + parent.getAppliedRuleApp() + "\" was found.");
@@ -3574,7 +3574,7 @@ public final class SymbolicExecutionUtil {
      */
     public static String getDisplayString(IProgramVariable pv) {
         if (pv != null) {
-            if (pv.name()instanceof ProgramElementName name) {
+            if (pv.name() instanceof ProgramElementName name) {
                 if (SymbolicExecutionUtil.isStaticVariable(pv)) {
                     return name.toString();
                 } else {
@@ -3634,13 +3634,14 @@ public final class SymbolicExecutionUtil {
                 }
                 if (tryStatement != null) {
                     if (tryStatement.getBranchCount() == 1
-                            && tryStatement.getBranchList().get(0)instanceof Catch catchStatement) {
+                            && tryStatement.getBranchList()
+                                    .get(0) instanceof Catch catchStatement) {
                         if (catchStatement.getBody() instanceof StatementBlock) {
                             StatementBlock catchBlock = catchStatement.getBody();
                             if (catchBlock.getBody().size() == 1
                                     && catchBlock.getBody()
-                                            .get(0)instanceof Assignment assignment) {
-                                if (assignment.getFirstElement()instanceof IProgramVariable var) {
+                                            .get(0) instanceof Assignment assignment) {
+                                if (assignment.getFirstElement() instanceof IProgramVariable var) {
                                     return var;
                                 }
                             }
@@ -4193,7 +4194,7 @@ public final class SymbolicExecutionUtil {
             Term term,
             IProgramVariable variable) {
         ImmutableArray<Term> result = null;
-        if (term.op()instanceof ElementaryUpdate update) {
+        if (term.op() instanceof ElementaryUpdate update) {
             if (Objects.equals(variable, update.lhs())) {
                 result = term.subs();
             }

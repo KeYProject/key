@@ -81,7 +81,7 @@ public class ResolveGenerics extends TwoPassTransformation {
                         alwaysCast = true;
                     }
 
-                    if (tr.getASTParent()instanceof MethodDeclaration md) {
+                    if (tr.getASTParent() instanceof MethodDeclaration md) {
                         // may need to introduce some extra type casts for additional bounds...
                         List<MemberReference> mrl = ci.getReferences(md);
                         for (MemberReference memberReference : mrl) {

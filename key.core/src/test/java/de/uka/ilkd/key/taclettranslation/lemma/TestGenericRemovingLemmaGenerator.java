@@ -52,7 +52,7 @@ public class TestGenericRemovingLemmaGenerator {
 
         sorts.add(term.sort());
 
-        if (term.op()instanceof SortDependingFunction sdf) {
+        if (term.op() instanceof SortDependingFunction sdf) {
             sorts.add(sdf.getSortDependingOn());
         }
 

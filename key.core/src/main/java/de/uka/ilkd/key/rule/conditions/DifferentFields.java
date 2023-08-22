@@ -45,7 +45,7 @@ public final class DifferentFields extends VariableConditionAdapter {
 
             if (t1.op() == t2.op()) {
                 return false;
-            } else if (t1.op()instanceof Function op1 && t2.op()instanceof Function op2) {
+            } else if (t1.op() instanceof Function op1 && t2.op() instanceof Function op2) {
 
                 return op1.isUnique() && op2.isUnique();
             }

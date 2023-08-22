@@ -30,7 +30,7 @@ public class CountBranchFeature implements Feature {
      * @return the cost of <code>app</code>
      */
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-        if (app.rule()instanceof Taclet tac) {
+        if (app.rule() instanceof Taclet tac) {
             final long branches = tac.goalTemplates().size();
             return NumberRuleAppCost.create(branches);
         }

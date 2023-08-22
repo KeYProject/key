@@ -67,7 +67,7 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
         if (children == null) {
             Node node = getNode();
             if (node != null
-                    && node.getAppliedRuleApp()instanceof OneStepSimplifierRuleApp ruleApp) {
+                    && node.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp ruleApp) {
                 Protocol protocol = ruleApp.getProtocol();
                 if (protocol != null) {
                     children = new GUIAbstractTreeNode[protocol.size()];

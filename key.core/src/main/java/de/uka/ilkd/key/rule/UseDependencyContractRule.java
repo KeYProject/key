@@ -323,7 +323,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
         // top level symbol must be observer
         final Term focus = pio.subTerm();
-        if (!(focus.op()instanceof IObserverFunction target)) {
+        if (!(focus.op() instanceof IObserverFunction target)) {
             return false;
         }
 

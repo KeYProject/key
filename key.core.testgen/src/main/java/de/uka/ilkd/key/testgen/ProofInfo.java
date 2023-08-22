@@ -164,7 +164,7 @@ public class ProofInfo {
 
 
     private String processUpdate(Term update) {
-        if (update.op()instanceof ElementaryUpdate up) {
+        if (update.op() instanceof ElementaryUpdate up) {
             if (up.lhs().sort()
                     .extendsTrans(services.getTypeConverter().getHeapLDT().targetSort())) {
                 return "";

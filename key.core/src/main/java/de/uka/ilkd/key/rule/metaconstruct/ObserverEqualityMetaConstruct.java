@@ -89,8 +89,8 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
         Term termExt = term.sub(0);
         Term termBase = term.sub(1);
 
-        if (!(termExt.op()instanceof IObserverFunction obs1)
-                || !(termBase.op()instanceof IObserverFunction obs2)) {
+        if (!(termExt.op() instanceof IObserverFunction obs1)
+                || !(termBase.op() instanceof IObserverFunction obs2)) {
             throw new IllegalArgumentException("\\sameObserver must be true for " + NAME);
         }
 

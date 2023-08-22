@@ -898,7 +898,7 @@ public class Recoder2KeY implements JavaReader {
         }
 
         for (int i = 0, sz = memberList.size(); i < sz; i++) {
-            if (memberList.get(i)instanceof MethodDeclaration olddecl) {
+            if (memberList.get(i) instanceof MethodDeclaration olddecl) {
                 if (olddecl.getName().equals(mdecl.getName())) {
                     memberList.remove(i);
                 }

@@ -974,7 +974,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             // catching ClassCastException occurring when clicking on
             // "No proof loaded"
             if (!(e.getNewLeadSelectionPath()
-                    .getLastPathComponent()instanceof GUIAbstractTreeNode treeNode)) {
+                    .getLastPathComponent() instanceof GUIAbstractTreeNode treeNode)) {
                 return;
             }
 

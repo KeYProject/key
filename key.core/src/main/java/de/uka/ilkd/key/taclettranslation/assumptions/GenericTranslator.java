@@ -114,7 +114,7 @@ class GenericTranslator {
 
         }
 
-        if (term.op()instanceof SortDependingFunction func) {
+        if (term.op() instanceof SortDependingFunction func) {
 
             try { // Try block is necessary because there are some
                   // taclets
