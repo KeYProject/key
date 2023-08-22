@@ -182,8 +182,8 @@ public abstract class AbstractUserInterfaceControl
 
         @Override
         public void taskStarted(TaskStartedInfo info) {
-            if (TaskStartedInfo.TaskKind.Macro == info.getKind()
-                    && !info.getMessage().contains(ProverCore.PROCESSING_STRATEGY)) {
+            if (TaskStartedInfo.TaskKind.Macro == info.kind()
+                    && !info.message().contains(ProverCore.PROCESSING_STRATEGY)) {
                 macroStarted(info);
             }
         }

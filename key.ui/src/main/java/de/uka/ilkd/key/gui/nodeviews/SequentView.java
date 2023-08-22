@@ -818,14 +818,14 @@ public abstract class SequentView extends JEditorPane {
                 ImmutableList<FormulaChangeInfo> modified =
                     node.getNodeInfo().getSequentChangeInfo().modifiedFormulas();
                 for (FormulaChangeInfo fci : modified) {
-                    PosInOccurrence positionOfMod = fci.getPositionOfModification();
+                    PosInOccurrence positionOfMod = fci.positionOfModification();
                     pio_age_list.add(new PIO_age(positionOfMod, age));
                     for (PIO_age pair : pio_age_list) {
                         if (pair.get_pio().sequentFormula().equals(fci.getOriginalFormula())) {
                             if (positionOfMod.posInTerm().isPrefixOf(pair.get_pio().posInTerm())) {
                                 pair.active = false;
                             } else {
-                                pair.set_pio(new PosInOccurrence(fci.getNewFormula(),
+                                pair.set_pio(new PosInOccurrence(fci.newFormula(),
                                     pair.get_pio().posInTerm(), pair.get_pio().isInAntec()));
                             }
                         }
@@ -1059,8 +1059,7 @@ public abstract class SequentView extends JEditorPane {
 
         @Override
         public boolean equals(Object o) {
-            if (o instanceof CurrentGoalView.PIO_age) {
-                CurrentGoalView.PIO_age c = (CurrentGoalView.PIO_age) o;
+            if (o instanceof PIO_age c) {
                 return this.age == c.age && this.pio == c.pio;
             }
             return false;

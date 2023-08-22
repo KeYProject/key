@@ -60,14 +60,12 @@ public class ResolveBoxing extends TwoPassTransformation {
         TreeWalker tw = new TreeWalker(root);
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
-            if (pe instanceof Expression) {
+            if (pe instanceof Expression e) {
                 NonTerminalProgramElement parent = pe.getASTParent();
-                Expression e = (Expression) pe;
                 Type t = si.getType(e);
                 Type tt = null; // target type
-                if (parent instanceof MethodReference) {
+                if (parent instanceof MethodReference mr) {
                     // find out if boxing has been used
-                    MethodReference mr = (MethodReference) parent;
                     Method m = si.getMethod(mr);
                     if (mr.getArguments() != null) {
                         int idx = mr.getArguments().indexOf(e);
@@ -78,8 +76,7 @@ public class ResolveBoxing extends TwoPassTransformation {
                         // otherwise, expression is not used as an argument
                         // but e.g. as a reference prefix
                     }
-                } else if (parent instanceof Operator) {
-                    Operator op = (Operator) parent;
+                } else if (parent instanceof Operator op) {
                     if (op.getArity() == 2) {
                         Type target = si.getType(op);
                         if (target instanceof PrimitiveType && e instanceof ClassType) {

@@ -72,13 +72,13 @@ public class NodeReplacement {
         // Information about modified formulas is currently not used
         it2 = p_sci.modifiedFormulas(true).iterator();
         while (it2.hasNext()) {
-            addRemovedChange(it2.next().getPositionOfModification().sequentFormula(), true);
+            addRemovedChange(it2.next().positionOfModification().sequentFormula(), true);
         }
 
         // Information about modified formulas is currently not used
         it2 = p_sci.modifiedFormulas(false).iterator();
         while (it2.hasNext()) {
-            addRemovedChange(it2.next().getPositionOfModification().sequentFormula(), false);
+            addRemovedChange(it2.next().positionOfModification().sequentFormula(), false);
         }
 
         it = p_sci.addedFormulas(true).iterator();
@@ -94,13 +94,13 @@ public class NodeReplacement {
         // Information about modified formulas is currently not used
         it2 = p_sci.modifiedFormulas(true).iterator();
         while (it2.hasNext()) {
-            addAddedChange(it2.next().getNewFormula(), true);
+            addAddedChange(it2.next().newFormula(), true);
         }
 
         // Information about modified formulas is currently not used
         it2 = p_sci.modifiedFormulas(false).iterator();
         while (it2.hasNext()) {
-            addAddedChange(it2.next().getNewFormula(), false);
+            addAddedChange(it2.next().newFormula(), false);
         }
 
         // Information about formulas that have not been added as equal or more general

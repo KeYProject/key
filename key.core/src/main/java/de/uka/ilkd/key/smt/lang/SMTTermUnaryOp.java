@@ -150,10 +150,9 @@ public class SMTTermUnaryOp extends SMTTerm {
             return true;
         }
 
-        if (!(term instanceof SMTTermUnaryOp)) {
+        if (!(term instanceof SMTTermUnaryOp ut)) {
             return false;
         }
-        SMTTermUnaryOp ut = (SMTTermUnaryOp) term;
 
         return this.operator.equals(ut.operator) && this.sub.equals(ut.sub);
     }

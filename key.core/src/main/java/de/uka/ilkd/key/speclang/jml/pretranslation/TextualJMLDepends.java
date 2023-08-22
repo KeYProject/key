@@ -52,10 +52,9 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TextualJMLDepends)) {
+        if (!(o instanceof TextualJMLDepends a)) {
             return false;
         }
-        TextualJMLDepends a = (TextualJMLDepends) o;
         return mods.equals(a.mods) && depends.equals(a.depends);
     }
 

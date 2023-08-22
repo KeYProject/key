@@ -486,7 +486,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
             // Add current branch condition to path
             Term condition = services.getTermBuilder().and(bcs);
             // Simplify path condition
-            if (getSettings().isSimplifyConditions()) {
+            if (getSettings().simplifyConditions()) {
                 condition = SymbolicExecutionUtil.simplify(initConfig, getProof(), condition);
             }
             condition = SymbolicExecutionUtil.improveReadability(condition, services);

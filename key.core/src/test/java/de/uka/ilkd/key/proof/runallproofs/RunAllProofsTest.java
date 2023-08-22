@@ -87,7 +87,7 @@ public final class RunAllProofsTest {
         try (JunitXmlWriter xml =
             new JunitXmlWriter(new FileWriter(xmlFile), "runallproofs." + unit.getTestName())) {
             TestResult report = unit.runTest(xml);
-            Assertions.assertTrue(report.success, report.message);
+            Assertions.assertTrue(report.success(), report.message());
         }
     }
 }

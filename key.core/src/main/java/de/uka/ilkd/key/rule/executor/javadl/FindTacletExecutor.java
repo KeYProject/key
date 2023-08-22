@@ -180,7 +180,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
                 // add it close to the modified formula
                 final FormulaChangeInfo head = modifiedFormulas.head();
                 result =
-                    new PosInOccurrence(head.getNewFormula(), PosInTerm.getTopLevel(), inAntec);
+                    new PosInOccurrence(head.newFormula(), PosInTerm.getTopLevel(), inAntec);
             } else {
                 // just add it
                 result = null;

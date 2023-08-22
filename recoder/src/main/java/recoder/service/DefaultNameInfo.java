@@ -512,8 +512,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         List<Type> tl = getTypes();
         int s = tl.size();
         for (Type t : tl) {
-            if (t instanceof ClassType) {
-                ClassType ct = (ClassType) t;
+            if (t instanceof ClassType ct) {
                 if (ct.getContainer() == pkg) {
                     result.add(ct);
                 }

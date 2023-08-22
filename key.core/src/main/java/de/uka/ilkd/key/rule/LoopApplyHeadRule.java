@@ -78,14 +78,14 @@ public class LoopApplyHeadRule implements BuiltInRule {
 
         TermBuilder tb = services.getTermBuilder();
         AbstractLoopContractRule.Instantiation instantiation = ruleApp.instantiation;
-        Modality modality = instantiation.modality;
-        Term update = instantiation.update;
-        Term target = instantiation.formula;
+        Modality modality = instantiation.modality();
+        Term update = instantiation.update();
+        Term target = instantiation.formula();
 
         JavaBlock newJavaBlock;
         newJavaBlock = JavaBlock.createJavaBlock(
             (StatementBlock) new ProgramElementReplacer(target.javaBlock().program(), services)
-                    .replace(instantiation.statement, headAndBlock));
+                    .replace(instantiation.statement(), headAndBlock));
 
         for (LoopContract c : contracts) {
             LoopContract newContract = c.replaceEnhancedForVariables(block, services);

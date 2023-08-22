@@ -305,11 +305,11 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             Proof proof = null;
             for (Goal valueGoal : valueGoals) {
                 pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(),
-                    getSettings().isSimplifyConditions(), false));
+                    getSettings().simplifyConditions(), false));
                 proof = valueGoal.node().proof();
             }
             Term comboundPathCondition = tb.or(pathConditions);
-            if (getSettings().isSimplifyConditions()) {
+            if (getSettings().simplifyConditions()) {
                 comboundPathCondition =
                     SymbolicExecutionUtil.simplify(initConfig, proof, comboundPathCondition);
             }

@@ -180,11 +180,11 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     public void taskStarted(TaskStartedInfo info) {
         super.taskStarted(info);
-        progressMax = info.getSize();
-        if (TaskKind.Strategy.equals(info.getKind())) {
-            System.out.println(info.getMessage() + " ["); // start progress bar
+        progressMax = info.size();
+        if (TaskKind.Strategy.equals(info.kind())) {
+            System.out.println(info.message() + " ["); // start progress bar
         } else {
-            System.out.println(info.getMessage());
+            System.out.println(info.message());
         }
     }
 

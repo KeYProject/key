@@ -75,8 +75,7 @@ public class EnumClassBuilder extends RecoderModelTransformer {
             TreeWalker tw = new TreeWalker(unit);
             while (tw.next()) {
                 ProgramElement pe = tw.getProgramElement();
-                if (pe instanceof EnumDeclaration) {
-                    EnumDeclaration ed = (EnumDeclaration) pe;
+                if (pe instanceof EnumDeclaration ed) {
                     addCases(ed);
                     EnumClassDeclaration ecd = new EnumClassDeclaration(ed);
                     substitutes.put(ed, ecd);

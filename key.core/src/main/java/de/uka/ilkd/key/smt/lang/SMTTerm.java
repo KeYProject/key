@@ -119,8 +119,7 @@ public abstract class SMTTerm {
 
         if (args != null) {
             for (SMTTerm arg : args) {
-                if (arg instanceof SMTTerms) {
-                    SMTTerms terms = (SMTTerms) arg;
+                if (arg instanceof SMTTerms terms) {
                     argsList.addAll(terms.terms);
                     continue;
                 }
@@ -317,8 +316,7 @@ public abstract class SMTTerm {
             return FALSE;
         }
 
-        if (this instanceof SMTTermUnaryOp) {
-            SMTTermUnaryOp ut = (SMTTermUnaryOp) this;
+        if (this instanceof SMTTermUnaryOp ut) {
             if (ut.getOperator().equals(SMTTermUnaryOp.Op.NOT)) {
                 return ut.getSub();
             }
@@ -652,8 +650,7 @@ public abstract class SMTTerm {
     }
 
     public SMTTerm mul(SMTTerm right) {
-        if (this instanceof SMTTermNumber) {
-            SMTTermNumber ln = (SMTTermNumber) this;
+        if (this instanceof SMTTermNumber ln) {
             if (ln.getIntValue() == 0)
             // return SMTTerm.number(0);
             {
@@ -663,8 +660,7 @@ public abstract class SMTTerm {
                 return right;
             }
         }
-        if (right instanceof SMTTermNumber) {
-            SMTTermNumber rn = (SMTTermNumber) right;
+        if (right instanceof SMTTermNumber rn) {
             if (rn.getIntValue() == 0) {
                 return SMTTerm.number(0, (int) this.sort().getBitSize());
             }
@@ -678,14 +674,12 @@ public abstract class SMTTerm {
     }
 
     public SMTTerm div(SMTTerm right) {
-        if (this instanceof SMTTermNumber) {
-            SMTTermNumber ln = (SMTTermNumber) this;
+        if (this instanceof SMTTermNumber ln) {
             if (ln.getIntValue() == 0) {
                 return SMTTerm.number(0, (int) this.sort().getBitSize());
             }
         }
-        if (right instanceof SMTTermNumber) {
-            SMTTermNumber rn = (SMTTermNumber) right;
+        if (right instanceof SMTTermNumber rn) {
             if (rn.getIntValue() == 1) {
                 return this;
             }
@@ -701,14 +695,12 @@ public abstract class SMTTerm {
     }
 
     public SMTTerm plus(SMTTerm right) {
-        if (this instanceof SMTTermNumber) {
-            SMTTermNumber ln = (SMTTermNumber) this;
+        if (this instanceof SMTTermNumber ln) {
             if (ln.getIntValue() == 0) {
                 return right;
             }
         }
-        if (right instanceof SMTTermNumber) {
-            SMTTermNumber rn = (SMTTermNumber) right;
+        if (right instanceof SMTTermNumber rn) {
             if (rn.getIntValue() == 0) {
                 return this;
             }
@@ -718,8 +710,7 @@ public abstract class SMTTerm {
     }
 
     public SMTTerm minus(SMTTerm right) {
-        if (right instanceof SMTTermNumber) {
-            SMTTermNumber rn = (SMTTermNumber) right;
+        if (right instanceof SMTTermNumber rn) {
 
             if (rn.getIntValue() == 0) {
                 return this;
@@ -796,8 +787,7 @@ public abstract class SMTTerm {
         // Correct possible wrong placement of patterns
         // TODO: A more general simplification, which will get ride of nested
         // quantifiers, is the the prenex normal form
-        if (this instanceof SMTTermQuant) {
-            SMTTermQuant subQt = (SMTTermQuant) this;
+        if (this instanceof SMTTermQuant subQt) {
             if (subQt.getQuant().equals(SMTTermQuant.Quant.FORALL)) {
                 if (pats == null && subQt.pats != null) {
                     return subQt.sub.forall(bindVars, subQt.bindVars, subQt.pats);
@@ -858,8 +848,7 @@ public abstract class SMTTerm {
         // Correct possible wrong placement of patterns
         // TODO: A more general simplification, which will get ride of nested
         // quantifiers, is the the prenex normal form
-        if (this instanceof SMTTermQuant) {
-            SMTTermQuant subQt = (SMTTermQuant) this;
+        if (this instanceof SMTTermQuant subQt) {
             if (subQt.getQuant() == Quant.EXISTS) {
                 if (pats == null && subQt.pats != null) {
                     return subQt.sub.exists(bindVars, subQt.bindVars, subQt.pats);
@@ -1124,8 +1113,7 @@ public abstract class SMTTerm {
         // }
         // }
 
-        if (this instanceof SMTTermCall) {
-            SMTTermCall tc = (SMTTermCall) this;
+        if (this instanceof SMTTermCall tc) {
 
             for (SMTTerm arg : tc.args) {
                 if (!arg.isCons()) {
@@ -1136,18 +1124,15 @@ public abstract class SMTTerm {
 
         }
 
-        if (this instanceof SMTTermUnaryOp) {
-            SMTTermUnaryOp ut = (SMTTermUnaryOp) this;
+        if (this instanceof SMTTermUnaryOp ut) {
             return ut.getSub().isCons();
         }
 
-        if (this instanceof SMTTermBinOp) {
-            SMTTermBinOp bt = (SMTTermBinOp) this;
+        if (this instanceof SMTTermBinOp bt) {
             return bt.getLeft().isCons() && bt.getRight().isCons();
         }
 
-        if (this instanceof SMTTermMultOp) {
-            SMTTermMultOp lt = (SMTTermMultOp) this;
+        if (this instanceof SMTTermMultOp lt) {
             for (SMTTerm term : lt.getSubs()) {
                 if (!term.isCons()) {
                     return false;

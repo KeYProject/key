@@ -62,8 +62,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         if (cost instanceof TopRuleAppCost) {
             return cost.mul(this);
         }
-        if (cost instanceof NumberRuleAppCost) {
-            NumberRuleAppCost numberRuleAppCost = (NumberRuleAppCost) cost;
+        if (cost instanceof NumberRuleAppCost numberRuleAppCost) {
             return create(getValue() * numberRuleAppCost.getValue());
         }
         throw new IllegalArgumentException();

@@ -136,10 +136,9 @@ public class ProofEnvironment {
      * to available rules and specs.
      */
     public boolean equals(Object cmp) {
-        if (!(cmp instanceof ProofEnvironment)) {
+        if (!(cmp instanceof ProofEnvironment pe)) {
             return false;
         }
-        ProofEnvironment pe = (ProofEnvironment) cmp;
         return pe.getJavaModel().equals(getJavaModel())
                 && pe.initConfig.getActivatedChoices().equals(initConfig.getActivatedChoices());
     }

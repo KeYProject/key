@@ -87,10 +87,9 @@ public class Extension<T> implements Comparable<Extension<T>> {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Extension)) {
+        if (!(o instanceof Extension<?> extension)) {
             return false;
         }
-        Extension<?> extension = (Extension<?>) o;
         return clazz.equals(extension.clazz);
     }
 

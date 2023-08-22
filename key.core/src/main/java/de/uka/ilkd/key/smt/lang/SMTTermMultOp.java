@@ -383,10 +383,9 @@ public class SMTTermMultOp extends SMTTerm {
             return true;
         }
 
-        if (!(term instanceof SMTTermMultOp)) {
+        if (!(term instanceof SMTTermMultOp lt)) {
             return false;
         }
-        SMTTermMultOp lt = (SMTTermMultOp) term;
 
         if (!this.operator.equals(lt.operator)) {
             return false;

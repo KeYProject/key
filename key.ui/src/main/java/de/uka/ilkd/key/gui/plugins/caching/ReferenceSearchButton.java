@@ -59,9 +59,9 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
                 p.closeGoal(goal);
                 goal.node().register(c, ClosedBy.class);
 
-                c.getProof()
+                c.proof()
                         .addProofDisposedListenerFirst(new CachingExtension.CopyBeforeDispose(
-                            mediator, c.getProof(), p));
+                            mediator, c.proof(), p));
             }
         }
         var dialog =

@@ -324,10 +324,9 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      */
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof FunctionalOperationContractPO)) {
+        if (!(po instanceof FunctionalOperationContractPO cPO)) {
             return false;
         }
-        FunctionalOperationContractPO cPO = (FunctionalOperationContractPO) po;
         return specRepos.splitContract(cPO.contract).subset(specRepos.splitContract(contract));
     }
 

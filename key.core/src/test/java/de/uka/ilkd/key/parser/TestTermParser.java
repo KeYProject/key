@@ -46,11 +46,23 @@ public class TestTermParser extends AbstractTestTermParser {
 
     @BeforeEach
     public void setUp() throws IOException {
-        parseDecls("\\sorts { boolean; elem; list; int; int_sort; numbers;  }\n" + "\\functions {\n"
-            + "  elem head(list);\n" + "  list tail(list);\n" + "  list nil;\n"
-            + "  list cons(elem,list);\n" + "int aa ;\n" + "int bb ;\n" + "int cc ;\n"
-            + "int dd ;\n" + "int ee ;\n" + "}\n" + "\\predicates {\n" + "  isempty(list);\n"
-            + "}\n" + "\\programVariables {int globalIntPV;}"
+        parseDecls("""
+                \\sorts { boolean; elem; list; int; int_sort; numbers;  }
+                \\functions {
+                  elem head(list);
+                  list tail(list);
+                  list nil;
+                  list cons(elem,list);
+                int aa ;
+                int bb ;
+                int cc ;
+                int dd ;
+                int ee ;
+                }
+                \\predicates {
+                  isempty(list);
+                }
+                \\programVariables {int globalIntPV;}"""
 
         );
 
@@ -345,9 +357,11 @@ public class TestTermParser extends AbstractTestTermParser {
     @Test
     public void testAmbigiousFuncVarPred() {
         // tests bug id 216
-        String s = "\\functions {} \\predicates{mypred(int, int);}"
-            + "\n\\problem {\\forall int x; mypred(x, 0)}\n \\proof {\n" + "(branch \"dummy ID\""
-            + "(opengoal \"  ==> true  -> true \") ) }";
+        String s = """
+                \\functions {} \\predicates{mypred(int, int);}
+                \\problem {\\forall int x; mypred(x, 0)}
+                 \\proof {
+                (branch "dummy ID"(opengoal "  ==> true  -> true ") ) }""";
         try {
             parseProblem(s);
         } catch (Exception re) {

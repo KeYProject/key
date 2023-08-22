@@ -255,10 +255,9 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
                 // preceeding.getExpression(i).getASTParent()));
                 replace(preceeding.get(i), tempVarRefs.get(i));
             }
-        } else if (parent instanceof FieldSpecification) {
+        } else if (parent instanceof FieldSpecification fs) {
             ProgramFactory f = getProgramFactory();
             // create class initializer and insert it before the field
-            FieldSpecification fs = (FieldSpecification) parent;
             StatementBlock body = f.createStatementBlock();
             // add variable declarations
             for (int i = 0; i < tempSize; i += 1) {

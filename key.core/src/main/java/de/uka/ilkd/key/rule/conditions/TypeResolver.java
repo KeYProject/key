@@ -215,10 +215,9 @@ public abstract class TypeResolver {
                 result = ((ProgramVariable) op).getContainerType().getSort();
             } else if (op instanceof IObserverFunction) {
                 result = ((IObserverFunction) op).getContainerType().getSort();
-            } else if (op instanceof Function && ((Function) op).isUnique()
+            } else if (op instanceof Function func && ((Function) op).isUnique()
                     && op.name().toString().contains("::")) {
                 // Heap
-                Function func = (Function) op;
                 String funcName = func.name().toString();
                 String sortName = funcName.substring(0, funcName.indexOf("::"));
                 return services.getNamespaces().sorts().lookup(new Name(sortName));
