@@ -197,7 +197,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             mainWindow.displayResults(info.toString());
         } else if (info != null && info.getSource() instanceof ProofMacro) {
             if (!isAtLeastOneMacroRunning()) {
-                resetStatus(this);
+                mainWindow.hideStatusProgress();
                 assert info instanceof ProofMacroFinishedInfo;
                 Proof proof = info.getProof();
                 if (proof != null && !proof.closed()
