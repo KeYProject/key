@@ -22,8 +22,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * these tests are used to control if the collision mechanisms work correct. Collisions may be:
- * collisions between variablesv, with the context or or inside formula- and termsvs
+ * these tests are used to control if the collision mechanisms work correctly. Collisions may be:
+ * collisions between variablesv, with the context or inside formula- and termsvs
  */
 public class TestCollisionResolving {
 

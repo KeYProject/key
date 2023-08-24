@@ -1047,7 +1047,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             }
             if (result == null) {
                 raiseError(format("Method %s(%s) not found!", lookupName,
-                    createSignatureString(params.getParameters())), ctx);
+                    createSignatureString(params.parameters())), ctx);
             }
         }
         if (((IProgramMethod) result.getTerm().op()).getStateCount() > 1
@@ -1593,11 +1593,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitPrimaryUnionInf(JmlParser.PrimaryUnionInfContext ctx) {
         addWarning(ctx,
-            "!!! Deprecation Warnung: You used \\infinite_union "
-                + "in the functional syntax \\infinite_union(...)."
-                + "\n\tThis is deprecated and won't be valid in future versions of KeY."
-                + "\n\tPlease use \\infinite_union as a binder instead: "
-                + "(\\infinite_union var type; guard; store-ref-expr).");
+            """
+                    !!! Deprecation Warnung: You used \\infinite_union in the functional syntax \\infinite_union(...).
+                    \tThis is deprecated and won't be valid in future versions of KeY.
+                    \tPlease use \\infinite_union as a binder instead: (\\infinite_union var type; guard; store-ref-expr).""");
         return createInfiniteUnion(ctx.boundvarmodifiers(), ctx.quantifiedvardecls(),
             ctx.predicate(), ctx.storeref());
     }
@@ -2174,7 +2173,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitMeasured_by_clause(JmlParser.Measured_by_clauseContext ctx) {
         final List<SLExpression> seq = ctx.predornot().stream().map(it -> (SLExpression) accept(it))
-                .collect(Collectors.toList());
+                .toList();
         Optional<SLExpression> t =
             seq.stream().reduce((a, b) -> new SLExpression(tb.pair(a.getTerm(), b.getTerm())));
         Term result = t.orElse(seq.get(0)).getTerm();

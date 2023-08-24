@@ -97,10 +97,9 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof InfFlowContractPO)) {
+        if (!(po instanceof InfFlowContractPO cPO)) {
             return false;
         }
-        final InfFlowContractPO cPO = (InfFlowContractPO) po;
         return contract.equals(cPO.contract);
     }
 

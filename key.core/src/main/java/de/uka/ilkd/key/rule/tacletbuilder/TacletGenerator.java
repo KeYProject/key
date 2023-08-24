@@ -22,7 +22,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
 
-import org.key_project.util.collection.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -293,13 +292,7 @@ public class TacletGenerator {
             if (selfNull != null) {
                 addForumlaTerm = TB.and(addForumlaTerm, TB.not(selfNull));
             }
-            // final TermAndBoundVarPair schemaAdd =
-            // createSchemaTerm(addForumlaTerm, pvs, svs, services);
 
-            // final Term addedFormula = schemaAdd.term;
-            // final SequentFormula addedCf = new SequentFormula(addedFormula);
-            // final Semisequent addedSemiSeq =
-            // Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();
         }
 
         // create taclet
@@ -909,8 +902,7 @@ public class TacletGenerator {
 
         // top level operator
         Operator newOp = t.op();
-        if (t.op() instanceof IObserverFunction) {
-            final IObserverFunction obs = (IObserverFunction) t.op();
+        if (t.op() instanceof IObserverFunction obs) {
             for (Pair<Sort, IObserverFunction> pair : toLimit) {
                 if (pair.second.equals(t.op())
                         && (obs.isStatic() || t.sub(1).sort().extendsTrans(pair.first))) {
@@ -1015,16 +1007,5 @@ public class TacletGenerator {
     }
 
 
-
-    private static class TermAndBoundVarPair {
-
-        public final Term term;
-        public final ImmutableSet<VariableSV> boundVars;
-
-
-        public TermAndBoundVarPair(Term term, ImmutableSet<VariableSV> boundVars) {
-            this.term = term;
-            this.boundVars = boundVars;
-        }
-    }
+    private record TermAndBoundVarPair(Term term, ImmutableSet<VariableSV> boundVars) {}
 }

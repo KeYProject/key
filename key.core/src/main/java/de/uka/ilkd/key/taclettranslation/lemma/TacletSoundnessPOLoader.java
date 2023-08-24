@@ -310,8 +310,7 @@ public class TacletSoundnessPOLoader {
 
 
     public void registerProofs(ProofAggregate aggregate, ProofEnvironment proofEnv) {
-        if (aggregate instanceof CompoundProof) {
-            CompoundProof cp = (CompoundProof) aggregate;
+        if (aggregate instanceof CompoundProof cp) {
             for (ProofAggregate child : cp.getChildren()) {
                 registerProofs(child, proofEnv);
             }

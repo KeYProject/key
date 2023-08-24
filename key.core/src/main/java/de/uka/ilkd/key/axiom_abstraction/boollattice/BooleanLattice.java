@@ -42,13 +42,10 @@ public class BooleanLattice extends AbstractDomainLattice {
     @Override
     public AbstractDomainElement join(AbstractDomainElement elem1, AbstractDomainElement elem2) {
 
-        if (!(elem1 instanceof BooleanDomainElem) || !(elem2 instanceof BooleanDomainElem)) {
+        if (!(elem1 instanceof BooleanDomainElem a) || !(elem2 instanceof BooleanDomainElem b)) {
             throw new IllegalArgumentException(
                 "Expected arguments of the abstract domain of sign analysis.");
         }
-
-        BooleanDomainElem a = (BooleanDomainElem) elem1;
-        BooleanDomainElem b = (BooleanDomainElem) elem2;
 
         if (a.isTop() || b.isTop()) {
             return Top.getInstance();

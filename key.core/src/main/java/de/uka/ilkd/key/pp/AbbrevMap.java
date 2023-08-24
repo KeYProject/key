@@ -158,33 +158,21 @@ public class AbbrevMap {
 
     }
 
-    public static class AbbrevWrapper {
-
-        private final Term t;
-
-        public AbbrevWrapper(Term t) {
-            this.t = t;
-        }
+    public record AbbrevWrapper(Term t) {
 
         @Override
-        public int hashCode() {
-            return t.hashCode();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (!(o instanceof AbbrevWrapper)) {
-                return false;
+            public boolean equals(Object o) {
+                if (!(o instanceof AbbrevWrapper scw)) {
+                    return false;
+                }
+                if (scw.getTerm() == t) {
+                    return true;
+                }
+                return t.equals(scw.getTerm());
             }
-            AbbrevWrapper scw = (AbbrevWrapper) o;
-            if (scw.getTerm() == t) {
-                return true;
-            }
-            return t.equals(scw.getTerm());
-        }
 
-        public Term getTerm() {
-            return t;
+            public Term getTerm() {
+                return t;
+            }
         }
-    }
 }

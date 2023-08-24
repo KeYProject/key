@@ -51,7 +51,7 @@ public class OracleMethod {
         StringBuilder argString = new StringBuilder();
 
         for (OracleVariable var : args) {
-            argString.append(var.getSort().name()).append(" ").append(var.getName()).append(",");
+            argString.append(var.sort().name()).append(" ").append(var.name()).append(",");
         }
         if (!args.isEmpty()) {
             argString = new StringBuilder(argString.substring(0, argString.length() - 1));

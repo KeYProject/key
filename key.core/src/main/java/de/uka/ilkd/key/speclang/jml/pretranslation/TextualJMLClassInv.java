@@ -45,10 +45,9 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TextualJMLClassInv)) {
+        if (!(o instanceof TextualJMLClassInv ci)) {
             return false;
         }
-        TextualJMLClassInv ci = (TextualJMLClassInv) o;
         return mods.equals(ci.mods) && inv.equals(ci.inv);
     }
 

@@ -257,10 +257,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof TextualJMLSpecCase)) {
+        if (!(o instanceof TextualJMLSpecCase that)) {
             return false;
         }
-        TextualJMLSpecCase that = (TextualJMLSpecCase) o;
         return getBehavior() == that.getBehavior() && clauses.equals(that.clauses);
     }
 

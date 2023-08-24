@@ -244,11 +244,9 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof AbstractionPredicate)) {
+        if (!(obj instanceof AbstractionPredicate otherPred)) {
             return false;
         }
-
-        final AbstractionPredicate otherPred = (AbstractionPredicate) obj;
 
         return otherPred.placeholderVariable.equals(placeholderVariable)
                 && otherPred.predicateFormWithPlaceholder.equals(predicateFormWithPlaceholder);

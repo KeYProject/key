@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 import org.key_project.proofmanagement.io.ProofBundleHandler;
@@ -62,7 +61,7 @@ public class FilesChecker {
             return Collections.emptyList();
         }
         try (var files = Files.walk(pbh.getBootclasspath())) {
-            return files.collect(Collectors.toUnmodifiableList());
+            return files.toList();
         }
     }
 

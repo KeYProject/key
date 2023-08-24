@@ -84,9 +84,8 @@ public class LocationSet {
      */
     public boolean equals(Object o) {
 
-        if (o instanceof LocationSet) {
+        if (o instanceof LocationSet ls) {
 
-            LocationSet ls = (LocationSet) o;
             return ls.name.equals(name);
 
 

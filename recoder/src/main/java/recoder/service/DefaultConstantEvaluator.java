@@ -1277,13 +1277,12 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
             }
             throw new ModelException("Unknown literal type");
         }
-        if (expr instanceof Operator) {
+        if (expr instanceof Operator op) {
             if (expr instanceof Assignment) {
                 // Assignments are not considered compile-time constants (!)
                 return false;
             }
 
-            Operator op = (Operator) expr;
             if (op instanceof TypeOperator) {
                 if (op instanceof TypeCast) {
                     if (!isCompileTimeConstant(((TypeCast) expr).getExpressionAt(0), res)) {
@@ -1611,8 +1610,7 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
             visitedVariableReferences.push(expr);
             try {
                 ProgramModelInfo qs = v.getProgramModelInfo();
-                if (qs instanceof SourceInfo) {
-                    SourceInfo ais = (SourceInfo) qs;
+                if (qs instanceof SourceInfo ais) {
                     expr = ais.getVariableSpecification(v).getInitializer();
                     if (expr == null) {
                         return false;
@@ -1623,8 +1621,7 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
                     // cast to type of constant variable
                     doPrimitiveTypeCast(vtype, res);
                     return true;
-                } else if (qs instanceof ByteCodeInfo) {
-                    ByteCodeInfo bis = (ByteCodeInfo) qs;
+                } else if (qs instanceof ByteCodeInfo bis) {
                     String val = bis.getFieldInfo((Field) v).getConstantValue();
                     if (val == null) {
                         return false;

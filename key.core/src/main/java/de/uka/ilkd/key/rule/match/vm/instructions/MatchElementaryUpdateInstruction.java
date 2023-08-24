@@ -34,8 +34,7 @@ public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpda
             Services services) {
         final Operator instantiationCandidateOp = instantiationCandidate.op();
         if (instantiationCandidateOp != op) {
-            if (instantiationCandidateOp instanceof ElementaryUpdate) {
-                final ElementaryUpdate instElUpdate = (ElementaryUpdate) instantiationCandidateOp;
+            if (instantiationCandidateOp instanceof ElementaryUpdate instElUpdate) {
                 matchCond = leftHandSide.match(instElUpdate.lhs(), matchCond, services);
             } else {
                 matchCond = null;

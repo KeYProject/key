@@ -156,10 +156,9 @@ public class Position implements Comparable<Position> {
         if (x == this) {
             return true;
         }
-        if (!(x instanceof Position)) {
+        if (!(x instanceof Position p)) {
             return false;
         }
-        Position p = (Position) x;
         return line == p.line && column == p.column;
     }
 

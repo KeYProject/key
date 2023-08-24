@@ -17,7 +17,7 @@ public class TriggerVariableInstantiationProjection implements ProjectionToTerm 
         final Taclet t = (Taclet) app.rule();
 
         final SVInstantiationProjection instProj =
-            SVInstantiationProjection.create(t.getTrigger().getTriggerVar().name(), true);
+            SVInstantiationProjection.create(t.getTrigger().triggerVar().name(), true);
         return instProj.toTerm(app, pos, goal);
     }
 

@@ -122,8 +122,7 @@ class LabeledTermImpl extends TermImpl implements EqualsModProofIrrelevancy {
             return false;
         }
 
-        if (o instanceof LabeledTermImpl) {
-            final LabeledTermImpl cmp = (LabeledTermImpl) o;
+        if (o instanceof LabeledTermImpl cmp) {
             if (labels.size() == cmp.labels.size()) {
                 for (int i = 0, sz = labels.size(); i < sz; i++) {
                     // skip irrelevant (origin) labels that differ for no real reason

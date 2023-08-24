@@ -38,7 +38,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
     }
 
     public static <T> ImmutableSLList<T> singleton(T obj) {
-        return new Cons(obj, nil());
+        return new Cons<>(obj, nil());
     }
 
     /**
@@ -282,7 +282,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
          */
         @Override
         public ImmutableList<S> append(S e) {
-            return new Cons<S>(e).prepend(this);
+            return new Cons<>(e).prepend(this);
         }
 
         /**

@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The objects of this class represent families of function symbols, where each family contains an
  * instantiation of a template symbol for a particular sort. The following invariant has to hold:
- * Given two sort depending functions f1 and f2 then from f1.isSimilar(f2) and
+ * Given two sort-depending functions f1 and f2 then from f1.isSimilar(f2) and
  * f1.getSortDependingOn() == f2.getSortDependingOn() follows f1 == f2
  */
 public final class SortDependingFunction extends Function {
@@ -130,15 +130,14 @@ public final class SortDependingFunction extends Function {
                     functions.add(result);
                     if (instantiateName(getKind(), sort).toString().contains("String")
                             && instantiateName(getKind(), sort).toString().contains("seqGet")
-                            && (n == null || sort instanceof GenericSort
-                                    && n.getSortDependingOn() != sort)) {
+                            && (n == null || n.getSortDependingOn() != sort)) {
                         LOGGER.debug("Hash code: {}", result.hashCode());
                     }
                 }
             } else if (result == null) {
                 result = new SortDependingFunction(template, sort);
                 // The namespaces may be wrapped for local symbols
-                // Sort depending functions are to be added to the "root" namespace, however.
+                // Sort depending on functions are to be added to the "root" namespace, however.
                 // Therefore, let's rewind to the root (MU, 2017-03)
                 synchronized (functions) {
                     while (functions.parent() != null) {
@@ -185,20 +184,7 @@ public final class SortDependingFunction extends Function {
     // inner classes
     // -------------------------------------------------------------------------
 
-    private static final class SortDependingFunctionTemplate {
-        public final GenericSort sortDependingOn;
-        public final Name kind;
-        public final Sort sort;
-        public final ImmutableArray<Sort> argSorts;
-        public final boolean unique;
-
-        public SortDependingFunctionTemplate(GenericSort sortDependingOn, Name kind, Sort sort,
-                ImmutableArray<Sort> argSorts, boolean unique) {
-            this.sortDependingOn = sortDependingOn;
-            this.kind = kind;
-            this.sort = sort;
-            this.argSorts = argSorts;
-            this.unique = unique;
-        }
+    private record SortDependingFunctionTemplate(GenericSort sortDependingOn, Name kind, Sort sort,
+            ImmutableArray<Sort> argSorts, boolean unique) {
     }
 }

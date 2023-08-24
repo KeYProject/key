@@ -40,8 +40,7 @@ public class TreeWalker extends AbstractTreeWalker {
             return false;
         }
         current = stack[--count]; // pop
-        if (current instanceof NonTerminalProgramElement) {
-            NonTerminalProgramElement nt = (NonTerminalProgramElement) current;
+        if (current instanceof NonTerminalProgramElement nt) {
             int s = nt.getChildCount();
             if (count + s >= stack.length) {
                 ProgramElement[] newStack =

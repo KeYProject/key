@@ -265,11 +265,9 @@ public class Monomial {
             return true;
         }
 
-        if (!(o instanceof Monomial)) {
+        if (!(o instanceof Monomial m)) {
             return false;
         }
-
-        final Monomial m = (Monomial) o;
 
         if (!coefficient.equals(m.coefficient)) {
             return false;

@@ -64,11 +64,9 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
         final Services services = proof.getServices();
 
         final RuleApp app = goals.head().node().parent().getAppliedRuleApp();
-        if (!(app instanceof BlockContractInternalBuiltInRuleApp)) {
+        if (!(app instanceof BlockContractInternalBuiltInRuleApp blockRuleApp)) {
             return false;
         }
-        final BlockContractInternalBuiltInRuleApp blockRuleApp =
-            (BlockContractInternalBuiltInRuleApp) app;
         final BlockContract contract = blockRuleApp.getContract();
         final IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
         if (ifVars == null) {

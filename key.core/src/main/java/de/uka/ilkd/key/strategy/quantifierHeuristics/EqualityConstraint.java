@@ -580,8 +580,7 @@ public class EqualityConstraint implements Constraint {
         if (this == obj) {
             return true;
         }
-        if (obj instanceof Constraint) {
-            Constraint c = (Constraint) obj;
+        if (obj instanceof Constraint c) {
             if (c instanceof EqualityConstraint) {
                 return map.keySet().equals(((EqualityConstraint) c).map.keySet())
                         && join(c, null) == this && c.join(this, null) == c;
@@ -814,10 +813,9 @@ public class EqualityConstraint implements Constraint {
         private int hash;
 
         public boolean equals(Object o) {
-            if (!(o instanceof ECPair)) {
+            if (!(o instanceof ECPair e)) {
                 return false;
             }
-            final ECPair e = (ECPair) o;
             return first == e.first && second == e.second;
         }
 

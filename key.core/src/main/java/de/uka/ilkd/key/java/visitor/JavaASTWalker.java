@@ -61,9 +61,8 @@ public abstract class JavaASTWalker {
      * @param node the JavaProgramElement the walker is at
      */
     protected void walk(ProgramElement node) {
-        if (node instanceof NonTerminalProgramElement) {
+        if (node instanceof NonTerminalProgramElement nonTerminalNode) {
             depth++;
-            NonTerminalProgramElement nonTerminalNode = (NonTerminalProgramElement) node;
             for (int i = 0; i < nonTerminalNode.getChildCount(); i++) {
                 if (nonTerminalNode.getChildAt(i) != null) {
                     walk(nonTerminalNode.getChildAt(i));

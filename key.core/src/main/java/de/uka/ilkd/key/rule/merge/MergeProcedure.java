@@ -114,35 +114,9 @@ public abstract class MergeProcedure {
      *
      * @author Dominic Scheurer
      */
-    public static class ValuesMergeResult {
-        private final ImmutableSet<Term> newConstraints;
-        private final Term mergeVal;
-        private final LinkedHashSet<Name> newNames;
-        private final LinkedHashSet<Term> sideConditions;
-
-        public ValuesMergeResult(ImmutableSet<Term> newConstraints, Term mergeVal,
-                LinkedHashSet<Name> newNames, LinkedHashSet<Term> sideConditions) {
-            this.newConstraints = newConstraints;
-            this.mergeVal = mergeVal;
-            this.newNames = newNames;
-            this.sideConditions = sideConditions;
-        }
-
-        public ImmutableSet<Term> getNewConstraints() {
-            return newConstraints;
-        }
-
-        public Term getMergeVal() {
-            return mergeVal;
-        }
-
-        public LinkedHashSet<Name> getNewNames() {
-            return newNames;
-        }
-
-        public LinkedHashSet<Term> getSideConditions() {
-            return sideConditions;
-        }
+    public record ValuesMergeResult(ImmutableSet<Term> newConstraints, Term mergeVal,
+            LinkedHashSet<Name> newNames,
+            LinkedHashSet<Term> sideConditions) {
     }
 
 }

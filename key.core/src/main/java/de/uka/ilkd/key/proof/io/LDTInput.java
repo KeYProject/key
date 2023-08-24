@@ -138,11 +138,10 @@ public class LDTInput implements EnvInput {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof LDTInput)) {
+        if (!(o instanceof LDTInput li)) {
             return false;
         }
 
-        LDTInput li = (LDTInput) o;
         if (keyFiles.length != li.keyFiles.length) {
             return false;
         }
