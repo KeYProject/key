@@ -39,6 +39,9 @@ public final class PosInTerm {
     }
 
     public PosInTerm sub() {
+        if (size == 1) {
+            return PosInTerm.TOP_LEVEL;
+        }
         int[] pathMinusHead = new int[size - 1];
         for (int i = 1; i < size; i++) {
             pathMinusHead[i - 1] = positions[i];

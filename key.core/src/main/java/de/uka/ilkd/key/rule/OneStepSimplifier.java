@@ -242,7 +242,8 @@ public final class OneStepSimplifier implements BuiltInRule {
      * @param protocol
      */
     private SequentFormula simplifyPos(Goal goal, Services services, PosInOccurrence pos,
-            int indexNr, Protocol protocol) {
+            int indexNr, Protocol protocol, Map<TermReplacementKey, PosInOccurrence> context,
+            Set<PosInOccurrence> ifInsts, RuleApp ruleApp) {
         final ImmutableList<NoPosTacletApp> apps =
             indices[indexNr].getRewriteTaclet(pos, TacletFilter.TRUE, services);
         for (TacletApp app : apps) {
@@ -261,6 +262,12 @@ public final class OneStepSimplifier implements BuiltInRule {
                 taclet.getRewriteResult(goal, new TermLabelState(), services, app);
             if (protocol != null) {
                 protocol.add(app);
+                Term resultReplaceKnown = replaceKnownHelper(context, result.formula(),
+                    pos.isInAntec(), ifInsts, protocol, services, goal, ruleApp,
+                    pos.posInTerm() != PosInTerm.getTopLevel() ? pos.posInTerm() : null);
+                if (resultReplaceKnown != null) {
+                    result = new SequentFormula(resultReplaceKnown);
+                }
             }
             return result;
             // TODO Idea: return new Pair<TacletApp, SequentFormula>(null, null);
@@ -298,7 +305,7 @@ public final class OneStepSimplifier implements BuiltInRule {
      */
     private SequentFormula simplifyPosOrSub(Goal goal, Services services, PosInOccurrence pos,
             int indexNr, Protocol protocol, Map<TermReplacementKey, PosInOccurrence> context,
-            /* out */ Set<PosInOccurrence> ifInsts, RuleApp ruleApp) {
+            Set<PosInOccurrence> ifInsts, RuleApp ruleApp) {
         final Term term = pos.subTerm();
         if (notSimplifiableCaches[indexNr].get(term) != null) {
             return null;
@@ -308,12 +315,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         if (bottomUp[indexNr]) {
             result = simplifySub(goal, services, pos, indexNr, protocol, context, ifInsts, ruleApp);
             while (result != null && !applicableCheck) {
-                var result3 = replaceKnownHelper(context, result.formula(), pos.isInAntec(),
-                    ifInsts, protocol, services, goal, ruleApp, pos.posInTerm());
-                if (result3 != null) {
-                    result = new SequentFormula(result3);
-                }
-                var p = new PosInOccurrence(result, pos.posInTerm(), pos.isInAntec());
+                var p = pos.replaceConstrainedFormula(result);
                 if (!p.subTermExists()) {
                     return result;
                 }
@@ -325,55 +327,36 @@ public final class OneStepSimplifier implements BuiltInRule {
                     break;
                 }
             }
-            var p = result != null ? new PosInOccurrence(result, pos.posInTerm(), pos.isInAntec())
+            var p = result != null ? pos.replaceConstrainedFormula(result)
                     : pos;
             if (p.subTermExists()) {
-                var result2 = simplifyPos(goal, services, p, indexNr, protocol);
+                var result2 =
+                    simplifyPos(goal, services, p, indexNr, protocol, context, ifInsts, ruleApp);
                 if (result2 != null) {
-                    if (!applicableCheck) {
-                        var result3 =
-                            replaceKnownHelper(context, result2.formula(), pos.isInAntec(),
-                                ifInsts, protocol, services, goal, ruleApp, pos.posInTerm());
-                        if (result3 != null) {
-                            result2 = new SequentFormula(result3);
-                        }
-                    }
                     result = result2;
                 }
             }
         } else {
-            result = simplifyPos(goal, services, pos, indexNr, protocol);
+            result = simplifyPos(goal, services, pos, indexNr, protocol, context, ifInsts, ruleApp);
             while (result != null && !applicableCheck) {
-                var result3 = replaceKnownHelper(context, result.formula(), pos.isInAntec(),
-                    ifInsts, protocol, services, goal, ruleApp, pos.posInTerm());
-                if (result3 != null) {
-                    result = new SequentFormula(result3);
-                }
-                var p = new PosInOccurrence(result, pos.posInTerm(), pos.isInAntec());
+                var p = pos.replaceConstrainedFormula(result);
                 if (!p.subTermExists()) {
                     return result;
                 }
-                var result2 = simplifyPos(goal, services, p, indexNr, protocol);
+                var result2 =
+                    simplifyPos(goal, services, p, indexNr, protocol, context, ifInsts, ruleApp);
                 if (result2 != null) {
                     result = result2;
                 } else {
                     break;
                 }
             }
-            var p = result != null ? new PosInOccurrence(result, pos.posInTerm(), pos.isInAntec())
+            var p = result != null ? pos.replaceConstrainedFormula(result)
                     : pos;
             if (p.subTermExists()) {
                 var result2 =
                     simplifySub(goal, services, p, indexNr, protocol, context, ifInsts, ruleApp);
                 if (result2 != null) {
-                    if (!applicableCheck) {
-                        var result3 =
-                            replaceKnownHelper(context, result2.formula(), pos.isInAntec(),
-                                ifInsts, protocol, services, goal, ruleApp, pos.posInTerm());
-                        if (result3 != null) {
-                            result2 = new SequentFormula(result3);
-                        }
-                    }
                     result = result2;
                 }
             }
@@ -424,7 +407,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             Term[] subs = new Term[in.arity()];
             boolean changed = false;
             for (int i = 0; i < subs.length; i++) {
-                if (pio != null && pio.getIndex() != i) {
+                if (pio != null && pio.getIndexAt(0) != i) {
                     subs[i] = in.sub(i);
                     continue;
                 }
