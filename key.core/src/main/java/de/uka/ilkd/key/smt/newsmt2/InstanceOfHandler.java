@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
+import java.util.List;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
@@ -40,9 +41,10 @@ public class InstanceOfHandler implements SMTHandler {
     }
 
     @Override
-    public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
+    public SExpr handle(MasterHandler trans, Term term, List<SExpr> boundVars)
+            throws SMTTranslationException {
         SortDependingFunction op = (SortDependingFunction) term.op();
-        SExpr inner = trans.translate(term.sub(0), Type.UNIVERSE);
+        SExpr inner = trans.translate(term.sub(0), Type.UNIVERSE, boundVars);
         if (exactInstanceOfOp.isSimilar(op)) {
             trans.addSort(op.getSortDependingOn());
             return new SExpr("exactinstanceof", Type.BOOL, inner,

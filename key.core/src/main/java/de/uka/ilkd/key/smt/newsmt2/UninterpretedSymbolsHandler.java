@@ -56,7 +56,8 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
     }
 
     @Override
-    public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
+    public SExpr handle(MasterHandler trans, Term term, List<SExpr> boundVars)
+            throws SMTTranslationException {
         SortedOperator op = (SortedOperator) term.op();
         String name = PREFIX + op.name().toString();
         if (!trans.isKnownSymbol(name)) {
@@ -67,7 +68,7 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
             trans.addKnownSymbol(name);
         }
 
-        List<SExpr> children = trans.translate(term.subs(), Type.UNIVERSE);
+        List<SExpr> children = trans.translate(term.subs(), Type.UNIVERSE, boundVars);
         SExpr.Type exprType = term.sort() == Sort.FORMULA ? BOOL : UNIVERSE;
         return new SExpr(name, exprType, children);
     }

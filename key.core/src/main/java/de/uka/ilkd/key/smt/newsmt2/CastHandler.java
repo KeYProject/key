@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
@@ -37,9 +38,10 @@ public class CastHandler implements SMTHandler {
     }
 
     @Override
-    public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
+    public SExpr handle(MasterHandler trans, Term term, List<SExpr> boundVars)
+            throws SMTTranslationException {
         SortDependingFunction op = (SortDependingFunction) term.op();
-        SExpr inner = trans.translate(term.sub(0));
+        SExpr inner = trans.translate(term.sub(0), boundVars);
         Sort depSort = op.getSortDependingOn();
         trans.addSort(depSort);
         trans.introduceSymbol("cast");

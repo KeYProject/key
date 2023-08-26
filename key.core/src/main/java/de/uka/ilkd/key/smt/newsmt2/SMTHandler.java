@@ -113,7 +113,8 @@ public interface SMTHandler {
      * @return an SExpr representing the term
      * @throws SMTTranslationException if the translation fails unexpectedly.
      */
-    SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException;
+    SExpr handle(MasterHandler trans, Term term, List<SExpr> boundVars)
+            throws SMTTranslationException;
 
     /**
      * Any handler can offer a collection of properties that can be set in the GUI/script to control

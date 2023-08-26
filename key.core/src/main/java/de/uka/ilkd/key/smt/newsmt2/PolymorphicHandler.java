@@ -34,17 +34,18 @@ public class PolymorphicHandler implements SMTHandler {
     }
 
     @Override
-    public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
+    public SExpr handle(MasterHandler trans, Term term, List<SExpr> boundVars)
+            throws SMTTranslationException {
         Operator op = term.op();
         if (op == Equality.EQUALS) {
-            List<SExpr> children = trans.translate(term.subs());
+            List<SExpr> children = trans.translate(term.subs(), boundVars);
             children.set(0, SExprs.coerce(children.get(0), Type.UNIVERSE));
             children.set(1, SExprs.coerce(children.get(1), Type.UNIVERSE));
             return new SExpr("=", Type.BOOL, children);
         }
 
         if (op == IfThenElse.IF_THEN_ELSE) {
-            List<SExpr> children = trans.translate(term.subs());
+            List<SExpr> children = trans.translate(term.subs(), boundVars);
             children.set(0, SExprs.coerce(children.get(0), Type.BOOL));
             children.set(1, SExprs.coerce(children.get(1), Type.UNIVERSE));
             children.set(2, SExprs.coerce(children.get(2), Type.UNIVERSE));

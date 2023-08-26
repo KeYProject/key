@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
+import java.util.List;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
@@ -36,7 +37,7 @@ public class NumberConstantsHandler implements SMTHandler {
     }
 
     @Override
-    public SExpr handle(MasterHandler trans, Term term) {
+    public SExpr handle(MasterHandler trans, Term term, List<SExpr> boundVars) {
         if (term.sub(0).op() == negNumberSign) {
             String s = AbstractTermTransformer.convertToDecimalString(term, services);
             return new SExpr("-", IntegerOpHandler.INT, s.substring(1));

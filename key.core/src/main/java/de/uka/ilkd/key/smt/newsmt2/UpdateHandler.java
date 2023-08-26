@@ -37,30 +37,31 @@ public class UpdateHandler implements SMTHandler {
     }
 
     @Override
-    public SExpr handle(MasterHandler trans, Term term) {
+    public SExpr handle(MasterHandler trans, Term term, List<SExpr> boundVars) {
 
         Term update = term.sub(0);
         assert update.sort() == Sort.UPDATE;
 
         List<SExpr> individualUpdates = new ArrayList<>();
-        collectUpdates(update, individualUpdates, trans);
+        collectUpdates(update, individualUpdates, trans, boundVars);
 
         Term inner = term.sub(1);
-        SExpr innerSMT = trans.translate(inner);
+        SExpr innerSMT = trans.translate(inner, boundVars);
         return new SExpr("let", innerSMT.getType(), new SExpr(individualUpdates), innerSMT);
     }
 
-    private void collectUpdates(Term update, List<SExpr> individualUpdates, MasterHandler trans) {
+    private void collectUpdates(Term update, List<SExpr> individualUpdates, MasterHandler trans,
+            List<SExpr> boundVars) {
         if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
             for (Term subUpd : update.subs()) {
-                collectUpdates(subUpd, individualUpdates, trans);
+                collectUpdates(subUpd, individualUpdates, trans, boundVars);
             }
         } else if (update.op() == UpdateJunctor.SKIP) {
             // Do precisely that: skip
         } else if (update.op() instanceof ElementaryUpdate elemUpd) {
             Term target = services.getTermFactory().createTerm(elemUpd.lhs());
-            SExpr smtTarget = trans.translate(target);
-            SExpr smtValue = trans.translate(update.sub(0), Type.UNIVERSE);
+            SExpr smtTarget = trans.translate(target, boundVars);
+            SExpr smtValue = trans.translate(update.sub(0), Type.UNIVERSE, boundVars);
             individualUpdates.add(new SExpr(smtTarget, smtValue));
         } else {
             throw new RuntimeException("Unexpected update connector " + update);

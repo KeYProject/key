@@ -57,8 +57,9 @@ public class BooleanConnectiveHandler implements SMTHandler {
     }
 
     @Override
-    public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
-        List<SExpr> children = trans.translate(term.subs(), Type.BOOL);
+    public SExpr handle(MasterHandler trans, Term term, List<SExpr> boundVars)
+            throws SMTTranslationException {
+        List<SExpr> children = trans.translate(term.subs(), Type.BOOL, boundVars);
         Operator op = term.op();
         String smtOp = supportedOperators.get(op);
         assert smtOp != null;

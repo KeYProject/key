@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -55,7 +56,8 @@ public class FloatRemainderHandler implements SMTHandler {
     }
 
     @Override
-    public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
+    public SExpr handle(MasterHandler trans, Term term, List<SExpr> boundVars)
+            throws SMTTranslationException {
 
         Map<Term, SExpr> map = (Map<Term, SExpr>) trans.getTranslationState().get(MAP_KEY);
         if (map == null) {

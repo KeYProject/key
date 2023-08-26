@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
+import java.util.List;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
@@ -47,13 +48,14 @@ public class CastingFunctionsHandler implements SMTHandler {
     }
 
     @Override
-    public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
+    public SExpr handle(MasterHandler trans, Term term, List<SExpr> boundVars)
+            throws SMTTranslationException {
         Operator op = term.op();
         SortDependingFunction sdf = (SortDependingFunction) op;
         String name = sdf.getKind().toString();
         String prefixedName = DefinedSymbolsHandler.PREFIX + name;
         trans.introduceSymbol(name);
-        SExpr result = trans.handleAsFunctionCall(prefixedName, term);
+        SExpr result = trans.handleAsFunctionCall(prefixedName, term, boundVars);
         Sort dep = sdf.getSortDependingOn();
         if (dep == Sort.ANY) {
             return result;

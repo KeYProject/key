@@ -128,11 +128,13 @@ public class DefinedSymbolsHandler implements SMTHandler {
         return op instanceof Function && supportedFunctions.contains(op.name().toString());
     }
 
-    private void introduceSymbol(MasterHandler trans, String name) throws SMTTranslationException {
-        introduceSymbol(trans, name, services.getNamespaces().functions().lookup(name));
+    private void introduceSymbol(MasterHandler trans, String name, List<SExpr> boundVars)
+            throws SMTTranslationException {
+        introduceSymbol(trans, name, services.getNamespaces().functions().lookup(name), boundVars);
     }
 
-    private boolean introduceSymbol(MasterHandler trans, String name, SortedOperator op)
+    private boolean introduceSymbol(MasterHandler trans, String name, SortedOperator op,
+            List<SExpr> boundVars)
             throws SMTTranslationException {
         if (trans.isKnownSymbol(name)) {
             return true;
@@ -172,13 +174,13 @@ public class DefinedSymbolsHandler implements SMTHandler {
         }
 
         if (snippets.containsKey(name + DL_SUFFIX)) {
-            handleDLAxioms(name, trans);
+            handleDLAxioms(name, trans, boundVars);
             return true;
         }
 
         if (snippets.containsKey(name + TACLETS_SUFFIX)) {
             // handle taclets
-            handleTacletAxioms(name, trans);
+            handleTacletAxioms(name, trans, boundVars);
             return true;
         }
 
@@ -186,16 +188,17 @@ public class DefinedSymbolsHandler implements SMTHandler {
     }
 
     @Override
-    public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
+    public SExpr handle(MasterHandler trans, Term term, List<SExpr> boundVars)
+            throws SMTTranslationException {
         SortedOperator op = (SortedOperator) term.op();
         String name = op.name().toString();
         String prefixedname = PREFIX + name;
 
-        List<SExpr> children = trans.translate(term.subs(), Type.UNIVERSE);
+        List<SExpr> children = trans.translate(term.subs(), Type.UNIVERSE, boundVars);
         SExpr.Type exprType = term.sort() == Sort.FORMULA ? BOOL : UNIVERSE;
         SExpr result = new SExpr(prefixedname, exprType, children);
 
-        if (!introduceSymbol(trans, name, op)) {
+        if (!introduceSymbol(trans, name, op, boundVars)) {
             throw new SMTTranslationException(
                 "I thought I would handle this term, but cannot: " + term);
         }
@@ -208,7 +211,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
         return List.of(PROPERTY_AXIOMATISATION);
     }
 
-    private void handleTacletAxioms(String name, MasterHandler trans)
+    private void handleTacletAxioms(String name, MasterHandler trans, List<SExpr> boundVars)
             throws SMTTranslationException {
         String[] strTaclets = snippets.getProperty(name + TACLETS_SUFFIX).trim().split(" *, *");
         for (String str : strTaclets) {
@@ -218,7 +221,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
             }
             SMTTacletTranslator tacletTranslator = new SMTTacletTranslator(services);
             Term formula = tacletTranslator.translate(taclet);
-            SExpr smt = trans.translate(formula);
+            SExpr smt = trans.translate(formula, boundVars);
             trans.addAxiom(SExprs.assertion(smt));
         }
     }
@@ -233,7 +236,8 @@ public class DefinedSymbolsHandler implements SMTHandler {
         }
     }
 
-    private void handleDLAxioms(String name, MasterHandler trans) throws SMTTranslationException {
+    private void handleDLAxioms(String name, MasterHandler trans, List<SExpr> boundVars)
+            throws SMTTranslationException {
         int cnt = 2;
         String snipName = name + DL_SUFFIX;
         String dl = snippets.getProperty(snipName);
@@ -248,7 +252,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
                 // a wrapper services object is used.
                 Term axiom = tp.parse(new StringReader(dl), Sort.FORMULA, localServices, nss,
                     new AbbrevMap());
-                trans.addAxiom(SExprs.assertion(trans.translate(axiom)));
+                trans.addAxiom(SExprs.assertion(trans.translate(axiom, boundVars)));
             } catch (ParserException e) {
                 throw new SMTTranslationException("Error while translating snippet " + snipName, e);
             }
