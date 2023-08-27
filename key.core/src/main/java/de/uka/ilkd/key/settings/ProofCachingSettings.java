@@ -33,6 +33,10 @@ public class ProofCachingSettings extends AbstractPropertiesSettings {
     private final AbstractPropertiesSettings.PropertyEntry<String> dispose =
         createStringProperty(DISPOSE_KEY, "");
 
+    public ProofCachingSettings() {
+        super("ProofCaching");
+    }
+
     public boolean getEnabled() {
         return enabled.get();
     }

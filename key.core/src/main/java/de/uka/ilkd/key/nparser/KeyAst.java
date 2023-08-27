@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.nparser;
 
 import java.net.URL;
+import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -141,7 +142,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         public Configuration asConfiguration() {
             final var cfg = new ConfigurationBuilder();
             List<Object> res = cfg.visitCfile(ctx);
-            if (res.size() > 0)
+            if (!res.isEmpty())
                 return (Configuration) res.get(0);
             else
                 throw new RuntimeException();
