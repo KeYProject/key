@@ -273,8 +273,7 @@ public class DelayedCutProcessor implements Runnable {
      * @return
      */
     private LinkedList<Goal> apply(Goal goal, RuleApp app, TermServices services) {
-        if (app instanceof TacletApp) {
-            TacletApp tapp = (TacletApp) app;
+        if (app instanceof TacletApp tapp) {
             final SVInstantiations insts = tapp.instantiations();
             final Iterator<SchemaVariable> svIt = insts.svIterator();
             while (svIt.hasNext()) {

@@ -87,10 +87,9 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
         if (!isDisposed()) {
             final Services services = getServices();
             // Make sure that the contract is compatible
-            if (!(getContract() instanceof FunctionalOperationContract)) {
+            if (!(getContract() instanceof FunctionalOperationContract contract)) {
                 throw new ProofInputException("Unsupported contract: " + getContract());
             }
-            FunctionalOperationContract contract = (FunctionalOperationContract) getContract();
             // Compute instantiation
             Instantiation inst = UseOperationContractRule.computeInstantiation(
                 getProofNode().getAppliedRuleApp().posInOccurrence().subTerm(), services);
@@ -132,7 +131,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
             // Compute contract text
             return FunctionalOperationContractImpl.getText(contract, contractParams, resultTerm,
                 selfTerm, exceptionTerm, baseHeap, baseHeapTerm, heapContext, atPres, false,
-                services, getSettings().isUsePrettyPrinting(), getSettings().isUseUnicode()).trim();
+                services, getSettings().usePrettyPrinting(), getSettings().useUnicode()).trim();
         } else {
             return null;
         }
@@ -305,10 +304,9 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
         postModality = TermBuilder.goBelowUpdates(postModality);
         MethodFrame mf = JavaTools.getInnermostMethodFrame(postModality.javaBlock(), services);
         SourceElement firstElement = NodeInfo.computeActiveStatement(mf.getFirstElement());
-        if (!(firstElement instanceof CopyAssignment)) {
+        if (!(firstElement instanceof CopyAssignment assignment)) {
             return null;
         }
-        CopyAssignment assignment = (CopyAssignment) firstElement;
         ProgramElement rightChild = assignment.getChildAt(1);
         if (!(rightChild instanceof LocationVariable)) {
             return null;

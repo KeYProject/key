@@ -193,8 +193,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
 
             for (int j = 0, size = vBoundVars.size(); j < size; j++) {
                 QuantifiableVariable boundVar = vBoundVars.get(j);
-                if (boundVar instanceof SchemaVariable) {
-                    final SchemaVariable boundSchemaVariable = (SchemaVariable) boundVar;
+                if (boundVar instanceof SchemaVariable boundSchemaVariable) {
                     final Term instantiationForBoundSchemaVariable =
                         (Term) svInst.getInstantiation(boundSchemaVariable);
                     if (instantiationForBoundSchemaVariable != null) {
@@ -322,8 +321,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
     @Override
     public void subtreeLeft(Term subtreeRoot) {
         tacletTermStack.pop();
-        if (subtreeRoot.op() instanceof TermTransformer) {
-            final TermTransformer mop = (TermTransformer) subtreeRoot.op();
+        if (subtreeRoot.op() instanceof TermTransformer mop) {
             final Term newTerm = //
                 mop.transform((Term) subStack.pop(), svInst, services);
             pushNew(newTerm);

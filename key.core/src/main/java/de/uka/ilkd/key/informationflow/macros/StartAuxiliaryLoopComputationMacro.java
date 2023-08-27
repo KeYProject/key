@@ -59,10 +59,9 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
         final Services services = proof.getServices();
 
         RuleApp app = goals.head().node().parent().getAppliedRuleApp();
-        if (!(app instanceof LoopInvariantBuiltInRuleApp)) {
+        if (!(app instanceof LoopInvariantBuiltInRuleApp loopInvRuleApp)) {
             return false;
         }
-        final LoopInvariantBuiltInRuleApp loopInvRuleApp = (LoopInvariantBuiltInRuleApp) app;
         final LoopSpecification loopInv = loopInvRuleApp.getSpec();
         final IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
         if (ifVars == null) {

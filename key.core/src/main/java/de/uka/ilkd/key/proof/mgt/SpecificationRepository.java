@@ -208,10 +208,9 @@ public final class SpecificationRepository {
     private IObserverFunction getCanonicalFormForKJT(IObserverFunction obs, KeYJavaType kjt) {
         assert obs != null;
         assert kjt != null;
-        if (!(obs instanceof IProgramMethod) || obs.getContainerType().equals(kjt)) {
+        if (!(obs instanceof IProgramMethod pm) || obs.getContainerType().equals(kjt)) {
             return unlimitObs(obs);
         }
-        final IProgramMethod pm = (IProgramMethod) obs;
         if (pm.isConstructor()) {
             assert pm.getContainerType().equals(kjt);
             return pm;

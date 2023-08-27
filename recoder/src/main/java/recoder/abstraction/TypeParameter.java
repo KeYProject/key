@@ -34,10 +34,9 @@ public interface TypeParameter extends ClassType {
             if (t1 == o) {
                 return true;
             }
-            if (!(o instanceof TypeParameter)) {
+            if (!(o instanceof TypeParameter t2)) {
                 return false;
             }
-            TypeParameter t2 = (TypeParameter) o;
             ClassType c1 = t1.getContainingClassType();
             ClassType c2 = t2.getContainingClassType();
 

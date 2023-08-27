@@ -45,10 +45,9 @@ public class UnwindLoop extends ProgramTransformer {
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
-        if (!(pe instanceof LoopStatement)) {
+        if (!(pe instanceof LoopStatement originalLoop)) {
             return new ProgramElement[] { pe };
         }
-        final LoopStatement originalLoop = (LoopStatement) pe;
 
         final WhileLoopTransformation w = new WhileLoopTransformation(originalLoop,
             (ProgramElementName) svInst.getInstantiation(outerLabel),

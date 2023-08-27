@@ -1,26 +1,12 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-// Universitaet Koblenz-Landau, Germany
-// Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-// Technical University Darmstadt, Germany
-// Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.ast.declaration;
 
 import java.util.List;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.*;
 import de.uka.ilkd.key.java.ast.abstraction.Package;
@@ -63,7 +49,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
      * @param specMathMode spec math mode
      */
     public record JMLModifiers(boolean strictlyPure, boolean pure, boolean nullableByDefault,
-            @Nullable SpecMathMode specMathMode) {}
+            SpecMathMode specMathMode) {}
 
     protected final JMLModifiers jmlModifiers;
 
@@ -165,7 +151,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
 
     @Nonnull
     public SourceElement getFirstElement() {
-        if (modArray != null && (modArray.size() > 0)) {
+        if (modArray != null && (!modArray.isEmpty())) {
             return modArray.get(0);
         } else {
             return this;

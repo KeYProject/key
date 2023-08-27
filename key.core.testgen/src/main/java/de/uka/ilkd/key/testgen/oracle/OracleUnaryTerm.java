@@ -6,8 +6,8 @@ package de.uka.ilkd.key.testgen.oracle;
 import java.util.HashMap;
 import java.util.Map;
 
-public class OracleUnaryTerm implements OracleTerm {
-
+public record OracleUnaryTerm(OracleTerm sub,
+                              de.uka.ilkd.key.testgen.oracle.OracleUnaryTerm.Op op) implements OracleTerm {
 
 
     public enum Op {
@@ -24,26 +24,6 @@ public class OracleUnaryTerm implements OracleTerm {
         op2String.put(Op.Minus, OP_MINUS);
     }
 
-
-    private final OracleTerm sub;
-    private final Op op;
-
-    public OracleUnaryTerm(OracleTerm sub, Op op) {
-        this.sub = sub;
-        this.op = op;
-    }
-
-
-
-    public Op getOp() {
-        return op;
-    }
-
-
-
-    public OracleTerm getSub() {
-        return sub;
-    }
 
     public String toString() {
         return op2String.get(op) + sub.toString();

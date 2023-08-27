@@ -22,9 +22,9 @@ public class BuildingExceptions extends RuntimeException {
         sb.append("Multiple errors occurred:");
         for (BuildingIssue error : errors) {
             sb.append(System.lineSeparator())
-                    .append(error.getPosition())
+                    .append(error.position())
                     .append(": ")
-                    .append(error.getMessage());
+                    .append(error.message());
         }
 
         return sb.toString();

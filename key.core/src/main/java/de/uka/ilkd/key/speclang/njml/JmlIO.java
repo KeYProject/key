@@ -381,9 +381,9 @@ public class JmlIO {
      * Sets class type, spec math mode and self var.
      */
     public JmlIO context(Context context) {
-        this.classType(context.classType);
-        this.specMathMode(context.specMathMode);
-        this.selfVar(context.selfVar);
+        this.classType(context.classType());
+        this.specMathMode(context.specMathMode());
+        this.selfVar(context.selfVar());
         return this;
     }
 

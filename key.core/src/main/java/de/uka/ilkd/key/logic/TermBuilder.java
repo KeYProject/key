@@ -1091,9 +1091,9 @@ public class TermBuilder {
         if (updates.isEmpty()) {
             return target;
         } else {
-            return apply(updates.head().getUpdate(),
+            return apply(updates.head().update(),
                 applyUpdatePairsSequential(updates.tail(), target),
-                updates.head().getUpdateApplicationlabels());
+                updates.head().updateApplicationlabels());
         }
     }
 

@@ -1,19 +1,6 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-// Universitaet Koblenz-Landau, Germany
-// Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-// Technical University Darmstadt, Germany
-// Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.ast.declaration;
 
 import java.util.List;
@@ -58,7 +45,9 @@ public class MethodDeclaration extends JavaDeclaration
      * @param specMathMode spec math mode
      */
     public record JMLModifiers(boolean pure, boolean strictlyPure, boolean helper,
-            SpecMathMode specMathMode) {}
+            SpecMathMode specMathMode) {
+    }
+
 
     /**
      * this field stores if parent is an InterfaceDeclaration because we will be

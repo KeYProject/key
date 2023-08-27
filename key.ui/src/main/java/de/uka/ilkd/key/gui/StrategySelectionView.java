@@ -245,9 +245,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
             boolean topLevel, AbstractStrategyPropertyDefinition definition) {
 
         // Individual options
-        if (definition instanceof OneOfStrategyPropertyDefinition) {
-            OneOfStrategyPropertyDefinition oneOfDefinition =
-                (OneOfStrategyPropertyDefinition) definition;
+        if (definition instanceof OneOfStrategyPropertyDefinition oneOfDefinition) {
             ButtonGroup buttonGroup = new ButtonGroup();
             if (!oneOfDefinition.getValues().isEmpty()) {
                 data.addPropertyGroup(oneOfDefinition.getApiKey(), buttonGroup);

@@ -253,10 +253,9 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof DependencyContractPO)) {
+        if (!(po instanceof DependencyContractPO cPO)) {
             return false;
         }
-        DependencyContractPO cPO = (DependencyContractPO) po;
         return contract.equals(cPO.contract);
     }
 

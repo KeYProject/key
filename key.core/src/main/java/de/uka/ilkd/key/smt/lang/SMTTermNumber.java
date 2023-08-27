@@ -165,10 +165,9 @@ public class SMTTermNumber extends SMTTerm {
             return true;
         }
 
-        if (!(term instanceof SMTTermNumber)) {
+        if (!(term instanceof SMTTermNumber tn)) {
             return false;
         }
-        SMTTermNumber tn = (SMTTermNumber) term;
 
         return this.intValue == tn.intValue && this.bitSize == tn.bitSize;
     }
@@ -183,10 +182,9 @@ public class SMTTermNumber extends SMTTerm {
             return true;
         }
 
-        if (!(term instanceof SMTTermNumber)) {
+        if (!(term instanceof SMTTermNumber tn)) {
             return false;
         }
-        SMTTermNumber tn = (SMTTermNumber) term;
 
         return this.intValue == tn.intValue && this.bitSize == tn.bitSize;
     }

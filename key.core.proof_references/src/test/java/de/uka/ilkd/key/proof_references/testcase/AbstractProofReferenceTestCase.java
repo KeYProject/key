@@ -235,10 +235,10 @@ public abstract class AbstractProofReferenceTestCase {
         int i = 0;
         for (IProofReference<?> currentReference : current) {
             ExpectedProofReferences expectedReference = expected[i];
-            assertEquals(expectedReference.getKind(), currentReference.getKind());
-            if (expectedReference.getTarget() != null) {
+            assertEquals(expectedReference.kind(), currentReference.getKind());
+            if (expectedReference.target() != null) {
                 assertNotNull(currentReference.getTarget());
-                assertEquals(expectedReference.getTarget(),
+                assertEquals(expectedReference.target(),
                     currentReference.getTarget().toString());
             } else {
                 assertNull(currentReference.getTarget());
@@ -250,48 +250,40 @@ public abstract class AbstractProofReferenceTestCase {
     /**
      * Defines the values of an expected proof reference.
      *
+     * @param kind   The expected kind.
+     * @param target The expected target.
      * @author Martin Hentschel
      */
-    protected static class ExpectedProofReferences {
-        /**
-         * The expected kind.
-         */
-        private final String kind;
-
-        /**
-         * The expected target.
-         */
-        private final String target;
-
+        protected record ExpectedProofReferences(String kind, String target) {
         /**
          * Constructor.
          *
-         * @param kind The expected kind.
+         * @param kind   The expected kind.
          * @param target The expected target.
          */
-        public ExpectedProofReferences(String kind, String target) {
-            this.kind = kind;
-            this.target = target;
+        public ExpectedProofReferences {
         }
 
-        /**
-         * Returns the expected kind.
-         *
-         * @return The expected kind.
-         */
-        public String getKind() {
-            return kind;
-        }
+            /**
+             * Returns the expected kind.
+             *
+             * @return The expected kind.
+             */
+            @Override
+            public String kind() {
+                return kind;
+            }
 
-        /**
-         * Returns the expected target.
-         *
-         * @return The expected target.
-         */
-        public String getTarget() {
-            return target;
+            /**
+             * Returns the expected target.
+             *
+             * @return The expected target.
+             */
+            @Override
+            public String target() {
+                return target;
+            }
         }
-    }
 
     /**
      * Does some test steps with a {@link Proof}.

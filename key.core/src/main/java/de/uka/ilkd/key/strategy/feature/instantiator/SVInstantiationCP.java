@@ -61,7 +61,7 @@ public class SVInstantiationCP implements Feature {
     private SchemaVariable findSVWithName(TacletApp app) {
 
         if (svToInstantiate == null) {
-            return app.taclet().getTrigger().getTriggerVar();
+            return app.taclet().getTrigger().triggerVar();
         }
 
         final ImmutableSet<SchemaVariable> vars = app.uninstantiatedVars();

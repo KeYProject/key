@@ -177,8 +177,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
                 // ignore all labels which are not schema variables
                 // if intended to match concrete label, match against schema label
                 // and use an appropriate variable condition
-                if (l instanceof SchemaVariable) {
-                    final SchemaVariable schemaLabel = (SchemaVariable) l;
+                if (l instanceof SchemaVariable schemaLabel) {
                     final MatchConditions cond = ElementMatcher.getElementMatcherFor(schemaLabel)
                             .match(schemaLabel, term, matchCond, services);
                     if (cond == null) {
@@ -340,8 +339,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
     public MatchConditions checkVariableConditions(SchemaVariable var,
             SVSubstitute instantiationCandidate, MatchConditions matchCond, Services services) {
         if (matchCond != null) {
-            if (instantiationCandidate instanceof Term) {
-                final Term term = (Term) instantiationCandidate;
+            if (instantiationCandidate instanceof Term term) {
                 if (!(term.op() instanceof QuantifiableVariable)) {
                     if (varIsBound(var) || varDeclaredNotFree(var)) {
                         // match(x) is not a variable, but the corresponding template variable is

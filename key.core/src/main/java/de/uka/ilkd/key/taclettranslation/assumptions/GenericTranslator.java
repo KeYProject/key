@@ -114,9 +114,8 @@ class GenericTranslator {
 
         }
 
-        if (term.op() instanceof SortDependingFunction) {
+        if (term.op() instanceof SortDependingFunction func) {
 
-            SortDependingFunction func = (SortDependingFunction) term.op();
             try { // Try block is necessary because there are some
                   // taclets
                   // that should have isReference-Condition, but

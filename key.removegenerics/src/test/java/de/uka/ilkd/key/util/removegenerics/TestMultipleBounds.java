@@ -18,10 +18,14 @@ public class TestMultipleBounds extends ResolveGenericClass {
 
     @Test
     public void testJLS1() throws Exception {
-        String before = "interface I1 { void m1(); }\n" + "interface I2 { void m2(); }\n"
-            + "class T { <T extends I1 & I2> void test(T t) {" + "t.m1(); t.m2(); } }";
-        String after = "interface I1 { void m1(); }\n" + "interface I2 { void m2(); }\n"
-            + "class T { void test(I1 t) {" + "t.m1(); ((I2) t).m2(); } }";
+        String before = """
+                interface I1 { void m1(); }
+                interface I2 { void m2(); }
+                class T { <T extends I1 & I2> void test(T t) {t.m1(); t.m2(); } }""";
+        String after = """
+                interface I1 { void m1(); }
+                interface I2 { void m2(); }
+                class T { void test(I1 t) {t.m1(); ((I2) t).m2(); } }""";
         equalCU(before, after);
     }
 

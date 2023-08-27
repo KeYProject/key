@@ -431,39 +431,17 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
             getGenericSortInstantiations(), getGenericSortConditions());
     }
 
-    public static class UpdateLabelPair {
-        private final Term update;
-
-        private final ImmutableArray<TermLabel> updateApplicationlabels;
-
-        public UpdateLabelPair(Term update, ImmutableArray<TermLabel> updateApplicationlabels) {
-            this.update = update;
-            this.updateApplicationlabels = updateApplicationlabels;
-        }
-
-        public Term getUpdate() {
-            return update;
-        }
-
-        public ImmutableArray<TermLabel> getUpdateApplicationlabels() {
-            return updateApplicationlabels;
-        }
-
+    public record UpdateLabelPair(Term update, ImmutableArray<TermLabel> updateApplicationlabels) {
         @Override
-        public int hashCode() {
-            return update.hashCode() + updateApplicationlabels.hashCode() * 7;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof UpdateLabelPair) {
-                return update.equals(((UpdateLabelPair) obj).getUpdate()) && updateApplicationlabels
-                        .equals(((UpdateLabelPair) obj).getUpdateApplicationlabels());
-            } else {
-                return false;
+            public boolean equals(Object obj) {
+                if (obj instanceof UpdateLabelPair) {
+                    return update.equals(((UpdateLabelPair) obj).update()) && updateApplicationlabels
+                            .equals(((UpdateLabelPair) obj).updateApplicationlabels());
+                } else {
+                    return false;
+                }
             }
         }
-    }
 
     public SVInstantiations addUpdateList(ImmutableList<UpdateLabelPair> updates) {
         if (updates.isEmpty() && updateContext.isEmpty()) {
@@ -609,8 +587,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
             pairIterator();
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
-            if (e.value().getInstantiation() instanceof TermLabel) {
-                TermLabel termLabel = (TermLabel) e.value().getInstantiation();
+            if (e.value().getInstantiation() instanceof TermLabel termLabel) {
                 if (!termLabel.isProofRelevant()) {
                     continue;
                 }

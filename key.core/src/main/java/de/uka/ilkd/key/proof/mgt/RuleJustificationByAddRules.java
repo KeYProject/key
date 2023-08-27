@@ -11,15 +11,10 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 
 
-public class RuleJustificationByAddRules implements RuleJustification {
+public record RuleJustificationByAddRules(Node node, boolean isAxiom) implements RuleJustification {
 
-    private final Node node;
-    private final boolean isAxiom;
-
-    public RuleJustificationByAddRules(Node node, boolean isAxiom) {
+    public RuleJustificationByAddRules {
         assert node != null;
-        this.node = node;
-        this.isAxiom = isAxiom;
     }
 
     public boolean isAxiomJustification() {
@@ -34,13 +29,13 @@ public class RuleJustificationByAddRules implements RuleJustification {
         String mother;
         if (motherTaclet().rule() instanceof Taclet) {
             LogicPrinter tacPrinter =
-                LogicPrinter.purePrinter(new NotationInfo(), node.proof().getServices());
+                    LogicPrinter.purePrinter(new NotationInfo(), node.proof().getServices());
             tacPrinter.printTaclet((Taclet) (motherTaclet().rule()));
             mother = tacPrinter.result();
         } else {
             mother = motherTaclet().rule().name().toString();
         }
         return "added rule justification \nintroduced at node " + node.serialNr() + " by rule \n"
-            + mother;
+                + mother;
     }
 }

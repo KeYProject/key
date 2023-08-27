@@ -1137,8 +1137,7 @@ public interface AuxiliaryContract extends SpecificationElement {
                 first = statement.getFirstElement();
             }
 
-            while (first instanceof LabeledStatement) {
-                LabeledStatement s = (LabeledStatement) first;
+            while (first instanceof LabeledStatement s) {
                 first = s.getBody();
             }
 
@@ -1189,8 +1188,7 @@ public interface AuxiliaryContract extends SpecificationElement {
             if (statement instanceof LoopStatement) {
             } else {
                 first = statement.getFirstElement();
-                while (first instanceof LabeledStatement) {
-                    LabeledStatement s = (LabeledStatement) first;
+                while (first instanceof LabeledStatement s) {
                     first = s.getBody();
                 }
 

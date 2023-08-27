@@ -98,10 +98,9 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof BlockExecutionPO)) {
+        if (!(po instanceof BlockExecutionPO cPO)) {
             return false;
         }
-        final BlockExecutionPO cPO = (BlockExecutionPO) po;
         return contract.equals(cPO.contract);
     }
 

@@ -376,8 +376,7 @@ public final class JavaInfo {
         final Type t = kjt.getJavaType();
         if (t instanceof ClassType) {
             return ((ClassType) t).isPrivate();
-        } else if (t instanceof ArrayType) {
-            final ArrayType at = (ArrayType) t;
+        } else if (t instanceof ArrayType at) {
             return isPrivate(at.getBaseType().getKeYJavaType());
         } else // primitive type or null
         {

@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
@@ -71,7 +70,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         final Proof proof = state.getProof();
         final Optional<BuiltInRule> maybeBuiltInRule =
-            proof.getInitConfig().getProfile().getStandardRules().getStandardBuiltInRules().stream()
+            proof.getInitConfig().getProfile().getStandardRules().standardBuiltInRules().stream()
                     .filter(r -> r.name().toString().equals(p.rulename)).findAny();
 
         final Optional<Taclet> maybeTaclet = Optional.ofNullable(
@@ -197,7 +196,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             throws ScriptException {
         final List<IBuiltInRuleApp> matchingApps = //
             findBuiltInRuleApps(p, state).stream().filter(r -> r.rule().name().equals(rule.name()))
-                    .collect(Collectors.toList());
+                    .toList();
 
         if (matchingApps.isEmpty()) {
             throw new ScriptException("No matching applications.");
@@ -343,8 +342,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     private List<TacletApp> filterList(Parameters p, ImmutableList<TacletApp> list) {
         List<TacletApp> matchingApps = new ArrayList<>();
         for (TacletApp tacletApp : list) {
-            if (tacletApp instanceof PosTacletApp) {
-                PosTacletApp pta = (PosTacletApp) tacletApp;
+            if (tacletApp instanceof PosTacletApp pta) {
                 boolean add =
                     p.on == null || pta.posInOccurrence().subTerm().equalsModRenaming(p.on);
 

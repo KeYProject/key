@@ -120,8 +120,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     @Override
     protected void walk(ProgramElement node) {
-        if (node instanceof LocalVariableDeclaration && replaceallbynew) {
-            LocalVariableDeclaration vd = (LocalVariableDeclaration) node;
+        if (node instanceof LocalVariableDeclaration vd && replaceallbynew) {
             ImmutableArray<VariableSpecification> vspecs = vd.getVariableSpecifications();
             for (int i = 0; i < vspecs.size(); i++) {
                 ProgramVariable pv = (ProgramVariable) vspecs.get(i).getProgramVariable();
@@ -317,9 +316,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         if (oldContract instanceof UnparameterizedMergeContract && changed) {
             return new UnparameterizedMergeContract(
                 oldContract.getInstantiatedMergeProcedure(services), newMps, oldContract.getKJT());
-        } else if (oldContract instanceof PredicateAbstractionMergeContract) {
-            final PredicateAbstractionMergeContract pamc =
-                (PredicateAbstractionMergeContract) oldContract;
+        } else if (oldContract instanceof PredicateAbstractionMergeContract pamc) {
             final Map<LocationVariable, Term> atPres = pamc.getAtPres();
 
             final Map<LocationVariable, Term> saveCopy =

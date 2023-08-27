@@ -51,8 +51,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
             return true;
         }
 
-        if (rule instanceof Taclet) {
-            Taclet taclet = (Taclet) rule;
+        if (rule instanceof Taclet taclet) {
             for (RuleSet rs : taclet.getRuleSets()) {
                 if (ADMITTED_RULE_SETS.contains(rs.name().toString())) {
                     return true;

@@ -42,10 +42,9 @@ public final class TextualJMLMergePointDecl extends TextualJMLConstruct {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof TextualJMLMergePointDecl)) {
+        if (!(o instanceof TextualJMLMergePointDecl that)) {
             return false;
         }
-        TextualJMLMergePointDecl that = (TextualJMLMergePointDecl) o;
         return getMergeProc().equals(that.getMergeProc());
     }
 

@@ -43,8 +43,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
     @Override
     protected Operator replaceOp(Operator op, TermServices services) {
 
-        if (op instanceof SortDependingFunction) {
-            SortDependingFunction sdf = (SortDependingFunction) op;
+        if (op instanceof SortDependingFunction sdf) {
             Sort sort = sdf.getSortDependingOn();
             Sort repSort = replaceSort(sort, services);
             if (sort != repSort) {

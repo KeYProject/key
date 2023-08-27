@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.Main;
@@ -91,7 +90,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
          */
         for (SolverType options : solverTypes.stream().filter(
             t -> ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().containsSolver(t))
-                .collect(Collectors.toList())) {
+                .toList()) {
             getChildren().add(new SolverOptions(options));
         }
     }

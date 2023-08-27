@@ -1243,8 +1243,6 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * @param ui The {@link DefaultUserInterfaceControl} to use.
      * @param builder The {@link SymbolicExecutionGoalChooser} to do step on.
      * @param oraclePathInBaseDirFile The oracle path.
-     * @param oracleIndex The index of the current step.
-     * @param oracleFileExtension The oracle file extension
      * @param baseDir The base directory for oracles.
      * @throws IOException Occurred Exception
      * @throws ProofInputException Occurred Exception
@@ -1275,8 +1273,6 @@ public abstract class AbstractSymbolicExecutionTestCase {
      *
      * @param builder The {@link SymbolicExecutionTreeBuilder} to test.
      * @param oraclePathInBaseDirFile The oracle path.
-     * @param oracleIndex The index of the current step.
-     * @param oracleFileExtension The oracle file extension
      * @param baseDir The base directory for oracles.
      * @throws IOException Occurred Exception
      * @throws ProofInputException Occurred Exception
@@ -1342,7 +1338,6 @@ public abstract class AbstractSymbolicExecutionTestCase {
      *
      * @param baseDir The base directory which contains test and oracle file.
      * @param baseContractName The name of the contract.
-     * @param methodFullName The method name to search.
      * @param mergeBranchConditions Merge branch conditions?
      * @param useOperationContracts Use operation contracts?
      * @param useLoopInvarints Use loop invariants?

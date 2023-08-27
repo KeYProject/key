@@ -23,7 +23,7 @@ import de.uka.ilkd.key.speclang.Contract;
  *
  * @author Martin Hentschel
  * @see ProofReferenceUtil
- * @see IProofReferencesAnalyst.
+ * @see IProofReferencesAnalyst
  */
 public interface IProofReference<T> {
     /**

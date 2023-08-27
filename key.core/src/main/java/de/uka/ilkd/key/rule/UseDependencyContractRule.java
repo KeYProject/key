@@ -323,7 +323,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
         // top level symbol must be observer
         final Term focus = pio.subTerm();
-        if (!(focus.op() instanceof IObserverFunction)) {
+        if (!(focus.op() instanceof IObserverFunction target)) {
             return false;
         }
 
@@ -340,7 +340,6 @@ public final class UseDependencyContractRule implements BuiltInRule {
         // heap term of observer must be store-term (or anon, create,
         // memset, ...)
         final Services services = goal.proof().getServices();
-        final IObserverFunction target = (IObserverFunction) focus.op();
         // final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
         boolean hasRawSteps = false;
         for (int i = 0; i < target.getHeapCount(services) * target.getStateCount(); i++) {

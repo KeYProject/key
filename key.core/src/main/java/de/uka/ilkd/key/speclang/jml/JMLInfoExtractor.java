@@ -157,8 +157,7 @@ public final class JMLInfoExtractor {
         int position = 0;
 
         for (final MemberDeclaration md : td.getMembers()) {
-            if (md instanceof FieldDeclaration) {
-                FieldDeclaration tmp = (FieldDeclaration) md;
+            if (md instanceof FieldDeclaration tmp) {
                 ImmutableArray<FieldSpecification> aofs = tmp.getFieldSpecifications();
                 for (int j = 0; j < aofs.size(); j++) {
                     if (aofs.get(j).getProgramName().equals(fieldName)) {

@@ -184,9 +184,8 @@ public class InitArrayCreation extends InitArray {
                 return new ProgramElement[] {
                     arrayCreationWithoutInitializers(array, na, services) };
             }
-        } else if (pe instanceof ArrayInitializer) {
+        } else if (pe instanceof ArrayInitializer init) {
             final KeYJavaType kjt = array.getKeYJavaType(services, svInst.getExecutionContext());
-            final ArrayInitializer init = (ArrayInitializer) pe;
             ArrayType arrayType = null;
             try {
                 arrayType = (ArrayType) kjt.getJavaType();

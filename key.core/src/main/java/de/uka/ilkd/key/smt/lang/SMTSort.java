@@ -211,10 +211,9 @@ public class SMTSort {
             return true;
         }
 
-        if (!(that instanceof SMTSort)) {
+        if (!(that instanceof SMTSort sort)) {
             return false;
         }
-        SMTSort sort = (SMTSort) that;
 
         if (this.isBV() && sort.isBV()) {
             return this.bitSize == sort.bitSize;

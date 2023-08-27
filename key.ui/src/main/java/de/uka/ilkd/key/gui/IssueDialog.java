@@ -376,8 +376,7 @@ public final class IssueDialog extends JDialog {
                 Element elem = getHyperlinkElement(translated);
                 if (elem != null) {
                     Object attribute = elem.getAttributes().getAttribute(HTML.Tag.A);
-                    if (attribute instanceof AttributeSet) {
-                        AttributeSet set = (AttributeSet) attribute;
+                    if (attribute instanceof AttributeSet set) {
                         String href = (String) set.getAttribute(HTML.Attribute.HREF);
                         if (href != null) {
                             try {
@@ -417,8 +416,7 @@ public final class IssueDialog extends JDialog {
                 Element elem = getHyperlinkElement(translated);
                 if (elem != null) {
                     Object attribute = elem.getAttributes().getAttribute(HTML.Tag.A);
-                    if (attribute instanceof AttributeSet) {
-                        AttributeSet set = (AttributeSet) attribute;
+                    if (attribute instanceof AttributeSet set) {
                         String href = (String) set.getAttribute(HTML.Attribute.HREF);
                         if (href != null && !entered) {
                             entered = true;
@@ -479,8 +477,7 @@ public final class IssueDialog extends JDialog {
     private static Element getHyperlinkElement(MouseEvent event) {
         JEditorPane editor = (JEditorPane) event.getSource();
         int pos = editor.getUI().viewToModel(editor, event.getPoint());
-        if (pos >= 0 && editor.getDocument() instanceof HTMLDocument) {
-            HTMLDocument hdoc = (HTMLDocument) editor.getDocument();
+        if (pos >= 0 && editor.getDocument() instanceof HTMLDocument hdoc) {
             Element elem = hdoc.getCharacterElement(pos);
             if (elem.getAttributes().getAttribute(HTML.Tag.A) != null) {
                 return elem;
