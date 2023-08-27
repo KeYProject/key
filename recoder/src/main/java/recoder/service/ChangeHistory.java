@@ -480,8 +480,7 @@ public class ChangeHistory extends AbstractService {
         }
         while (reportCount > position) {
             reportCount -= 1;
-            if (reportStack[reportCount] instanceof TreeChange) {
-                TreeChange lastChange = (TreeChange) reportStack[reportCount];
+            if (reportStack[reportCount] instanceof TreeChange lastChange) {
                 TreeChange undoChange = undo(lastChange);
                 if (lastChange == getTailChange()) {
                     // if the change is still in the update queue, remove it
@@ -599,10 +598,9 @@ public class ChangeHistory extends AbstractService {
             }
             return result;
         }
-        if (!(tc instanceof DetachChange)) {
+        if (!(tc instanceof DetachChange dc)) {
             return null;
         }
-        DetachChange dc = (DetachChange) tc;
 
         // !!!!!!!!!!!!!!!!!!!!!!
         // if (dc.getReplacement() != null) ...

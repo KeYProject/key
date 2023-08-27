@@ -81,17 +81,15 @@ public class ResolveGenerics extends TwoPassTransformation {
                         alwaysCast = true;
                     }
 
-                    if (tr.getASTParent() instanceof MethodDeclaration) {
+                    if (tr.getASTParent() instanceof MethodDeclaration md) {
                         // may need to introduce some extra type casts for additional bounds...
-                        MethodDeclaration md = (MethodDeclaration) tr.getASTParent();
                         List<MemberReference> mrl = ci.getReferences(md);
                         for (MemberReference memberReference : mrl) {
                             MethodReference mr = (MethodReference) memberReference;
                             NonTerminalProgramElement parent = mr.getASTParent();
-                            if (parent instanceof MethodReference) {
+                            if (parent instanceof MethodReference pr) {
                                 // find out what type's method is referenced
                                 ClassType tmpResolved = resolvedType;
-                                MethodReference pr = (MethodReference) parent;
                                 do {
                                     // need to deal with reference suffixes, too!
                                     ClassType target = ci.getMethod(pr).getContainingClassType();
@@ -132,8 +130,7 @@ public class ResolveGenerics extends TwoPassTransformation {
                                         TypeKit.createTypeReference(ci, target, mr)));
                                 }
                                 // may also need to cast rhs of assignment
-                                if (parent instanceof Assignment) {
-                                    Assignment as = (Assignment) parent;
+                                if (parent instanceof Assignment as) {
                                     if (as.getExpressionAt(0) == mr) {
                                         casts.add(new IntroduceCast(as, TypeKit.createTypeReference(
                                             ci, target, as.getExpressionAt(1))));
@@ -187,11 +184,9 @@ public class ResolveGenerics extends TwoPassTransformation {
                 if (p.analyze() != IDENTITY) {
                     parts.add(p);
                 }
-            } else if (pe instanceof TypeReference) {
+            } else if (pe instanceof TypeReference tr) {
                 TwoPassTransformation p;
-                TypeReference tr = (TypeReference) pe;
-                if (parent instanceof MethodDeclaration) {
-                    MethodDeclaration md = (MethodDeclaration) parent;
+                if (parent instanceof MethodDeclaration md) {
                     if (md.getTypeReference() != tr) {
                         continue; // argument, not return type
                     }
@@ -203,7 +198,7 @@ public class ResolveGenerics extends TwoPassTransformation {
                         }
                     }
                     p = new ResolveMethodReturnType(getServiceConfiguration(), md);
-                } else if (parent instanceof VariableDeclaration) {
+                } else if (parent instanceof VariableDeclaration vd) {
                     Type t = getSourceInfo().getType(tr);
                     if (t instanceof TypeDeclaration && !(t instanceof TypeParameterDeclaration)) {
                         CompilationUnit tcu = UnitKit.getCompilationUnit((TypeDeclaration) t);
@@ -211,7 +206,6 @@ public class ResolveGenerics extends TwoPassTransformation {
                             continue;
                         }
                     }
-                    VariableDeclaration vd = (VariableDeclaration) parent;
                     p = new ResolveSingleVariableDeclaration(getServiceConfiguration(), vd);
                 } else if (parent instanceof InheritanceSpecification) {
                     // InheritanceSpecification is = (InheritanceSpecification)parent;
@@ -254,8 +248,7 @@ public class ResolveGenerics extends TwoPassTransformation {
                 if (p.analyze() != IDENTITY) {
                     trParts.add(p);
                 }
-            } else if (pe instanceof New) {
-                New n = (New) pe;
+            } else if (pe instanceof New n) {
                 if (n.getTypeReference().getTypeArguments() != null) {
                     stuffToBeRemoved.addAll(n.getTypeReference().getTypeArguments());
                 }

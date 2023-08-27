@@ -64,8 +64,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
     private IProgramVariable findAttr(String fieldName) {
         String completeName = getFullName() + "::" + fieldName;
         for (int i = 0; i < members.size(); i++) {
-            if (members.get(i) instanceof FieldDeclaration) {
-                FieldDeclaration fd = (FieldDeclaration) members.get(i);
+            if (members.get(i) instanceof FieldDeclaration fd) {
                 FieldSpecification fs = fd.getFieldSpecifications().get(0);
                 if (fs.getName().equals(completeName)) {
                     return fs.getProgramVariable();

@@ -62,8 +62,7 @@ public class SaveInstCommand extends AbstractCommand<Map<String, String>> {
             try {
                 final RuleApp ruleApp =
                     stateMap.getFirstOpenAutomaticGoal().node().parent().getAppliedRuleApp();
-                if (ruleApp instanceof TacletApp) {
-                    final TacletApp tacletApp = (TacletApp) ruleApp;
+                if (ruleApp instanceof TacletApp tacletApp) {
                     final Object inst = tacletApp.matchConditions().getInstantiations()
                             .lookupValue(new Name(value));
                     if (inst != null && ((Term) inst).op() instanceof Function) {

@@ -138,8 +138,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
     public List<ClassType> getSupertypes(ClassType ct) {
         Debug.assertNonnull(ct);
         // TODO cache / register (?)
-        if (ct instanceof TypeParameterInfo) {
-            TypeParameterInfo tp = (TypeParameterInfo) ct;
+        if (ct instanceof TypeParameterInfo tp) {
             List<ClassType> res = new ArrayList<>();
             if (tp.getBoundCount() == 0) {
                 // see JLS 3rd edition ?4.4

@@ -95,10 +95,9 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof SymbolicExecutionPO)) {
+        if (!(po instanceof SymbolicExecutionPO cPO)) {
             return false;
         }
-        final SymbolicExecutionPO cPO = (SymbolicExecutionPO) po;
         return contract.equals(cPO.contract);
     }
 

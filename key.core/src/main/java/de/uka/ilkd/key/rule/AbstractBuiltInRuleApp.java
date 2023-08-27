@@ -145,10 +145,9 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 
     @Override
     public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof IBuiltInRuleApp)) {
+        if (!(obj instanceof IBuiltInRuleApp that)) {
             return false;
         }
-        IBuiltInRuleApp that = (IBuiltInRuleApp) obj;
         if (!(Objects.equals(rule(), that.rule())
                 && Objects.equals(getHeapContext(), that.getHeapContext()))) {
             return false;

@@ -267,10 +267,9 @@ public class SMTTermQuant extends SMTTerm {
             return true;
         }
 
-        if (!(term instanceof SMTTermQuant)) {
+        if (!(term instanceof SMTTermQuant qt)) {
             return false;
         }
-        SMTTermQuant qt = (SMTTermQuant) term;
 
         if (!this.quant.equals(qt.quant)) {
             return false;

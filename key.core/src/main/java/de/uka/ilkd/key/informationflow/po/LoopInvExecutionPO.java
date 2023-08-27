@@ -117,10 +117,9 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof LoopInvExecutionPO)) {
+        if (!(po instanceof LoopInvExecutionPO lPO)) {
             return false;
         }
-        LoopInvExecutionPO lPO = (LoopInvExecutionPO) po;
         return loopInvariant.equals(lPO.loopInvariant);
     }
 

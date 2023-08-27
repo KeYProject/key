@@ -705,8 +705,7 @@ public final class MainWindow extends JFrame {
          */
         smtComponent.addListener(e -> {
             DropdownSelectionButton but = (DropdownSelectionButton) e.getSource();
-            if (but.getAction() instanceof SMTInvokeAction) {
-                SMTInvokeAction action = (SMTInvokeAction) but.getAction();
+            if (but.getAction() instanceof SMTInvokeAction action) {
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
                         .setActiveSolverUnion(action.getSolverUnion());
             }

@@ -101,8 +101,7 @@ public class MissingProofsChecker implements Checker {
             // considered. For other contracts (e.g. from bootclasspath) a message is
             // printed if loglevel is low enough.
             Type type = c.getKJT().getJavaType();
-            if (type instanceof TypeDeclaration) {
-                TypeDeclaration td = (TypeDeclaration) type;
+            if (type instanceof TypeDeclaration td) {
                 PositionInfo positionInfo = td.getPositionInfo();
                 URI uri = positionInfo.getURI().orElseThrow().normalize();
                 URI srcURI = data.getPbh().getPath("src").toAbsolutePath().normalize().toUri();

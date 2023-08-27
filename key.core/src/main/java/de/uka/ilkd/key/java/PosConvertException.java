@@ -72,8 +72,7 @@ public class PosConvertException extends ConvertException implements HasLocation
     public Location getLocation() throws MalformedURLException {
         Throwable cause = getCause();
         if (this.file == null) {
-            if (cause instanceof UnresolvedReferenceException) {
-                UnresolvedReferenceException ure = (UnresolvedReferenceException) cause;
+            if (cause instanceof UnresolvedReferenceException ure) {
                 CompilationUnit cu = UnitKit.getCompilationUnit(ure.getUnresolvedReference());
                 String dataloc = cu.getDataLocation().toString();
                 this.file = dataloc.substring(dataloc.indexOf(':') + 1);

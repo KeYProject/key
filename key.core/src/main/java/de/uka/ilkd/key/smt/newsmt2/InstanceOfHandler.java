@@ -33,8 +33,7 @@ public class InstanceOfHandler implements SMTHandler {
 
     @Override
     public boolean canHandle(Operator op) {
-        if (op instanceof SortDependingFunction) {
-            SortDependingFunction sdf = (SortDependingFunction) op;
+        if (op instanceof SortDependingFunction sdf) {
             return exactInstanceOfOp.isSimilar(sdf) || instanceOfOp.isSimilar(sdf);
         }
         return false;

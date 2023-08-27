@@ -57,8 +57,7 @@ public class ResolveVarArgs extends TwoPassTransformation {
         TreeWalker tw = new TreeWalker(cu);
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
-            if (pe instanceof MethodDeclaration) {
-                MethodDeclaration md = (MethodDeclaration) pe;
+            if (pe instanceof MethodDeclaration md) {
                 if (md.isVarArgMethod()) {
                     varArgMeths.add(md);
                     lastParamTypes.add(getSourceInfo().getType(

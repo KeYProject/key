@@ -193,8 +193,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
             Services services, List<TermLabel> labels) {
         if (goal != null && !isInnerMostParentRefactored(state, goal)) {
             TermLabel existingLabel = term.getLabel(FormulaTermLabel.NAME);
-            if (existingLabel instanceof FormulaTermLabel) {
-                FormulaTermLabel pLabel = (FormulaTermLabel) existingLabel;
+            if (existingLabel instanceof FormulaTermLabel pLabel) {
                 int labelID = pLabel.getMajorId();
                 int labelSubID = FormulaTermLabel.newLabelSubID(services, labelID);
                 labels.remove(existingLabel);
@@ -411,7 +410,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
         Set<SequentFormula> sfSet =
             (Set<SequentFormula>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
         if (sfSet == null) {
-            sfSet = new LinkedHashSet<SequentFormula>();
+            sfSet = new LinkedHashSet<>();
             labelState.put(SEQUENT_FORMULA_REFACTORING_REQUIRED, sfSet);
         }
         sfSet.add(sf);

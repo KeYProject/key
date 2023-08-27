@@ -280,7 +280,7 @@ public class InitConfig {
     public ImmutableList<BuiltInRule> builtInRules() {
         Profile profile = getProfile();
         return (profile == null ? ImmutableSLList.nil()
-                : profile.getStandardRules().getStandardBuiltInRules());
+                : profile.getStandardRules().standardBuiltInRules());
     }
 
 

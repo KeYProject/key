@@ -45,36 +45,15 @@ public class SolverCommunication {
 
     /**
      * Represents a single message sent from or to the solver.
+     *
+     * @param content the text of the message
+     * @param type the type of the message (INPUT/OUTPUT/ERROR)
      */
-    public static final class Message {
-        /** the text of the message */
-        private final String content;
-
-        /** the type of the message (INPUT/OUTPUT/ERROR) */
-        private final MessageType type;
-
-        /**
-         * Creates a new message.
-         *
-         * @param content the text of the new message
-         * @param type the type of the new message
-         */
-        public Message(String content, MessageType type) {
-            this.content = content;
-            this.type = type;
-        }
-
-        public String getContent() {
-            return content;
-        }
-
-        public MessageType getType() {
-            return type;
-        }
+    public record Message(String content, MessageType type) {
     }
 
     /**
-     * Returns all messages that were sent between KeY and the solver. Note that, input and output
+     * Returns all messages that were sent between KeY and the solver. Note that input and output
      * messages are interwoven but in order.
      *
      * @return all messages sent in both directions
@@ -93,7 +72,7 @@ public class SolverCommunication {
      */
     public Iterable<Message> getMessages(MessageType type) {
         // since we stream from a list, the original order is maintained
-        return messages.stream().sequential().filter(m -> m.getType() == type)
+        return messages.stream().filter(m -> m.type() == type)
                 // ACTIVATE WHEN Java 11: // .collect(Collectors.toUnmodifiableList());
                 .collect(Collectors.toList());
     }
@@ -106,8 +85,8 @@ public class SolverCommunication {
      */
     public Iterable<Message> getOutMessages() {
         // since we stream from a list, the original order is maintained
-        return messages.stream().sequential()
-                .filter(m -> m.getType() == MessageType.OUTPUT || m.getType() == MessageType.ERROR)
+        return messages.stream()
+                .filter(m -> m.type() == MessageType.OUTPUT || m.type() == MessageType.ERROR)
                 // ACTIVATE WHEN Java 11: // .collect(Collectors.toUnmodifiableList());
                 .collect(Collectors.toList());
     }

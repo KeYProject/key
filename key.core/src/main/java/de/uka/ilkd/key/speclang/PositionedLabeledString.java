@@ -71,10 +71,9 @@ public class PositionedLabeledString extends PositionedString {
      */
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof PositionedLabeledString)) {
+        if (!(o instanceof PositionedLabeledString cmp)) {
             return false;
         }
-        final PositionedLabeledString cmp = (PositionedLabeledString) o;
         if (labels.size() == cmp.labels.size()) {
             if (!super.equals(o)) {
                 return false;

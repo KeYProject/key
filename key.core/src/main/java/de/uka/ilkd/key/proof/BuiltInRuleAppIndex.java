@@ -182,7 +182,7 @@ public class BuiltInRuleAppIndex {
 
         while (!fcis.isEmpty()) {
             final FormulaChangeInfo fci = fcis.head();
-            final SequentFormula cfma = fci.getNewFormula();
+            final SequentFormula cfma = fci.newFormula();
             scanSimplificationRule(index.rules(), goal, antec, cfma, listener);
             fcis = fcis.tail();
         }

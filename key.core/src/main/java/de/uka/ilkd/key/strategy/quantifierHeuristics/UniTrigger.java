@@ -74,10 +74,9 @@ class UniTrigger implements Trigger {
     }
 
     public boolean equals(Object arg0) {
-        if (!(arg0 instanceof UniTrigger)) {
+        if (!(arg0 instanceof UniTrigger a)) {
             return false;
         }
-        final UniTrigger a = (UniTrigger) arg0;
         return a.trigger.equals(trigger);
     }
 

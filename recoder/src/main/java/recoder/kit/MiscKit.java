@@ -199,8 +199,7 @@ public class MiscKit {
      * </CODE> if there is no such element.
      */
     public static ProgramElement checkParentLinks(ProgramElement root) {
-        if (root instanceof NonTerminalProgramElement) {
-            NonTerminalProgramElement nt = (NonTerminalProgramElement) root;
+        if (root instanceof NonTerminalProgramElement nt) {
             for (int s = nt.getChildCount(), i = 0; i < s; i += 1) {
                 ProgramElement child = nt.getChildAt(i);
                 if (child.getASTParent() != nt) {

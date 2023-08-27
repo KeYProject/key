@@ -66,14 +66,15 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
     private void ensureChildrenArray() {
         if (children == null) {
             Node node = getNode();
-            if (node != null && node.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
-                Protocol protocol =
-                    ((OneStepSimplifierRuleApp) node.getAppliedRuleApp()).getProtocol();
+            if (node != null
+                    && node.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp ruleApp) {
+                Protocol protocol = ruleApp.getProtocol();
                 if (protocol != null) {
                     children = new GUIAbstractTreeNode[protocol.size()];
                     for (int i = 0; i < children.length; i++) {
                         children[i] =
-                            new GUIOneStepChildTreeNode(getProofTreeModel(), this, protocol.get(i));
+                            new GUIOneStepChildTreeNode(getProofTreeModel(), this, protocol.get(i),
+                                node.sequent().formulaNumberInSequent(ruleApp.posInOccurrence()));
                     }
                     return;
                 }

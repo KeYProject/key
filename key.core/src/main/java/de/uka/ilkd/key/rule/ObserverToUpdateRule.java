@@ -350,11 +350,10 @@ public final class ObserverToUpdateRule implements BuiltInRule {
 
         // active statement must be reading model field
         final SourceElement activeStatement = JavaTools.getActiveStatement(mainFml.javaBlock());
-        if (!(activeStatement instanceof CopyAssignment)) {
+        if (!(activeStatement instanceof CopyAssignment ca)) {
             return null;
         }
 
-        final CopyAssignment ca = (CopyAssignment) activeStatement;
         final Expression lhs = ca.getExpressionAt(0);
         final Expression rhs = ca.getExpressionAt(1);
 

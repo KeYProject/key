@@ -35,7 +35,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     /** the empty set */
     @SuppressWarnings("unchecked")
-    public static final <T> DefaultImmutableSet<T> nil() {
+    public static <T> DefaultImmutableSet<T> nil() {
         return (DefaultImmutableSet<T>) NILSet.NIL;
     }
 

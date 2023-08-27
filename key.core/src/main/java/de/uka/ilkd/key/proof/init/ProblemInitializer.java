@@ -408,7 +408,7 @@ public final class ProblemInitializer {
             // register built in rules
             Profile profile = proofs[i].getInitConfig().getProfile();
             final ImmutableList<BuiltInRule> rules =
-                profile.getStandardRules().getStandardBuiltInRules();
+                profile.getStandardRules().standardBuiltInRules();
             int j = 0;
             final int step = rules.size() != 0 ? (7 / rules.size()) : 0;
             for (Rule r : rules) {

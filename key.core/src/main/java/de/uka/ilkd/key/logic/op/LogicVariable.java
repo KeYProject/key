@@ -31,10 +31,9 @@ public final class LogicVariable extends AbstractSortedOperator
 
     @Override
     public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof LogicVariable)) {
+        if (!(obj instanceof LogicVariable that)) {
             return false;
         }
-        LogicVariable that = (LogicVariable) obj;
         return name().equals(that.name()) && sort().equals(that.sort());
     }
 

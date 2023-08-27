@@ -25,9 +25,10 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         "Comma separated list of rule set names, containing clutter rules.";
     private static final String INFO_CLUTTER_RULE = "Comma separated listof clutter rules, \n"
         + "which are rules with less priority in the taclet menu";
-    private static final String LOOK_AND_FEEL_INFO = "Look and feel used by KeY.\n"
-        + "'System' tries to mimic the default looks, 'Metal' is the Java default.\n"
-        + "KeY must be restarted to apply changes.";
+    private static final String LOOK_AND_FEEL_INFO = """
+            Look and feel used by KeY.
+            'System' tries to mimic the default looks, 'Metal' is the Java default.
+            KeY must be restarted to apply changes.""";
     /**
      * Labels for the selectable look and feels. Must be kept in sync with {@link #LAF_CLASSES}.
      */
@@ -83,9 +84,11 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         addTitledComponent("Tree and sequent font factor: ", spFontSizeTreeSequent, "");
 
 
-        String info = "Maximum size (line count) of the tooltips of applicable rules\n"
-            + "<br> with schema variable instantiations displayed.\n"
-            + "In case of longer <br>tooltips the instantiation will be suppressed.\n";
+        String info = """
+                Maximum size (line count) of the tooltips of applicable rules
+                <br> with schema variable instantiations displayed.
+                In case of longer <br>tooltips the instantiation will be suppressed.
+                """;
         txtMaxTooltipLines =
             addNumberField("Maximum line number for tooltips", 1, 100, 5, info, emptyValidator());
 

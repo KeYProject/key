@@ -210,8 +210,7 @@ public abstract class ElementMatcher<T extends Operator> {
             if (subst == op) {
                 return mc;
             }
-            if (subst instanceof LogicVariable) {
-                final LogicVariable lv = (LogicVariable) subst;
+            if (subst instanceof LogicVariable lv) {
                 if (lv.sort() == op.sort() && mc.renameTable().sameAbstractName(op, lv)) {
                     return mc;
                 }
@@ -227,14 +226,13 @@ public abstract class ElementMatcher<T extends Operator> {
         @Override
         public MatchConditions match(ModalOperatorSV op, SVSubstitute subst, MatchConditions mc,
                 Services services) {
-            if (!(subst instanceof Modality)) {
+            if (!(subst instanceof Modality m)) {
                 LOGGER.debug(
                     "FAILED. ModalOperatorSV matches only modalities (template, orig) {} {}", op,
                     subst);
                 return null;
             }
 
-            final Modality m = (Modality) subst;
             if (op.getModalities().contains(m)) {
                 Operator o = (Operator) mc.getInstantiations().getInstantiation(op);
                 if (o == null) {
@@ -308,7 +306,7 @@ public abstract class ElementMatcher<T extends Operator> {
             // This restriction has been dropped for free generic sorts to prove taclets correct
             // assert !(s2 instanceof GenericSort)
             // : "Sort s2 is not allowed to be of type generic.";s
-            if (!(s1 instanceof GenericSort)) {
+            if (!(s1 instanceof GenericSort gs)) {
                 if (s1 == s2) {
                     return mc;
                 } else {
@@ -316,7 +314,6 @@ public abstract class ElementMatcher<T extends Operator> {
                     return null;
                 }
             } else {
-                final GenericSort gs = (GenericSort) s1;
                 final GenericSortCondition c = GenericSortCondition.createIdentityCondition(gs, s2);
                 if (c == null) {
                     LOGGER.debug("FAILED. Generic sort condition");
@@ -342,13 +339,12 @@ public abstract class ElementMatcher<T extends Operator> {
         @Override
         public MatchConditions match(SortDependingFunction op, SVSubstitute subst,
                 MatchConditions mc, Services services) {
-            if (!(subst instanceof SortDependingFunction)) {
+            if (!(subst instanceof SortDependingFunction sdp)) {
                 LOGGER.debug("FAILED. Given operator cannot be matched by a sort"
                     + "depending function (template, orig) {} {}", op, subst);
                 return null;
             }
 
-            final SortDependingFunction sdp = (SortDependingFunction) subst;
             if (!op.isSimilar(sdp)) {
                 LOGGER.debug("FAILED. Sort depending symbols not similar. {} {}", op, subst);
                 return null;
@@ -373,11 +369,10 @@ public abstract class ElementMatcher<T extends Operator> {
         @Override
         public MatchConditions match(TermLabelSV op, SVSubstitute subst, MatchConditions mc,
                 Services services) {
-            if (!(subst instanceof Term)) {
+            if (!(subst instanceof Term t)) {
                 return null;
             }
 
-            final Term t = (Term) subst;
             final SVInstantiations svInsts = mc.getInstantiations();
             final TermLabelInstantiationEntry inst =
                 (TermLabelInstantiationEntry) svInsts.getInstantiation(op);

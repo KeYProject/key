@@ -130,8 +130,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
      */
     private TacletApp filterList(Parameters p, ImmutableList<TacletApp> list) {
         for (TacletApp tacletApp : list) {
-            if (tacletApp instanceof PosTacletApp) {
-                PosTacletApp pta = (PosTacletApp) tacletApp;
+            if (tacletApp instanceof PosTacletApp pta) {
                 if (pta.posInOccurrence().subTerm().equalsModRenaming(p.formula)) {
                     return pta;
                 }

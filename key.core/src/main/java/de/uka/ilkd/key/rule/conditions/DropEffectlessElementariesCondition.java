@@ -35,8 +35,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
 
     private static Term dropEffectlessElementariesHelper(Term update,
             Set<LocationVariable> relevantVars, TermServices services) {
-        if (update.op() instanceof ElementaryUpdate) {
-            ElementaryUpdate eu = (ElementaryUpdate) update.op();
+        if (update.op() instanceof ElementaryUpdate eu) {
             LocationVariable lhs = (LocationVariable) eu.lhs();
             if (relevantVars.contains(lhs)) {
                 relevantVars.remove(lhs);

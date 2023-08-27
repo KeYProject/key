@@ -33,8 +33,7 @@ public class MethodStackInfo implements NameCreationInfo {
             final ImmutableArray<ProgramPrefix> prefix =
                 ((ProgramPrefix) element).getPrefixElements();
             for (int i = prefix.size() - 1; i >= 0; i--) {
-                if (prefix.get(i) instanceof MethodFrame) {
-                    final MethodFrame frame = (MethodFrame) prefix.get(i);
+                if (prefix.get(i) instanceof MethodFrame frame) {
                     IProgramMethod method = frame.getProgramMethod();
                     if (method != null) {
                         list = list.prepend(method);
