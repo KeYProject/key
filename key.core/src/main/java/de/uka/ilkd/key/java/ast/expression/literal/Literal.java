@@ -35,10 +35,14 @@ import org.key_project.util.ExtList;
  * @author <TT>AutoDoc</TT>
  */
 
-public abstract sealed class Literal extends JavaProgramElement
+public abstract sealed
+
+class Literal extends JavaProgramElement
         implements Expression, TerminalProgramElement
-        permits AbstractIntegerLiteral, BooleanLiteral, DoubleLiteral, EmptyMapLiteral,
-                EmptySeqLiteral, EmptySetLiteral, FloatLiteral, FreeLiteral, NullLiteral, RealLiteral, StringLiteral {
+permits AbstractIntegerLiteral, BooleanLiteral, DoubleLiteral, EmptyMapLiteral,
+                EmptySeqLiteral, EmptySetLiteral, FloatLiteral, FreeLiteral, NullLiteral, RealLiteral, StringLiteral
+{
+
     public Literal(@Nullable PositionInfo pi, @Nullable List<Comment> comments) {
         super(pi, comments);
     }

@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 import org.key_project.util.java.CollectionUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -432,7 +433,8 @@ public class Services implements TermServices {
         return javaService;
     }
 
-    private JavaService activateJavaPath(@Nonnull Path bootClassPath, Collection<Path> libraryPaths) {
+    private JavaService activateJavaPath(@Nonnull Path bootClassPath,
+            Collection<Path> libraryPaths) {
         if (javaService != null && javaService.getBootClassPath().equals(bootClassPath)
                 && CollectionUtil.containsSame(javaService.getLibraryPath(), libraryPaths)) {
             return javaService;
@@ -459,7 +461,7 @@ public class Services implements TermServices {
 
     public static Path getReduxPath() {
         // TODO weigl: where to put this code. The implementation of services.getProfile() is
-        //      stupid.
+        // stupid.
         var resourcePath = "JavaRedux/JAVALANG.TXT";
         var url = KeYResourceManager.getManager().getResourceFile(JavaService.class, resourcePath);
         try {

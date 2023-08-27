@@ -15,7 +15,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 
 public class FieldReference extends VariableReference
-        implements MemberReference      , ReferenceSuffix, TypeReferenceContainer, ExpressionContainer {
+        implements MemberReference, ReferenceSuffix, TypeReferenceContainer, ExpressionContainer {
 
     /**
      * Reference prefix.

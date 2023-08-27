@@ -5,8 +5,8 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class ArrayLength extends ProgramTransformer {

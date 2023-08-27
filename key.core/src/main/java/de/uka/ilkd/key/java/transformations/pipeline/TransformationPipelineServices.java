@@ -292,10 +292,10 @@ public class TransformationPipelineServices {
 
             final var name = p.name();
             return switch (name.toLowerCase()) {
-                case "int", "byte", "short" -> new IntegerLiteralExpr("0");
-                case "char" -> new CharLiteralExpr("0");
-                case "float", "double" -> new DoubleLiteralExpr("0.0");
-                default -> throw new IllegalStateException("Unexpected value: " + name.toLowerCase());
+            case "int", "byte", "short" -> new IntegerLiteralExpr("0");
+            case "char" -> new CharLiteralExpr("0");
+            case "float", "double" -> new DoubleLiteralExpr("0.0");
+            default -> throw new IllegalStateException("Unexpected value: " + name.toLowerCase());
             };
         }
 

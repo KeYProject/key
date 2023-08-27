@@ -97,7 +97,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     }
 
     public MethodBodyStatement(IProgramMethod method, ReferencePrefix newContext,
-                               IProgramVariable res, ImmutableArray<Expression> args, boolean useSpecification) {
+            IProgramVariable res, ImmutableArray<Expression> args, boolean useSpecification) {
         this(method, newContext, res, args, useSpecification, null);
     }
 

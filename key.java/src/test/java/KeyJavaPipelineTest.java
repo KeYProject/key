@@ -1,6 +1,21 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.transformations.KeYJavaPipeline;
+import de.uka.ilkd.key.java.transformations.pipeline.JavaTransformer;
+import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.Problem;
@@ -12,26 +27,11 @@ import com.github.javaparser.printer.Printer;
 import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
 import com.github.javaparser.printer.configuration.PrinterConfiguration;
 import com.google.common.truth.Truth;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.transformations.KeYJavaPipeline;
-import de.uka.ilkd.key.java.transformations.pipeline.JavaTransformer;
-import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
-import de.uka.ilkd.key.proof.init.JavaProfile;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * @author Alexander Weigl

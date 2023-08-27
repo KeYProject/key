@@ -143,7 +143,8 @@ public class TestJP2KeY {
     public Stream<DynamicTest> testJBlocks() {
         return Arrays.stream(JAVA_BLOCKS).map(it -> DynamicTest.dynamicTest(it, () -> {
             String keyProg = removeBlanks(c2k.readBlockWithEmptyContext(it, null).toString());
-            String recoderProg = removeBlanks(c2k.parseBlock(it, c2k.createEmptyContext()).toString());
+            String recoderProg =
+                removeBlanks(c2k.parseBlock(it, c2k.createEmptyContext()).toString());
             assertEquals(recoderProg, keyProg);
         }));
     }
@@ -162,6 +163,7 @@ public class TestJP2KeY {
      */
     @TestFactory
     public Stream<DynamicTest> testJClasses() {
-        return Arrays.stream(JAVA_CLASSES).map(it -> DynamicTest.dynamicTest(it, () -> testClass(it)));
+        return Arrays.stream(JAVA_CLASSES)
+                .map(it -> DynamicTest.dynamicTest(it, () -> testClass(it)));
     }
 }

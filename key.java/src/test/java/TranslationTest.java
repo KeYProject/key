@@ -10,6 +10,8 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 
+import org.key_project.util.collection.ImmutableSet;
+
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
@@ -20,7 +22,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
-import org.key_project.util.collection.ImmutableSet;
 
 /**
  * @author Alexander Weigl
