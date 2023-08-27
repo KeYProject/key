@@ -6,10 +6,7 @@ package de.uka.ilkd.key.java;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.Map.Entry;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -23,6 +20,8 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 import org.key_project.util.java.CollectionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * this is a collection of common services to the KeY prover. Services include information on the
@@ -30,6 +29,8 @@ import org.key_project.util.java.CollectionUtil;
  * possible) and back.
  */
 public class Services implements TermServices {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Services.class);
+
     /**
      * the proof
      */
@@ -179,8 +180,7 @@ public class Services implements TermServices {
      */
     @Nonnull
     public JavaInfo getJavaInfo() {
-        assert javaInfo != null;
-        return javaInfo;
+        return Objects.requireNonNull(javaInfo);
     }
 
 
@@ -277,7 +277,7 @@ public class Services implements TermServices {
 
 
     /**
-     * Marks this services as proof specific Please make sure that the {@link Services} does not not
+     * Marks this services as proof specific Please make sure that the {@link Services} does not
      * yet belong to an existing proof or that it is owned by a proof environment. In both cases
      * copy the {@link InitConfig} via {@link InitConfig#deepCopy()} or one of the other copy
      * methods first.
@@ -432,23 +432,25 @@ public class Services implements TermServices {
         return javaService;
     }
 
-    private void activateJavaPath(@Nonnull Path bootClassPath, Collection<Path> libraryPaths) {
+    private JavaService activateJavaPath(@Nonnull Path bootClassPath, Collection<Path> libraryPaths) {
         if (javaService != null && javaService.getBootClassPath().equals(bootClassPath)
                 && CollectionUtil.containsSame(javaService.getLibraryPath(), libraryPaths)) {
-            return;
+            return javaService;
         }
+        LOGGER.info("activate java with {} and {}", bootClassPath, libraryPaths);
         javaService = new JavaService(this, bootClassPath, libraryPaths);
         javaInfo = new JavaInfo(new KeYProgModelInfo(javaService), this);
+        return javaService;
     }
 
-    public void activateJava(@Nullable Path bootClassPath, Collection<Path> libraryPaths) {
+    public JavaService activateJava(@Nullable Path bootClassPath, Collection<Path> libraryPaths) {
         Path path;
         if (bootClassPath != null) {
             path = bootClassPath;
         } else {
             path = getReduxPath();
         }
-        activateJavaPath(path, libraryPaths);
+        return activateJavaPath(path, libraryPaths);
     }
 
     public void activateJava(@Nullable Path bootClassPath) {
@@ -457,7 +459,7 @@ public class Services implements TermServices {
 
     public static Path getReduxPath() {
         // TODO weigl: where to put this code. The implementation of services.getProfile() is
-        // stupid.
+        //      stupid.
         var resourcePath = "JavaRedux/JAVALANG.TXT";
         var url = KeYResourceManager.getManager().getResourceFile(JavaService.class, resourcePath);
         try {

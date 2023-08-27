@@ -9,7 +9,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Name;
 
@@ -17,7 +16,7 @@ import de.uka.ilkd.key.logic.Name;
  * Null literal. Is used as singleton.
  */
 
-public class NullLiteral extends Literal {
+public non-sealed class NullLiteral extends Literal {
 
     public static final NullLiteral NULL = new NullLiteral();
 

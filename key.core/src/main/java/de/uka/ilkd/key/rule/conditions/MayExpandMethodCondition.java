@@ -6,7 +6,7 @@ package de.uka.ilkd.key.rule.conditions;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.abstraction.ClassType;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;

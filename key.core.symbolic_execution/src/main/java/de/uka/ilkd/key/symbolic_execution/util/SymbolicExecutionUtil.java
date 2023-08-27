@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.ast.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.ast.expression.Assignment;
+import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;

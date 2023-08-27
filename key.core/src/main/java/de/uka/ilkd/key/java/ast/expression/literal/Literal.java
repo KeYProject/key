@@ -14,7 +14,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.java.ast.expression;
+package de.uka.ilkd.key.java.ast.expression.literal;
 
 import java.util.List;
 import javax.annotation.Nullable;
@@ -22,6 +22,7 @@ import javax.annotation.Nullable;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -34,8 +35,10 @@ import org.key_project.util.ExtList;
  * @author <TT>AutoDoc</TT>
  */
 
-public abstract class Literal extends JavaProgramElement
-        implements Expression, TerminalProgramElement {
+public abstract sealed class Literal extends JavaProgramElement
+        implements Expression, TerminalProgramElement
+        permits AbstractIntegerLiteral, BooleanLiteral, DoubleLiteral, EmptyMapLiteral,
+                EmptySeqLiteral, EmptySetLiteral, FloatLiteral, FreeLiteral, NullLiteral, RealLiteral, StringLiteral {
     public Literal(@Nullable PositionInfo pi, @Nullable List<Comment> comments) {
         super(pi, comments);
     }

@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;

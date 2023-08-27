@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.java.ast.expression;
 
 
-import de.uka.ilkd.key.java.ast.Expression;
 import de.uka.ilkd.key.java.ast.LoopInitializer;
 
 /**

@@ -8,14 +8,13 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.ast.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.Name;
 
 
 
-public class EmptySeqLiteral extends Literal {
+public non-sealed class EmptySeqLiteral extends Literal {
 
     public static final EmptySeqLiteral INSTANCE = new EmptySeqLiteral();
 

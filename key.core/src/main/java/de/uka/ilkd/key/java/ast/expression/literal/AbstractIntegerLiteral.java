@@ -23,7 +23,6 @@ import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.SourceElement;
-import de.uka.ilkd.key.java.ast.expression.Literal;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
 
@@ -37,7 +36,7 @@ import org.key_project.util.ExtList;
  *
  * @author Wolfram Pfeifer
  */
-public abstract class AbstractIntegerLiteral extends Literal {
+public abstract non-sealed class AbstractIntegerLiteral extends Literal {
     public AbstractIntegerLiteral(@Nullable PositionInfo pi, @Nullable List<Comment> comments) {
         super(pi, comments);
     }

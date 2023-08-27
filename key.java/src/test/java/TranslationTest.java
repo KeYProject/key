@@ -2,10 +2,12 @@
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.loader.JP2KeYConverter;
 import de.uka.ilkd.key.java.loader.JP2KeYTypeConverter;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 
 import com.github.javaparser.StaticJavaParser;
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * @author Alexander Weigl
@@ -25,6 +28,15 @@ import org.junit.jupiter.params.provider.CsvFileSource;
  */
 class TranslationTest {
     private final Services services = new Services(JavaProfile.getDefaultProfile());
+    {
+        var sorts = services.getNamespaces().sorts();
+        sorts.add(new SortImpl(new Name("int"), ImmutableSet.empty(), false));
+        sorts.add(new SortImpl(new Name("boolean"), ImmutableSet.empty(), false));
+        sorts.add(new SortImpl(new Name("long"), ImmutableSet.empty(), false));
+        sorts.add(new SortImpl(new Name("double"), ImmutableSet.empty(), false));
+        sorts.add(new SortImpl(new Name("float"), ImmutableSet.empty(), false));
+        services.activateJava(null);
+    }
     private final KeYJPMapping mapping = new KeYJPMapping();
     private final TypeSolver typeSolver = new ReflectionTypeSolver(true);
     private final JP2KeYConverter converter = new JP2KeYConverter(services, mapping,

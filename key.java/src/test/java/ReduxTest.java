@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.stream.Stream;
 
+import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.KeYJPMapping;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.loader.JP2KeYConverter;
@@ -55,6 +57,7 @@ public class ReduxTest {
         sorts.add(new SortImpl(new Name("long"), ImmutableSet.empty(), false));
         sorts.add(new SortImpl(new Name("double"), ImmutableSet.empty(), false));
         sorts.add(new SortImpl(new Name("float"), ImmutableSet.empty(), false));
+        services.activateJava(null);
     }
 
     @Test

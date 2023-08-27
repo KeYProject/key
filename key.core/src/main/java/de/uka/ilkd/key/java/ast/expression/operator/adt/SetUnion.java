@@ -6,7 +6,7 @@ package de.uka.ilkd.key.java.ast.expression.operator.adt;
 import java.util.List;
 
 import de.uka.ilkd.key.java.ast.Comment;
-import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperator;

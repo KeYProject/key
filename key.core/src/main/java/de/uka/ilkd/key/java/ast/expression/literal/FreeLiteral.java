@@ -24,12 +24,11 @@ import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.ast.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.FreeLDT;
 import de.uka.ilkd.key.logic.Name;
 
-public class FreeLiteral extends Literal {
+public non-sealed class FreeLiteral extends Literal {
     public final static FreeLiteral INSTANCE = new FreeLiteral(null, null);
 
     public FreeLiteral(@Nullable PositionInfo pi, @Nullable List<Comment> comments) {

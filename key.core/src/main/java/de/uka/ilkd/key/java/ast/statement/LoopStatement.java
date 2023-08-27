@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 
+import de.uka.ilkd.key.java.ast.expression.Expression;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 

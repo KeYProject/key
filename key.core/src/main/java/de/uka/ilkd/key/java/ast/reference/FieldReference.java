@@ -8,13 +8,14 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 
 
 public class FieldReference extends VariableReference
-        implements MemberReference, ReferenceSuffix, TypeReferenceContainer, ExpressionContainer {
+        implements MemberReference      , ReferenceSuffix, TypeReferenceContainer, ExpressionContainer {
 
     /**
      * Reference prefix.

@@ -8,6 +8,7 @@ import java.util.List;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -96,7 +97,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     }
 
     public MethodBodyStatement(IProgramMethod method, ReferencePrefix newContext,
-            IProgramVariable res, ImmutableArray<Expression> args, boolean useSpecification) {
+                               IProgramVariable res, ImmutableArray<Expression> args, boolean useSpecification) {
         this(method, newContext, res, args, useSpecification, null);
     }
 

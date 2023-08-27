@@ -30,12 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class TestJP2KeY {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestJP2KeY.class);
-
-
     private static JavaService c2k;
 
     // some nonsense java blocks with lots of statements and expressions
-    private static final String[] jblocks = new String[] {
+    private static final String[] JAVA_BLOCKS = new String[] {
         """
                 {
                     int j = 7;
@@ -71,7 +69,7 @@ public class TestJP2KeY {
     };
 
 
-    private static final String[] jclasses = new String[] {
+    private static final String[] JAVA_CLASSES = new String[] {
         "class A1 { public A1() { }} ",
         """
                 package qwe.rty;
@@ -105,22 +103,16 @@ public class TestJP2KeY {
         "public class B extends Object {class E  { public E(Object s) {super();} }}",
         " class circ_A {   static int a = circ_B.b;   } class circ_B {   static int b = circ_A.a;   }",
         " class circ2_A {   static final int a = circ2_B.b;   } " +
-            "class circ2_B {   static final int b = circ2_A.a;   }", // unpatched recoder library
+            "class circ2_B {   static final int b = circ2_A.a;   }",
         "class Cycle1 { void m(Cycle2 c) {} } class Cycle2 { void m(Cycle1 c) {} }",
-        "class EmptyConstr { EmptyConstr(); } " // empty constructors for stubs
+        "class EmptyConstr { EmptyConstr(); } "
     };
 
     /**
      * removes blanks and line feeds from a given string
      */
     private static String removeBlanks(String s) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            if (!(s.charAt(i) == (' ')) && !(s.charAt(i) == ('\n')) && !(s.charAt(i) == ('\r'))) {
-                sb.append(s.charAt(i));
-            }
-        }
-        return sb.toString();
+        return s.replaceAll("\\s+", "");
     }
 
     @BeforeEach
@@ -149,10 +141,9 @@ public class TestJP2KeY {
      */
     @TestFactory
     public Stream<DynamicTest> testJBlocks() {
-        return Arrays.stream(jblocks).map(it -> DynamicTest.dynamicTest(it, () -> {
+        return Arrays.stream(JAVA_BLOCKS).map(it -> DynamicTest.dynamicTest(it, () -> {
             String keyProg = removeBlanks(c2k.readBlockWithEmptyContext(it, null).toString());
-            String recoderProg =
-                removeBlanks(c2k.parseBlock(it, c2k.createEmptyContext()).toString());
+            String recoderProg = removeBlanks(c2k.parseBlock(it, c2k.createEmptyContext()).toString());
             assertEquals(recoderProg, keyProg);
         }));
     }
@@ -161,7 +152,7 @@ public class TestJP2KeY {
         try {
             c2k.readCompilationUnit(is);
         } catch (RuntimeException e) {
-            LOGGER.error("An error occured while parsing:", e);
+            LOGGER.error("An error occurred while parsing:", e);
             throw e;
         }
     }
@@ -171,6 +162,6 @@ public class TestJP2KeY {
      */
     @TestFactory
     public Stream<DynamicTest> testJClasses() {
-        return Arrays.stream(jclasses).map(it -> DynamicTest.dynamicTest(it, () -> testClass(it)));
+        return Arrays.stream(JAVA_CLASSES).map(it -> DynamicTest.dynamicTest(it, () -> testClass(it)));
     }
 }

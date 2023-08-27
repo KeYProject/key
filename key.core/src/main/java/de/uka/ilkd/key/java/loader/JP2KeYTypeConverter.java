@@ -9,7 +9,7 @@ import javax.annotation.Nonnull;
 import de.uka.ilkd.key.java.KeYJPMapping;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
-import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.ResolvedLogicalType;
 import de.uka.ilkd.key.java.ast.abstraction.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
@@ -165,8 +165,7 @@ public class JP2KeYTypeConverter {
     private void addPrimitiveType(ResolvedType type) {
         var description = type.describe();
         // TODO javaparser why does this use typeConverter? this seems like a loop since it gets
-        // initialized by
-        // this step
+        //      initialized by this step
         var primitiveType = PrimitiveType.getPrimitiveType(type.describe());
         var result = getTypeConverter().getKeYJavaType(primitiveType);
         var sort = result.getSort();

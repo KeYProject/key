@@ -8,7 +8,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.ast.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.RealLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -21,7 +20,7 @@ import org.key_project.util.ExtList;
  * @author bruns
  */
 
-public class RealLiteral extends Literal {
+public non-sealed class RealLiteral extends Literal {
 
     /**
      * Textual representation of the value.

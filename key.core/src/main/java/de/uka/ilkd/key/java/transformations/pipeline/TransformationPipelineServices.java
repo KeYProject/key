@@ -239,16 +239,15 @@ public class TransformationPipelineServices {
                     .filter(BodyDeclaration::isInitializerDeclaration)
                     .map(it -> (InitializerDeclaration) it)
                     .filter(it -> !it.isStatic())
-                    .collect(Collectors.toList());
+                    .toList();
 
 
         for (InitializerDeclaration initializer : initializers) {
-
             String name = PipelineConstants.OBJECT_INITIALIZER_IDENTIFIER + mdl.size();
             var initializerMethod = cd.addMethod(name, Modifier.Keyword.PRIVATE);
             initializerMethod.setBody(initializer.getBody().clone());
             mdl.add(initializerMethod);
-            result.add(new ExpressionStmt(new MethodCallExpr(null, new NameExpr(name))));
+            result.add(new ExpressionStmt(new MethodCallExpr(name)));
         }
 
         var memberFields =
@@ -256,7 +255,7 @@ public class TransformationPipelineServices {
                     .filter(BodyDeclaration::isFieldDeclaration)
                     .map(it -> (FieldDeclaration) it)
                     .filter(it -> !it.isStatic())
-                    .collect(Collectors.toList());
+                    .toList();
 
         for (FieldDeclaration field : memberFields) {
             for (VariableDeclarator variable : field.getVariables()) {
@@ -292,17 +291,12 @@ public class TransformationPipelineServices {
             }
 
             final var name = p.name();
-            switch (name.toLowerCase()) {
-            case "int":
-            case "byte":
-            case "short":
-                return new IntegerLiteralExpr("0");
-            case "char":
-                return new CharLiteralExpr("0");
-            case "float":
-            case "double":
-                return new DoubleLiteralExpr("0.0");
-            }
+            return switch (name.toLowerCase()) {
+                case "int", "byte", "short" -> new IntegerLiteralExpr("0");
+                case "char" -> new CharLiteralExpr("0");
+                case "float", "double" -> new DoubleLiteralExpr("0.0");
+                default -> throw new IllegalStateException("Unexpected value: " + name.toLowerCase());
+            };
         }
 
         if (type.isReferenceType()
@@ -381,14 +375,14 @@ public class TransformationPipelineServices {
 
         public Set<ClassOrInterfaceDeclaration> classDeclarations() {
             return typeDeclarations().stream()
-                    .filter(it -> it.isClassOrInterfaceDeclaration())
+                    .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
                     .map(it -> (ClassOrInterfaceDeclaration) it)
                     .collect(Collectors.toSet());
         }
 
         public Set<EnumDeclaration> enumDeclarations() {
             return typeDeclarations().stream()
-                    .filter(it -> it.isEnumDeclaration())
+                    .filter(BodyDeclaration::isEnumDeclaration)
                     .map(it -> (EnumDeclaration) it)
                     .collect(Collectors.toSet());
         }
@@ -396,7 +390,7 @@ public class TransformationPipelineServices {
 
         public Set<RecordDeclaration> recordDeclarations() {
             return typeDeclarations().stream()
-                    .filter(it -> it.isRecordDeclaration())
+                    .filter(BodyDeclaration::isRecordDeclaration)
                     .map(it -> (RecordDeclaration) it)
                     .collect(Collectors.toSet());
         }
@@ -439,7 +433,6 @@ public class TransformationPipelineServices {
     }
 
     public LinkedList<ResolvedFieldDeclaration> getFinalVariables(LambdaExpr n) {
-        var seq = new LinkedList<ResolvedFieldDeclaration>();
-        return seq;
+        return new LinkedList<>();
     }
 }

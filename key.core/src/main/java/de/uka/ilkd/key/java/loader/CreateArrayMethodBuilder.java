@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.declaration.modifier.Private;
 import de.uka.ilkd.key.java.ast.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.ast.declaration.modifier.Static;
+import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
