@@ -56,7 +56,7 @@ public final class HTMLReport {
         data.print("Generating html report ...");
         try {
             String output = st.render();
-            Files.write(target, output.getBytes(StandardCharsets.UTF_8));
+            Files.writeString(target, output);
             data.print("Report generated at " + target.normalize());
         } catch (IOException e) {
             data.print("Unable to generate report: " + e.getMessage());

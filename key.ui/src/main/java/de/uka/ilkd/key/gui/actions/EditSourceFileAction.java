@@ -240,7 +240,7 @@ public class EditSourceFileAction extends KeyAction {
                     // workaround for #1641: replace "\n" with system dependent line separators when
                     // saving
                     String text = textPane.getText().replace("\n", System.lineSeparator());
-                    Files.write(sourceFile.toPath(), text.getBytes(StandardCharsets.UTF_8));
+                    Files.writeString(sourceFile.toPath(), text);
                 } catch (IOException ioe) {
                     String message = "Cannot write to file:\n" + ioe.getMessage();
                     JOptionPane.showMessageDialog(parent, message);

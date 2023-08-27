@@ -180,7 +180,7 @@ public class MasterHandlerTest {
             Path tmpSmt = Files.createTempFile("SMT_key_" + data.name, ".smt2");
             // FIXME This is beyond Java 8: add as soon as switched to Java 11:
             // Files.writeString(tmpSmt, translation);
-            Files.write(tmpSmt, data.translation.getBytes(StandardCharsets.UTF_8));
+            Files.writeString(tmpSmt, data.translation);
             LOGGER.info("SMT2 for {}  saved in: {}", data.name, tmpSmt);
         }
 
