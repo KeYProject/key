@@ -110,144 +110,120 @@ class ScriptLineParser {
             }
 
             switch (c) {
-            case -1:
-                if (sb.length() > 0 || key != null || !result.isEmpty()) {
-                    throw new ScriptException("Trailing characters at end of script (missing ';'?)",
-                        getLocation());
-                }
-                return null;
-            case '=':
-                switch (state) {
-                case IN_ID:
-                    state = State.AFTER_EQ;
-                    key = sb.toString();
-                    sb.setLength(0);
-                    break;
-                case IN_QUOTE:
-                    sb.append((char) c);
-                    break;
-                case IN_COMMENT:
-                    break;
-                default:
-                    exc(c);
-                }
-                break;
-            case ' ':
-            case '\t':
-            case '\n':
-                switch (state) {
-                case IN_ID:
-                    state = State.INIT;
-                    result.put("#" + (impCounter++), sb.toString());
-                    sb.setLength(0);
-                    break;
-                case IN_QUOTE:
-                    sb.append((char) c);
-                    break;
-                case IN_UNQUOTE:
-                    state = State.INIT;
-                    result.put(key, sb.toString());
-                    sb.setLength(0);
-                    break;
-                case IN_COMMENT:
-                    if (c == '\n') {
-                        state = stateBeforeComment;
+                case -1 -> {
+                    if (!sb.isEmpty() || key != null || !result.isEmpty()) {
+                        throw new ScriptException("Trailing characters at end of script (missing ';'?)",
+                                getLocation());
                     }
-                    break;
-                default:
-                    break;
+                    return null;
                 }
-                break;
-            case '\r':
-                break;
-            case '"':
-            case '\'':
-                switch (state) {
-                case INIT:
-                    state = State.IN_QUOTE;
-                    stringInitChar = c;
-                    key = "#" + (impCounter++);
-                    break;
-                case AFTER_EQ:
-                    state = State.IN_QUOTE;
-                    stringInitChar = c;
-                    break;
-                case IN_QUOTE:
-                    if (stringInitChar == c) {
-                        state = State.INIT;
-                        result.put(key, sb.toString());
-                        sb.setLength(0);
-                    } else {
-                        sb.append((char) c);
+                case '=' -> {
+                    switch (state) {
+                        case IN_ID -> {
+                            state = State.AFTER_EQ;
+                            key = sb.toString();
+                            sb.setLength(0);
+                        }
+                        case IN_QUOTE -> sb.append((char) c);
+                        case IN_COMMENT -> {}
+                        default -> exc(c);
                     }
-                    break;
-                case IN_COMMENT:
-                    break;
-                default:
-                    exc(c);
                 }
-                break;
-            case '#':
-                switch (state) {
-                case IN_QUOTE:
-                    sb.append((char) c);
-                    break;
-                case IN_COMMENT:
-                    break;
-                default:
-                    stateBeforeComment = state;
-                    state = State.IN_COMMENT;
-                }
-                break;
-            case ';':
-                switch (state) {
-                case IN_QUOTE:
-                    sb.append((char) c);
-                    break;
-                case IN_COMMENT:
-                    break;
-                case IN_ID:
-                    result.put("#" + (impCounter++), sb.toString());
-                    break;
-                case INIT:
-                    break;
-                case IN_UNQUOTE:
-                    result.put(key, sb.toString());
-                    break;
-                default:
-                    exc(c);
-                }
-                if (state != State.IN_COMMENT && state != State.IN_QUOTE) {
-                    result.put(LITERAL_KEY, cmdBuilder.toString().trim());
-                    var end = getLocation();
-                    return new ParsedCommand(result, start, end);
-                }
-                break;
-            default:
-                switch (state) {
-                case INIT:
-                case IN_ID:
-                    state = State.IN_ID; // fallthru intended!
-                    if (!isIDChar(c)) {
-                        exc(c);
+                case ' ', '\t', '\n' -> {
+                    switch (state) {
+                        case IN_ID -> {
+                            state = State.INIT;
+                            result.put("#" + (impCounter++), sb.toString());
+                            sb.setLength(0);
+                        }
+                        case IN_QUOTE -> sb.append((char) c);
+                        case IN_UNQUOTE -> {
+                            state = State.INIT;
+                            result.put(key, sb.toString());
+                            sb.setLength(0);
+                        }
+                        case IN_COMMENT -> {
+                            if (c == '\n') {
+                                state = stateBeforeComment;
+                            }
+                        }
+                        default -> {}
                     }
-                    sb.append((char) c);
-                    break;
-                case IN_UNQUOTE:
-                case AFTER_EQ:
-                    state = State.IN_UNQUOTE;
-                    if (!isIDChar(c)) {
-                        exc(c);
+                }
+                case '\r' -> {}
+                case '"', '\'' -> {
+                    switch (state) {
+                        case INIT -> {
+                            state = State.IN_QUOTE;
+                            stringInitChar = c;
+                            key = "#" + (impCounter++);
+                        }
+                        case AFTER_EQ -> {
+                            state = State.IN_QUOTE;
+                            stringInitChar = c;
+                        }
+                        case IN_QUOTE -> {
+                            if (stringInitChar == c) {
+                                state = State.INIT;
+                                result.put(key, sb.toString());
+                                sb.setLength(0);
+                            } else {
+                                sb.append((char) c);
+                            }
+                        }
+                        case IN_COMMENT -> {
+                        }
+                        default -> exc(c);
                     }
-                    sb.append((char) c);
-                    break;
-                case IN_QUOTE:
-                    sb.append((char) c);
-                    break;
-                case IN_COMMENT:
-                    break;
-                default:
-                    assert false;
+                }
+                case '#' -> {
+                    switch (state) {
+                        case IN_QUOTE -> sb.append((char) c);
+                        case IN_COMMENT -> {
+                        }
+                        default -> {
+                            stateBeforeComment = state;
+                            state = State.IN_COMMENT;
+                        }
+                    }
+                }
+                case ';' -> {
+                    switch (state) {
+                        case IN_QUOTE -> sb.append((char) c);
+                        case IN_COMMENT, INIT -> {}
+                        case IN_ID -> result.put("#" + (impCounter++), sb.toString());
+                        case IN_UNQUOTE -> result.put(key, sb.toString());
+                        default -> exc(c);
+                    }
+                    if (state != State.IN_COMMENT && state != State.IN_QUOTE) {
+                        result.put(LITERAL_KEY, cmdBuilder.toString().trim());
+                        var end = getLocation();
+                        return new ParsedCommand(result, start, end);
+                    }
+                }
+                default -> {
+                    switch (state) {
+                        case INIT, IN_ID -> {
+                            state = State.IN_ID; // fallthru intended!
+                            if (!isIDChar(c)) {
+                                exc(c);
+                            }
+                            sb.append((char) c);
+                        }
+                        case IN_UNQUOTE, AFTER_EQ -> {
+                            state = State.IN_UNQUOTE;
+                            if (!isIDChar(c)) {
+                                exc(c);
+                            }
+                            sb.append((char) c);
+                        }
+                        case IN_QUOTE -> sb.append((char) c);
+                        case IN_COMMENT -> {
+                        }
+                        default -> {
+                            assert false;
+                        }
+                    }
                 }
             }
             if (state != State.IN_COMMENT) {
