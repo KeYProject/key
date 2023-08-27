@@ -1,8 +1,9 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-
 package org.key_project.proofmanagement.check.dependency;
+
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -15,11 +16,10 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractAxiom;
+
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.*;
 
 import static org.key_project.proofmanagement.check.dependency.DependencyGraph.EdgeType.TERMINATION_INSENSITIVE;
 import static org.key_project.proofmanagement.check.dependency.DependencyGraph.EdgeType.TERMINATION_SENSITIVE;
@@ -62,8 +62,8 @@ public class ContractAppCollector extends NodeIntermediateWalker {
     /**
      * Creates a new collector for the given proof, starting at given root node.
      *
-     * @param root   the root node to start from
-     * @param proof  the proof object (needed to get SpecificationRepository, JavaInfo, ...)
+     * @param root the root node to start from
+     * @param proof the proof object (needed to get SpecificationRepository, JavaInfo, ...)
      * @param logger the logger to print out messages
      */
     public ContractAppCollector(NodeIntermediate root, Proof proof, Logger logger) {
@@ -135,7 +135,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
             if (classType == null) {
                 // still no hit -> critical error
                 throw new NullPointerException("KeYJavaType still is null for class with name "
-                        + className);
+                    + className);
             }
         }
 
@@ -194,7 +194,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
             // in default case (e.g. legacy proofs without saved modality information)
             // we assume diamond modality but print a warning
             logger.print(LogLevel.WARNING, "No saved modality information was found!" +
-                    " Assuming \"diamond\" (incomplete for box contracts)!");
+                " Assuming \"diamond\" (incomplete for box contracts)!");
             edgeType = TERMINATION_SENSITIVE;
         } else if (modality.terminationSensitive()) {
             edgeType = TERMINATION_SENSITIVE;
