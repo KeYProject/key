@@ -5,6 +5,7 @@ package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -55,10 +56,11 @@ import org.key_project.util.collection.ImmutableSLList;
 /**
  * The menu shown by a {@link CurrentGoalViewListener} when the user clicks on a
  * {@link CurrentGoalView}, i.e. when the user clicks on the sequent.
- *
+ * <p>
  * Shows all {@link Taclet}s that are applicable at a selected position.
  */
 public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> {
+    @Serial
     private static final long serialVersionUID = 8151230546928796116L;
 
     private static final String INTRODUCE_AXIOM_TACLET_NAME = "introduceAxiom";
@@ -537,82 +539,73 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 PosInOccurrence occ = getPos().getPosInOccurrence();
 
                 switch (((JMenuItem) e.getSource()).getText()) {
-                case DISABLE_ABBREVIATION:
-                    if (occ != null && occ.posInTerm() != null) {
-                        mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(), false);
-                        getSequentView().printSequent();
-                    }
-
-                    break;
-
-                case ENABLE_ABBREVIATION:
-                    if (occ != null && occ.posInTerm() != null) {
-                        mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(), true);
-                        getSequentView().printSequent();
-                    }
-
-                    break;
-
-                case CREATE_ABBREVIATION:
-                    if (occ != null && occ.posInTerm() != null) {
-                        // trim string, otherwise window gets too large (bug #1430)
-                        final String oldTerm = occ.subTerm().toString();
-                        final String term =
-                            oldTerm.length() > 200 ? oldTerm.substring(0, 200) : oldTerm;
-                        String abbreviation = (String) JOptionPane.showInputDialog(new JFrame(),
-                            "Enter abbreviation for term: \n" + term, "New Abbreviation",
-                            JOptionPane.QUESTION_MESSAGE, null, null, "");
-
-                        try {
-                            if (abbreviation != null) {
-                                if (!validAbbreviation(abbreviation)) {
-                                    JOptionPane.showMessageDialog(new JFrame(),
-                                        "Only letters, numbers and '_' are allowed for Abbreviations",
-                                        "Sorry", JOptionPane.INFORMATION_MESSAGE);
-                                } else {
-                                    mediator.getNotationInfo().getAbbrevMap().put(occ.subTerm(),
-                                        abbreviation, true);
-                                    getSequentView().printSequent();
-                                }
-                            }
-                        } catch (AbbrevException sce) {
-                            JOptionPane.showMessageDialog(new JFrame(), sce.getMessage(), "Sorry",
-                                JOptionPane.INFORMATION_MESSAGE);
+                    case DISABLE_ABBREVIATION -> {
+                        if (occ != null && occ.posInTerm() != null) {
+                            mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(), false);
+                            getSequentView().printSequent();
                         }
                     }
-
-                    break;
-
-                case CHANGE_ABBREVIATION:
-                    if (occ != null && occ.posInTerm() != null) {
-                        String abbreviation = (String) JOptionPane.showInputDialog(new JFrame(),
-                            "Enter abbreviation for term: \n" + occ.subTerm().toString(),
-                            "Change Abbreviation", JOptionPane.QUESTION_MESSAGE, null, null,
-                            mediator.getNotationInfo().getAbbrevMap().getAbbrev(occ.subTerm())
-                                    .substring(1));
-                        try {
-                            if (abbreviation != null) {
-                                if (!validAbbreviation(abbreviation)) {
-                                    JOptionPane.showMessageDialog(new JFrame(),
-                                        "Only letters, numbers and '_'"
-                                            + "are allowed for Abbreviations",
-                                        "Sorry", JOptionPane.INFORMATION_MESSAGE);
-                                } else {
-                                    mediator.getNotationInfo().getAbbrevMap()
-                                            .changeAbbrev(occ.subTerm(), abbreviation);
-                                    getSequentView().printSequent();
-                                }
-                            }
-                        } catch (AbbrevException sce) {
-                            JOptionPane.showMessageDialog(new JFrame(), sce.getMessage(), "Sorry",
-                                JOptionPane.INFORMATION_MESSAGE);
+                    case ENABLE_ABBREVIATION -> {
+                        if (occ != null && occ.posInTerm() != null) {
+                            mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(), true);
+                            getSequentView().printSequent();
                         }
                     }
+                    case CREATE_ABBREVIATION -> {
+                        if (occ != null && occ.posInTerm() != null) {
+                            // trim string, otherwise window gets too large (bug #1430)
+                            final String oldTerm = occ.subTerm().toString();
+                            final String term =
+                                    oldTerm.length() > 200 ? oldTerm.substring(0, 200) : oldTerm;
+                            String abbreviation = (String) JOptionPane.showInputDialog(new JFrame(),
+                                    "Enter abbreviation for term: \n" + term, "New Abbreviation",
+                                    JOptionPane.QUESTION_MESSAGE, null, null, "");
 
-                    break;
-
-                default:
-                    super.actionPerformed(e);
+                            try {
+                                if (abbreviation != null) {
+                                    if (!validAbbreviation(abbreviation)) {
+                                        JOptionPane.showMessageDialog(new JFrame(),
+                                                "Only letters, numbers and '_' are allowed for Abbreviations",
+                                                "Sorry", JOptionPane.INFORMATION_MESSAGE);
+                                    } else {
+                                        mediator.getNotationInfo().getAbbrevMap().put(occ.subTerm(),
+                                                abbreviation, true);
+                                        getSequentView().printSequent();
+                                    }
+                                }
+                            } catch (AbbrevException sce) {
+                                JOptionPane.showMessageDialog(new JFrame(), sce.getMessage(), "Sorry",
+                                        JOptionPane.INFORMATION_MESSAGE);
+                            }
+                        }
+                    }
+                    case CHANGE_ABBREVIATION -> {
+                        if (occ != null && occ.posInTerm() != null) {
+                            String abbreviation = (String) JOptionPane.showInputDialog(new JFrame(),
+                                    "Enter abbreviation for term: \n" + occ.subTerm().toString(),
+                                    "Change Abbreviation", JOptionPane.QUESTION_MESSAGE, null, null,
+                                    mediator.getNotationInfo().getAbbrevMap().getAbbrev(occ.subTerm())
+                                            .substring(1));
+                            try {
+                                if (abbreviation != null) {
+                                    if (!validAbbreviation(abbreviation)) {
+                                        JOptionPane.showMessageDialog(new JFrame(),
+                                                "Only letters, numbers and '_'"
+                                                        + "are allowed for Abbreviations",
+                                                "Sorry", JOptionPane.INFORMATION_MESSAGE);
+                                    } else {
+                                        mediator.getNotationInfo().getAbbrevMap()
+                                                .changeAbbrev(occ.subTerm(), abbreviation);
+                                        getSequentView().printSequent();
+                                    }
+                                }
+                            } catch (AbbrevException sce) {
+                                JOptionPane.showMessageDialog(new JFrame(), sce.getMessage(), "Sorry",
+                                        JOptionPane.INFORMATION_MESSAGE);
+                            }
+                        }
+                    }
+                    default -> super.actionPerformed(e);
                 }
             }
         }
@@ -621,9 +614,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     static class FocussedRuleApplicationMenuItem extends JMenuItem {
         private static final String APPLY_RULES_AUTOMATICALLY_HERE =
             "Apply rules automatically here";
-        /**
-         *
-         */
+
+        @Serial
         private static final long serialVersionUID = -6486650015103963268L;
 
         public FocussedRuleApplicationMenuItem() {
@@ -732,7 +724,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
             final Taclet taclet1 = o1.taclet();
 
-            map.put("closing", taclet1.goalTemplates().size() == 0 ? -1 : 1);
+            map.put("closing", taclet1.goalTemplates().isEmpty() ? -1 : 1);
 
             boolean calc = false;
             for (RuleSet rs : taclet1.getRuleSets()) {

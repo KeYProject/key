@@ -52,7 +52,7 @@ public abstract class DependencyGraphBuilder {
             // get current node and root of proof
             Proof proof = line.proof;
             DependencyNode currentNode = graph.getNodeByName(proof.name().toString());
-            BranchNodeIntermediate node = line.parseResult.getParsedResult();
+            BranchNodeIntermediate node = line.parseResult.parsedResult();
 
             // collect all contracts the current proof refers to
             Services services = proof.getServices();

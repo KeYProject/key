@@ -20,15 +20,6 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
     public static final Feature INSTANCE = new NonDuplicateAppModPositionFeature();
 
     @Override
-    public boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        if (!app.ifInstsComplete()) {
-            return true;
-        }
-
-        return noDuplicateFindTaclet(app, pos, goal);
-    }
-
-    @Override
     protected boolean comparePio(TacletApp newApp, TacletApp oldApp, PosInOccurrence newPio,
             PosInOccurrence oldPio) {
         final Term newFocus = newPio.subTerm();

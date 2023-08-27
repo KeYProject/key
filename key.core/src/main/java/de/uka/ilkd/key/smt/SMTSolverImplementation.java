@@ -290,17 +290,12 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         ReasonOfInterruption reason = getReasonOfInterruption();
         setReasonOfInterruption(ReasonOfInterruption.Exception, e);
         switch (reason) {
-        case Exception:
-        case NoInterruption:
-            setReasonOfInterruption(ReasonOfInterruption.Exception, e);
-            listener.processInterrupted(this, problem, e);
-            break;
-        case Timeout:
-            listener.processTimeout(this, problem);
-            break;
-        case User:
-            listener.processUser(this, problem);
-            break;
+            case Exception, NoInterruption -> {
+                setReasonOfInterruption(ReasonOfInterruption.Exception, e);
+                listener.processInterrupted(this, problem, e);
+            }
+            case Timeout -> listener.processTimeout(this, problem);
+            case User -> listener.processUser(this, problem);
         }
     }
 

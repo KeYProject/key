@@ -3,19 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
-import java.net.URI;
-import java.net.URL;
-import java.util.*;
-import javax.annotation.Nonnull;
-
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.util.parsing.LocatableException;
-
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
+
+import javax.annotation.Nonnull;
+import java.net.URI;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * A short little hack, but completely working and fast, for replaying proofs inside KeY files.
@@ -25,7 +26,7 @@ import org.antlr.v4.runtime.Token;
  *
  * @author Alexander Weigl
  * @version 1 (12/5/19)
- * @see #run(Token, CharStream, IProofFileParser, URL)
+ * @see #run(Token, CharStream, IProofFileParser, URI)
  */
 public class ProofReplayer {
     /**
@@ -63,7 +64,7 @@ public class ProofReplayer {
      * Replays the proof behind the given {@code input}. This method uses the {@link KeYLexer} to
      * lex input stream, and parse them manually by consuming the tokens. It singals to the given
      * {@link IProofFileParser} at start or end of an expr.
-     *
+     * <p>
      * Avoid the usage of a parser, avoids also the construction of an ASTs.
      *
      * @param input a valid input stream
@@ -82,41 +83,38 @@ public class ProofReplayer {
         while (true) {
             int type = stream.LA(1); // current token type
             switch (type) {
-            case KeYLexer.LPAREN:
-                // expected "(" <id> ["string"]
-                stream.consume(); // consume the "("
-                Token idToken = stream.LT(1); // element id
-                IProofFileParser.ProofElementID cur = proofSymbolElementId.get(idToken.getText());
-
-                if (cur == null) {
-                    Location loc =
-                        new Location(source, Position.fromToken(idToken).offsetLine(startLine - 1));
-                    throw new LocatableException("Unknown proof element: " + idToken.getText(),
-                        loc);
+                case KeYLexer.LPAREN -> {
+                    // expected "(" <id> ["string"]
+                    stream.consume(); // consume the "("
+                    Token idToken = stream.LT(1); // element id
+                    IProofFileParser.ProofElementID cur = proofSymbolElementId.get(idToken.getText());
+                    if (cur == null) {
+                        Location loc =
+                                new Location(source, Position.fromToken(idToken).offsetLine(startLine - 1));
+                        throw new LocatableException("Unknown proof element: " + idToken.getText(),
+                                loc);
+                    }
+                    stream.consume();
+                    String arg = null;
+                    int pos = idToken.getLine() + startLine;
+                    if (stream.LA(1) == KeYLexer.STRING_LITERAL) {
+                        // argument was given
+                        arg = stream.LT(1).getText();
+                        arg = unescape(arg.substring(1, arg.length() - 1));
+                        stream.consume();// throw string away
+                    }
+                    prl.beginExpr(cur, arg);
+                    stack.push(cur);
+                    posStack.push(pos);
                 }
-                stream.consume();
-
-                String arg = null;
-                int pos = idToken.getLine() + startLine;
-                if (stream.LA(1) == KeYLexer.STRING_LITERAL) {
-                    // argument was given
-                    arg = stream.LT(1).getText();
-                    arg = unescape(arg.substring(1, arg.length() - 1));
-                    stream.consume();// throw string away
+                case KeYLexer.RPAREN -> {
+                    prl.endExpr(stack.pop(), posStack.pop());
+                    stream.consume();
                 }
-
-                prl.beginExpr(cur, arg);
-                stack.push(cur);
-                posStack.push(pos);
-                break;
-            case KeYLexer.RPAREN:
-                prl.endExpr(stack.pop(), posStack.pop());
-                stream.consume();
-                break;
-            case KeYLexer.EOF:
-                return;
-            default:
-                stream.consume();
+                case KeYLexer.EOF -> {
+                    return;
+                }
+                default -> stream.consume();
             }
         }
     }

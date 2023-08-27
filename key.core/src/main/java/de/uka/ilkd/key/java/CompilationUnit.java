@@ -242,10 +242,4 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     }
 
 
-    /** toString */
-    public String toString() {
-        PrettyPrinter pp = PrettyPrinter.purePrinter();
-        pp.print(this);
-        return pp.result();
-    }
 }

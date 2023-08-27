@@ -71,12 +71,4 @@ public class DeclarationProgramVariableCollector extends JavaASTVisitor {
         addVariable(x.getProgramVariable());
     }
 
-    public void performActionOnLocationVariable(LocationVariable x) {
-        performActionOnProgramVariable(x);
-    }
-
-    public void performActionOnProgramConstant(ProgramConstant x) {
-        performActionOnProgramVariable(x);
-    }
-
 }

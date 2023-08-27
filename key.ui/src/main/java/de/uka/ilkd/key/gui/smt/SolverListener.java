@@ -574,9 +574,11 @@ public class SolverListener implements SolverLauncherListener {
 
 
     public static String computeSolverTypeWarningMessage(SolverType type) {
-        return ("You are using a version of %s which has not been tested for this version of KeY.\n" +
-                "It can therefore be that errors occur that would not occur\n" +
-                "using the following version or higher:\n%s")
+        return ("""
+                You are using a version of %s which has not been tested for this version of KeY.
+                It can therefore be that errors occur that would not occur
+                using the following version or higher:
+                %s""")
                 .formatted(type.getName(), type.getMinimumSupportedVersion());
     }
 

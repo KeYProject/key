@@ -48,15 +48,6 @@ public class ExpressionSVWrapper extends Literal
     public void makeParentRoleValid() {
     }
 
-    /**
-     * Get AST parent.
-     *
-     * @return the non terminal program element.
-     */
-    public NonTerminalProgramElement getASTParent() {
-        return expressionParent;
-    }
-
 
     /**
      * sets the schema variable of sort statement
@@ -72,24 +63,6 @@ public class ExpressionSVWrapper extends Literal
         return sv;
     }
 
-
-    /**
-     * Get expression container.
-     *
-     * @return the expression container.
-     */
-    public ExpressionContainer getExpressionContainer() {
-        return expressionParent;
-    }
-
-    /**
-     * Set expression container.
-     *
-     * @param c an expression container.
-     */
-    public void setExpressionContainer(ExpressionContainer c) {
-        expressionParent = c;
-    }
 
     // don't think we need it
     public void accept(SourceVisitor v) {

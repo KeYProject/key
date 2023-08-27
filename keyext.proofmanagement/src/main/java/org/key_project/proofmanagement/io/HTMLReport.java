@@ -69,6 +69,7 @@ public final class HTMLReport {
      * @return the ST object for rendering the HTML report
      * @throws IOException if an error occurs accessing the StringTemplate resources
      */
+    @SuppressWarnings("rawtypes")
     private static ST prepareStringTemplate() throws IOException {
         ClassLoader classLoader = HTMLReport.class.getClassLoader();
         URL url = classLoader.getResource("report/html");

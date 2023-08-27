@@ -5,6 +5,7 @@ package de.uka.ilkd.key.gui.extension.api;
 
 import java.util.Collections;
 import java.util.List;
+import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -18,21 +19,16 @@ import de.uka.ilkd.key.rule.Rule;
  * @version 1 (16.04.19)
  */
 public abstract class ContextMenuAdapter implements KeYGuiExtension.ContextMenu {
+    @Nonnull
     @Override
-    public final List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
-            Object underlyingObject) {
-        switch ((DefaultContextMenuKind) kind) {
-        case PROOF_LIST:
-            return getContextActions(mediator, kind, (Proof) underlyingObject);
-        case PROOF_TREE:
-            return getContextActions(mediator, kind, (Node) underlyingObject);
-        case TACLET_INFO:
-            return getContextActions(mediator, kind, (Rule) underlyingObject);
-        case SEQUENT_VIEW:
-            return getContextActions(mediator, kind, (PosInSequent) underlyingObject);
-        default:
-            throw new IllegalArgumentException("unexpected kind");
-        }
+    public final List<Action> getContextActions(@Nonnull KeYMediator mediator, @Nonnull ContextMenuKind kind,
+                                                @Nonnull Object underlyingObject) {
+        return switch ((DefaultContextMenuKind) kind) {
+            case PROOF_LIST -> getContextActions(mediator, kind, (Proof) underlyingObject);
+            case PROOF_TREE -> getContextActions(mediator, kind, (Node) underlyingObject);
+            case TACLET_INFO -> getContextActions(mediator, kind, (Rule) underlyingObject);
+            case SEQUENT_VIEW -> getContextActions(mediator, kind, (PosInSequent) underlyingObject);
+        };
     }
 
     public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,

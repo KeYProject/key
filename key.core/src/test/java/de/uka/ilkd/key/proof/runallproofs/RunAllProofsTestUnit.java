@@ -86,29 +86,23 @@ public final class RunAllProofsTestUnit implements Serializable {
 
         ForkMode forkMode = settings.getForkMode();
         switch (forkMode) {
-        case PERGROUP:
-            testResults = ForkedTestFileRunner.processTestFiles(testFiles, getTempDir());
-            break;
-
-        case NOFORK:
-            testResults = new ArrayList<>();
-            for (TestFile testFile : testFiles) {
-                TestResult testResult = testFile.runKey();
-                testResults.add(testResult);
+            case PERGROUP -> testResults = ForkedTestFileRunner.processTestFiles(testFiles, getTempDir());
+            case NOFORK -> {
+                testResults = new ArrayList<>();
+                for (TestFile testFile : testFiles) {
+                    TestResult testResult = testFile.runKey();
+                    testResults.add(testResult);
+                }
             }
-            break;
-
-        case PERFILE:
-            testResults = new ArrayList<>();
-            for (TestFile testFile : testFiles) {
-                TestResult testResult =
-                    ForkedTestFileRunner.processTestFile(testFile, getTempDir());
-                testResults.add(testResult);
+            case PERFILE -> {
+                testResults = new ArrayList<>();
+                for (TestFile testFile : testFiles) {
+                    TestResult testResult =
+                            ForkedTestFileRunner.processTestFile(testFile, getTempDir());
+                    testResults.add(testResult);
+                }
             }
-            break;
-
-        default:
-            throw new RuntimeException("Unexpected value for fork mode: " + forkMode);
+            default -> throw new RuntimeException("Unexpected value for fork mode: " + forkMode);
         }
 
         if (verbose) {

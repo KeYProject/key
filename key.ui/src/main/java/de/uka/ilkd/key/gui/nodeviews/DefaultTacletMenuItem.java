@@ -17,15 +17,14 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.util.collection.ImmutableList;
 
+import java.io.Serial;
+
 /**
  * this class extends JMenuItem. The objective is to store the Taclet of each item in the item for
  * easier access to the Taclet if the item has been selected
  */
 class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
-
-    /**
-     *
-     */
+    @Serial
     private static final long serialVersionUID = -5537139155045230424L;
     private final TacletApp connectedTo;
 
@@ -114,20 +113,11 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         int sbl = asb.length();
         for (int i = 0; i < sbl; i++) {
             switch (asb.charAt(i)) {
-            case '<':
-                nsb.append("&lt;");
-                break;
-            case '>':
-                nsb.append("&gt;");
-                break;
-            case '&':
-                nsb.append("&amp;");
-                break;
-            case '\n':
-                nsb.append("<br>");
-                break;
-            default:
-                nsb.append(asb.charAt(i));
+                case '<' -> nsb.append("&lt;");
+                case '>' -> nsb.append("&gt;");
+                case '&' -> nsb.append("&amp;");
+                case '\n' -> nsb.append("<br>");
+                default -> nsb.append(asb.charAt(i));
             }
         }
         return nsb;
@@ -141,11 +131,6 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         return string.replaceAll("(?m)^[ \t]*\r?\n|\n$", "");
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see de.uka.ilkd.key.gui.TacletMenuItem#connectedTo()
-     */
     @Override
     public TacletApp connectedTo() {
         return connectedTo;

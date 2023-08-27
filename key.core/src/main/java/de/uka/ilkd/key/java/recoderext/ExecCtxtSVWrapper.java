@@ -37,10 +37,6 @@ public class ExecCtxtSVWrapper extends ExecutionContext implements KeYRecoderExt
         return sv;
     }
 
-    public SourceElement getFirstElement() {
-        return this;
-    }
-
     public ExecutionContext deepClone() {
         return new ExecCtxtSVWrapper(sv);
     }
