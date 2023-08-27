@@ -1,8 +1,6 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
@@ -147,10 +145,9 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 
     @Override
     public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof IBuiltInRuleApp)) {
+        if (!(obj instanceof IBuiltInRuleApp that)) {
             return false;
         }
-        IBuiltInRuleApp that = (IBuiltInRuleApp) obj;
         if (!(Objects.equals(rule(), that.rule())
                 && Objects.equals(getHeapContext(), that.getHeapContext()))) {
             return false;

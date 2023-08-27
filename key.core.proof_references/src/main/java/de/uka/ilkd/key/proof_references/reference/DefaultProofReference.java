@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof_references.reference;
 
 import java.util.Collection;
@@ -92,8 +95,7 @@ public class DefaultProofReference<T> implements IProofReference<T> {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof IProofReference<?>) {
-            IProofReference<?> other = (IProofReference<?>) obj;
+        if (obj instanceof IProofReference<?> other) {
             return Objects.equals(getKind(), other.getKind())
                     && Objects.equals(getSource(), other.getSource())
                     && Objects.equals(getTarget(), other.getTarget());

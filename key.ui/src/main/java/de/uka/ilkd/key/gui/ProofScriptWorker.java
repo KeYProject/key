@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -122,20 +125,19 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
         Document doc = logArea.getDocument();
         for (ProofScriptEngine.Message info : chunks) {
             var message = new StringBuilder("\n---\n");
-            if (info instanceof ProofScriptEngine.EchoMessage) {
-                var echo = (ProofScriptEngine.EchoMessage) info;
-                message.append(echo.message);
+            if (info instanceof ProofScriptEngine.EchoMessage echo) {
+                message.append(echo.message());
             } else {
                 var exec = (ProofScriptEngine.ExecuteInfo) info;
-                if (exec.command.startsWith("'echo ")) {
+                if (exec.command().startsWith("'echo ")) {
                     continue;
                 }
-                if (exec.location.getFileURI().isPresent()) {
-                    message.append(exec.location.getFileURI().get()).append(":");
+                if (exec.location().getFileURI().isPresent()) {
+                    message.append(exec.location().getFileURI().get()).append(":");
                 }
-                message.append(exec.location.getPosition().line())
-                        .append(": Executing on goal ").append(exec.nodeSerial).append('\n')
-                        .append(exec.command);
+                message.append(exec.location().getPosition().line())
+                        .append(": Executing on goal ").append(exec.nodeSerial()).append('\n')
+                        .append(exec.command());
             }
             try {
                 doc.insertString(doc.getLength(), message.toString(), null);
@@ -170,6 +172,7 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
         } catch (CancellationException ex) {
             LOGGER.info("Scripting was cancelled.");
         } catch (Throwable ex) {
+            LOGGER.error("", ex);
             IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
         }
 

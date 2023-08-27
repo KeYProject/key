@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
 
 import java.util.*;
@@ -503,8 +506,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         } else if (find instanceof Term) {
             return new RewriteTacletBuilder().setFind((Term) find)
                     .setApplicationRestriction(applicationRestriction);
-        } else if (find instanceof Sequent) {
-            Sequent findSeq = (Sequent) find;
+        } else if (find instanceof Sequent findSeq) {
             if (findSeq.isEmpty()) {
                 return new NoFindTacletBuilder();
             } else if (findSeq.antecedent().size() == 1 && findSeq.succedent().size() == 0) {

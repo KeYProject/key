@@ -1,8 +1,6 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
 
 import java.util.ArrayList;
@@ -23,7 +21,8 @@ import java.util.List;
  */
 public abstract class SMTBeautifier {
 
-    private SMTBeautifier() {}
+    private SMTBeautifier() {
+    }
 
     // A kind of "int*" in Java.
     private static class MutableInt {

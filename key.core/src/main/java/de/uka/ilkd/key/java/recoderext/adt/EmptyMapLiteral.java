@@ -1,8 +1,6 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
@@ -24,7 +22,8 @@ public final class EmptyMapLiteral extends Literal {
     }
 
     @Override
-    public void accept(SourceVisitor v) {}
+    public void accept(SourceVisitor v) {
+    }
 
     @Override
     public Object getEquivalentJavaType() {

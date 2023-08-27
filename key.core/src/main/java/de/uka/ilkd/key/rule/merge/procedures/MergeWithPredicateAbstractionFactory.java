@@ -1,8 +1,6 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge.procedures;
 
 import java.util.LinkedHashMap;
@@ -33,7 +31,8 @@ public class MergeWithPredicateAbstractionFactory extends MergeWithPredicateAbst
     /**
      * Hidden constructor since this class is a Singleton.
      */
-    private MergeWithPredicateAbstractionFactory() {}
+    private MergeWithPredicateAbstractionFactory() {
+    }
 
     /**
      * @return The Singleton instance of {@link MergeWithPredicateAbstractionFactory}.

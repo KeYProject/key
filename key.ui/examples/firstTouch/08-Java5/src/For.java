@@ -1,4 +1,4 @@
-class For implements Iterable {
+final class For implements Iterable {
 
     int[] a;
     Trivial it;
@@ -25,12 +25,15 @@ class For implements Iterable {
     void infiniteLoop() {
         //@ maintaining \invariant_for(f);
         //@ assignable \strictly_nothing;
+        //disabled //@ diverges true;
+        //   this would remove the syntax warning, but triggers other strange
+        //   behaviour cases (and is not traditional Java)
         for (Object o: f);
     }
 
-    public java.util.Iterator iterator () { return it; }
+    public Trivial iterator () { return it; }
 
-    class Trivial implements java.util.Iterator {
+    final class Trivial implements java.util.Iterator {
         public boolean hasNext() { return true; }
         public Object next() { return null; }
         public void remove() { }

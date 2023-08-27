@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import java.util.ArrayList;
@@ -254,10 +257,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof TextualJMLSpecCase)) {
+        if (!(o instanceof TextualJMLSpecCase that)) {
             return false;
         }
-        TextualJMLSpecCase that = (TextualJMLSpecCase) o;
         return getBehavior() == that.getBehavior() && clauses.equals(that.clauses);
     }
 

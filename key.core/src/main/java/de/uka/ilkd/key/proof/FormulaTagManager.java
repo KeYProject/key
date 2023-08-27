@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.HashMap;
@@ -178,7 +181,7 @@ public class FormulaTagManager {
     private void updateTag(FormulaChangeInfo p_info, Sequent p_newSeq, Goal p_goal) {
 
 
-        final PosInOccurrence oldPIO = p_info.getPositionOfModification().topLevel();
+        final PosInOccurrence oldPIO = p_info.positionOfModification().topLevel();
         final FormulaTag tag = getTagForPos(oldPIO);
         final FormulaInfo oldInfo = getFormulaInfo(tag);
         final FormulaInfo newInfo = oldInfo.addModification(p_info, p_newSeq, p_goal.getTime());
@@ -252,7 +255,7 @@ public class FormulaTagManager {
         }
 
         public FormulaInfo addModification(FormulaChangeInfo p_info, Sequent p_newSeq, long p_age) {
-            final PosInOccurrence newPIO = new PosInOccurrence(p_info.getNewFormula(),
+            final PosInOccurrence newPIO = new PosInOccurrence(p_info.newFormula(),
                 PosInTerm.getTopLevel(), pio.isInAntec());
 
             return new FormulaInfo(newPIO, modifications.prepend(p_info), p_age);

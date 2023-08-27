@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.*;
@@ -117,8 +120,7 @@ public class UserDefinedSymbols {
     public void replaceGenericByProxySorts() {
         Set<Sort> result = new HashSet<>();
         for (Sort sort : usedExtraSorts) {
-            if (sort instanceof GenericSort) {
-                GenericSort genSort = (GenericSort) sort;
+            if (sort instanceof GenericSort genSort) {
                 ProxySort proxySort = new ProxySort(genSort.name(), genSort.extendsSorts());
                 result.add(proxySort);
             } else {

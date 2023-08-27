@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing;
 
 import java.util.ArrayList;
@@ -114,8 +117,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         // check whether the rule of this proof step was added by another proof step
         // -> if so, add that dynamically added taclet as a dependency
         Rule rule = n.getAppliedRuleApp().rule();
-        if (rule instanceof Taclet) {
-            Taclet taclet = (Taclet) rule;
+        if (rule instanceof Taclet taclet) {
             if (taclet.getAddedBy() != null) {
                 input.add(new Pair<>(dynamicRules.get(taclet), false));
             }

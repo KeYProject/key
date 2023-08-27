@@ -1,8 +1,6 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.java.SourceVisitor;
@@ -13,7 +11,8 @@ public class NoState extends Modifier {
 
     private static final long serialVersionUID = 2717863742463891263L;
 
-    public NoState() {}
+    public NoState() {
+    }
 
 
     protected NoState(NoState proto) {
@@ -24,6 +23,7 @@ public class NoState extends Modifier {
         return new NoState(this);
     }
 
-    public void accept(SourceVisitor v) {}
+    public void accept(SourceVisitor v) {
+    }
 
 }

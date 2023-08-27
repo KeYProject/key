@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.util.ArrayList;
@@ -111,9 +114,8 @@ class GenericTranslator {
 
         }
 
-        if (term.op() instanceof SortDependingFunction) {
+        if (term.op() instanceof SortDependingFunction func) {
 
-            SortDependingFunction func = (SortDependingFunction) term.op();
             try { // Try block is necessary because there are some
                   // taclets
                   // that should have isReference-Condition, but

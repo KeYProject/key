@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.LinkedHashMap;
@@ -117,8 +120,7 @@ public class ClassPreparationMethodBuilder extends RecoderModelTransformer {
         for (final CompilationUnit cu : getUnits()) {
             final int typeCount = cu.getTypeDeclarationCount();
             for (int i = 0; i < typeCount; i++) {
-                if (cu.getTypeDeclarationAt(i) instanceof ClassDeclaration) {
-                    ClassDeclaration cd = (ClassDeclaration) cu.getTypeDeclarationAt(i);
+                if (cu.getTypeDeclarationAt(i) instanceof ClassDeclaration cd) {
                     if (cd.getTypeDeclarationCount() > 0) {
                         LOGGER.debug("clPrepBuilder: Inner Class detected. "
                             + "Reject building class initialisation methods.");

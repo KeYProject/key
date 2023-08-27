@@ -1,8 +1,6 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge.procedures;
 
 import java.lang.reflect.Constructor;
@@ -55,7 +53,8 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
     /**
      * Default constructor for subclasses.
      */
-    protected MergeWithPredicateAbstraction() {}
+    protected MergeWithPredicateAbstraction() {
+    }
 
     /**
      * Creates a new instance of {@link MergeWithPredicateAbstraction}. This {@link MergeProcedure}

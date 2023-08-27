@@ -1,8 +1,6 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -20,7 +18,8 @@ public class CountBranchFeature implements Feature {
 
     public static final Feature INSTANCE = new CountBranchFeature();
 
-    private CountBranchFeature() {}
+    private CountBranchFeature() {
+    }
 
     /**
      * Compute the cost of a RuleApp.
@@ -31,8 +30,7 @@ public class CountBranchFeature implements Feature {
      * @return the cost of <code>app</code>
      */
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-        if (app.rule() instanceof Taclet) {
-            final Taclet tac = (Taclet) app.rule();
+        if (app.rule() instanceof Taclet tac) {
             final long branches = tac.goalTemplates().size();
             return NumberRuleAppCost.create(branches);
         }

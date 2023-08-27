@@ -1,8 +1,6 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -23,7 +21,8 @@ public class BuiltInRuleIndex implements java.io.Serializable {
     private ImmutableList<BuiltInRule> rules = ImmutableSLList.nil();
 
     /** constructs empty rule index */
-    public BuiltInRuleIndex() {}
+    public BuiltInRuleIndex() {
+    }
 
     /**
      * creates a new index with the given built-in-rules

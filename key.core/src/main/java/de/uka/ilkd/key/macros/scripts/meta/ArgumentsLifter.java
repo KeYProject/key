@@ -1,8 +1,6 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts.meta;
 
 import java.lang.reflect.Field;
@@ -19,7 +17,8 @@ import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 public final class ArgumentsLifter {
     // private static final Map<Class, Type> TYPE_MAP = new HashMap<>();
 
-    private ArgumentsLifter() {}
+    private ArgumentsLifter() {
+    }
 
     public static <T> List<ProofScriptArgument<T>> inferScriptArguments(Class<?> clazz,
             ProofScriptCommand<T> command) {

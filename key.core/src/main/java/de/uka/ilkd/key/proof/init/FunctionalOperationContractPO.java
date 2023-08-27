@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
@@ -321,10 +324,9 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      */
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof FunctionalOperationContractPO)) {
+        if (!(po instanceof FunctionalOperationContractPO cPO)) {
             return false;
         }
-        FunctionalOperationContractPO cPO = (FunctionalOperationContractPO) po;
         return specRepos.splitContract(cPO.contract).subset(specRepos.splitContract(contract));
     }
 

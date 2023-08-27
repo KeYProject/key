@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import javax.annotation.Nonnull;
@@ -347,11 +350,10 @@ public final class ObserverToUpdateRule implements BuiltInRule {
 
         // active statement must be reading model field
         final SourceElement activeStatement = JavaTools.getActiveStatement(mainFml.javaBlock());
-        if (!(activeStatement instanceof CopyAssignment)) {
+        if (!(activeStatement instanceof CopyAssignment ca)) {
             return null;
         }
 
-        final CopyAssignment ca = (CopyAssignment) activeStatement;
         final Expression lhs = ca.getExpressionAt(0);
         final Expression rhs = ca.getExpressionAt(1);
 

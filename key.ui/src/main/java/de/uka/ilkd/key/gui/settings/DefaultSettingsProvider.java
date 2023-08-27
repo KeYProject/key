@@ -1,8 +1,6 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
 import java.util.List;
@@ -22,7 +20,8 @@ public class DefaultSettingsProvider implements SettingsProvider {
     private int priority;
     private Icon icon;
 
-    public DefaultSettingsProvider() {}
+    public DefaultSettingsProvider() {
+    }
 
     public DefaultSettingsProvider(String desc, JComponent pane) {
         setDescription(desc);
@@ -53,7 +52,8 @@ public class DefaultSettingsProvider implements SettingsProvider {
     }
 
     @Override
-    public void applySettings(MainWindow window) throws InvalidSettingsInputException {}
+    public void applySettings(MainWindow window) throws InvalidSettingsInputException {
+    }
 
     @Override
     public Icon getIcon() {

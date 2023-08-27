@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.Services;
@@ -31,8 +34,7 @@ public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpda
             Services services) {
         final Operator instantiationCandidateOp = instantiationCandidate.op();
         if (instantiationCandidateOp != op) {
-            if (instantiationCandidateOp instanceof ElementaryUpdate) {
-                final ElementaryUpdate instElUpdate = (ElementaryUpdate) instantiationCandidateOp;
+            if (instantiationCandidateOp instanceof ElementaryUpdate instElUpdate) {
                 matchCond = leftHandSide.match(instElUpdate.lhs(), matchCond, services);
             } else {
                 matchCond = null;

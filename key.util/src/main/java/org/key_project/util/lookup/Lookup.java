@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.lookup;
 
 import java.lang.ref.WeakReference;
@@ -5,7 +8,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This class handles the management of services and implementations.
@@ -210,7 +212,7 @@ public class Lookup {
      */
     protected <T> T tryToInject(Constructor<T> ctor) throws InjectionException {
         List<?> services =
-            Arrays.stream(ctor.getParameterTypes()).map(this::get).collect(Collectors.toList());
+            Arrays.stream(ctor.getParameterTypes()).map(this::get).toList();
 
         if (services.stream().allMatch(Objects::nonNull)) {
             try {

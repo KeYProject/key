@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
@@ -122,7 +125,7 @@ public class SemisequentTacletAppIndex {
 
         while (infoIt.hasNext()) {
             final FormulaChangeInfo info = infoIt.next();
-            final SequentFormula newFor = info.getNewFormula();
+            final SequentFormula newFor = info.newFormula();
             final TermTacletAppIndex oldIndex = oldIndexIt.next();
 
             if (oldIndex == null)
@@ -130,7 +133,7 @@ public class SemisequentTacletAppIndex {
             {
                 addTermIndex(newFor, services, tacletIndex, listener);
             } else {
-                final PosInOccurrence oldPos = info.getPositionOfModification();
+                final PosInOccurrence oldPos = info.positionOfModification();
                 final PosInOccurrence newPos = oldPos.replaceConstrainedFormula(newFor);
                 termIndices = termIndices.put(newFor,
                     oldIndex.update(newPos, services, tacletIndex, listener, indexCaches));

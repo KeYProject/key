@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.LinkedHashMap;
@@ -301,12 +304,12 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                                     List<Term> conditions = new LinkedList<>();
                                     for (Node node : entry.getValue()) {
                                         Term condition = SymbolicExecutionUtil.computePathCondition(
-                                            node, getSettings().isSimplifyConditions(), false);
+                                            node, getSettings().simplifyConditions(), false);
                                         conditions.add(condition);
                                     }
                                     Term condition = services.getTermBuilder().or(conditions);
                                     if (conditions.size() >= 2) {
-                                        if (getSettings().isSimplifyConditions()) {
+                                        if (getSettings().simplifyConditions()) {
                                             condition = SymbolicExecutionUtil.simplify(initConfig,
                                                 info.getProof(), condition);
                                         }

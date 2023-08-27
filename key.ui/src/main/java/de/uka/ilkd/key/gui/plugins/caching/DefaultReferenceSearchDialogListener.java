@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.util.function.Consumer;
@@ -52,7 +55,7 @@ public class DefaultReferenceSearchDialogListener implements ReferenceSearchDial
             } catch (Exception e) {
                 mediator.startInterface(true);
                 LOGGER.error("failed to copy cache ", e);
-                IssueDialog.showExceptionDialog(dialog, e);
+                IssueDialog.showExceptionDialog(dialog, new CachingException(e));
             }
         }).start();
     }

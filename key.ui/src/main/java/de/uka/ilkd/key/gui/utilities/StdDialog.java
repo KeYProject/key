@@ -1,8 +1,6 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.utilities;
 
 import java.awt.*;
@@ -39,7 +37,6 @@ public class StdDialog extends JDialog {
     }
 
     public StdDialog(String title, JComponent content, int strut, boolean helpButton) {
-        this.setLocationRelativeTo(MainWindow.getInstance());
         this.setTitle(title);
         this.setModal(true);
         // content.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
@@ -81,6 +78,7 @@ public class StdDialog extends JDialog {
         } else {
             this.pack();
         }
+        this.setLocationRelativeTo(MainWindow.getInstance());
     }
 
     public void setContent(JComponent content) {

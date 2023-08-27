@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.*;
@@ -39,7 +42,7 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithLatticeAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
-import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
@@ -490,7 +493,7 @@ public class OutputStreamProofSaver {
         output.append("\")");
     }
 
-    private void printSingleSMTRuleApp(RuleAppSMT smtApp, Node node, String prefix,
+    private void printSingleSMTRuleApp(SMTRuleApp smtApp, Node node, String prefix,
             Appendable output) throws IOException {
         output.append(" (").append(ProofElementID.SOLVERTYPE.getRawName())
                 .append(" \"").append(smtApp.getSuccessfulSolverName()).append("\")");
@@ -513,7 +516,7 @@ public class OutputStreamProofSaver {
 
         final RuleJustificationBySpec ruleJustiBySpec = (RuleJustificationBySpec) ruleJusti;
         output.append(" (contract \"");
-        output.append(ruleJustiBySpec.getSpec().getName());
+        output.append(ruleJustiBySpec.spec().getName());
         output.append("\")");
     }
 
@@ -543,8 +546,7 @@ public class OutputStreamProofSaver {
             // for operation contract rules we add the modality under which the rule was applied
             // -> needed for proof management tool
             if (appliedRuleApp.rule() instanceof UseOperationContractRule) {
-                if (appliedRuleApp instanceof ContractRuleApp) {
-                    ContractRuleApp app = (ContractRuleApp) appliedRuleApp;
+                if (appliedRuleApp instanceof ContractRuleApp app) {
                     Modality modality = (Modality) app.programTerm().op();
                     output.append(" (modality \"");
                     output.append(modality.toString());
@@ -559,8 +561,8 @@ public class OutputStreamProofSaver {
         if (appliedRuleApp instanceof CloseAfterMergeRuleBuiltInRuleApp) {
             printSingleCloseAfterMergeRuleApp((CloseAfterMergeRuleBuiltInRuleApp) appliedRuleApp,
                 node, prefix, output);
-        } else if (appliedRuleApp instanceof RuleAppSMT) {
-            printSingleSMTRuleApp((RuleAppSMT) appliedRuleApp, node, prefix, output);
+        } else if (appliedRuleApp instanceof SMTRuleApp) {
+            printSingleSMTRuleApp((SMTRuleApp) appliedRuleApp, node, prefix, output);
         }
 
         output.append("");

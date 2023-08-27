@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.service;
 
 import java.util.*;
@@ -238,8 +240,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                 // (!m.isPrivate() && c.getPackage() == ct.getPackage())) {
                 if (isVisibleFor(m, ct)) {
                     List<? extends Type> msig = m.getSignature();
-                    if (c instanceof ParameterizedType) {
-                        ParameterizedType pt = (ParameterizedType) c;
+                    if (c instanceof ParameterizedType pt) {
                         List<Type> tmp = new ArrayList<>(msig.size());
                         for (Type t : msig) {
                             if (t instanceof TypeParameter) {
@@ -573,9 +574,8 @@ public abstract class DefaultProgramModelInfo extends AbstractService
 
     private ClassType getClassTypeFromTypeParameter(TypeParameter tp, int i) {
         ClassType t;
-        if (tp instanceof TypeParameterDeclaration) {
+        if (tp instanceof TypeParameterDeclaration tpd) {
             // TODO split up in bytecode/sourcecode info
-            TypeParameterDeclaration tpd = (TypeParameterDeclaration) tp;
             SourceInfo si = (SourceInfo) this;
             t = (ClassType) si.getType(tpd.getBounds().get(i));
         } else {
@@ -768,8 +768,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             return getNameInfo().getJavaLangObject();
         }
         // WildcardMode.None / WildcardMode.Any
-        if (ta instanceof TypeArgumentInfo) {
-            TypeArgumentInfo tai = (TypeArgumentInfo) ta;
+        if (ta instanceof TypeArgumentInfo tai) {
             if (tai.isTypeVariable()) {
                 if (tai.getContainingMethodInfo() != null) {
                     if (tai.getContainingMethodInfo().getTypeParameters() != null) {
@@ -848,8 +847,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                     methodSig = replaceTypeArguments(methodSig, typeArguments, m);
                 } // otherwise, checks against bounds will be done
             }
-            if (context instanceof ParameterizedType) {
-                ParameterizedType pt = (ParameterizedType) context;
+            if (context instanceof ParameterizedType pt) {
                 methodSig = replaceTypeArgs(methodSig, pt.getTypeArgs(),
                     pt.getGenericType().getTypeParameters());
             }
@@ -880,8 +878,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                         methodSig = replaceTypeArguments(methodSig, typeArguments, m);
                     } // otherwise, checks against bounds will be done
                 }
-                if (context instanceof ParameterizedType) {
-                    ParameterizedType pt = (ParameterizedType) context;
+                if (context instanceof ParameterizedType pt) {
                     methodSig = replaceTypeArgs(methodSig, pt.getTypeArgs(),
                         pt.getGenericType().getTypeParameters());
                 }
@@ -1114,70 +1111,66 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         return getConstructors(ct, signature, null);
     }
 
-    static class ResolvedTypeArgument implements TypeArgument {
-        final WildcardMode wm;
-        final Type type;
-        final List<? extends TypeArgument> typeArgs;
-
-        public ResolvedTypeArgument(WildcardMode wm, Type type,
-                List<? extends TypeArgument> typeArgs) {
+    record ResolvedTypeArgument(WildcardMode wm, Type type,
+                                List<? extends TypeArgument> typeArgs) implements TypeArgument {
+        ResolvedTypeArgument {
             if (!(type instanceof ArrayType || type instanceof ClassType)) {
                 throw new IllegalArgumentException();
             }
-            this.wm = wm;
-            this.type = type;
-            this.typeArgs = typeArgs;
         }
 
-        public WildcardMode getWildcardMode() {
-            return wm;
-        }
-
-        public String getTypeName() {
-            return type.getFullName();
-        }
-
-        public List<? extends TypeArgument> getTypeArguments() {
-            return typeArgs;
-        }
-
+    public WildcardMode getWildcardMode() {
+        return wm;
     }
 
-    static class ClassTypeCacheEntry {
-        List<ClassType> supertypes; // used in specialized services only
-
-        Set<ClassType> subtypes;
-
-        List<ClassType> allSupertypes;
-
-        List<ClassType> allMemberTypes;
-
-        List<Field> allFields;
-
-        List<Method> allMethods;
+    public String getTypeName() {
+        return type.getFullName();
     }
 
-    static class SuperTypeTopSort extends ClassTypeTopSort {
-
-        protected final List<ClassType> getAdjacent(ClassType c) {
-            return c.getSupertypes();
-        }
+    public List<? extends TypeArgument> getTypeArguments() {
+        return typeArgs;
     }
 
-    static class ReplaceTypeArgResult {
-        final Type baseType;
-        final WildcardMode wildcardMode;
+}
 
-        ReplaceTypeArgResult(Type t, WildcardMode wm) {
-            this.baseType = t;
-            this.wildcardMode = wm;
-        }
-    }
 
-    class SubTypeTopSort extends ClassTypeTopSort {
+static class ClassTypeCacheEntry {
+    List<ClassType> supertypes; // used in specialized services only
 
-        protected final List<ClassType> getAdjacent(ClassType c) {
-            return getSubtypes(c);
-        }
+    Set<ClassType> subtypes;
+
+    List<ClassType> allSupertypes;
+
+    List<ClassType> allMemberTypes;
+
+    List<Field> allFields;
+
+    List<Method> allMethods;
+}
+
+
+static class SuperTypeTopSort extends ClassTypeTopSort {
+
+    protected final List<ClassType> getAdjacent(ClassType c) {
+        return c.getSupertypes();
     }
 }
+
+
+static class ReplaceTypeArgResult {
+    final Type baseType;
+    final WildcardMode wildcardMode;
+
+    ReplaceTypeArgResult(Type t, WildcardMode wm) {
+        this.baseType = t;
+        this.wildcardMode = wm;
+    }
+}
+
+
+class SubTypeTopSort extends ClassTypeTopSort {
+
+    protected final List<ClassType> getAdjacent(ClassType c) {
+        return getSubtypes(c);
+    }
+}}
