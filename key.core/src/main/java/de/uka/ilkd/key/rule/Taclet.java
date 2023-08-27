@@ -669,11 +669,11 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
     StringBuffer toStringTriggers(StringBuffer sb) {
         if (trigger != null) {
             sb.append("\n\\trigger{");
-            sb.append(trigger.getTriggerVar());
+            sb.append(trigger.triggerVar());
             sb.append("} ");
             sb.append(trigger.getTerm());
             if (trigger.hasAvoidConditions()) {
-                Iterator<Term> itTerms = trigger.getAvoidConditions().iterator();
+                Iterator<Term> itTerms = trigger.avoidConditions().iterator();
                 sb.append(" \\avoid ");
                 while (itTerms.hasNext()) {
                     Term cond = itTerms.next();

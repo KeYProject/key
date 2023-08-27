@@ -72,9 +72,8 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
          * G&lt;A, B extends A&gt; where B would be replaced by A, which needs to be resolved to
          * Object.
          */
-        while (t instanceof TypeParameter) {
+        while (t instanceof TypeParameter typeParameter) {
             changed = true;
-            TypeParameter typeParameter = (TypeParameter) t;
             int boundNo = typeParameter.getBoundCount();
             if (boundNo == 0) {
                 t = getNameInfo().getJavaLangObject();
@@ -83,10 +82,9 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
                 }
             } else {
                 String bound = typeParameter.getBoundName(0);
-                if (typeParameter instanceof TypeParameterDeclaration) {
+                if (typeParameter instanceof TypeParameterDeclaration tdecl) {
                     // TP - Declaration needs to know context (bound may rely on
                     // imports)
-                    TypeParameterDeclaration tdecl = (TypeParameterDeclaration) typeParameter;
                     t = getSourceInfo().getType(bound, tdecl);
                 } else {
                     // TP - Info from Class file is always complete (I hope)
@@ -144,18 +142,15 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
      */
     public static String toString(Object object) {
 
-        if (object instanceof MethodDeclaration) {
-            MethodDeclaration md = (MethodDeclaration) object;
+        if (object instanceof MethodDeclaration md) {
             return md.getFullName() + toString(md.getSignature());
         }
 
-        if (object instanceof NamedModelElement) {
-            NamedModelElement ne = (NamedModelElement) object;
+        if (object instanceof NamedModelElement ne) {
             String name = ne.getName();
             if (object instanceof NamedProgramElement) {
                 ProgramElement parent = ((NamedProgramElement) ne).getASTParent();
-                if (parent instanceof NamedModelElement) {
-                    NamedModelElement p = (NamedModelElement) parent;
+                if (parent instanceof NamedModelElement p) {
                     return p.getName() + "::" + name;
                 }
             } else {
@@ -163,9 +158,8 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
             }
         }
 
-        if (object instanceof Collection<?>) {
+        if (object instanceof Collection<?> coll) {
             StringBuilder ret = new StringBuilder("[ ");
-            Collection<?> coll = (Collection<?>) object;
             for (Object o : coll) {
                 ret.append(toString(o)).append(" ");
             }

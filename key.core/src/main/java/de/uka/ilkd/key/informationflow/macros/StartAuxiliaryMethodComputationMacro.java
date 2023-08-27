@@ -58,10 +58,9 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro
         }
         Services services = proof.getServices();
         ProofOblInput poForProof = services.getSpecificationRepository().getProofOblInput(proof);
-        if (!(poForProof instanceof InfFlowContractPO)) {
+        if (!(poForProof instanceof InfFlowContractPO po)) {
             return false;
         }
-        final InfFlowContractPO po = (InfFlowContractPO) poForProof;
 
         final InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(po.getContract(),
             po.getIFVars().c1, po.getIFVars().c2, services);

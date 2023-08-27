@@ -42,6 +42,7 @@ import org.key_project.util.collection.ImmutableList;
  * @version 1 (20.08.19)
  */
 
+@SuppressWarnings("ClassCanBeRecord")
 public class ProofExplorationService {
     private final @Nonnull Proof proof;
     private final @Nonnull Services services;

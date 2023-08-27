@@ -58,7 +58,7 @@ public final class ReferenceSearcher {
             for (var taclet : tacletIndex.allNoPosTacletApps().stream()
                     .filter(x -> x.taclet().getOrigin() != null
                             && x.taclet().getOrigin().contains(proofFile))
-                    .collect(Collectors.toList())) {
+                    .toList()) {
                 if (newTaclets == null) {
                     newTaclets = newTacletIndex.allNoPosTacletApps();
                 }

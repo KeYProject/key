@@ -100,8 +100,7 @@ public class ReplaceEnums extends TwoPassTransformation {
             ASTArrayList<FieldSpecification> enumSpecRepl = new ASTArrayList<>();
             for (int i = 0; i < ed.getMembers().size(); i++) {
                 MemberDeclaration md = ed.getMembers().get(i);
-                if (md instanceof EnumConstantDeclaration) {
-                    EnumConstantDeclaration ec = (EnumConstantDeclaration) md;
+                if (md instanceof EnumConstantDeclaration ec) {
                     EnumConstantSpecification ecs = ec.getEnumConstantSpecification();
 
                     // create replacement for current constant
@@ -282,11 +281,10 @@ public class ReplaceEnums extends TwoPassTransformation {
                 Do repl = f.createDo(f.createBooleanLiteral(false), sb);
                 for (int i = 0; i < sw.getBranchCount(); i++) {
                     Branch b = sw.getBranchAt(i);
-                    if (b instanceof Default) {
+                    if (b instanceof Default d) {
                         if (i != sw.getBranchCount() - 1) {
                             throw new ModelException("case after default is illegal");
                         }
-                        Default d = (Default) b;
                         ASTArrayList<Statement> defaultStmnt = new ASTArrayList<>();
                         StatementBlock sb2 = f.createStatementBlock(defaultStmnt);
                         LogicalOr cond = f.createLogicalOr(

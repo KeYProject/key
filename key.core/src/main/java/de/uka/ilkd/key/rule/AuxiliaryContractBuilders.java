@@ -869,11 +869,10 @@ public final class AuxiliaryContractBuilders {
          * @return the loop contract's decreases clause.
          */
         public Term buildDecreasesCheck() {
-            if (!(contract instanceof LoopContract)) {
+            if (!(contract instanceof LoopContract lc)) {
                 throw new IllegalStateException();
             }
 
-            LoopContract lc = (LoopContract) contract;
             Term decreases = lc.getDecreases(getBaseHeap(), terms.self, services);
 
             if (decreases == null) {
@@ -1391,11 +1390,11 @@ public final class AuxiliaryContractBuilders {
                 ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(
                     termLabelState, services, occurrence, application.rule(), application, goal,
                     BlockContractHint.createValidityBranchHint(variables.exception), null,
-                    instantiation.modality, new ImmutableArray<>(newPost), null, newJavaBlock,
-                    instantiation.formula.getLabels());
+                    instantiation.modality(), new ImmutableArray<>(newPost), null, newJavaBlock,
+                    instantiation.formula().getLabels());
 
                 term = tb.applySequential(updates,
-                    tb.prog(instantiation.modality, newJavaBlock, newPost, labels));
+                    tb.prog(instantiation.modality(), newJavaBlock, newPost, labels));
 
                 goal.changeFormula(new SequentFormula(term), occurrence);
                 TermLabelManager.refactorGoal(termLabelState, services, occurrence,
@@ -1404,7 +1403,8 @@ public final class AuxiliaryContractBuilders {
             } else {
                 Term pre = tb.and(assumptions);
                 Term prog =
-                    tb.prog(instantiation.modality, newJavaBlock, newPost, new ImmutableArray<>());
+                    tb.prog(instantiation.modality(), newJavaBlock, newPost,
+                        new ImmutableArray<>());
                 term = tb.applySequential(updates, tb.imp(pre, prog));
             }
 
@@ -1439,7 +1439,7 @@ public final class AuxiliaryContractBuilders {
                 final Term[] postconditionsNext, final ProgramVariable exceptionParameter,
                 final AuxiliaryContract.Terms terms, final AuxiliaryContract.Variables nextVars) {
             final TermBuilder tb = services.getTermBuilder();
-            final Modality modality = instantiation.modality;
+            final Modality modality = instantiation.modality();
 
             final ProgramVariable[] loopVariables = createLoopVariables(services);
             OuterBreakContinueAndReturnCollector collector =
@@ -1552,10 +1552,10 @@ public final class AuxiliaryContractBuilders {
          *         itself.
          */
         private Statement wrapInMethodFrameIfContextIsAvailable(final StatementBlock block) {
-            if (instantiation.context == null) {
+            if (instantiation.context() == null) {
                 return block;
             }
-            return new MethodFrame(null, instantiation.context, block);
+            return new MethodFrame(null, instantiation.context(), block);
         }
 
         /**
@@ -1609,13 +1609,14 @@ public final class AuxiliaryContractBuilders {
 
         private Term buildUsageFormula(Goal goal) {
             return services.getTermBuilder().prog(
-                instantiation.modality, replaceBlock(instantiation.formula.javaBlock(),
-                    instantiation.statement, constructAbruptTerminationIfCascade()),
-                instantiation.formula.sub(0),
+                instantiation.modality(), replaceBlock(instantiation.formula().javaBlock(),
+                    instantiation.statement(), constructAbruptTerminationIfCascade()),
+                instantiation.formula().sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services, occurrence,
                     application.rule(), application, goal, BlockContractHint.USAGE_BRANCH, null,
-                    instantiation.modality, new ImmutableArray<>(instantiation.formula.sub(0)),
-                    null, instantiation.formula.javaBlock(), instantiation.formula.getLabels()));
+                    instantiation.modality(), new ImmutableArray<>(instantiation.formula().sub(0)),
+                    null, instantiation.formula().javaBlock(),
+                    instantiation.formula().getLabels()));
         }
 
         private JavaBlock replaceBlock(final JavaBlock java, final JavaStatement oldBlock,
@@ -1651,13 +1652,14 @@ public final class AuxiliaryContractBuilders {
         private JavaBlock getJavaBlock(final ProgramVariable exceptionParameter) {
             final StatementBlock block;
 
-            if (instantiation.statement instanceof StatementBlock) {
+            if (instantiation.statement() instanceof StatementBlock) {
                 block =
-                    new ValidityProgramConstructor(labels, (StatementBlock) instantiation.statement,
+                    new ValidityProgramConstructor(labels,
+                        (StatementBlock) instantiation.statement(),
                         variables, exceptionParameter, services).construct();
             } else {
                 block = new ValidityProgramConstructor(labels,
-                    new StatementBlock(instantiation.statement), variables, exceptionParameter,
+                    new StatementBlock(instantiation.statement()), variables, exceptionParameter,
                     services).construct();
             }
 

@@ -122,10 +122,9 @@ public class SMTFunction {
             return true;
         }
 
-        if (!(obj instanceof SMTFunction)) {
+        if (!(obj instanceof SMTFunction f)) {
             return false;
         }
-        SMTFunction f = (SMTFunction) obj;
 
         if (!this.id.equals(f.id)) {
             return false;

@@ -171,9 +171,7 @@ public class SequentViewSearchBar extends SearchBar {
     public boolean search(@Nonnull String search) {
         clearSearchResults();
 
-        if (sequentView.getFilter() instanceof SearchSequentPrintFilter) {
-            SearchSequentPrintFilter searchSequentPrintFilter =
-                (SearchSequentPrintFilter) sequentView.getFilter();
+        if (sequentView.getFilter() instanceof SearchSequentPrintFilter searchSequentPrintFilter) {
             searchSequentPrintFilter.setLogicPrinter(sequentView.getLogicPrinter());
             searchSequentPrintFilter.setSearchString(searchField.getText());
         }

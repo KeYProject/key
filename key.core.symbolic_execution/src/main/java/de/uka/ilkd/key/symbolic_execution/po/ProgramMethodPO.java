@@ -239,8 +239,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ProgramMethodPO) {
-            ProgramMethodPO other = (ProgramMethodPO) obj;
+        if (obj instanceof ProgramMethodPO other) {
             return Objects.equals(pm, other.getProgramMethod())
                     && Objects.equals(precondition, other.getPrecondition());
         } else {

@@ -41,8 +41,7 @@ public class ProofTreePopupFactory {
         // filter out nodes with only OSS children (i.e., OSS nodes are not expanded)
         // (take care to not filter out any GUIBranchNodes accidentally!)
         Object o = tp.getLastPathComponent();
-        if (o instanceof GUIProofTreeNode) {
-            GUIProofTreeNode n = ((GUIProofTreeNode) o);
+        if (o instanceof GUIProofTreeNode n) {
             if (n.getNode().getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
                 return false;
             }

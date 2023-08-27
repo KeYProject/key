@@ -757,8 +757,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         sig.append(pm.getName());
         sig.append("(");
         for (SVSubstitute subst : originalParamVars) {
-            if (subst instanceof Named) {
-                Named named = (Named) subst;
+            if (subst instanceof Named named) {
                 sig.append(named.name()).append(", ");
             } else if (subst instanceof Term) {
                 sig.append(LogicPrinter.quickPrintTerm((Term) subst, services, usePrettyPrinting,

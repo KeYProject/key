@@ -175,8 +175,7 @@ public abstract class AbstractUpdateExtractor {
             for (int i = 0; i < term.arity(); i++) {
                 fillInitialObjectsToIgnoreRecursively(term.sub(i), toFill);
             }
-        } else if (term.op() instanceof ElementaryUpdate) {
-            ElementaryUpdate eu = (ElementaryUpdate) term.op();
+        } else if (term.op() instanceof ElementaryUpdate eu) {
             if (eu.lhs() instanceof ProgramVariable) {
                 toFill.add(term.sub(0));
             }
@@ -255,14 +254,12 @@ public abstract class AbstractUpdateExtractor {
                 collectLocationsFromTerm(sub, locationsToFill, updateCreatedObjectsToFill,
                     updateValueObjectsToFill, objectsToIgnore);
             }
-        } else if (updateTerm.op() instanceof ElementaryUpdate) {
-            ElementaryUpdate eu = (ElementaryUpdate) updateTerm.op();
+        } else if (updateTerm.op() instanceof ElementaryUpdate eu) {
             if (SymbolicExecutionUtil.isHeapUpdate(getServices(), updateTerm)) {
                 collectLocationsFromHeapUpdate(updateTerm.sub(0), locationsToFill,
                     updateCreatedObjectsToFill, updateValueObjectsToFill);
-            } else if (eu.lhs() instanceof ProgramVariable) {
+            } else if (eu.lhs() instanceof ProgramVariable var) {
                 final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
-                ProgramVariable var = (ProgramVariable) eu.lhs();
                 if (!SymbolicExecutionUtil.isHeap(var, heapLDT)) {
                     if (!isImplicitProgramVariable(var)
                             && !objectsToIgnore.contains(getServices().getTermBuilder().var(var))
@@ -1047,8 +1044,7 @@ public abstract class AbstractUpdateExtractor {
          */
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof ExtractLocationParameter) {
-                ExtractLocationParameter other = (ExtractLocationParameter) obj;
+            if (obj instanceof ExtractLocationParameter other) {
                 return Objects.equals(arrayIndex, other.arrayIndex)
                         && stateMember == other.stateMember
                         && Objects.equals(parentTerm, other.parentTerm)
@@ -1784,8 +1780,7 @@ public abstract class AbstractUpdateExtractor {
          */
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof ExecutionVariableValuePair) {
-                ExecutionVariableValuePair other = (ExecutionVariableValuePair) obj;
+            if (obj instanceof ExecutionVariableValuePair other) {
                 return isArrayRange()
                         ? (getArrayStartIndex().equals(other.getArrayStartIndex())
                                 && getArrayEndIndex().equals(other.getArrayEndIndex()))

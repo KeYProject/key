@@ -65,10 +65,9 @@ public class SMTTermVariable extends SMTTerm {
             return true;
         }
 
-        if (!(term instanceof SMTTermVariable)) {
+        if (!(term instanceof SMTTermVariable tv)) {
             return false;
         }
-        SMTTermVariable tv = (SMTTermVariable) term;
 
         return this.sort.equals(tv.sort) && this.id.equals(tv.id);
     }

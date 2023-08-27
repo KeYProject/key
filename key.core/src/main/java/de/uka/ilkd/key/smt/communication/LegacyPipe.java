@@ -184,7 +184,7 @@ class LegacyPipe implements Pipe {
             } else {
                 // just to fix compile problems, the message type is completely thrown away here
                 // (the class only exists as unused legacy code)
-                return result.getContent();
+                return result.content();
             }
         }
         return null;

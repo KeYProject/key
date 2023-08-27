@@ -39,7 +39,7 @@ public class GotoReferenceAction extends KeyAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Node ref = node.lookup(ClosedBy.class).getNode();
+        Node ref = node.lookup(ClosedBy.class).node();
         mediator.getSelectionModel().setSelectedNode(ref);
     }
 }

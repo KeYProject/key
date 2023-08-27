@@ -77,10 +77,9 @@ public class PositionedString {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof PositionedString)) {
+        if (!(o instanceof PositionedString that)) {
             return false;
         }
-        PositionedString that = (PositionedString) o;
         return text.equals(that.text) && Objects.equals(location, that.location);
     }
 

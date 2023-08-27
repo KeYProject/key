@@ -23,8 +23,7 @@ public class ExceptionFailureNotificationDialog extends ShowDisplayPane {
 
     @Override
     public boolean execute(NotificationEvent event) {
-        if (event instanceof ExceptionFailureEvent) {
-            ExceptionFailureEvent ev = (ExceptionFailureEvent) event;
+        if (event instanceof ExceptionFailureEvent ev) {
             setMessage(ev.getErrorMessage());
             LOGGER.error(ev.getErrorMessage(), ev.getException());
             IssueDialog.showExceptionDialog(parentComponent, ev.getException());

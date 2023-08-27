@@ -140,7 +140,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
                 branchCondition = services.getTermBuilder().and(mergedBranchCondtions);
                 // Simplify merged branch conditions
                 if (mergedConditions.length >= 2) {
-                    if (getSettings().isSimplifyConditions()) {
+                    if (getSettings().simplifyConditions()) {
                         branchCondition =
                             SymbolicExecutionUtil.simplify(initConfig, getProof(), branchCondition);
                     }
@@ -149,7 +149,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
                 }
             } else {
                 branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(),
-                    getSettings().isSimplifyConditions(), true);
+                    getSettings().simplifyConditions(), true);
             }
             // Format branch condition
             formatedBranchCondition = formatTerm(branchCondition, services);
@@ -210,7 +210,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
             }
             pathCondition = services.getTermBuilder().and(parentPath, branchCondition);
             // Simplify path condition
-            if (getSettings().isSimplifyConditions()) {
+            if (getSettings().simplifyConditions()) {
                 pathCondition =
                     SymbolicExecutionUtil.simplify(initConfig, getProof(), pathCondition);
             }
@@ -266,7 +266,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
             Iterator<Node> iter = mergedProofNodes.iterator();
             for (int i = 0; i < result.length; i++) {
                 result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(),
-                    getSettings().isSimplifyConditions(), true);
+                    getSettings().simplifyConditions(), true);
             }
             return result;
         } else {

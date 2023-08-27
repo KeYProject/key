@@ -64,11 +64,8 @@ public class RemoveStaticImports extends TwoPassTransformation {
         TreeWalker tw = new TreeWalker(cu);
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
-            if (pe instanceof MemberReference && pe instanceof ReferenceSuffix
-                    && pe instanceof NameReference) {
-                MemberReference r = (MemberReference) pe;
-                ReferenceSuffix s = (ReferenceSuffix) pe;
-                NameReference nr = (NameReference) pe;
+            if (pe instanceof MemberReference r && pe instanceof ReferenceSuffix s
+                    && pe instanceof NameReference nr) {
                 if (s.getReferencePrefix() != null) {
                     continue; // not found through a static import
                 }

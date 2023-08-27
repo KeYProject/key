@@ -49,10 +49,9 @@ public class TestPositions {
     private static void preorderTraverse(ProgramElement element,
             Consumer<ProgramElement> consumer) {
         consumer.accept(element);
-        if (!(element instanceof NonTerminalProgramElement)) {
+        if (!(element instanceof NonTerminalProgramElement e)) {
             return;
         }
-        var e = ((NonTerminalProgramElement) element);
         var n = e.getChildCount();
         for (int i = 0; i < n; ++i) {
             preorderTraverse(e.getChildAt(i), consumer);

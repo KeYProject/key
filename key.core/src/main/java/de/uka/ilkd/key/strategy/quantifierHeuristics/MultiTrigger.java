@@ -96,11 +96,10 @@ class MultiTrigger implements Trigger {
 
     @Override
     public boolean equals(Object arg0) {
-        if (!(arg0 instanceof MultiTrigger)) {
+        if (!(arg0 instanceof MultiTrigger a)) {
             return false;
         }
 
-        final MultiTrigger a = (MultiTrigger) arg0;
         return a.triggers.equals(triggers);
     }
 

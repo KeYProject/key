@@ -77,13 +77,13 @@ public class FindTacletAppContainer extends TacletAppContainer {
             final FormulaChangeInfo info = infoList.head();
             infoList = infoList.tail();
 
-            final SequentFormula newFormula = info.getNewFormula();
+            final SequentFormula newFormula = info.newFormula();
             if (newFormula == applicationPosition.sequentFormula()) {
                 // then there were no relevant modifications since the creation
                 // of the rule app object
                 return false;
             }
-            if (!independentSubformulas(info.getPositionOfModification(), newFormula)) {
+            if (!independentSubformulas(info.positionOfModification(), newFormula)) {
                 return true;
             }
         }

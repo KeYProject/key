@@ -749,8 +749,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             if (obj instanceof TermReplacementKey) {
                 obj = ((TermReplacementKey) obj).term;
             }
-            if (obj instanceof Term) {
-                Term t = (Term) obj;
+            if (obj instanceof Term t) {
                 return term.equalsModRenaming(t); // Ignore naming and term labels in the way a
                                                   // taclet rule does.
             } else {
