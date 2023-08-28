@@ -119,6 +119,7 @@ public class TaskTree extends JPanel {
         }
     }
 
+    @Override
     public void updateUI() {
         super.updateUI();
         Font myFont = UIManager.getFont(Config.KEY_FONT_PROOF_LIST_VIEW);

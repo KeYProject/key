@@ -243,7 +243,7 @@ public class CachingExtension
                     .equals(ProofCachingSettings.DISPOSE_COPY)) {
                 mediator.stopInterface(true);
                 newProof.copyCachedGoals(referencedProof, null, null);
-                mediator.startInterface(true);
+                mediator.startInterface(true, false);
             } else {
                 newProof.closedGoals().stream()
                         .filter(x -> x.node().lookup(ClosedBy.class) != null
@@ -364,7 +364,7 @@ public class CachingExtension
             try {
                 mediator.stopInterface(true);
                 new CopyingProofReplayer(c.proof(), node.proof()).copy(c.node(), current);
-                mediator.startInterface(true);
+                mediator.startInterface(true, false);
             } catch (Exception ex) {
                 LOGGER.error("failed to copy proof ", ex);
                 IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);

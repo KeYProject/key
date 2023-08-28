@@ -291,6 +291,8 @@ public class KeYMediator {
                                                 // instantiated everytime again?
             caches.getIfThenElseMalusCache().clear(); // TODO: Is this required since the strategy
                                                       // is instantiated everytime again?
+            // refresh selection: the node is no longer a closed goal / inner node
+            keySelectionModel.setSelectedNode(keySelectionModel.getSelectedNode());
         }
     }
 

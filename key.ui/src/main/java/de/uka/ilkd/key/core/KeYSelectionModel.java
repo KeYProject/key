@@ -41,27 +41,8 @@ public class KeYSelectionModel {
     private final KeYSelectionEvent selectionEvent = new KeYSelectionEvent(this);
 
     public KeYSelectionModel() {
-        listenerList = Collections.synchronizedList(new ArrayList<>(5));
+        listenerList = Collections.synchronizedList(new ArrayList<>());
         goalIsValid = false;
-    }
-
-    /**
-     * Does not take care of GUI effects
-     */
-    public void setProof(Proof p) {
-        proof = Objects.requireNonNull(p);
-        Goal g = proof.openGoals().iterator().next();
-        if (g == null) {
-            selectedNode = proof.root().leavesIterator().next();
-            selectedSequent = selectedNode.sequent();
-            selectedRuleApp = selectedNode.getAppliedRuleApp();
-        } else {
-            goalIsValid = true;
-            selectedNode = g.node();
-            selectedSequent = selectedNode.sequent();
-            selectedRuleApp = selectedNode.getAppliedRuleApp();
-            selectedGoal = g;
-        }
     }
 
     /**
@@ -94,6 +75,9 @@ public class KeYSelectionModel {
             selectedGoal = null;
         }
         fireSelectedProofChanged();
+        if (selectedNode != null) {
+            fireSelectedNodeChanged();
+        }
     }
 
     /**
@@ -127,6 +111,7 @@ public class KeYSelectionModel {
      *
      * @param node selected node
      * @param sequent selected sequent
+     * @param ruleApp selected rule app (may not be node's rule app inside a OSS)
      */
     public void setSelectedSequentAndRuleApp(Node node, Sequent sequent, RuleApp ruleApp) {
         // switch proof if needed
@@ -216,7 +201,7 @@ public class KeYSelectionModel {
         private Iterator<Goal> goalIt;
         private Iterator<Node> nodeIt;
 
-        public DefaultSelectionIterator() {
+        protected DefaultSelectionIterator() {
             findNext();
         }
 
@@ -280,29 +265,17 @@ public class KeYSelectionModel {
      * proof tree
      */
     public void defaultSelection() {
-        Goal g = null;
-        Goal firstG = null;
-        Iterator<Goal> it = new DefaultSelectionIterator();
-
-        while (g == null && it.hasNext()) {
-            g = it.next();
-            if (firstG == null) {
-                firstG = g;
-            }
-        }
+        Goal g = new DefaultSelectionIterator().next();
 
         /*
-         * Order of preference: 1. Not yet closable goals 2. Goals which are not closed for all
-         * metavariable instantiations 3. The first node of the tree
+         * Order of preference:
+         * 1. "Default selection" (Not yet closable goals)
+         * 2. The first node of the tree
          */
         if (g != null) {
             setSelectedGoal(g);
         } else {
-            if (firstG != null) {
-                setSelectedGoal(firstG);
-            } else {
-                setSelectedNode(proof.root().leavesIterator().next());
-            }
+            setSelectedNode(proof.root().leavesIterator().next());
         }
     }
 
