@@ -211,7 +211,8 @@ public class SolverListener implements SolverLauncherListener {
         try {
             new ProofSMTApplyUserAction(mediator, smtProof, problems).actionPerformed(null);
         } finally {
-            mediator.startInterface(false);
+            // no change to selection model
+            mediator.startInterface(false, false);
         }
 
     }
