@@ -940,8 +940,16 @@ public abstract class SequentView extends JEditorPane {
 
     protected void updateSequent(Node node) {
         var start = System.nanoTime();
-        getLogicPrinter().update(getFilter(), getLineWidth());
-        String printed = getLogicPrinter().result();
+
+        // auto-abbreviate heaps
+        if (node != null) {
+            for (var sf : node.sequent().asList()) {
+                sf.formula().execPreOrder(new AbbreviatingVisitor(node.proof().getServices()));
+            }
+        }
+
+        printer.update(filter, getLineWidth());
+        String printed = printer.result();
         boolean html =
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUseSyntaxHighlighting();
         var args = new HTMLSyntaxHighlighter.Args(node, printed, html);
@@ -950,10 +958,9 @@ public abstract class SequentView extends JEditorPane {
         var highlight = System.nanoTime();
         setTextCache.get(highlighted);
         var setText = System.nanoTime();
-        LOGGER.trace("updateSequent " + (node != null ? node.serialNr() : -1) + ": print "
-            + (print - start) / 1e6
-            + "ms, highlight " + (highlight - print) / 1e6 + "ms, setText "
-            + (setText - highlight) / 1e6 + "ms");
+        LOGGER.trace("updateSequent {}: print {}ms, highlight {}ms, setText {}ms",
+            node != null ? node.serialNr() : -1, (print - start) / 1e6, (highlight - print) / 1e6,
+            (setText - highlight) / 1e6);
     }
 
     public void setFilter(SequentPrintFilter sequentPrintFilter, boolean forceUpdate) {

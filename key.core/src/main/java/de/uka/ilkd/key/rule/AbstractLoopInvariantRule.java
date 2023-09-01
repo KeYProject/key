@@ -38,6 +38,10 @@ import org.key_project.util.collection.ImmutableSet;
  * @author Dominic Scheurer
  */
 public abstract class AbstractLoopInvariantRule implements BuiltInRule {
+    /**
+     * The suffix given to anon heap names created because of loops.
+     */
+    public static final String ANON_HEAP_NAME_SUFFIX = "LOOP";
 
     /**
      * The last formula the loop invariant rule was applied to. Used for checking whether
@@ -416,13 +420,12 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      *
      * @param heap The original heap {@link LocationVariable}.
      * @param mod The modifiers term.
-     * @param inv The loop invariant.
      * @param services The {@link Services} object.
      * @return An {@link AnonUpdateData} object encapsulating the anonymizing update, the loop heap,
      *         the base heap, and the anonymized heap.
      */
     protected static AnonUpdateData createAnonUpdate(LocationVariable heap, Term mod,
-            LoopSpecification inv, Services services) {
+            Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final Name loopHeapName = new Name(tb.newName(heap + "_After_LOOP"));
@@ -430,7 +433,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         services.getNamespaces().functions().addSafely(loopHeapFunc);
 
         final Term loopHeap = tb.func(loopHeapFunc);
-        final Name anonHeapName = new Name(tb.newName("anon_" + heap + "_LOOP"));
+        final Name anonHeapName =
+            new Name(tb.newName("anon_" + heap + "_" + ANON_HEAP_NAME_SUFFIX));
         final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
         services.getNamespaces().functions().addSafely(anonHeapFunc);
         final Term anonHeapTerm =
@@ -491,7 +495,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             // weigl: prevent NPE
             Term modifiesTerm = mods.get(heap);
             modifiesTerm = modifiesTerm == null ? tb.strictlyNothing() : modifiesTerm;
-            final AnonUpdateData tAnon = createAnonUpdate(heap, modifiesTerm, inst.inv, services);
+            final AnonUpdateData tAnon = createAnonUpdate(heap, modifiesTerm, services);
             anonUpdateData = anonUpdateData.append(tAnon);
 
             anonUpdate = tb.parallel(anonUpdate, tAnon.anonUpdate);
