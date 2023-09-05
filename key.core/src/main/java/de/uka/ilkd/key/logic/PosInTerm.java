@@ -39,6 +39,22 @@ public final class PosInTerm {
     }
 
     /**
+     * Remove the first index from this position.
+     *
+     * @return position of the first subterm
+     */
+    public PosInTerm sub() {
+        if (size == 1) {
+            return PosInTerm.TOP_LEVEL;
+        }
+        int[] pathMinusHead = new int[size - 1];
+        for (int i = 1; i < size; i++) {
+            pathMinusHead[i - 1] = positions[i];
+        }
+        return new PosInTerm(pathMinusHead);
+    }
+
+    /**
      * create a position from the string
      *
      * The string contains a comma separated list of integers. The position created from the string
