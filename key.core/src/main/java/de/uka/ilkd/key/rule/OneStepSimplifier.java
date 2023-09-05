@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
 
@@ -737,8 +738,8 @@ public final class OneStepSimplifier implements BuiltInRule {
          */
         @Override
         public int hashCode() {
-            return term.op().hashCode(); // Allow more conflicts to ensure that naming and term
-                                         // labels are ignored.
+            // Allow more conflicts to ensure that naming and term labels are ignored.
+            return Objects.hash(term.op(), term.depth());
         }
 
         /**
