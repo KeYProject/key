@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -565,13 +566,20 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
 
         // simplify as long as possible
-        ImmutableList<SequentFormula> list = ImmutableSLList.nil();
+        Collection<SequentFormula> seen = new ArrayList<>();
         SequentFormula simplifiedCf = cf;
+        SequentFormula lastCf = null;
         while (true) {
             simplifiedCf = simplifyConstrainedFormula(services, simplifiedCf, ossPIO.isInAntec(),
                 context, ifInsts, protocol, goal, ruleApp);
-            if (simplifiedCf != null && !list.contains(simplifiedCf)) {
-                list = list.prepend(simplifiedCf);
+            if (simplifiedCf != null && !seen.contains(simplifiedCf)) {
+                seen.add(simplifiedCf);
+                // optimization: use a set for more efficient contains() check
+                // (only helpful for longer OSS)
+                if (seen.size() == 30 && seen instanceof ArrayList<SequentFormula>) {
+                    seen = new HashSet<>(seen);
+                }
+                lastCf = simplifiedCf;
             } else {
                 break;
             }
@@ -580,7 +588,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         PosInOccurrence[] ifInstsArr = ifInsts.toArray(new PosInOccurrence[0]);
         ImmutableList<PosInOccurrence> immutableIfInsts =
             ImmutableSLList.<PosInOccurrence>nil().append(ifInstsArr);
-        return new Instantiation(list.head(), protocol != null ? protocol.size() : list.size(),
+        return new Instantiation(lastCf, protocol != null ? protocol.size() : seen.size(),
             immutableIfInsts);
     }
 
