@@ -29,6 +29,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -64,13 +65,13 @@ public final class OneStepSimplifier implements BuiltInRule {
      * If true, the simplification process will stop on cycles.
      * Note that cycles should never happen by careful selection of the rulesets.
      */
-    private static boolean ENABLE_CYCLE_CHECK = true;
+    private static final boolean ENABLE_CYCLE_CHECK = true;
     /**
      * If true, the simplifier will keep a log of rule applications.
      * This may lead to excessive memory consumption, so it can be disabled here.
      * TODO: add a real (user-facing) option?
      */
-    private static boolean ENABLE_PROTOCOL = true;
+    private static final boolean ENABLE_PROTOCOL = true;
 
     private static final int APPLICABILITY_CACHE_SIZE = 1000;
     private static final int DEFAULT_CACHE_SIZE = 10000;
@@ -91,9 +92,9 @@ public final class OneStepSimplifier implements BuiltInRule {
      */
     private static final ImmutableList<String> ruleSets = ImmutableSLList.<String>nil()
             .append("concrete").append("update_elim").append("update_apply_on_update")
-            .append("update_apply").append("update_join").append("elimQuantifier");
+            .append("update_apply").append("update_join").append("elimQuantifier").append("oss");
 
-    private static final boolean[] bottomUp = { false, false, true, true, true, false };
+    private static final boolean[] bottomUp = { false, false, true, true, true, false, true };
     private final Map<SequentFormula, Boolean> applicabilityCache =
         new LRUCache<>(APPLICABILITY_CACHE_SIZE);
     /**
@@ -298,6 +299,9 @@ public final class OneStepSimplifier implements BuiltInRule {
     private SequentFormula simplifySub(Goal goal, Services services, PosInOccurrence pos,
             int indexNr, Protocol protocol, Map<TermReplacementKey, PosInOccurrence> context,
             /* out */ Set<PosInOccurrence> ifInsts, RuleApp ruleApp) {
+        if (pos.subTerm().op() instanceof Quantifier && ruleSets.get(indexNr).equals("oss")) {
+            return null; // this ruleset does not recurse into quantifiers
+        }
         for (int i = 0, n = pos.subTerm().arity(); i < n; i++) {
             SequentFormula result =
                 simplifyPosOrSub(goal, services, pos.down(i), indexNr, protocol, context, ifInsts,
