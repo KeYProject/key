@@ -60,6 +60,17 @@ public final class OneStepSimplifier implements BuiltInRule {
      * @see #apply(Goal, Services, RuleApp)
      */
     public static boolean disableOSSRestriction = false;
+    /**
+     * If true, the simplification process will stop on cycles.
+     * Note that cycles should never happen by careful selection of the rulesets.
+     */
+    private static boolean ENABLE_CYCLE_CHECK = true;
+    /**
+     * If true, the simplifier will keep a log of rule applications.
+     * This may lead to excessive memory consumption, so it can be disabled here.
+     * TODO: add a real (user-facing) option?
+     */
+    private static boolean ENABLE_PROTOCOL = true;
 
     private static final int APPLICABILITY_CACHE_SIZE = 1000;
     private static final int DEFAULT_CACHE_SIZE = 10000;
@@ -265,7 +276,11 @@ public final class OneStepSimplifier implements BuiltInRule {
             SequentFormula result =
                 taclet.getRewriteResult(goal, new TermLabelState(), services, app);
             if (protocol != null) {
-                protocol.add(app);
+                if (ENABLE_PROTOCOL) {
+                    protocol.add(app);
+                } else {
+                    protocol.add(null); // to keep size correct
+                }
             }
             return result;
             // TODO Idea: return new Pair<TacletApp, SequentFormula>(null, null);
@@ -407,7 +422,11 @@ public final class OneStepSimplifier implements BuiltInRule {
         if (pos != null) {
             ifInsts.add(pos);
             if (protocol != null) {
-                protocol.add(makeReplaceKnownTacletApp(in, inAntecedent, pos));
+                if (ENABLE_PROTOCOL) {
+                    protocol.add(makeReplaceKnownTacletApp(in, inAntecedent, pos));
+                } else {
+                    protocol.add(null); // to keep size correct
+                }
             }
             Term result =
                 pos.isInAntec() ? services.getTermBuilder().tt() : services.getTermBuilder().ff();
@@ -573,7 +592,9 @@ public final class OneStepSimplifier implements BuiltInRule {
             simplifiedCf = simplifyConstrainedFormula(services, simplifiedCf, ossPIO.isInAntec(),
                 context, ifInsts, protocol, goal, ruleApp);
             if (simplifiedCf != null && !seen.contains(simplifiedCf)) {
-                seen.add(simplifiedCf);
+                if (ENABLE_CYCLE_CHECK) {
+                    seen.add(simplifiedCf);
+                }
                 // optimization: use a set for more efficient contains() check
                 // (only helpful for longer OSS)
                 if (seen.size() == 30 && seen instanceof ArrayList<SequentFormula>) {
