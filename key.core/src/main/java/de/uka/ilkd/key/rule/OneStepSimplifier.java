@@ -258,7 +258,8 @@ public final class OneStepSimplifier implements BuiltInRule {
      * @param protocol
      */
     private SequentFormula simplifyPos(Goal goal, Services services, PosInOccurrence pos,
-            int indexNr, Protocol protocol) {
+            int indexNr, Protocol protocol, Map<TermReplacementKey, PosInOccurrence> context,
+            /* out */ Set<PosInOccurrence> ifInsts, RuleApp ruleApp) {
         final ImmutableList<NoPosTacletApp> apps =
             indices[indexNr].getRewriteTaclet(pos, TacletFilter.TRUE, services);
         for (TacletApp app : apps) {
@@ -282,6 +283,18 @@ public final class OneStepSimplifier implements BuiltInRule {
                     protocol.add(null); // to keep size correct
                 }
             }
+
+            // do replace-known until done
+            while (!applicableCheck && pos.posInTerm().existsSubTerm(result.formula())) {
+                Term replacedKnown = replaceKnownHelper(context, result.formula(), pos.isInAntec(),
+                    ifInsts, protocol, services, goal, ruleApp, pos.posInTerm());
+                if (replacedKnown != null && replacedKnown != result.formula()) {
+                    result = new SequentFormula(replacedKnown);
+                } else {
+                    break;
+                }
+            }
+
             return result;
             // TODO Idea: return new Pair<TacletApp, SequentFormula>(null, null);
         }
@@ -327,66 +340,21 @@ public final class OneStepSimplifier implements BuiltInRule {
         // the core loop of the simplifier:
         // - if the ruleset is to be applied bottom-up, first recurse into subformulas
         // - otherwise, check for applicable rules on the current pos
-        // - simplifications are applied until no more are possible
-        // (unless we are only checking for applicability of the OSS rule)
+        // - simplifications are applied recursively
         SequentFormula result;
         if (bottomUp[indexNr]) {
             result = simplifySub(goal, services, pos, indexNr, protocol, context, ifInsts, ruleApp);
-            while (result != null && !applicableCheck) {
-                var p = new PosInOccurrence(result, pos.posInTerm(), pos.isInAntec());
-                if (!p.subTermExists()) {
-                    break;
-                }
-                SequentFormula resultRepeat =
-                    simplifySub(goal, services, p, indexNr, protocol, context, ifInsts, ruleApp);
-                if (resultRepeat != null) {
-                    result = resultRepeat;
-                } else {
-                    break;
-                }
-            }
             var p = result != null ? new PosInOccurrence(result, pos.posInTerm(), pos.isInAntec())
                     : pos;
             if (p.subTermExists()) {
-                SequentFormula resultPos = simplifyPos(goal, services, p, indexNr, protocol);
+                SequentFormula resultPos =
+                    simplifyPos(goal, services, p, indexNr, protocol, context, ifInsts, ruleApp);
                 if (resultPos != null) {
                     result = resultPos;
-                    while (!applicableCheck && p.posInTerm().existsSubTerm(result.formula())) {
-                        Term replacedKnown =
-                            replaceKnownHelper(context, result.formula(), p.isInAntec(),
-                                ifInsts, protocol, services, goal, ruleApp, p.posInTerm());
-                        if (replacedKnown != null && replacedKnown != result.formula()) {
-                            result = new SequentFormula(replacedKnown);
-                        } else {
-                            break;
-                        }
-                    }
                 }
             }
         } else {
-            result = simplifyPos(goal, services, pos, indexNr, protocol);
-            while (result != null && !applicableCheck) {
-                while (pos.posInTerm().existsSubTerm(result.formula())) {
-                    Term replacedKnown =
-                        replaceKnownHelper(context, result.formula(), pos.isInAntec(),
-                            ifInsts, protocol, services, goal, ruleApp, pos.posInTerm());
-                    if (replacedKnown != null && replacedKnown != result.formula()) {
-                        result = new SequentFormula(replacedKnown);
-                    } else {
-                        break;
-                    }
-                }
-                var p = new PosInOccurrence(result, pos.posInTerm(), pos.isInAntec());
-                if (!p.subTermExists()) {
-                    break;
-                }
-                SequentFormula resultRepeat = simplifyPos(goal, services, p, indexNr, protocol);
-                if (resultRepeat != null) {
-                    result = resultRepeat;
-                } else {
-                    break;
-                }
-            }
+            result = simplifyPos(goal, services, pos, indexNr, protocol, context, ifInsts, ruleApp);
             var p = result != null ? new PosInOccurrence(result, pos.posInTerm(), pos.isInAntec())
                     : pos;
             if (p.subTermExists()) {
@@ -646,7 +614,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         if (active != newActive || lastProof != proof || // The setting or proof has changed.
                 (isShutdown() && !proof.closed())) { // A closed proof was pruned.
             active = newActive;
-            if (active && proof != null && !proof.closed()) {
+            if (active && !proof.closed()) {
                 initIndices(proof);
             } else {
                 shutdownIndices();
