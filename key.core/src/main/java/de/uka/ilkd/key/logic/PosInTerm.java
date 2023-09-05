@@ -234,6 +234,10 @@ public final class PosInTerm {
         return sub;
     }
 
+    /**
+     * @param t some term
+     * @return whether this position exists in that term
+     */
     public boolean existsSubTerm(Term t) {
         Term sub = t;
         for (int i = 0; i < size; i++) {
@@ -245,6 +249,7 @@ public final class PosInTerm {
         return true;
     }
 
+    @Override
     public int hashCode() {
         if (hash == (char) -1) {
             char localHash = 13;

@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -83,6 +84,10 @@ public final class OneStepSimplifier implements BuiltInRule {
     private static final boolean[] bottomUp = { false, false, true, true, true, false };
     private final Map<SequentFormula, Boolean> applicabilityCache =
         new LRUCache<>(APPLICABILITY_CACHE_SIZE);
+    /**
+     * Whether the OSS rule is currently checked for applicability.
+     * This means that it is only necessary to prove that one single rule app is possible.
+     */
     private boolean applicableCheck = false;
 
     private Proof lastProof;
@@ -303,23 +308,28 @@ public final class OneStepSimplifier implements BuiltInRule {
             return null;
         }
 
+        // the core loop of the simplifier:
+        // - if the ruleset is to be applied bottom-up, first recurse into subformulas
+        // - otherwise, check for applicable rules on the current pos
+        // - simplifications are applied until no more are possible
+        // (unless we are only checking for applicability of the OSS rule)
         SequentFormula result;
         if (bottomUp[indexNr]) {
             result = simplifySub(goal, services, pos, indexNr, protocol, context, ifInsts, ruleApp);
             while (result != null && !applicableCheck) {
-                var result3 = replaceKnownHelper(context, result.formula(), pos.isInAntec(),
+                Term replacedKnown = replaceKnownHelper(context, result.formula(), pos.isInAntec(),
                     ifInsts, protocol, services, goal, ruleApp);
-                if (result3 != null) {
-                    result = new SequentFormula(result3);
+                if (replacedKnown != null) {
+                    result = new SequentFormula(replacedKnown);
                 }
                 var p = new PosInOccurrence(result, pos.posInTerm(), pos.isInAntec());
                 if (!p.subTermExists()) {
                     break;
                 }
-                var result2 =
+                SequentFormula resultRepeat =
                     simplifySub(goal, services, p, indexNr, protocol, context, ifInsts, ruleApp);
-                if (result2 != null) {
-                    result = result2;
+                if (resultRepeat != null) {
+                    result = resultRepeat;
                 } else {
                     break;
                 }
@@ -327,26 +337,26 @@ public final class OneStepSimplifier implements BuiltInRule {
             var p = result != null ? new PosInOccurrence(result, pos.posInTerm(), pos.isInAntec())
                     : pos;
             if (p.subTermExists()) {
-                var result2 = simplifyPos(goal, services, p, indexNr, protocol);
-                if (result2 != null) {
-                    result = result2;
+                SequentFormula resultPos = simplifyPos(goal, services, p, indexNr, protocol);
+                if (resultPos != null) {
+                    result = resultPos;
                 }
             }
         } else {
             result = simplifyPos(goal, services, pos, indexNr, protocol);
             while (result != null && !applicableCheck) {
-                var result3 = replaceKnownHelper(context, result.formula(), pos.isInAntec(),
+                Term replacedKnown = replaceKnownHelper(context, result.formula(), pos.isInAntec(),
                     ifInsts, protocol, services, goal, ruleApp);
-                if (result3 != null) {
-                    result = new SequentFormula(result3);
+                if (replacedKnown != null) {
+                    result = new SequentFormula(replacedKnown);
                 }
                 var p = new PosInOccurrence(result, pos.posInTerm(), pos.isInAntec());
                 if (!p.subTermExists()) {
                     break;
                 }
-                var result2 = simplifyPos(goal, services, p, indexNr, protocol);
-                if (result2 != null) {
-                    result = result2;
+                SequentFormula resultRepeat = simplifyPos(goal, services, p, indexNr, protocol);
+                if (resultRepeat != null) {
+                    result = resultRepeat;
                 } else {
                     break;
                 }
@@ -354,10 +364,10 @@ public final class OneStepSimplifier implements BuiltInRule {
             var p = result != null ? new PosInOccurrence(result, pos.posInTerm(), pos.isInAntec())
                     : pos;
             if (p.subTermExists()) {
-                var result2 =
+                SequentFormula resultSub =
                     simplifySub(goal, services, p, indexNr, protocol, context, ifInsts, ruleApp);
-                if (result2 != null) {
-                    result = result2;
+                if (resultSub != null) {
+                    result = resultSub;
                 }
             }
         }
