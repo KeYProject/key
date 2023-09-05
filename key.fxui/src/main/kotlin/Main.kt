@@ -1,5 +1,6 @@
 package io.github.wadoon.key
 
+import io.github.wadoon.key.view.ProofTree
 import javafx.application.Application
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
@@ -61,12 +62,7 @@ class KMainView : View("KeY") {
     }
 }
 
-class ProofTree : View("Proof Tree", FontIcon(Material2AL.ACCOUNT_TREE)) {
-    override val root = vbox {
-        toolbar()
-        treeview(TreeItem<String>("No proof loaded")) { }
-    }
-}
+
 
 class StrategySettings : View("Strategy") {
     override val root = vbox {
