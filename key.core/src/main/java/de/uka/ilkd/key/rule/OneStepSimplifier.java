@@ -27,12 +27,14 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.FormulaSV;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletIndex;
@@ -169,7 +171,10 @@ public final class OneStepSimplifier implements BuiltInRule {
             }
 
             if (accept) {
-                appsTakenOver = appsTakenOver.prepend(app);
+                if (app.taclet().getRuleSets().stream()
+                        .noneMatch(x -> x.name().toString().equals("oss"))) {
+                    appsTakenOver = appsTakenOver.prepend(app);
+                }
                 result = result.prepend(tac);
             }
         }
@@ -312,7 +317,10 @@ public final class OneStepSimplifier implements BuiltInRule {
     private SequentFormula simplifySub(Goal goal, Services services, PosInOccurrence pos,
             int indexNr, Protocol protocol, Map<TermReplacementKey, PosInOccurrence> context,
             /* out */ Set<PosInOccurrence> ifInsts, RuleApp ruleApp) {
-        if (pos.subTerm().op() instanceof Quantifier && ruleSets.get(indexNr).equals("oss")) {
+        var op = pos.subTerm().op();
+        if ((op instanceof Quantifier
+                || (op instanceof Function function && function.name().toString().equals("seqDef"))
+                || op instanceof UpdateJunctor) && ruleSets.get(indexNr).equals("oss")) {
             return null; // this ruleset does not recurse into quantifiers
         }
         for (int i = 0, n = pos.subTerm().arity(); i < n; i++) {

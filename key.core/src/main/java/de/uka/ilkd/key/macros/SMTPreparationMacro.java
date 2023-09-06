@@ -51,6 +51,11 @@ public class SMTPreparationMacro extends SequentialProofMacro {
         return "Auto Pilot";
     }
 
+    @Override
+    public String getScriptCommandName() {
+        return "smt-prepare";
+    }
+
     /**
      * Gets the description of this macro.
      * <p>
