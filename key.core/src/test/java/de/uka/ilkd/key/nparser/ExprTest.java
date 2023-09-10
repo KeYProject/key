@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
 import java.io.IOException;
@@ -14,6 +17,7 @@ import org.junit.jupiter.params.provider.CsvFileSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
@@ -55,4 +59,15 @@ public class ExprTest {
 
         return io;
     }
+
+
+    @ParameterizedTest
+    @CsvFileSource(resources = "precedence_tests.txt", delimiterString = ":::")
+    void precedenceStrongArithmetic(String actual, String expected) throws IOException {
+        var io = getIo();
+        var e = io.parseExpression(expected);
+        var a = io.parseExpression(actual);
+        assertEquals(e, a);
+    }
+
 }

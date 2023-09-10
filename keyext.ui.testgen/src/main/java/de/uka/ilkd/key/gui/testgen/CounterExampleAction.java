@@ -1,6 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.testgen;
 
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import javax.swing.*;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -20,15 +25,23 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.counterexample.AbstractCounterExampleGenerator;
 import de.uka.ilkd.key.smt.counterexample.AbstractSideProofCounterExampleGenerator;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
-public class CounterExampleAction extends MainWindowAction {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class CounterExampleAction extends MainWindowAction implements PropertyChangeListener {
     private static final long serialVersionUID = -1931682474791981751L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(CounterExampleAction.class);
 
     private static final String NAME = "Search for Counterexample";
     private static final String TOOLTIP = "Search for a counterexample for the selected goal";
+    private static final String TOOLTIP_EXTRA = ". Install Z3 to enable this functionality!";
+    private boolean haveZ3CE = false;
 
     public CounterExampleAction(MainWindow mainWindow) {
         super(mainWindow);
@@ -49,6 +62,10 @@ public class CounterExampleAction extends MainWindowAction {
      * is implemented by the {@link AbstractCounterExampleGenerator}</b>.
      */
     public void init() {
+        ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
+                .addPropertyChangeListener(this);
+        checkZ3CE();
+
         final KeYSelectionListener selListener = new KeYSelectionListener() {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
@@ -62,7 +79,7 @@ public class CounterExampleAction extends MainWindowAction {
                     // Can be applied only to root nodes
 
 
-                    setEnabled(selNode.childrenCount() == 0 && !selNode.isClosed());
+                    setEnabled(haveZ3CE && selNode.childrenCount() == 0 && !selNode.isClosed());
                 }
             }
 
@@ -106,8 +123,30 @@ public class CounterExampleAction extends MainWindowAction {
             getMediator().addInterruptedListener(worker);
             worker.execute();
         } catch (Exception exc) {
+            LOGGER.error("", exc);
             IssueDialog.showExceptionDialog(mainWindow, exc);
         }
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        checkZ3CE();
+    }
+
+    /**
+     * @return whether Z3 is installed
+     */
+    private boolean checkZ3CE() {
+        haveZ3CE = SolverTypes.Z3_CE_SOLVER.isInstalled(false);
+        if (!haveZ3CE) {
+            setEnabled(false);
+            setTooltip(TOOLTIP + TOOLTIP_EXTRA);
+        } else if (!isEnabled()) {
+            Node selNode = getMediator().getSelectedNode();
+            setEnabled(selNode != null && selNode.childrenCount() == 0 && !selNode.isClosed());
+            setTooltip(TOOLTIP);
+        }
+        return haveZ3CE;
     }
 
     /**
@@ -170,7 +209,7 @@ public class CounterExampleAction extends MainWindowAction {
             SpecificationRepository spec = proof.getServices().getSpecificationRepository();
             spec.registerProof(spec.getProofOblInput(oldProof), proof);
 
-            mediator.goalChosen(proof.getGoal(proof.root()));
+            mediator.goalChosen(proof.getOpenGoal(proof.root()));
 
             return proof;
         }

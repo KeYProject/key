@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
 
@@ -106,6 +109,13 @@ public class SimpleSettingsPanel extends JPanel {
         area.setRows(5);
         area.getDocument().addDocumentListener(new DocumentValidatorAdapter(area, validator));
         return new JScrollPane(area);
+    }
+
+    protected JTextArea createTextAreaWithoutScroll(String text, Validator<String> validator) {
+        JTextArea area = new JTextArea(text);
+        area.setRows(5);
+        area.getDocument().addDocumentListener(new DocumentValidatorAdapter(area, validator));
+        return area;
     }
 
 

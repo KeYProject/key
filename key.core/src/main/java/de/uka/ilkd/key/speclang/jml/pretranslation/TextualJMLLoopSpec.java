@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import java.util.*;
@@ -11,9 +14,6 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.ASSIGNABLE;
-
-
 /**
  * A JML loop specification (invariant, assignable clause, decreases clause, ...) in textual form.
  */
@@ -25,7 +25,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
      * Heap-dependent clauses
      */
     public enum ClauseHd {
-        INFORMATION_FLOW, ASSIGNABLE, INVARIANT, INVARIANT_FREE
+        INFORMATION_FLOW, ASSIGNABLE, ASSIGNABLE_FREE, INVARIANT, INVARIANT_FREE
     }
 
     public TextualJMLLoopSpec(ImmutableList<JMLModifier> mods) {
@@ -67,13 +67,8 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     }
 
     public ImmutableList<LabeledParserRuleContext> getAssignable() {
-        return getList(ASSIGNABLE);
+        return getList(ClauseHd.ASSIGNABLE);
     }
-
-    /*
-     * public ImmutableList<LabeledParserRuleContext> getAssignable(String hName) { return
-     * getList(ClauseHd.ASSIGNABLE); }
-     */
 
     public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignables() {
         return getMap(ClauseHd.ASSIGNABLE);
@@ -83,6 +78,17 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return getMapInit(ClauseHd.ASSIGNABLE);
     }
 
+    public ImmutableList<LabeledParserRuleContext> getAssignableFree() {
+        return getList(ClauseHd.ASSIGNABLE_FREE);
+    }
+
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignablesFree() {
+        return getMap(ClauseHd.ASSIGNABLE_FREE);
+    }
+
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignablesFreeInit() {
+        return getMapInit(ClauseHd.ASSIGNABLE_FREE);
+    }
 
     public ImmutableList<LabeledParserRuleContext> getInfFlowSpecs() {
         return getList(ClauseHd.INFORMATION_FLOW);

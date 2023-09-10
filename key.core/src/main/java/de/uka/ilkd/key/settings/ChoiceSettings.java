@@ -1,6 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
 import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
 import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.logic.Choice;
@@ -178,5 +189,29 @@ public class ChoiceSettings extends AbstractSettings {
             category2Default.put(c.category(), c.name().toString());
         }
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ChoiceSettings that = (ChoiceSettings) o;
+
+        if (!Objects.equals(category2Default, that.category2Default)) {
+            return false;
+        }
+        return Objects.equals(category2Choices, that.category2Choices);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = category2Default != null ? category2Default.hashCode() : 0;
+        result = 31 * result + (category2Choices != null ? category2Choices.hashCode() : 0);
+        return result;
     }
 }

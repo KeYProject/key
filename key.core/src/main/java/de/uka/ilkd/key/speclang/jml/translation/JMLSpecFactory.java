@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import java.util.*;
@@ -67,7 +70,13 @@ public class JMLSpecFactory {
     protected final de.uka.ilkd.key.logic.TermBuilder tb;
     protected final de.uka.ilkd.key.java.Services services;
     protected final ContractFactory cf;
-    private int invCounter;
+
+    /**
+     * Counter for numbering the partial invariant rules. One counter is maintained per type.
+     * Otherwise, partial invariant taclets might not be applicable during proof reloading, when
+     * additional classes are added.
+     */
+    private final Map<KeYJavaType, Integer> invCounter = new IdentityHashMap<>();
     /**
      * Used to check that there is only one represents clause per type and field.
      */
@@ -201,6 +210,7 @@ public class JMLSpecFactory {
         public Term measuredBy;
         public Term decreases;
         public final Map<LocationVariable, Term> assignables = new LinkedHashMap<>();
+        public final Map<LocationVariable, Term> assignablesFree = new LinkedHashMap<>();
         public final Map<ProgramVariable, Term> accessibles = new LinkedHashMap<>();
         public final Map<LocationVariable, Term> ensures = new LinkedHashMap<>();
         public final Map<LocationVariable, Term> ensuresFree = new LinkedHashMap<>();
@@ -212,6 +222,7 @@ public class JMLSpecFactory {
         public Map<Label, Term> continues;
         public Term returns;
         public final Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<>();
+        public final Map<LocationVariable, Boolean> hasFreeMod = new LinkedHashMap<>();
         public ImmutableList<InfFlowSpec> infFlowSpecs;
 
         public void clear() {
@@ -223,12 +234,12 @@ public class JMLSpecFactory {
     // -------------------------------------------------------------------------
 
     protected String getDefaultInvName(String name, KeYJavaType kjt) {
-        invCounter++;
         if (name == null) {
-            return "JML class invariant nr " + (invCounter - 1) + " in " + kjt.getName();
+            int number = invCounter.getOrDefault(kjt, 1);
+            invCounter.put(kjt, number + 1);
+            return "JML class invariant in " + kjt.getFullName() + " no " + number;
         } else {
-            return "JML class invariant \"" + name + "\" in " + kjt.getName() + " (nr "
-                + (invCounter - 1) + ")";
+            return "JML class invariant \"" + name + "\" in " + kjt.getFullName();
         }
     }
 
@@ -275,8 +286,7 @@ public class JMLSpecFactory {
                     result = result.prepend(lpv);
                     return result;
                 }
-            } else if (s instanceof BranchStatement) {
-                BranchStatement bs = (BranchStatement) s;
+            } else if (s instanceof BranchStatement bs) {
                 for (int j = 0, n = bs.getBranchCount(); j < n; j++) {
                     ImmutableList<ProgramVariable> lpv =
                         collectLocalVariables(bs.getBranchAt(j), loop);
@@ -360,7 +370,8 @@ public class JMLSpecFactory {
 
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             translateAssignable(context, progVars, heap, savedHeap,
-                textualSpecCase.getAssignable(heap.name()), clauses);
+                textualSpecCase.getAssignable(heap.name()),
+                textualSpecCase.getAssignableFree(heap.name()), clauses);
             translateRequires(context, progVars, heap, savedHeap,
                 textualSpecCase.getRequires(heap.name()),
                 textualSpecCase.getRequiresFree(heap.name()), clauses);
@@ -470,9 +481,15 @@ public class JMLSpecFactory {
 
     private void translateAssignable(Context context, ProgramVariableCollection progVars,
             LocationVariable heap, final LocationVariable savedHeap,
-            final ImmutableList<LabeledParserRuleContext> mod, ContractClauses clauses)
+            final ImmutableList<LabeledParserRuleContext> mod,
+            final ImmutableList<LabeledParserRuleContext> modFree, ContractClauses clauses)
             throws SLTranslationException {
         clauses.hasMod.put(heap, !translateStrictlyPure(context, progVars.paramVars, mod));
+
+        // For assignable_free, the default if there is no modFree term is strictly_nothing.
+        clauses.hasFreeMod.put(heap,
+            !modFree.isEmpty() && !translateStrictlyPure(context, progVars.paramVars, modFree));
+
         if (heap == savedHeap && mod.isEmpty()) {
             clauses.assignables.put(heap, null);
         } else {
@@ -487,11 +504,36 @@ public class JMLSpecFactory {
                     progVars.atPres, progVars.atBefores, mod));
             }
         }
+
+        if (heap == savedHeap && modFree.isEmpty()) {
+            clauses.assignablesFree.put(heap, null);
+        } else {
+            final Boolean hasFreeMod = clauses.hasFreeMod.get(heap);
+            if (hasFreeMod == null || !hasFreeMod) {
+                final ImmutableList<LabeledParserRuleContext> assignableFreeNothing =
+                    ImmutableSLList
+                            .<LabeledParserRuleContext>nil().append(getAssignableFreeNothing());
+                clauses.assignablesFree.put(heap,
+                    translateAssignableFree(context, progVars.paramVars,
+                        progVars.atPres, progVars.atBefores, assignableFreeNothing));
+            } else {
+                clauses.assignablesFree.put(heap,
+                    translateAssignableFree(context, progVars.paramVars,
+                        progVars.atPres, progVars.atBefores, modFree));
+            }
+        }
+
     }
 
     @Nonnull
     private LabeledParserRuleContext getAssignableNothing() {
         return new LabeledParserRuleContext(JmlFacade.parseClause("assignable \\nothing;"),
+            ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
+    }
+
+    @Nonnull
+    private LabeledParserRuleContext getAssignableFreeNothing() {
+        return new LabeledParserRuleContext(JmlFacade.parseClause("assignable_free \\nothing;"),
             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
     }
 
@@ -711,6 +753,16 @@ public class JMLSpecFactory {
         }
     }
 
+    private Term translateAssignableFree(Context context, ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atBefores,
+            ImmutableList<LabeledParserRuleContext> originalClauses) throws SLTranslationException {
+        // If originalClauses.isEmpty, the default value for assignable_free is strictly_nothing,
+        // which cannot be represented by a LocSet term.
+        assert !originalClauses.isEmpty();
+        return translateUnionClauses(context, paramVars, atPres, atBefores, originalClauses,
+            SpecType.ASSIGNABLE_FREE);
+    }
+
     private boolean translateStrictlyPure(Context context, ImmutableList<ProgramVariable> paramVars,
             ImmutableList<LabeledParserRuleContext> assignableClauses) {
 
@@ -863,14 +915,16 @@ public class JMLSpecFactory {
             // create diamond modality contract
             FunctionalOperationContract contract = cf.func(name, pm, true, pres,
                 clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
+                clauses.assignables, clauses.assignablesFree, clauses.accessibles, clauses.hasMod,
+                clauses.hasFreeMod, progVars);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else if (clauses.diverges.equals(tb.tt())) {
             // create box modality contract
             FunctionalOperationContract contract = cf.func(name, pm, false, pres,
                 clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
+                clauses.assignables, clauses.assignablesFree, clauses.accessibles, clauses.hasMod,
+                clauses.hasFreeMod, progVars);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else {
@@ -884,11 +938,13 @@ public class JMLSpecFactory {
             }
             FunctionalOperationContract contract1 = cf.func(name, pm, true, pres,
                 clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
+                clauses.assignables, clauses.assignablesFree, clauses.accessibles, clauses.hasMod,
+                clauses.hasFreeMod, progVars);
             contract1 = cf.addGlobalDefs(contract1, abbrvLhs);
             FunctionalOperationContract contract2 = cf.func(name, pm, false, clauses.requires,
                 clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
+                clauses.assignables, clauses.assignablesFree, clauses.accessibles, clauses.hasMod,
+                clauses.hasFreeMod, progVars);
             contract2 = cf.addGlobalDefs(contract2, abbrvLhs);
             result = result.add(contract1).add(contract2);
         }
@@ -960,7 +1016,7 @@ public class JMLSpecFactory {
         Term inv = tb.convertToFormula(inv0);
         // create invariant
         String name = getDefaultInvName(null, kjt);
-        return new ClassInvariantImpl(name, name, kjt, visibility, inv, context.selfVar);
+        return new ClassInvariantImpl(name, name, kjt, visibility, inv, context.selfVar());
     }
 
     public ClassInvariant createJMLClassInvariant(KeYJavaType kjt, TextualJMLClassInv textualInv) {
@@ -982,7 +1038,7 @@ public class JMLSpecFactory {
         String name = getDefaultInvName(null, kjt);
         String display = getDefaultInvName(textualInv.getName(), kjt);
         return new ClassInvariantImpl(name, display, kjt, getVisibility(textualInv), inv,
-            context.selfVar);
+            context.selfVar(), textualInv.isFree());
     }
 
     public InitiallyClause createJMLInitiallyClause(@Nonnull KeYJavaType kjt,
@@ -996,7 +1052,7 @@ public class JMLSpecFactory {
 
         // create invariant
         String name = getInicName();
-        return new InitiallyClauseImpl(name, name, kjt, new Public(), inv, context.selfVar,
+        return new InitiallyClauseImpl(name, name, kjt, new Public(), inv, context.selfVar(),
             original);
 
     }
@@ -1027,7 +1083,7 @@ public class JMLSpecFactory {
         Term repFormula = tb.convertToFormula(rep.second);
         // create class axiom
         return new RepresentsAxiom("JML represents clause for " + rep.first.name(), rep.first, kjt,
-            visibility, null, repFormula, context.selfVar, ImmutableSLList.nil(), null);
+            visibility, null, repFormula, context.selfVar(), ImmutableSLList.nil(), null);
     }
 
     public ClassAxiom createJMLRepresents(KeYJavaType kjt, TextualJMLRepresents textualRep)
@@ -1055,7 +1111,7 @@ public class JMLSpecFactory {
                 : "JML represents clause \"" + textualRep.getName() + "\" for " + rep.first.name();
         Term repFormula = tb.convertToFormula(rep.second);
         return new RepresentsAxiom(name, displayName, rep.first, kjt, getVisibility(textualRep),
-            null, repFormula, context.selfVar, ImmutableSLList.nil(), null);
+            null, repFormula, context.selfVar(), ImmutableSLList.nil(), null);
     }
 
     /**
@@ -1082,7 +1138,7 @@ public class JMLSpecFactory {
         String name = "class axiom in " + kjt.getFullName();
         String displayName = textual.getName() == null ? name
                 : "class axiom \"" + textual.getName() + "\" in " + kjt.getFullName();
-        return new ClassAxiomImpl(name, displayName, kjt, new Public(), ax, context.selfVar);
+        return new ClassAxiomImpl(name, displayName, kjt, new Public(), ax, context.selfVar());
     }
 
     public Contract createJMLDependencyContract(KeYJavaType kjt, LocationVariable targetHeap,
@@ -1099,7 +1155,7 @@ public class JMLSpecFactory {
         // translateToTerm expression
         Triple<IObserverFunction, Term, Term> dep =
             new JmlIO(services).context(context).translateDependencyContract(originalDep);
-        return cf.dep(kjt, targetHeap, dep, dep.first.isStatic() ? null : context.selfVar);
+        return cf.dep(kjt, targetHeap, dep, dep.first.isStatic() ? null : context.selfVar());
     }
 
     public Contract createJMLDependencyContract(KeYJavaType kjt, TextualJMLDepends textualDep) {
@@ -1213,13 +1269,13 @@ public class JMLSpecFactory {
                     .resultVariable(progVars.resultVar).exceptionVariable(progVars.excVar)
                     .atPres(atPres).translateMergeParams(ctx.mergeparamsspec());
 
-            final Stream<Term> stream = specs.getPredicates().stream();
+            final Stream<Term> stream = specs.predicates().stream();
             final List<AbstractionPredicate> abstractionPredicates =
-                stream.map(t -> AbstractionPredicate.create(t, specs.getPlaceholder(), services))
+                stream.map(t -> AbstractionPredicate.create(t, specs.placeholder(), services))
                         .collect(Collectors.toList());
 
             result = result.add(new PredicateAbstractionMergeContract(mps, atPres, kjt,
-                specs.getLatticeType(), abstractionPredicates));
+                specs.latticeType(), abstractionPredicates));
         } else {
             throw new IllegalStateException(
                 "MergeProcedures should either be an UnparametricMergeProcedure or a ParametricMergeProcedure");
@@ -1256,7 +1312,8 @@ public class JMLSpecFactory {
             method, behavior, variables, clauses.requires, clauses.requiresFree, clauses.measuredBy,
             clauses.ensures, clauses.ensuresFree, clauses.infFlowSpecs, clauses.breaks,
             clauses.continues, clauses.returns, clauses.signals, clauses.signalsOnly,
-            clauses.diverges, clauses.assignables, clauses.hasMod, services).create();
+            clauses.diverges, clauses.assignables, clauses.assignablesFree,
+            clauses.hasMod, clauses.hasFreeMod, services).create();
     }
 
     /**
@@ -1288,7 +1345,8 @@ public class JMLSpecFactory {
             method, behavior, variables, clauses.requires, clauses.requiresFree, clauses.measuredBy,
             clauses.ensures, clauses.ensuresFree, clauses.infFlowSpecs, clauses.breaks,
             clauses.continues, clauses.returns, clauses.signals, clauses.signalsOnly,
-            clauses.diverges, clauses.assignables, clauses.hasMod, clauses.decreases, services)
+            clauses.diverges, clauses.assignables, clauses.assignablesFree, clauses.hasMod,
+            clauses.hasFreeMod, clauses.decreases, services)
                     .create();
     }
 
@@ -1322,7 +1380,8 @@ public class JMLSpecFactory {
             method, behavior, variables, clauses.requires, clauses.requiresFree, clauses.measuredBy,
             clauses.ensures, clauses.ensuresFree, clauses.infFlowSpecs, clauses.breaks,
             clauses.continues, clauses.returns, clauses.signals, clauses.signalsOnly,
-            clauses.diverges, clauses.assignables, clauses.hasMod, clauses.decreases, services)
+            clauses.diverges, clauses.assignables, clauses.assignablesFree, clauses.hasMod,
+            clauses.hasFreeMod, clauses.decreases, services)
                     .create();
     }
 
@@ -1492,8 +1551,7 @@ public class JMLSpecFactory {
                     result = result.prepend(visibleLocalVariables);
                     return result;
                 }
-            } else if (s instanceof BranchStatement) {
-                final BranchStatement branch = (BranchStatement) s;
+            } else if (s instanceof BranchStatement branch) {
                 final int branchCount = branch.getBranchCount();
                 for (int j = 0; j < branchCount; j++) {
                     final ImmutableList<ProgramVariable> visibleLocalVariables =
@@ -1512,6 +1570,7 @@ public class JMLSpecFactory {
             Map<String, ImmutableList<LabeledParserRuleContext>> originalInvariants,
             Map<String, ImmutableList<LabeledParserRuleContext>> originalFreeInvariants,
             Map<String, ImmutableList<LabeledParserRuleContext>> originalAssignables,
+            Map<String, ImmutableList<LabeledParserRuleContext>> originalFreeAssignables,
             ImmutableList<LabeledParserRuleContext> originalInfFlowSpecs,
             LabeledParserRuleContext originalVariant) {
         assert pm != null;
@@ -1546,7 +1605,10 @@ public class JMLSpecFactory {
 
         // translateToTerm assignable
         Map<LocationVariable, Term> mods =
-            translateToTermAssignable(context, atPres, allVars, originalAssignables);
+            translateToTermAssignable(context, atPres, allVars, originalAssignables, false);
+        Map<LocationVariable, Term> freeMods =
+            translateToTermAssignable(context, atPres, allVars, originalFreeAssignables, true);
+
 
         // translateToTerm infFlowSpecs
         Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs =
@@ -1560,10 +1622,10 @@ public class JMLSpecFactory {
         ImmutableList<Term> localOuts = tb.var(MiscTools.getLocalOuts(loop, services));
 
         // create loop invariant annotation
-        Term selfTerm = context.selfVar == null ? null : tb.var(context.selfVar);
+        Term selfTerm = context.selfVar() == null ? null : tb.var(context.selfVar());
 
         return new LoopSpecImpl(loop, pm, pm.getContainerType(), invariants, freeInvariants, mods,
-            infFlowSpecs, variant, selfTerm, localIns, localOuts, atPres);
+            freeMods, infFlowSpecs, variant, selfTerm, localIns, localOuts, atPres);
     }
 
     private Term translateToTermVariant(Context context, Map<LocationVariable, Term> atPres,
@@ -1599,7 +1661,8 @@ public class JMLSpecFactory {
 
     private Map<LocationVariable, Term> translateToTermAssignable(Context context,
             Map<LocationVariable, Term> atPres, ImmutableList<ProgramVariable> allVars,
-            Map<String, ImmutableList<LabeledParserRuleContext>> originalAssignables) {
+            Map<String, ImmutableList<LabeledParserRuleContext>> originalAssignables,
+            boolean free) {
         Map<LocationVariable, Term> mods = new LinkedHashMap<>();
         for (String h : originalAssignables.keySet()) {
             LocationVariable heap =
@@ -1610,13 +1673,18 @@ public class JMLSpecFactory {
             Term a;
             ImmutableList<LabeledParserRuleContext> as = originalAssignables.get(h);
             if (as.isEmpty()) {
-                a = tb.allLocs();
+                if (free) {
+                    a = tb.strictlyNothing();
+                } else {
+                    a = tb.allLocs();
+                }
             } else {
                 a = tb.empty();
                 for (LabeledParserRuleContext expr : as) {
                     Term translated =
                         new JmlIO(services).context(context).parameters(allVars).atPres(atPres)
-                                .atBefore(atPres).translateTerm(expr, SpecType.ASSIGNABLE);
+                                .atBefore(atPres).translateTerm(expr,
+                                    free ? SpecType.ASSIGNABLE_FREE : SpecType.ASSIGNABLE);
                     a = tb.union(a, translated);
                 }
             }
@@ -1641,7 +1709,8 @@ public class JMLSpecFactory {
             TextualJMLLoopSpec textualLoopSpec) {
         return createJMLLoopInvariant(pm, loop, textualLoopSpec.getInvariants(),
             textualLoopSpec.getFreeInvariants(), textualLoopSpec.getAssignablesInit(),
-            textualLoopSpec.getInfFlowSpecs(), textualLoopSpec.getVariant());
+            textualLoopSpec.getAssignablesFreeInit(), textualLoopSpec.getInfFlowSpecs(),
+            textualLoopSpec.getVariant());
     }
 
     /**

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.fonticons;
 
 import java.awt.*;
@@ -20,6 +23,7 @@ public enum FontAwesomeSolid implements IconFont {
     ARROW_CIRCLE_LEFT('\uf0a8'), ARROW_CIRCLE_RIGHT('\uf0a9'), ARROW_CIRCLE_UP('\uf0aa'),
     ARROW_DOWN('\uf063'), ARROW_LEFT('\uf060'), ARROW_RIGHT('\uf061'), ARROW_UP('\uf062'),
     ARROWS_ALT('\uf0b2'), ARROWS_ALT_H('\uf337'), ARROWS_ALT_V('\uf338'),
+    ARROWS_TO_EYE('\ue4bf'),
     ASSISTIVE_LISTENING_SYSTEMS('\uf2a2'), ASTERISK('\uf069'), AT('\uf1fa'), ATLAS('\uf558'),
     ATOM('\uf5d2'), AUDIO_DESCRIPTION('\uf29e'), AWARD('\uf559'), BABY('\uf77c'),
     BABY_CARRIAGE('\uf77d'), BACKSPACE('\uf55a'), BACKWARD('\uf04a'), BACON('\uf7e5'),
@@ -260,7 +264,7 @@ public enum FontAwesomeSolid implements IconFont {
     public Font getFont() throws IOException, FontFormatException {
         if (font == null) {
             font = Font.createFont(Font.TRUETYPE_FONT,
-                getClass().getResourceAsStream("/fonts/Font Awesome 5 Free-Solid-900.otf"));
+                getClass().getResourceAsStream("/fonts/Font Awesome 6 Free-Solid-900.otf"));
         }
         return font;
     }

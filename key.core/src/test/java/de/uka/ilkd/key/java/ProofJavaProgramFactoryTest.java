@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import java.io.File;
@@ -217,8 +220,7 @@ public class ProofJavaProgramFactoryTest {
     private Optional<Method> findMethod(CompilationUnit cu, String className, String methodName) {
         for (int i = 0; i < cu.getTypeDeclarationCount(); i++) {
             TypeDeclaration td = cu.getTypeDeclarationAt(i);
-            if (td instanceof ClassDeclaration) {
-                ClassDeclaration clazz = (ClassDeclaration) td;
+            if (td instanceof ClassDeclaration clazz) {
                 if (clazz.getName().equals(className)) {
                     return clazz.getMethods().stream().filter(it -> it.getName().equals(methodName))
                             .findFirst();

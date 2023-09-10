@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
 import java.util.Iterator;
@@ -454,11 +457,11 @@ public class LogicPrinter {
         }
         layouter.nl().beginC().print("\\trigger {");
         Trigger trigger = taclet.getTrigger();
-        printSchemaVariable(trigger.getTriggerVar());
+        printSchemaVariable(trigger.triggerVar());
         layouter.print("} ");
         printTerm(trigger.getTerm());
         if (trigger.hasAvoidConditions()) {
-            Iterator<Term> itTerms = trigger.getAvoidConditions().iterator();
+            Iterator<Term> itTerms = trigger.avoidConditions().iterator();
             layouter.brk(1, 2);
             layouter.print(" \\avoid ");
             while (itTerms.hasNext()) {
@@ -919,8 +922,7 @@ public class LogicPrinter {
             String name = t.op().name().toString();
             layouter.startTerm(t.arity());
             boolean alreadyPrinted = false;
-            if (t.op() instanceof SortDependingFunction) {
-                SortDependingFunction op = (SortDependingFunction) t.op();
+            if (t.op() instanceof SortDependingFunction op) {
                 if (op.getKind().compareTo(AbstractSort.EXACT_INSTANCE_NAME) == 0) {
                     layouter.print(op.getSortDependingOn().declarationString());
                     layouter.print("::");
@@ -971,8 +973,7 @@ public class LogicPrinter {
     protected boolean printEmbeddedHeapConstructorTerm(Term t) {
 
         Notation notation = notationInfo.getNotation(t.op());
-        if (notation instanceof HeapConstructorNotation) {
-            HeapConstructorNotation heapNotation = (HeapConstructorNotation) notation;
+        if (notation instanceof HeapConstructorNotation heapNotation) {
             heapNotation.printEmbeddedHeap(t, this);
             return true;
         } else {
@@ -1040,8 +1041,7 @@ public class LogicPrinter {
 
     protected void printEmbeddedObserver(final Term heapTerm, final Term objectTerm) {
         Notation notation = notationInfo.getNotation(objectTerm.op());
-        if (notation instanceof ObserverNotation) {
-            ObserverNotation obsNotation = (ObserverNotation) notation;
+        if (notation instanceof ObserverNotation obsNotation) {
             Term innerheap = objectTerm.sub(0);
             boolean paren = !heapTerm.equals(innerheap);
             if (paren) {

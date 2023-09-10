@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.List;
@@ -29,6 +32,14 @@ public interface OperationContract extends Contract {
     boolean hasModifiesClause(LocationVariable heap);
 
     /**
+     * Returns <code>true</code> iff the method (according to a free clause of the contract) does
+     * not modify the heap at all, i.e., iff it is freely "strictly pure."
+     *
+     * @return whether this contract is freely strictly pure.
+     */
+    boolean hasFreeModifiesClause(LocationVariable heap);
+
+    /**
      * Returns the modifies clause of the contract.
      *
      * @param heapVar the heap variable.
@@ -52,6 +63,34 @@ public interface OperationContract extends Contract {
      */
     Term getMod(LocationVariable heapVar, Term heapTerm, Term selfTerm,
             ImmutableList<Term> paramTerms, Services services);
+
+    /**
+     * Returns the free modifies clause of the contract.
+     *
+     * @param heapVar the heap variable.
+     * @param selfVar the self variable.
+     * @param paramVars the list of parameter variables.
+     * @param services the services object.
+     * @return the free modifies clause.
+     */
+    Term getFreeMod(LocationVariable heapVar, ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Services services);
+
+    /**
+     * Returns the free modifies clause of the contract.
+     *
+     * @param heapVar the heap variable
+     * @param heapTerm the heap variable term.
+     * @param selfTerm the self variable term.
+     * @param paramTerms the list of parameter variable terms.
+     * @param services the services object.
+     * @return the free modifies clause.
+     */
+    Term getFreeMod(LocationVariable heapVar, Term heapTerm,
+            Term selfTerm,
+            ImmutableList<Term> paramTerms,
+            Services services);
 
     Term getFreePre(LocationVariable heap, ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,

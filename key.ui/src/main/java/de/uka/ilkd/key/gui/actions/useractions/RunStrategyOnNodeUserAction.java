@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions.useractions;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -39,7 +42,7 @@ public class RunStrategyOnNodeUserAction extends ProofModifyingUserAction {
 
     @Override
     protected void apply() {
-        Goal invokedGoal = proof.getGoal(invokedNode);
+        Goal invokedGoal = proof.getOpenGoal(invokedNode);
         KeYMediator r = mediator;
         // is the node a goal?
         if (invokedGoal == null) {

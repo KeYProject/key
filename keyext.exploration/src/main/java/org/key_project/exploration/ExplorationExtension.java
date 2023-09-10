@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration;
 
 import java.awt.*;
@@ -39,7 +42,7 @@ import org.key_project.exploration.ui.ExplorationStepsList;
  */
 @KeYGuiExtension.Info(name = "Exploration",
     description = "Author: Sarah Grebing <grebing@ira.uka.de>, Alexander Weigl <weigl@ira.uka.de>",
-    experimental = false, optional = true, priority = 10000)
+    experimental = true, optional = true, priority = 10000)
 public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Startup, KeYGuiExtension.Toolbar, KeYGuiExtension.MainMenu,
         KeYGuiExtension.LeftPanel, KeYGuiExtension.StatusLine, ProofDisposedListener {

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
 import java.util.LinkedHashMap;
@@ -888,6 +891,12 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
+    public Object visitInv_free(JmlParser.Inv_freeContext ctx) {
+        return termFactory.createInvFree(selfVar == null ? null : tb.var(selfVar), containerType);
+    }
+
+
+    @Override
     public Object visitTrue_(JmlParser.True_Context ctx) {
         return new SLExpression(tb.tt());
     }
@@ -995,6 +1004,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
             }
             return termFactory.createInv(receiver.getTerm(), receiver.getType());
         }
+        if (ctx.INV_FREE() != null) {
+            assert !methodCall;
+            if (receiver == null) {
+                raiseError("Unknown reference to " + fullyQualifiedName, ctx);
+            }
+            return termFactory.createInvFree(receiver.getTerm(), receiver.getType());
+        }
         if (ctx.MULT() != null) {
             assert !methodCall;
             if (receiver == null) {
@@ -1031,7 +1047,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             }
             if (result == null) {
                 raiseError(format("Method %s(%s) not found!", lookupName,
-                    createSignatureString(params.getParameters())), ctx);
+                    createSignatureString(params.parameters())), ctx);
             }
         }
         if (((IProgramMethod) result.getTerm().op()).getStateCount() > 1
@@ -1466,9 +1482,22 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
+    public SLExpression visitPrimaryInvFreeFor(JmlParser.PrimaryInvFreeForContext ctx) {
+        SLExpression result = accept(ctx.expression());
+        assert result != null;
+        return termFactory.invFreeFor(result);
+    }
+
+    @Override
     public SLExpression visitPrimaryStaticInv(JmlParser.PrimaryStaticInvContext ctx) {
         KeYJavaType typ = accept(ctx.referencetype());
         return termFactory.staticInfFor(typ);
+    }
+
+    @Override
+    public SLExpression visitPrimaryStaticInvFree(JmlParser.PrimaryStaticInvFreeContext ctx) {
+        KeYJavaType typ = accept(ctx.referencetype());
+        return termFactory.staticInfFreeFor(typ);
     }
 
     @Override
@@ -1564,11 +1593,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitPrimaryUnionInf(JmlParser.PrimaryUnionInfContext ctx) {
         addWarning(ctx,
-            "!!! Deprecation Warnung: You used \\infinite_union "
-                + "in the functional syntax \\infinite_union(...)."
-                + "\n\tThis is deprecated and won't be valid in future versions of KeY."
-                + "\n\tPlease use \\infinite_union as a binder instead: "
-                + "(\\infinite_union var type; guard; store-ref-expr).");
+            """
+                    !!! Deprecation Warnung: You used \\infinite_union in the functional syntax \\infinite_union(...).
+                    \tThis is deprecated and won't be valid in future versions of KeY.
+                    \tPlease use \\infinite_union as a binder instead: (\\infinite_union var type; guard; store-ref-expr).""");
         return createInfiniteUnion(ctx.boundvarmodifiers(), ctx.quantifiedvardecls(),
             ctx.predicate(), ctx.storeref());
     }
@@ -2145,7 +2173,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitMeasured_by_clause(JmlParser.Measured_by_clauseContext ctx) {
         final List<SLExpression> seq = ctx.predornot().stream().map(it -> (SLExpression) accept(it))
-                .collect(Collectors.toList());
+                .toList();
         Optional<SLExpression> t =
             seq.stream().reduce((a, b) -> new SLExpression(tb.pair(a.getTerm(), b.getTerm())));
         Term result = t.orElse(seq.get(0)).getTerm();

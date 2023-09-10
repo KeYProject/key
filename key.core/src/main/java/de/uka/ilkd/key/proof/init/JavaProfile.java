@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
@@ -9,7 +12,25 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooserBuilder;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
+import de.uka.ilkd.key.rule.AbstractContractRuleApp;
+import de.uka.ilkd.key.rule.BlockContractExternalRule;
+import de.uka.ilkd.key.rule.BlockContractInternalRule;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.JmlAssertRule;
+import de.uka.ilkd.key.rule.LoopApplyHeadRule;
+import de.uka.ilkd.key.rule.LoopContractExternalRule;
+import de.uka.ilkd.key.rule.LoopContractInternalRule;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
+import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
+import de.uka.ilkd.key.rule.ObserverToUpdateRule;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.QueryExpand;
+import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.UseDependencyContractRule;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.label.OriginTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
@@ -133,7 +154,9 @@ public class JavaProfile extends AbstractProfile {
                 .prepend(UseDependencyContractRule.INSTANCE).prepend(getOneStepSimpilifier())
                 .prepend(QueryExpand.INSTANCE).prepend(MergeRule.INSTANCE)
                 .prepend(LoopApplyHeadRule.INSTANCE).prepend(JmlAssertRule.ASSERT_INSTANCE)
-                .prepend(JmlAssertRule.ASSUME_INSTANCE).prepend(SetStatementRule.INSTANCE);
+                .prepend(JmlAssertRule.ASSUME_INSTANCE)
+                .prepend(SetStatementRule.INSTANCE)
+                .prepend(ObserverToUpdateRule.INSTANCE);
 
         // contract insertion rule, ATTENTION: ProofMgt relies on the fact
         // that Contract insertion rule is the FIRST element of this list!

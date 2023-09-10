@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -316,11 +319,11 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                     }
                     mediator().getUI().getProofControl().applyInteractive(app, goal);
                 } catch (Exception exc) {
-                    if (exc instanceof SVInstantiationExceptionWithPosition) {
-                        var ex = (SVInstantiationExceptionWithPosition) exc;
+                    if (exc instanceof SVInstantiationExceptionWithPosition ex) {
                         errorPositionKnown(exc.getMessage(), ex.getPosition().line(),
                             ex.getPosition().column(), ex.inIfSequent());
                     }
+                    LOGGER.error("", exc);
                     IssueDialog.showExceptionDialog(TacletMatchCompletionDialog.this, exc);
                     return;
                 }

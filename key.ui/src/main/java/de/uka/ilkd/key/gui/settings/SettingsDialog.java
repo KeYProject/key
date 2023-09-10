@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
 import java.awt.*;
@@ -11,6 +14,9 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The settings dialog.
  *
@@ -20,6 +26,8 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
  */
 public class SettingsDialog extends JDialog {
     private static final long serialVersionUID = -3204453471778351602L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SettingsDialog.class);
+
     private final MainWindow mainWindow;
     private final SettingsUi ui;
     private final Action actionCancel = new CancelAction();
@@ -32,7 +40,7 @@ public class SettingsDialog extends JDialog {
         setTitle("Settings");
 
         mainWindow = owner;
-        ui = new SettingsUi(owner);
+        ui = new SettingsUi(owner, this);
 
         JPanel root = new JPanel(new BorderLayout());
         root.add(ui);
@@ -43,7 +51,7 @@ public class SettingsDialog extends JDialog {
         getRootPane().registerKeyboardAction(e -> dispose(),
             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-        setSize(600, 400);
+        setSize(new Dimension(900, 600));
     }
 
     private JPanel createButtonBar() {
@@ -59,7 +67,8 @@ public class SettingsDialog extends JDialog {
 
     public void setSettingsProvider(List<SettingsProvider> providers) {
         this.providers = providers;
-        this.ui.setSettingsProvider(providers);
+        int width = this.ui.setSettingsProvider(providers);
+        setSize(new Dimension(width, 600));
     }
 
     SettingsUi getUi() {
@@ -85,6 +94,9 @@ public class SettingsDialog extends JDialog {
 
     private boolean showErrors(List<Exception> apply) {
         if (!apply.isEmpty()) {
+            for (Exception e : apply) {
+                LOGGER.error("", e);
+            }
             String msg = apply.stream().map(Throwable::getMessage)
                     .collect(Collectors.joining("<br>", "<html>", "</html>"));
             JOptionPane.showMessageDialog(this, msg, "Error in Settings",

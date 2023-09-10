@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
 import java.util.ArrayDeque;
@@ -185,6 +188,11 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
             ((BuiltinRuleInformation) ruleInfo).currContract = str;
             break;
 
+        case MODALITY:
+            // (additional information which can be used in external tools such as proof management)
+            ((BuiltinRuleInformation) ruleInfo).currContractModality = str;
+            break;
+
         case ASSUMES_INST_BUILT_IN: // ifInst (for built in rules)
             BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
 
@@ -370,7 +378,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         } else {
             result = new BuiltInAppIntermediate(builtinInfo.currRuleName,
                 new Pair<>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
-                builtinInfo.currContract, builtinInfo.builtinIfInsts, builtinInfo.currNewNames);
+                builtinInfo.currContract, builtinInfo.currContractModality,
+                builtinInfo.builtinIfInsts, builtinInfo.currNewNames);
         }
 
         return result;
@@ -445,6 +454,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         protected PosInTerm currIfInstPosInTerm;
         /* > Method Contract */
         protected String currContract = null;
+        protected String currContractModality = null;
         /* > Merge Rule */
         protected String currMergeProc = null;
         protected int currNrPartners = 0;
@@ -467,7 +477,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      *
      * @author Dominic Scheurer
      */
-    static class Result {
+    public static class Result {
         private final List<Throwable> errors;
         private final String status;
         private BranchNodeIntermediate parsedResult = null;

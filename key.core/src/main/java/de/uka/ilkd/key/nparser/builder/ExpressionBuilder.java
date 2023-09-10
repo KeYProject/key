@@ -1,9 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
 
 import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -19,6 +23,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.nparser.KeYLexer;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeYParser.DoubleLiteralContext;
 import de.uka.ilkd.key.nparser.KeYParser.FloatLiteralContext;
@@ -326,7 +331,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitWeak_arith_term(KeYParser.Weak_arith_termContext ctx) {
-        Term termL = accept(ctx.a);
+        Term termL = Objects.requireNonNull(accept(ctx.a));
         if (ctx.op.isEmpty()) {
             return updateOrigin(termL, ctx);
         }
@@ -334,9 +339,26 @@ public class ExpressionBuilder extends DefaultBuilder {
         List<Term> terms = mapOf(ctx.b);
         Term last = termL;
         for (int i = 0; i < terms.size(); i++) {
-            final String opTok = ctx.op.get(i).getText();
-            // it's either + or -.
-            String opname = opTok.equals("+") ? "add" : "sub";
+            String opname = "";
+            switch (ctx.op.get(i).getType()) {
+            case KeYLexer.UTF_INTERSECT:
+                opname = "intersect";
+                break;
+            case KeYLexer.UTF_SETMINUS:
+                opname = "setMinus";
+                break;
+            case KeYLexer.UTF_UNION:
+                opname = "union";
+                break;
+            case KeYLexer.PLUS:
+                opname = "add";
+                break;
+            case KeYLexer.MINUS:
+                opname = "sub";
+                break;
+            default:
+                semanticError(ctx, "Unexpected token: %s", ctx.op.get(i));
+            }
             Term cur = terms.get(i);
             last = binaryLDTSpecificTerm(ctx, opname, last, cur);
         }
@@ -376,15 +398,46 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
+    public Object visitEmptyset(KeYParser.EmptysetContext ctx) {
+        var op = services.getTypeConverter().getLocSetLDT().getEmpty();
+        return updateOrigin(getTermFactory().createTerm(op), ctx);
+    }
+
+    @Override
     public Object visitStrong_arith_term_2(KeYParser.Strong_arith_term_2Context ctx) {
-        Term termL = accept(ctx.a);
-        if (ctx.b == null) {
-            return termL;
+        if (ctx.b.isEmpty()) { // fast path
+            return accept(ctx.a);
         }
 
-        Term termR = accept(ctx.b);
-        String opName = ctx.SLASH() != null ? "div" : "mod";
-        return binaryLDTSpecificTerm(ctx, opName, termL, termR);
+        List<Term> termL = mapOf(ctx.b);
+        // List<String> opName = ctx.op.stream().map(it -> it.getType()== KeYLexer.PERCENT ? "mod" :
+        // "div").collect(Collectors.toList());
+
+        Term term = accept(ctx.a);
+        var sort = term.sort();
+        if (sort == null) {
+            semanticError(ctx, "No sort for term '%s'", term);
+        }
+
+        var ldt = services.getTypeConverter().getLDTFor(sort);
+
+        if (ldt == null) {
+            // falling back to integer ldt (for instance for untyped schema variables)
+            ldt = services.getTypeConverter().getIntegerLDT();
+        }
+
+        assert ctx.op.size() == ctx.b.size();
+
+        for (int i = 0; i < termL.size(); i++) {
+            var opName = ctx.op.get(i).getType() == KeYLexer.PERCENT ? "mod" : "div";
+            Function op = ldt.getFunctionFor(opName, services);
+            if (op == null) {
+                semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", opName,
+                    sort);
+            }
+            term = binaryTerm(ctx, op, term, termL.get(i));
+        }
+        return term;
     }
 
     protected Term capsulateTf(ParserRuleContext ctx, Supplier<Term> termSupplier) {
@@ -610,12 +663,11 @@ public class ExpressionBuilder extends DefaultBuilder {
     public Term createAttributeTerm(Term prefix, Operator attribute, ParserRuleContext ctx) {
         Term result = prefix;
 
-        if (attribute instanceof SchemaVariable) {
+        if (attribute instanceof SchemaVariable sv) {
             /*
              * if (!inSchemaMode()) { semanticError(null,
              * "Schemavariables may only occur inside taclets."); }
              */
-            SchemaVariable sv = (SchemaVariable) attribute;
             if (sv.sort() instanceof ProgramSVSort
                     || sv.sort() == AbstractTermTransformer.METASORT) {
                 semanticError(null, "Cannot use schema variable " + sv + " as an attribute");
@@ -668,6 +720,8 @@ public class ExpressionBuilder extends DefaultBuilder {
             // not part of the class declaration
             // A special case is needed, hence.
             result = javaInfo.getInvProgramVar();
+        } else if (attributeName.equals("<inv_free>")) {
+            result = javaInfo.getFreeInvProgramVar();
         } else {
             final KeYJavaType prefixKJT = javaInfo.getKeYJavaType(prefixSort);
             if (prefixKJT == null) {
@@ -1142,8 +1196,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         List<String> parts = mapOf(ctx.name.simple_ident());
         String varfuncid = ctx.name.getText();
 
-        if (ctx.name.INT_LITERAL() != null) {// number
-            return toZNotation(ctx.name.INT_LITERAL().getText(), functions());
+        if (ctx.INT_LITERAL() != null) {// number
+            return toZNotation(ctx.INT_LITERAL().getText(), functions());
         }
 
         assert parts != null && varfuncid != null;
@@ -1172,14 +1226,13 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
         } else {
             String firstName =
-                ctx.name.simple_ident().size() == 0 ? ctx.name.INT_LITERAL().getText()
+                ctx.name == null ? ctx.INT_LITERAL().getText()
                         : ctx.name.simple_ident(0).getText();
             op = lookupVarfuncId(ctx, firstName,
                 ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
-            if (op instanceof ProgramVariable && ctx.name.simple_ident().size() > 1) {
+            if (op instanceof ProgramVariable v && ctx.name.simple_ident().size() > 1) {
                 List<KeYParser.Simple_identContext> otherParts =
                     ctx.name.simple_ident().subList(1, ctx.name.simple_ident().size());
-                ProgramVariable v = (ProgramVariable) op;
                 Term tv = getServices().getTermFactory().createTerm(v);
                 String memberName = otherParts.get(0).getText();
                 if (v.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
@@ -1210,9 +1263,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
             // region split up package and class name
             while (startWithPackage
-                    && ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext) {
-                KeYParser.Attribute_simpleContext a =
-                    (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
+                    && ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext a) {
                 if (a.heap != null) {
                     break; // No heap on java package allowed
                 }
@@ -1226,9 +1277,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 }
             }
 
-            while (ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext) {
-                KeYParser.Attribute_simpleContext a =
-                    (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
+            while (ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext a) {
                 if (a.heap != null) {
                     break; // No heap on java Class name allowed
                 }
@@ -1255,9 +1304,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 KeYParser.AttributeContext attrib = ctx.attribute(i);
                 boolean isLast = i == ctx.attribute().size() - 1;
 
-                if (attrib instanceof KeYParser.Attribute_simpleContext) {
-                    KeYParser.Attribute_simpleContext simpleContext =
-                        (KeYParser.Attribute_simpleContext) attrib;
+                if (attrib instanceof KeYParser.Attribute_simpleContext simpleContext) {
                     boolean isCall = simpleContext.call() != null;
                     ParserRuleContext heap = simpleContext.heap; // TODO?
                     String attributeName = accept(simpleContext.id);
@@ -1278,9 +1325,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                         addWarning("");
                         return current;
                     }
-                } else if (attrib instanceof KeYParser.Attribute_complexContext) {
-                    KeYParser.Attribute_complexContext attrid =
-                        (KeYParser.Attribute_complexContext) attrib;
+                } else if (attrib instanceof KeYParser.Attribute_complexContext attrid) {
                     String className = attrid.sort.getText();
                     String attributeName = attrid.id.getText();
                     Term[] args = visitArguments(attrid.call().argument_list());
@@ -1346,7 +1391,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     if (isCall) {
                         String classRef = current.sort().name().toString();
                         KeYJavaType kjt = getTypeByClassName(classRef); // Why not direct use of
-                                                                        // Sort?
+                        // Sort?
                         if (kjt == null) {
                             semanticError(ctxSuffix, "Could not find sort for %s", classRef);
                         }
@@ -1824,15 +1869,5 @@ public class ExpressionBuilder extends DefaultBuilder {
 }
 
 
-class JavaQuery {
-    final String packageName, className;
-    final List<String> attributeNames;
-    final KeYJavaType kjt;
-
-    JavaQuery(String packageName, String className, List<String> attributeNames, KeYJavaType kjt) {
-        this.packageName = packageName;
-        this.className = className;
-        this.attributeNames = attributeNames;
-        this.kjt = kjt;
-    }
+record JavaQuery(String packageName, String className, List<String> attributeNames, KeYJavaType kjt) {
 }

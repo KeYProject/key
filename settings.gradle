@@ -1,8 +1,7 @@
 include "key.util"
 include "key.ui"
 include "key.core"
-//include "key.core:informationflow"
-include "key.core:rifl"
+include "key.core.rifl"
 include "key.core.symbolic_execution"
 include "key.core.testgen"
 include "key.removegenerics"
@@ -11,6 +10,6 @@ include "key.core.example"
 include "key.core.symbolic_execution.example"
 include 'recoder'
 include 'keyext.ui.testgen'
-include 'keyext.action_history'
+include 'keyext.proofmanagement'
 include 'keyext.exploration'
 include 'keyext.slicing'

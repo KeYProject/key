@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import java.util.ArrayList;
@@ -101,14 +104,14 @@ public abstract class TextualJMLConstruct {
     protected void addGeneric(Map<String, ImmutableList<LabeledParserRuleContext>> item,
             @Nonnull LabeledParserRuleContext ps) {
         String t = ps.first.getText();
-        if (!t.startsWith("<") || t.startsWith("<inv>")) {
+        if (!t.startsWith("<") || t.startsWith("<inv>") || t.startsWith("<inv_free>")) {
             ImmutableList<LabeledParserRuleContext> l = item.get(HeapLDT.BASE_HEAP_NAME.toString());
             l = l.append(ps);
             item.put(HeapLDT.BASE_HEAP_NAME.toString(), l);
             return;
         }
         List<String> hs = new ArrayList<>();
-        while (t.startsWith("<") && !t.startsWith("<inv>")) {
+        while (t.startsWith("<") && !t.startsWith("<inv>") && !t.startsWith("<inv_free>")) {
             for (Name heapName : HeapLDT.VALID_HEAP_NAMES) {
                 for (String hName : new String[] { heapName.toString(),
                     heapName + "AtPre" }) {

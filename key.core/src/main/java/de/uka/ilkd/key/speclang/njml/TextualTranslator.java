@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
 import javax.annotation.Nullable;
@@ -271,14 +274,21 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitAssignable_clause(JmlParser.Assignable_clauseContext ctx) {
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
-        final LabeledParserRuleContext ctx2 =
-            new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.ASSIGNABLE);
+        final boolean isFree =
+            ctx.ASSIGNABLE() != null && ctx.ASSIGNABLE().getText().endsWith("_free")
+                    || ctx.MODIFIES() != null && ctx.MODIFIES().getText().endsWith("_free");
+        final LabeledParserRuleContext ctx2 = new LabeledParserRuleContext(ctx, isFree
+                ? OriginTermLabel.SpecType.ASSIGNABLE_FREE
+                : OriginTermLabel.SpecType.ASSIGNABLE);
         for (Name heap : heaps) {
             if (methodContract != null) {
-                methodContract.addClause(ASSIGNABLE, heap, ctx2);
+                methodContract.addClause(isFree ? ASSIGNABLE_FREE : ASSIGNABLE, heap, ctx2);
             }
             if (loopContract != null) {
-                loopContract.addClause(TextualJMLLoopSpec.ClauseHd.ASSIGNABLE, heap, ctx2);
+                loopContract.addClause(
+                    isFree ? TextualJMLLoopSpec.ClauseHd.ASSIGNABLE_FREE
+                            : TextualJMLLoopSpec.ClauseHd.ASSIGNABLE,
+                    heap, ctx2);
             }
         }
         return null;
@@ -418,7 +428,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitClass_invariant(JmlParser.Class_invariantContext ctx) {
-        TextualJMLClassInv inv = new TextualJMLClassInv(mods, ctx);
+        final boolean isFree = ctx.INVARIANT().getText().endsWith("_free");
+        TextualJMLClassInv inv = new TextualJMLClassInv(mods, ctx, isFree);
         constructs = constructs.append(inv);
         return null;
     }

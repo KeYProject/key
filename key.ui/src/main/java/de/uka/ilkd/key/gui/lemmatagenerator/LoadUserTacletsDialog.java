@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
 import java.awt.CardLayout;
@@ -25,31 +28,29 @@ public class LoadUserTacletsDialog extends JPanel {
 
     /** the text to be displayed when the "Help" button is pressed */
     private static final String HELP_TEXT =
-        "In this dialog you can choose the files that are used for loading user-defined taclets:"
-            + "\n\n"
-            + "User-Defined Taclets:\nThis file contains the taclets that should be loaded, so that "
-            + "they can be used for the current proof. For each taclet an extra proof obligation is "
-            + "built that must be provable, in order to sustain the correctness of the calculus.\n\n"
-            + "Definitions:\n"
-            + "This file contains the signature (function symbols, predicate symbols, sorts)"
-            + " that are used for creating the proof obligations mentioned above. In most cases it "
-            + "should be the same file as indicated in 'User-Defined Taclets'.\n\n"
-            + "Axioms:\nIn order to prove the correctness of the created lemmata,"
-            + " for some user-defined taclets the introduction "
-            + "of additional axioms is necessary. At this point you can add them.\n"
-            + "Beware of the fact that it is crucial for the correctness of the calculus that the used "
-            + "axioms are consistent."
-            + "It is the responsibility of the user to guarantee this consistency.\n\n"
-            + "Technical Remarks:\nThe axioms must be stored in another file than the user-defined "
-            + "taclets. Furthermore the axioms are only loaded for the lemmata, but not for the "
-            + "current proof.";
+        """
+                In this dialog you can choose the files that are used for loading user-defined taclets:
+
+                User-Defined Taclets:
+                This file contains the taclets that should be loaded, so that they can be used for the current proof. For each taclet an extra proof obligation is built that must be provable, in order to sustain the correctness of the calculus.
+
+                Definitions:
+                This file contains the signature (function symbols, predicate symbols, sorts) that are used for creating the proof obligations mentioned above. In most cases it should be the same file as indicated in 'User-Defined Taclets'.
+
+                Axioms:
+                In order to prove the correctness of the created lemmata, for some user-defined taclets the introduction of additional axioms is necessary. At this point you can add them.
+                Beware of the fact that it is crucial for the correctness of the calculus that the used axioms are consistent.It is the responsibility of the user to guarantee this consistency.
+
+                Technical Remarks:
+                The axioms must be stored in another file than the user-defined taclets. Furthermore the axioms are only loaded for the lemmata, but not for the current proof.""";
 
     /** warning text that will be shown when loading taclets without proving them */
     private static final String INFO_TEXT =
-        "Be aware of the fact that you are going to load taclets\n"
-            + "without creating corresponding proof obligations!\n"
-            + "In case that the taclets that you want to load are unsound,\n"
-            + "the calculus will become unsound!";
+        """
+                Be aware of the fact that you are going to load taclets
+                without creating corresponding proof obligations!
+                In case that the taclets that you want to load are unsound,
+                the calculus will become unsound!""";
 
     /** this dialog can be in one of two modes (started from different actions) */
     public enum Mode {
@@ -263,9 +264,9 @@ public class LoadUserTacletsDialog extends JPanel {
             textArea.setEditable(false);
             helpWindow.getContentPane().add(new JScrollPane(textArea));
             helpWindow.setMinimumSize(new Dimension(400, 200));
-            helpWindow.setLocationByPlatform(true);
             helpWindow.setTitle("Help");
             helpWindow.pack();
+            helpWindow.setLocationRelativeTo(MainWindow.getInstance());
 
         }
         return helpWindow;
@@ -448,8 +449,8 @@ public class LoadUserTacletsDialog extends JPanel {
             buttonPane.add(Box.createHorizontalStrut(5));
             buttonPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             pane.add(buttonPane);
-            dialog.setLocationByPlatform(true);
             dialog.pack();
+            dialog.setLocationRelativeTo(MainWindow.getInstance());
         }
         return dialog;
     }

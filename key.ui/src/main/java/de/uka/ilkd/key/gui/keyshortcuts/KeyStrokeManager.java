@@ -1,8 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.keyshortcuts;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
 import java.lang.ref.WeakReference;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.*;
@@ -20,8 +24,7 @@ import javax.swing.*;
  * includes all combinations using the Windows key),
  * <li>the <a href="http://en.wikipedia.org/wiki/Keyboard_shortcut#.22Sacred.22_keybindings">
  * "sacred keybindings"</a> must not be touched,
- * <li>the theme for strategy macros should be consistent (currently either F keys or CTRL + SHIFT +
- * letter).
+ * <li>the theme for strategy macros should be consistent (currently CTRL + SHIFT + letter).
  * </ul>
  *
  * @author bruns
@@ -30,22 +33,15 @@ import javax.swing.*;
 public final class KeyStrokeManager {
     /**
      * This constant holds the typical key to be used for shortcuts (usually
-     * {@link java.awt.Event#CTRL_MASK})
+     * {@link InputEvent#CTRL_DOWN_MASK})
      */
     public static final int SHORTCUT_KEY_MASK = getShortcutMask();
 
-
-    /**
-     * If true, F keys are used for macros, otherwise CTRL+SHIFT+letter.
-     */
-    public static final boolean FKEY_MACRO_SCHEME = Boolean.getBoolean("key.gui.fkeyscheme");
-
     /**
      * This constant holds the typical key combination to be used for auxiliary shortcuts
-     * ({@link KeyEvent#SHIFT_MASK} plus usually {@link KeyEvent#CTRL_MASK})
+     * ({@link InputEvent#SHIFT_DOWN_MASK} plus usually {@link InputEvent#CTRL_DOWN_MASK})
      */
-    public static final int MULTI_KEY_MASK = SHORTCUT_KEY_MASK | KeyEvent.SHIFT_DOWN_MASK;
-
+    public static final int MULTI_KEY_MASK = SHORTCUT_KEY_MASK | InputEvent.SHIFT_DOWN_MASK;
 
     /**
      * List of actions, that requested a {@link KeyStroke}.
@@ -53,6 +49,9 @@ public final class KeyStrokeManager {
      * Needed for dynamical configurability of the {@link KeyStroke} via {@link ShortcutSettings }
      */
     static final Map<String, WeakReference<Action>> actions = new HashMap<>(100);
+
+    private KeyStrokeManager() {
+    }
 
     /**
      * Get a {@link KeyStroke} for the given <code>key</code>. If no {@link KeyStroke} is defined,
@@ -142,10 +141,6 @@ public final class KeyStrokeManager {
         return KeyStrokeSettings.getInstance();
     }
 
-    /**
-     * @param clazz
-     * @return
-     */
     static Action findAction(String clazz) {
         return actions.getOrDefault(clazz, new WeakReference<>(null)).get();
     }
@@ -155,9 +150,18 @@ public final class KeyStrokeManager {
      */
     private static int getShortcutMask() {
         try {
-            return Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+            return Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
         } catch (HeadlessException e) {
             return 0;
         }
+    }
+
+    /**
+     * Get all the managed actions.
+     *
+     * @return all actions
+     */
+    public static Collection<WeakReference<Action>> getAllActions() {
+        return actions.values();
     }
 }

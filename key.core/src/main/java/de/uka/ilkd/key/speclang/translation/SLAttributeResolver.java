@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -78,10 +81,15 @@ public final class SLAttributeResolver extends SLExpressionResolver {
 
         Term recTerm = receiver.getTerm();
 
-        // <inv> is special case (because it's really a predicate, not a boolean attribute)
+        // <inv> and <inv_free> are special cases
+        // (because they're predicates, not boolean attributes)
         if (name.equals("<inv>") && receiver.isTerm()) {
             return new SLExpression(services.getTermBuilder().inv(receiver.getTerm()));
         }
+        if (name.equals("<inv_free>") && receiver.isTerm()) {
+            return new SLExpression(services.getTermBuilder().invFree(receiver.getTerm()));
+        }
+
 
         ProgramVariable attribute = null;
         try {

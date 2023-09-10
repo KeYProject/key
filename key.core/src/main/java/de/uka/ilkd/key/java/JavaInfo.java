@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import java.util.*;
@@ -87,12 +90,23 @@ public final class JavaInfo {
     private ObserverFunction inv;
 
     /**
+     * caches the program variable for {@code <inv_free>}
+     */
+    private ProgramVariable invFreeProgVar;
+
+    /**
+     * caches the observer for {@code <inv_free>}
+     */
+    private ObserverFunction invFree;
+
+    /**
      * the name of the class used as default execution context
      */
     static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
     static final String DEFAULT_EXECUTION_CONTEXT_METHOD = "<defaultMethod>";
 
     private final HashMap<KeYJavaType, ObserverFunction> staticInvs = new LinkedHashMap<>();
+    private final HashMap<KeYJavaType, ObserverFunction> staticFreeInvs = new LinkedHashMap<>();
 
 
     /**
@@ -204,10 +218,8 @@ public final class JavaInfo {
         nameCachedSize = kpmi.rec2key().size();
         name2KJTCache = new LinkedHashMap<>();
         for (final Object o : kpmi.allElements()) {
-            if (o instanceof KeYJavaType) {
-                final KeYJavaType oKJT = (KeYJavaType) o;
-                if (oKJT.getJavaType() instanceof ArrayType) {
-                    final ArrayType at = (ArrayType) oKJT.getJavaType();
+            if (o instanceof KeYJavaType oKJT) {
+                if (oKJT.getJavaType() instanceof ArrayType at) {
                     name2KJTCache.put(at.getFullName(), oKJT);
                     name2KJTCache.put(at.getAlternativeNameRepresentation(), oKJT);
                 } else {
@@ -388,8 +400,7 @@ public final class JavaInfo {
         final Type t = kjt.getJavaType();
         if (t instanceof ClassType) {
             return ((ClassType) t).isPrivate();
-        } else if (t instanceof ArrayType) {
-            final ArrayType at = (ArrayType) t;
+        } else if (t instanceof ArrayType at) {
             return isPrivate(at.getBaseType().getKeYJavaType());
         } else // primitive type or null
         {
@@ -446,8 +457,7 @@ public final class JavaInfo {
             sortCachedSize = kpmi.rec2key().size();
             sort2KJTCache = new HashMap<>();
             for (final Object o : kpmi.allElements()) {
-                if (o instanceof KeYJavaType) {
-                    final KeYJavaType oKJT = (KeYJavaType) o;
+                if (o instanceof KeYJavaType oKJT) {
                     Sort s = oKJT.getSort();
                     List<KeYJavaType> l = sort2KJTCache.computeIfAbsent(s, k -> new LinkedList<>());
                     if (!l.contains(oKJT)) {
@@ -470,8 +480,7 @@ public final class JavaInfo {
         if (type2KJTCache == null) {
             type2KJTCache = new LinkedHashMap<>();
             for (final Object o : kpmi.allElements()) {
-                if (o instanceof KeYJavaType) {
-                    final KeYJavaType oKJT = (KeYJavaType) o;
+                if (o instanceof KeYJavaType oKJT) {
                     type2KJTCache.put(oKJT.getJavaType(), oKJT);
                 }
             }
@@ -1405,7 +1414,46 @@ public final class JavaInfo {
     }
 
     /**
-     * Returns the special symbol <code>&lt;staticInv&gt;</code> which stands for the static
+     * Returns the special symbol <code>&lt;inv_free&gt;</code> which stands for the free
+     * class invariant of an object.
+     *
+     * @see #getInvProgramVar()
+     */
+    public IObserverFunction getInvFree() {
+        if (invFree == null || invFree.getHeapCount(services) != HeapContext
+                .getModHeaps(services, false).size()) {
+            invFree = (ObserverFunction) services.getNamespaces().functions()
+                    .lookup(ObserverFunction.createName("<inv_free>", getJavaLangObject()));
+            if (invFree == null) {
+                invFree = new ObserverFunction("<inv_free>", Sort.FORMULA, null,
+                    services.getTypeConverter().getHeapLDT().targetSort(), getJavaLangObject(),
+                    false, new ImmutableArray<>(), HeapContext.getModHeaps(services, false).size(),
+                    1);
+                services.getNamespaces().functions().add(invFree);
+            }
+        }
+        return invFree;
+    }
+
+    /**
+     * Returns the special program variable symbol <code>&lt;inv_free&gt;</code> which stands for
+     * the free class
+     * invariant of an object.
+     *
+     * @see #getFreeInv()
+     */
+    public ProgramVariable getFreeInvProgramVar() {
+        if (invFreeProgVar == null) {
+            ProgramElementName pen = new ProgramElementName("<inv_free>", "java.lang.Object");
+            invFreeProgVar = new LocationVariable(pen,
+                getPrimitiveKeYJavaType(PrimitiveType.JAVA_BOOLEAN), getJavaLangObject(),
+                false, true);
+        }
+        return invFreeProgVar;
+    }
+
+    /**
+     * Returns the special symbol <code>&lt;$inv&gt;</code> which stands for the static
      * invariant of a type.
      */
     public IObserverFunction getStaticInv(KeYJavaType target) {
@@ -1423,6 +1471,26 @@ public final class JavaInfo {
                 services.getNamespaces().functions().add(inv);
             }
             staticInvs.put(target, inv);
+        }
+        return inv;
+    }
+
+    /**
+     * Returns the special symbol <code>&lt$inv_free&gt;</code> which stands for the static
+     * invariant of a type.
+     */
+    public IObserverFunction getStaticInvFree(KeYJavaType target) {
+        ObserverFunction inv = staticFreeInvs.get(target);
+        if (inv == null) {
+            inv = (ObserverFunction) services.getNamespaces().functions()
+                    .lookup(ObserverFunction.createName("<$inv_free>", target));
+            if (inv == null) {
+                inv = new ObserverFunction("<$inv_free>", Sort.FORMULA, null,
+                    services.getTypeConverter().getHeapLDT().targetSort(), target, true,
+                    new ImmutableArray<>(), HeapContext.getModHeaps(services, false).size(), 1);
+                services.getNamespaces().functions().add(inv);
+            }
+            staticFreeInvs.put(target, inv);
         }
         return inv;
     }

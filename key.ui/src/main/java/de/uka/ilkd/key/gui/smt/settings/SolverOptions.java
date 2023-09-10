@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.smt.settings;
 
 import java.math.RoundingMode;
@@ -54,7 +57,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         createCheckSupportButton();
     }
 
-    private static final String versionInfo(String info, String versionString) {
+    private static String versionInfo(String info, String versionString) {
         String builder = info +
             " " +
             "(" +
@@ -85,12 +88,21 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         }
     }
 
-    private JTextField createSolverInformation() {
+    private JTextArea createSolverInformation() {
         String info = solverType.getInfo();
         if (info != null && !info.equals("")) {
-            JTextField solverInfo =
-                addTextField("Info", info, BUNDLE.getString(INFO_SOLVER_INFO), null);
+            JTextArea solverInfo =
+                addTextAreaWithoutScroll("Info", info, BUNDLE.getString(INFO_SOLVER_INFO), null);
+            solverInfo.setLineWrap(true);
+            solverInfo.setWrapStyleWord(true);
             solverInfo.setEditable(false);
+
+            // text field to copy style from
+            JTextField textField = new JTextField();
+            textField.setEditable(false);
+            solverInfo.setBackground(textField.getBackground());
+            solverInfo.setBorder(textField.getBorder());
+
             return solverInfo;
         }
         return null;

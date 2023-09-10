@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -16,12 +19,15 @@ public class ShowActiveTactletOptionsAction extends MainWindowAction {
      */
     private static final long serialVersionUID = -7012564698194718532L;
 
-    public ShowActiveTactletOptionsAction(MainWindow mainWindow) {
+    private final Proof proof;
+
+    public ShowActiveTactletOptionsAction(MainWindow mainWindow, Proof proof) {
         super(mainWindow);
         setName("Show Active Taclet Options");
 
         getMediator().enableWhenProofLoaded(this);
 
+        this.proof = proof;
     }
 
     @Override
@@ -30,7 +36,7 @@ public class ShowActiveTactletOptionsAction extends MainWindowAction {
     }
 
     private void showActivatedChoices() {
-        Proof currentProof = getMediator().getSelectedProof();
+        Proof currentProof = proof == null ? getMediator().getSelectedProof() : proof;
         if (currentProof == null) {
             mainWindow.notify(new GeneralInformationEvent("No Options available.",
                 "If you wish to see Taclet Options " + "for a proof you have to load one first"));

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
 import java.util.Objects;
@@ -119,8 +122,7 @@ class LabeledTermImpl extends TermImpl implements EqualsModProofIrrelevancy {
             return false;
         }
 
-        if (o instanceof LabeledTermImpl) {
-            final LabeledTermImpl cmp = (LabeledTermImpl) o;
+        if (o instanceof LabeledTermImpl cmp) {
             if (labels.size() == cmp.labels.size()) {
                 for (int i = 0, sz = labels.size(); i < sz; i++) {
                     // skip irrelevant (origin) labels that differ for no real reason

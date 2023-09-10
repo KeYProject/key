@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java;
 
 import recoder.ProgramFactory;
@@ -264,10 +266,9 @@ public interface SourceElement {
             if (x == this) {
                 return true;
             }
-            if (!(x instanceof Position)) {
+            if (!(x instanceof Position p)) {
                 return false;
             }
-            Position p = (Position) x;
             return line == p.line && column == p.column;
         }
 

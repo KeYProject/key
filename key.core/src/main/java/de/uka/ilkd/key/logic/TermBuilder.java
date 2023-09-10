@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
 import java.util.Iterator;
@@ -1087,9 +1090,9 @@ public class TermBuilder {
         if (updates.isEmpty()) {
             return target;
         } else {
-            return apply(updates.head().getUpdate(),
+            return apply(updates.head().update(),
                 applyUpdatePairsSequential(updates.tail(), target),
-                updates.head().getUpdateApplicationlabels());
+                updates.head().updateApplicationlabels());
         }
     }
 
@@ -1540,6 +1543,37 @@ public class TermBuilder {
             hs[i++] = var(heap);
         }
         return func(services.getJavaInfo().getStaticInv(t), hs);
+    }
+
+    public Term invFree(Term[] h, Term o) {
+        Term[] p = new Term[h.length + 1];
+        System.arraycopy(h, 0, p, 0, h.length);
+        p[h.length] = o;
+        return func(services.getJavaInfo().getInvFree(), p);
+    }
+
+    public Term invFree(Term o) {
+        List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        Term[] hs = new Term[heaps.size()];
+        int i = 0;
+        for (LocationVariable heap : heaps) {
+            hs[i++] = var(heap);
+        }
+        return invFree(hs, o);
+    }
+
+    public Term staticInvFree(Term[] h, KeYJavaType t) {
+        return func(services.getJavaInfo().getStaticInvFree(t), h);
+    }
+
+    public Term staticInvFree(KeYJavaType t) {
+        List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        Term[] hs = new Term[heaps.size()];
+        int i = 0;
+        for (LocationVariable heap : heaps) {
+            hs[i++] = var(heap);
+        }
+        return func(services.getJavaInfo().getStaticInvFree(t), hs);
     }
 
     public Term select(Sort asSort, Term h, Term o, Term f) {

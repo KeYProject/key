@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge.procedures;
 
 import java.util.LinkedHashSet;
@@ -108,9 +111,9 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
             Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
                 createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm, elseTerm, services);
 
-            cond = distFormAndRightSidesForITEUpd.first;
-            ifForm = distFormAndRightSidesForITEUpd.second;
-            elseForm = distFormAndRightSidesForITEUpd.third;
+            cond = distFormAndRightSidesForITEUpd.first();
+            ifForm = distFormAndRightSidesForITEUpd.second();
+            elseForm = distFormAndRightSidesForITEUpd.third();
         } else {
             cond = distinguishingFormula;
             ifForm = ifTerm;
@@ -214,9 +217,18 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
         // left); this
         // should be allowed (although they are of course indistinguishable).
         assert distinguishingFormula != null || distinguishingFormula2 != null
-                : String.format("\nA computed distinguishing formula is trivial (\"true\"); "
-                    + "please verify that everything is OK. Symbolic execution states were:\n\n"
-                    + "--- State 1 ---\n%s\n\n---State 2---\n%s\n", state1, state2);
+                : String.format(
+                    """
+
+                            A computed distinguishing formula is trivial ("true"); please verify that everything is OK. Symbolic execution states were:
+
+                            --- State 1 ---
+                            %s
+
+                            ---State 2---
+                            %s
+                            """,
+                    state1, state2);
 
         boolean commuteSides = false;
         if (distinguishingFormula == null) {

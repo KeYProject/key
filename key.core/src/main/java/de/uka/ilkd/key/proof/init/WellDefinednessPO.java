@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
@@ -196,9 +199,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     protected ImmutableSet<ClassAxiom> selectClassAxioms(KeYJavaType kjt) {
         ImmutableSet<ClassAxiom> result = DefaultImmutableSet.nil();
         for (ClassAxiom axiom : specRepos.getClassAxioms(kjt)) {
-            if (axiom instanceof ClassAxiom && check instanceof ClassWellDefinedness) {
+            if (axiom instanceof ClassAxiom && check instanceof ClassWellDefinedness cwd) {
                 final ClassAxiom classAxiom = axiom;
-                final ClassWellDefinedness cwd = (ClassWellDefinedness) check;
                 final String kjtName = cwd.getKJT().getFullName();
                 final String invName = "in " + cwd.getKJT().getName();
                 if (!classAxiom.getName().endsWith(invName)
@@ -235,16 +237,16 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         register(vars, proofServices);
         final POTerms po = check.replace(check.createPOTerms(), vars);
         final TermAndFunc preCond =
-            check.getPre(po.pre, vars.self, vars.heap, vars.params, false, proofServices);
-        final Term wdPre = tb.wd(preCond.term);
-        final Term wdMod = tb.wd(po.mod);
-        final Term wdRest = tb.and(tb.wd(po.rest));
-        register(preCond.func, proofServices);
-        mbyAtPre = preCond.func != null ? check.replace(tb.func(preCond.func), vars) : null;
-        final Term post = check.getPost(po.post, vars.result, proofServices);
-        final Term pre = preCond.term;
+            check.getPre(po.pre(), vars.self, vars.heap, vars.params, false, proofServices);
+        final Term wdPre = tb.wd(preCond.term());
+        final Term wdMod = tb.wd(po.mod());
+        final Term wdRest = tb.and(tb.wd(po.rest()));
+        register(preCond.func(), proofServices);
+        mbyAtPre = preCond.func() != null ? check.replace(tb.func(preCond.func()), vars) : null;
+        final Term post = check.getPost(po.post(), vars.result, proofServices);
+        final Term pre = preCond.term();
         final Term updates =
-            check.getUpdates(po.mod, vars.heap, vars.heapAtPre, vars.anonHeap, proofServices);
+            check.getUpdates(po.mod(), vars.heap, vars.heapAtPre, vars.anonHeap, proofServices);
         final Term wfAnon = tb.wellFormed(vars.anonHeap);
         final Term uPost =
             check instanceof ClassWellDefinedness ? tb.tt() : tb.apply(updates, tb.wd(post));
@@ -266,10 +268,9 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof WellDefinednessPO)) {
+        if (!(po instanceof WellDefinednessPO wPO)) {
             return false;
         }
-        WellDefinednessPO wPO = (WellDefinednessPO) po;
         WellDefinednessCheck check = getContract();
         return check.equals(wPO.getContract());
     }

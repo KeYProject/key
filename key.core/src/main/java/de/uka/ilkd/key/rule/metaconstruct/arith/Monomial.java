@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
@@ -262,11 +265,9 @@ public class Monomial {
             return true;
         }
 
-        if (!(o instanceof Monomial)) {
+        if (!(o instanceof Monomial m)) {
             return false;
         }
-
-        final Monomial m = (Monomial) o;
 
         if (!coefficient.equals(m.coefficient)) {
             return false;

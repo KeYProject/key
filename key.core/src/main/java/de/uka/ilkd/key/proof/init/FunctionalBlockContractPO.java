@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
@@ -205,9 +208,12 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final Map<LocationVariable, Term> modifiesClauses =
             conditionsAndClausesBuilder.buildModifiesClauses();
+        final Map<LocationVariable, Term> freeModifiesClauses =
+            conditionsAndClausesBuilder.buildModifiesClauses();
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term frameCondition =
-            conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
+            conditionsAndClausesBuilder.buildFrameCondition(
+                modifiesClauses, freeModifiesClauses);
         return new Term[] { postcondition, frameCondition };
     }
 
@@ -291,11 +297,10 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof FunctionalBlockContractPO)) {
+        if (!(po instanceof FunctionalBlockContractPO other)) {
             return false;
         }
 
-        FunctionalBlockContractPO other = (FunctionalBlockContractPO) po;
         return contract.equals(other.contract);
     }
 
@@ -316,10 +321,9 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof FunctionalBlockContractPO)) {
+        if (!(obj instanceof FunctionalBlockContractPO other)) {
             return false;
         }
-        FunctionalBlockContractPO other = (FunctionalBlockContractPO) obj;
         if (contract == null) {
             if (other.contract != null) {
                 return false;

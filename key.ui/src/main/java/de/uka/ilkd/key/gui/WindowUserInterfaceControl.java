@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.io.File;
@@ -123,7 +126,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void progressStopped(Object sender) {
-        mainWindow.getMediator().startInterface(true);
+        // no need to call startInterface(), will be done by ProblemLoader once loading is done
     }
 
     @Override
@@ -149,6 +152,11 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @Override
     public void taskFinished(TaskFinishedInfo info) {
         super.taskFinished(info);
+        // ensure all UI modifying operations are done on the UI thread
+        SwingUtilities.invokeLater(() -> taskFinishedInternal(info));
+    }
+
+    private void taskFinishedInternal(TaskFinishedInfo info) {
         if (info != null && info.getSource() instanceof ProverCore) {
             if (!isAtLeastOneMacroRunning()) {
                 resetStatus(this);
@@ -156,7 +164,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             ApplyStrategyInfo result = (ApplyStrategyInfo) info.getResult();
 
             Proof proof = info.getProof();
-            if (proof != null && !proof.closed()
+            if (proof != null && !proof.isDisposed() && !proof.closed()
                     && mainWindow.getMediator().getSelectedProof() == proof) {
                 Goal g = result.nonCloseableGoal();
                 if (g == null) {
@@ -194,6 +202,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             resetStatus(this);
             Throwable result = (Throwable) info.getResult();
             if (info.getResult() != null) {
+                LOGGER.error("", result);
                 IssueDialog.showExceptionDialog(mainWindow, result);
             } else if (getMediator().getUI().isSaveOnly()) {
                 mainWindow.displayResults("Finished Saving!");
@@ -242,7 +251,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @Override
     public void taskStarted(TaskStartedInfo info) {
         super.taskStarted(info);
-        mainWindow.setStatusLine(info.getMessage(), info.getSize());
+        mainWindow.setStatusLine(info.message(), info.size());
     }
 
     @Override
@@ -357,9 +366,12 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             }
             String errorMsg;
             try {
+                getMediator().stopInterface(true);
                 errorMsg = saver.save();
             } catch (IOException e) {
                 errorMsg = e.toString();
+            } finally {
+                getMediator().startInterface(true);
             }
             if (errorMsg != null) {
                 mainWindow.notify(

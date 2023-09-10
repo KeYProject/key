@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util;
 
 import java.util.Objects;
@@ -91,6 +94,7 @@ public final class EqualsModProofIrrelevancyUtil {
     /**
      * Compare two immutable lists using the elements' {@link EqualsModProofIrrelevancy}
      * implementation.
+     * A null list is considered equal to a zero-sized list.
      *
      * @param a first list
      * @param b second list
@@ -99,7 +103,10 @@ public final class EqualsModProofIrrelevancyUtil {
     public static boolean compareImmutableLists(
             ImmutableList<? extends EqualsModProofIrrelevancy> a,
             ImmutableList<? extends EqualsModProofIrrelevancy> b) {
-        if (a.size() != b.size()) {
+        if (a == b || (a == null && b.size() == 0) || (b == null && a.size() == 0)) {
+            return true;
+        }
+        if (a == null || b == null || (a.size() != b.size())) {
             return false;
         }
         ImmutableList<? extends EqualsModProofIrrelevancy> remainderToCompare = a;

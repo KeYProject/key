@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
 import java.util.HashSet;
@@ -172,6 +175,27 @@ public class Sequent implements Iterable<SequentFormula> {
             composeSequent(p.isInAntec(), semiCI.semisequent()), this);
     }
 
+    /**
+     * Replace a formula at the specified index.
+     *
+     * @param formulaNr where to replace the formula
+     * @param replacement the new sequent formula
+     * @return a SequentChangeInfo which contains the new sequent and information which formulas
+     *         have been added or removed
+     */
+    public SequentChangeInfo replaceFormula(int formulaNr, SequentFormula replacement) {
+        formulaNr--;
+        boolean inAntec = formulaNr < antecedent.size();
+
+        Semisequent seq = inAntec ? antecedent : succedent;
+        int idx = inAntec ? formulaNr : formulaNr - antecedent.size();
+
+        final SemisequentChangeInfo semiCI = seq.replace(idx, replacement);
+
+        return SequentChangeInfo.createSequentChangeInfo(inAntec, semiCI,
+            composeSequent(inAntec, semiCI.semisequent()), this);
+    }
+
     /** returns semisequent of the antecedent to work with */
     public Semisequent antecedent() {
         return antecedent;
@@ -251,11 +275,10 @@ public class Sequent implements Iterable<SequentFormula> {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Sequent)) {
+        if (!(o instanceof Sequent o1)) {
             return false;
         }
 
-        final Sequent o1 = (Sequent) o;
         return antecedent.equals(o1.antecedent) && succedent.equals(o1.succedent);
     }
 
@@ -280,6 +303,19 @@ public class Sequent implements Iterable<SequentFormula> {
         }
         throw new RuntimeException(
             "Ghost formula " + cfma + " in sequent " + this + " [antec=" + inAntec + "]");
+    }
+
+    /**
+     * Computes the position of the given {@link PosInOccurrence} on the proof sequent.
+     *
+     * @param pio the position
+     * @return an integer strictly greater than zero for the position of the given sequent formula
+     *         on the proof sequent.
+     */
+    public int formulaNumberInSequent(PosInOccurrence pio) {
+        var inAntec = pio.isInAntec();
+        var formula = pio.sequentFormula();
+        return formulaNumberInSequent(inAntec, formula);
     }
 
     /**

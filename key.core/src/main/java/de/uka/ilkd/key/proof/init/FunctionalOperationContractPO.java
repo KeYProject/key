@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
@@ -229,11 +232,21 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         for (LocationVariable heap : modHeaps) {
             final Term ft;
             if (!getContract().hasModifiesClause(heap)) {
-                // strictly pure have a different contract.
-                ft = tb.frameStrictlyEmpty(tb.var(heap), heapToAtPre);
+                if (!getContract().hasFreeModifiesClause(heap)) {
+                    ft = tb.frameStrictlyEmpty(tb.var(heap), heapToAtPre);
+                } else {
+                    ft = tb.frame(tb.var(heap), heapToAtPre,
+                        getContract().getFreeMod(heap, selfVar, paramVars, services));
+                }
             } else {
-                ft = tb.frame(tb.var(heap), heapToAtPre,
-                    getContract().getMod(heap, selfVar, paramVars, services));
+                if (!getContract().hasFreeModifiesClause(heap)) {
+                    ft = tb.frame(tb.var(heap), heapToAtPre,
+                        getContract().getMod(heap, selfVar, paramVars, services));
+                } else {
+                    ft = tb.frame(tb.var(heap), heapToAtPre, tb.union(
+                        getContract().getMod(heap, selfVar, paramVars, services),
+                        getContract().getFreeMod(heap, selfVar, paramVars, services)));
+                }
             }
 
             if (frameTerm == null) {
@@ -311,10 +324,9 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      */
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof FunctionalOperationContractPO)) {
+        if (!(po instanceof FunctionalOperationContractPO cPO)) {
             return false;
         }
-        FunctionalOperationContractPO cPO = (FunctionalOperationContractPO) po;
         return specRepos.splitContract(cPO.contract).subset(specRepos.splitContract(contract));
     }
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
@@ -217,34 +220,34 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
         final Instantiation instantiation =
             instantiate(application.posInOccurrence().subTerm(), goal, services);
         final LoopContract contract = application.getContract();
-        contract.setInstantiationSelf(instantiation.self);
+        contract.setInstantiationSelf(instantiation.self());
 
-        assert contract.isOnBlock() && contract.getBlock().equals(instantiation.statement)
-                || !contract.isOnBlock() && contract.getLoop().equals(instantiation.statement);
+        assert contract.isOnBlock() && contract.getBlock().equals(instantiation.statement())
+                || !contract.isOnBlock() && contract.getLoop().equals(instantiation.statement());
 
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<ProgramVariable> localInVariables =
-            MiscTools.getLocalIns(instantiation.statement, services);
+            MiscTools.getLocalIns(instantiation.statement(), services);
         final ImmutableSet<ProgramVariable> localOutVariables =
-            MiscTools.getLocalOuts(instantiation.statement, services);
+            MiscTools.getLocalOuts(instantiation.statement(), services);
         final Map<LocationVariable, Function> anonymisationHeaps =
             createAndRegisterAnonymisationVariables(heaps, contract, services);
         final LoopContract.Variables variables =
             new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables(), services)
-                    .createAndRegister(instantiation.self, true);
+                    .createAndRegister(instantiation.self(), true);
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
-            new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self,
+            new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self(),
                 services);
         final Map<LocationVariable, Term> modifiesClauses =
             conditionsAndClausesBuilder.buildModifiesClauses();
 
-        final Term[] preconditions = createPreconditions(instantiation.self, contract, heaps,
+        final Term[] preconditions = createPreconditions(instantiation.self(), contract, heaps,
             localInVariables, conditionsAndClausesBuilder, services);
         final Term[] assumptions = createUsageAssumptions(localOutVariables, anonymisationHeaps,
             conditionsAndClausesBuilder);
         final Term freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
-        final Term[] updates = createUpdates(instantiation.update, heaps, anonymisationHeaps,
+        final Term[] updates = createUpdates(instantiation.update(), heaps, anonymisationHeaps,
             variables, modifiesClauses, services);
 
         final ImmutableList<Goal> result;

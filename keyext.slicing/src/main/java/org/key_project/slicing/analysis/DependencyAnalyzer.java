@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing.analysis;
 
 import java.util.ArrayDeque;
@@ -26,12 +29,13 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
-import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.slicing.DependencyNodeData;
@@ -178,6 +182,11 @@ public final class DependencyAnalyzer {
             throw new IllegalStateException("cannot analyze proof with no (recorded) closed goals, "
                 + "try disabling GeneralSettings.noPruningClosed");
         }
+        // first check that all goals are closed without proof caching references
+        if (!proof.closedGoals().stream()
+                .allMatch(goal -> goal.node().lookup(ClosedBy.class) == null)) {
+            throw new IllegalStateException("cannot analyze proof with cached references");
+        }
 
         executionTime.start(TOTAL_WORK);
         proof.setStepIndices();
@@ -222,7 +231,7 @@ public final class DependencyAnalyzer {
         executionTime.start(STATISTICS);
         int steps = proof.countNodes() - proof.closedGoals().size()
                 + (int) proof.closedGoals()
-                        .stream().filter(it -> it.node().getAppliedRuleApp() instanceof RuleAppSMT)
+                        .stream().filter(it -> it.node().getAppliedRuleApp() instanceof SMTRuleApp)
                         .count();
         // gather statistics on useful/useless rules
         RuleStatistics rules = getRuleStatistics();
