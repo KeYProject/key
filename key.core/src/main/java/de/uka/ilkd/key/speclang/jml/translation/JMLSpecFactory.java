@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.statement.SetStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.HeapLDT.SplitFieldName;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -1425,11 +1426,11 @@ public class JMLSpecFactory {
                 return variable + " is not a ghost variable";
             }
         } else if (services.getTypeConverter().getHeapLDT().isSelectOp(assignee.op())) {
-            var field = assignee.subs().last();
-            var op = field.op();
-            var split = HeapLDT.trySplitFieldName(op);
+            Term field = assignee.subs().last();
+            Operator op = field.op();
+            SplitFieldName split = HeapLDT.trySplitFieldName(op);
             if (split != null) {
-                var attribute =
+                ProgramVariable attribute =
                     services.getJavaInfo().getAttribute(split.attributeName, split.className);
                 if (attribute.isGhost()) {
                     return null;
@@ -1460,7 +1461,7 @@ public class JMLSpecFactory {
                 .parameters(pv.paramVars)
                 .resultVariable(pv.resultVar).exceptionVariable(pv.excVar).atPres(pv.atPres)
                 .atBefore(pv.atBefores);
-        var assignee = io.translateTerm(setStatementContext.assignee);
+        Term assignee = io.translateTerm(setStatementContext.assignee);
         String error = checkSetStatementAssignee(assignee);
         if (error != null) {
             throw new SLTranslationException(

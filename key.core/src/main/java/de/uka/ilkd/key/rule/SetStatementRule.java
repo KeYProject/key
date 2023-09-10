@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.Optional;
@@ -72,11 +75,11 @@ public final class SetStatementRule implements BuiltInRule {
         if (!(ruleApp instanceof SetStatementBuiltInRuleApp)) {
             throw new IllegalArgumentException("can only apply SetStatementBuiltInRuleApp");
         }
-        final var tb = services.getTermBuilder();
-        final var occurrence = ruleApp.posInOccurrence();
+        final TermBuilder tb = services.getTermBuilder();
+        final PosInOccurrence occurrence = ruleApp.posInOccurrence();
 
-        final var formula = occurrence.subTerm();
-        final var update = UpdateApplication.getUpdate(formula);
+        final Term formula = occurrence.subTerm();
+        final Term update = UpdateApplication.getUpdate(formula);
 
         Term target;
         if (formula.op() instanceof UpdateApplication) {
@@ -92,7 +95,7 @@ public final class SetStatementRule implements BuiltInRule {
         final CopyAssignment copy = KeYJavaASTFactory.assign(setStatement.getExpressionAt(0),
             setStatement.getExpressionAt(1), setStatement.getPositionInfo());
 
-        final var result = goal.split(1);
+        final ImmutableList<Goal> result = goal.split(1);
 
         final var javaBlock =
             JavaTools.replaceStatement(target.javaBlock(), services, setStatement, copy);
