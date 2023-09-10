@@ -6,17 +6,16 @@ import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.scene.Parent
 import javafx.scene.control.TreeItem
+import javafx.scene.layout.Priority
 import org.fxmisc.richtext.CodeArea
+import org.kordamp.ikonli.fontawesome.FontAwesome
 import org.kordamp.ikonli.javafx.FontIcon
 import org.kordamp.ikonli.material2.Material2AL
+import org.kordamp.ikonli.material2.Material2MZ
 import tornadofx.*
-import java.awt.event.KeyEvent
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
-import javax.swing.JMenu
-import javax.swing.event.MenuEvent
-import javax.swing.event.MenuListener
 import kotlin.io.path.isDirectory
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
@@ -42,6 +41,7 @@ class KMainView : View("KeY") {
 
     override val root = borderpane {
         top<TopView>()
+
         left = drawer {
             item(OpenProofs::class, expanded = true)
             item(ProofTree::class, expanded = true)
@@ -63,7 +63,6 @@ class KMainView : View("KeY") {
 }
 
 
-
 class StrategySettings : View("Strategy") {
     override val root = vbox {
 
@@ -73,7 +72,7 @@ class StrategySettings : View("Strategy") {
 class OpenProofs : View("Proofs") {
     override val root = vbox {
         toolbar()
-        treeview(TreeItem<String>("No proof loaded")) {}
+        treeview(TreeItem("No proof loaded")) {}
     }
 }
 
@@ -157,7 +156,7 @@ class TopView : View() {
                 separator()
                 menu("recentFileMenu") {}
                 separator()
-                item("exitMainAction") {}
+                item("exitMainAction", graphic = FontIcon(FontAwesome.WINDOW_CLOSE)) {}
             }
 
             menu("_View") {
@@ -218,12 +217,13 @@ class TopView : View() {
                 checkmenuitem("Auto save")
                 checkmenuitem("Right Mouse Click Toggle")
                 checkmenuitem("Ensure Source Consistency")
+                hgrow=Priority.ALWAYS
             }
             menu("_About") {
-                item("About")
-                item("Homepage")
-                item("Send Feedback")
-                item("License Action")
+                item("About", graphic=FontIcon(FontAwesome.QUESTION_CIRCLE_O))
+                item("Homepage",graphic=FontIcon(FontAwesome.WORDPRESS))
+                item("Send Feedback",graphic=FontIcon(FontAwesome.MAIL_FORWARD))
+                item("License Action",graphic=FontIcon(FontAwesome.DRIVERS_LICENSE))
             }
         }
 
@@ -234,6 +234,49 @@ class TopView : View() {
                     globalData.workspacePath.setValue(file?.toPath())
                 }
             }
+
+            menubutton(graphic = FontIcon(FontAwesome.ARROW_DOWN)) {
+                item("Run Z3_FP")
+                item("Run Z3_FP")
+            }
+
+            button(graphic = FontIcon(FontAwesome.BACKWARD)) {
+
+            }
+
+            button(graphic = FontIcon(FontAwesome.SCISSORS)) {
+
+            }
+            button(graphic = FontIcon(FontAwesome.UNDO)) {
+
+            }
+            button(graphic = FontIcon(FontAwesome.FOLDER_OPEN)) {
+
+            }
+            button(graphic = FontIcon(FontAwesome.STEP_FORWARD)) {
+
+            }
+            button(graphic = FontIcon(FontAwesome.CODEPEN)) {
+
+            }
+            button(graphic = FontIcon(FontAwesome.SAVE)) {
+
+            }
+            button(graphic = FontIcon(FontAwesome.SAVE)) {
+
+            }
+            button(graphic = FontIcon(FontAwesome.TASKS)) {
+
+            }
+
+            button(graphic = FontIcon(FontAwesome.TASKS)) {
+
+            }
+
+            button(graphic=FontIcon(Material2AL.DO_NOT_STEP))
+            button(graphic=FontIcon(FontAwesome.BOMB))
+            button(graphic=FontIcon(Material2AL.ADB))
+
         }
     }
 }
