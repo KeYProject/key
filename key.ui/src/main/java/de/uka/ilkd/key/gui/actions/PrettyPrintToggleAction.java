@@ -64,7 +64,7 @@ public class PrettyPrintToggleAction extends MainWindowAction {
     protected void updateMainWindow(boolean prettySyntax) {
         mainWindow.getUnicodeToggleAction().setEnabled(prettySyntax);
         mainWindow.getHidePackagePrefixToggleAction().setEnabled(prettySyntax);
-        mainWindow.makePrettyView();
+        mainWindow.refreshSequentView();
     }
 
     protected void handleViewSettingsChanged(EventObject e) {

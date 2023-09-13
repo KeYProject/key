@@ -98,7 +98,7 @@ public class TermLabelMenu extends JMenu {
             box.setEnabled(visibleTermLabels.isShowLabels());
             box.setSelected(!visibleTermLabels.isHidden(box.labelName));
         }
-        mainWindow.makePrettyView();
+        mainWindow.refreshSequentView();
     }
 
     private void rebuildMenu() {
@@ -161,7 +161,7 @@ public class TermLabelMenu extends JMenu {
             for (JCheckBoxMenuItem checkBox : checkBoxMap.values()) {
                 checkBox.setEnabled(selected);
             }
-            mainWindow.makePrettyView();
+            mainWindow.refreshSequentView();
         }
 
         @Override
@@ -198,7 +198,7 @@ public class TermLabelMenu extends JMenu {
         @Override
         public void handleClickEvent() {
             visibleTermLabels.setHidden(labelName, !isSelected());
-            mainWindow.makePrettyView();
+            mainWindow.refreshSequentView();
         }
 
         @Override

@@ -28,7 +28,7 @@ public class SyntaxHighlightingToggleAction extends MainWindowAction {
         boolean useSyntaxHighlighting = ((JCheckBoxMenuItem) e.getSource()).isSelected();
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                 .setUseSyntaxHighlighting(useSyntaxHighlighting);
-        mainWindow.makePrettyView();
+        mainWindow.refreshSequentView();
     }
 
 }

@@ -824,6 +824,17 @@ public final class MainWindow extends JFrame {
         }
     }
 
+    /**
+     * Redraw the current goal view. Use this method after changing settings that
+     * influence the rendering of the sequent.
+     */
+    public void refreshSequentView() {
+        if (getMediator().ensureProofLoaded()) {
+            getMediator().getNotationInfo().refresh(mediator.getServices());
+            updateSequentView();
+        }
+    }
+
     private void addToProofList(de.uka.ilkd.key.proof.ProofAggregate plist) {
         proofList.addProof(plist);
         // GUI
