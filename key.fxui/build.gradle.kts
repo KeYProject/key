@@ -31,7 +31,7 @@ dependencies {
     implementation("org.kordamp.ikonli:ikonli-fontawesome-pack:12.3.1")
     implementation("org.kordamp.ikonli:ikonli-javafx:12.3.1")
 //    implementation("io.github.palexdev:materialfx:11.16.1")
-   // implementation("com.pixelduke:fxribbon:1.2.2")
+    implementation("com.pixelduke:fxribbon:1.2.2")
     testImplementation(kotlin("test"))
 }
 

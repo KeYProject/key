@@ -4,48 +4,56 @@ import de.uka.ilkd.key.proof.Node
 import de.uka.ilkd.key.proof.Proof
 import de.uka.ilkd.key.proof.ProofTreeEvent
 import de.uka.ilkd.key.proof.ProofTreeListener
+import io.github.wadoon.key.GlobalData
 import javafx.application.Platform
 import javafx.beans.Observable
 import javafx.beans.property.*
-import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections
-import javafx.event.ActionEvent
+import javafx.collections.ObservableMap
 import javafx.event.EventHandler
-import javafx.scene.control.*
+import javafx.geometry.Side
+import javafx.scene.control.ContextMenu
+import javafx.scene.control.Label
+import javafx.scene.control.TreeCell
+import javafx.scene.control.TreeItem
+import javafx.scene.control.TreeView
 import javafx.scene.control.cell.TextFieldTreeCell
 import javafx.scene.input.ContextMenuEvent
+import javafx.scene.layout.Priority
+import javafx.util.StringConverter
+import org.kordamp.ikonli.fontawesome.FontAwesome
 import org.kordamp.ikonli.javafx.FontIcon
 import org.kordamp.ikonli.material2.Material2AL
-import org.kordamp.ikonli.material2.Material2RoundAL
+import org.kordamp.ikonli.material2.Material2MZ
 import tornadofx.*
-import java.util.*
-import java.util.function.Consumer
-import java.util.stream.Stream
 
 
 class ProofTree : View("Proof Tree", FontIcon(Material2AL.ACCOUNT_TREE)) {
-    private val services by property(null)
+    val globalData: GlobalData by inject()
+
     private val proof: ObjectProperty<Proof> = SimpleObjectProperty()
 
     //private val root: ObjectProperty<Node?> = SimpleObjectProperty()
-    private val sentinels: SetProperty<Node?> = SimpleSetProperty(FXCollections.observableSet<Any?>())
+    private val sentinels = SimpleSetProperty(FXCollections.observableSet<Any?>())
     private val colorOfNodes: MapProperty<Node, String> =
-        SimpleMapProperty<Node, String>(FXCollections.observableHashMap<Node, String>())
+        SimpleMapProperty(FXCollections.observableHashMap())
 
     private var treeView: TreeView<TreeNode> by singleAssign()
 
     override val root = vbox {
-        toolbar()
+        toolbar {
+            label(title)
+            spacer()
+            button(graphic = FontIcon(FontAwesome.TRASH))
+            button(graphic = FontIcon(FontAwesome.REORDER))
+        }
         treeView = treeview()
     }
 
-    private var contextMenu: ContextMenu? = null
+    private val contextMenu: ContextMenu?
         get() {
-            if (field == null) {
-                field = ProofTreeContextMenu(this)
-            }
-            return field
+            return null // TODO ProofTreeContextMenu(this)
         }
 
 
@@ -84,25 +92,24 @@ class ProofTree : View("Proof Tree", FontIcon(Material2AL.ACCOUNT_TREE)) {
 
         override fun notesChanged(proofTreeEvent: ProofTreeEvent?) {}
     }
-    private val treeCreation: ProofTree.TreeTransformationKey
+    private val treeCreation: TreeTransformationKey
 
     init {
-        treeCreation = ProofTree.TreeTransformationKey()
-        treeProof!!.setCellFactory { nodeTreeView: TreeView<TreeNode> ->
+        treeCreation = TreeTransformationKey()
+        treeView.setCellFactory { nodeTreeView: TreeView<TreeNode> ->
             cellFactory(
                 nodeTreeView
             )
         }
-        root.addListener { o: Observable? -> init() }
-        proof.addListener(ChangeListener<Proof?> { prop: ObservableValue<out Proof?>?, old: Proof?, n: Proof? ->
-            if (old != null) {
-                old.removeProofTreeListener(proofTreeListener)
-            }
-            if (n != null) n.addProofTreeListener(proofTreeListener)
-        })
-        onContextMenuRequested = EventHandler { evt: ContextMenuEvent ->
-            contextMenu!!.show(
-                this,
+        globalData.selectedProofProperty.fxProperty.addListener { _: Observable? -> init() }
+        proof.addListener { _: ObservableValue<out Proof?>?, old: Proof?, n: Proof? ->
+            old?.removeProofTreeListener(proofTreeListener)
+            n?.addProofTreeListener(proofTreeListener)
+        }
+        root.onContextMenuRequested = EventHandler { evt: ContextMenuEvent ->
+            contextMenu?.show(
+                root,
+                Side.RIGHT,
                 evt.screenX,
                 evt.screenY
             )
@@ -110,13 +117,9 @@ class ProofTree : View("Proof Tree", FontIcon(Material2AL.ACCOUNT_TREE)) {
         init()
     }
 
-    fun setNodeColor(n: Node, color: String) {
-        colorOfNodes[n] = color
-    }
-
-    fun expandRootToSentinels() {
+    /*fun expandRootToSentinels() {
         if (getTreeProof()!!.root == null) {
-            if (root.get() != null) {
+            if (root != null) {
                 val item: TreeItem<TreeNode>
                 item = if (sentinels.contains(root.get())) {
                     treeCreation.itemFactory(root.get())
@@ -128,11 +131,6 @@ class ProofTree : View("Proof Tree", FontIcon(Material2AL.ACCOUNT_TREE)) {
         }
         expandRootToLeaves(getTreeProof()!!.root)
     }
-
-    fun getTreeProof(): TreeView<TreeNode>? {
-        return treeProof
-    }
-
     fun consumeNode(consumer: Consumer<Node?>, success: String?) {
         val item: TreeItem<TreeNode> = treeProof!!.getSelectionModel().selectedItem
         val n: Node = item.value.node
@@ -143,22 +141,23 @@ class ProofTree : View("Proof Tree", FontIcon(Material2AL.ACCOUNT_TREE)) {
             Events.fire(PublishMessage("Current item does not have a node.", 2))
         }
     }
+*/
 
     private fun init() {}
     private fun cellFactory(nodeTreeView: TreeView<TreeNode>): TreeCell<TreeNode> {
         val tftc: TextFieldTreeCell<TreeNode> = TextFieldTreeCell<TreeNode>()
-        val stringConverter: StringConverter<TreeNode> = object : StringConverter<TreeNode?>() {
-            fun toString(`object`: TreeNode): String {
-                return `object`.label
+        val stringConverter: StringConverter<TreeNode> = object : StringConverter<TreeNode>() {
+            override fun toString(node: TreeNode?): String? {
+                return node?.label
             }
 
-            fun fromString(string: String?): TreeNode? {
+            override fun fromString(string: String?): TreeNode? {
                 return null
             }
         }
         tftc.setConverter(stringConverter)
         tftc.itemProperty()
-            .addListener(ChangeListener<TreeNode?> { p: ObservableValue<out TreeNode?>?, o: TreeNode?, n: TreeNode? ->
+            .addListener({ p: ObservableValue<out TreeNode?>?, o: TreeNode?, n: TreeNode? ->
                 if (n != null) repaint(
                     tftc
                 )
@@ -168,10 +167,10 @@ class ProofTree : View("Proof Tree", FontIcon(Material2AL.ACCOUNT_TREE)) {
 
     private fun repaint(tftc: TextFieldTreeCell<TreeNode>) {
         val item: TreeNode = tftc.item
-        val n: Node = item.node
+        val n: Node? = item.node
         tftc.style = ""
         if (n != null) {
-            if (n.leaf() && !item.label.contains("CASE")) {
+            if (n.leaf() && item.label?.contains("CASE") != true) {
                 if (n.isClosed) {
                     colorOfNodes.putIfAbsent(n, "lightseagreen")
                 } else {
@@ -203,85 +202,26 @@ class ProofTree : View("Proof Tree", FontIcon(Material2AL.ACCOUNT_TREE)) {
         this.colorOfNodes.set(colorOfNodes)
     }
 
-    fun getRoot(): Node? {
-        return root.get()
-    }
-
-    fun setRoot(root: Node?) {
-        this.root.set(root)
-    }
-
-    fun rootProperty(): ObjectProperty<Node?> {
-        return root
-    }
-
-    fun getProof(): Proof {
-        return proof.get()
-    }
-
-    fun setProof(proof: Proof) {
-        this.proof.set(proof)
-    }
-
-    fun proofProperty(): ObjectProperty<Proof> {
-        return proof
-    }
-
-    fun getSentinels(): ObservableSet<Node?> {
-        return sentinels.get()
-    }
-
-    fun setSentinels(sentinels: ObservableSet<Node?>?) {
-        this.sentinels.set(sentinels)
-    }
-
-    fun sentinelsProperty(): SetProperty<Node?> {
-        return sentinels
-    }
-
-    fun isDeactivateRefresh(): Boolean {
-        return deactivateRefresh.get()
-    }
-
-    fun setDeactivateRefresh(deactivateRefresh: Boolean) {
-        this.deactivateRefresh.set(deactivateRefresh)
-    }
-
-    fun deactivateRefreshProperty(): BooleanProperty {
-        return deactivateRefresh
-    }
-
     private fun populate(label: String, node: Node): TreeItem<TreeNode>? {
         return null
     }
 
     fun repopulate() {
-        if (deactivateRefresh.get()) return
-        if (root.get() != null) {
-            val item: TreeItem<TreeNode> = treeCreation.create(proof.get())
-            item.addEventHandler(
-                TreeItem.branchExpandedEvent<Any>(),
-                object : EventHandler<TreeItem.TreeModificationEvent<TreeNode?>?>() {
-                    fun handle(event: TreeItem.TreeModificationEvent<TreeNode>) {
-                        expandTreeView(event.treeItem)
-                    }
-                })
-            item.addEventHandler(
-                TreeItem.branchCollapsedEvent<Any>(),
-                object : EventHandler<TreeItem.TreeModificationEvent<TreeNode?>?>() {
-                    fun handle(event: TreeItem.TreeModificationEvent<TreeNode?>) {
-                        collapseTreeView(event.treeItem)
-                        treeProof!!.setCellFactory { nodeTreeView: TreeView<TreeNode> ->
-                            cellFactory(
-                                nodeTreeView
-                            )
-                        }
-                    }
-                })
-            treeProof!!.setRoot(item)
+        if (deactivateRefresh) return
+        globalData.selectedProof?.let { proof ->
+            val item: TreeItem<TreeNode> = treeCreation.create(proof)
+            item.addEventHandler(TreeItem.branchExpandedEvent<TreeNode>()) { event -> expandTreeView(event.treeItem) }
+            item.addEventHandler(TreeItem.branchCollapsedEvent<TreeNode>()) { event ->
+                collapseTreeView(event.treeItem)
+                treeView.setCellFactory { nodeTreeView: TreeView<TreeNode> ->
+                    cellFactory(nodeTreeView)
+                }
+            }
+
+            treeView.root = item
             expandTreeView(item)
         }
-        treeProof!!.refresh()
+        treeView.refresh()
     }
 
     private fun expandTreeView(item: TreeItem<TreeNode>?) {
@@ -302,215 +242,6 @@ class ProofTree : View("Proof Tree", FontIcon(Material2AL.ACCOUNT_TREE)) {
         }
     }
 
-    @AllArgsConstructor
-    private class TreeNode {
-        var label: String? = null
-        var node: Node? = null
-    }
-
-    internal open inner class TreeTransformationKey {
-        fun create(proof: Proof): TreeItem<TreeNode> {
-            val self1: TreeItem<TreeNode> = TreeItem<TreeNode>(TreeNode("Proof", null))
-            self1.getChildren().add(populate("", proof.root()))
-            return self1
-        }
-
-        protected fun itemFactory(n: Node, label: String): TreeItem<TreeNode> {
-            return if (label == "") {
-                itemFactory(n)
-            } else {
-                TreeItem<TreeNode>(TreeNode(label, n))
-            }
-        }
-
-        protected fun itemFactory(n: Node): TreeItem<TreeNode> {
-            return TreeItem<TreeNode>(TreeNode(n.serialNr() + ": " + toString(n), n))
-        }
-
-        protected fun toString(`object`: Node): String {
-            return if (`object`.appliedRuleApp != null) {
-                `object`.appliedRuleApp.rule().name().toString()
-            } else {
-                if (`object`.isClosed) "CLOSED GOAL" else "OPEN GOAL"
-            }
-        }
-
-        /**
-         * recursive population.
-         *
-         * @param label
-         * @param n
-         * @return
-         */
-        protected fun populate(label: String, n: Node): TreeItem<TreeNode> {
-            //val treeNode = new TreeNode(label, n);
-            val currentItem: TreeItem<TreeNode> = itemFactory(n, label)
-            //new TreeItem<>(treeNode);
-
-            // abort the traversing iff we have reached a sentinel!
-            if (sentinels.contains(n)) {
-                return currentItem
-            }
-            /* if (label.equals("Proof")) { //we are at the root
-            TreeItem<TreeNode> self1 = new TreeItem<>(new TreeNode(n.serialNr() + ": " + toString(n), n));
-             currentItem.getChildren().add(self1);
-            }*/
-
-            //if we are at a leaf we need to check goal state
-            if (n.childrenCount() === 0) {
-                //  TreeItem<TreeNode> e = new TreeItem<>(new TreeNode(
-                //           n.isClosed() ? "CLOSED GOAL" : "OPEN GOAL", null));
-                // currentItem.getChildren().addCell(e);
-                return currentItem
-            }
-            assert(
-                n.childrenCount() > 0 // there is at least one children
-            )
-
-            //consume child proof nodes until there are more than one child, then recursion!
-            var node: Node = n.child(0)
-            if (n.childrenCount() === 1) {
-                currentItem.getChildren().add(
-                    TreeItem<TreeNode>(
-                        TreeNode(
-                            node.serialNr() + ": " + toString(node),
-                            node
-                        )
-                    )
-                )
-                while (node.childrenCount() === 1) {
-                    node = node.child(0)
-                    currentItem.getChildren().add(
-                        TreeItem<TreeNode>(
-                            TreeNode(
-                                node.serialNr() + ": " + toString(node),
-                                node
-                            )
-                        )
-                    )
-                }
-
-
-                /*do {
-                    currentItem.getChildren().add(itemFactory(node));
-                    node = node.child(0);
-                } while (node.childrenCount() == 1);*/
-            }
-
-            // if the current node has more zero children. abort.
-            if (node.childrenCount() === 0) return currentItem
-            assert(
-                node.childrenCount() > 0 // there is at least 2 children
-            )
-            val nodeIterator: Iterator<Node> = node.childrenIterator()
-            var branchCounter = 1
-            while (nodeIterator.hasNext()) {
-                val childNode: Node = nodeIterator.next()
-                if (childNode.nodeInfo.branchLabel != null) {
-                    val populate: TreeItem<TreeNode> =
-                        populate(childNode.nodeInfo.branchLabel, childNode)
-                    currentItem.getChildren().add(populate)
-                } else {
-                    val populate: TreeItem<TreeNode> = populate("CASE $branchCounter", childNode)
-                    //TreeItem<TreeNode> self = new TreeItem<>(new TreeNode(childNode.serialNr() + ": " + toString(childNode), childNode));
-                    val self: TreeItem<TreeNode> = itemFactory(childNode)
-                    populate.getChildren().add(0, self)
-                    currentItem.getChildren().add(populate)
-                    branchCounter++
-                }
-            }
-            return currentItem
-        }
-    }
-
-    @RequiredArgsConstructor
-    internal inner class TreeTransformationScript : ProofTree.TreeTransformationKey() {
-        private val manager: ProofTreeManager<KeyData>? = null
-
-        /**
-         * maps a node to its siblings, that were created by an mutator call.
-         */
-        private var entryExitMap: Multimap<Node, Node> = HashMultimap.create()
-
-        /**
-         * maps a node to its mutator, that was applied on it.
-         */
-        private var mutatedBy: MutableMap<Node, ASTNode> = HashMap<Node, ASTNode>()
-        override fun create(proof: Proof?): TreeItem<TreeNode> {
-            val nodes: Set<PTreeNode<KeyData>> = manager.getNodes()
-            entryExitMap.clear()
-            mutatedBy.clear()
-            nodes.forEach(
-                Consumer<PTreeNode<KeyData?>> { pn: PTreeNode<KeyData?> ->
-                    try {
-                        if (pn.isAtomic()) {
-                            val startNode: Node = pn.getStateBeforeStmt().getSelectedGoalNode().getData().getNode()
-                            mutatedBy[startNode] = pn.getStatement()
-                            pn.getMutatedNodes().forEach { mn -> entryExitMap.put(startNode, mn.getData().getNode()) }
-                        }
-                    } catch (e: NullPointerException) {
-                    }
-                }
-            )
-            return super.create(proof)
-        }
-
-        protected override fun populate(label: String?, n: Node): TreeItem<TreeNode> {
-            val currentItem: `val` = itemFactory(n)
-            for (child in entryExitMap.get(n)) {
-                if (isMutated(child)) {
-                    currentItem.getChildren().add(populate("", child))
-                } else {
-                    currentItem.getChildren().add(super.itemFactory(child))
-                }
-            }
-            return currentItem
-        }
-
-        private fun isMutated(child: Node): Boolean {
-            return mutatedBy.containsKey(child)
-        }
-
-        override fun itemFactory(n: Node): TreeItem<TreeNode> {
-            val ast: ASTNode? = mutatedBy[n]
-            var lbl = ast.accept(ShortCommandPrinter()) as String
-            lbl += ("  " + n.serialNr()).toString() + " " + toString(n)
-            return TreeItem<TreeNode>(TreeNode(lbl, n))
-        }
-
-        //TODO: Reverse ArrayList in the end or nah?
-        @Deprecated("")
-        fun getBranchLabels(node: TreeNode?): ArrayList<String> {
-            val proofTree: TreeItem<TreeNode> = create(proof.get())
-            val branchlabels = ArrayList<String>()
-            var i = 0
-            branchlabels[0] = node.label
-            while (node != null) {
-                if (branchlabels[i] != node.label) {
-                    i++
-                    branchlabels[i] = node.label
-                }
-                //TODO: node = node.parent
-            }
-            return branchlabels
-        }
-
-        fun getBranchLabels(node: Node): ArrayList<String> {
-            val branchlabels = ArrayList<String>()
-            var i = 0
-            //TODO: branchlabel = all branchlabels or only next one
-            branchlabels[0] = node.nodeInfo.branchLabel
-            var n: Node = node.parent()
-            while (n != null) {
-                if (branchlabels[i] != n.nodeInfo.branchLabel) {
-                    i++
-                    branchlabels[i] = n.nodeInfo.branchLabel
-                }
-                n = n.parent()
-            }
-            return branchlabels
-        }
-    }
 
     companion object {
         /**
@@ -531,7 +262,7 @@ class ProofTree : View("Proof Tree", FontIcon(Material2AL.ACCOUNT_TREE)) {
             if (candidate != null) {
                 if (!candidate.isLeaf) {
                     candidate.setExpanded(true)
-                    val children: ObservableList<TreeItem<*>> = candidate.getChildren()
+                    val children = candidate.getChildren()
                     children.forEach { treeItem -> expandRootToLeaves(treeItem) }
                 }
             }
@@ -540,7 +271,7 @@ class ProofTree : View("Proof Tree", FontIcon(Material2AL.ACCOUNT_TREE)) {
 
 
     fun createProofTreeContextMenu(proofTree: ProofTree): ContextMenu = contextmenu() {
-        item("Refresh", graphic = FontIcon(Material2RoundAL.REFRESH)) {
+        item("Refresh", graphic = FontIcon(Material2MZ.REFRESH)) {
             proofTree.repopulate()
         }
 
@@ -553,70 +284,126 @@ class ProofTree : View("Proof Tree", FontIcon(Material2AL.ACCOUNT_TREE)) {
         isAutoFix = true
         isAutoHide = true
     }
+}
 
-    private fun onCreateCases(evt: ActionEvent?) {
-        if (proofTree.getProof() == null) {
-            return
-        }
-        val labels: List<Array<String>> = LabelFactory.getLabelOfOpenGoals(
-            proofTree.getProof(),
-            LabelFactory::getBranchingLabel
-        )
-        val text: String
-        text = if (labels.isEmpty()) {
-            "// no open goals"
-        } else if (labels.size == 1) {
-            "// only one goal"
+data class TreeNode(var label: String? = null, var node: Node? = null)
+
+internal class TreeTransformationKey {
+    fun create(proof: Proof): TreeItem<TreeNode> {
+        val self1: TreeItem<TreeNode> = TreeItem<TreeNode>(TreeNode("Proof", null))
+        self1.getChildren().add(populate("", proof.root()))
+        return self1
+    }
+
+    private fun itemFactory(n: Node, label: String): TreeItem<TreeNode> {
+        return if (label == "") {
+            itemFactory(n)
         } else {
-            var upperLimit = 0
-            /* trying to find the common suffix*/try {
-                val ref = labels[0]
-                while (true) {
-                    for (lbl in labels) {
-                        if (lbl[upperLimit] != ref[upperLimit]) {
-                            break
-                        }
-                    }
-                    upperLimit++
-                    upperLimit++
-                }
-            } catch (e: ArrayIndexOutOfBoundsException) {
-            }
-            val finalUpperLimit = upperLimit
-            labels.stream()
-                .map<Stream<String>> { a: Array<String> ->
-                    Arrays.stream<String>(
-                        a,
-                        finalUpperLimit,
-                        a.size
-                    )
-                }
-                .map<String> { s: Stream<String> ->
-                    s.reduce { a: String, b: String -> (b + LabelFactory.SEPARATOR).toString() + a }
-                        .orElse("error")
-                }
-                .map<String> { s: String? ->
-                    String.format(
-                        "\tcase match \"%s\" :\n\t\t//commands",
-                        s
-                    )
-                }
-                .reduce { a: String, b: String ->
-                    """
-                         $a
-                         $b
-                         """.trimIndent()
-                }
-                .orElse("ERROR")
+            TreeItem<TreeNode>(TreeNode(label, n))
         }
-        val s = "cases {\n$text\n}"
-        Events.fire(InsertAtTheEndOfMainScript(s))
-        Events.fire(PublishMessage("Copied to Clipboard"))
+    }
+
+    private fun itemFactory(n: Node): TreeItem<TreeNode> {
+        return TreeItem<TreeNode>(TreeNode(n.serialNr().toString() + ": " + toString(n), n))
+    }
+
+    private fun toString(`object`: Node): String {
+        return if (`object`.appliedRuleApp != null) {
+            `object`.appliedRuleApp.rule().name().toString()
+        } else {
+            if (`object`.isClosed) "CLOSED GOAL" else "OPEN GOAL"
+        }
+    }
+
+    /**
+     * recursive population.
+     *
+     * @param label
+     * @param n
+     * @return
+     */
+    private fun populate(label: String, n: Node): TreeItem<TreeNode> {
+        //val treeNode = new TreeNode(label, n);
+        val currentItem: TreeItem<TreeNode> = itemFactory(n, label)
+        //new TreeItem<>(treeNode);
+
+        // abort the traversing iff we have reached a sentinel!
+        //if (sentinels.contains(n)) {
+        //    return currentItem
+        //}
+        /* if (label.equals("Proof")) { //we are at the root
+        TreeItem<TreeNode> self1 = new TreeItem<>(new TreeNode(n.serialNr() + ": " + toString(n), n));
+         currentItem.getChildren().add(self1);
+        }*/
+
+        //if we are at a leaf we need to check goal state
+        if (n.childrenCount() == 0) {
+            //  TreeItem<TreeNode> e = new TreeItem<>(new TreeNode(
+            //           n.isClosed() ? "CLOSED GOAL" : "OPEN GOAL", null));
+            // currentItem.getChildren().addCell(e);
+            return currentItem
+        }
+        assert(
+            n.childrenCount() > 0 // there is at least one children
+        )
+
+        //consume child proof nodes until there are more than one child, then recursion!
+        var node: Node = n.child(0)
+        if (n.childrenCount() == 1) {
+            currentItem.getChildren().add(
+                TreeItem(
+                    TreeNode(
+                        node.serialNr().toString() + ": " + toString(node),
+                        node
+                    )
+                )
+            )
+            while (node.childrenCount() == 1) {
+                node = node.child(0)
+                currentItem.getChildren().add(
+                    TreeItem(
+                        TreeNode(
+                            node.serialNr().toString() + ": " + toString(node),
+                            node
+                        )
+                    )
+                )
+            }
+
+
+            /*do {
+                currentItem.getChildren().add(itemFactory(node));
+                node = node.child(0);
+            } while (node.childrenCount() == 1);*/
+        }
+
+        // if the current node has more zero children. abort.
+        if (node.childrenCount() == 0) return currentItem
+        assert(
+            node.childrenCount() > 0 // there is at least 2 children
+        )
+        val nodeIterator: Iterator<Node> = node.childrenIterator()
+        var branchCounter = 1
+        while (nodeIterator.hasNext()) {
+            val childNode: Node = nodeIterator.next()
+            if (childNode.nodeInfo.branchLabel != null) {
+                val populate: TreeItem<TreeNode> =
+                    populate(childNode.nodeInfo.branchLabel, childNode)
+                currentItem.getChildren().add(populate)
+            } else {
+                val populate: TreeItem<TreeNode> = populate("CASE $branchCounter", childNode)
+                //TreeItem<TreeNode> self = new TreeItem<>(new TreeNode(childNode.serialNr() + ": " + toString(childNode), childNode));
+                val self: TreeItem<TreeNode> = itemFactory(childNode)
+                populate.getChildren().add(0, self)
+                currentItem.getChildren().add(populate)
+                branchCounter++
+            }
+        }
+        return currentItem
     }
 }
-}
 
-
+/*
 class ProofTreeContextMenu(private val proofTree: ProofTree) : ContextMenu() {
     private var copyBranchLabel = MenuItem("Branch Label")
     private var copyProgramLines = MenuItem("Program Lines")
@@ -760,3 +547,4 @@ class ProofTreeContextMenu(private val proofTree: ProofTree) : ContextMenu() {
         Events.fire(PublishMessage("Copied to Clipboard"))
     }
 }
+*/
