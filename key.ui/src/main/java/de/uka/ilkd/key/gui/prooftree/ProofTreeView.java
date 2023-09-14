@@ -884,7 +884,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
         @Override
         public void selectedNodeChanged(KeYSelectionEvent e) {
             if (!ignoreNodeSelectionChange) {
+                LOGGER.debug("selected node changed");
                 makeSelectedNodeVisible(mediator.getSelectedNode());
+            } else {
+                LOGGER.debug("selected node changed, but ignoring change");
             }
         }
 

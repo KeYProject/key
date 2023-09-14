@@ -45,8 +45,12 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Immutables;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public final class OneStepSimplifier implements BuiltInRule {
+    private static final Logger LOGGER = LoggerFactory.getLogger(OneStepSimplifier.class);
 
     /**
      * If true, the OneStepSimplifier has access to the entire sequent during replay.
@@ -541,17 +545,21 @@ public final class OneStepSimplifier implements BuiltInRule {
     // -------------------------------------------------------------------------
 
     /**
-     * Enables or disables the one step simplification, depending on the strategy setting made.
+     * Enables or disables the One Step Simplification, depending on the strategy setting made.
      * <strong>IMPORTANT:</strong> This won't do any good if called <i>before</i> the strategy has
-     * been set / changed for the current proof. So make sure that everything is done in proper
-     * order.
+     * been set / changed for the current proof using
+     * {@link de.uka.ilkd.key.strategy.Strategy#updateStrategySettings(Proof, StrategyProperties)}.
+     * So make sure that everything is done in proper order.
      *
      * @param proof The {@link Proof} for which to refresh the {@link OneStepSimplifier} instance.
      */
     public static void refreshOSS(Proof proof) {
         OneStepSimplifier simplifierInstance = MiscTools.findOneStepSimplifier(proof);
         if (simplifierInstance != null) {
+            LOGGER.debug("refreshing OSS");
             simplifierInstance.refresh(proof);
+        } else {
+            LOGGER.debug("not refreshing OSS");
         }
     }
 

@@ -519,7 +519,6 @@ public class KeYMediator {
      * returns the current selected proof
      *
      * @return the current selected proof
-     * @see #getProof()
      */
     @Nullable
     public Proof getSelectedProof() {
@@ -579,11 +578,11 @@ public class KeYMediator {
 
     private int goalsClosedByAutoMode = 0;
 
-    public void closedAGoal() {
+    private void closedAGoal() {
         goalsClosedByAutoMode++;
     }
 
-    public int getNrGoalsClosedByAutoMode() {
+    private int getNrGoalsClosedByAutoMode() {
         return goalsClosedByAutoMode;
     }
 
@@ -592,24 +591,22 @@ public class KeYMediator {
     }
 
     public void stopInterface(boolean fullStop) {
-        final boolean b = fullStop;
-        Runnable interfaceSignaller = () -> {
+        ThreadUtilities.invokeAndWait(() -> {
             ui.notifyAutoModeBeingStarted();
-            if (b) {
+            if (fullStop) {
                 inAutoMode = true;
                 getUI().getProofControl()
-                        .fireAutoModeStarted(new ProofEvent(getSelectedProof())); // TODO: Is
-                                                                                  // this
-                                                                                  // wrong use
-                                                                                  // of
-                                                                                  // auto mode
-                                                                                  // really
-                                                                                  // required?
+                        .fireAutoModeStarted(new ProofEvent(getSelectedProof()));
+                // TODO: Is this wrong use of auto mode really required?
             }
-        };
-        ThreadUtilities.invokeAndWait(interfaceSignaller);
+        });
     }
 
+    /**
+     * Make the interface interactive again.
+     *
+     * @param fullStop whether auto mode was active
+     */
     public void startInterface(boolean fullStop) {
         startInterface(fullStop, true);
     }
@@ -617,13 +614,13 @@ public class KeYMediator {
     /**
      * Make the interface interactive again.
      *
-     * @param fullStop whether automode was active
-     * @param fireSelectionChanged if true, <code>fireSelectedProofChanged</code> will be called
+     * @param fullStop whether auto mode was active
+     * @param fireSelectionChanged if true, <code>fireSelectedProofChanged</code> and
+     *        <code>fireSelectedNodeChanged</code> will be called
      */
     public void startInterface(boolean fullStop, boolean fireSelectionChanged) {
-        final boolean b = fullStop;
-        Runnable interfaceSignaller = () -> {
-            if (b) {
+        ThreadUtilities.invokeOnEventQueue(() -> {
+            if (fullStop) {
                 inAutoMode = false;
                 getUI().getProofControl()
                         .fireAutoModeStopped(new ProofEvent(getSelectedProof()));
@@ -632,9 +629,9 @@ public class KeYMediator {
             ui.notifyAutomodeStopped();
             if (getSelectedProof() != null && fireSelectionChanged) {
                 keySelectionModel.fireSelectedProofChanged();
+                keySelectionModel.fireSelectedNodeChanged();
             }
-        };
-        ThreadUtilities.invokeOnEventQueue(interfaceSignaller);
+        });
     }
 
     /**
@@ -646,6 +643,9 @@ public class KeYMediator {
         return inAutoMode;
     }
 
+    /**
+     * The associated lookup of user-defined data.
+     */
     @Nullable
     private Lookup userData;
 
@@ -684,7 +684,7 @@ public class KeYMediator {
      *
      * @param obj registered object
      * @param service the key under which the data was registered
-     * @param <T> arbitray object
+     * @param <T> arbitrary object
      */
     public <T> void deregister(T obj, Class<T> service) {
         if (userData != null) {
@@ -692,11 +692,6 @@ public class KeYMediator {
         }
     }
 
-    /**
-     * Get the assocated lookup of user-defined data.
-     *
-     * @return
-     */
     public @Nonnull Lookup getUserData() {
         if (userData == null) {
             userData = new Lookup();
