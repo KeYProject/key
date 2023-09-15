@@ -1,7 +1,5 @@
 package io.github.wadoon.key
 
-import com.pixelduke.control.Ribbon
-import com.pixelduke.control.ribbon.*
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl
 import de.uka.ilkd.key.control.KeYEnvironment
 import de.uka.ilkd.key.java.Services
@@ -19,6 +17,7 @@ import de.uka.ilkd.key.prover.TaskFinishedInfo
 import de.uka.ilkd.key.prover.TaskStartedInfo
 import de.uka.ilkd.key.speclang.Contract
 import de.uka.ilkd.key.util.KeYTypeUtil
+import io.github.wadoon.key.controls.*
 import io.github.wadoon.key.view.ProofTree
 import io.github.wadoon.key.view.SetStatusBar
 import io.github.wadoon.key.view.StatusBar
@@ -40,6 +39,7 @@ import org.kordamp.ikonli.javafx.FontIcon
 import org.kordamp.ikonli.material2.Material2AL
 import org.kordamp.ikonli.material2.Material2MZ
 import tornadofx.*
+import view.ExampleChooser
 import view.chooseContract
 import java.io.File
 import java.nio.file.Path
@@ -296,6 +296,7 @@ class TopView : View() {
             }
         }
 
+        /*
         toolbar {
             button("Open Workspace", FontIcon(Material2AL.FOLDER_OPEN)) {
                 action {
@@ -347,7 +348,7 @@ class TopView : View() {
             button(graphic = FontIcon(Material2AL.ADB))
 
         }
-
+        */
         ribbon {
             quickAccessBar {
 
@@ -366,94 +367,16 @@ class TopView : View() {
                             if (file != null) {
                                 globalData.workspacePath = file.toPath()
 
-                                val ui = object : DefaultUserInterfaceControl(null) {
-                                    override fun loadingStarted(loader: AbstractProblemLoader?) {
-                                        super.loadingStarted(loader)
-                                    }
-
-                                    override fun loadingFinished(
-                                        loader: AbstractProblemLoader?,
-                                        poContainer: IPersistablePO.LoadedPOContainer,
-                                        proofList: ProofAggregate,
-                                        result: AbstractProblemLoader.ReplayResult
-                                    ) {
-                                        super.loadingFinished(loader, poContainer, proofList, result)
-                                        fire(SetStatusBar("Task Finished: " + proofList.size()))
-                                    }
-
-                                    override fun taskStarted(info: TaskStartedInfo?) {
-                                        super.taskStarted(info)
-                                        fire(SetStatusBar("Task Started: " + info))
-
-                                    }
-
-                                    override fun taskProgress(position: Int) {
-                                        super.taskProgress(position)
-                                        fire(SetStatusBar("Task Progress:" + position))
-                                    }
-
-                                    override fun taskFinished(info: TaskFinishedInfo?) {
-                                        super.taskFinished(info)
-                                        fire(SetStatusBar("Task Finished: " + info))
-                                    }
-
-                                    override fun proofCreated(
-                                        sender: ProblemInitializer?,
-                                        proofAggregate: ProofAggregate?
-                                    ) {
-                                        super.proofCreated(sender, proofAggregate)
-                                        fire(SetStatusBar("Proof Created"))
-                                    }
-
-                                    override fun macroStarted(info: TaskStartedInfo?) {
-                                        super.macroStarted(info)
-                                        fire(SetStatusBar(info.toString()))
-                                    }
-
-                                    override fun macroFinished(info: ProofMacroFinishedInfo?) {
-                                        super.macroFinished(info)
-                                        fire(SetStatusBar(info.toString()))
-                                    }
-                                }
-                                val loader = ui.load(
-                                    null,
-                                    file, mutableListOf(), null, mutableListOf(),
-                                    null, false, null
-                                )
-                                val initConfig = loader.initConfig
-
-                                val env = KeYEnvironment(
-                                    ui, initConfig, loader.proof,
-                                    loader.proofScript, loader.result
-                                )
-
-                                if (loader.proof != null) {
-                                    val allContracts = mutableListOf<Contract>()
-                                    val kjts: Set<KeYJavaType> = env.javaInfo.getAllKeYJavaTypes()
-                                    for (type in kjts) {
-                                        if (!KeYTypeUtil.isLibraryClass(type)) {
-                                            val targets: ImmutableSet<IObserverFunction> =
-                                                env.specificationRepository.getContractTargets(type)
-                                            for (target in targets) {
-                                                val contracts: ImmutableSet<Contract> =
-                                                    env.specificationRepository.getContracts(type, target)
-                                                allContracts.addAll(contracts)
-                                            }
-                                        }
-                                    }
-                                    val contract = chooseContract(env.services, allContracts)
-                                    if (contract != null) {
-                                        val proofOblInput = contract.createProofObl(env.initConfig, contract)
-                                        val proof = env.createProof(proofOblInput)
-                                        globalData.selectedProof = proof
-                                        globalData.selectedGoal = proof.openGoals().head()
-                                        globalData.selectedNode = proof.root()
-                                    }
-                                }
+                                loadFile(file)
                             }
                         }
                     }
-                    button("Open Examples", FontAwesome.PENCIL_SQUARE) { }
+                    button("Open Examples", FontAwesome.ENVELOPE_OPEN) {
+                        action {
+                            val example = ExampleChooser.showInstance()
+                            example?.let{loadFile(it) }
+                        }
+                    }
                     button("Recent files", FontAwesome.PENCIL_SQUARE) {}
                     button("Edit Most Recent File", fontIcon = FontAwesome.PENCIL_SQUARE) {}
                     button("Save", fontIcon = FontAwesome.SAVE) {}
@@ -559,6 +482,93 @@ class TopView : View() {
         }
     }
 
+    private fun loadFile(file: File?) {
+        val ui = object : DefaultUserInterfaceControl(null) {
+            override fun loadingStarted(loader: AbstractProblemLoader?) {
+                super.loadingStarted(loader)
+            }
+
+            override fun loadingFinished(
+                loader: AbstractProblemLoader?,
+                poContainer: IPersistablePO.LoadedPOContainer,
+                proofList: ProofAggregate,
+                result: AbstractProblemLoader.ReplayResult
+            ) {
+                super.loadingFinished(loader, poContainer, proofList, result)
+                fire(SetStatusBar("Task Finished: " + proofList.size()))
+            }
+
+            override fun taskStarted(info: TaskStartedInfo?) {
+                super.taskStarted(info)
+                fire(SetStatusBar("Task Started: " + info))
+
+            }
+
+            override fun taskProgress(position: Int) {
+                super.taskProgress(position)
+                fire(SetStatusBar("Task Progress:" + position))
+            }
+
+            override fun taskFinished(info: TaskFinishedInfo?) {
+                super.taskFinished(info)
+                fire(SetStatusBar("Task Finished: " + info))
+            }
+
+            override fun proofCreated(
+                sender: ProblemInitializer?,
+                proofAggregate: ProofAggregate?
+            ) {
+                super.proofCreated(sender, proofAggregate)
+                fire(SetStatusBar("Proof Created"))
+            }
+
+            override fun macroStarted(info: TaskStartedInfo?) {
+                super.macroStarted(info)
+                fire(SetStatusBar(info.toString()))
+            }
+
+            override fun macroFinished(info: ProofMacroFinishedInfo?) {
+                super.macroFinished(info)
+                fire(SetStatusBar(info.toString()))
+            }
+        }
+        val loader = ui.load(
+            null,
+            file, mutableListOf(), null, mutableListOf(),
+            null, false, null
+        )
+        val initConfig = loader.initConfig
+
+        val env = KeYEnvironment(
+            ui, initConfig, loader.proof,
+            loader.proofScript, loader.result
+        )
+
+        if (loader.proof != null) {
+            val allContracts = mutableListOf<Contract>()
+            val kjts: Set<KeYJavaType> = env.javaInfo.getAllKeYJavaTypes()
+            for (type in kjts) {
+                if (!KeYTypeUtil.isLibraryClass(type)) {
+                    val targets: ImmutableSet<IObserverFunction> =
+                        env.specificationRepository.getContractTargets(type)
+                    for (target in targets) {
+                        val contracts: ImmutableSet<Contract> =
+                            env.specificationRepository.getContracts(type, target)
+                        allContracts.addAll(contracts)
+                    }
+                }
+            }
+            val contract = chooseContract(env.services, allContracts)
+            if (contract != null) {
+                val proofOblInput = contract.createProofObl(env.initConfig, contract)
+                val proof = env.createProof(proofOblInput)
+                globalData.selectedProof = proof
+                globalData.selectedGoal = proof.openGoals().head()
+                globalData.selectedNode = proof.root()
+            }
+        }
+    }
+
     private fun RibbonGroup.column(block: Column.() -> Unit): Column = Column().also {
         it.block()
         nodes.add(it)
@@ -624,7 +634,7 @@ class TopView : View() {
         block: RibbonGroup.() -> Unit = {}
     ): RibbonGroup {
         val group = RibbonGroup()
-        group.title = title
+        //group.title = title
         group.graphic = graphic
         fontIcon?.let { group.graphic = FontIcon(fontIcon) }
         group.block()
