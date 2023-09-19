@@ -152,8 +152,7 @@ public class FloatHandler implements SMTHandler {
     }
 
     @Override
-    public SExpr handle(MasterHandler trans, Term term, List<SExpr> boundVars)
-            throws SMTTranslationException {
+    public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
 
         trans.introduceSymbol("float");
         trans.introduceSymbol("double");
@@ -178,7 +177,7 @@ public class FloatHandler implements SMTHandler {
 
             for (Term t : subs) {
                 Type type = getType(t.sort());
-                translatedSubs.add(trans.translate(t, type, boundVars));
+                translatedSubs.add(trans.translate(t, type));
             }
 
             return new SExpr(fpOp, exprType, translatedSubs);

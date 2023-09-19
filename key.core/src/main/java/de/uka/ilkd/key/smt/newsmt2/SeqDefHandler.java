@@ -68,8 +68,7 @@ public class SeqDefHandler implements SMTHandler {
     }
 
     @Override
-    public SExpr handle(MasterHandler trans, Term term, List<SExpr> boundVars)
-            throws SMTTranslationException {
+    public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
         Operator op = term.op();
 
         assert (op == seqLDT.getSeqDef());
@@ -96,10 +95,10 @@ public class SeqDefHandler implements SMTHandler {
 
         trans.addDeclaration(makeFunctionDeclaration(name, vars));
         trans.addAxiom(makeTyping(name, vars, trans));
-        trans.addAxiom(makeSeqGetDefinition(name, vars, term, trans, boundVars));
-        trans.addAxiom(makeSeqLenDefinition(name, vars, term, trans, boundVars));
+        trans.addAxiom(makeSeqGetDefinition(name, vars, term, trans));
+        trans.addAxiom(makeSeqLenDefinition(name, vars, term, trans));
 
-        SExpr result = makeTermApplication(trans, name, vars, boundVars);
+        SExpr result = makeTermApplication(trans, name, vars);
         seqDefMap.put(term, result);
 
         return result;
@@ -131,7 +130,7 @@ public class SeqDefHandler implements SMTHandler {
     }
 
     private SExpr makeSeqLenDefinition(String function, Set<ParsableVariable> vars, Term term,
-            MasterHandler trans, List<SExpr> boundVars) throws SMTTranslationException {
+            MasterHandler trans) throws SMTTranslationException {
         List<SExpr> qvars = new ArrayList<>();
         List<SExpr> params = new ArrayList<>();
         for (ParsableVariable var : vars) {
@@ -144,8 +143,8 @@ public class SeqDefHandler implements SMTHandler {
         // \forall freevars; seqLen(function(params)) = \if(up-lo>=0) \then(up-lo) \else 0
         SExpr app = new SExpr(function, params);
         SExpr seqLen = new SExpr(SEQLEN, app);
-        SExpr len = SExprs.minus(trans.translate(term.sub(1), IntegerOpHandler.INT, boundVars),
-            trans.translate(term.sub(0), IntegerOpHandler.INT, boundVars));
+        SExpr len = SExprs.minus(trans.translate(term.sub(1), IntegerOpHandler.INT),
+            trans.translate(term.sub(0), IntegerOpHandler.INT));
         SExpr ite = SExprs.ite(SExprs.greaterEqual(len, SExprs.ZERO), len, SExprs.ZERO);
         SExpr eq = SExprs.eq(seqLen, ite);
         SExpr forall = SExprs.forall(qvars, eq);
@@ -153,7 +152,7 @@ public class SeqDefHandler implements SMTHandler {
     }
 
     private SExpr makeSeqGetDefinition(String function, Set<ParsableVariable> vars, Term term,
-            MasterHandler trans, List<SExpr> boundVars) throws SMTTranslationException {
+            MasterHandler trans) throws SMTTranslationException {
 
         List<SExpr> qvars = new ArrayList<>();
         List<SExpr> guards = new ArrayList<>();
@@ -179,11 +178,11 @@ public class SeqDefHandler implements SMTHandler {
         SExpr i = LogicalVariableHandler.makeVarRef(name, sort);
         qvars.add(LogicalVariableHandler.makeVarDecl(name, sort));
         guards.add(SExprs.lessEqual(SExprs.ZERO, i));
-        SExpr upper = trans.translate(term.sub(1), IntegerOpHandler.INT, boundVars);
-        SExpr lower = trans.translate(term.sub(0), IntegerOpHandler.INT, boundVars);
+        SExpr upper = trans.translate(term.sub(1), IntegerOpHandler.INT);
+        SExpr lower = trans.translate(term.sub(0), IntegerOpHandler.INT);
         SExpr len = SExprs.minus(upper, lower);
         guards.add(SExprs.lessThan(i, len));
-        SExpr smtTerm = trans.translate(term.sub(2), Type.UNIVERSE, boundVars);
+        SExpr smtTerm = trans.translate(term.sub(2), Type.UNIVERSE);
         SExpr replacedSMTTerm = SExprs.let(LogicalVariableHandler.VAR_PREFIX + name,
             SExprs.coerce(SExprs.plus(i, lower), IntegerOpHandler.INT), smtTerm);
         SExpr seqGet = new SExpr(SEQGET, Type.UNIVERSE, app, new SExpr("i2u", i));
@@ -213,12 +212,11 @@ public class SeqDefHandler implements SMTHandler {
         return new SExpr(name, Type.UNIVERSE, args);
     }
 
-    private SExpr makeTermApplication(MasterHandler trans, String name, Set<ParsableVariable> vars,
-            List<SExpr> boundVars)
+    private SExpr makeTermApplication(MasterHandler trans, String name, Set<ParsableVariable> vars)
             throws SMTTranslationException {
         List<SExpr> args = new ArrayList<>();
         for (ParsableVariable var : vars) {
-            SExpr ref = trans.translate(termFactory.createTerm(var), boundVars);
+            SExpr ref = trans.translate(termFactory.createTerm(var));
             args.add(SExprs.coerce(ref, Type.UNIVERSE));
         }
         return new SExpr(name, Type.UNIVERSE, args);

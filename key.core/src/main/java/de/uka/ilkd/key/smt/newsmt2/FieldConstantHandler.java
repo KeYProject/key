@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -63,8 +62,7 @@ public class FieldConstantHandler implements SMTHandler {
     }
 
     @Override
-    public SExpr handle(MasterHandler trans, Term term, List<SExpr> boundVars)
-            throws SMTTranslationException {
+    public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
         String name = term.op().name().toString();
         String smtName = "field_" + name;
 
@@ -73,7 +71,7 @@ public class FieldConstantHandler implements SMTHandler {
 
         if (op == heapLDT.getArr()) {
             trans.introduceSymbol("arr");
-            return trans.handleAsFunctionCall("arr", term, boundVars);
+            return trans.handleAsFunctionCall("arr", term);
         }
 
         if (!trans.isKnownSymbol(smtName)) {

@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -196,7 +195,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     private List<SExpr> makeSMTAsserts(MasterHandler master, List<Term> sequentAsserts) {
         List<SExpr> sequentSMTAsserts = new LinkedList<>();
         for (Term t : sequentAsserts) {
-            sequentSMTAsserts.add(master.translate(t, Type.BOOL, Collections.emptyList()));
+            sequentSMTAsserts.add(master.translate(t, Type.BOOL));
         }
         return sequentSMTAsserts;
     }

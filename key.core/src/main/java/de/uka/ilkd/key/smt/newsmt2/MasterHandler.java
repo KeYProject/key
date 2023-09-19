@@ -5,7 +5,6 @@ package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -128,8 +127,7 @@ public class MasterHandler {
      */
     @FunctionalInterface
     public interface SymbolIntroducer {
-        void introduce(MasterHandler masterHandler, String name, List<SExpr> boundVars)
-                throws SMTTranslationException;
+        void introduce(MasterHandler masterHandler, String name) throws SMTTranslationException;
     }
 
     /**
@@ -144,13 +142,12 @@ public class MasterHandler {
      * @param problem the non-null term to translate
      * @return the S-Expression representing the translation
      */
-    public SExpr translate(Term problem, List<SExpr> boundVars) {
-
+    public SExpr translate(Term problem) {
         try {
             SMTHandler cached = handlerMap.get(problem.op());
             if (cached != null) {
                 // There is a handler that promised to handle this operator ...
-                return cached.handle(this, problem, boundVars);
+                return cached.handle(this, problem);
             }
 
             for (SMTHandler smtHandler : handlers) {
@@ -158,18 +155,18 @@ public class MasterHandler {
                 switch (response) {
                 case YES_THIS_INSTANCE:
                     // handle this but do not cache.
-                    return smtHandler.handle(this, problem, boundVars);
+                    return smtHandler.handle(this, problem);
                 case YES_THIS_OPERATOR:
                     // handle it and cache it for future instances of the op.
                     handlerMap.put(problem.op(), smtHandler);
-                    return smtHandler.handle(this, problem, boundVars);
+                    return smtHandler.handle(this, problem);
                 }
             }
 
-            return handleAsUnknownValue(problem, boundVars);
+            return handleAsUnknownValue(problem);
         } catch (Exception ex) {
             exceptions.add(ex);
-            return handleAsUnknownValue(problem, boundVars);
+            return handleAsUnknownValue(problem);
         }
     }
 
@@ -189,15 +186,15 @@ public class MasterHandler {
      * @param type the type of the resulting s-expression
      * @return the S-Expression representing the translation
      */
-    public SExpr translate(Term problem, Type type, List<SExpr> boundVars) {
+    public SExpr translate(Term problem, Type type) {
         try {
-            return SExprs.coerce(translate(problem, boundVars), type);
+            return SExprs.coerce(translate(problem), type);
         } catch (Exception ex) {
             // Fall back to an unknown value despite the exception.
             // The result will still be valid SMT code then.
             exceptions.add(ex);
             try {
-                return SExprs.coerce(handleAsUnknownValue(problem, boundVars), type);
+                return SExprs.coerce(handleAsUnknownValue(problem), type);
             } catch (SMTTranslationException e) {
                 // This can actually never happen since a universe element is translated
                 throw new Error(e);
@@ -211,20 +208,27 @@ public class MasterHandler {
      * @param problem the problematic term
      * @return a generic translation as unknown value
      */
-    private SExpr handleAsUnknownValue(Term problem, List<SExpr> boundVars) {
-        var names = boundVars.stream().map(x -> new SExpr(x.getName())).toList();
-        var types = boundVars.stream().map(x -> x.getChildren().get(0)).toList();
+    private SExpr handleAsUnknownValue(Term problem) {
         if (unknownValues.containsKey(problem)) {
             return unknownValues.get(problem);
         }
         int number = unknownValues.size();
         SExpr translation;
         SExpr abbr = new SExpr("unknown_" + number, Type.UNIVERSE);
-        if (boundVars.isEmpty()) {
+        var freeVars = problem.freeVars();
+        if (freeVars.isEmpty()) {
+            // simple case: unknown value does not depend on anything else
             SExpr e = new SExpr("declare-const", Type.UNIVERSE, abbr.toString(), "U");
             addAxiom(e);
             translation = abbr;
         } else {
+            // unknown value depends on quantified variables
+            var names = freeVars.stream()
+                    .map(x -> new SExpr(LogicalVariableHandler.VAR_PREFIX + x.name().toString()))
+                    .toList();
+            var types = freeVars.stream()
+                    .map(x -> LogicalVariableHandler.makeVarDecl("", x.sort()).getChildren().get(0))
+                    .toList();
             SExpr signature = new SExpr(types);
             SExpr e = new SExpr("declare-fun", abbr, signature, new SExpr("U"));
             addAxiom(e);
@@ -252,8 +256,8 @@ public class MasterHandler {
      * @param term the term to be translated
      * @return an expression with the name functionName and subterms as children
      */
-    SExpr handleAsFunctionCall(String functionName, Term term, List<SExpr> boundVars) {
-        return handleAsFunctionCall(functionName, Type.UNIVERSE, term, boundVars);
+    SExpr handleAsFunctionCall(String functionName, Term term) {
+        return handleAsFunctionCall(functionName, Type.UNIVERSE, term);
     }
 
     /**
@@ -272,10 +276,10 @@ public class MasterHandler {
      * @param term the term to be translated
      * @return an expression with the name functionName and the term's sub-terms as children
      */
-    SExpr handleAsFunctionCall(String functionName, Type type, Term term, List<SExpr> boundVars) {
+    SExpr handleAsFunctionCall(String functionName, Type type, Term term) {
         List<SExpr> children = new ArrayList<>();
         for (int i = 0; i < term.arity(); i++) {
-            children.add(translate(term.sub(i), Type.UNIVERSE, boundVars));
+            children.add(translate(term.sub(i), Type.UNIVERSE));
         }
         return new SExpr(functionName, type, children);
     }
@@ -307,9 +311,8 @@ public class MasterHandler {
      * @return a list of translations
      * @throws SMTTranslationException if the type conversion is impossible
      */
-    public List<SExpr> translate(Iterable<Term> terms, Type type, List<SExpr> boundVars)
-            throws SMTTranslationException {
-        return SExprs.coerce(translate(terms, boundVars), type);
+    public List<SExpr> translate(Iterable<Term> terms, Type type) throws SMTTranslationException {
+        return SExprs.coerce(translate(terms), type);
     }
 
     /**
@@ -318,10 +321,10 @@ public class MasterHandler {
      * @param terms non-null list of terms.
      * @return a list of translations
      */
-    public List<SExpr> translate(Iterable<Term> terms, List<SExpr> boundVars) {
+    public List<SExpr> translate(Iterable<Term> terms) {
         List<SExpr> result = new LinkedList<>();
         for (Term term : terms) {
-            result.add(translate(term, boundVars));
+            result.add(translate(term));
         }
         return result;
     }
@@ -362,8 +365,7 @@ public class MasterHandler {
         if (translationState.containsKey(functionName + ".intro")) {
             SymbolIntroducer introducer =
                 (SymbolIntroducer) translationState.get(functionName + ".intro");
-            introducer.introduce(this, functionName, Collections.emptyList()); // TODO: is emptyList
-                                                                               // valid?
+            introducer.introduce(this, functionName);
         }
 
         // Handle it locally.

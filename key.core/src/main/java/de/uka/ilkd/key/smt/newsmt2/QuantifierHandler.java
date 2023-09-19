@@ -45,10 +45,7 @@ public class QuantifierHandler implements SMTHandler {
     }
 
     @Override
-    public SExpr handle(MasterHandler trans, Term term, List<SExpr> boundVars)
-            throws SMTTranslationException {
-        List<SExpr> boundVarsNew = new ArrayList<>(boundVars);
-
+    public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
         term = collectQuantifications(term);
 
         Set<Term> triggerTerms = new HashSet<>();
@@ -56,16 +53,16 @@ public class QuantifierHandler implements SMTHandler {
 
         Set<SExpr> triggers = new HashSet<>();
         for (Term triggerTerm : triggerTerms) {
-            triggers.add(trans.translate(triggerTerm, boundVars));
+            triggers.add(trans.translate(triggerTerm));
         }
 
+        SExpr matrix = trans.translate(term.sub(0), Type.BOOL);
         List<SExpr> vars = new ArrayList<>();
         List<SExpr> typeGuards = new ArrayList<>();
         for (QuantifiableVariable bv : term.boundVars()) {
             Sort sort = bv.sort();
             String name = bv.name().toString();
             vars.add(LogicalVariableHandler.makeVarDecl(name, sort));
-            boundVarsNew.add(vars.get(vars.size() - 1));
             if (!sort.equals(services.getTypeConverter().getIntegerLDT().targetSort())) {
                 // Special casing integer quantification: Avoid conversion to "U".
                 // Caution: Must be in sync with logical variable treatment.
@@ -74,7 +71,6 @@ public class QuantifierHandler implements SMTHandler {
                     new SExpr(LogicalVariableHandler.VAR_PREFIX + name), SExprs.sortExpr(sort)));
             }
         }
-        SExpr matrix = trans.translate(term.sub(0), Type.BOOL, boundVarsNew);
         SExpr typeGuard = SExprs.and(typeGuards);
         String smtOp;
         Operator op = term.op();

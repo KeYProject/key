@@ -41,8 +41,7 @@ public class SumProdHandler implements SMTHandler {
     }
 
     @Override
-    public SExpr handle(MasterHandler trans, Term term, List<SExpr> boundVars)
-            throws SMTTranslationException {
+    public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
         Operator op = term.op();
         if (op == bsumOp) {
             for (Term t : usedBsumTerms.keySet()) {
@@ -51,8 +50,8 @@ public class SumProdHandler implements SMTHandler {
                 }
             }
             List<SExpr> exprs = new LinkedList<>();
-            exprs.add(trans.translate(term.sub(0), boundVars));
-            exprs.add(SExprs.coerce(trans.translate(term.sub(1), boundVars), IntegerOpHandler.INT));
+            exprs.add(trans.translate(term.sub(0)));
+            exprs.add(SExprs.coerce(trans.translate(term.sub(1)), IntegerOpHandler.INT));
             String s = String.valueOf(usedBsumTerms.size());
             trans.addDeclaration(bsumOrProdDecl("bsum", s));
             SExpr ret = new SExpr("bsum" + s, IntegerOpHandler.INT, exprs);
@@ -65,8 +64,8 @@ public class SumProdHandler implements SMTHandler {
                 }
             }
             List<SExpr> exprs = new LinkedList<>();
-            exprs.add(trans.translate(term.sub(0), boundVars));
-            exprs.add(SExprs.coerce(trans.translate(term.sub(1), boundVars), IntegerOpHandler.INT));
+            exprs.add(trans.translate(term.sub(0)));
+            exprs.add(SExprs.coerce(trans.translate(term.sub(1)), IntegerOpHandler.INT));
             String s = String.valueOf(usedBprodTerms.size());
             trans.addDeclaration(bsumOrProdDecl("bprod", s));
             SExpr ret = new SExpr("bprod" + s, IntegerOpHandler.INT, exprs);
