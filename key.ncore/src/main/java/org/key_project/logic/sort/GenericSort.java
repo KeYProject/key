@@ -1,0 +1,93 @@
+package org.key_project.logic.sort;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
+
+import java.util.Iterator;
+
+/**
+ * Sort used for generic taclets
+ * <p></p>
+ * Within an SVInstantiations-object a generic sort is instantiated by a concrete sort, which has to
+ * be a subsort of the instantiations of the supersorts of this sort
+ */
+public final class GenericSort extends AbstractSort {
+    /*
+     * A possible instantiation of this generic sort by a concrete sort must satisfy each of these
+     * conditions:
+     *
+     * - if any generic supersort is to be instantiated simultanously, then this instantiation has
+     * to be a supersort of the instantiation of this sort
+     *
+     * - the instantiation of this sort has to be a subsort of every concrete supersort
+     *
+     * - if "oneOf" is not empty, the instantiation must be an element of "oneOf"
+     */
+
+
+    /**
+     * list of sorts this generic sort may be instantiated with; EMPTY_SORT_SORT means that every
+     * sort may be used
+     */
+    private final ImmutableSet<Sort> oneOf;
+
+    /**
+     * creates a generic sort
+     *
+     * @param ext supersorts of this sort, which have to be either concrete sorts or plain generic
+     *        sorts (i.e. not collection sorts of generic sorts)
+     */
+    public GenericSort(Name name, ImmutableSet<Sort> ext, ImmutableSet<Sort> oneOf) {
+        super(name, ext, false);
+        this.oneOf = oneOf;
+    }
+
+
+    public GenericSort(Name name) {
+        super(name, DefaultImmutableSet.nil(), false);
+        this.oneOf = DefaultImmutableSet.nil();
+    }
+
+    /**
+     * @return possible instantiations
+     */
+    public ImmutableSet<Sort> getOneOf() {
+        return oneOf;
+    }
+
+    /**
+     * @return true if "p_s" is a possible instantiation of this sort. This method does not check
+     *         the instantiations of other generic sorts, i.e. the return value true is possible
+     *         even if "p_s" is not a valid instantiation.
+     *
+     *         Use "GenericSortInstantiations" instead
+     */
+    public boolean isPossibleInstantiation(Sort p_s) {
+        return p_s != Sort.FORMULA && (oneOf.isEmpty() || oneOf.contains(p_s))
+                && checkNonGenericSupersorts(p_s);
+    }
+
+    /**
+     * @return true iff "p_s" is subsort of every non-generic supersort of this sort
+     */
+    private boolean checkNonGenericSupersorts(Sort p_s) {
+        Iterator<Sort> it = extendsSorts().iterator();
+        Sort ss;
+
+        while (it.hasNext()) {
+            ss = it.next();
+            if (ss instanceof GenericSort) {
+                if (!((GenericSort) ss).checkNonGenericSupersorts(p_s)) {
+                    return false;
+                }
+            } else {
+                if (!p_s.extendsTrans(ss)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+}
