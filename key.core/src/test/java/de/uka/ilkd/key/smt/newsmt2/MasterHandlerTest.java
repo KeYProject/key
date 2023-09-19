@@ -99,6 +99,8 @@ public class MasterHandlerTest {
                 }
             } catch (Exception e) {
                 LOGGER.error("Error reading {}", file, e);
+                // make sure faulty test cases fail
+                throw e;
             }
         }
         return result;
