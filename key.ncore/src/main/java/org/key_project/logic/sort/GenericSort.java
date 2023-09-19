@@ -1,14 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic.sort;
+
+import java.util.Iterator;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-import java.util.Iterator;
-
 /**
  * Sort used for generic taclets
- * <p></p>
+ * <p>
+ * </p>
  * Within an SVInstantiations-object a generic sort is instantiated by a concrete sort, which has to
  * be a subsort of the instantiations of the supersorts of this sort
  */

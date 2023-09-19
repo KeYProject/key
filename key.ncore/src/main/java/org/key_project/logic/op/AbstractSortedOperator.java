@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic.op;
 
 import org.key_project.logic.Name;
@@ -6,13 +9,14 @@ import org.key_project.logic.Term;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
-public abstract class AbstractSortedOperator extends AbstractOperator implements SortedOperator, Sorted {
+public abstract class AbstractSortedOperator extends AbstractOperator
+        implements SortedOperator, Sorted {
     private static final ImmutableArray<Sort> EMPTY_SORT_LIST = new ImmutableArray<>();
     private final Sort sort;
     private final ImmutableArray<Sort> argSorts;
 
     protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
-                                     ImmutableArray<Boolean> whereToBind, boolean isRigid) {
+            ImmutableArray<Boolean> whereToBind, boolean isRigid) {
         super(name, argSorts == null ? 0 : argSorts.size(), whereToBind, isRigid);
         if (sort == null) {
             throw new NullPointerException("Given sort is null");
@@ -22,13 +26,13 @@ public abstract class AbstractSortedOperator extends AbstractOperator implements
     }
 
     protected AbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, Boolean[] whereToBind,
-                                     boolean isRigid) {
+            boolean isRigid) {
         this(name, new ImmutableArray<>(argSorts), sort,
-                new ImmutableArray<>(whereToBind), isRigid);
+            new ImmutableArray<>(whereToBind), isRigid);
     }
 
     protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
-                                     boolean isRigid) {
+            boolean isRigid) {
         this(name, argSorts, sort, null, isRigid);
     }
 

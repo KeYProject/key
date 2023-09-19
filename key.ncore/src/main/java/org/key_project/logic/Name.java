@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic;
 
 import java.util.Objects;
@@ -14,7 +17,7 @@ public class Name implements Comparable<Name> {
     private static final String NONAME = "_noname_";
 
     private final /** Interned */
-            String nameString;
+    String nameString;
 
     /**
      * creates a name object
