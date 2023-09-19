@@ -9,6 +9,7 @@ configurations { antlr4 }
 
 dependencies {
     api project(':key.util')
+    api project(':key.ncore')
     //api group: group, name: 'recoderkey', version: '1.0'
     api project(':recoder')
     implementation group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
@@ -20,7 +21,7 @@ dependencies {
 
     antlr4 "org.antlr:antlr4:4.13.1"
     api "org.antlr:antlr4-runtime:4.13.1"
-    //implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
+    //implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'sourc
 }
 
 // The target directory for JavaCC (parser generation)
