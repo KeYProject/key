@@ -1,0 +1,14 @@
+plugins {
+}
+
+description "Generic data strutures for terms and formulas without dependencies to a specific target programming language"
+
+configurations { }
+
+dependencies {
+    api project(':key.util')
+}
+
+tasks.withType(Test) {
+    enableAssertions = true
+}
