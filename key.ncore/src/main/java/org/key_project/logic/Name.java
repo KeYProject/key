@@ -14,6 +14,7 @@ import java.util.Objects;
  * stored in their {@linkplain String#intern() interned} representation.
  */
 public class Name implements Comparable<Name> {
+
     private static final String NONAME = "_noname_";
 
     private final /** Interned */
@@ -50,4 +51,5 @@ public class Name implements Comparable<Name> {
     public int hashCode() {
         return nameString.hashCode();
     }
+
 }

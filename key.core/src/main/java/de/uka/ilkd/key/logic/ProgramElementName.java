@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.reference.ReferenceSuffix;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
 
+import org.key_project.logic.Name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

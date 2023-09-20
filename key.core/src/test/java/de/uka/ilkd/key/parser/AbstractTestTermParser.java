@@ -17,6 +17,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import org.key_project.logic.Name;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

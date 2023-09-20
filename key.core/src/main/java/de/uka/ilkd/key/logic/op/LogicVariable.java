@@ -5,7 +5,7 @@ package de.uka.ilkd.key.logic.op;
 
 import java.util.Objects;
 
-import de.uka.ilkd.key.logic.Name;
+import org.key_project.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.util.EqualsModProofIrrelevancy;

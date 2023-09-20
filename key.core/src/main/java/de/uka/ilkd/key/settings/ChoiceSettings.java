@@ -15,7 +15,7 @@ import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
+import org.key_project.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 
 import org.key_project.util.collection.DefaultImmutableSet;

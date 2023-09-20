@@ -8,7 +8,7 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Named;
+import org.key_project.logic.Named;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.rule.TacletForTests;
 

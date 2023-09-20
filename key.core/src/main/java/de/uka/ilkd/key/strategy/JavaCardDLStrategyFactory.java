@@ -6,7 +6,7 @@ package de.uka.ilkd.key.strategy;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.logic.Name;
+import org.key_project.logic.Name;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.definition.AbstractStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.OneOfStrategyPropertyDefinition;

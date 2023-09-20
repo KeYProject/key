@@ -6,7 +6,7 @@ package de.uka.ilkd.key.gui;
 import java.util.*;
 import javax.swing.tree.DefaultTreeModel;
 
-import de.uka.ilkd.key.logic.Name;
+import org.key_project.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;

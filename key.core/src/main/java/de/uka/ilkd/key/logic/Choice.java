@@ -4,6 +4,9 @@
 package de.uka.ilkd.key.logic;
 
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+
 import java.util.List;
 import java.util.Objects;
 

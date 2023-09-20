@@ -5,7 +5,7 @@ package de.uka.ilkd.key.logic.sort;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.Name;
+import org.key_project.logic.Name;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;

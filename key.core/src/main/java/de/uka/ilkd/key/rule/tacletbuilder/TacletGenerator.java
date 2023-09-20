@@ -22,6 +22,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -64,8 +65,8 @@ public class TacletGenerator {
      * reference to self, it is considered as if it were static.
      */
     public Taclet generateAxiomTaclet(Name tacletName, Term originalAxiom,
-            ImmutableList<ProgramVariable> programVars, KeYJavaType kjt, RuleSet ruleSet,
-            TermServices services) {
+                                      ImmutableList<ProgramVariable> programVars, KeYJavaType kjt, RuleSet ruleSet,
+                                      TermServices services) {
         // create schema terms
         final ImmutableList<SchemaVariable> schemaVars = createSchemaVariables(programVars);
         final TermAndBoundVarPair schemaAxiom =

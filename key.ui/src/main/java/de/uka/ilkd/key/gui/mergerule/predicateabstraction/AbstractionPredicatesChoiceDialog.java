@@ -37,6 +37,7 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
+import org.key_project.logic.Name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

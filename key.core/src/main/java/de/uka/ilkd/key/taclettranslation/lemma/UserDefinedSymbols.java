@@ -5,7 +5,7 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.*;
 
-import de.uka.ilkd.key.logic.Named;
+import org.key_project.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.Function;

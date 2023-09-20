@@ -34,6 +34,8 @@ import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 import de.uka.ilkd.key.util.Triple;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
 import org.key_project.util.collection.*;
 
 import org.jspecify.annotations.NonNull;

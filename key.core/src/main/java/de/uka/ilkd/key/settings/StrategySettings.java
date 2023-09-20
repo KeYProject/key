@@ -6,7 +6,7 @@ package de.uka.ilkd.key.settings;
 import java.util.Objects;
 import java.util.Properties;
 
-import de.uka.ilkd.key.logic.Name;
+import org.key_project.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.StopCondition;

@@ -17,6 +17,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.slf4j.Logger;

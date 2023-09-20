@@ -25,6 +25,8 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.util.Pair;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
 
 /**
  * Helper class for are visitor that requires a namespaces and services. Also it provides the

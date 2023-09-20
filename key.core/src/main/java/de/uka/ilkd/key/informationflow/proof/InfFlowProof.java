@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.informationflow.proof;
 
 import de.uka.ilkd.key.informationflow.po.InfFlowProofSymbols;
-import de.uka.ilkd.key.logic.Named;
+import org.key_project.logic.Named;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;

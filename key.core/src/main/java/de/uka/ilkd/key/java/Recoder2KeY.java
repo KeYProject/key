@@ -25,6 +25,8 @@ import de.uka.ilkd.key.util.*;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 

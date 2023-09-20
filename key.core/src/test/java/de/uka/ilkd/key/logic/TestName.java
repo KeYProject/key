@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.logic;
 
 import org.junit.jupiter.api.Test;
+import org.key_project.logic.Name;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

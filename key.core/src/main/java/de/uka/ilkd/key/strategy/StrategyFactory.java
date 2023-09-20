@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.Named;
+import org.key_project.logic.Named;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;

@@ -9,7 +9,7 @@ import java.util.Map;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.ldt.*;
-import de.uka.ilkd.key.logic.Name;
+import org.key_project.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 /**

@@ -18,6 +18,7 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
+import org.key_project.logic.Name;
 import org.key_project.util.lookup.Lookup;
 
 /**
