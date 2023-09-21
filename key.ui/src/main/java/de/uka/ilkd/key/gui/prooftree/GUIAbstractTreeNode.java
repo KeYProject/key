@@ -38,7 +38,12 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
 
     public abstract int getChildCount();
 
+    @Override
     public TreeNode getParent() {
+        if (parent == null && this != tree.getRoot()
+                && !(getNode() != null && ProofTreeViewFilter.hiddenByGlobalFilters(getNode()))) {
+            throw new IllegalStateException("abstract tree node without parent: " + this);
+        }
         return parent;
     }
 
@@ -77,9 +82,9 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
     }
 
     protected GUIAbstractTreeNode findBranch(Node p_node) {
-        TreeNode res = getProofTreeModel().findBranch(p_node);
+        GUIAbstractTreeNode res = getProofTreeModel().findBranch(p_node);
         if (res != null) {
-            return (GUIAbstractTreeNode) res;
+            return res;
         }
 
         String label = ensureBranchLabelIsSet(p_node);
@@ -120,16 +125,22 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
         return noderef.get();
     }
 
+    /**
+     * Get the children of the specified node whilst respecting the configured
+     * global view filters.
+     *
+     * @param n the nodes
+     * @return children nodes
+     */
     protected List<Node> findChild(Node n) {
         if (n.childrenCount() == 1) {
             return List.of(n.child(0));
         }
 
-        /*
-         * if (!getProofTreeModel().globalFilterActive()) {
-         * return List.of();
-         * }
-         */
+        if (!getProofTreeModel().globalFilterActive()
+                && !getProofTreeModel().linearizedModeActive()) {
+            return List.of();
+        }
 
         List<Node> nextN = new ArrayList<>();
         for (int i = 0; i != n.childrenCount(); ++i) {

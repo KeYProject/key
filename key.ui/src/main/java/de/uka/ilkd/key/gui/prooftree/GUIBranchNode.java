@@ -15,7 +15,7 @@ import de.uka.ilkd.key.proof.Node;
  * @see ProofTreeView
  */
 class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
-    private static final String NORM = "Normal Execution";
+    private static final String MAIN_LABEL = "Normal Execution";
 
     private final Object label;
 
@@ -31,6 +31,7 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         childrenCache = new GUIAbstractTreeNode[getChildCountHelp()];
     }
 
+    @Override
     public TreeNode getChildAt(int childIndex) {
         fillChildrenCache();
         return childrenCache[childIndex];
@@ -61,8 +62,10 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
                 break;
             }
             if (nextN.size() > 1) {
-                if (nextN.get(0).getNodeInfo().getBranchLabel() != null
-                        && nextN.get(0).getNodeInfo().getBranchLabel().startsWith(NORM)) {
+                // linearized mode: the main branch will be continued without a new BranchNode
+                if (getProofTreeModel().linearizedModeActive()
+                        && nextN.get(0).getNodeInfo().getBranchLabel() != null
+                        && nextN.get(0).getNodeInfo().getBranchLabel().startsWith(MAIN_LABEL)) {
                     n = nextN.get(0);
                     nextN.remove(0);
                     for (var node : nextN) {
@@ -98,6 +101,7 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         return toString();
     }
 
+    @Override
     public int getChildCount() {
         if (childrenCache == null) {
             createChildrenCache();
@@ -120,8 +124,9 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
                 break;
             }
             if (nextN.size() > 1) {
-                if (nextN.get(0).getNodeInfo().getBranchLabel() != null
-                        && nextN.get(0).getNodeInfo().getBranchLabel().startsWith(NORM)) {
+                if (getProofTreeModel().linearizedModeActive()
+                        && nextN.get(0).getNodeInfo().getBranchLabel() != null
+                        && nextN.get(0).getNodeInfo().getBranchLabel().startsWith(MAIN_LABEL)) {
                     n = nextN.get(0);
                     count += nextN.size() - 1;
                     continue;
@@ -149,6 +154,7 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         }
     }
 
+    @Override
     public boolean isLeaf() {
         return false;
     }

@@ -38,6 +38,7 @@ public class ProofTreeSettingsMenuFactory {
             }
             menu.addSeparator();
 
+            menu.add(createLinearizedModeToggle(view));
             menu.add(createExpandOSSToggle(view));
             menu.add(createTacletInfoToggle());
             return menu;
@@ -106,6 +107,19 @@ public class ProofTreeSettingsMenuFactory {
             }
         });
         return button;
+    }
+
+    private static CCheckBox createLinearizedModeToggle(ProofTreeView view) {
+        CCheckBox check = new CCheckBox() {
+            @Override
+            protected void changed() {
+                final boolean selected = isSelected();
+                view.setLinearizedMode(selected);
+            }
+        };
+        check.setText("Linearize Proof Tree");
+        check.setSelected(view.isLinearizedMode());
+        return check;
     }
 
     private static CCheckBox createExpandOSSToggle(ProofTreeView view) {

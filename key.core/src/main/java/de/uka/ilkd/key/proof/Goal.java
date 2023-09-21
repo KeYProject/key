@@ -636,19 +636,17 @@ public final class Goal {
 
         proof.getServices().saveNameRecorder(n);
 
-        if (goalList != null) { // TODO: can goalList be null?
-            if (goalList.isEmpty()) {
-                proof.closeGoal(this);
-            } else {
-                proof.replace(this, goalList);
-                if (ruleApp instanceof TacletApp && ((TacletApp) ruleApp).taclet().closeGoal()) {
-                    // the first new goal is the one to be closed
-                    proof.closeGoal(goalList.head());
-                }
-                if (ruleApp instanceof SMTRuleApp) {
-                    // the first new goal is the one to be closed
-                    proof.closeGoal(goalList.head());
-                }
+        if (goalList.isEmpty()) {
+            proof.closeGoal(this);
+        } else {
+            proof.replace(this, goalList);
+            if (ruleApp instanceof TacletApp && ((TacletApp) ruleApp).taclet().closeGoal()) {
+                // the first new goal is the one to be closed
+                proof.closeGoal(goalList.head());
+            }
+            if (ruleApp instanceof SMTRuleApp) {
+                // the first new goal is the one to be closed
+                proof.closeGoal(goalList.head());
             }
         }
 
