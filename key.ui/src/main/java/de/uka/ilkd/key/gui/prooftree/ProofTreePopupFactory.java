@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.awt.event.ActionEvent;
@@ -38,8 +41,7 @@ public class ProofTreePopupFactory {
         // filter out nodes with only OSS children (i.e., OSS nodes are not expanded)
         // (take care to not filter out any GUIBranchNodes accidentally!)
         Object o = tp.getLastPathComponent();
-        if (o instanceof GUIProofTreeNode) {
-            GUIProofTreeNode n = ((GUIProofTreeNode) o);
+        if (o instanceof GUIProofTreeNode n) {
             if (n.getNode().getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
                 return false;
             }

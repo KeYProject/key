@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
@@ -135,11 +138,10 @@ public class LDTInput implements EnvInput {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof LDTInput)) {
+        if (!(o instanceof LDTInput li)) {
             return false;
         }
 
-        LDTInput li = (LDTInput) o;
         if (keyFiles.length != li.keyFiles.length) {
             return false;
         }

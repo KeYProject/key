@@ -1,9 +1,7 @@
-/*
- * Created on 17.03.2006
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation.java5to4;
 
 import java.util.ArrayList;
@@ -54,8 +52,7 @@ public class MakeConditionalCompatible extends TwoPassTransformation {
         TreeWalker tw = new TreeWalker(root);
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
-            if (pe instanceof Conditional) {
-                Conditional c = (Conditional) pe;
+            if (pe instanceof Conditional c) {
                 Type t = getSourceInfo().getType(c);
                 Type e1 = getSourceInfo().getType(c.getExpressionAt(1));
                 Type e2 = getSourceInfo().getType(c.getExpressionAt(2));

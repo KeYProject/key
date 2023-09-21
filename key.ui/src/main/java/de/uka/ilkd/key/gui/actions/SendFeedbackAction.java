@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.*;
@@ -356,6 +359,7 @@ public class SendFeedbackAction extends AbstractAction {
                         + "e-mail to " + FEEDBACK_RECIPIENT + ".", jfc.getSelectedFile()));
             }
         } catch (Exception e) {
+            LOGGER.error("", e);
             IssueDialog.showExceptionDialog(parent, e);
         }
     }
@@ -399,6 +403,7 @@ public class SendFeedbackAction extends AbstractAction {
             }
 
         } catch (Exception e) {
+            LOGGER.error("", e);
             IssueDialog.showExceptionDialog(parent, e);
         }
     }

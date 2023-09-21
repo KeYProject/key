@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing;
 
 import java.io.File;
@@ -228,6 +231,9 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
             filename = MiscTools.removeFileExtension(currentProof.getProofFile().getName());
         } else {
             filename = MiscTools.removeFileExtension(currentProof.name().toString());
+            // make sure that no special chars are in name (e.g., "Taclet: seqPerm ..." for taclet
+            // proofs)
+            filename = MiscTools.toValidFileName(filename);
         }
         int prevSlice = filename.indexOf("_slice");
         if (prevSlice != -1) {

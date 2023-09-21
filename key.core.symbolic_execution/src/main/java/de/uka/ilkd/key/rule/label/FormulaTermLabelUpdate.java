@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.label;
 
 import java.util.Collections;
@@ -50,8 +53,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
             Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Operator newTermOp,
             ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars,
             JavaBlock newTermJavaBlock, Set<TermLabel> labels) {
-        if (hint instanceof TacletLabelHint) {
-            TacletLabelHint tacletHint = (TacletLabelHint) hint;
+        if (hint instanceof TacletLabelHint tacletHint) {
             if ((TacletOperation.ADD_ANTECEDENT.equals(tacletHint.getTacletOperation())
                     || TacletOperation.ADD_SUCCEDENT.equals(tacletHint.getTacletOperation()))
                     && (TruthValueTracingUtil.isPredicate(newTermOp)
@@ -59,8 +61,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
                 if (getTermLabel(labels, FormulaTermLabel.NAME) == null) {
                     TermLabel label = TermLabelManager.findInnerMostParentLabel(
                         applicationPosInOccurrence, FormulaTermLabel.NAME);
-                    if (label instanceof FormulaTermLabel) {
-                        FormulaTermLabel oldLabel = (FormulaTermLabel) label;
+                    if (label instanceof FormulaTermLabel oldLabel) {
                         int labelSubID = FormulaTermLabel.newLabelSubID(services, oldLabel);
                         FormulaTermLabel newLabel = new FormulaTermLabel(oldLabel.getMajorId(),
                             labelSubID, Collections.singletonList(oldLabel.getId()));
@@ -72,8 +73,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
                 }
             }
         }
-        if (ruleApp instanceof TacletApp) {
-            TacletApp ta = (TacletApp) ruleApp;
+        if (ruleApp instanceof TacletApp ta) {
             if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {
                 Map<SequentFormula, FormulaTermLabel> ifLabels =
                     new LinkedHashMap<>();

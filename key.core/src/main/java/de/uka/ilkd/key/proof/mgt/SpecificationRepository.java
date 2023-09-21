@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.mgt;
 
 import java.net.URI;
@@ -205,10 +208,9 @@ public final class SpecificationRepository {
     private IObserverFunction getCanonicalFormForKJT(IObserverFunction obs, KeYJavaType kjt) {
         assert obs != null;
         assert kjt != null;
-        if (!(obs instanceof IProgramMethod) || obs.getContainerType().equals(kjt)) {
+        if (!(obs instanceof IProgramMethod pm) || obs.getContainerType().equals(kjt)) {
             return unlimitObs(obs);
         }
-        final IProgramMethod pm = (IProgramMethod) obs;
         if (pm.isConstructor()) {
             assert pm.getContainerType().equals(kjt);
             return pm;

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.beans.PropertyChangeListener;
@@ -235,6 +238,15 @@ public class Proof implements Named {
         if (closed()) {
             fireProofClosed();
         }
+    }
+
+    public Proof(String name, Term problem, String header, InitConfig initConfig, File proofFile) {
+        this(name,
+            Sequent.createSuccSequent(
+                Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(problem)).semisequent()),
+            initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(), initConfig);
+        problemHeader = header;
+        this.proofFile = proofFile;
     }
 
     public Proof(String name, Term problem, String header, InitConfig initConfig) {
@@ -522,8 +534,7 @@ public class Proof implements Named {
 
 
     /**
-     * Add the given constraint to the closure constraint of the given goal, i.e. the given goal is
-     * closed if p_c is satisfied.
+     * Close the given goals and all goals in the subtree below it.
      *
      * @param goalToClose the goal to close.
      */
@@ -535,6 +546,7 @@ public class Proof implements Named {
         Iterator<Node> it = closedSubtree.leavesIterator();
         Goal goal;
 
+        // close all goals below the given goalToClose
         while (it.hasNext()) {
             goal = getOpenGoal(it.next());
             if (goal != null) {
@@ -694,9 +706,7 @@ public class Proof implements Named {
                 }
 
                 // Merge rule applications: Unlink all merge partners.
-                if (visitedNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
-                    final MergeRuleBuiltInRuleApp mergeApp =
-                        (MergeRuleBuiltInRuleApp) visitedNode.getAppliedRuleApp();
+                if (visitedNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp mergeApp) {
 
                     for (MergePartner mergePartner : mergeApp.getMergePartners()) {
                         final Goal linkedGoal = mergePartner.getGoal();
@@ -1469,7 +1479,7 @@ public class Proof implements Named {
             if (c == null) {
                 continue;
             }
-            if (referencedFrom != null && referencedFrom != c.getProof()) {
+            if (referencedFrom != null && referencedFrom != c.proof()) {
                 continue;
             }
             todo.add(g);
@@ -1482,7 +1492,7 @@ public class Proof implements Named {
             ClosedBy c = g.node().lookup(ClosedBy.class);
             g.node().deregister(c, ClosedBy.class);
             try {
-                new CopyingProofReplayer(c.getProof(), this).copy(c.getNode(), g);
+                new CopyingProofReplayer(c.proof(), this).copy(c.node(), g);
             } catch (IntermediateProofReplayer.BuiltInConstructionException e) {
                 throw new RuntimeException(e);
             }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.macros;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -61,11 +64,9 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
         final Services services = proof.getServices();
 
         final RuleApp app = goals.head().node().parent().getAppliedRuleApp();
-        if (!(app instanceof BlockContractInternalBuiltInRuleApp)) {
+        if (!(app instanceof BlockContractInternalBuiltInRuleApp blockRuleApp)) {
             return false;
         }
-        final BlockContractInternalBuiltInRuleApp blockRuleApp =
-            (BlockContractInternalBuiltInRuleApp) app;
         final BlockContract contract = blockRuleApp.getContract();
         final IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
         if (ifVars == null) {

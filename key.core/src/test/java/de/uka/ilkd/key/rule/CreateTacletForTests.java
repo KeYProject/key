@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 
@@ -218,8 +221,14 @@ public class CreateTacletForTests extends AbstractTestTermParser {
     public void setUp() throws IOException {
         nss = new NamespaceSet();
 
-        parseDecls("\\sorts { Nat; testSort1; }\n" + "\\schemaVariables {\n" + "  \\formula b,b0;\n"
-            + "  \\term testSort1 x;\n" + "  \\variables testSort1 z;\n" + "}\n");
+        parseDecls("""
+                \\sorts { Nat; testSort1; }
+                \\schemaVariables {
+                  \\formula b,b0;
+                  \\term testSort1 x;
+                  \\variables testSort1 z;
+                }
+                """);
 
         sort1 = nss.sorts().lookup(new Name("testSort1"));
         nat = nss.sorts().lookup(new Name("Nat"));

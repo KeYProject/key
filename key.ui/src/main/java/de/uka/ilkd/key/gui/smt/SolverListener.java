@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Color;
@@ -203,11 +206,12 @@ public class SolverListener implements SolverLauncherListener {
 
     private void applyResults() {
         KeYMediator mediator = MainWindow.getInstance().getMediator();
-        mediator.stopInterface(true);
+        // To ensure that the next goal is selected correctly, do not fully stop the interface here!
+        mediator.stopInterface(false);
         try {
             new ProofSMTApplyUserAction(mediator, smtProof, problems).actionPerformed(null);
         } finally {
-            mediator.startInterface(true);
+            mediator.startInterface(false);
         }
 
     }
@@ -320,13 +324,19 @@ public class SolverListener implements SolverLauncherListener {
 
     private void discardEvent(final SolverLauncher launcher) {
         launcher.stop();
-        progressDialog.setVisible(false);
+        progressDialog.dispose();
     }
 
     private void applyEvent(final SolverLauncher launcher) {
         launcher.stop();
         applyResults();
-        progressDialog.setVisible(false);
+        /*
+         * Previously, the progressDialog was only made invisible which enabled users to
+         * click the apply button more than once, each time creating a new SMT goal.
+         * Disposing of the dialog is fine as it is created anew each time a SolverLauncher
+         * is started anyway (see #launcherStarted(), #prepareDialog()).
+         */
+        progressDialog.dispose();
     }
 
     @Override

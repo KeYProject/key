@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.StringReader;
@@ -41,12 +44,9 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactor
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.smt.RuleAppSMT;
-import de.uka.ilkd.key.smt.SMTFocusResults;
-import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
-import de.uka.ilkd.key.smt.SolverLauncher;
-import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.Pair;
@@ -216,8 +216,7 @@ public class IntermediateProofReplayer {
                         queue.addFirst(new Pair<>(currNode,
                             currNodeInterm.getChildren().get(0)));
                     }
-                } else if (currNodeInterm instanceof AppNodeIntermediate) {
-                    AppNodeIntermediate currInterm = (AppNodeIntermediate) currNodeInterm;
+                } else if (currNodeInterm instanceof AppNodeIntermediate currInterm) {
 
                     currNode.getNodeInfo().setNotes(currInterm.getNotes());
 
@@ -262,8 +261,7 @@ public class IntermediateProofReplayer {
                         BuiltInAppIntermediate appInterm =
                             (BuiltInAppIntermediate) currInterm.getIntermediateRuleApp();
 
-                        if (appInterm instanceof MergeAppIntermediate) {
-                            MergeAppIntermediate joinAppInterm = (MergeAppIntermediate) appInterm;
+                        if (appInterm instanceof MergeAppIntermediate joinAppInterm) {
                             HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodesInfo =
                                 joinPartnerNodes.get(((MergeAppIntermediate) appInterm).getId());
 
@@ -325,10 +323,8 @@ public class IntermediateProofReplayer {
                                         e);
                                 }
                             }
-                        } else if (appInterm instanceof MergePartnerAppIntermediate) {
+                        } else if (appInterm instanceof MergePartnerAppIntermediate joinPartnerApp) {
                             // Register this partner node
-                            MergePartnerAppIntermediate joinPartnerApp =
-                                (MergePartnerAppIntermediate) appInterm;
                             HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodeInfo =
                                 joinPartnerNodes.computeIfAbsent(joinPartnerApp.getMergeNodeId(),
                                     k -> new HashSet<>());
@@ -581,7 +577,7 @@ public class IntermediateProofReplayer {
             }
         }
 
-        if (RuleAppSMT.RULE.name().toString().equals(ruleName)) {
+        if (SMTRuleApp.RULE.name().toString().equals(ruleName)) {
             if (!ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().isEnableOnLoad()) {
                 status = SMT_NOT_RUN;
                 throw new SkipSMTRuleException();
@@ -625,12 +621,11 @@ public class IntermediateProofReplayer {
                 throw new SkipSMTRuleException();
             } else {
                 String name = smtProblem.getSuccessfulSolver().name();
-                Optional<ImmutableList<PosInOccurrence>> unsatCore =
-                    SMTFocusResults.getUnsatCore(smtProblem);
-                if (unsatCore.isPresent()) {
-                    return RuleAppSMT.RULE.createApp(name, unsatCore.get());
+                ImmutableList<PosInOccurrence> unsatCore = SMTFocusResults.getUnsatCore(smtProblem);
+                if (unsatCore != null) {
+                    return SMTRuleApp.RULE.createApp(name, unsatCore);
                 } else {
-                    return RuleAppSMT.RULE.createApp(name);
+                    return SMTRuleApp.RULE.createApp(name);
                 }
             }
         }

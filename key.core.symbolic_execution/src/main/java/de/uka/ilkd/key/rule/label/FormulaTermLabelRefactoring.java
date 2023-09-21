@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.label;
 
 import java.util.*;
@@ -190,8 +193,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
             Services services, List<TermLabel> labels) {
         if (goal != null && !isInnerMostParentRefactored(state, goal)) {
             TermLabel existingLabel = term.getLabel(FormulaTermLabel.NAME);
-            if (existingLabel instanceof FormulaTermLabel) {
-                FormulaTermLabel pLabel = (FormulaTermLabel) existingLabel;
+            if (existingLabel instanceof FormulaTermLabel pLabel) {
                 int labelID = pLabel.getMajorId();
                 int labelSubID = FormulaTermLabel.newLabelSubID(services, labelID);
                 labels.remove(existingLabel);
@@ -408,7 +410,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
         Set<SequentFormula> sfSet =
             (Set<SequentFormula>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
         if (sfSet == null) {
-            sfSet = new LinkedHashSet<SequentFormula>();
+            sfSet = new LinkedHashSet<>();
             labelState.put(SEQUENT_FORMULA_REFACTORING_REQUIRED, sfSet);
         }
         sfSet.add(sf);

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
 import javax.annotation.Nonnull;
@@ -59,8 +62,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         if (cost instanceof TopRuleAppCost) {
             return cost.mul(this);
         }
-        if (cost instanceof NumberRuleAppCost) {
-            NumberRuleAppCost numberRuleAppCost = (NumberRuleAppCost) cost;
+        if (cost instanceof NumberRuleAppCost numberRuleAppCost) {
             return create(getValue() * numberRuleAppCost.getValue());
         }
         throw new IllegalArgumentException();

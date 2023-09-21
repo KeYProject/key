@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.ArrayList;
@@ -99,11 +102,9 @@ public class SMTTacletTranslator {
         }
 
         List<QuantifiableVariable> qvars = new ArrayList<>();
-        if (op instanceof Quantifier) {
-            Quantifier q = (Quantifier) op;
+        if (op instanceof Quantifier q) {
             for (QuantifiableVariable boundVar : term.boundVars()) {
-                if (boundVar instanceof SchemaVariable) {
-                    SchemaVariable sv = (SchemaVariable) boundVar;
+                if (boundVar instanceof SchemaVariable sv) {
                     LogicVariable lv =
                         variables.computeIfAbsent(sv, x -> new LogicVariable(x.name(), x.sort()));
                     qvars.add(lv);

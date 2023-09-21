@@ -6,17 +6,16 @@ on:
 
 jobs:
   doc:
-    # later limit to master only!
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - run: ls -ld
       - run: ls -lh 'gradle'
 
-      - name: Set up JDK 11
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          java-version: '17'
           distribution: 'temurin'
 
       - name: Build with Gradle

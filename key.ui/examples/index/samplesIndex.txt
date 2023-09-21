@@ -48,7 +48,6 @@ heap/permutedSum/README.txt
 heap/quicksort/README.txt
 
 # Dynamic Frames
-firstTouch/07-Cell/README.txt
 ## Block & Loop Contracts
 heap/block_loop_contracts/Simple/README.txt
 heap/block_loop_contracts/Divide/README.txt

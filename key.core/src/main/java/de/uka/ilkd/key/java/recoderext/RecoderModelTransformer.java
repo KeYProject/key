@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.*;
@@ -302,8 +305,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
 
         public void walk(SourceElement s) {
             s.accept(this);
-            if (s instanceof NonTerminalProgramElement) {
-                final NonTerminalProgramElement pe = (NonTerminalProgramElement) s;
+            if (s instanceof NonTerminalProgramElement pe) {
                 for (int i = 0, sz = pe.getChildCount(); i < sz; i++) {
                     walk(pe.getChildAt(i));
                 }
@@ -349,8 +351,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
             if (s instanceof TypeDeclaration) {
                 types.add((TypeDeclaration) s);
             }
-            if (s instanceof NonTerminalProgramElement) {
-                final NonTerminalProgramElement pe = (NonTerminalProgramElement) s;
+            if (s instanceof NonTerminalProgramElement pe) {
                 for (int i = 0, sz = pe.getChildCount(); i < sz; i++) {
                     walk(pe.getChildAt(i));
                 }
