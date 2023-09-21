@@ -27,9 +27,8 @@ import org.slf4j.LoggerFactory;
  */
 public final class SwingUtil {
     public static final Logger LOGGER = LoggerFactory.getLogger(SwingUtil.class);
+    private static final String NOTIFICATION_ERROR = "failed to show notification ";
 
-    private static boolean notifySendAvailable = false;
-    private static boolean notifySendChecked = false;
 
     private SwingUtil() {
     }
@@ -197,46 +196,46 @@ public final class SwingUtil {
      * @param text text of the notification
      */
     public static void showNotification(String title, String text) {
-        // Linux: try notify-send first (looks better)
-        if (System.getProperty("os.name").equals("Linux")) {
-            if (!notifySendChecked) {
-                notifySendChecked = true;
-                notifySendAvailable = true;
-                try {
-                    new ProcessBuilder(
-                        "notify-send",
-                        "-?").start().waitFor();
-                } catch (IOException | InterruptedException e) {
-                    LOGGER.warn("notify-send is not available (will not display notifications!)");
-                    notifySendAvailable = false;
-                }
-            }
-            if (!notifySendAvailable) {
-                // the default Swing notification on Linux looks hideous
-                // => do not notify!
-                return;
-            }
+        if (System.getProperty("os.name").startsWith("Linux")) {
+            // Linux: try notify-send (looks better than SystemTray)
+            String exe = "notify-send";
             try {
-                new ProcessBuilder(
-                    "notify-send",
-                    "-a", "KeY", title, text).start().waitFor();
+                new CheckedProcessBuilder(exe, new String[] { exe, "-?" })
+                        .start(exe, "-a", "KeY", title, text);
             } catch (IOException | InterruptedException e) {
                 // since we checked for notify-send previously, this error is unlikely
-                LOGGER.warn("failed to show notification ", e);
+                LOGGER.warn(NOTIFICATION_ERROR, e);
+            }
+        } else if (System.getProperty("os.name").startsWith("Mac")) {
+            // macOS: show a native notification
+            String exe = "osascript";
+            try {
+                new CheckedProcessBuilder(exe, new String[] { exe, "-e", "return \"\"" })
+                        .start(exe, "-e",
+                            "display notification \"%s\" with title \"%s\"".formatted(text, title));
+            } catch (IOException | InterruptedException e) {
+                // since we checked for osascript previously, this error is unlikely
+                LOGGER.warn(NOTIFICATION_ERROR, e);
             }
         } else {
+            // else: use the Java API
+            // this will show a native notification on Windows 10/11 at least
             SystemTray tray = null;
             TrayIcon trayIcon = null;
             try {
                 tray = SystemTray.getSystemTray();
+                if (tray == null) {
+                    LOGGER.warn(NOTIFICATION_ERROR + "(tray null)");
+                    return;
+                }
 
                 trayIcon = new TrayIcon(IconFactory.keyLogo(), "KeY");
                 // Let the system resize the image if needed
                 trayIcon.setImageAutoSize(true);
                 tray.add(trayIcon);
-                trayIcon.displayMessage(title, text, TrayIcon.MessageType.INFO);
+                trayIcon.displayMessage(title, text, TrayIcon.MessageType.NONE);
             } catch (AWTException e) {
-                LOGGER.warn("failed to show notification ", e);
+                LOGGER.warn(NOTIFICATION_ERROR, e);
             } finally {
                 if (tray != null && trayIcon != null) {
                     tray.remove(trayIcon);
