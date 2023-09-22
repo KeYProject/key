@@ -285,7 +285,10 @@ public final class OneStepSimplifier implements BuiltInRule {
             }
 
             // do replace-known until done
-            while (!applicableCheck && pos.posInTerm().existsSubTerm(result.formula())) {
+            while (!applicableCheck) {
+                while (!pos.posInTerm().existsSubTerm(result.formula()) && pos.isTopLevel()) {
+                    pos = pos.up();
+                }
                 Term replacedKnown = replaceKnownHelper(context, result.formula(), pos.isInAntec(),
                     ifInsts, protocol, services, goal, ruleApp, pos.posInTerm());
                 if (replacedKnown != null && replacedKnown != result.formula()) {
@@ -344,25 +347,15 @@ public final class OneStepSimplifier implements BuiltInRule {
         SequentFormula result;
         if (bottomUp[indexNr]) {
             result = simplifySub(goal, services, pos, indexNr, protocol, context, ifInsts, ruleApp);
-            var p = result != null ? new PosInOccurrence(result, pos.posInTerm(), pos.isInAntec())
-                    : pos;
-            if (p.subTermExists()) {
-                SequentFormula resultPos =
-                    simplifyPos(goal, services, p, indexNr, protocol, context, ifInsts, ruleApp);
-                if (resultPos != null) {
-                    result = resultPos;
-                }
+            if (result == null) {
+                result =
+                    simplifyPos(goal, services, pos, indexNr, protocol, context, ifInsts, ruleApp);
             }
         } else {
             result = simplifyPos(goal, services, pos, indexNr, protocol, context, ifInsts, ruleApp);
-            var p = result != null ? new PosInOccurrence(result, pos.posInTerm(), pos.isInAntec())
-                    : pos;
-            if (p.subTermExists()) {
-                SequentFormula resultSub =
-                    simplifySub(goal, services, p, indexNr, protocol, context, ifInsts, ruleApp);
-                if (resultSub != null) {
-                    result = resultSub;
-                }
+            if (result == null) {
+                result =
+                    simplifySub(goal, services, pos, indexNr, protocol, context, ifInsts, ruleApp);
             }
         }
 
