@@ -30,8 +30,11 @@ dependencies {
     implementation("org.kordamp.ikonli:ikonli-material2-pack:12.3.1")
     implementation("org.kordamp.ikonli:ikonli-fontawesome-pack:12.3.1")
     implementation("org.kordamp.ikonli:ikonli-javafx:12.3.1")
-//    implementation("io.github.palexdev:materialfx:11.16.1")
-    implementation("com.pixelduke:fxribbon:1.2.2")
+
+    implementation("net.raumzeitfalle.fx:scenic-view:11.0.2")
+
+    //implementation("io.github.palexdev:materialfx:11.16.1")
+    //implementation("com.pixelduke:fxribbon:1.2.2")
     testImplementation(kotlin("test"))
 }
 
@@ -50,5 +53,6 @@ kotlin {
 
 javafx {
     version = "20"
-    modules("javafx.controls", "javafx.fxml")
+    modules("javafx.controls", "javafx.fxml",
+        /*"javafx.web", "javafx.swing"*/)
 }

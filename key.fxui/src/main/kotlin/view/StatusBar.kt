@@ -3,10 +3,7 @@ package io.github.wadoon.key.view
 import javafx.scene.control.Label
 import org.kordamp.ikonli.Ikon
 import org.kordamp.ikonli.javafx.FontIcon
-import tornadofx.FXEvent
-import tornadofx.View
-import tornadofx.getValue
-import tornadofx.setValue
+import tornadofx.*
 
 /**
  *
@@ -14,7 +11,11 @@ import tornadofx.setValue
  * @version 1 (11.09.23)
  */
 class StatusBar : View() {
-    override val root = Label()
+    override val root = label {
+        style {
+            padding = box(0.2.em)
+        }
+    }
 
     val graphicProperty = root.graphicProperty()
     var graphic by graphicProperty
@@ -31,3 +32,4 @@ class StatusBar : View() {
 }
 
 data class SetStatusBar(val text: String, val icon: Ikon? = null) : FXEvent()
+

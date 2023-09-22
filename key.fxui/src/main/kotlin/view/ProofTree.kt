@@ -10,17 +10,14 @@ import javafx.beans.Observable
 import javafx.beans.property.*
 import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections
-import javafx.collections.ObservableMap
 import javafx.event.EventHandler
 import javafx.geometry.Side
 import javafx.scene.control.ContextMenu
-import javafx.scene.control.Label
 import javafx.scene.control.TreeCell
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
 import javafx.scene.control.cell.TextFieldTreeCell
 import javafx.scene.input.ContextMenuEvent
-import javafx.scene.layout.Priority
 import javafx.util.StringConverter
 import org.kordamp.ikonli.fontawesome.FontAwesome
 import org.kordamp.ikonli.javafx.FontIcon
@@ -96,12 +93,8 @@ class ProofTree : View("Proof Tree", FontIcon(Material2AL.ACCOUNT_TREE)) {
 
     init {
         treeCreation = TreeTransformationKey()
-        treeView.setCellFactory { nodeTreeView: TreeView<TreeNode> ->
-            cellFactory(
-                nodeTreeView
-            )
-        }
-        globalData.selectedProofProperty.fxProperty.addListener { _: Observable? -> init() }
+        treeView.setCellFactory { nodeTreeView: TreeView<TreeNode> -> cellFactory(nodeTreeView) }
+        globalData.selectedProofProperty.addListener { _: Observable? -> init() }
         proof.addListener { _: ObservableValue<out Proof?>?, old: Proof?, n: Proof? ->
             old?.removeProofTreeListener(proofTreeListener)
             n?.addProofTreeListener(proofTreeListener)
@@ -143,7 +136,9 @@ class ProofTree : View("Proof Tree", FontIcon(Material2AL.ACCOUNT_TREE)) {
     }
 */
 
-    private fun init() {}
+    private fun init() {
+        globalData.selectedProofProperty.onChange { repopulate() }
+    }
     private fun cellFactory(nodeTreeView: TreeView<TreeNode>): TreeCell<TreeNode> {
         val tftc: TextFieldTreeCell<TreeNode> = TextFieldTreeCell<TreeNode>()
         val stringConverter: StringConverter<TreeNode> = object : StringConverter<TreeNode>() {
@@ -155,13 +150,13 @@ class ProofTree : View("Proof Tree", FontIcon(Material2AL.ACCOUNT_TREE)) {
                 return null
             }
         }
-        tftc.setConverter(stringConverter)
+        tftc.converter = stringConverter
         tftc.itemProperty()
-            .addListener({ p: ObservableValue<out TreeNode?>?, o: TreeNode?, n: TreeNode? ->
+            .addListener { _: ObservableValue<out TreeNode?>?, _: TreeNode?, n: TreeNode? ->
                 if (n != null) repaint(
                     tftc
                 )
-            })
+            }
         return tftc
     }
 
@@ -181,29 +176,6 @@ class ProofTree : View("Proof Tree", FontIcon(Material2AL.ACCOUNT_TREE)) {
                 }
             }
         }
-        //TODO for Screenshot tftc.setStyle("-fx-font-size: 18pt");
-        /* if (colorOfNodes.containsKey(n)) {
-                tftc.setStyle("-fx-border-color: "+colorOfNodes.get(n)+";");
-            }*/
-
-
-        //System.out.println("colorOfNodes = " + colorOfNodes);
-    }
-
-    fun colorOfNodesProperty(): MapProperty<Node, String> {
-        return colorOfNodes
-    }
-
-    fun getColorOfNodes(): ObservableMap<Node, String> {
-        return colorOfNodes.get()
-    }
-
-    fun setColorOfNodes(colorOfNodes: ObservableMap<Node?, String?>) {
-        this.colorOfNodes.set(colorOfNodes)
-    }
-
-    private fun populate(label: String, node: Node): TreeItem<TreeNode>? {
-        return null
     }
 
     fun repopulate() {
@@ -270,7 +242,7 @@ class ProofTree : View("Proof Tree", FontIcon(Material2AL.ACCOUNT_TREE)) {
     }
 
 
-    fun createProofTreeContextMenu(proofTree: ProofTree): ContextMenu = contextmenu() {
+    fun createProofTreeContextMenu(proofTree: ProofTree): ContextMenu = contextmenu {
         item("Refresh", graphic = FontIcon(Material2MZ.REFRESH)) {
             proofTree.repopulate()
         }

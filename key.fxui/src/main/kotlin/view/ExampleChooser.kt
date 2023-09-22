@@ -38,6 +38,8 @@ class ExampleChooser(val examplesDir: File) : Dialog<File>() {
 
     private val root = splitpane {
         titledpane("Examples") {
+            isAnimated=false
+            isCollapsible=false
             val examples = listExamples(examplesDir)
             val root = TreeValue("/")
             examples.forEach { addToRoot(it, root, it.path.iterator()) }
@@ -54,7 +56,7 @@ class ExampleChooser(val examplesDir: File) : Dialog<File>() {
         tabPane = tabpane {
 
         }
-        setDividerPositions(300.0)
+        setDividerPositions(.3)
     }
 
     init {
