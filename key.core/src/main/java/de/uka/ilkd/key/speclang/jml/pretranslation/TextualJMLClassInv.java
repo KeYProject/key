@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.JmlParser;
@@ -42,10 +45,9 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TextualJMLClassInv)) {
+        if (!(o instanceof TextualJMLClassInv ci)) {
             return false;
         }
-        TextualJMLClassInv ci = (TextualJMLClassInv) o;
         return mods.equals(ci.mods) && inv.equals(ci.inv);
     }
 

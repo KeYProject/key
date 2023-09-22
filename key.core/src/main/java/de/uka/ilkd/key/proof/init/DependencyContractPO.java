@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
@@ -250,10 +253,9 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof DependencyContractPO)) {
+        if (!(po instanceof DependencyContractPO cPO)) {
             return false;
         }
-        DependencyContractPO cPO = (DependencyContractPO) po;
         return contract.equals(cPO.contract);
     }
 

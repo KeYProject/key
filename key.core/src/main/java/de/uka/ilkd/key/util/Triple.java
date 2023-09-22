@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 
@@ -45,10 +48,9 @@ public class Triple<T1, T2, T3> {
 
 
     public boolean equals(Object o) {
-        if (!(o instanceof Triple<?, ?, ?>)) {
+        if (!(o instanceof Triple<?, ?, ?> p)) {
             return false;
         }
-        Triple<?, ?, ?> p = (Triple<?, ?, ?>) o;
         return Objects.equals(first, p.first) && Objects.equals(second, p.second)
                 && Objects.equals(third, p.third);
     }

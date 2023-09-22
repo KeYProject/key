@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.event.ActionEvent;
@@ -135,8 +138,7 @@ final class ChaosMonkey {
                 for (int i = 0; i < 100; i++) {
                     int actionIdx = rand.nextInt(actions.size());
                     var action = actions.get(actionIdx);
-                    if (action instanceof JButton) {
-                        JButton button = (JButton) action;
+                    if (action instanceof JButton button) {
                         // only enabled buttons
                         // (the "Show log" button is broken in test cases)
                         if (!button.isEnabled() || (button.getToolTipText() != null
@@ -152,8 +154,7 @@ final class ChaosMonkey {
                             container = container.getParent();
                         }
                         for (var x : hierarchy) {
-                            if (x instanceof AbstractDockable) {
-                                AbstractDockable c = (AbstractDockable) x;
+                            if (x instanceof AbstractDockable c) {
                                 LOGGER.info(" {}", c.getTitleText());
                             } else {
                                 LOGGER.info(" {}", x);
@@ -169,8 +170,7 @@ final class ChaosMonkey {
                         });
                         foundButton = true;
                         break;
-                    } else if (action instanceof Action) {
-                        Action keyAction = (Action) action;
+                    } else if (action instanceof Action keyAction) {
                         if (!keyAction.isEnabled()
                                 || BANNED_KEY_ACTIONS.contains(keyAction.getClass())
                                 || BANNED_KEY_ACTIONS_BY_CLASS_NAME

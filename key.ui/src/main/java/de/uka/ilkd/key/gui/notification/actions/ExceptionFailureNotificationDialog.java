@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.notification.actions;
 
 import java.awt.Frame;
@@ -20,8 +23,7 @@ public class ExceptionFailureNotificationDialog extends ShowDisplayPane {
 
     @Override
     public boolean execute(NotificationEvent event) {
-        if (event instanceof ExceptionFailureEvent) {
-            ExceptionFailureEvent ev = (ExceptionFailureEvent) event;
+        if (event instanceof ExceptionFailureEvent ev) {
             setMessage(ev.getErrorMessage());
             LOGGER.error(ev.getErrorMessage(), ev.getException());
             IssueDialog.showExceptionDialog(parentComponent, ev.getException());

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.*;
@@ -513,7 +516,7 @@ public class OutputStreamProofSaver {
 
         final RuleJustificationBySpec ruleJustiBySpec = (RuleJustificationBySpec) ruleJusti;
         output.append(" (contract \"");
-        output.append(ruleJustiBySpec.getSpec().getName());
+        output.append(ruleJustiBySpec.spec().getName());
         output.append("\")");
     }
 
@@ -543,8 +546,7 @@ public class OutputStreamProofSaver {
             // for operation contract rules we add the modality under which the rule was applied
             // -> needed for proof management tool
             if (appliedRuleApp.rule() instanceof UseOperationContractRule) {
-                if (appliedRuleApp instanceof ContractRuleApp) {
-                    ContractRuleApp app = (ContractRuleApp) appliedRuleApp;
+                if (appliedRuleApp instanceof ContractRuleApp app) {
                     Modality modality = (Modality) app.programTerm().op();
                     output.append(" (modality \"");
                     output.append(modality.toString());

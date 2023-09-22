@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
 import java.net.URI;
@@ -174,8 +177,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
         pe.setEndPosition(updatePositionRelativeTo(pe.getEndPosition(), pos));
 
         // recurse to children
-        if (pe instanceof NonTerminalProgramElement) {
-            NonTerminalProgramElement ntpe = (NonTerminalProgramElement) pe;
+        if (pe instanceof NonTerminalProgramElement ntpe) {
             for (int i = 0; i < ntpe.getChildCount(); i++) {
                 updatePositionInformation(ntpe.getChildAt(i), pos);
             }
@@ -188,8 +190,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
     private ProgramElement[] getChildren(ProgramElement pe) {
         ProgramElement[] result;
 
-        if (pe instanceof NonTerminalProgramElement) {
-            NonTerminalProgramElement ntpe = (NonTerminalProgramElement) pe;
+        if (pe instanceof NonTerminalProgramElement ntpe) {
             int childCount = ntpe.getChildCount();
             result = new ProgramElement[childCount];
             for (int i = 0; i < childCount; i++) {
@@ -685,18 +686,16 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
                     // iterate over all pre-existing constructors
                     for (Constructor aConstructorList : constructorList) {
-                        if (aConstructorList instanceof ConstructorDeclaration) {
-                            ConstructorDeclaration cd = (ConstructorDeclaration) aConstructorList;
+                        if (aConstructorList instanceof ConstructorDeclaration cd) {
                             transformMethodlevelComments(cd, resource);
                         }
                     }
 
                     // iterate over all pre-existing methods
                     for (Method aMethodList : methodList) {
-                        if (aMethodList instanceof MethodDeclaration) { // might
+                        if (aMethodList instanceof MethodDeclaration md) { // might
                             // be
                             // ImplicitEnumMethod
-                            MethodDeclaration md = (MethodDeclaration) aMethodList;
                             transformMethodlevelComments(md, resource);
                         }
                     }
@@ -733,8 +732,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
         public void walk(@Nonnull SourceElement s) {
             s.accept(this);
-            if (s instanceof NonTerminalProgramElement) {
-                NonTerminalProgramElement pe = (NonTerminalProgramElement) s;
+            if (s instanceof NonTerminalProgramElement pe) {
                 for (int i = 0; i < pe.getChildCount(); i++) {
                     walk(pe.getChildAt(i));
                 }

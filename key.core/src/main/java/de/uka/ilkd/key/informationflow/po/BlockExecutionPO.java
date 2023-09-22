@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po;
 
 import java.util.List;
@@ -95,10 +98,9 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof BlockExecutionPO)) {
+        if (!(po instanceof BlockExecutionPO cPO)) {
             return false;
         }
-        final BlockExecutionPO cPO = (BlockExecutionPO) po;
         return contract.equals(cPO.contract);
     }
 

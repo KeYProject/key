@@ -83,6 +83,6 @@ jobs:
           body: |
             Thank you for your contribution.
             
-            The test artifacts are available on [Artiweb](https://keyproject.github.io/artiweb/${{steps.rpn.outputs.pr-number}}/).
-            The newest artifact is [here](https://keyproject.github.io/artiweb/${{steps.rpn.outputs.pr-number}}/${{steps.da.outputs.test-artifact-id}}/).
+            The test artifacts are available on [Artiweb](e8e3f762-a110-4e21-bc41-cacb5f3a3a50.ka.bw-cloud-instance.org/${{steps.rpn.outputs.pr-number}}/).
+            The newest artifact is [here](e8e3f762-a110-4e21-bc41-cacb5f3a3a50.ka.bw-cloud-instance.org/${{steps.rpn.outputs.pr-number}}/${{steps.da.outputs.test-artifact-id}}/).
           edit-mode: replace

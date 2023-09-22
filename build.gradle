@@ -21,7 +21,7 @@ plugins {
     // id "com.github.ben-manes.versions" version "0.39.0"
 
     // Code formatting
-    id "com.diffplug.spotless" version "6.16.0"
+    id "com.diffplug.spotless" version "6.20.0"
 }
 
 // Configure this project for use inside IntelliJ:
@@ -50,7 +50,7 @@ static def getDate() {
 def build = System.env.BUILD_NUMBER == null ? "" : "-${System.env.BUILD_NUMBER}"
 
 group = "org.key-project"
-version = "2.12.0$build"
+version = "2.13.0$build"
 
 subprojects {
     apply plugin: "java"
@@ -67,8 +67,8 @@ subprojects {
     group = rootProject.group
     version = rootProject.version
 
-    sourceCompatibility = 11
-    targetCompatibility = 11
+    sourceCompatibility = 17
+    targetCompatibility = 17
 
     repositories {
         mavenCentral()
@@ -78,8 +78,8 @@ subprojects {
     }
 
     dependencies {
-        implementation("org.slf4j:slf4j-api:2.0.7")
-        testImplementation("ch.qos.logback:logback-classic:1.4.8")
+        implementation("org.slf4j:slf4j-api:2.0.9")
+        testImplementation("ch.qos.logback:logback-classic:1.4.11")
 
         //compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.12.0'
         //compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.12.0'
@@ -98,8 +98,8 @@ subprojects {
     tasks.withType(JavaCompile) {
         // Setting UTF-8 as the java source encoding.
         options.encoding = "UTF-8"
-        // Setting the release to Java 11
-        options.release = 11
+        // Setting the release to Java 17
+        options.release = 17
     }
 
     tasks.withType(Javadoc) {
@@ -277,101 +277,6 @@ subprojects {
         archiveClassifier = 'javadoc'
     }
 
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                from components.java
-                artifact sourcesJar
-                artifact javadocJar
-                pom {
-                    name = projects.name
-                    description = project.description
-                    url = 'http://key-project.org/'
-
-                    licenses {
-                        license {
-                            name = "GNU General Public License (GPL), Version 2"
-                            url = "http://www.gnu.org/licenses/old-licenses/gpl-2.0.html"
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id = 'key'
-                            name = 'KeY Developers'
-                            email = 'support@key-project.org'
-                        }
-                    }
-                    scm {
-                        connection = 'scm:git:git://git.key-project.org/key/key.git'
-                        developerConnection = 'scm:git:git://git.key-project.org/key/key.git'
-                        url = 'https://git.key-project.org/'
-                    }
-                }
-            }
-        }
-        repositories {
-            maven {
-                /**
-                 * To be able to publish things on Maven Central, you need two things:
-                 *
-                 * (1) a JIRA account with permission on group-id `org.key-project`
-                 * (2) a keyserver-published GPG (w/o sub-keys)
-                 *
-                 * Your `$HOME/.gradle/gradle.properties` should like this:
-                 * ```
-                 * signing.keyId=YourKeyId
-                 * signing.password=YourPublicKeyPassword
-                 * ossrhUsername=your-jira-id
-                 * ossrhPassword=your-jira-password
-                 * ```
-                 *
-                 * You can test signing with `gradle sign`, and publish with `gradle publish`.
-                 * https://central.sonatype.org/publish/publish-guide/
-                 */
-                if (project.version.endsWith("-SNAPSHOT")) {
-                    name = "mavenSnapshot"
-                    url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-                    credentials(PasswordCredentials) {
-                        username = project.properties.getOrDefault("ossrhUsername","")
-                        password = project.properties.getOrDefault("ossrhPassword","")
-                    }
-                } else {
-                    name = "mavenStaging"
-                    url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-                    credentials(PasswordCredentials) {
-                        username = project.properties.getOrDefault("ossrhUsername","")
-                        password = project.properties.getOrDefault("ossrhPassword","")
-                    }
-                }
-            }
-
-            /*
-            maven { // deployment to git.key-project.org
-                name = "GitlabPackages"
-                url "https://git.key-project.org/api/v4/projects/35/packages/maven"
-                credentials(HttpHeaderCredentials) {
-                    if (System.getenv("TOKEN") != null) {
-                        name = 'Private-Token'
-                        value = System.getenv("TOKEN")
-                    } else {
-                        name = 'Job-Token'
-                        value = System.getenv("CI_JOB_TOKEN")
-                    }
-                }
-                authentication {
-                    header(HttpHeaderAuthentication)
-                }
-            }
-            */
-        }
-    }
-
-    signing {
-        useGpgCmd() // works better than the Java implementation, which requires PGP keyrings.
-        sign publishing.publications.mavenJava
-    }
-
     license {//configures the license file header
         header = file("$rootDir/gradle/header")
 
@@ -395,7 +300,6 @@ subprojects {
             }
         }
     }
-
 
     spotless {
         // see https://github.com/diffplug/spotless/tree/main/plugin-gradle
@@ -431,7 +335,10 @@ subprojects {
             toggleOffOn()
 
             removeUnusedImports()
-            eclipse().configFile("$rootDir/scripts/tools/checkstyle/keyCodeStyle.xml")
+            /* At the moment, we have to ensure that version 4.22 of the eclipse formatter is run, since newer versions
+             * of the formatter crash in SymbolicExecutionTreeBuilder (seems to be a but in the formatter)!
+             */
+            eclipse("4.22").configFile("$rootDir/scripts/tools/checkstyle/keyCodeStyle.xml")
             trimTrailingWhitespace()        // not sure how to set this in the xml file ...
             //googleJavaFormat().aosp().reflowLongStrings()
 
@@ -442,10 +349,111 @@ subprojects {
             // specific delimiter: normally just 'package', but spotless crashes for files in default package
             // (see https://github.com/diffplug/spotless/issues/30), therefore 'import' is needed. '//' is for files
             // with completely commented out code (which would probably better just be removed in future).
-            //licenseHeaderFile("$rootDir/gradle/header", '(package|import|//)')
+            if(project.name == 'recoder') {
+                licenseHeaderFile("$rootDir/gradle/header-recoder", '(package|import|//)')
+            }else {
+                licenseHeaderFile("$rootDir/gradle/header", '(package|import|//)')
+            }
         }
     }
 
+    afterEvaluate { // required so project.description is non-null as set by sub build.gradle
+        publishing {
+            publications {
+                mavenJava(MavenPublication) {
+                    from components.java
+                    artifact sourcesJar
+                    artifact javadocJar
+                    pom {
+                        name = projects.name
+                        description = project.description
+                        url = 'https://key-project.org/'
+
+                        licenses {
+                            license {
+                                name = "GNU General Public License (GPL), Version 2"
+                                url = "https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"
+                            }
+                        }
+
+                        developers {
+                            developer {
+                                id = 'key'
+                                name = 'KeY Developers'
+                                email = 'support@key-project.org'
+                                url = "https://www.key-project.org/about/people/"
+                            }
+                        }
+                        scm {
+                            connection = 'scm:git:git://github.com/keyproject/key.git'
+                            developerConnection = 'scm:git:git://github.com/keyproject/key.git'
+                            url = 'https://github.com/keyproject/key/'
+                        }
+                    }
+                }
+            }
+            repositories {
+                maven {
+                    /**
+                     * To be able to publish things on Maven Central, you need two things:
+                     *
+                     * (1) a JIRA account with permission on group-id `org.key-project`
+                     * (2) a keyserver-published GPG (w/o sub-keys)
+                     *
+                     * Your `$HOME/.gradle/gradle.properties` should like this:
+                     * ```
+                     * signing.keyId=YourKeyId
+                     * signing.password=YourPublicKeyPassword
+                     * ossrhUsername=your-jira-id
+                     * ossrhPassword=your-jira-password
+                     * ```
+                     *
+                     * You can test signing with `gradle sign`, and publish with `gradle publish`.
+                     * https://central.sonatype.org/publish/publish-guide/
+                     */
+                    if (project.version.endsWith("-SNAPSHOT")) {
+                        name = "mavenSnapshot"
+                        url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+                        credentials(PasswordCredentials) {
+                            username = project.properties.getOrDefault("ossrhUsername", "")
+                            password = project.properties.getOrDefault("ossrhPassword", "")
+                        }
+                    } else {
+                        name = "mavenStaging"
+                        url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+                        credentials(PasswordCredentials) {
+                            username = project.properties.getOrDefault("ossrhUsername", "")
+                            password = project.properties.getOrDefault("ossrhPassword", "")
+                        }
+                    }
+                }
+
+                /*
+            maven { // deployment to git.key-project.org
+                name = "GitlabPackages"
+                url "https://git.key-project.org/api/v4/projects/35/packages/maven"
+                credentials(HttpHeaderCredentials) {
+                    if (System.getenv("TOKEN") != null) {
+                        name = 'Private-Token'
+                        value = System.getenv("TOKEN")
+                    } else {
+                        name = 'Job-Token'
+                        value = System.getenv("CI_JOB_TOKEN")
+                    }
+                }
+                authentication {
+                    header(HttpHeaderAuthentication)
+                }
+            }
+            */
+            }
+        }
+
+        signing {
+            useGpgCmd() // works better than the Java implementation, which requires PGP keyrings.
+            sign publishing.publications.mavenJava
+        }
+    }
 }
 
 task start {
@@ -480,7 +488,7 @@ task alldoc(type: Javadoc) {
         docTitle = "KeY JavaDoc ($project.version) -- ${getDate()}"
         bottom = "Copyright &copy; 2003-2023 <a href=\"http://key-project.org\">The KeY-Project</a>."
         use = true
-        links += "https://docs.oracle.com/en/java/javase/11/docs/api/"
+        links += "https://docs.oracle.com/en/java/javase/17/docs/api/"
         links += "http://www.antlr2.org/javadoc/"
         links += "http://www.antlr3.org/api/Java/"
         links += "https://www.antlr.org/api/Java/"

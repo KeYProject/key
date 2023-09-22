@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.ArrayList;
@@ -302,11 +305,11 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             Proof proof = null;
             for (Goal valueGoal : valueGoals) {
                 pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(),
-                    getSettings().isSimplifyConditions(), false));
+                    getSettings().simplifyConditions(), false));
                 proof = valueGoal.node().proof();
             }
             Term comboundPathCondition = tb.or(pathConditions);
-            if (getSettings().isSimplifyConditions()) {
+            if (getSettings().simplifyConditions()) {
                 comboundPathCondition =
                     SymbolicExecutionUtil.simplify(initConfig, proof, comboundPathCondition);
             }

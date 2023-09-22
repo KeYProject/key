@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.*;
@@ -168,9 +171,7 @@ public class SequentViewSearchBar extends SearchBar {
     public boolean search(@Nonnull String search) {
         clearSearchResults();
 
-        if (sequentView.getFilter() instanceof SearchSequentPrintFilter) {
-            SearchSequentPrintFilter searchSequentPrintFilter =
-                (SearchSequentPrintFilter) sequentView.getFilter();
+        if (sequentView.getFilter() instanceof SearchSequentPrintFilter searchSequentPrintFilter) {
             searchSequentPrintFilter.setLogicPrinter(sequentView.getLogicPrinter());
             searchSequentPrintFilter.setSearchString(searchField.getText());
         }

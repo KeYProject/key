@@ -1,8 +1,6 @@
-/**
- * visitor for <t> execPostOrder </t> of {@link de.uka.ilkd.key.logic.Term}. Called with that method
- * on a term, the visitor builds a new term replacing SchemaVariables with their instantiations that
- * are given as a SVInstantiations object.
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayDeque;
@@ -194,8 +192,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
 
             for (int j = 0, size = vBoundVars.size(); j < size; j++) {
                 QuantifiableVariable boundVar = vBoundVars.get(j);
-                if (boundVar instanceof SchemaVariable) {
-                    final SchemaVariable boundSchemaVariable = (SchemaVariable) boundVar;
+                if (boundVar instanceof SchemaVariable boundSchemaVariable) {
                     final Term instantiationForBoundSchemaVariable =
                         (Term) svInst.getInstantiation(boundSchemaVariable);
                     if (instantiationForBoundSchemaVariable != null) {
@@ -323,8 +320,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
     @Override
     public void subtreeLeft(Term subtreeRoot) {
         tacletTermStack.pop();
-        if (subtreeRoot.op() instanceof TermTransformer) {
-            final TermTransformer mop = (TermTransformer) subtreeRoot.op();
+        if (subtreeRoot.op() instanceof TermTransformer mop) {
             final Term newTerm = //
                 mop.transform((Term) subStack.pop(), svInst, services);
             pushNew(newTerm);

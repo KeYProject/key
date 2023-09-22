@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.awt.*;
@@ -98,9 +101,9 @@ class ReferenceSearchTable extends JTable implements TableModel {
             if (c == null) {
                 return "no reference found";
             } else {
-                int i = mediator.getCurrentlyOpenedProofs().indexOf(c.getProof()) + 1;
+                int i = mediator.getCurrentlyOpenedProofs().indexOf(c.proof()) + 1;
                 return String.format("reference available (proof %d, node %d)", i,
-                    c.getNode().serialNr());
+                    c.node().serialNr());
             }
         }
     }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -68,10 +71,9 @@ public class PositionedLabeledString extends PositionedString {
      */
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof PositionedLabeledString)) {
+        if (!(o instanceof PositionedLabeledString cmp)) {
             return false;
         }
-        final PositionedLabeledString cmp = (PositionedLabeledString) o;
         if (labels.size() == cmp.labels.size()) {
             if (!super.equals(o)) {
                 return false;

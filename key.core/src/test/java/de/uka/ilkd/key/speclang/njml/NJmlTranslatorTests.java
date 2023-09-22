@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
 import java.io.File;
@@ -106,11 +109,12 @@ public class NJmlTranslatorTests {
     @Test
     void testContractModifiersMultiple() {
         preParser.clearWarnings();
-        String contracts = "/*@ public abstract final normal_behaviour\n" +
-            "  @ requires true;\n" +
-            "  @ private static exceptional_behaviour\n" +
-            "  @ requires false;\n" +
-            "  @*/";
+        String contracts = """
+                /*@ public abstract final normal_behaviour
+                  @ requires true;
+                  @ private static exceptional_behaviour
+                  @ requires false;
+                  @*/""";
         ImmutableList<TextualJMLConstruct> result =
             preParser.parseClassLevel(contracts, null, Position.newOneBased(5, 5));
         assertNotNull(result);
@@ -126,12 +130,13 @@ public class NJmlTranslatorTests {
     @Test
     void testContractModifiersMultipleAlso() {
         preParser.clearWarnings();
-        String contracts = "/*@ public abstract final normal_behaviour\n" +
-            "  @ requires true;\n" +
-            "  @ also \n" +
-            "  @ private static exceptional_behaviour\n" +
-            "  @ requires false;\n" +
-            "  @*/";
+        String contracts = """
+                /*@ public abstract final normal_behaviour
+                  @ requires true;
+                  @ also\s
+                  @ private static exceptional_behaviour
+                  @ requires false;
+                  @*/""";
         ImmutableList<TextualJMLConstruct> result =
             preParser.parseClassLevel(contracts, null, Position.newOneBased(5, 5));
         assertNotNull(result);

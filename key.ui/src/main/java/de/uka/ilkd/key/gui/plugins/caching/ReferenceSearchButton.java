@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.awt.*;
@@ -56,9 +59,9 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
                 p.closeGoal(goal);
                 goal.node().register(c, ClosedBy.class);
 
-                c.getProof()
+                c.proof()
                         .addProofDisposedListenerFirst(new CachingExtension.CopyBeforeDispose(
-                            mediator, c.getProof(), p));
+                            mediator, c.proof(), p));
             }
         }
         var dialog =

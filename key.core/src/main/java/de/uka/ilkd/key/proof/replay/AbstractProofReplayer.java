@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.replay;
 
 import java.util.ArrayList;
@@ -128,7 +131,7 @@ public abstract class AbstractProofReplayer {
                     .getJustification(ruleApp, originalProof.getServices());
             currContract = proof.getServices().getSpecificationRepository()
                     .getContractByName(
-                        ((RuleJustificationBySpec) justification).getSpec().getName());
+                        ((RuleJustificationBySpec) justification).spec().getName());
         }
 
         // Load ifInsts, if applicable
@@ -279,8 +282,7 @@ public abstract class AbstractProofReplayer {
                 .map(x -> new Pair<>(x, true))
                 .collect(Collectors.toList());
         // add direct instantiations
-        if (tacletApp instanceof PosTacletApp) {
-            PosTacletApp posTacletApp = (PosTacletApp) tacletApp;
+        if (tacletApp instanceof PosTacletApp posTacletApp) {
             if (posTacletApp.ifFormulaInstantiations() != null) {
                 for (IfFormulaInstantiation x : posTacletApp.ifFormulaInstantiations()) {
                     if (x instanceof IfFormulaInstDirect) {

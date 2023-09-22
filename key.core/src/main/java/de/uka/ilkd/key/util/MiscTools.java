@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 import java.io.IOException;
@@ -234,8 +237,7 @@ public final class MiscTools {
      */
     public static ImmutableSet<Pair<Sort, IObserverFunction>> collectObservers(Term t) {
         ImmutableSet<Pair<Sort, IObserverFunction>> result = DefaultImmutableSet.nil();
-        if (t.op() instanceof IObserverFunction) {
-            final IObserverFunction obs = (IObserverFunction) t.op();
+        if (t.op() instanceof IObserverFunction obs) {
             final Sort s = obs.isStatic() ? obs.getContainerType().getSort() : t.sub(1).sort();
             result = result.add(new Pair<>(s, obs));
         }
@@ -594,8 +596,7 @@ public final class MiscTools {
                 if (!pv.isMember() && !declaredPVs.contains(pv)) {
                     result = result.add(pv);
                 }
-            } else if (node instanceof VariableSpecification) {
-                VariableSpecification vs = (VariableSpecification) node;
+            } else if (node instanceof VariableSpecification vs) {
                 ProgramVariable pv = (ProgramVariable) vs.getProgramVariable();
                 if (!pv.isMember()) {
                     assert !declaredPVs.contains(pv);
@@ -631,14 +632,12 @@ public final class MiscTools {
         protected void doDefaultAction(SourceElement node) {
             if (node instanceof Assignment) {
                 ProgramElement lhs = ((Assignment) node).getChildAt(0);
-                if (lhs instanceof ProgramVariable) {
-                    ProgramVariable pv = (ProgramVariable) lhs;
+                if (lhs instanceof ProgramVariable pv) {
                     if (!pv.isMember() && !declaredPVs.contains(pv)) {
                         writtenPVs = writtenPVs.add(pv);
                     }
                 }
-            } else if (node instanceof VariableSpecification) {
-                VariableSpecification vs = (VariableSpecification) node;
+            } else if (node instanceof VariableSpecification vs) {
                 ProgramVariable pv = (ProgramVariable) vs.getProgramVariable();
                 if (!pv.isMember()) {
                     assert !declaredPVs.contains(pv);
@@ -736,7 +735,7 @@ public final class MiscTools {
         try {
             switch (loc.getType()) {
             case "URL": // URLDataLocation
-                return Optional.of(((URLDataLocation) loc).getUrl().toURI());
+                return Optional.of(((URLDataLocation) loc).url().toURI());
             case "ARCHIVE": // ArchiveDataLocation
                 // format: "ARCHIVE:<filename>?<itemname>"
                 ArchiveDataLocation adl = (ArchiveDataLocation) loc;

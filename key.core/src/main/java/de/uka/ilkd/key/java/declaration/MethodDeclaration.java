@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.declaration;
 
 import de.uka.ilkd.key.java.*;
@@ -29,25 +32,14 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
 
     /**
      * JML modifiers of a method
+     *
+     * @param pure pure
+     * @param strictlyPure strictly pure
+     * @param helper helper
+     * @param specMathMode spec math mode
      */
-    public static final class JMLModifiers {
-        /** pure */
-        public final boolean pure;
-        /** strictly pure */
-        public final boolean strictlyPure;
-        /** helper */
-        public final boolean helper;
-        /** spec math mode */
-        public final SpecMathMode specMathMode;
-
-        /** constructor */
-        public JMLModifiers(boolean pure, boolean strictlyPure, boolean helper,
-                SpecMathMode specMathMode) {
-            this.pure = pure;
-            this.strictlyPure = strictlyPure;
-            this.helper = helper;
-            this.specMathMode = specMathMode;
-        }
+    public record JMLModifiers(boolean pure, boolean strictlyPure, boolean helper,
+            SpecMathMode specMathMode) {
     }
 
 

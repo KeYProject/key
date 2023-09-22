@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -179,7 +182,7 @@ public class BuiltInRuleAppIndex {
 
         while (!fcis.isEmpty()) {
             final FormulaChangeInfo fci = fcis.head();
-            final SequentFormula cfma = fci.getNewFormula();
+            final SequentFormula cfma = fci.newFormula();
             scanSimplificationRule(index.rules(), goal, antec, cfma, listener);
             fcis = fcis.tail();
         }

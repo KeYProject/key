@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
@@ -116,11 +119,10 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof FunctionalLoopContractPO)) {
+        if (!(po instanceof FunctionalLoopContractPO other)) {
             return false;
         }
 
-        FunctionalLoopContractPO other = (FunctionalLoopContractPO) po;
         return contract.equals(other.contract);
     }
 
@@ -141,10 +143,9 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof FunctionalLoopContractPO)) {
+        if (!(obj instanceof FunctionalLoopContractPO other)) {
             return false;
         }
-        FunctionalLoopContractPO other = (FunctionalLoopContractPO) obj;
         if (contract == null) {
             if (other.contract != null) {
                 return false;

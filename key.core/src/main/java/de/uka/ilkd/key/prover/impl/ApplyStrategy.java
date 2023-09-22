@@ -1,10 +1,6 @@
-/*
- *
- * Uses code by Hans Muller and Kathy Walrath from
- * http://java.sun.com/products/jfc/tsc/articles/threads/threads2.html
- *
- */
-
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.prover.impl;
 
 
@@ -28,6 +24,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Applies rules in an automated fashion. The caller should ensure that the strategy runs in its own
  * thread
+ * <a href="http://java.sun.com/products/jfc/tsc/articles/threads/threads2.html">Uses code by Hans
+ * Muller
+ * and Kathy Walrath</a>
  *
  * @author Richard Bubel
  */

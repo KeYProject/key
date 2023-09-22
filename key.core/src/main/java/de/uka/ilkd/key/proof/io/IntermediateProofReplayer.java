@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.StringReader;
@@ -213,8 +216,7 @@ public class IntermediateProofReplayer {
                         queue.addFirst(new Pair<>(currNode,
                             currNodeInterm.getChildren().get(0)));
                     }
-                } else if (currNodeInterm instanceof AppNodeIntermediate) {
-                    AppNodeIntermediate currInterm = (AppNodeIntermediate) currNodeInterm;
+                } else if (currNodeInterm instanceof AppNodeIntermediate currInterm) {
 
                     currNode.getNodeInfo().setNotes(currInterm.getNotes());
 
@@ -259,8 +261,7 @@ public class IntermediateProofReplayer {
                         BuiltInAppIntermediate appInterm =
                             (BuiltInAppIntermediate) currInterm.getIntermediateRuleApp();
 
-                        if (appInterm instanceof MergeAppIntermediate) {
-                            MergeAppIntermediate joinAppInterm = (MergeAppIntermediate) appInterm;
+                        if (appInterm instanceof MergeAppIntermediate joinAppInterm) {
                             HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodesInfo =
                                 joinPartnerNodes.get(((MergeAppIntermediate) appInterm).getId());
 
@@ -322,10 +323,8 @@ public class IntermediateProofReplayer {
                                         e);
                                 }
                             }
-                        } else if (appInterm instanceof MergePartnerAppIntermediate) {
+                        } else if (appInterm instanceof MergePartnerAppIntermediate joinPartnerApp) {
                             // Register this partner node
-                            MergePartnerAppIntermediate joinPartnerApp =
-                                (MergePartnerAppIntermediate) appInterm;
                             HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodeInfo =
                                 joinPartnerNodes.computeIfAbsent(joinPartnerApp.getMergeNodeId(),
                                     k -> new HashSet<>());

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.util.*;
@@ -463,8 +466,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
         while (!(goalnode.serialNr() == root.serialNr())) {
             final Node oldNode = goalnode;
             goalnode = goalnode.parent();
-            if (goalnode.getAppliedRuleApp() instanceof NoPosTacletApp) {
-                NoPosTacletApp npta = (NoPosTacletApp) goalnode.getAppliedRuleApp();
+            if (goalnode.getAppliedRuleApp() instanceof NoPosTacletApp npta) {
                 if ("CUT".equalsIgnoreCase(npta.taclet().name().toString())) {
                     Term inst = (Term) npta.instantiations()
                             .lookupEntryForSV(new Name("cutFormula")).value().getInstantiation();

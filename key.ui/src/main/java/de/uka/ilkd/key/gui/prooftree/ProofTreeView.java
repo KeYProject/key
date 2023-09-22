@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.awt.*;
@@ -190,8 +193,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 super.updateUI();
                 /* we want plus/minus signs to expand/collapse tree nodes */
                 final TreeUI ui = getUI();
-                if (ui instanceof BasicTreeUI) {
-                    final BasicTreeUI treeUI = (BasicTreeUI) ui;
+                if (ui instanceof BasicTreeUI treeUI) {
                     treeUI.setExpandedIcon(IconFactory.expandedIcon(iconHeight));
                     treeUI.setCollapsedIcon(IconFactory.collapsedIcon(iconHeight));
                 }
@@ -972,7 +974,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             // catching ClassCastException occurring when clicking on
             // "No proof loaded"
             if (!(e.getNewLeadSelectionPath()
-                    .getLastPathComponent() instanceof GUIAbstractTreeNode)) {
+                    .getLastPathComponent() instanceof GUIAbstractTreeNode treeNode)) {
                 return;
             }
 
@@ -980,8 +982,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
             delegateModel.storeSelection(newTP);
 
 
-            GUIAbstractTreeNode treeNode =
-                ((GUIAbstractTreeNode) e.getNewLeadSelectionPath().getLastPathComponent());
             if (treeNode.getNode().proof().isDisposed()) {
                 setProof(null);
                 return;
@@ -993,10 +993,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 Goal selected = proof.getOpenGoal(node);
                 if (selected != null) {
                     mediator.goalChosen(selected);
-                } else if (treeNode instanceof GUIOneStepChildTreeNode) {
+                } else if (treeNode instanceof GUIOneStepChildTreeNode ossNode) {
                     // One Step Simplifier child node: show a sequent modified to include
                     // the transformed formula
-                    var ossNode = ((GUIOneStepChildTreeNode) treeNode);
                     var pio = ossNode.getRuleApp().posInOccurrence();
                     var ossParentNode = ((GUIProofTreeNode) ossNode.getParent());
                     var newSequent = ossParentNode.getNode().sequent();
@@ -1275,7 +1274,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
                 boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            if (proof == null || proof.isDisposed() || !(value instanceof GUIAbstractTreeNode)) {
+            if (proof == null || proof.isDisposed()
+                    || !(value instanceof GUIAbstractTreeNode node)) {
                 // print dummy tree
                 return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row,
                     hasFocus);
@@ -1283,7 +1283,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 
-            GUIAbstractTreeNode node = (GUIAbstractTreeNode) value;
             Style style = new Style();
             style.foreground = getForeground();
             style.background = getBackground();

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.*;
@@ -666,11 +669,11 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
     StringBuffer toStringTriggers(StringBuffer sb) {
         if (trigger != null) {
             sb.append("\n\\trigger{");
-            sb.append(trigger.getTriggerVar());
+            sb.append(trigger.triggerVar());
             sb.append("} ");
             sb.append(trigger.getTerm());
             if (trigger.hasAvoidConditions()) {
-                Iterator<Term> itTerms = trigger.getAvoidConditions().iterator();
+                Iterator<Term> itTerms = trigger.avoidConditions().iterator();
                 sb.append(" \\avoid ");
                 while (itTerms.hasNext()) {
                     Term cond = itTerms.next();

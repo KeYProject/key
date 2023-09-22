@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import java.util.List;
@@ -168,8 +171,7 @@ public class Recoder2KeYTypeConverter {
                 s = new NullSort(objectSort);
             }
             addKeYJavaType(t, s);
-        } else if (t instanceof recoder.abstraction.ParameterizedType) {
-            recoder.abstraction.ParameterizedType pt = (recoder.abstraction.ParameterizedType) t;
+        } else if (t instanceof recoder.abstraction.ParameterizedType pt) {
             return getKeYJavaType(pt.getGenericType());
         } else if (t instanceof recoder.abstraction.ClassType) {
             s = namespaces.sorts().lookup(new Name(t.getFullName()));
@@ -325,8 +327,7 @@ public class Recoder2KeYTypeConverter {
      * @return a freshly created Sort object
      */
     private Sort createObjectSort(recoder.abstraction.ClassType ct, ImmutableSet<Sort> supers) {
-        if (ct instanceof recoder.abstraction.ArrayType) {
-            var at = (recoder.abstraction.ArrayType) ct;
+        if (ct instanceof recoder.abstraction.ArrayType at) {
             Sort objectSort = javaInfo.objectSort();
             Sort cloneableSort = javaInfo.cloneableSort();
             Sort serializableSort = javaInfo.serializableSort();

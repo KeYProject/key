@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.awt.event.ActionEvent;
@@ -111,9 +114,9 @@ public class CachingExtension
                 goal.setEnabled(false);
 
                 goal.node().register(c, ClosedBy.class);
-                c.getProof()
+                c.proof()
                         .addProofDisposedListenerFirst(
-                            new CopyBeforeDispose(mediator, c.getProof(), p));
+                            new CopyBeforeDispose(mediator, c.proof(), p));
             }
         }
     }
@@ -163,8 +166,8 @@ public class CachingExtension
 
     @Override
     public void taskStarted(TaskStartedInfo info) {
-        if (info.getKind().equals(TaskStartedInfo.TaskKind.Macro)
-                && info.getMessage().equals(new TryCloseMacro().getName())) {
+        if (info.kind().equals(TaskStartedInfo.TaskKind.Macro)
+                && info.message().equals(new TryCloseMacro().getName())) {
             tryToClose = false;
         }
     }
@@ -244,7 +247,7 @@ public class CachingExtension
             } else {
                 newProof.closedGoals().stream()
                         .filter(x -> x.node().lookup(ClosedBy.class) != null
-                                && x.node().lookup(ClosedBy.class).getProof() == referencedProof)
+                                && x.node().lookup(ClosedBy.class).proof() == referencedProof)
                         .forEach(x -> {
                             newProof.reOpenGoal(x);
                             x.node().deregister(x.node().lookup(ClosedBy.class), ClosedBy.class);
@@ -360,7 +363,7 @@ public class CachingExtension
             Goal current = node.proof().getClosedGoal(node);
             try {
                 mediator.stopInterface(true);
-                new CopyingProofReplayer(c.getProof(), node.proof()).copy(c.getNode(), current);
+                new CopyingProofReplayer(c.proof(), node.proof()).copy(c.node(), current);
                 mediator.startInterface(true);
             } catch (Exception ex) {
                 LOGGER.error("failed to copy proof ", ex);

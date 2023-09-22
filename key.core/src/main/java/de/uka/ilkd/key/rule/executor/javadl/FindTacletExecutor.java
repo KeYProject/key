@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.executor.javadl;
 
 import java.util.Iterator;
@@ -177,7 +180,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
                 // add it close to the modified formula
                 final FormulaChangeInfo head = modifiedFormulas.head();
                 result =
-                    new PosInOccurrence(head.getNewFormula(), PosInTerm.getTopLevel(), inAntec);
+                    new PosInOccurrence(head.newFormula(), PosInTerm.getTopLevel(), inAntec);
             } else {
                 // just add it
                 result = null;

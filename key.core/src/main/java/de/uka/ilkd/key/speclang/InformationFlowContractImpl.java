@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.Iterator;
@@ -491,7 +494,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     public boolean equals(Contract c) {
-        if (!(c instanceof InformationFlowContract)) {
+        if (!(c instanceof InformationFlowContract ifc)) {
             return false;
         }
         assert name != null;
@@ -504,7 +507,6 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         assert origParams != null;
         assert origDep != null;
         assert origInfFlowSpecs != null;
-        InformationFlowContract ifc = (InformationFlowContract) c;
         return name.equals(ifc.getName()) && forClass.equals(ifc.getKJT())
                 && pm.equals(ifc.getTarget()) && modality.equals(ifc.getModality())
                 && origPre.equals(ifc.getPre()) && origFreePre.equals(ifc.getFreePre())

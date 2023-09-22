@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.label;
 
 import java.util.Deque;
@@ -47,8 +50,7 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
             // May change sub ID if logical operators like junctors are used
             boolean newLabelIdRequired = false;
             Set<String> originalLabelIds = new LinkedHashSet<>();
-            if (hint instanceof TacletLabelHint) {
-                TacletLabelHint tacletHint = (TacletLabelHint) hint;
+            if (hint instanceof TacletLabelHint tacletHint) {
                 if (isBelowIfThenElse(tacletHint.getTacletTermStack())) {
                     return null; // Do not label children of if-then-else. They are labeled when a
                                  // rule rewrites them outside of the if-then-else.
