@@ -26,6 +26,7 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
+          cache: 'gradle'
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2.4.2
@@ -61,6 +62,7 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
+          cache: 'gradle'
 
       - name: Cache SMT-Solvers
         id: smt-solvers

@@ -31,6 +31,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
+          cache: 'gradle'
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2.4.2
         with:
@@ -62,6 +63,8 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
+          cache: 'gradle'
+
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2.4.2
         with:
@@ -88,6 +91,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
+          cache: 'gradle'
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2.4.2
         with:

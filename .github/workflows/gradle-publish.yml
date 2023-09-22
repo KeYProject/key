@@ -18,6 +18,7 @@ jobs:
       with:
         java-version: '21'
         distribution: 'temurin'
+        cache: 'gradle'
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
 
     - name: Assemble with Gradle
