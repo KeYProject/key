@@ -21,13 +21,14 @@ import de.uka.ilkd.key.rule.Rule;
 public abstract class ContextMenuAdapter implements KeYGuiExtension.ContextMenu {
     @Nonnull
     @Override
-    public final List<Action> getContextActions(@Nonnull KeYMediator mediator, @Nonnull ContextMenuKind kind,
-                                                @Nonnull Object underlyingObject) {
+    public final List<Action> getContextActions(@Nonnull KeYMediator mediator,
+            @Nonnull ContextMenuKind kind,
+            @Nonnull Object underlyingObject) {
         return switch ((DefaultContextMenuKind) kind) {
-            case PROOF_LIST -> getContextActions(mediator, kind, (Proof) underlyingObject);
-            case PROOF_TREE -> getContextActions(mediator, kind, (Node) underlyingObject);
-            case TACLET_INFO -> getContextActions(mediator, kind, (Rule) underlyingObject);
-            case SEQUENT_VIEW -> getContextActions(mediator, kind, (PosInSequent) underlyingObject);
+        case PROOF_LIST -> getContextActions(mediator, kind, (Proof) underlyingObject);
+        case PROOF_TREE -> getContextActions(mediator, kind, (Node) underlyingObject);
+        case TACLET_INFO -> getContextActions(mediator, kind, (Rule) underlyingObject);
+        case SEQUENT_VIEW -> getContextActions(mediator, kind, (PosInSequent) underlyingObject);
         };
     }
 

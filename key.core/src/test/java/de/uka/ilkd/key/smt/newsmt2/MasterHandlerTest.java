@@ -59,7 +59,8 @@ public class MasterHandlerTest {
      * If this variable is set when running this test class, then those cases with expected result
      * "weak_valid" will raise an exception unless they can be proved using the solver.
      * <p>
-     * Otherwise, a "timeout" or "unknown" is accepted. This can be used to deal with test cases that
+     * Otherwise, a "timeout" or "unknown" is accepted. This can be used to deal with test cases
+     * that
      * should verify but do not yet do so.
      * <p>
      * (Default false)
@@ -213,10 +214,11 @@ public class MasterHandlerTest {
         try {
             String lookFor = null;
             switch (expectation) {
-                case "valid" -> lookFor = "unsat";
-                case "fail" -> lookFor = "(sat|timeout)";
-                case "irrelevant" -> {}
-                default -> fail("Unexpected expectation: " + expectation);
+            case "valid" -> lookFor = "unsat";
+            case "fail" -> lookFor = "(sat|timeout)";
+            case "irrelevant" -> {
+            }
+            default -> fail("Unexpected expectation: " + expectation);
             }
 
             if (lookFor != null) {

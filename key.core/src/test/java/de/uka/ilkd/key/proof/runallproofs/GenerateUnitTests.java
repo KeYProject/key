@@ -5,7 +5,6 @@ package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -68,34 +67,34 @@ public class GenerateUnitTests {
     // +
     // "@RunWith(NamedRunner.class)\n" +
     private static final String TEMPLATE_CONTENT =
-            """
-                    /* This file is part of KeY - https://key-project.org
-                     * KeY is licensed under the GNU General Public License Version 2
-                     * SPDX-License-Identifier: GPL-2.0-only */
-                     
-                    package $packageName;
+        """
+                /* This file is part of KeY - https://key-project.org
+                 * KeY is licensed under the GNU General Public License Version 2
+                 * SPDX-License-Identifier: GPL-2.0-only */
 
-                    import org.junit.jupiter.api.*;
-                    import static org.junit.jupiter.api.Assertions.*;
+                package $packageName;
 
-                    public class $className extends de.uka.ilkd.key.proof.runallproofs.ProveTest {
-                      public static final String STATISTIC_FILE = "$statisticsFile";
+                import org.junit.jupiter.api.*;
+                import static org.junit.jupiter.api.Assertions.*;
 
-                      { // initialize during construction
-                        this.baseDirectory = "$baseDirectory";
-                        this.statisticsFile = STATISTIC_FILE;
-                        this.name = "$name";
-                        this.reloadEnabled = $reloadEnabled;
-                        this.tempDir = "$tempDir";
+                public class $className extends de.uka.ilkd.key.proof.runallproofs.ProveTest {
+                  public static final String STATISTIC_FILE = "$statisticsFile";
 
-                        this.globalSettings = "$keySettings";
-                        this.localSettings =  "$localSettings";
-                      }
+                  { // initialize during construction
+                    this.baseDirectory = "$baseDirectory";
+                    this.statisticsFile = STATISTIC_FILE;
+                    this.name = "$name";
+                    this.reloadEnabled = $reloadEnabled;
+                    this.tempDir = "$tempDir";
 
-                      $timeout
-                      $methods
-                    }
-                    """;
+                    this.globalSettings = "$keySettings";
+                    this.localSettings =  "$localSettings";
+                  }
+
+                  $timeout
+                  $methods
+                }
+                """;
 
     /**
      * Generates the test classes for the given proof collection, and writes the
@@ -108,7 +107,7 @@ public class GenerateUnitTests {
             throws IOException {
         String packageName = "de.uka.ilkd.key.proof.runallproofs.gen";
         String name = unit.getTestName();
-        String className = '_'+name // avoids name clashes, i.e., group "switch"
+        String className = '_' + name // avoids name clashes, i.e., group "switch"
                 .replaceAll("\\.java", "")
                 .replaceAll("\\.key", "")
                 .replaceAll("[^a-zA-Z0-9]+", "_");
@@ -164,14 +163,14 @@ public class GenerateUnitTests {
             // "// This tests is based on").append(keyFile.getAbsolutePath()).append("\n");
 
             switch (file.getTestProperty()) {
-                case PROVABLE ->
-                        methods.append("assertProvability(\"").append(keyFile.getAbsolutePath()).append("\");");
-                case NOTPROVABLE ->
-                        methods.append("assertUnProvability(\"").append(keyFile.getAbsolutePath()).append("\");");
-                case LOADABLE ->
-                        methods.append("assertLoadability(\"").append(keyFile.getAbsolutePath()).append("\");");
-                case NOTLOADABLE ->
-                        methods.append("assertUnLoadability(\"").append(keyFile.getAbsolutePath()).append("\");");
+            case PROVABLE -> methods.append("assertProvability(\"")
+                    .append(keyFile.getAbsolutePath()).append("\");");
+            case NOTPROVABLE -> methods.append("assertUnProvability(\"")
+                    .append(keyFile.getAbsolutePath()).append("\");");
+            case LOADABLE -> methods.append("assertLoadability(\"")
+                    .append(keyFile.getAbsolutePath()).append("\");");
+            case NOTLOADABLE -> methods.append("assertUnLoadability(\"")
+                    .append(keyFile.getAbsolutePath()).append("\");");
             }
             methods.append("}");
         }
@@ -188,6 +187,6 @@ public class GenerateUnitTests {
         File folder = new File(outputFolder, packageName.replace('.', '/'));
         folder.mkdirs();
         Files.writeString(Paths.get(folder.getAbsolutePath(), className + ".java"),
-                sb.toString());
+            sb.toString());
     }
 }

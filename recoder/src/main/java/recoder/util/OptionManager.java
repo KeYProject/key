@@ -117,33 +117,33 @@ public class OptionManager {
         }
         Object optval = null;
         switch (descr.type) {
-            case SIMPLE -> optval = TRUE;
-            case SWITCH -> {
-                if ("on".equals(sval)) {
-                    optval = ON;
-                } else if ("off".equals(sval)) {
-                    optval = OFF;
-                } else {
-                    throw new IllegalOptionValueException(opt, sval);
-                }
+        case SIMPLE -> optval = TRUE;
+        case SWITCH -> {
+            if ("on".equals(sval)) {
+                optval = ON;
+            } else if ("off".equals(sval)) {
+                optval = OFF;
+            } else {
+                throw new IllegalOptionValueException(opt, sval);
             }
-            case BOOL -> {
-                if ("true".equals(sval)) {
-                    optval = TRUE;
-                } else if ("false".equals(sval)) {
-                    optval = FALSE;
-                } else {
-                    throw new IllegalOptionValueException(opt, sval);
-                }
+        }
+        case BOOL -> {
+            if ("true".equals(sval)) {
+                optval = TRUE;
+            } else if ("false".equals(sval)) {
+                optval = FALSE;
+            } else {
+                throw new IllegalOptionValueException(opt, sval);
             }
-            case NUM -> {
-                try {
-                    optval = Integer.valueOf(sval);
-                } catch (NumberFormatException nfe) {
-                    throw new IllegalOptionValueException(opt, sval);
-                }
+        }
+        case NUM -> {
+            try {
+                optval = Integer.valueOf(sval);
+            } catch (NumberFormatException nfe) {
+                throw new IllegalOptionValueException(opt, sval);
             }
-            case STRING -> optval = sval;
+        }
+        case STRING -> optval = sval;
         }
         Debug.assertNonnull(optval);
         descr.values.addElement(optval);

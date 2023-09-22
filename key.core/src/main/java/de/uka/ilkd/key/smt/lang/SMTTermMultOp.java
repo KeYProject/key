@@ -36,10 +36,10 @@ public class SMTTermMultOp extends SMTTerm {
 
         public SMTTerm getIdem() {
             return switch (this) {
-                case AND -> SMTTerm.TRUE;
-                case OR -> SMTTerm.FALSE;
-                default -> throw new RuntimeException(
-                        "Unexpected: getIdem() is only app. to the Operators 'AND' and 'OR': " + this);
+            case AND -> SMTTerm.TRUE;
+            case OR -> SMTTerm.FALSE;
+            default -> throw new RuntimeException(
+                "Unexpected: getIdem() is only app. to the Operators 'AND' and 'OR': " + this);
             };
         }
 
@@ -66,13 +66,13 @@ public class SMTTermMultOp extends SMTTerm {
 
     public static OpProperty getProperty(SMTTermMultOp.Op op) {
         return switch (op) {
-            case AND, OR, PLUS, MUL -> OpProperty.FULLASSOC;
-            case MINUS, XOR, DIV -> OpProperty.LEFTASSOC;
-            case IMPLIES -> OpProperty.RIGHTASSOC;
-            case IFF, EQUALS ->
-                /* case LT: case LTE: case GT: case GTE: */ OpProperty.CHAINABLE;
-            case DISTINCT -> OpProperty.PAIRWISE;
-            default -> OpProperty.NONE;
+        case AND, OR, PLUS, MUL -> OpProperty.FULLASSOC;
+        case MINUS, XOR, DIV -> OpProperty.LEFTASSOC;
+        case IMPLIES -> OpProperty.RIGHTASSOC;
+        case IFF, EQUALS ->
+            /* case LT: case LTE: case GT: case GTE: */ OpProperty.CHAINABLE;
+        case DISTINCT -> OpProperty.PAIRWISE;
+        default -> OpProperty.NONE;
         };
     }
 

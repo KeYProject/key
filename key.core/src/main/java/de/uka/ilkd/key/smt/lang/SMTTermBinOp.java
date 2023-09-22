@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.lang;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -54,13 +54,13 @@ public class SMTTermBinOp extends SMTTerm {
 
     public static OpProperty getProperty(SMTTermBinOp.Op op) {
         return switch (op) {
-            case AND, OR, PLUS, MUL -> OpProperty.FULLASSOC;
-            case MINUS, XOR, DIV -> OpProperty.LEFTASSOC;
-            case IMPLIES -> OpProperty.RIGHTASSOC;
-            case EQUALS ->
-                /* case LT: case LTE: case GT: case GTE: */ OpProperty.CHAINABLE;
-            case DISTINCT -> OpProperty.PAIRWISE;
-            default -> OpProperty.NONE;
+        case AND, OR, PLUS, MUL -> OpProperty.FULLASSOC;
+        case MINUS, XOR, DIV -> OpProperty.LEFTASSOC;
+        case IMPLIES -> OpProperty.RIGHTASSOC;
+        case EQUALS ->
+            /* case LT: case LTE: case GT: case GTE: */ OpProperty.CHAINABLE;
+        case DISTINCT -> OpProperty.PAIRWISE;
+        default -> OpProperty.NONE;
         };
     }
 

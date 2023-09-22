@@ -6,9 +6,7 @@ package de.uka.ilkd.key.java.recoderext;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
 import recoder.java.LoopInitializer;
-import recoder.java.NonTerminalProgramElement;
 import recoder.java.SourceVisitor;
 import recoder.java.StatementContainer;
 import recoder.java.expression.Literal;

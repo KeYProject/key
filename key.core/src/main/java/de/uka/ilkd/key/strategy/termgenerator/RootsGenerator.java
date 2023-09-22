@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termgenerator;
 
+import java.math.BigInteger;
+import java.util.Iterator;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -16,10 +19,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
-import org.key_project.util.collection.ImmutableSLList;
 
-import java.math.BigInteger;
-import java.util.Iterator;
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -58,7 +59,7 @@ public class RootsGenerator implements TermGenerator {
         assert op.arity() == 2;
 
         final BigInteger lit = new BigInteger(
-                AbstractTermTransformer.convertToDecimalString(powerRel.sub(1), services));
+            AbstractTermTransformer.convertToDecimalString(powerRel.sub(1), services));
 
         final Monomial mon = Monomial.create(powerRel.sub(0), services);
         final int pow = mon.getParts().size();

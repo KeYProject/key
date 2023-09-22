@@ -97,10 +97,11 @@ public class UserDefinedSymbols {
         addUserDefinedSymbol(symbol, usedExtraVariables, referenceNamespaces.variables());
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void addSchemaVariable(SchemaVariable symbol) {
         // FIXME: This breaks the generics of namespace
-        addUserDefinedSymbol(symbol, usedSchemaVariables, (Namespace) referenceNamespaces.variables());
+        addUserDefinedSymbol(symbol, usedSchemaVariables,
+            (Namespace) referenceNamespaces.variables());
     }
 
     public void addSymbolsToNamespaces(NamespaceSet namespaces) {

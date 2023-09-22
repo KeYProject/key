@@ -3,6 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.proofdiff;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.Iterator;
+import java.util.LinkedList;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -10,12 +16,6 @@ import de.uka.ilkd.key.gui.proofdiff.diff_match_patch.Diff;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.Iterator;
-import java.util.LinkedList;
 
 /**
  * Proof-of-concept implementation of a textual sequent comparison.
@@ -204,23 +204,23 @@ public class ProofDiffFrame extends JFrame {
         sb.append("<pre>");
         for (Diff diff : diffs) {
             switch (diff.operation) {
-                case EQUAL -> sb.append(toHtml(diff.text));
-                case DELETE -> {
-                    if (onlySpaces(diff.text)) {
-                        sb.append(diff.text);
-                    } else {
-                        sb.append("<span style='background-color: #ff8080;'>").append(toHtml(diff.text))
-                                .append("</span>");
-                    }
+            case EQUAL -> sb.append(toHtml(diff.text));
+            case DELETE -> {
+                if (onlySpaces(diff.text)) {
+                    sb.append(diff.text);
+                } else {
+                    sb.append("<span style='background-color: #ff8080;'>").append(toHtml(diff.text))
+                            .append("</span>");
                 }
-                case INSERT -> {
-                    if (onlySpaces(diff.text)) {
-                        sb.append(diff.text);
-                    } else {
-                        sb.append("<span style='background-color: #80ff80;'>").append(toHtml(diff.text))
-                                .append("</span>");
-                    }
+            }
+            case INSERT -> {
+                if (onlySpaces(diff.text)) {
+                    sb.append(diff.text);
+                } else {
+                    sb.append("<span style='background-color: #80ff80;'>").append(toHtml(diff.text))
+                            .append("</span>");
                 }
+            }
             }
         }
         sb.append("</pre>");

@@ -272,8 +272,8 @@ public abstract class DefaultProgramModelInfo extends AbstractService
 
     private Type makeParameterizedType(TypeArgument ta) {
         Type bt = switch (ta.getWildcardMode()) {
-            case Super, Any -> getNameInfo().getJavaLangObject();
-            case None, Extends -> getBaseType(ta);
+        case Super, Any -> getNameInfo().getJavaLangObject();
+        case None, Extends -> getBaseType(ta);
         };
         if (ta.getTypeArguments() == null || ta.getTypeArguments().isEmpty()) {
             return bt;
@@ -566,7 +566,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
     }
 
     private boolean internalIsCompatibleSignature(List<Type> a, List<Type> b,
-                                                  boolean allowAutoboxing, boolean isVarArgMethod) {
+            boolean allowAutoboxing, boolean isVarArgMethod) {
         int s = b.size();
         int n = a.size();
         if (isVarArgMethod) {

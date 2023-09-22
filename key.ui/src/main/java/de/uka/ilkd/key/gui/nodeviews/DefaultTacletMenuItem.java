@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
+import java.io.Serial;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -16,8 +17,6 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.util.collection.ImmutableList;
-
-import java.io.Serial;
 
 /**
  * this class extends JMenuItem. The objective is to store the Taclet of each item in the item for
@@ -113,11 +112,11 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         int sbl = asb.length();
         for (int i = 0; i < sbl; i++) {
             switch (asb.charAt(i)) {
-                case '<' -> nsb.append("&lt;");
-                case '>' -> nsb.append("&gt;");
-                case '&' -> nsb.append("&amp;");
-                case '\n' -> nsb.append("<br>");
-                default -> nsb.append(asb.charAt(i));
+            case '<' -> nsb.append("&lt;");
+            case '>' -> nsb.append("&gt;");
+            case '&' -> nsb.append("&amp;");
+            case '\n' -> nsb.append("<br>");
+            default -> nsb.append(asb.charAt(i));
             }
         }
         return nsb;

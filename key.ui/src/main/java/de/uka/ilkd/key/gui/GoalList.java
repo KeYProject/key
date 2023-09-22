@@ -648,7 +648,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
         private boolean isHiddenGoal(final Goal goal) {
             return proof != null
-                    && //that afterwards should always be false as goals exist only for open nodes
+                    && // that afterwards should always be false as goals exist only for open nodes
                     goal.node().isClosed();
         }
 

@@ -35,7 +35,8 @@ public abstract class SLResolverManager {
     private final boolean useLocalVarsAsImplicitReceivers;
     private final TermBuilder tb;
 
-    private ImmutableList<Namespace<ParsableVariable>> localVariablesNamespaces = ImmutableSLList.nil();
+    private ImmutableList<Namespace<ParsableVariable>> localVariablesNamespaces =
+        ImmutableSLList.nil();
 
     private final Map<ParsableVariable, KeYJavaType> kjts = new LinkedHashMap<>();
 

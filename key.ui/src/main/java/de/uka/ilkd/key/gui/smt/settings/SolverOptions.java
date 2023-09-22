@@ -12,13 +12,14 @@ import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
+
 /**
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
 class SolverOptions extends SettingsPanel implements SettingsProvider {
-    private static final String[] SOLVER_SUPPORT_TEXT = {SMTSettingsProvider.SOLVER_SUPPORTED,
-            SMTSettingsProvider.SOLVER_MAY_SUPPORTED, SMTSettingsProvider.SOLVER_UNSUPPORTED};
+    private static final String[] SOLVER_SUPPORT_TEXT = { SMTSettingsProvider.SOLVER_SUPPORTED,
+        SMTSettingsProvider.SOLVER_MAY_SUPPORTED, SMTSettingsProvider.SOLVER_UNSUPPORTED };
     private static final int SOLVER_SUPPORTED = 0;
 
     private static final int SOLVER_NOT_SUPPOTED = 1;
@@ -96,7 +97,8 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     protected JTextField createSolverSupported() {
 
         JTextField txt = addTextField("Support", getSolverSupportText(),
-            SMTSettingsProvider.INFO_SOLVER_SUPPORT + createSupportedVersionText(), emptyValidator());
+            SMTSettingsProvider.INFO_SOLVER_SUPPORT + createSupportedVersionText(),
+            emptyValidator());
         txt.setEditable(false);
         return txt;
     }

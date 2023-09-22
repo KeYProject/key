@@ -214,11 +214,11 @@ public final class LocSetLDT extends LDT {
     @Override
     public Function getFunctionFor(String operationName, Services services) {
         return switch (operationName) {
-            case "add" -> getUnion();
-            case "sub" -> getSetMinus();
-            case "mul" -> getIntersect();
-            case "le" -> getSubset();
-            default -> null;
+        case "add" -> getUnion();
+        case "sub" -> getSetMinus();
+        case "mul" -> getIntersect();
+        case "le" -> getSubset();
+        default -> null;
         };
     }
 }

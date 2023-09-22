@@ -3,6 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
+import java.io.File;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Consumer;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -15,16 +23,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
-import org.antlr.v4.runtime.CharStreams;
+
 import org.key_project.util.collection.ImmutableList;
 
-import javax.annotation.Nonnull;
-import java.io.File;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Consumer;
+import org.antlr.v4.runtime.CharStreams;
 
 /**
  * @author Alexander Weigl
@@ -157,30 +159,30 @@ public class EngineState {
             int childCount = node.childrenCount();
 
             switch (childCount) {
-                case 0 -> {
-                    result = getGoal(proof.openGoals(), node);
-                    if (!checkAutomatic || Objects.requireNonNull(result).isAutomatic()) {
-                        // We found our goal
-                        break loop;
-                    }
-                    node = choices.pollLast();
+            case 0 -> {
+                result = getGoal(proof.openGoals(), node);
+                if (!checkAutomatic || Objects.requireNonNull(result).isAutomatic()) {
+                    // We found our goal
+                    break loop;
                 }
-                case 1 -> node = node.child(0);
-                default -> {
-                    Node next = null;
-                    for (int i = 0; i < childCount; i++) {
-                        Node child = node.child(i);
-                        if (!child.isClosed()) {
-                            if (next == null) {
-                                next = child;
-                            } else {
-                                choices.add(child);
-                            }
+                node = choices.pollLast();
+            }
+            case 1 -> node = node.child(0);
+            default -> {
+                Node next = null;
+                for (int i = 0; i < childCount; i++) {
+                    Node child = node.child(i);
+                    if (!child.isClosed()) {
+                        if (next == null) {
+                            next = child;
+                        } else {
+                            choices.add(child);
                         }
                     }
-                    assert next != null;
-                    node = next;
                 }
+                assert next != null;
+                node = next;
+            }
             }
         }
 
@@ -191,10 +193,11 @@ public class EngineState {
     public Term toTerm(String string, Sort sort) throws ParserException, ScriptException {
         final var io = getKeyIO();
         var term = io.parseExpression(string);
-        if(sort == null || term.sort().equals(sort))
+        if (sort == null || term.sort().equals(sort))
             return term;
         else
-            throw new IllegalStateException("Unexpected sort for term: " + term+ ". Expected: " + sort);
+            throw new IllegalStateException(
+                "Unexpected sort for term: " + term + ". Expected: " + sort);
     }
 
     @Nonnull

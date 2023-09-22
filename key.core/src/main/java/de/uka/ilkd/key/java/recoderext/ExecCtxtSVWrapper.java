@@ -5,7 +5,6 @@ package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
-import recoder.java.SourceElement;
 import recoder.java.SourceVisitor;
 
 public class ExecCtxtSVWrapper extends ExecutionContext implements KeYRecoderExtension, SVWrapper {
