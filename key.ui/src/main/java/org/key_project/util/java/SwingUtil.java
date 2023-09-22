@@ -198,20 +198,18 @@ public final class SwingUtil {
     public static void showNotification(String title, String text) {
         if (System.getProperty("os.name").startsWith("Linux")) {
             // Linux: try notify-send (looks better than SystemTray)
-            String exe = "notify-send";
             try {
-                new CheckedProcessBuilder(exe, new String[] { exe, "-?" })
-                        .start(exe, "-a", "KeY", title, text);
+                new CheckedProcessBuilder("notify-send", new String[] { "-?" })
+                        .start("-a", "KeY", title, text);
             } catch (IOException | InterruptedException e) {
                 // since we checked for notify-send previously, this error is unlikely
                 LOGGER.warn(NOTIFICATION_ERROR, e);
             }
         } else if (System.getProperty("os.name").startsWith("Mac")) {
             // macOS: show a native notification
-            String exe = "osascript";
             try {
-                new CheckedProcessBuilder(exe, new String[] { exe, "-e", "return \"\"" })
-                        .start(exe, "-e",
+                new CheckedProcessBuilder("osascript", new String[] { "-e", "return \"\"" })
+                        .start("-e",
                             "display notification \"%s\" with title \"%s\"".formatted(text, title));
             } catch (IOException | InterruptedException e) {
                 // since we checked for osascript previously, this error is unlikely

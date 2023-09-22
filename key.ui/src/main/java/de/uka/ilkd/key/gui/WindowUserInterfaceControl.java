@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -39,6 +38,8 @@ import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
@@ -180,8 +181,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                         "Couldn't close Goal Nr. " + g.node().serialNr() + " automatically");
                     dialog.show();
                 }
-                if (!isAtLeastOneMacroRunning() && !MainWindow.getInstance().isActive()) {
-                    SwingUtil.showNotification("Automated proof search", info.toString());
+                if (!isAtLeastOneMacroRunning()) {
+                    showNotification("Automated proof search", info.toString());
                 }
             }
             mainWindow.displayResults(info.toString());
@@ -202,8 +203,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                             "Couldn't close Goal Nr. " + g.node().serialNr() + " automatically");
                         dialog.show();
                     }
-                    if (!isAtLeastOneMacroRunning() && !MainWindow.getInstance().isActive()) {
-                        SwingUtil.showNotification(macro.getName(), info.toString());
+                    if (!isAtLeastOneMacroRunning()) {
+                        showNotification(macro.getName(), info.toString());
                     }
                 }
             }
@@ -242,6 +243,24 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         }
         // this seems to be a good place to free some memory
         Runtime.getRuntime().gc();
+    }
+
+    /**
+     * Show a notification, if enabled by the settings.
+     *
+     * @param title header
+     * @param text body
+     */
+    private void showNotification(String title, String text) {
+        var mode =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().notificationAfterMacro();
+        if (mode.equals(ViewSettings.NOTIFICATION_ALWAYS)) {
+            SwingUtil.showNotification(title, text);
+        } else if (mode.equals(ViewSettings.NOTIFICATION_UNFOCUSED)) {
+            if (!MainWindow.getInstance().isActive()) {
+                SwingUtil.showNotification(title, text);
+            }
+        }
     }
 
     protected boolean inStopAtFirstUncloseableGoalMode(Proof proof) {

@@ -4,8 +4,10 @@
 package org.key_project.util.java;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +37,7 @@ public class CheckedProcessBuilder {
      * Create a new builder and check for the given program.
      *
      * @param program the program
-     * @param programCheck program invocation used to check (e.g. z3 --version)
+     * @param programCheck program invocation used to check (e.g. --version)
      */
     public CheckedProcessBuilder(String program, String[] programCheck) {
         this.program = program;
@@ -44,7 +46,9 @@ public class CheckedProcessBuilder {
         }
         CHECKED.add(program);
         try {
-            new ProcessBuilder(programCheck).start().waitFor();
+            String[] check = Stream.concat(Stream.of(program), Arrays.stream(programCheck))
+                    .toArray(String[]::new);
+            new ProcessBuilder(check).start().waitFor();
             AVAILABLE.add(program);
         } catch (IOException | InterruptedException e) {
             // not available
@@ -56,7 +60,7 @@ public class CheckedProcessBuilder {
      * Start and wait for the program with the given argument list.
      * If the program is not available, no action is done.
      *
-     * @param args arguments
+     * @param args arguments (without program name)
      * @throws IOException on start error (unlikely)
      * @throws InterruptedException on wait error
      */
@@ -64,11 +68,10 @@ public class CheckedProcessBuilder {
         if (args.length == 0) {
             throw new IllegalStateException("need program to execute");
         }
-        if (!args[0].equals(program)) {
-            throw new IllegalStateException("used for wrong program");
-        }
         if (AVAILABLE.contains(program)) {
-            new ProcessBuilder(args).start().waitFor();
+            String[] fullArgs =
+                Stream.concat(Stream.of(program), Arrays.stream(args)).toArray(String[]::new);
+            new ProcessBuilder(fullArgs).start().waitFor();
         }
     }
 }
