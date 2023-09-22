@@ -1,0 +1,552 @@
+/*
+ *  Copyright (c) 2016, 2018 Pixel Duke (Pedro Duque Vieira - www.pixelduke.com)
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions are met:
+ *    * Redistributions of source code must retain the above copyright
+ *  notice, this list of conditions and the following disclaimer.
+ *    * Redistributions in binary form must reproduce the above copyright
+ *  notice, this list of conditions and the following disclaimer in the
+ *  documentation and/or other materials provided with the distribution.
+ *    * Neither the name of Pixel Duke, any associated website, nor the
+ *  names of its contributors may be used to endorse or promote products
+ *  derived from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ *  DISCLAIMED. IN NO EVENT SHALL PIXEL DUKE BE LIABLE FOR ANY
+ *  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ *  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ *  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+.ribbon
+{
+    -fx-background: white;
+
+
+    /************************* CSS Variables (Override to set your own theme) ****************************************/
+
+    H1_COLOR: #2796c4; /* @Deprecated: Use ACCENT_COLOR instead. This variable will be removed in a later version */
+    ACCENT_COLOR: H1_COLOR;
+
+    RIBBON_BUTTON_HIGHLIGHT_COLOR: derive(ACCENT_COLOR, 95%);
+    BUTTON_SELECTED_COLOR: derive(RIBBON_BUTTON_HIGHLIGHT_COLOR, -3%); /* @Deprecated: Use RIBBON_BUTTON_SELECTED_COLOR instead. This variable will be removed in a later version */
+    RIBBON_BUTTON_SELECTED_COLOR: BUTTON_SELECTED_COLOR; /* Used for buttons when they're selected */
+
+    /* Label color of controls inside the Ribbon */
+    CONTROLS_LABEL_COLOR: #4b4b4b;
+    /* Color for titles - tabs titles */
+    TITLES_COLOR: gray;
+    /* Color for Ribbon group titles */
+    RIBBON_GROUP_TITLE: #767676;
+
+}
+
+.ribbon > .outer-container > .tab-pane > .tab-content-area
+{
+    -fx-background-color: #cccccc, white;
+    -fx-background-insets: 0, 0 0 1 0;
+}
+
+/**
+ *   For now, below, we'll be using "!important" until JMetro has support for the Ribbon
+ */
+
+/*******************************************************************************
+ *                                                                             *
+ * Label                                                                       *
+ *                                                                             *
+ ******************************************************************************/
+
+.ribbon .label{
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 1em;
+    -fx-text-fill: CONTROLS_LABEL_COLOR;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Ribbon Tab                                                                  *
+ *                                                                             *
+ ******************************************************************************/
+
+.ribbon > .outer-container > .tab-pane {
+    -fx-tab-min-height: 2.91666375em; /* 34 */
+    -fx-tab-max-height: 2.91666375em; /* 34 */
+}
+
+.ribbon > .outer-container > .tab-pane > .tab-header-area {
+    -fx-padding: 0 0.166667em 0em 0.416667em; /* 0 2 5 5 */
+}
+
+.ribbon > .outer-container > .tab-pane > .tab-header-area > .headers-region > .tab {
+    -fx-background-color: transparent, transparent, white;
+    -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;
+    -fx-padding: 0.083333em 1.25em 0.0769em 1.25em; /* 1 15 0.99 15 */
+}
+
+.ribbon > .outer-container > .tab-pane > .tab-header-area > .headers-region > .tab:selected {
+    -fx-background-color: transparent, #cccccc, white;
+    -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;
+}
+
+/* Contextual tabs */
+.ribbon > .outer-container > .tab-pane > .tab-header-area > .headers-region > .tab.blue {
+    -fx-background-color: transparent, transparent, lightblue;
+    -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;
+    -fx-padding: 0.083333em 1.25em 0.0769em 1.25em; /* 1 15 0.99 15 */
+}
+
+.ribbon > .outer-container > .tab-pane > .tab-header-area > .headers-region > .tab.blue:selected {
+    -fx-background-color: transparent, #cccccc, lightblue;
+    -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;
+}
+
+.ribbon > .outer-container > .tab-pane > .tab-header-area > .headers-region > .tab.orange {
+    -fx-background-color: transparent, transparent, orange;
+    -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;
+    -fx-padding: 0.083333em 1.25em 0.0769em 1.25em; /* 1 15 0.99 15 */
+}
+
+.ribbon > .outer-container > .tab-pane > .tab-header-area > .headers-region > .tab.orange:selected {
+    -fx-background-color: transparent, #cccccc, orange;
+    -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;
+}
+
+.ribbon > .outer-container > .tab-pane > .tab-header-area > .headers-region > .tab.green {
+    -fx-background-color: transparent, transparent, greenyellow;
+    -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;
+    -fx-padding: 0.083333em 1.25em 0.0769em 1.25em; /* 1 15 0.99 15 */
+}
+
+.ribbon > .outer-container > .tab-pane > .tab-header-area > .headers-region > .tab.green:selected {
+    -fx-background-color: transparent, #cccccc, greenyellow;
+    -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;
+}
+
+.ribbon > .outer-container > .tab-pane > .tab-header-area > .headers-region > .tab.yellow {
+    -fx-background-color: transparent, transparent, yellow;
+    -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;
+    -fx-padding: 0.083333em 1.25em 0.0769em 1.25em; /* 1 15 0.99 15 */
+}
+
+.ribbon > .outer-container > .tab-pane > .tab-header-area > .headers-region > .tab.yellow:selected {
+    -fx-background-color: transparent, #cccccc, yellow;
+    -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;
+}
+
+.ribbon > .outer-container > .tab-pane > .tab-header-area > .headers-region > .tab.violet {
+    -fx-background-color: transparent, transparent, violet;
+    -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;
+    -fx-padding: 0.083333em 1.25em 0.0769em 1.25em; /* 1 15 0.99 15 */
+}
+
+.ribbon > .outer-container > .tab-pane > .tab-header-area > .headers-region > .tab.violet:selected {
+    -fx-background-color: transparent, #cccccc, violet;
+    -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;
+}
+
+.ribbon > .outer-container > .tab-pane > .tab-header-area > .headers-region > .tab.pink {
+    -fx-background-color: transparent, transparent, lightpink;
+    -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;
+    -fx-padding: 0.083333em 1.25em 0.0769em 1.25em; /* 1 15 0.99 15 */
+}
+
+.ribbon > .outer-container > .tab-pane > .tab-header-area > .headers-region > .tab.pink:selected {
+    -fx-background-color: transparent, #cccccc, lightpink;
+    -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;
+}
+
+
+.ribbon  > .outer-container > .tab-pane > .tab-header-area > .headers-region > .tab > .tab-container > .tab-label {
+    -fx-text-fill: TITLES_COLOR !important;
+    -fx-font-size: 1em !important; /* 12 */
+    -fx-font-family: "Segoe UI";
+}
+
+.ribbon > .outer-container > .tab-pane > .tab-header-area > .headers-region > .tab:selected > .tab-container > .tab-label {
+    -fx-text-fill: ACCENT_COLOR !important;
+}
+
+.ribbon > .outer-container > .tab-pane > .tab-header-area > .headers-region > .tab:hover > .tab-container > .tab-label {
+    -fx-text-fill: ACCENT_COLOR !important;
+}
+
+.ribbon > .outer-container > .tab-pane > .tab-header-area > .tab-header-background {
+    -fx-background-color:
+        -fx-outer-border,
+        transparent,
+        white;
+    -fx-background-insets: 1 1 0 1, 0 0 1 0, 1;
+}
+
+.ribbon > .outer-container > .tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+    -fx-border-width: 0, 0;
+    -fx-border-color: transparent, transparent;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Ribbon Group                                                                *
+ *                                                                             *
+ ******************************************************************************/
+.ribbon-group {
+    -fx-padding: 0 10px 0 10px;
+}
+
+.ribbon-group .title {
+    -fx-text-fill: RIBBON_GROUP_TITLE;
+    -fx-font-family: "Segoe UI";
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Ribbon Item                                                                 *
+ *                                                                             *
+ ******************************************************************************/
+.ribbon-item .label
+{
+    -fx-padding: 0 5px 0 0;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Button                                                                      *
+ *                                                                             *
+ ******************************************************************************/
+
+.ribbon-group .button{
+    -fx-border-color: transparent !important;
+    -fx-border-width: 0 !important;
+
+    -fx-background-radius: 0 !important;
+
+    -fx-background-color: transparent !important;
+
+    -fx-font-family:"Segoe UI" !important;
+    -fx-font-size: 1em !important; /* 12 */
+    -fx-text-fill: CONTROLS_LABEL_COLOR !important;
+
+    -fx-padding: 0.333333em 0.666667em 0.333333em 0.666667em !important; /* 4 8 4 8 */
+
+    -shrink-animate-on-press: false !important;
+}
+
+.ribbon-group .button.big
+{
+    -fx-min-width: 50px;
+    -fx-max-width: 50px;
+    -fx-min-height: 100px;
+    -fx-max-height: 100px;
+}
+
+.ribbon-group .button:hover{
+    -fx-background-color: RIBBON_BUTTON_HIGHLIGHT_COLOR !important;
+}
+
+.ribbon-group .button:pressed, .ribbon-group .button:default:hover:pressed
+{
+    -fx-background-color: black !important;
+    -fx-text-fill: white !important;
+}
+
+.ribbon-group .button:focused
+{
+    -fx-border-color: transparent, black !important;
+    -fx-border-width: 1, 1 !important;
+    -fx-border-style: solid, segments(1, 2) !important;
+    -fx-border-radius: 0, 0 !important;
+    -fx-border-insets: 1 1 1 1, 0 !important;
+}
+
+.ribbon-group .button:disabled, .ribbon-group > .button:default:disabled
+{
+    -fx-opacity: 0.4 !important;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Toggle Button                                                               *
+ *                                                                             *
+ ******************************************************************************/
+
+.ribbon-group .toggle-button {
+    -fx-padding: 5 22 5 22 !important;
+    -fx-border-style: null !important;
+    -fx-background-radius: 0 !important;
+
+    -fx-background-color: transparent !important;
+
+    -fx-font-family:"Segoe UI" !important;
+    -fx-font-size: 1.166667em !important; /* 14 */
+    -fx-text-fill: CONTROLS_LABEL_COLOR !important;
+
+    -fx-border-color: transparent !important;
+    -fx-border-width: 2 !important;
+
+    -shrink-animate-on-press: false !important;
+}
+
+.ribbon-group .toggle-button.big {
+    -fx-min-width: 100px !important;
+    -fx-max-width: 100px !important;
+    -fx-min-height: 100px !important;
+    -fx-max-height: 100px !important;
+}
+
+.ribbon-group .toggle-button.normal {
+    -fx-padding: 2px 2px 2px 2px !important;
+}
+
+.ribbon-group .toggle-button:focused {
+    -fx-border-color: transparent, black !important;
+    -fx-border-width: 1, 1 !important;
+    -fx-border-style: solid, segments(1, 2) !important;
+    -fx-border-radius: 0, 0 !important;
+    -fx-border-insets: 1 1 1 1, 0 !important;
+}
+
+.ribbon-group .toggle-button:hover, .ribbon-group .toggle-button:hover:selected {
+    -fx-background-color: RIBBON_BUTTON_HIGHLIGHT_COLOR !important;
+}
+
+.ribbon-group .toggle-button:pressed, .ribbon-group .toggle-button:pressed:selected
+{
+    -fx-background-color: black !important;
+    -fx-text-fill: white !important;
+}
+
+.ribbon-group .toggle-button:selected {
+    -fx-background-color: RIBBON_BUTTON_SELECTED_COLOR !important;
+    -fx-text-fill: CONTROLS_LABEL_COLOR !important;
+}
+
+.ribbon-group .toggle-button:disabled {
+    -fx-opacity: 0.4 !important;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * ComboBox                                                                    *
+ *                                                                             *
+ ******************************************************************************/
+
+.ribbon-group .combo-box {
+    -fx-font-size: 1em !important;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Separator                                                                   *
+ *                                                                             *
+ ******************************************************************************/
+
+.ribbon-group .separator:vertical .line {
+    -fx-padding: 6px 6px 6px 6px;
+
+    -fx-border-color: null;
+    -fx-border-width: 2;
+    -fx-border-insets: 0;
+
+
+    -fx-min-width: 4px;
+    -fx-pref-width: 4px;
+    -fx-max-width: 4px;
+
+    -fx-background-insets: 12px 0px 12px 3px;
+    -fx-background-color: lightgray;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * MenuButton                                                                  *
+ *                                                                             *
+ ******************************************************************************/
+
+.ribbon-group > .ribbon-group-content > .menu-button {
+    -fx-border-color: transparent !important;
+    -fx-border-width: 2 !important;
+
+    -fx-background-radius: 0 !important;
+
+    -fx-background-color: transparent !important;
+
+    -fx-font-family:"Segoe UI" !important;
+    -fx-font-size: 1em !important; /* 12 */
+    -fx-text-fill: black !important;
+
+    -fx-min-width: 100px !important;
+    -fx-pref-width: 140px !important;
+    -fx-max-width: 180px !important;
+    -fx-min-height: 100px !important;
+    -fx-max-height: 100px !important;
+}
+
+.ribbon-group > .ribbon-group-content > .menu-button:hover{
+    -fx-background-color: RIBBON_BUTTON_HIGHLIGHT_COLOR !important;
+}
+
+.ribbon-group > .ribbon-group-content > .menu-button:pressed, .ribbon-group > .menu-button:default:hover:pressed
+{
+    -fx-background-color: black !important;
+    -fx-text-fill: white !important;
+}
+
+.ribbon-group > .ribbon-group-content > .menu-button:pressed > .arrow-button > .arrow{
+    -fx-background-color: white, white !important;
+}
+
+.ribbon-group > .ribbon-group-content > .menu-button:focused
+{
+    -fx-border-color: transparent, black !important;
+    -fx-border-width: 1, 1 !important;
+    -fx-border-style: solid, segments(1, 2) !important;
+    -fx-border-radius: 0, 0 !important;
+    -fx-border-insets: 1 1 1 1, 0 !important;
+}
+
+.ribbon-group > .ribbon-group-content > .menu-button:disabled, .ribbon-group > .menu-button:default:disabled
+{
+    -fx-opacity: 0.4 !important;
+    -fx-text-fill: #212121 !important;
+}
+
+.ribbon-group > .ribbon-group-content > .menu-button:default
+{
+    -fx-background-color: #008287 !important;
+    -fx-text-fill: #ffffff !important;
+}
+
+.ribbon-group > .ribbon-group-content > .menu-button:default:hover{
+    -fx-background-color: #219297 !important;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * QuickAccessBar Buttons                                                      *
+ *                                                                             *
+ ******************************************************************************/
+.tab-pane:bottom > .tab-header-area {
+    -fx-padding: 0 0.166667em 0.416667em 0.416667em !important; /* 0 2 5 5 */
+}
+
+.quick-access-bar {
+    -fx-background-color: white;
+    -fx-border-color: transparent;
+
+    /* align left with first ribbon tab border */
+    -fx-padding: 0 0 0 0.416667em; /* 0 0 0 5 */
+}
+
+.quick-access-bar > .outer-container{
+    -fx-padding: 0 5 0 0;
+}
+
+.quick-access-bar > .outer-container > .button-container {
+    -fx-background-color: white;
+    -fx-spacing: 5px;
+}
+
+.quick-access-bar > .outer-container .button {
+    -fx-border-color: transparent !important;
+    -fx-border-width: 0 !important;
+    -fx-padding: 0 !important;
+
+    -fx-background-radius: 0 !important;
+
+    -fx-background-color: transparent !important;
+
+    -fx-font-family:"Segoe UI" !important;
+    -fx-text-fill: #828282 !important;
+
+    -fx-min-width: 16px;
+    -fx-max-width: 16px;
+    -fx-min-height: 16px;
+    -fx-max-height: 16px;
+
+    -fx-content-display: right;
+    -fx-ellipsis-string: '';
+}
+
+.quick-access-bar > .outer-container .button.store-button > .label{
+    -fx-min-width: 16px;
+    -fx-max-width: 120px;
+    -fx-min-height: 16px;
+    -fx-max-height: 16px;
+}
+
+.quick-access-bar > .outer-container .button > .label{
+    -fx-font-size: 14px !important;
+}
+
+.quick-access-bar > .outer-container .button:hover{
+    -fx-background-color: RIBBON_BUTTON_HIGHLIGHT_COLOR !important;
+}
+
+.quick-access-bar > .outer-container .button:pressed
+{
+    -fx-background-color: black !important;
+    -fx-text-fill: white !important;
+}
+
+.quick-access-bar > .outer-container .button:focused
+{
+    -fx-border-color: transparent, black !important;
+    -fx-border-width: 1, 1 !important;
+    -fx-border-style: solid, segments(1, 2) !important;
+    -fx-border-radius: 0, 0 !important;
+    -fx-border-insets: 1 1 1 1, 0 !important;
+}
+
+.quick-access-bar > .outer-container .button:disabled
+{
+    -fx-opacity: 0.4 !important;
+}
+
+/*************** Preferences ******************/
+
+.quick-access-bar > .outer-container .button.preferences-button > .label{
+    -fx-text-fill: gray;
+}
+
+/*************** Save ******************/
+
+.quick-access-bar > .outer-container .button.save-button > .label{
+    -fx-text-fill: gray;
+}
+
+/*************** Help ******************/
+
+.quick-access-bar > .outer-container .button.help-button > .label{
+    -fx-text-fill: gray;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Column                                                                      *
+ *                                                                             *
+ ******************************************************************************/
+.ribbon-group-content {
+    /* These two below + the label height + the padding on ribbon-group define the height of the Ribbon */
+    -fx-max-height: 112px;
+    -fx-min-height: 112px;
+}
+
+.ribbon-group{
+    -fx-padding: 0 0 5px 0;
+}
+
+.ribbon-group-content > .column
+{
+    -fx-padding: 16px 0px 16px 10px;
+    -fx-spacing: 6;
+}
