@@ -30,7 +30,12 @@ public class TestComment {
     }
 
     public static void testComments() throws ParserException {
-        CompilationUnit cu = registerCU("class A {\n\n\n" + "// some comment\r\nA a; } class B {}");
+        CompilationUnit cu = registerCU("""
+                class A {
+
+
+                // some comment\r
+                A a; } class B {}""");
         FieldDeclaration fd = (FieldDeclaration) cu.getDeclarations().get(0).getMembers().get(0);
         TypeReference oldType = fd.getTypeReference();
         TypeReference newType = TypeKit.createTypeReference(sc.getProgramFactory(), "B");

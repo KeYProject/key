@@ -90,8 +90,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         for (JavaStatement statement : statements) {
             ImmutableSet<AuxiliaryContract> contracts = DefaultImmutableSet.nil();
 
-            if (statement instanceof StatementBlock) {
-                StatementBlock block = (StatementBlock) statement;
+            if (statement instanceof StatementBlock block) {
 
                 contracts =
                     contracts.union(services.getSpecificationRepository().getBlockContracts(block));
@@ -184,10 +183,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     "Unsupported kind of merge contract: " + spec.getClass().getSimpleName());
             }
 
-            if (spec instanceof PredicateAbstractionMergeContract) {
+            if (spec instanceof PredicateAbstractionMergeContract pamc) {
                 final MergePointStatement mps = spec.getMergePointStatement();
-                final PredicateAbstractionMergeContract pamc =
-                    (PredicateAbstractionMergeContract) spec;
                 addNeededVariables(pamc.getAtPres().keySet());
                 services.getSpecificationRepository().removeMergeContracts(mps);
                 services.getSpecificationRepository()

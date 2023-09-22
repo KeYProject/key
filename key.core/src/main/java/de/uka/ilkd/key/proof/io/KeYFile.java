@@ -410,9 +410,9 @@ public class KeYFile implements EnvInput {
     protected List<PositionedString> getPositionedStrings(List<BuildingIssue> issues) {
         return issues.stream().map(w -> {
             try {
-                return new PositionedString(w.getMessage(),
+                return new PositionedString(w.message(),
                     new Location(file != null ? new URL(file.getExternalForm()).toURI() : null,
-                        w.getPosition()));
+                        w.position()));
             } catch (MalformedURLException | URISyntaxException e) {
                 throw new RuntimeException(e);
             }

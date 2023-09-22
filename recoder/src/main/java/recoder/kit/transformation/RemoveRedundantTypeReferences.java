@@ -114,8 +114,7 @@ public class RemoveRedundantTypeReferences extends TwoPassTransformation {
                             .addAll(TypeKit.getRedundantSuperInterfaces(si, ((TypeDeclaration) p)));
                 } else if (removeExceptions && p instanceof Throws) {
                     references.addAll(TypeKit.getRedundantExceptions(si, (Throws) p));
-                } else if (removeTypeCasts && p instanceof TypeCast) {
-                    TypeCast tc = (TypeCast) p;
+                } else if (removeTypeCasts && p instanceof TypeCast tc) {
                     Type td = si.getType(tc.getTypeReference());
                     Type te = si.getType(tc.getExpressionAt(0));
                     ExpressionContainer parent = tc.getExpressionContainer();

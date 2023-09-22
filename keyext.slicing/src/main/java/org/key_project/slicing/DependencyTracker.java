@@ -117,8 +117,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         // check whether the rule of this proof step was added by another proof step
         // -> if so, add that dynamically added taclet as a dependency
         Rule rule = n.getAppliedRuleApp().rule();
-        if (rule instanceof Taclet) {
-            Taclet taclet = (Taclet) rule;
+        if (rule instanceof Taclet taclet) {
             if (taclet.getAddedBy() != null) {
                 input.add(new Pair<>(dynamicRules.get(taclet), false));
             }

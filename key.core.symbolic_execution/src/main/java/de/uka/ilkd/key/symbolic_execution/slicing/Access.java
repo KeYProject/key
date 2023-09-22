@@ -98,8 +98,7 @@ public class Access {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Access) {
-            Access other = (Access) obj;
+        if (obj instanceof Access other) {
             return Objects.equals(programVariable, other.getProgramVariable())
                     && Objects.equals(dimensionExpressions, other.getDimensionExpressions());
         } else {

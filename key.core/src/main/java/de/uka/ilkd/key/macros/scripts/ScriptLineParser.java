@@ -273,14 +273,6 @@ class ScriptLineParser {
         return pos;
     }
 
-    public static final class ParsedCommand {
-        public final Map<String, String> args;
-        public final Location start, end;
-
-        public ParsedCommand(Map<String, String> args, Location start, Location end) {
-            this.args = args;
-            this.start = start;
-            this.end = end;
-        }
+    public record ParsedCommand(Map<String, String> args, Location start, Location end) {
     }
 }

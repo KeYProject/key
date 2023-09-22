@@ -42,8 +42,7 @@ public class StaticInitialisation extends ProgramTransformer {
             } else {
                 return null; // no static initialisation necessary
             }
-        } else if (pe instanceof MethodReference) {
-            final MethodReference mr = (MethodReference) pe;
+        } else if (pe instanceof MethodReference mr) {
             final ExecutionContext ec = insts.getContextInstantiation().activeStatementContext();
             final IProgramMethod m;
             final KeYJavaType mrPrefixType = mr.determineStaticPrefixType(services, ec);

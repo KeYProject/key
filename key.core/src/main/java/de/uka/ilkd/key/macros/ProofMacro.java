@@ -233,7 +233,7 @@ public interface ProofMacro {
         public void taskStarted(TaskStartedInfo info) {
             // assert size == numberSteps;
             String suffix = getMessageSuffix();
-            super.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, info.getMessage() + suffix,
+            super.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, info.message() + suffix,
                 numberGoals * numberSteps));
             super.taskProgress(completedGoals * numberSteps);
         }

@@ -4,7 +4,6 @@
 package org.key_project.slicing;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.util.Pair;
 
@@ -58,11 +57,11 @@ class DependencyGraphTest {
         assertEquals(4, graph.countEdges());
 
         var incomingClosedGoal =
-            graph.incomingGraphEdgesOf(closedGoal).collect(Collectors.toList());
+            graph.incomingGraphEdgesOf(closedGoal).toList();
         assertEquals(1, incomingClosedGoal.size());
         assertEquals(formB, incomingClosedGoal.get(0).second);
 
-        var incomingFormB = graph.incomingGraphEdgesOf(formB).collect(Collectors.toList());
+        var incomingFormB = graph.incomingGraphEdgesOf(formB).toList();
         assertEquals(2, incomingFormB.size());
         if (incomingFormB.get(0).second.equals(formA)) {
             assertEquals(formC, incomingFormB.get(1).second);
@@ -74,7 +73,7 @@ class DependencyGraphTest {
         assertTrue(graph.containsNode(formD));
         assertTrue(graph.containsNode(closedGoal));
 
-        var neighborsB = graph.neighborsOf(formB).collect(Collectors.toList());
+        var neighborsB = graph.neighborsOf(formB).toList();
         assertEquals(3, neighborsB.size());
         assertTrue(neighborsB.contains(formA));
         assertTrue(neighborsB.contains(formC));

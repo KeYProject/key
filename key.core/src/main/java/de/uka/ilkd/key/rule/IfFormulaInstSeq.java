@@ -96,10 +96,9 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
 
     @Override
     public boolean equals(Object p_obj) {
-        if (!(p_obj instanceof IfFormulaInstSeq)) {
+        if (!(p_obj instanceof IfFormulaInstSeq other)) {
             return false;
         }
-        final IfFormulaInstSeq other = (IfFormulaInstSeq) p_obj;
         return seq == other.seq && cf == other.cf && antec == other.antec;
     }
 

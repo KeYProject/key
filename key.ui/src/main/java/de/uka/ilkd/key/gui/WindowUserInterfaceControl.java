@@ -251,7 +251,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @Override
     public void taskStarted(TaskStartedInfo info) {
         super.taskStarted(info);
-        mainWindow.setStatusLine(info.getMessage(), info.getSize());
+        mainWindow.setStatusLine(info.message(), info.size());
     }
 
     @Override

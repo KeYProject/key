@@ -175,8 +175,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
                 // Continue search in children
                 if (s instanceof StatementContainer) {
                     collectStatementsToExecute(toFill, (StatementContainer) s);
-                } else if (s instanceof BranchStatement) {
-                    BranchStatement bs = (BranchStatement) s;
+                } else if (s instanceof BranchStatement bs) {
                     for (int j = 0; j < bs.getBranchCount(); j++) {
                         Branch branch = bs.getBranchAt(j);
                         collectStatementsToExecute(toFill, branch);
@@ -266,8 +265,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ProgramMethodSubsetPO) {
-            ProgramMethodSubsetPO other = (ProgramMethodSubsetPO) obj;
+        if (obj instanceof ProgramMethodSubsetPO other) {
             return super.equals(obj)
                     && Objects.equals(getStartPosition(), other.getStartPosition())
                     && Objects.equals(getEndPosition(), other.getEndPosition());

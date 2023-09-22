@@ -198,8 +198,7 @@ public abstract class VariableNamer implements InstantiationProposer {
             }
 
             protected void doAction(ProgramElement node) {
-                if (node instanceof ProgramVariable) {
-                    ProgramVariable var = (ProgramVariable) node;
+                if (node instanceof ProgramVariable var) {
                     ProgramElementName name = var.getProgramElementName();
                     if (!(name instanceof TempIndProgramElementName)) {
                         BasenameAndIndex bai = getBasenameAndIndex(name);
@@ -251,8 +250,7 @@ public abstract class VariableNamer implements InstantiationProposer {
             }
 
             protected void doAction(ProgramElement node) {
-                if (node instanceof ProgramVariable) {
-                    ProgramVariable var = (ProgramVariable) node;
+                if (node instanceof ProgramVariable var) {
                     ProgramElementName varname = var.getProgramElementName();
                     if (varname.getProgramName().equals(nameToFind)) {
                         foundIt = true;
@@ -588,8 +586,7 @@ public abstract class VariableNamer implements InstantiationProposer {
                             app.instantiations(), services);
                         name = ProofSaver.printProgramElement(rhs);
                         break;
-                    } else if (c.getStatementAt(1) instanceof CopyAssignment) {
-                        CopyAssignment p2 = (CopyAssignment) c.getStatementAt(1);
+                    } else if (c.getStatementAt(1) instanceof CopyAssignment p2) {
                         Expression lhs = p2.getExpressionAt(0);
                         if (lhs.equals(sv)) {
                             SchemaVariable rhs = (SchemaVariable) p2.getExpressionAt(1);

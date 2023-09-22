@@ -319,8 +319,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                     }
                     mediator().getUI().getProofControl().applyInteractive(app, goal);
                 } catch (Exception exc) {
-                    if (exc instanceof SVInstantiationExceptionWithPosition) {
-                        var ex = (SVInstantiationExceptionWithPosition) exc;
+                    if (exc instanceof SVInstantiationExceptionWithPosition ex) {
                         errorPositionKnown(exc.getMessage(), ex.getPosition().line(),
                             ex.getPosition().column(), ex.inIfSequent());
                     }

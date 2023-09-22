@@ -706,9 +706,7 @@ public class Proof implements Named {
                 }
 
                 // Merge rule applications: Unlink all merge partners.
-                if (visitedNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
-                    final MergeRuleBuiltInRuleApp mergeApp =
-                        (MergeRuleBuiltInRuleApp) visitedNode.getAppliedRuleApp();
+                if (visitedNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp mergeApp) {
 
                     for (MergePartner mergePartner : mergeApp.getMergePartners()) {
                         final Goal linkedGoal = mergePartner.getGoal();
@@ -1481,7 +1479,7 @@ public class Proof implements Named {
             if (c == null) {
                 continue;
             }
-            if (referencedFrom != null && referencedFrom != c.getProof()) {
+            if (referencedFrom != null && referencedFrom != c.proof()) {
                 continue;
             }
             todo.add(g);
@@ -1494,7 +1492,7 @@ public class Proof implements Named {
             ClosedBy c = g.node().lookup(ClosedBy.class);
             g.node().deregister(c, ClosedBy.class);
             try {
-                new CopyingProofReplayer(c.getProof(), this).copy(c.getNode(), g);
+                new CopyingProofReplayer(c.proof(), this).copy(c.node(), g);
             } catch (IntermediateProofReplayer.BuiltInConstructionException e) {
                 throw new RuntimeException(e);
             }

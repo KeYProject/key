@@ -159,8 +159,7 @@ public class NodeInfo {
     public static SourceElement computeFirstStatement(RuleApp ruleApp) {
         SourceElement firstStatement = null;
         // TODO: unify with MiscTools getActiveStatement
-        if (ruleApp instanceof PosTacletApp) {
-            PosTacletApp pta = (PosTacletApp) ruleApp;
+        if (ruleApp instanceof PosTacletApp pta) {
             if (!isSymbolicExecution(pta.taclet())) {
                 return null;
             }
@@ -310,8 +309,8 @@ public class NodeInfo {
             return;
         }
         RuleApp ruleApp = node.parent().getAppliedRuleApp();
-        if (ruleApp instanceof TacletApp) {
-            TacletApp tacletApp = (TacletApp) ruleApp; // XXX
+        if (ruleApp instanceof TacletApp tacletApp) {
+            // XXX
 
             Pattern p = Pattern.compile("#\\w+");
             Matcher m = p.matcher(s);

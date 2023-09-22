@@ -684,8 +684,7 @@ public class Recoder2KeY implements JavaReader {
 
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
-            if (pe instanceof MethodDeclaration) {
-                MethodDeclaration methDecl = (MethodDeclaration) pe;
+            if (pe instanceof MethodDeclaration methDecl) {
                 if (!allowed && methDecl.getBody() != null) {
                     LOGGER.warn("Method body ({}) should not be allowed: {}", methDecl.getName(),
                         rcu.getDataLocation());
@@ -702,8 +701,7 @@ public class Recoder2KeY implements JavaReader {
              * +rcu.getDataLocation(), Recoder2KeY.class.getName()); }
              * fieldSpec.setInitializer(null); }
              */
-            if (pe instanceof ClassInitializer) {
-                ClassInitializer classInit = (ClassInitializer) pe;
+            if (pe instanceof ClassInitializer classInit) {
                 if (!allowed && classInit.getBody() != null) {
                     LOGGER.warn("There should be no class initializers: {}", rcu.getDataLocation());
                 }
@@ -900,9 +898,7 @@ public class Recoder2KeY implements JavaReader {
         }
 
         for (int i = 0, sz = memberList.size(); i < sz; i++) {
-            if (memberList.get(i) instanceof recoder.java.declaration.MethodDeclaration) {
-                recoder.java.declaration.MethodDeclaration olddecl =
-                    (recoder.java.declaration.MethodDeclaration) memberList.get(i);
+            if (memberList.get(i) instanceof MethodDeclaration olddecl) {
                 if (olddecl.getName().equals(mdecl.getName())) {
                     memberList.remove(i);
                 }

@@ -254,10 +254,9 @@ public class PredictCostProver {
 
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof Clause)) {
+            if (!(o instanceof Clause other)) {
                 return false;
             }
-            final Clause other = (Clause) o;
             if (other.literals.size() != literals.size()) {
                 return false;
             }

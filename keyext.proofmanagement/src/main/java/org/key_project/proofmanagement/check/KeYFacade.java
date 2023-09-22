@@ -225,8 +225,7 @@ public final class KeYFacade {
         Contract contract = contractPO.getContract();
         line.contract = contract;
         Type type = contract.getTarget().getContainerType().getJavaType();
-        if (type instanceof JavaSourceElement) {
-            JavaSourceElement jse = (JavaSourceElement) type;
+        if (type instanceof JavaSourceElement jse) {
             line.sourceFile = jse.getPositionInfo().getURL().orElseThrow();
             String str = line.sourceFile.toString();
             line.shortSrc = str.substring(str.lastIndexOf('/') + 1);

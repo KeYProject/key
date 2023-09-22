@@ -19,7 +19,7 @@ public class TriggerVarInstantiatedFeature extends BinaryTacletAppFeature {
         assert app.taclet().hasTrigger();
 
         SVInstantiationProjection instProj = SVInstantiationProjection
-                .create(app.taclet().getTrigger().getTriggerVar().name(), false);
+                .create(app.taclet().getTrigger().triggerVar().name(), false);
 
         return instProj.toTerm(app, pos, goal) != null;
     }

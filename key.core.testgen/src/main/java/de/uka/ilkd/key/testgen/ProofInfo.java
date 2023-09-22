@@ -76,8 +76,7 @@ public class ProofInfo {
 
     public Term getPreConTerm() {
         Contract c = getContract();
-        if (c instanceof FunctionalOperationContract) {
-            FunctionalOperationContract t = (FunctionalOperationContract) c;
+        if (c instanceof FunctionalOperationContract t) {
             OriginalVariables orig = t.getOrigVars();
             Term post = t.getPre(services.getTypeConverter().getHeapLDT().getHeap(), orig.self,
                 orig.params, orig.atPres, services);
@@ -165,8 +164,7 @@ public class ProofInfo {
 
 
     private String processUpdate(Term update) {
-        if (update.op() instanceof ElementaryUpdate) {
-            ElementaryUpdate up = (ElementaryUpdate) update.op();
+        if (update.op() instanceof ElementaryUpdate up) {
             if (up.lhs().sort()
                     .extendsTrans(services.getTypeConverter().getHeapLDT().targetSort())) {
                 return "";
