@@ -8,6 +8,9 @@ import de.uka.ilkd.key.prover.TaskFinishedInfo;
 
 public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
 
+    /**
+     * See {@link TaskFinishedInfo#getSource()} for possible values.
+     */
     private final Object source;
 
     // TODO
