@@ -9,7 +9,7 @@ import java.net.URISyntaxException;
 import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nparser.ChoiceInformation;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ProblemInformation;
@@ -37,7 +37,7 @@ import org.antlr.v4.runtime.Token;
  * obligation.
  */
 public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
-    private Term problemTerm = null;
+    private Sequent problemTerm = null;
 
     // -------------------------------------------------------------------------
     // constructors
