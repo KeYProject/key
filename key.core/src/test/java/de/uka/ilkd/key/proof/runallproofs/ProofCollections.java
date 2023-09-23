@@ -965,6 +965,10 @@ public class ProofCollections {
         g.provable("redux/arrays/ArrayCopy.arraycopy.exceptional.0.key");
         g.provable("redux/arrays/ArrayCopy.arraycopy.exceptional.1.key");
 
+        g = c.group("AlgebraicDatatypes");
+        g.provable("standard_key/adt/dt_list.key");
+
+
         return c;
     }
 
