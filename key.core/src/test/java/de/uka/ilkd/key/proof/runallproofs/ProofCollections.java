@@ -966,8 +966,9 @@ public class ProofCollections {
         g.provable("redux/arrays/ArrayCopy.arraycopy.exceptional.1.key");
 
         g = c.group("AlgebraicDatatypes");
-        g.provable("standard_key/adt/dt_list.key");
-
+        g.loadable("standard_key/adt/dt_list_revrev.proof");
+        g.loadable("standard_key/adt/dt_list_appnil.proof");
+        g.loadable("standard_key/adt/dt_color.proof");
 
         return c;
     }
