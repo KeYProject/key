@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic.sort;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -23,9 +23,6 @@ public abstract class AbstractSort implements Sort {
      * //@see de.uka.ilkd.key.nparser.KeYParser.One_sort_declContext#doc
      */
     private String documentation;
-
-    /** Information of the origin of this sort */
-    private String origin;
 
     public AbstractSort(Name name, ImmutableSet<Sort> ext, boolean isAbstract) {
         this.name = name;
@@ -86,15 +83,5 @@ public abstract class AbstractSort implements Sort {
     @Override
     public String getDocumentation() {
         return documentation;
-    }
-
-    @Nullable
-    @Override
-    public String getOrigin() {
-        return origin;
-    }
-
-    public void setOrigin(@Nullable String origin) {
-        this.origin = origin;
     }
 }

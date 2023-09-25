@@ -1,4 +1,7 @@
 module org.key_project.util {
+    requires java.desktop;
+    requires jakarta.annotation;
+
     exports org.key_project.util.bean;
     exports org.key_project.util.collection;
     exports org.key_project.util.bitops;

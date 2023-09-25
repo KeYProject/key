@@ -5,7 +5,6 @@ package de.uka.ilkd.key.logic.sort;
 
 import de.uka.ilkd.key.java.Services;
 import org.key_project.logic.Name;
-import org.key_project.logic.Named;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.rule.HasOrigin;
@@ -15,8 +14,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.jspecify.annotations.Nullable;
 
 
-public interface Sort extends Named, HasOrigin {
-
+public interface Sort extends org.key_project.logic.sort.Sort<Sort>, HasOrigin {
     /**
      * Formulas are represented as "terms" of this sort.
      */
@@ -52,23 +50,11 @@ public interface Sort extends Named, HasOrigin {
      */
     Name EXACT_INSTANCE_NAME = new Name("exactInstance");
 
-
-    /**
-     * @return the direct supersorts of this sort. Not supported by {@code NullSort}.
-     */
-    ImmutableSet<Sort> extendsSorts();
-
     /**
      * @param services services.
      * @return the direct supersorts of this sort.
      */
     ImmutableSet<Sort> extendsSorts(Services services);
-
-    /**
-     * @param s some sort.
-     * @return whether the given sort is a reflexive, transitive subsort of this sort.
-     */
-    boolean extendsTrans(Sort s);
 
     /**
      * @return whether this sort has no exact elements.
@@ -92,13 +78,4 @@ public interface Sort extends Named, HasOrigin {
      * @return the {@code exactinstanceof} symbol of this sort.
      */
     SortDependingFunction getExactInstanceofSymbol(TermServices services);
-
-    String declarationString();
-
-    /**
-     * Returns an human explainable text describing this sort. This field is typical set by the
-     * parser, who captures the documentation comments.
-     */
-    @Nullable
-    default String getDocumentation() { return null; }
 }

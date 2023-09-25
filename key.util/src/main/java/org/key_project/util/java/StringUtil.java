@@ -8,9 +8,7 @@ import java.util.Comparator;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import javax.swing.*;
-
 import org.jspecify.annotations.NonNull;
-
 
 /**
  * Provides static methods to work with strings.

@@ -3,14 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic.sort;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
-import org.key_project.rule.HasOrigin;
 import org.key_project.util.collection.ImmutableSet;
 
-public interface Sort extends Named, HasOrigin {
+public interface Sort<S extends Sort> extends Named {
     /**
      * Formulas are represented as "terms" of this sort.
      */
@@ -22,11 +21,6 @@ public interface Sort extends Named, HasOrigin {
     Sort UPDATE = new SortImpl(new Name("Update"));
 
     /**
-     * Term labels are represented as "terms" of this sort.
-     */
-    Sort TERMLABEL = new SortImpl(new Name("TermLabel"));
-
-    /**
      * Any is a supersort of all sorts.
      */
     Sort ANY = new SortImpl(new Name("any"));
@@ -34,13 +28,13 @@ public interface Sort extends Named, HasOrigin {
     /**
      * @return the direct supersorts of this sort. Not supported by {@code NullSort}.
      */
-    ImmutableSet<Sort> extendsSorts();
+    ImmutableSet<S> extendsSorts();
 
     /**
      * @param s some sort.
      * @return whether the given sort is a reflexive, transitive subsort of this sort.
      */
-    boolean extendsTrans(Sort s);
+    boolean extendsTrans(S s);
 
     /**
      * @return whether this sort has no exact elements.
@@ -55,4 +49,6 @@ public interface Sort extends Named, HasOrigin {
      */
     @Nullable
     default String getDocumentation() { return null; }
+
+
 }
