@@ -11,16 +11,20 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.util.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
+import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.RuleSource;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.PredictionMode;
+import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.slf4j.Logger;
@@ -37,6 +41,13 @@ import org.slf4j.LoggerFactory;
  */
 public final class ParsingFacade {
     private static final Logger LOGGER = LoggerFactory.getLogger(ParsingFacade.class);
+
+    /**
+     * TODO weigl
+     */
+    public static final boolean DISABLE_PARSER_CACHE = Boolean.getBoolean("key.antlr.caching");
+
+    private static final Map<String, CachedRuleContext> ANTLR_CACHE = new HashMap<>();
 
     private ParsingFacade() {
     }
@@ -125,6 +136,16 @@ public final class ParsingFacade {
     }
 
     public static KeyAst.File parseFile(CharStream stream) {
+        if(!DISABLE_PARSER_CACHE){
+            var key = stream.getSourceName();
+            if (ANTLR_CACHE.containsKey(key)) {
+                var entry = ANTLR_CACHE.get(key);
+                //var mtime = Files.getLastModifiedTime(file);
+                //if (mtime.compareTo(entry.mtime()) <= 0) {
+                    return new KeyAst.File(entry.context);
+                //}
+            }
+        }
         KeYParser p = createParser(stream);
 
         p.getInterpreter().setPredictionMode(PredictionMode.SLL);
@@ -141,6 +162,12 @@ public final class ParsingFacade {
         }
 
         p.getErrorReporter().throwException();
+
+        if (!DISABLE_PARSER_CACHE) {
+            var entry = new CachedRuleContext(null/*Files.getLastModifiedTime(file)*/, ctx);
+            ANTLR_CACHE.put(stream.getSourceName(), entry);
+        }
+
         return new KeyAst.File(ctx);
     }
 
@@ -192,4 +219,6 @@ public final class ParsingFacade {
         String value = docComment.getText();
         return value.substring(3, value.length() - 2);// remove leading "/*!" and trailing "*/"
     }
+
+    private record CachedRuleContext(FileTime mtime, KeYParser.FileContext context) {}
 }
