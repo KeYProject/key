@@ -29,7 +29,6 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.conditions.TypeResolver;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.util.collection.DefaultImmutableSet;
