@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
+          distribution: 'corretto'
           java-version: '21'
           cache: 'gradle'
       - name: Build with Gradle
@@ -61,7 +61,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
+          distribution: 'corretto'
           java-version: '21'
           cache: 'gradle'
 
@@ -89,7 +89,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
+          distribution: 'corretto'
           java-version: '21'
           cache: 'gradle'
       - name: Build with Gradle
