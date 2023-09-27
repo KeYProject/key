@@ -56,7 +56,7 @@ public class ProofReplayer {
     public static void run(@Nonnull Token token, CharStream input, IProofFileParser prl,
             URI source) {
         input.seek(1 + token.getStopIndex()); // ends now on \proof|
-        run(input, prl, token.getLine() - 1, source);
+        run(input, prl, token.getLine(), source);
     }
 
     /**
