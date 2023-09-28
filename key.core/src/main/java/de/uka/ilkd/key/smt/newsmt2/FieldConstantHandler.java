@@ -69,6 +69,8 @@ public class FieldConstantHandler implements SMTHandler {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         Operator op = term.op();
 
+        trans.addSort(((SortedOperator) op).sort());
+
         if (op == heapLDT.getArr()) {
             trans.introduceSymbol("arr");
             return trans.handleAsFunctionCall("arr", term);
