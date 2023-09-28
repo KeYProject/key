@@ -69,7 +69,7 @@ public class ProblemFinder extends ExpressionBuilder {
         if (obj instanceof Sequent s)
             return s;
         if (obj instanceof Term t)
-            return Sequent.createAnteSequent(new Semisequent(new SequentFormula(t)));
+            return Sequent.createSuccSequent(new Semisequent(new SequentFormula(t)));
         return null;
     }
 
