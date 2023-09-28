@@ -21,7 +21,7 @@ plugins {
     // id "com.github.ben-manes.versions" version "0.39.0"
 
     // Code formatting
-    id "com.diffplug.spotless" version "6.20.0"
+    id "com.diffplug.spotless" version "6.21.0"
 }
 
 // Configure this project for use inside IntelliJ:
@@ -78,7 +78,7 @@ subprojects {
     }
 
     dependencies {
-        implementation("org.slf4j:slf4j-api:2.0.7")
+        implementation("org.slf4j:slf4j-api:2.0.9")
         testImplementation("ch.qos.logback:logback-classic:1.4.11")
 
         //compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.12.0'
