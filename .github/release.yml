@@ -6,18 +6,23 @@
 changelog:
   exclude:
     labels:
-      - ignore-for-release
+      - "Ignore in Changelog"
     authors:
       - octocat
       - dependabot
   categories:
-    - title: Core
+    - title: Breaking Changes 🗲
       labels:
-    - title: UI
+        - "Breaking Change"
+    - title: Exciting New Features 🎉
       labels:
-        - enhancement
-    - title: Proof Scripts
-
+        - "Exciting New Feature"
+    - title: Enhancement
+      labels:
+        - "Enhancement"
+    - title: Bug Fixes
+      labels:
+        - "🐞 Bug"
     - title: Other Changes
       labels:
         - "*"
