@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import javax.annotation.Nonnull;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
@@ -40,6 +38,8 @@ import de.uka.ilkd.key.util.Union;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Implements the rule which translates the toplevel formula
@@ -150,7 +150,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         return true;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
         Union<Instantiation, ModelFieldInstantiation> inst =

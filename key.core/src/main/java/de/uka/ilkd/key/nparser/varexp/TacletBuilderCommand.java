@@ -4,9 +4,10 @@
 package de.uka.ilkd.key.nparser.varexp;
 
 import java.util.List;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This interface describes a commands that manipulate taclets during construction in the parser.
@@ -23,7 +24,7 @@ public interface TacletBuilderCommand {
      * Checks if this command is responsible for the given command name. For example, for
      * {@code \varcond(\newType(t))} the name would be "newType".
      */
-    boolean isSuitableFor(@Nonnull String name);
+    boolean isSuitableFor(@NonNull String name);
 
     /**
      * Defines the amount and type of expected arguments. For example, if you want describe a

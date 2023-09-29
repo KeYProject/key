@@ -7,7 +7,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.Nullable;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Little helper class that helps to check for the version of a solver. Mainly it provides a method

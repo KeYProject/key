@@ -38,6 +38,8 @@ import de.uka.ilkd.key.util.Triple;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * <p>
  * A {@link BuiltInRule} which evaluates a modality in a side proof.
@@ -132,6 +134,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
     /**
      * {@inheritDoc}
      */
+    @NonNull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException {

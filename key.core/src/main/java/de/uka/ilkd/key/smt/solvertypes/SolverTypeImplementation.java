@@ -7,8 +7,6 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
@@ -16,6 +14,8 @@ import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.communication.Z3Socket;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -473,7 +473,7 @@ public final class SolverTypeImplementation implements SolverType {
         return supportHasBeenChecked;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public AbstractSolverSocket getSocket(ModelExtractor query) {
         AbstractSolverSocket socket = solverSocket.copy();

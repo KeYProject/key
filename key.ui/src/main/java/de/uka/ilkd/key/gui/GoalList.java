@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
 import java.util.WeakHashMap;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -38,6 +37,7 @@ import de.uka.ilkd.key.proof.*;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +111,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
             KeYGuiExtension.KeyboardShortcuts.GOAL_LIST);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getTitle() {
         return "Goals";
@@ -122,7 +122,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         return GOAL_LIST_ICON;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public JComponent getComponent() {
         return new JScrollPane(this);

@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -33,6 +32,8 @@ import de.uka.ilkd.key.util.properties.Properties.Property;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A proof is represented as a tree of nodes containing sequents. The initial proof consists of just
@@ -523,7 +524,7 @@ public final class Goal {
      * @param n number of goals to create
      * @return the list of new created goals.
      */
-    @Nonnull
+    @NonNull
     public ImmutableList<Goal> split(int n) {
         ImmutableList<Goal> goalList = ImmutableSLList.nil();
 

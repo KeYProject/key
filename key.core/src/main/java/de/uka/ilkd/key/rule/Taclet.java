@@ -4,8 +4,6 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.*;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -28,6 +26,9 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static org.key_project.util.Strings.formatAsList;
 
@@ -949,7 +950,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
      *         close-goal-taclet ( this.closeGoal () ), the first goal of the return list is the
      *         goal that should be closed (with the constraint this taclet is applied under).
      */
-    @Nonnull
+    @NonNull
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp tacletApp) {
         return getExecutor().apply(goal, services, tacletApp);

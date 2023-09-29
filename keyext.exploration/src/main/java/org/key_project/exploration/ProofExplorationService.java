@@ -4,8 +4,6 @@
 package org.key_project.exploration;
 
 import java.util.Objects;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
@@ -18,6 +16,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.*;
 
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * ExplorationAction that handles the addition of formulas to the sequent. This action is
@@ -44,19 +45,19 @@ import org.key_project.util.collection.ImmutableList;
 
 @SuppressWarnings("ClassCanBeRecord")
 public class ProofExplorationService {
-    private final @Nonnull Proof proof;
-    private final @Nonnull Services services;
+    private final @NonNull Proof proof;
+    private final @NonNull Services services;
 
-    public ProofExplorationService(@Nonnull Proof proof, @Nonnull Services services) {
+    public ProofExplorationService(@NonNull Proof proof, @NonNull Services services) {
         this.proof = proof;
         this.services = services;
     }
 
-    public static @Nonnull ProofExplorationService get(KeYMediator mediator) {
+    public static @NonNull ProofExplorationService get(KeYMediator mediator) {
         return get(mediator.getSelectedProof());
     }
 
-    private static @Nonnull ProofExplorationService get(Proof selectedProof) {
+    private static @NonNull ProofExplorationService get(Proof selectedProof) {
         @Nullable
         ProofExplorationService service = selectedProof.lookup(ProofExplorationService.class);
         if (service == null) {
@@ -78,7 +79,7 @@ public class ProofExplorationService {
     /**
      * Finds the `cut` taclet in the current proof environment.
      */
-    public @Nonnull Taclet getCutTaclet() {
+    public @NonNull Taclet getCutTaclet() {
         return Objects.requireNonNull(
             proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut")));
     }
@@ -90,7 +91,7 @@ public class ProofExplorationService {
      * @param t Term to add to teh sequent
      * @param antecedent whether to add teh term to antecedent
      */
-    public @Nonnull Node soundAddition(@Nonnull Goal g, @Nonnull Term t, boolean antecedent) {
+    public @NonNull Node soundAddition(@NonNull Goal g, @NonNull Term t, boolean antecedent) {
         Taclet cut =
             g.proof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
         Semisequent semisequent = new Semisequent(new SequentFormula(t));
@@ -130,12 +131,12 @@ public class ProofExplorationService {
         return toBeSelected;
     }
 
-    public Node applyChangeFormula(@Nonnull Goal g, @Nonnull PosInOccurrence pio,
-            @Nonnull Term term, @Nonnull Term newTerm) {
+    public Node applyChangeFormula(@NonNull Goal g, @NonNull PosInOccurrence pio,
+            @NonNull Term term, @NonNull Term newTerm) {
         TacletApp app = soundChange(pio, term, newTerm);
 
         // taint goal with exploration
-        @Nonnull
+        @NonNull
         ExplorationNodeData data = ExplorationNodeData.get(g.node());
         data.setExplorationAction(
             String.format("Edit %s to %s", LogicPrinter.quickPrintTerm(term, services),
@@ -171,8 +172,8 @@ public class ProofExplorationService {
         return toBeSelected;
     }
 
-    private TacletApp soundChange(@Nonnull PosInOccurrence pio, @Nonnull Term term,
-            @Nonnull Term newTerm) {
+    private TacletApp soundChange(@NonNull PosInOccurrence pio, @NonNull Term term,
+            @NonNull Term newTerm) {
         Taclet cut = getCutTaclet();
         Semisequent semisequent = new Semisequent(new SequentFormula(newTerm));
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);

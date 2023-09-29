@@ -5,7 +5,6 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -13,6 +12,8 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * A JML loop specification (invariant, assignable clause, decreases clause, ...) in textual form.
