@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.dl.translation;
 
 import java.util.LinkedHashMap;
@@ -69,11 +72,10 @@ public final class DLSpecFactory {
         if (fma.sub(1).op() instanceof UpdateApplication) {
             final Term update = fma.sub(1).sub(0);
             assert update.sort() == Sort.UPDATE;
-            if (!(update.op() instanceof ElementaryUpdate)) {
+            if (!(update.op() instanceof ElementaryUpdate eu)) {
                 throw new ProofInputException(
                     "Elementary update expected, " + "but found: " + update);
             }
-            final ElementaryUpdate eu = (ElementaryUpdate) update.op();
             if (!(eu.lhs() instanceof ProgramVariable)) {
                 throw new ProofInputException(
                     "Program variable expected, " + "but found: " + eu.lhs());

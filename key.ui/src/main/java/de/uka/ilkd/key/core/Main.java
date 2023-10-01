@@ -1,9 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.core;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -169,11 +173,16 @@ public final class Main {
      */
     public static final boolean showExampleChooserIfExamplesDirIsDefined = true;
 
+    private Main() {
+    }
+
     public static void main(final String[] args) {
         Locale.setDefault(Locale.US);
 
         // does no harm on non macs
         System.setProperty("apple.laf.useScreenMenuBar", "true");
+
+        Watchdog.start();
 
         try {
             cl = createCommandLine();
@@ -508,8 +517,6 @@ public final class Main {
 
             return new ConsoleUserInterfaceControl(loadOnly);
         } else {
-            updateSplashScreen();
-
             /*
              * explicitly enable pruning in closed branches for interactive mode (if not manually
              * disabled)
@@ -540,22 +547,39 @@ public final class Main {
         File examplesDir = getExamplesDir() == null ? ExampleChooser.lookForExamples()
                 : new File(getExamplesDir());
         if (!examplesDir.exists()) {
-            examplesDir = WebstartMain.setupExamples();
+            examplesDir = setupExamples();
         }
-        if (examplesDir != null) {
-            setExamplesDir(examplesDir.getAbsolutePath());
+        setExamplesDir(examplesDir.getAbsolutePath());
+    }
+
+    private static File setupExamples() {
+        try {
+            URL examplesURL = Main.class.getResource("/examples.zip");
+            if (examplesURL == null) {
+                throw new IOException("Missing examples.zip in resources");
+            }
+
+            File tempDir = createTempDirectory();
+
+            if (tempDir != null) {
+                IOUtil.extractZip(examplesURL.openStream(), tempDir.toPath());
+            }
+            return tempDir;
+        } catch (IOException e) {
+            LOGGER.warn("Error setting up examples", e);
+            return null;
         }
     }
 
-    private static void updateSplashScreen() {
-        try {
-            final java.awt.SplashScreen sp = java.awt.SplashScreen.getSplashScreen();
-            if (sp == null) {
-                // insert customization code here
-                // see http://docs.oracle.com/javase/tutorial/uiswing/misc/splashscreen.html
-            }
-        } catch (Exception e) {
+
+    private static File createTempDirectory() throws IOException {
+        final File tempDir = File.createTempFile("keyheap-examples-", null);
+        tempDir.delete();
+        if (!tempDir.mkdir()) {
+            return null;
         }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> IOUtil.delete(tempDir)));
+        return tempDir;
     }
 
     private static void evaluateLemmataOptions(CommandLine options) {

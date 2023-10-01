@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.ArrayList;
@@ -139,19 +142,19 @@ public class SExprs {
 
         if (type == Type.UNIVERSE) {
             // Use the injection to go to universe
-            if (orgType.injection == null) {
+            if (orgType.injection() == null) {
                 throw new SMTTranslationException(
                     "Cannot inject from " + orgType + " into U: " + exp);
             }
-            return new SExpr(orgType.injection, type, exp);
+            return new SExpr(orgType.injection(), type, exp);
         }
 
         if (orgType == Type.UNIVERSE) {
             // Use the projection to go to other type
-            if (type.projection == null) {
+            if (type.projection() == null) {
                 throw new SMTTranslationException("Cannot project from U to " + type + ": " + exp);
             }
-            return new SExpr(type.projection, type, exp);
+            return new SExpr(type.projection(), type, exp);
         }
 
         throw new SMTTranslationException(

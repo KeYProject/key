@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.util.Iterator;
@@ -79,8 +82,7 @@ public class TacletPrefixBuilder {
         }
         if (t.hasLabels()) {
             for (TermLabel l : t.getLabels()) {
-                if (l instanceof SchemaVariable) {
-                    SchemaVariable sv = (SchemaVariable) l;
+                if (l instanceof SchemaVariable sv) {
                     ImmutableSet<SchemaVariable> relevantBoundVars = removeNotFreeIn(sv);
                     TacletPrefix prefix = prefixMap.get(sv);
                     if (prefix == null || prefix.prefix().equals(relevantBoundVars)) {

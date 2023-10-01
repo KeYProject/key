@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.proofevent;
 
 
@@ -55,7 +58,7 @@ public class NodeChangeJournal implements GoalListener {
 
         for (final ImmutableMapEntry<Node, NodeChangesHolder> entry : changes) {
             final Node newNode = entry.key();
-            final Goal newGoal = proof.getGoal(newNode);
+            final Goal newGoal = proof.getOpenGoal(newNode);
 
             if (newGoal != null) {
                 final NodeChangesHolder nc = entry.value();

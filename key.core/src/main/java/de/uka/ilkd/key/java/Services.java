@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import java.util.HashMap;
@@ -325,6 +328,17 @@ public class Services implements TermServices {
         c = new Counter(name);
         counters.put(name, c);
         return c;
+    }
+
+    /**
+     * Reset all counters associated with this service.
+     * Only use this method if the proof is empty!
+     */
+    public void resetCounters() {
+        if (proof.root().childrenCount() > 0) {
+            throw new IllegalStateException("tried to reset counters on non-empty proof");
+        }
+        counters.clear();
     }
 
     /**

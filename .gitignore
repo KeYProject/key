@@ -64,3 +64,6 @@ key.core/src/main/resources/de/uka/ilkd/key/smt/solvertypes/solvers.txt
 
 key/key.ui/examples/**/**.proof
 **/testresults/**
+
+scripts/tools/checkstyle/key_checks_incremental.xml
+checkstyle-diff.txt

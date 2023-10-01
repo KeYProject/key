@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.ArrayList;
@@ -32,6 +35,9 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
 
     public void searchNext() {
         fillCache();
+        if (cache.isEmpty()) {
+            return; // no results to switch to
+        }
         startRow = currentRow + 1;
         startRow %= cache.size();
         search(searchField.getText(), Position.Bias.Forward);
@@ -39,6 +45,9 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
 
     public void searchPrevious() {
         fillCache();
+        if (cache.isEmpty()) {
+            return; // no results to switch to
+        }
         startRow = currentRow - 1;
         startRow %= cache.size();
         search(searchField.getText(), Position.Bias.Backward);
@@ -98,7 +107,8 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
     private void fillCache() {
         if (cache == null) {
             cache = new ArrayList<>();
-            if (this.proofTreeView.delegateModel.getRoot() != null) {
+            if (this.proofTreeView.delegateModel != null
+                    && this.proofTreeView.delegateModel.getRoot() != null) {
                 addNodeToCache((GUIAbstractTreeNode) this.proofTreeView.delegateModel.getRoot());
                 fillCacheHelp((GUIBranchNode) this.proofTreeView.delegateModel.getRoot());
             }

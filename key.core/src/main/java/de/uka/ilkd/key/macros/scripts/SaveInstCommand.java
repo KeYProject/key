@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
@@ -59,8 +62,7 @@ public class SaveInstCommand extends AbstractCommand<Map<String, String>> {
             try {
                 final RuleApp ruleApp =
                     stateMap.getFirstOpenAutomaticGoal().node().parent().getAppliedRuleApp();
-                if (ruleApp instanceof TacletApp) {
-                    final TacletApp tacletApp = (TacletApp) ruleApp;
+                if (ruleApp instanceof TacletApp tacletApp) {
                     final Object inst = tacletApp.matchConditions().getInstantiations()
                             .lookupValue(new Name(value));
                     if (inst != null && ((Term) inst).op() instanceof Function) {

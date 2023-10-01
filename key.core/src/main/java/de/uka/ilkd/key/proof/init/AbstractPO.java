@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import java.util.*;
@@ -99,8 +102,7 @@ public abstract class AbstractPO implements IPersistablePO {
         ImmutableSet<RewriteTaclet> res = DefaultImmutableSet.nil();
         ImmutableSet<String> names = DefaultImmutableSet.nil();
         for (WellDefinednessCheck ch : specRepos.getAllWdChecks()) {
-            if (ch instanceof MethodWellDefinedness) {
-                MethodWellDefinedness mwd = (MethodWellDefinedness) ch;
+            if (ch instanceof MethodWellDefinedness mwd) {
                 // WD(callee.m(...))
                 RewriteTaclet mwdTaclet = mwd.createOperationTaclet(proofConfig.getServices());
                 String tName = mwdTaclet.name().toString();
@@ -277,8 +279,7 @@ public abstract class AbstractPO implements IPersistablePO {
         }
 
         public boolean equals(Object o) {
-            if (o instanceof Vertex) {
-                Vertex other = (Vertex) o;
+            if (o instanceof Vertex other) {
                 return core.equals(other.core);
             } else {
                 return false;
@@ -502,7 +503,7 @@ public abstract class AbstractPO implements IPersistablePO {
             }
             proofs[i] = createProof(poNames != null ? poNames[i] : name, poTerms[i], ic);
             if (taclets != null) {
-                proofs[i].getGoal(proofs[i].root()).indexOfTaclets().addTaclets(taclets);
+                proofs[i].getOpenGoal(proofs[i].root()).indexOfTaclets().addTaclets(taclets);
             }
         }
 

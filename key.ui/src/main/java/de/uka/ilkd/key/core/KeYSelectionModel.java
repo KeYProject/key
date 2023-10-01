@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.core;
 
 import java.util.*;
@@ -179,7 +182,7 @@ public class KeYSelectionModel {
             throw new IllegalStateException("No proof loaded.");
         }
         if (!goalIsValid) {
-            selectedGoal = proof.getGoal(selectedNode);
+            selectedGoal = proof.getOpenGoal(selectedNode);
             goalIsValid = true;
         }
         return selectedGoal;
@@ -235,7 +238,7 @@ public class KeYSelectionModel {
                             goalIt = null;
                         }
                     } else {
-                        nextOne = proof.getGoal(nodeIt.next());
+                        nextOne = proof.getOpenGoal(nodeIt.next());
                     }
                     break;
 
@@ -342,7 +345,7 @@ public class KeYSelectionModel {
         while (it.hasNext()) {
             final Node node = it.next();
             if (!node.isClosed()) {
-                return proof.getGoal(node);
+                return proof.getOpenGoal(node);
             }
         }
         return null;

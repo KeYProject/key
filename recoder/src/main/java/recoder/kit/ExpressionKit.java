@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit;
 
 import java.util.List;
@@ -44,8 +46,7 @@ public class ExpressionKit {
                 return true;
             }
         }
-        if (expr instanceof ExpressionContainer) {
-            ExpressionContainer con = (ExpressionContainer) expr;
+        if (expr instanceof ExpressionContainer con) {
             for (int i = 0, s = con.getExpressionCount(); i < s; i += 1) {
                 if (containsStatements(con.getExpressionAt(i))) {
                     return true;
@@ -211,9 +212,8 @@ public class ExpressionKit {
         do {
             NonTerminalProgramElement parent = pe.getASTParent();
             Debug.assertNonnull(parent);
-            if ((parent instanceof Statement)
+            if ((parent instanceof Statement parentStatement)
                     && (((Statement) parent).getStatementContainer() != null)) {
-                Statement parentStatement = (Statement) parent;
                 destination = StatementKit.prepareStatementMutableList(parentStatement, ch);
                 destParent = parentStatement.getStatementContainer();
                 for (destIndex = 0; destination.get(destIndex) != parent; destIndex += 1) {
@@ -221,9 +221,8 @@ public class ExpressionKit {
                 }
                 break;
             }
-            if (parent instanceof FieldSpecification) {
+            if (parent instanceof FieldSpecification fs) {
                 // create class initializer and insert it before the field
-                FieldSpecification fs = (FieldSpecification) parent;
                 FieldDeclaration fd = (FieldDeclaration) fs.getParent();
                 destination = new ASTArrayList<>();
                 StatementBlock body = f.createStatementBlock(destination);

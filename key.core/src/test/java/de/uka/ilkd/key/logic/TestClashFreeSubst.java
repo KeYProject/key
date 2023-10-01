@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
 import java.io.IOException;
@@ -51,8 +54,16 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         r2k.parseSpecialClasses();
 
         parseDecls(
-            "\\sorts { srt; }\n" + "\\functions {\n" + "  srt f(srt);\n" + "  srt g(srt,srt);\n"
-                + "}\n" + "\\predicates {\n" + "  p(srt);\n" + "  q(srt,srt);\n" + "}");
+            """
+                    \\sorts { srt; }
+                    \\functions {
+                      srt f(srt);
+                      srt g(srt,srt);
+                    }
+                    \\predicates {
+                      p(srt);
+                      q(srt,srt);
+                    }""");
 
         srt = lookup_sort("srt");
 

@@ -1,6 +1,6 @@
-/**
- * Created on: Mar 23, 2011
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.lang;
 
 import java.util.LinkedList;
@@ -267,10 +267,9 @@ public class SMTTermQuant extends SMTTerm {
             return true;
         }
 
-        if (!(term instanceof SMTTermQuant)) {
+        if (!(term instanceof SMTTermQuant qt)) {
             return false;
         }
-        SMTTermQuant qt = (SMTTermQuant) term;
 
         if (!this.quant.equals(qt.quant)) {
             return false;

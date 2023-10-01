@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.prover.impl;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -27,12 +30,19 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
             if (nextGoals.isEmpty()) {
                 result = null;
             } else {
-                result = nextGoals.head();
-                nextGoals = nextGoals.tail();
+                do {
+                    result = nextGoals.head();
+                    nextGoals = nextGoals.tail();
+                } while (result != null && !result.isAutomatic());
             }
         } else {
             ++nextGoalCounter;
-            result = selectedList.isEmpty() ? null : selectedList.head();
+            do {
+                result = selectedList.isEmpty() ? null : selectedList.head();
+                if (result != null && !result.isAutomatic()) {
+                    selectedList = selectedList.tail();
+                }
+            } while (result != null && !result.isAutomatic());
         }
         return result;
     }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control.instantiation_model;
 
 import java.io.StringReader;
@@ -349,7 +352,7 @@ public class TacletFindModel extends AbstractTableModel {
                 sort = null;
                 if (sv instanceof VariableSV || sv instanceof SkolemTermSV) {
                     IdDeclaration idd = parseIdDeclaration(irow);
-                    sort = idd.getSort();
+                    sort = idd.sort();
                     if (sort == null) {
                         try {
                             sort = result.getRealSort(sv, services);
@@ -360,17 +363,17 @@ public class TacletFindModel extends AbstractTableModel {
                     }
 
                     if (sv instanceof VariableSV) {
-                        LogicVariable lv = new LogicVariable(new Name(idd.getName()), sort);
+                        LogicVariable lv = new LogicVariable(new Name(idd.name()), sort);
                         result = result.addCheckedInstantiation(sv, addOrigin(tb.var(lv)), services,
                             true);
                     } else {
                         // sv instanceof SkolemTermSV
-                        final Named n = namespaces().lookupLogicSymbol(new Name(idd.getName()));
+                        final Named n = namespaces().lookupLogicSymbol(new Name(idd.name()));
                         if (n == null) {
-                            result = result.createSkolemConstant(idd.getName(), sv, sort, true,
+                            result = result.createSkolemConstant(idd.name(), sv, sort, true,
                                 services);
                         } else {
-                            throw new SVInstantiationParserException(idd.getName(),
+                            throw new SVInstantiationParserException(idd.name(),
                                 createPosition(irow),
                                 "Name already in use.", false);
                         }

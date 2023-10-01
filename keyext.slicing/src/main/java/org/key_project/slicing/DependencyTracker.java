@@ -1,16 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -23,16 +24,12 @@ import de.uka.ilkd.key.proof.proofevent.NodeChangeAddFormula;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeRemoveFormula;
 import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
-import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.RuleAppUtil;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.slicing.analysis.AnalysisResults;
@@ -47,9 +44,6 @@ import org.key_project.slicing.graph.PseudoOutput;
 import org.key_project.slicing.graph.TrackedFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Tracks proof steps as they are applied on the proof.
  * Each proof step is recorded in the dependency graph ({@link DependencyGraph}).
@@ -57,11 +51,6 @@ import org.slf4j.LoggerFactory;
  * @author Arne Keller
  */
 public class DependencyTracker implements RuleAppListener, ProofTreeListener {
-    /**
-     * Logger.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(DependencyTracker.class);
-
     /**
      * The proof this tracker monitors.
      */
@@ -81,7 +70,6 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @see DependencyAnalyzer
      */
     private AnalysisResults analysisResults = null;
-    private boolean proofUsedStateMerging = false;
 
     /**
      * Construct a new tracker for a proof.
@@ -109,54 +97,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         if (ruleApp.posInOccurrence() != null) {
             inputs.add(ruleApp.posInOccurrence().topLevel());
         }
-        inputs.addAll(ifInstsOfRuleApp(ruleApp, node));
-        return inputs;
-    }
-
-    /**
-     * Compute the sequent formulas used by the provided rule application (if-instantiations):
-     *
-     * @param ruleApp the rule application
-     * @param node proof node which contains that rule application
-     * @return sequent formulas used
-     */
-    public static Set<PosInOccurrence> ifInstsOfRuleApp(RuleApp ruleApp, Node node) {
-        // replayer requires that ifInsts are provided in order (!)
-        Set<PosInOccurrence> inputs = new LinkedHashSet<>();
-        // taclets with \find or similar
-        if (ruleApp instanceof PosTacletApp) {
-            PosTacletApp posTacletApp = (PosTacletApp) ruleApp;
-
-            if (posTacletApp.ifFormulaInstantiations() != null) {
-                for (IfFormulaInstantiation x : posTacletApp.ifFormulaInstantiations()) {
-
-                    if (x instanceof IfFormulaInstSeq) {
-                        boolean antec = ((IfFormulaInstSeq) x).inAntec();
-                        inputs.add(new PosInOccurrence(x.getConstrainedFormula(),
-                            PosInTerm.getTopLevel(), antec));
-                    }
-                }
-            }
-        }
-        // built-ins need special treatment:
-        // record if instantiations
-        if (ruleApp instanceof AbstractBuiltInRuleApp) {
-            AbstractBuiltInRuleApp builtIn = (AbstractBuiltInRuleApp) ruleApp;
-            builtIn.ifInsts().forEach(inputs::add);
-        }
-
-        // State Merging: add all formulas as inputs
-        // TODO: this is not enough, as the State Merge processes every formula in the sequent
-        // (-> if more formulas are present after slicing, a different result will be produced!)
-
-        // SMT application: add all formulas as inputs
-        // (unless the unsat core has been recorded in the ifinsts)
-        if (ruleApp instanceof RuleAppSMT && ((RuleAppSMT) ruleApp).ifInsts().size() > 0) {
-            node.sequent().antecedent().iterator().forEachRemaining(
-                it -> inputs.add(new PosInOccurrence(it, PosInTerm.getTopLevel(), true)));
-            node.sequent().succedent().iterator().forEachRemaining(
-                it -> inputs.add(new PosInOccurrence(it, PosInTerm.getTopLevel(), false)));
-        }
+        inputs.addAll(RuleAppUtil.ifInstsOfRuleApp(ruleApp, node));
         return inputs;
     }
 
@@ -176,8 +117,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         // check whether the rule of this proof step was added by another proof step
         // -> if so, add that dynamically added taclet as a dependency
         Rule rule = n.getAppliedRuleApp().rule();
-        if (rule instanceof Taclet) {
-            Taclet taclet = (Taclet) rule;
+        if (rule instanceof Taclet taclet) {
             if (taclet.getAddedBy() != null) {
                 input.add(new Pair<>(dynamicRules.get(taclet), false));
             }
@@ -208,7 +148,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 // should only happen if the formula is the initial proof obligation
                 if (!proof.root().sequent().contains(in.sequentFormula())) {
                     throw new IllegalStateException(
-                        "found formula that was not produced by any rule!");
+                        "found formula that was not produced by any rule! " + in.sequentFormula());
                 }
                 TrackedFormula formula =
                     new TrackedFormula(in.sequentFormula(), loc, in.isInAntec(),

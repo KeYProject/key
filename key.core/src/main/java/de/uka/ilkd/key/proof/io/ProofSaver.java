@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
@@ -91,14 +94,14 @@ public class ProofSaver extends OutputStreamProofSaver {
         } catch (IOException ioe) {
             errorMsg = "Could not save \n" + filename() + ".\n";
             errorMsg += ioe.toString();
-            LOGGER.warn("Failed to save", ioe);
+            LOGGER.warn("Failed to save ", ioe);
         } catch (NullPointerException npe) {
             errorMsg = "Could not save \n" + filename() + "\n";
             errorMsg += "No proof present?";
-            LOGGER.warn("No proof present?", npe);
+            LOGGER.warn("No proof present? ", npe);
         } catch (RuntimeException e) {
             errorMsg = e.toString();
-            LOGGER.warn("Failed to save", e);
+            LOGGER.warn("Failed to save ", e);
         }
         fireProofSaved(new ProofSaverEvent(this, filename(), errorMsg));
         return errorMsg;

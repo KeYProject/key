@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen.oracle;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -48,8 +51,7 @@ public class OracleInvariantTranslator {
 
         for (ClassAxiom c : spec.getClassAxioms(kjt)) {
 
-            if (c instanceof RepresentsAxiom && c.getKJT().equals(kjt)) {
-                RepresentsAxiom ra = (RepresentsAxiom) c;
+            if (c instanceof RepresentsAxiom ra && c.getKJT().equals(kjt)) {
 
                 Term t = ra.getAxiom(h, o, services);
 

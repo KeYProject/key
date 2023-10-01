@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
@@ -220,25 +223,25 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
         final Instantiation instantiation =
             instantiate(application.posInOccurrence().subTerm(), goal, services);
         final BlockContract contract = application.getContract();
-        contract.setInstantiationSelf(instantiation.self);
-        assert contract.getBlock().equals(instantiation.statement);
-        final Term contextUpdate = instantiation.update;
+        contract.setInstantiationSelf(instantiation.self());
+        assert contract.getBlock().equals(instantiation.statement());
+        final Term contextUpdate = instantiation.update();
 
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<ProgramVariable> localInVariables =
-            MiscTools.getLocalIns(instantiation.statement, services);
+            MiscTools.getLocalIns(instantiation.statement(), services);
         final ImmutableSet<ProgramVariable> localOutVariables =
-            MiscTools.getLocalOuts(instantiation.statement, services);
+            MiscTools.getLocalOuts(instantiation.statement(), services);
         final Map<LocationVariable, Function> anonymisationHeaps =
             createAndRegisterAnonymisationVariables(heaps, contract, services);
         final BlockContract.Variables variables =
             new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables(), services)
-                    .createAndRegister(instantiation.self, true);
+                    .createAndRegister(instantiation.self(), true);
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
-            new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self,
+            new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self(),
                 services);
-        final Term[] preconditions = createPreconditions(contract, instantiation.self, heaps,
+        final Term[] preconditions = createPreconditions(contract, instantiation.self(), heaps,
             localInVariables, conditionsAndClausesBuilder, services);
         final Term freePrecondition = conditionsAndClausesBuilder.buildFreePrecondition();
         final Map<LocationVariable, Term> modifiesClauses =
@@ -251,7 +254,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
         final Term[] assumptions =
             createAssumptions(localOutVariables, anonymisationHeaps, conditionsAndClausesBuilder);
         final Term freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
-        final Term[] updates = createUpdates(instantiation.update, heaps, anonymisationHeaps,
+        final Term[] updates = createUpdates(instantiation.update(), heaps, anonymisationHeaps,
             variables, modifiesClauses, services);
 
         final GoalsConfigurator configurator =

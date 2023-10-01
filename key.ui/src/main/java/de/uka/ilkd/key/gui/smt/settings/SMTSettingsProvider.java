@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.smt.settings;
 
 import java.math.RoundingMode;
@@ -5,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.Main;
@@ -88,7 +90,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
          */
         for (SolverType options : solverTypes.stream().filter(
             t -> ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().containsSolver(t))
-                .collect(Collectors.toList())) {
+                .toList()) {
             getChildren().add(new SolverOptions(options));
         }
     }
@@ -206,6 +208,6 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         // Timeout can have up to 3 decimal places in seconds to still be an integer in ms.
         timeoutField.setValue(((double) this.settings.getTimeout()) / 1000);
         maxProcesses.setValue(this.settings.getMaxConcurrentProcesses());
-        enableOnLoad.setEnabled(this.settings.isEnableOnLoad());
+        enableOnLoad.setSelected(this.settings.isEnableOnLoad());
     }
 }

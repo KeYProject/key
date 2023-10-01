@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.docking;
 
 import java.awt.*;
@@ -161,7 +164,7 @@ final class SaveLayoutAction extends MainWindowAction {
         setMenuPath("View.Layout");
         if (key != null) {
             setAcceleratorKey(KeyStroke.getKeyStroke(key,
-                InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+                KeyStrokeManager.SHORTCUT_KEY_MASK | InputEvent.SHIFT_DOWN_MASK));
         }
         KeyStrokeManager.lookupAndOverride(this, getClass().getName() + "$" + layoutName);
     }

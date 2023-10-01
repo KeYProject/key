@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.extension.api;
 
 import java.lang.annotation.Retention;
@@ -107,6 +110,16 @@ public interface KeYGuiExtension {
      * Can be used for registering key binding.
      */
     interface Startup {
+        /**
+         * Earliest initialization method. Called before layout of the main window.
+         *
+         * @param window main window
+         * @param mediator mediator
+         */
+        default void preInit(MainWindow window, KeYMediator mediator) {
+
+        }
+
         void init(MainWindow window, KeYMediator mediator);
     }
 

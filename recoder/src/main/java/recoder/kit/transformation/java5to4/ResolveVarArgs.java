@@ -1,9 +1,7 @@
-/*
- * Created on 25.03.2006
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation.java5to4;
 
 import java.util.ArrayList;
@@ -59,8 +57,7 @@ public class ResolveVarArgs extends TwoPassTransformation {
         TreeWalker tw = new TreeWalker(cu);
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
-            if (pe instanceof MethodDeclaration) {
-                MethodDeclaration md = (MethodDeclaration) pe;
+            if (pe instanceof MethodDeclaration md) {
                 if (md.isVarArgMethod()) {
                     varArgMeths.add(md);
                     lastParamTypes.add(getSourceInfo().getType(

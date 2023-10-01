@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ui;
 
 import java.io.File;
@@ -48,7 +51,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         implements RuleCompletionHandler, ProofEnvironmentListener, ProofDisposedListener {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(AbstractMediatorUserInterfaceControl.class);
-    protected boolean saveOnly = false;
+    private boolean saveOnly = false;
 
     private final MediatorProofControl proofControl = createProofControl();
 

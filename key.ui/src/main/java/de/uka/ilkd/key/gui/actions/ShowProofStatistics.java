@@ -1,23 +1,37 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.*;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.html.HTML;
+import javax.swing.text.html.HTMLDocument;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
+import de.uka.ilkd.key.gui.plugins.caching.DefaultReferenceSearchDialogListener;
+import de.uka.ilkd.key.gui.plugins.caching.ReferenceSearchDialog;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
@@ -27,11 +41,17 @@ import org.slf4j.LoggerFactory;
 public class ShowProofStatistics extends MainWindowAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(ShowProofStatistics.class);
 
-    /**
-     *
-     */
     private static final long serialVersionUID = -8814798230037775905L;
 
+    /**
+     * Regex pattern to check for tooltips in statistics entries.
+     */
+    private static final Pattern TOOLTIP_PATTERN = Pattern.compile(".+\\[tooltip: (.+)]");
+
+    /**
+     * The proof to show statistics for. May be null if the currently selected proof
+     * is to be shown.
+     */
     private final Proof proof;
 
     public ShowProofStatistics(MainWindow mainWindow, Proof proof) {
@@ -39,7 +59,6 @@ public class ShowProofStatistics extends MainWindowAction {
         setName("Show Proof Statistics");
         setIcon(IconFactory.statistics(16));
         getMediator().enableWhenProofLoaded(this);
-        lookupAcceleratorKey();
 
         this.proof = proof;
     }
@@ -98,29 +117,82 @@ public class ShowProofStatistics extends MainWindowAction {
         return stats.toString();
     }
 
-    public static String getHTMLStatisticsMessage(Proof proof) {
-        final int openGoals = proof.openGoals().size();
+    private static String getHTMLStatisticsMessage(Node node) {
+        int openGoals = 0;
+        int cachedGoals = 0;
+
+        Iterator<Node> leavesIt = node.leavesIterator();
+        while (leavesIt.hasNext()) {
+            if (node.proof().getOpenGoal(leavesIt.next()) != null) {
+                if (node.lookup(ClosedBy.class) != null) {
+                    cachedGoals++;
+                } else {
+                    openGoals++;
+                }
+            }
+        }
+
+        return getHTMLStatisticsMessage(openGoals, cachedGoals, node.statistics());
+    }
+
+    private static String getHTMLStatisticsMessage(Proof proof) {
+        int openGoals = proof.openGoals().size();
+        int cachedGoals =
+            (int) proof.closedGoals().stream().filter(g -> g.node().lookup(ClosedBy.class) != null)
+                    .count();
+        return getHTMLStatisticsMessage(openGoals, cachedGoals, proof.getStatistics());
+    }
+
+    private static String getHTMLStatisticsMessage(int openGoals, int cachedGoals,
+            Statistics statistics) {
         StringBuilder stats = new StringBuilder("<html><head>" + "<style type=\"text/css\">"
             + "body {font-weight: normal; text-align: center;}" + "td {padding: 1px;}"
             + "th {padding: 2px; font-weight: bold;}" + "</style></head><body>");
+        // sadly something like: .tooltip {text-decoration: underline dashed;}
+        // is not possible, the underline is solid...
 
-        if (openGoals > 0) {
+        stats.append("<br>");
+        if (cachedGoals > 0 && openGoals > 0) {
+            stats.append("<strong>").append(openGoals).append(" open goal")
+                    .append(openGoals > 1 ? "s, " : ", ").append(cachedGoals)
+                    .append(" cached goal").append(cachedGoals > 1 ? "s." : ".")
+                    .append("</strong>");
+        } else if (cachedGoals > 0) {
+            stats.append("<strong>").append("Proved (using proof cache).").append("</strong>");
+        } else if (openGoals > 0) {
             stats.append("<strong>").append(openGoals).append(" open goal")
                     .append(openGoals > 1 ? "s." : ".").append("</strong>");
         } else {
             stats.append("<strong>Proved.</strong>");
         }
 
-        stats.append("<br/><br/><table>");
+        stats.append("<br/><br/>");
+        stats.append(getStatisticsTable(statistics));
+        stats.append("</body></html>");
+        return stats.toString();
+    }
 
-        final Statistics s = proof.getStatistics();
+    private static String getStatisticsTable(Statistics s) {
+        StringBuilder stats = new StringBuilder();
+        stats.append("<table>");
 
         for (Pair<String, String> x : s.getSummary()) {
             if ("".equals(x.second)) {
                 stats.append("<tr><th colspan=\"2\">").append(x.first).append("</th></tr>");
             } else {
-                stats.append("<tr><td>").append(x.first).append("</td><td>").append(x.second)
-                        .append("</td></tr>");
+                if (x.first.contains("[tooltip: ")) {
+                    Matcher m = TOOLTIP_PATTERN.matcher(x.first);
+                    m.find();
+                    String tooltip = m.group(1);
+                    stats.append("<tr><td class='tooltip' title='").append(tooltip).append("'>")
+                            .append(x.first, 0, x.first.indexOf('['))
+                            .append("</td><td>")
+                            .append(x.second)
+                            .append("</td></tr>");
+                } else {
+                    stats.append("<tr><td>").append(x.first).append("</td><td>").append(x.second)
+                            .append("</td></tr>");
+                }
             }
         }
 
@@ -146,7 +218,7 @@ public class ShowProofStatistics extends MainWindowAction {
             }
         }
 
-        stats.append("</table></body></html>");
+        stats.append("</table>");
 
         return stats.toString();
     }
@@ -159,6 +231,7 @@ public class ShowProofStatistics extends MainWindowAction {
     public static final class Window extends JDialog {
 
         private static final long serialVersionUID = 1266280148508192284L;
+        private final Proof proof;
 
         /**
          * Creates a new (initially invisible) proof statistics window.
@@ -169,16 +242,37 @@ public class ShowProofStatistics extends MainWindowAction {
         public Window(MainWindow mainWindow, Proof proof) {
             super(mainWindow, "Proof Statistics");
 
-            String stats = ShowProofStatistics.getHTMLStatisticsMessage(proof);
+            if (!EventQueue.isDispatchThread()) {
+                throw new IllegalStateException("tried to open statistics dialog on worker thread");
+            }
 
-            JEditorPane statisticsPane = new JEditorPane("text/html", stats);
+            this.proof = proof;
+
+            String stats = ShowProofStatistics.getHTMLStatisticsMessage(proof);
+            init(mainWindow, stats);
+        }
+
+        /**
+         * Creates a new (initially invisible) proof statistics window.
+         *
+         * @param mainWindow the main windown.
+         * @param node the node for which to show subtree statistics
+         */
+        public Window(MainWindow mainWindow, Node node) {
+            super(mainWindow, "Proof Statistics");
+            this.proof = node.proof();
+
+            String stats = ShowProofStatistics.getHTMLStatisticsMessage(node);
+            init(mainWindow, stats);
+        }
+
+        private void init(MainWindow mainWindow, String stats) {
+
+            JEditorPane statisticsPane = new StatisticsEditorPane("text/html", stats);
             statisticsPane.setEditable(false);
             statisticsPane.setBorder(BorderFactory.createEmptyBorder());
             statisticsPane.setCaretPosition(0);
             statisticsPane.setBackground(MainWindow.getInstance().getBackground());
-            statisticsPane.setSize(new Dimension(10, 360));
-            statisticsPane.setPreferredSize(
-                new Dimension(statisticsPane.getPreferredSize().width + 15, 360));
 
             JScrollPane scrollPane = new JScrollPane(statisticsPane);
             scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -193,6 +287,7 @@ public class ShowProofStatistics extends MainWindowAction {
             }
 
             JPanel buttonPane = new JPanel();
+            JPanel buttonPane2 = new JPanel();
 
             JButton okButton = new JButton("Close");
             okButton.addActionListener(event -> dispose());
@@ -207,9 +302,36 @@ public class ShowProofStatistics extends MainWindowAction {
                 event -> export("html", MiscTools.toValidFileName(proof.name().toString()),
                     ShowProofStatistics.getHTMLStatisticsMessage(proof)));
 
+            JButton saveButton = new JButton("Save proof");
+            saveButton.addActionListener(
+                e -> mainWindow.getUserInterface().saveProof(proof, ".proof"));
+            JButton saveBundleButton = new JButton("Save proof bundle");
+            saveBundleButton
+                    .addActionListener(e -> mainWindow.getUserInterface().saveProofBundle(proof));
+
             buttonPane.add(okButton);
             buttonPane.add(csvButton);
             buttonPane.add(htmlButton);
+            buttonPane2.add(saveButton);
+            buttonPane2.add(saveBundleButton);
+
+            if (proof.closedGoals().stream()
+                    .anyMatch(g -> g.node().lookup(ClosedBy.class) != null)) {
+                JButton copyReferences = new JButton("Realize cached branches");
+                copyReferences.setToolTipText("For each goal closed using the proof cache, copy " +
+                    "the referenced proof steps into this proof.");
+                copyReferences.addActionListener(e -> {
+                    dispose();
+                    ReferenceSearchDialog dialog =
+                        new ReferenceSearchDialog(proof, new DefaultReferenceSearchDialogListener(
+                            MainWindow.getInstance().getMediator()));
+                    // show the dialog and start the copy
+                    // (two callbacks because setVisible will block)
+                    SwingUtilities.invokeLater(() -> dialog.setVisible(true));
+                    SwingUtilities.invokeLater(dialog::apply);
+                });
+                buttonPane2.add(copyReferences);
+            }
 
             getRootPane().setDefaultButton(okButton);
             getRootPane().addKeyListener(new KeyAdapter() {
@@ -224,12 +346,20 @@ public class ShowProofStatistics extends MainWindowAction {
 
             setLayout(new BorderLayout());
             add(scrollPane, BorderLayout.CENTER);
-            add(buttonPane, BorderLayout.PAGE_END);
+            JPanel buttonsPane = new JPanel();
+            BoxLayout layout = new BoxLayout(buttonsPane, BoxLayout.Y_AXIS);
+            buttonsPane.setLayout(layout);
+            buttonsPane.add(Box.createVerticalGlue());
+            buttonsPane.add(buttonPane);
+            buttonsPane.add(buttonPane2);
+            add(buttonsPane, BorderLayout.PAGE_END);
 
-            int w = 50 + Math.max(scrollPane.getPreferredSize().width,
-                buttonPane.getPreferredSize().width);
-            int h =
-                scrollPane.getPreferredSize().height + buttonPane.getPreferredSize().height + 100;
+            pack();
+            int w = Math.min(600, 50 + Math.max(scrollPane.getPreferredSize().width,
+                buttonsPane.getPreferredSize().width));
+            int h = Math.min(850,
+                50 + scrollPane.getPreferredSize().height + buttonsPane.getPreferredSize().height);
+
             setSize(w, h);
             setLocationRelativeTo(mainWindow);
         }
@@ -259,6 +389,31 @@ public class ShowProofStatistics extends MainWindowAction {
                     assert false;
                 }
             }
+        }
+    }
+
+    /**
+     * Document pane extended to show tooltips for labeled elements.
+     *
+     * @author Arne Keller
+     */
+    private static final class StatisticsEditorPane extends JEditorPane {
+        public StatisticsEditorPane(String type, String text) {
+            super(type, text);
+            ToolTipManager.sharedInstance().registerComponent(this);
+        }
+
+        @Override
+        public String getToolTipText(MouseEvent evt) {
+            int pos = viewToModel2D(evt.getPoint());
+            if (pos >= 0) {
+                HTMLDocument hdoc = (HTMLDocument) getDocument();
+                javax.swing.text.Element e = hdoc.getCharacterElement(pos);
+                AttributeSet a = e.getAttributes();
+
+                return (String) a.getAttribute(HTML.Attribute.TITLE);
+            }
+            return null;
         }
     }
 

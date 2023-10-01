@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.fonticons;
 
 import java.awt.*;
@@ -124,7 +127,7 @@ public enum FontAwesomeBrands implements IconFont {
     public Font getFont() throws IOException, FontFormatException {
         if (font == null) {
             font = Font.createFont(Font.TRUETYPE_FONT,
-                getClass().getResourceAsStream("/fonts/Font Awesome 5 Brands-Regular-400.otf"));
+                getClass().getResourceAsStream("/fonts/Font Awesome 6 Brands-Regular-400.otf"));
         }
         return font;
     }

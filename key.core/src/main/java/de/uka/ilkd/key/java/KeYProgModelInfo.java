@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import java.util.*;
@@ -326,8 +329,7 @@ public class KeYProgModelInfo {
     private List<recoder.abstraction.Method> getRecoderMethods(KeYJavaType kjt) {
         if (kjt.getJavaType() instanceof TypeDeclaration) {
             Object o = rec2key().toRecoder(kjt);
-            if (o instanceof recoder.abstraction.ClassType) {
-                recoder.abstraction.ClassType rct = (recoder.abstraction.ClassType) o;
+            if (o instanceof ClassType rct) {
                 return rct.getProgramModelInfo().getMethods(rct);
             }
         }

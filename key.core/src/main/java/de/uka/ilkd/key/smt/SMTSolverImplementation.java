@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
 
 import java.io.IOException;
@@ -397,7 +400,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     public String getRawSolverOutput() {
         StringBuilder output = new StringBuilder();
         for (Message m : solverCommunication.getOutMessages()) {
-            String s = m.getContent();
+            String s = m.content();
             output.append(s).append("\n");
         }
         return output.toString();
@@ -408,7 +411,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         StringBuilder input = new StringBuilder();
 
         for (Message m : solverCommunication.getMessages(SolverCommunication.MessageType.INPUT)) {
-            String s = m.getContent();
+            String s = m.content();
             input.append(s).append("\n");
         }
         return input.toString();

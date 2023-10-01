@@ -3,7 +3,7 @@ plugins {
     id 'antlr'
 }
 
-//repositories { jcenter() }
+description "Core functionality (terms, rules, prover, ...) for deductive verification of Java programs"
 
 configurations { antlr4 }
 
@@ -18,8 +18,8 @@ dependencies {
     javacc group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
     antlr group: 'org.antlr', name: 'antlr', version: '3.5.3'   // use ANTLR version 3
 
-    antlr4 "org.antlr:antlr4:4.13.0"
-    api "org.antlr:antlr4-runtime:4.13.0"
+    antlr4 "org.antlr:antlr4:4.13.1"
+    api "org.antlr:antlr4-runtime:4.13.1"
     //implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
 }
 
@@ -100,6 +100,7 @@ task generateSolverPropsList {
                 list.add(file.name)
             }
         })
+        list.sort()
         if (!file("$outputDir/$pack/solvers.txt").exists()) {
             String files = ''
             for (String propsFile : list) {
@@ -246,7 +247,4 @@ task generateRAPUnitTests(type: JavaExec) {
 }
 sourceSets.test.java.srcDirs("$buildDir/generated-src/rap/")
 
-
-// @AW: Delete? weigl: depends: If want that gradle check validates everything then not.
-// check.dependsOn << testProofRules << testRunAllProofs
-
+sourcesJar.dependsOn(runAntlr4Jml, runAntlr4Key, compileJavacc, generateGrammarSource)

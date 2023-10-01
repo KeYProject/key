@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
@@ -1134,8 +1137,7 @@ public interface AuxiliaryContract extends SpecificationElement {
                 first = statement.getFirstElement();
             }
 
-            while (first instanceof LabeledStatement) {
-                LabeledStatement s = (LabeledStatement) first;
+            while (first instanceof LabeledStatement s) {
                 first = s.getBody();
             }
 
@@ -1186,8 +1188,7 @@ public interface AuxiliaryContract extends SpecificationElement {
             if (statement instanceof LoopStatement) {
             } else {
                 first = statement.getFirstElement();
-                while (first instanceof LabeledStatement) {
-                    LabeledStatement s = (LabeledStatement) first;
+                while (first instanceof LabeledStatement s) {
                     first = s.getBody();
                 }
 

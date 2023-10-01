@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing.ui;
 
 import java.awt.*;
@@ -82,11 +85,11 @@ public class PreviewDialog extends JDialog implements WindowListener {
     private void workerDone(GraphvizResult result) {
         if (result.hasImage()) {
             getContentPane().removeAll();
-            PanZoomImageView pziv = new PanZoomImageView(result.getImage(), 800, 600);
+            PanZoomImageView pziv = new PanZoomImageView(result.image(), 800, 600);
             pziv.setPreferredSize(new Dimension(800, 600));
             getContentPane().add(pziv, BorderLayout.CENTER);
         } else if (result.hasError()) {
-            JLabel label = new JLabel(result.getError());
+            JLabel label = new JLabel(result.error());
             label.setBorder(new EmptyBorder(0, 10, 10, 10));
             getContentPane().add(label, BorderLayout.SOUTH);
         } else {
