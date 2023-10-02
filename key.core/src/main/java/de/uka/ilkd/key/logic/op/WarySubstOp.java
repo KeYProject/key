@@ -7,6 +7,7 @@ import org.key_project.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.WaryClashFreeSubst;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 
 public final class WarySubstOp extends SubstOp {

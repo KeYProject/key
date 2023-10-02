@@ -36,6 +36,7 @@ import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.*;
 
 import org.jspecify.annotations.NonNull;

@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.*;
 
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

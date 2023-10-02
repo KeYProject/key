@@ -57,11 +57,6 @@ public interface Sort extends org.key_project.logic.sort.Sort<Sort>, HasOrigin {
     ImmutableSet<Sort> extendsSorts(Services services);
 
     /**
-     * @return whether this sort has no exact elements.
-     */
-    boolean isAbstract();
-
-    /**
      * @param services services.
      * @return the cast symbol of this sort.
      */

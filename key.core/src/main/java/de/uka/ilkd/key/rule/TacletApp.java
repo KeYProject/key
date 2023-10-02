@@ -97,7 +97,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @return set of the bound variables
      */
     protected static ImmutableSet<QuantifiableVariable> boundAtOccurrenceSet(TacletPrefix prefix,
-            SVInstantiations instantiations) {
+                                                                             SVInstantiations instantiations) {
         return collectPrefixInstantiations(prefix, instantiations);
     }
 

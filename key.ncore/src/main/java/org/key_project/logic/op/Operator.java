@@ -8,7 +8,7 @@ import org.key_project.logic.Term;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
-public interface Operator extends Named {
+public interface Operator<S extends Sort<S>, T extends Term> extends Named {
     /**
      * the arity of this operator
      */
@@ -23,7 +23,7 @@ public interface Operator extends Named {
      *        operator as top level operator
      * @return sort of the term with this operator as top level operator of the given substerms
      */
-    Sort sort(ImmutableArray<Term> terms);
+    S sort(ImmutableArray<T> terms);
 
     /**
      * Tells whether the operator binds variables at the n-th subterm.
@@ -34,8 +34,4 @@ public interface Operator extends Named {
      * Tells whether the operator is rigid.
      */
     boolean isRigid();
-
-    abstract class Modality implements Operator {
-
-    }
 }

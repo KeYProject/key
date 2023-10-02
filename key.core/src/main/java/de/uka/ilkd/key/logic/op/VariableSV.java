@@ -6,6 +6,7 @@ package de.uka.ilkd.key.logic.op;
 import org.key_project.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.pp.Layouter;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /**
  * Schema variable that is instantiated with logical variables.

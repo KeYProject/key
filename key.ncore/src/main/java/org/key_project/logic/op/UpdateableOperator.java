@@ -1,15 +1,16 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.logic.op;
+package org.key_project.logic.op;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.logic.Term;
+import org.key_project.logic.sort.Sort;
 
 /**
  * Operators implementing this interface may stand for locations as well. This means e.g. occur as
  * top level operators on the left side of an assignment pair of an update.
  */
-public interface UpdateableOperator extends org.key_project.logic.op.UpdateableOperator<Sort, Term>, ParsableVariable, SortedOperator, Operator {
+public interface UpdateableOperator<S extends Sort<S>, T extends Term> extends ParsableVariable<S, T> {
 
 }

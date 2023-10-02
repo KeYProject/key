@@ -27,6 +27,8 @@ import de.uka.ilkd.key.util.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /**
  * Helper class for are visitor that requires a namespaces and services. Also it provides the
