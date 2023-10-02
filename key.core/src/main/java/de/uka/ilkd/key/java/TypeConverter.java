@@ -74,6 +74,10 @@ public final class TypeConverter {
         return LDTs.get(ldtName);
     }
 
+    public JavaDLTheory getJavaDLTheory() {
+        return (JavaDLTheory) getLDT(JavaDLTheory.NAME);
+    }
+
     public IntegerLDT getIntegerLDT() {
         return (IntegerLDT) getLDT(IntegerLDT.NAME);
     }
@@ -287,8 +291,8 @@ public final class TypeConverter {
     private Term convertToInstanceofTerm(Instanceof io, ExecutionContext ec) {
         final KeYJavaType type = ((TypeReference) io.getChildAt(1)).getKeYJavaType();
         final Term obj = convertToLogicElement(io.getChildAt(0), ec);
-        final Sort s = type.getSort();
-        final Function instanceOfSymbol = s.getInstanceofSymbol(services);
+        final Function instanceOfSymbol =
+            getJavaDLTheory().getInstanceofSymbol(type.getSort(), services);
 
         // in JavaDL S::instance(o) is also true if o (for reference types S)
         // is null in opposite to Java
@@ -555,7 +559,7 @@ public final class TypeConverter {
         if (term.op() instanceof Function function) {
             if (function instanceof SortDependingFunction sdf) {
                 SortDependingFunction castFunction =
-                    SortDependingFunction.getFirstInstance(Sort.CAST_NAME, services);
+                    SortDependingFunction.getFirstInstance(JavaDLTheory.CAST_NAME, services);
                 if (sdf.isSimilar(castFunction)) {
                     Sort s = sdf.getSortDependingOn();
                     KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(s);

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -63,14 +64,15 @@ public class Substitution {
     }
 
 
-    public Term apply(Term t, TermServices services) {
+    public Term apply(Term t, Services services) {
         assert isGround() : "non-ground substitutions are not yet implemented: " + this;
         final Iterator<QuantifiableVariable> it = varMap.keyIterator();
         final TermBuilder tb = services.getTermBuilder();
         while (it.hasNext()) {
             final QuantifiableVariable var = it.next();
             final Sort quantifiedVarSort = var.sort();
-            final Function quantifiedVarSortCast = quantifiedVarSort.getCastSymbol(services);
+            final Function quantifiedVarSortCast =
+                services.getJavaDLTheory().getCastSymbol(quantifiedVarSort, services);
             Term instance = getSubstitutedTerm(var);
             if (!instance.sort().extendsTrans(quantifiedVarSort)) {
                 instance = tb.func(quantifiedVarSortCast, instance);
@@ -89,7 +91,7 @@ public class Substitution {
      * Try to apply the substitution to a term, introducing casts if necessary (may never be the
      * case any more, XXX)
      */
-    public Term applyWithoutCasts(Term t, TermServices services) {
+    public Term applyWithoutCasts(Term t, Services services) {
         assert isGround() : "non-ground substitutions are not yet implemented: " + this;
         final TermBuilder tb = services.getTermBuilder();
         final Iterator<QuantifiableVariable> it = varMap.keyIterator();
@@ -102,7 +104,7 @@ public class Substitution {
                 final Sort quantifiedVarSort = var.sort();
                 if (!instance.sort().extendsTrans(quantifiedVarSort)) {
                     final Function quantifiedVarSortCast =
-                        quantifiedVarSort.getCastSymbol(services);
+                        services.getJavaDLTheory().getCastSymbol(quantifiedVarSort, services);
                     instance = tb.func(quantifiedVarSortCast, instance);
                     t = applySubst(var, instance, t, tb);
                 } else {

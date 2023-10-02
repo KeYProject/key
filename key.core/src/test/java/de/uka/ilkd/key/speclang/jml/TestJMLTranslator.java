@@ -409,9 +409,11 @@ public class TestJMLTranslator {
         assertNotNull(resultTypeofClass);
         assertNotNull(resultTypeofPrimitive);
 
-        Function ioFuncObject = javaInfo.objectSort().getInstanceofSymbol(services);
+        Function ioFuncObject =
+            services.getJavaDLTheory().getInstanceofSymbol(javaInfo.objectSort(), services);
         Function ioFuncInt =
-            services.getNamespaces().sorts().lookup("int").getInstanceofSymbol(services);
+            services.getJavaDLTheory()
+                    .getInstanceofSymbol(services.getNamespaces().sorts().lookup("int"), services);
 
         assertTrue(termContains(resultTypeofClass, ioFuncObject));
         assertTrue(termContains(resultTypeofPrimitive, ioFuncInt));

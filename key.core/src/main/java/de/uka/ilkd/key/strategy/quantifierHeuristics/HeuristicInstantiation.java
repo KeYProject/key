@@ -5,6 +5,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -47,12 +48,13 @@ public class HeuristicInstantiation implements TermGenerator {
         private Term nextInst = null;
         private final TermServices services;
 
-        private HIIterator(Iterator<Term> it, QuantifiableVariable var, TermServices services) {
+        private HIIterator(Iterator<Term> it, QuantifiableVariable var, Services services) {
             this.instances = it;
             this.quantifiedVar = var;
             this.services = services;
             quantifiedVarSort = quantifiedVar.sort();
-            quantifiedVarSortCast = quantifiedVarSort.getCastSymbol(services);
+            quantifiedVarSortCast =
+                services.getJavaDLTheory().getCastSymbol(quantifiedVarSort, services);
             findNextInst();
         }
 

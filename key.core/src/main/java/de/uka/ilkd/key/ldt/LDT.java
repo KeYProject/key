@@ -127,6 +127,7 @@ public abstract class LDT implements Named {
         // TreeMap ensures the map is sorted according to the natural order of its keys.
         Map<Name, LDT> ret = new TreeMap<>();
 
+        ret.put(JavaDLTheory.NAME, new JavaDLTheory(s));
         ret.put(IntegerLDT.NAME, new IntegerLDT(s));
         ret.put(BooleanLDT.NAME, new BooleanLDT(s));
         ret.put(LocSetLDT.NAME, new LocSetLDT(s));

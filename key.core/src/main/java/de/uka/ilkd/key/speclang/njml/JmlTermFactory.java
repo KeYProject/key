@@ -670,7 +670,7 @@ public final class JmlTermFactory {
 
             Sort os = typeExpr.getType().getSort();
 
-            Function ioFunc = os.getExactInstanceofSymbol(services);
+            Function ioFunc = services.getJavaDLTheory().getExactInstanceofSymbol(os, services);
             Term instanceOf = tb.equals(tb.func(ioFunc, typeofExpr.getTerm()), tb.TRUE());
             IntegerLDT ldt = services.getTypeConverter().getIntegerLDT();
             if (os == ldt.targetSort()) {
@@ -1001,7 +1001,8 @@ public final class JmlTermFactory {
     public Term signalsOnly(ImmutableList<KeYJavaType> signalsonly, ProgramVariable excVar) {
         Term result = tb.ff();
         for (KeYJavaType kjt : signalsonly) {
-            Function instance = kjt.getSort().getInstanceofSymbol(services);
+            Function instance =
+                services.getJavaDLTheory().getInstanceofSymbol(kjt.getSort(), services);
             result = tb.or(result, tb.equals(tb.func(instance, tb.var(excVar)), tb.TRUE()));
         }
 
@@ -1019,7 +1020,7 @@ public final class JmlTermFactory {
             OpReplacer excVarReplacer = new OpReplacer(replaceMap, services.getTermFactory());
 
             Sort os = excType.getSort();
-            Function instance = os.getInstanceofSymbol(services);
+            Function instance = services.getJavaDLTheory().getInstanceofSymbol(os, services);
 
             result = tb.imp(tb.equals(tb.func(instance, tb.var(excVar)), tb.TRUE()),
                 tb.convertToFormula(excVarReplacer.replace(result)));

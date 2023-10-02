@@ -615,7 +615,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression result = accept(ctx.shiftexpr());
         KeYJavaType rtype = accept(ctx.typespec());
         assert rtype != null;
-        SortDependingFunction f = rtype.getSort().getInstanceofSymbol(services);
+        final SortDependingFunction f =
+            services.getJavaDLTheory().getInstanceofSymbol(rtype.getSort(), services);
         // instanceof-expression
         assert result != null;
         return new SLExpression(tb.and(tb.not(tb.equals(result.getTerm(), tb.NULL())),
@@ -646,8 +647,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
             fns.add(z);
             result = new SLExpression(tb.func(z));
         } else {
-            Sort os = right.getType().getSort();
-            Function ioFunc = os.getInstanceofSymbol(services);
+            final Function ioFunc =
+                services.getJavaDLTheory().getInstanceofSymbol(right.getType().getSort(), services);
             result = new SLExpression(tb.equals(tb.func(ioFunc, result.getTerm()), tb.TRUE()));
         }
         return result;

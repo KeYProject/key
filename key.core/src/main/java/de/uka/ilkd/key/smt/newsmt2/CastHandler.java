@@ -26,7 +26,7 @@ public class CastHandler implements SMTHandler {
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
             String[] handlerOptions) throws IOException {
-        this.anyCast = Sort.ANY.getCastSymbol(services);
+        this.anyCast = services.getJavaDLTheory().getCastSymbol(Sort.ANY, services);
         masterHandler.addDeclarationsAndAxioms(handlerSnippets);
     }
 

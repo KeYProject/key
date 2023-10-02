@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Function;
@@ -36,7 +37,7 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
 
         final Sort arraySort;
         if (array.op() instanceof SortDependingFunction && ((SortDependingFunction) array.op())
-                .getKind().equals(Sort.EXACT_INSTANCE_NAME)) {
+                .getKind().equals(JavaDLTheory.EXACT_INSTANCE_NAME)) {
             arraySort = ((SortDependingFunction) array.op()).getSortDependingOn();
         } else {
             arraySort = array.sort();
@@ -46,7 +47,8 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
 
         final Sort arrayElementSort = ((ArraySort) arraySort).elementSort();
 
-        Function instanceofSymbol = arrayElementSort.getInstanceofSymbol(services);
+        Function instanceofSymbol =
+            services.getJavaDLTheory().getInstanceofSymbol(arrayElementSort, services);
         Debug.assertTrue(instanceofSymbol != null, "Instanceof symbol not found for ",
             arrayElementSort);
 

@@ -13,15 +13,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.Notation.HeapConstructorNotation;
 import de.uka.ilkd.key.pp.Notation.ObserverNotation;
@@ -922,7 +918,7 @@ public class LogicPrinter {
             layouter.startTerm(t.arity());
             boolean alreadyPrinted = false;
             if (t.op() instanceof SortDependingFunction op) {
-                if (op.getKind().compareTo(AbstractSort.EXACT_INSTANCE_NAME) == 0) {
+                if (op.getKind().compareTo(JavaDLTheory.EXACT_INSTANCE_NAME) == 0) {
                     layouter.print(op.getSortDependingOn().declarationString());
                     layouter.print("::");
                     layouter.keyWord(op.getKind().toString());

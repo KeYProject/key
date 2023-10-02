@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -15,7 +16,6 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
@@ -112,8 +112,9 @@ class Instantiation {
         addInstance(new Substitution(varMap), services);
     }
 
-    private Term createArbitraryInstantiation(QuantifiableVariable var, TermServices services) {
-        return services.getTermBuilder().func(var.sort().getCastSymbol(services),
+    private Term createArbitraryInstantiation(QuantifiableVariable var, Services services) {
+        return services.getTermBuilder().func(
+            services.getJavaDLTheory().getCastSymbol(var.sort(), services),
             services.getTermBuilder().zero());
     }
 
@@ -175,7 +176,7 @@ class Instantiation {
     private RuleAppCost computeCostHelp(Term inst) {
         Long cost = instancesWithCosts.get(inst);
         if (cost == null && (inst.op() instanceof SortDependingFunction
-                && ((SortDependingFunction) inst.op()).getKind().equals(Sort.CAST_NAME))) {
+                && ((SortDependingFunction) inst.op()).getKind().equals(JavaDLTheory.CAST_NAME))) {
             cost = instancesWithCosts.get(inst.sub(0));
         }
 

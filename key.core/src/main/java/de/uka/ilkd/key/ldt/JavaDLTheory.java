@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.logic.Name;
@@ -19,14 +20,87 @@ import org.key_project.util.ExtList;
 
 public class JavaDLTheory extends LDT {
 
-    protected JavaDLTheory(Name name, TermServices services) {
-        super(name, services);
+    /**
+     * Name of {@link #getExactInstanceofSymbol(Sort)}.
+     */
+    public static final Name EXACT_INSTANCE_NAME = new Name("exactInstance");
+    /**
+     * Name of {@link #getCastSymbol(Sort)}.
+     */
+    public static final Name CAST_NAME = new Name("cast");
+    /**
+     * Name of {@link #getInstanceofSymbol(Sort)}.
+     */
+    public static final Name INSTANCE_NAME = new Name("instance");
+
+    public static final Name NAME = new Name("JavaDLTheory");
+
+    // TODO fix wrong tests (which do not use proper services)
+    // private final TermServices services;
+
+    protected JavaDLTheory(TermServices services) {
+        super(NAME, Sort.FORMULA, services);
+        // this.services = services;
     }
 
-    protected JavaDLTheory(Name name, Sort targetSort, TermServices services) {
-        super(name, targetSort, services);
+
+    /*
+     * aus NullSort
+     *
+     * @Override
+     * public SortDependingFunction getCastSymbol(TermServices services, Sort sort) {
+     * SortDependingFunction result = SortDependingFunction.getFirstInstance(JavaDLTheory.CAST_NAME,
+     * services)
+     * .getInstanceFor(this, services);
+     * assert result.getSortDependingOn() == sort && result.sort() == sort;
+     * return result;
+     * }
+     *
+     *
+     * @Override
+     * public SortDependingFunction getInstanceofSymbol(TermServices services, Sort sort) {
+     * SortDependingFunction result = SortDependingFunction
+     * .getFirstInstance(JavaDLTheory.INSTANCE_NAME, services).getInstanceFor(this, services);
+     * assert result.getSortDependingOn() == sort;
+     * return result;
+     * }
+     *
+     *
+     * @Override
+     * public SortDependingFunction getExactInstanceofSymbol(TermServices services, Sort sort) {
+     * SortDependingFunction result = SortDependingFunction
+     * .getFirstInstance(JavaDLTheory.EXACT_INSTANCE_NAME, services).getInstanceFor(this, services);
+     * assert result.getSortDependingOn() == sort;
+     * return result;
+     * }
+     */
+
+    public final SortDependingFunction getCastSymbol(Sort sort, TermServices services) {
+        SortDependingFunction castFunction =
+            SortDependingFunction.getFirstInstance(JavaDLTheory.CAST_NAME, services);
+        if (castFunction == null) {
+            throw new IllegalStateException("No 'cast' function found for any type.");
+        }
+        SortDependingFunction result = castFunction.getInstanceFor(sort, services);
+        assert result.getSortDependingOn() == sort && result.sort() == sort;
+        return result;
     }
 
+    public final SortDependingFunction getInstanceofSymbol(Sort sort, TermServices services) {
+        SortDependingFunction result = SortDependingFunction
+                .getFirstInstance(JavaDLTheory.INSTANCE_NAME, services)
+                .getInstanceFor(sort, services);
+        assert result.getSortDependingOn() == sort;
+        return result;
+    }
+
+    public final SortDependingFunction getExactInstanceofSymbol(Sort sort, TermServices services) {
+        SortDependingFunction result = SortDependingFunction
+                .getFirstInstance(JavaDLTheory.EXACT_INSTANCE_NAME, services)
+                .getInstanceFor(sort, services);
+        assert result.getSortDependingOn() == sort;
+        return result;
+    }
 
 
     @Override

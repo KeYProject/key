@@ -8,15 +8,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.DoubleLDT;
-import de.uka.ilkd.key.ldt.FloatLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
 
@@ -196,7 +190,7 @@ public final class NotationInfo {
             new Notation.ModalSVNotation(PRIORITY_MODALITY, PRIORITY_MODALITY));
         tbl.put(SchemaVariable.class, new Notation.SchemaVariableNotation());
 
-        tbl.put(Sort.CAST_NAME,
+        tbl.put(JavaDLTheory.CAST_NAME,
             new Notation.CastFunction("(", ")", PRIORITY_CAST, PRIORITY_BOTTOM));
         tbl.put(TermLabel.class, new Notation.LabelNotation("<<", ">>", PRIORITY_LABEL));
         return tbl;

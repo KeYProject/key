@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -129,7 +130,7 @@ class GenericTranslator {
                     }
                     func = func.getInstanceFor(instantiation, services);
 
-                    if (func.getKind().equals(Sort.CAST_NAME)) {
+                    if (func.getKind().equals(JavaDLTheory.CAST_NAME)) {
                         for (int i = 0; i < term.arity(); i++) {
 
                             if (!sameHierachyBranch(func.getSortDependingOn(),

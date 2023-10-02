@@ -4,8 +4,6 @@
 package de.uka.ilkd.key.logic.sort;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -16,40 +14,37 @@ import org.jspecify.annotations.Nullable;
 /**
  * Abstract base class for implementations of the Sort interface.
  */
-public abstract class AbstractSort implements Sort {
-    private final Name name;
-    private final ImmutableSet<Sort> ext;
-    private final boolean isAbstract;
-
+public abstract class AbstractSort extends org.key_project.logic.sort.AbstractSort<Sort>
+        implements Sort {
     /**
      * Documentation for this sort given by the associated documentation comment.
      *
      * @see de.uka.ilkd.key.nparser.KeYParser.One_sort_declContext#doc
      */
     private final String documentation;
+    private ImmutableSet<Sort> ext;
 
     /** Information of the origin of this sort */
     private final String origin;
 
-    public AbstractSort(Name name,
-            ImmutableSet<Sort> extendedSorts,
-            boolean isAbstract,
-            String documentation,
+    public AbstractSort(Name name, ImmutableSet<Sort> ext, boolean isAbstract, String documentation,
             String origin) {
-        this.name = name;
-        this.isAbstract = isAbstract;
-        if (extendedSorts != null && extendedSorts.isEmpty()) {
-            this.ext = DefaultImmutableSet.<Sort>nil().add(ANY);
-        } else {
-            this.ext = extendedSorts == null ? DefaultImmutableSet.<Sort>nil() : extendedSorts;
-        }
+        super(name, isAbstract);
+        this.ext = ext;
         this.documentation = documentation;
         this.origin = origin;
     }
 
     @Override
     public final ImmutableSet<Sort> extendsSorts() {
-        return ext;
+        if (this == Sort.FORMULA || this == Sort.UPDATE || this == Sort.ANY) {
+            return DefaultImmutableSet.nil();
+        } else {
+            if (ext.isEmpty()) {
+                ext = DefaultImmutableSet.<Sort>nil().add(Sort.ANY);
+            }
+            return ext;
+        }
     }
 
     @Override
@@ -72,57 +67,8 @@ public abstract class AbstractSort implements Sort {
                 .exists((Sort superSort) -> superSort == sort || superSort.extendsTrans(sort));
     }
 
-
-    @Override
-    public final Name name() {
-        return name;
-    }
-
-
-    @Override
-    public final boolean isAbstract() {
-        return isAbstract;
-    }
-
-
-    @Override
-    public final SortDependingFunction getCastSymbol(TermServices services) {
-        SortDependingFunction castFunction =
-            SortDependingFunction.getFirstInstance(CAST_NAME, services);
-        if (castFunction == null) {
-            throw new IllegalStateException("Your namespaces does `cast' defined.");
-        }
-        SortDependingFunction result = castFunction.getInstanceFor(this, services);
-        assert result.getSortDependingOn() == this && result.sort() == this;
-        return result;
-    }
-
-
-    @Override
-    public final SortDependingFunction getInstanceofSymbol(TermServices services) {
-        SortDependingFunction result = SortDependingFunction
-                .getFirstInstance(INSTANCE_NAME, services).getInstanceFor(this, services);
-        assert result.getSortDependingOn() == this;
-        return result;
-    }
-
-
-    @Override
-    public final SortDependingFunction getExactInstanceofSymbol(TermServices services) {
-        SortDependingFunction result = SortDependingFunction
-                .getFirstInstance(EXACT_INSTANCE_NAME, services).getInstanceFor(this, services);
-        assert result.getSortDependingOn() == this;
-        return result;
-    }
-
-
-    @Override
-    public final String toString() {
-        return name.toString();
-    }
-
     public String declarationString() {
-        return name.toString();
+        return name().toString();
     }
 
     @Nullable

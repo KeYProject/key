@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.proof.*;
@@ -163,6 +164,9 @@ public class Services implements TermServices {
         typeconverter = tc;
     }
 
+    public JavaDLTheory getJavaDLTheory() {
+        return typeconverter.getJavaDLTheory();
+    }
 
     /**
      * Returns the ConstantExpressionEvaluator associated with this Services object.
