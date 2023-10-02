@@ -103,8 +103,7 @@ class Instantiation {
         ImmutableMap<QuantifiableVariable, Term> varMap =
             DefaultImmutableMap.nilMap();
 
-        for (QuantifiableVariable quantifiableVariable : triggersSet.getUniQuantifiedVariables()) {
-            final QuantifiableVariable v = quantifiableVariable;
+        for (QuantifiableVariable v : triggersSet.getUniQuantifiedVariables()) {
             final Term inst = createArbitraryInstantiation(v, services);
             varMap = varMap.put(v, inst);
         }

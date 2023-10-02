@@ -55,7 +55,7 @@ public class Substitution {
         final Iterator<QuantifiableVariable> it = varMap.keyIterator();
         while (it.hasNext()) {
             final Term t = getSubstitutedTerm(it.next());
-            if (t.freeVars().size() != 0) {
+            if (!t.freeVars().isEmpty()) {
                 LOGGER.debug("evil free vars in term: " + t);
                 return false;
             }

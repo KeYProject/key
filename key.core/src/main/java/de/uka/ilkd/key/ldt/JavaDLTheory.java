@@ -21,15 +21,15 @@ import org.key_project.util.ExtList;
 public class JavaDLTheory extends LDT {
 
     /**
-     * Name of {@link #getExactInstanceofSymbol(Sort)}.
+     * Name of {@link #getExactInstanceofSymbol(Sort,TermServices)}.
      */
     public static final Name EXACT_INSTANCE_NAME = new Name("exactInstance");
     /**
-     * Name of {@link #getCastSymbol(Sort)}.
+     * Name of {@link #getCastSymbol(Sort,TermServices)}.
      */
     public static final Name CAST_NAME = new Name("cast");
     /**
-     * Name of {@link #getInstanceofSymbol(Sort)}.
+     * Name of {@link #getInstanceofSymbol(Sort,TermServices)}.
      */
     public static final Name INSTANCE_NAME = new Name("instance");
 

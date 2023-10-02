@@ -8,22 +8,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import jakarta.annotation.Nullable;
 
-public interface Sort<S extends Sort> extends Named {
-    // /**
-    // * Formulas are represented as "terms" of this sort.
-    // */
-    // Sort FORMULA = new SortImpl(new Name("Formula"));
-    //
-    // /**
-    // * Updates are represented as "terms" of this sort.
-    // */
-    // Sort UPDATE = new SortImpl(new Name("Update"));
-    //
-    // /**
-    // * Any is a supersort of all sorts.
-    // */
-    // Sort ANY = new SortImpl(new Name("any"));
-
+public interface Sort<S extends Sort<S>> extends Named {
     /**
      * @return the direct supersorts of this sort. Not supported by {@code NullSort}.
      */
@@ -43,11 +28,9 @@ public interface Sort<S extends Sort> extends Named {
     String declarationString();
 
     /**
-     * Returns an human explainable text describing this sort. This field is typical set by the
+     * Returns a human explainable text describing this sort. This field is typical set by the
      * parser, who captures the documentation comments.
      */
     @Nullable
     default String getDocumentation() { return null; }
-
-
 }

@@ -16,13 +16,14 @@ import org.jspecify.annotations.Nullable;
  */
 public abstract class AbstractSort extends org.key_project.logic.sort.AbstractSort<Sort>
         implements Sort {
+    private ImmutableSet<Sort> ext;
+
     /**
      * Documentation for this sort given by the associated documentation comment.
      *
      * @see de.uka.ilkd.key.nparser.KeYParser.One_sort_declContext#doc
      */
     private final String documentation;
-    private ImmutableSet<Sort> ext;
 
     /** Information of the origin of this sort */
     private final String origin;

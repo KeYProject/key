@@ -16,7 +16,6 @@ public abstract class AbstractSort<S extends Sort<S>> implements Sort<S> {
 
     /**
      * Documentation for this sort given by the associated documentation comment.
-     *
      * //@see de.uka.ilkd.key.nparser.KeYParser.One_sort_declContext#doc
      */
     private String documentation;
