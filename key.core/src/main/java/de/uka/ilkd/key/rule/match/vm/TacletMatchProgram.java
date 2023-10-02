@@ -71,7 +71,7 @@ public class TacletMatchProgram {
      */
     public static MatchSchemaVariableInstruction<? extends SchemaVariable> getMatchInstructionForSV(
             SchemaVariable op) {
-        MatchSchemaVariableInstruction<? extends SchemaVariable> instruction = null;
+        MatchSchemaVariableInstruction<? extends SchemaVariable> instruction;
 
         if (op instanceof ModalOperatorSV) {
             instruction = Instruction.matchModalOperatorSV((ModalOperatorSV) op);
