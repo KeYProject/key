@@ -11,10 +11,10 @@ import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;

@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.rule.label;
 
 import org.key_project.logic.Name;
-
 import org.key_project.util.collection.ImmutableList;
 
 /**

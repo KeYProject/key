@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import org.key_project.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.logic.Name;
 
 /**
  * The two objects of this class represent the universal and the existential quantifier,

@@ -6,8 +6,9 @@ package de.uka.ilkd.key.logic.op;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.key_project.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.logic.Name;
 
 /**
  * This class is used to represent a dynamic logic modality like diamond and box (but also

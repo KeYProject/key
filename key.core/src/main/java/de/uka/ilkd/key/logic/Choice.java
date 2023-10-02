@@ -4,13 +4,13 @@
 package de.uka.ilkd.key.logic;
 
 
-import org.key_project.logic.Name;
-import org.key_project.logic.Named;
-
 import java.util.List;
 import java.util.Objects;
 
 import org.jspecify.annotations.NonNull;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
 
 /**
  * A choice is an option in a category.

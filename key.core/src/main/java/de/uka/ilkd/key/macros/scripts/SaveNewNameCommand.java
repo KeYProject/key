@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import org.key_project.logic.Name;
-import org.key_project.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -18,6 +16,9 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
 
 /**
  * Special "Let" usually to be applied immediately after a manual rule application. Saves a new name

@@ -6,10 +6,10 @@ package de.uka.ilkd.key.rule.inst;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
-import org.key_project.logic.Name;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.rule.TacletForTests;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.*;
 
 import org.junit.jupiter.api.BeforeEach;

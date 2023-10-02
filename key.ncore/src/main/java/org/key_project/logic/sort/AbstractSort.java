@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic.sort;
 
-import jakarta.annotation.Nullable;
-
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+
+import jakarta.annotation.Nullable;
 
 /**
  * Abstract base class for implementations of the Sort interface.

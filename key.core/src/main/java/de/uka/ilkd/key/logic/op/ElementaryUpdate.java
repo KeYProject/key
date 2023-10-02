@@ -6,8 +6,9 @@ package de.uka.ilkd.key.logic.op;
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
-import org.key_project.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.logic.Name;
 
 
 /**

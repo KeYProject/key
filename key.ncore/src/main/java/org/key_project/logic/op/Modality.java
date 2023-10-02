@@ -20,8 +20,9 @@ public abstract class Modality extends AbstractSortedOperator {
      * Whether this is a transaction modality.
      */
     private boolean isTransaction;
+
     protected Modality(Name name) {
-        super(name, new Sort[]{ Sort.FORMULA }, Sort.FORMULA, false);
+        super(name, new Sort[] { Sort.FORMULA }, Sort.FORMULA, false);
     }
 
     public boolean terminationSensitive() {

@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.nparser;
 
 
-import org.key_project.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -12,6 +11,8 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
+
+import org.key_project.logic.Name;
 
 /**
  * @author Alexander Weigl

@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.MapLDT;
+
 import org.key_project.logic.Name;
 
 public class EmptyMapLiteral extends Literal {

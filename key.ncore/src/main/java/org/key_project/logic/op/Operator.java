@@ -18,7 +18,8 @@ public interface Operator<S extends Sort<S>> extends Named {
      * level operator and sub terms of sorts `sorts`. The assumption that the constructed term
      * would be allowed is not checked.
      *
-     * @param sorts an array of Sort containing the sort of the subterms of a (potential) term with this
+     * @param sorts an array of Sort containing the sort of the subterms of a (potential) term with
+     *        this
      *        operator as top level operator
      * @return sort of the term with this operator as top level operator of the given substerms
      */

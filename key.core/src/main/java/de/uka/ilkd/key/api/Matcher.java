@@ -6,7 +6,6 @@ package de.uka.ilkd.key.api;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
-import org.key_project.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -18,6 +17,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher;
 
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.CharStreams;

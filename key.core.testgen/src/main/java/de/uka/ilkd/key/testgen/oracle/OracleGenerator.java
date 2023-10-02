@@ -6,9 +6,9 @@ package de.uka.ilkd.key.testgen.oracle;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
-import org.key_project.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.smt.NumberTranslation;
@@ -16,7 +16,7 @@ import de.uka.ilkd.key.testgen.ReflectionClassCreator;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
 import de.uka.ilkd.key.testgen.oracle.OracleUnaryTerm.Op;
 
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.slf4j.Logger;

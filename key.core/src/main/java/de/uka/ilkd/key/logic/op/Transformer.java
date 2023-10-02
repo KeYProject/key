@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import org.key_project.logic.Name;
-import org.key_project.logic.Named;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableArray;
 
 /**

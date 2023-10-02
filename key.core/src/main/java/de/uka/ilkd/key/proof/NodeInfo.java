@@ -13,7 +13,6 @@ import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
-import org.key_project.logic.Name;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
@@ -32,6 +31,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
 
 import org.key_project.proof.LocationVariableTracker;
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;

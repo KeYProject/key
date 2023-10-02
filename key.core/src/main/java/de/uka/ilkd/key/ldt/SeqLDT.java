@@ -16,13 +16,13 @@ import de.uka.ilkd.key.java.expression.operator.adt.SeqReverse;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import org.key_project.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.Nullable;

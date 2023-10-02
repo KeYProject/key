@@ -11,8 +11,8 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.CharListLDT;
-import org.key_project.logic.Name;
 
+import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
 

@@ -5,7 +5,6 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.*;
 
-import org.key_project.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.Function;
@@ -17,6 +16,7 @@ import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableSet;
 
 public class UserDefinedSymbols {

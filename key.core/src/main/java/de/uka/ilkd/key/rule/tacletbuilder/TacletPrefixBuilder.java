@@ -10,9 +10,9 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.*;
 
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.*;
 
 public class TacletPrefixBuilder {

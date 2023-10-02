@@ -13,9 +13,10 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import javax.swing.JComponent;
 
-import org.key_project.logic.Name;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
+import org.key_project.logic.Name;
 
 /**
  * <p>
