@@ -18,6 +18,10 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
+/**
+ * The JavaDL theory class provides access to function symvols, sorts that are part of the core logic
+ * like cast or instanceof functions.
+ */
 public class JavaDLTheory extends LDT {
 
     /**
@@ -28,11 +32,13 @@ public class JavaDLTheory extends LDT {
      * Name of {@link #getCastSymbol(Sort,TermServices)}.
      */
     public static final Name CAST_NAME = new Name("cast");
+
     /**
      * Name of {@link #getInstanceofSymbol(Sort,TermServices)}.
      */
     public static final Name INSTANCE_NAME = new Name("instance");
 
+    /** Name of the JavaDL theory */
     public static final Name NAME = new Name("JavaDLTheory");
 
     // TODO fix wrong tests (which do not use proper services)
@@ -42,7 +48,6 @@ public class JavaDLTheory extends LDT {
         super(NAME, Sort.FORMULA, services);
         // this.services = services;
     }
-
 
     /*
      * aus NullSort
@@ -75,9 +80,15 @@ public class JavaDLTheory extends LDT {
      * }
      */
 
+    /**
+     * retrieves the cast function for the given sort
+     * @param sort the Sort for which to retrieve the cast function
+     * @param services the TermServices for lookup
+     * @return the found cast function
+     */
     public final SortDependingFunction getCastSymbol(Sort sort, TermServices services) {
         SortDependingFunction castFunction =
-            SortDependingFunction.getFirstInstance(JavaDLTheory.CAST_NAME, services);
+            SortDependingFunction.getFirstInstance(CAST_NAME, services);
         if (castFunction == null) {
             throw new IllegalStateException("No 'cast' function found for any type.");
         }
@@ -86,17 +97,30 @@ public class JavaDLTheory extends LDT {
         return result;
     }
 
+    /**
+     * retrieves the instanceof function for the given sort
+     * @param sort the Sort for which to retrieve the instanceof function
+     * @param services the TermServices for lookup
+     * @return the found instanceof function
+     */
     public final SortDependingFunction getInstanceofSymbol(Sort sort, TermServices services) {
         SortDependingFunction result = SortDependingFunction
-                .getFirstInstance(JavaDLTheory.INSTANCE_NAME, services)
+                .getFirstInstance(INSTANCE_NAME, services)
                 .getInstanceFor(sort, services);
         assert result.getSortDependingOn() == sort;
         return result;
     }
 
+
+    /**
+     * retrieves the exactInstance function for the given sort
+     * @param sort the Sort for which to retrieve the exactInstance function
+     * @param services the TermServices for lookup
+     * @return the found exactInstance function
+     */
     public final SortDependingFunction getExactInstanceofSymbol(Sort sort, TermServices services) {
         SortDependingFunction result = SortDependingFunction
-                .getFirstInstance(JavaDLTheory.EXACT_INSTANCE_NAME, services)
+                .getFirstInstance(EXACT_INSTANCE_NAME, services)
                 .getInstanceFor(sort, services);
         assert result.getSortDependingOn() == sort;
         return result;
