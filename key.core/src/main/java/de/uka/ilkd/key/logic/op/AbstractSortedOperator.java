@@ -60,7 +60,7 @@ public abstract class AbstractSortedOperator extends AbstractOperator
 
 
     @Override
-    public final Sort sort(ImmutableArray<Term> terms) {
+    public final Sort sort(Sort[] sorts) {
         return sort;
     }
 

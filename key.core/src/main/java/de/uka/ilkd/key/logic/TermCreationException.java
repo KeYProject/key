@@ -9,6 +9,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import java.util.stream.Collectors;
+
 public class TermCreationException extends RuntimeException {
 
     /**
@@ -34,7 +36,12 @@ public class TermCreationException extends RuntimeException {
         return "Building a term failed. Normally there is an arity mismatch "
             + "or one of the subterms' sorts "
             + "is not compatible (e.g. like the '2' in \"true & 2\")\n"
-            + "The top level operator was " + op + "(Sort: " + op.sort(subs) + ")"
+            + "The top level operator was " + op + "(Sort: " + op.sort(
+                            subs
+                                    .stream()
+                                    .map(Term::sort)
+                                    .toArray(Sort[]::new))
+                + ")"
             + (op instanceof SortedOperator
                     ? "; its expected arg sorts were:\n" + argsToString((SortedOperator) op)
                     : "")

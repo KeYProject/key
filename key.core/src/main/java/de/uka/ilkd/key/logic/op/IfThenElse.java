@@ -10,7 +10,6 @@ import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
 
@@ -62,9 +61,9 @@ public final class IfThenElse extends AbstractOperator {
 
 
     @Override
-    public Sort sort(ImmutableArray<Term> terms) {
-        final Sort s2 = terms.get(1).sort();
-        final Sort s3 = terms.get(2).sort();
+    public Sort sort(Sort[] sorts) {
+        final Sort s2 = sorts[1];
+        final Sort s3 = sorts[2];
         if (s2 instanceof ProgramSVSort || s2 == AbstractTermTransformer.METASORT) {
             return s3;
         } else if (s3 instanceof ProgramSVSort || s3 == AbstractTermTransformer.METASORT) {

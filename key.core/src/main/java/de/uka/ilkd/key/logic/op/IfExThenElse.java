@@ -8,9 +8,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import org.key_project.util.collection.ImmutableArray;
-
 
 /**
  * This singleton class implements a conditional operator "\ifEx iv; (phi) \then (t1) \else (t2)",
@@ -28,8 +25,8 @@ public final class IfExThenElse extends AbstractOperator {
 
 
     @Override
-    public Sort sort(ImmutableArray<Term> terms) {
-        return terms.get(1).sort();
+    public Sort sort(Sort[] sorts) {
+        return sorts[1];
     }
 
 

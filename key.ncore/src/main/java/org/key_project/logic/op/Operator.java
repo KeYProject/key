@@ -6,7 +6,6 @@ package org.key_project.logic.op;
 import org.key_project.logic.Named;
 import org.key_project.logic.Term;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableArray;
 
 public interface Operator<S extends Sort<S>, T extends Term> extends Named {
     /**
@@ -16,14 +15,14 @@ public interface Operator<S extends Sort<S>, T extends Term> extends Named {
 
     /**
      * Determines the sort of the {@link Term} if it would be created using this Operator as top
-     * level operator and the given terms as sub terms. The assumption that the constructed term
+     * level operator and sub terms of sorts `sorts`. The assumption that the constructed term
      * would be allowed is not checked.
      *
-     * @param terms an array of Term containing the subterms of a (potential) term with this
+     * @param sorts an array of Sort containing the sort of the subterms of a (potential) term with this
      *        operator as top level operator
      * @return sort of the term with this operator as top level operator of the given substerms
      */
-    S sort(ImmutableArray<T> terms);
+    S sort(S[] sorts);
 
     /**
      * Tells whether the operator binds variables at the n-th subterm.

@@ -49,7 +49,7 @@ public abstract class AbstractSortedOperator<S extends Sort<S>, T extends Term> 
 
 
     @Override
-    public final S sort(ImmutableArray<T> terms) {
+    public final S sort(S[] sorts) {
         return sort;
     }
 

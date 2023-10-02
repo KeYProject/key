@@ -9,8 +9,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-import org.key_project.util.collection.ImmutableArray;
-
 /**
  * Standard first-order substitution operator, resolving clashes but not preventing (usually
  * unsound) substitution of non-rigid terms across modal operators. Currently, only the subclass
@@ -28,9 +26,9 @@ public abstract class SubstOp extends AbstractOperator {
      *         has no correct (2=) arity
      */
     @Override
-    public Sort sort(ImmutableArray<Term> terms) {
-        if (terms.size() == 2) {
-            return terms.get(1).sort();
+    public Sort sort(Sort[] sorts) {
+        if (sorts.length == 2) {
+            return sorts[1];
         } else {
             throw new IllegalArgumentException(
                 "Cannot determine sort of " + "invalid term (Wrong arity).");

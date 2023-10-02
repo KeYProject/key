@@ -156,7 +156,11 @@ public final class TruthValueTracingUtil {
      */
     public static boolean isIfThenElseFormula(Operator operator, ImmutableArray<Term> subs) {
         if (operator == IfThenElse.IF_THEN_ELSE) {
-            Sort sort = operator.sort(subs);
+            Sort[] sorts = new Sort[subs.size()];
+            for (int i = 0; i < sorts.length; i++) {
+                sorts[i] = subs.get(i).sort();
+            }
+            Sort sort = operator.sort(sorts);
             return sort == Sort.FORMULA;
         } else {
             return false;

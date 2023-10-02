@@ -8,8 +8,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-import org.key_project.util.collection.ImmutableArray;
-
 
 /**
  * Singleton class defining a binary operator {u}t that applies updates u to terms, formulas, or
@@ -26,8 +24,8 @@ public final class UpdateApplication extends AbstractOperator {
 
 
     @Override
-    public Sort sort(ImmutableArray<Term> terms) {
-        return terms.get(1).sort();
+    public Sort sort(Sort[] sorts) {
+        return sorts[1];
     }
 
 

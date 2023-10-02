@@ -58,6 +58,7 @@ public class OriginTermLabel implements TermLabel {
      * @see #getChildCount()
      */
     public final static int CHILD_COUNT = 2;
+    public static final Sort[] EMPTY_SORTS = new Sort[0];
 
 
     /**
@@ -219,7 +220,7 @@ public class OriginTermLabel implements TermLabel {
         final JavaInfo ji = services.getJavaInfo();
 
         if (op.arity() == 0) {
-            Sort sort = op.sort(new ImmutableArray<>());
+            Sort sort = op.sort(EMPTY_SORTS);
 
             if (sort.extendsTrans(Sort.FORMULA)) {
                 return true;

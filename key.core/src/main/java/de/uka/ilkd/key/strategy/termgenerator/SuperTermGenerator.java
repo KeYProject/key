@@ -89,7 +89,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
                         return 2;
                     }
 
-                    public Sort sort(ImmutableArray<Term> terms) {
+                    public Sort sort(Sort[] sorts) {
                         return Sort.ANY;
                     }
 

@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortedOperator;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
@@ -42,7 +43,7 @@ import org.key_project.util.collection.ImmutableArray;
 public class FieldConstantHandler implements SMTHandler {
 
     private static final String CONSTANT_COUNTER_PROPERTY = "fieldConstant.counter";
-    private static final ImmutableArray<Term> NO_ARGS = new ImmutableArray<>();
+    private static final Sort[] NO_ARGS = new Sort[0];
     private Services services;
 
     @Override
