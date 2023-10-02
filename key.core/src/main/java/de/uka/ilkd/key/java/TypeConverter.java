@@ -166,7 +166,7 @@ public final class TypeConverter {
         if (prefix instanceof FieldReference) {
             return convertVariableReference((FieldReference) prefix, ec);
         } else if (prefix instanceof MetaClassReference) {
-            LOGGER.warn("WARNING: metaclass-references not supported yet");
+            LOGGER.warn("WARNING: metaclass references not supported yet");
             throw new IllegalArgumentException("TypeConverter could not handle" + " this");
         } else if (prefix instanceof ProgramVariable) {
             // the base case: the leftmost item is a local variable
@@ -334,7 +334,7 @@ public final class TypeConverter {
             assert !(pe instanceof MetaClassReference) : "not supported";
         }
         throw new IllegalArgumentException(
-            "TypeConverter: Unknown or not convertable ProgramElement " + pe + " of type "
+            "TypeConverter: Unknown or not convertible ProgramElement " + pe + " of type "
                 + pe.getClass());
     }
 
@@ -484,7 +484,7 @@ public final class TypeConverter {
     /**
      * Retrieves the static type of the expression. This method may only be called if the
      * expressions type can be determined without knowledge of context information, i.e. it must not
-     * be a expression with an ex-/or implicit this reference like this.a or a methodcall whose
+     * be an expression with an ex-/or implicit this reference like this.a or a methodcall whose
      * value can only be determined when one knows the exact invocation context.
      * <p>
      * For these cases please use @link #getKeYJavaType(Expression, ExecutionContext)
@@ -517,7 +517,7 @@ public final class TypeConverter {
      * exception.
      *
      * @param term the Term to be converted
-     * @return the Term as an program AST node of type expression
+     * @return the Term as a program AST node of type expression
      * @throws RuntimeException iff a conversion is not possible
      */
     public Expression convertToProgramElement(Term term) {
@@ -627,11 +627,11 @@ public final class TypeConverter {
         }
         // everything except \real and \bigint can be coerced to a double
         if (to == PrimitiveType.JAVA_DOUBLE) {
-            return from != PrimitiveType.JAVA_BIGINT;
+            return from != PrimitiveType.JAVA_BIGINT && from != PrimitiveType.JAVA_REAL;
         }
         // but a double cannot be coerced to anything else
         if (from == PrimitiveType.JAVA_DOUBLE) {
-            return from != PrimitiveType.JAVA_BIGINT;
+            return false; // real case already covered above
         }
         // everything except doubles can be coerced to a float
         if (to == PrimitiveType.JAVA_FLOAT) {
