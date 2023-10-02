@@ -5,6 +5,7 @@ package de.uka.ilkd.key.logic.sort;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -15,7 +16,7 @@ import org.key_project.util.collection.ImmutableSet;
  * Within an SVInstantiations-object a generic sort is instantiated by a concrete sort, which has to
  * be a subsort of the instantiations of the supersorts of this sort
  */
-public final class GenericSort extends AbstractSort {
+public final class GenericSort extends Sort {
 
 
     /**
@@ -96,7 +97,7 @@ public final class GenericSort extends AbstractSort {
      *         Use "GenericSortInstantiations" instead
      */
     public boolean isPossibleInstantiation(Sort p_s) {
-        return p_s != Sort.FORMULA && (oneOf.isEmpty() || oneOf.contains(p_s))
+        return p_s != JavaDLTheory.FORMULA && (oneOf.isEmpty() || oneOf.contains(p_s))
                 && checkNonGenericSupersorts(p_s);
     }
 

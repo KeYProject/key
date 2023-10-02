@@ -6,6 +6,7 @@ package de.uka.ilkd.key.testgen.oracle;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -605,7 +606,7 @@ public class OracleGenerator {
 
     private String getSetName(Sort s) {
 
-        if (s.equals(Sort.FORMULA)) {
+        if (s.equals(JavaDLTheory.FORMULA)) {
             return TestCaseGenerator.ALL_BOOLS;
         } else if (s.equals(services.getTypeConverter().getIntegerLDT().targetSort())) {
             return TestCaseGenerator.ALL_INTS;

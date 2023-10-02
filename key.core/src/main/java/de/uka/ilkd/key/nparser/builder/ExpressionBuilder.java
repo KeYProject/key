@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.*;
@@ -260,7 +261,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 final Term num = result.sub(0);
                 return capsulateTf(ctx,
                     () -> getTermFactory().createTerm(Z, getTermFactory().createTerm(neglit, num)));
-            } else if (result.sort() != Sort.FORMULA) {
+            } else if (result.sort() != JavaDLTheory.FORMULA) {
                 Sort sort = result.sort();
                 if (sort == null) {
                     semanticError(ctx, "No sort for %s", result);
@@ -667,7 +668,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         } else {
             if (attribute instanceof LogicVariable) {
                 Term attrTerm = capsulateTf(ctx, () -> getTermFactory().createTerm(attribute));
-                result = getServices().getTermBuilder().dot(Sort.ANY, result, attrTerm);
+                result = getServices().getTermBuilder().dot(JavaDLTheory.ANY, result, attrTerm);
             } else if (attribute instanceof ProgramConstant) {
                 result = capsulateTf(ctx, () -> getTermFactory().createTerm(attribute));
             } else if (attribute == getServices().getJavaInfo().getArrayLength()) {
@@ -876,7 +877,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     "Expecting term of sort %s as index of sequence %s, but found: %s",
                     IntegerLDT.NAME, term, indexTerm);
             }
-            return getServices().getTermBuilder().seqGet(Sort.ANY, term, indexTerm);
+            return getServices().getTermBuilder().seqGet(JavaDLTheory.ANY, term, indexTerm);
         }
 
         if (ctx.rangeTo != null) {
@@ -977,7 +978,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Term visitIfThenElseTerm(KeYParser.IfThenElseTermContext ctx) {
         Term condF = (Term) ctx.condF.accept(this);
-        if (condF.sort() != Sort.FORMULA) {
+        if (condF.sort() != JavaDLTheory.FORMULA) {
             semanticError(ctx, "Condition of an \\if-then-else term has to be a formula.");
         }
         Term thenT = (Term) ctx.thenT.accept(this);
@@ -992,7 +993,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         Namespace<QuantifiableVariable> orig = variables();
         List<QuantifiableVariable> exVars = accept(ctx.bound_variables());
         Term condF = accept(ctx.condF);
-        if (condF.sort() != Sort.FORMULA) {
+        if (condF.sort() != JavaDLTheory.FORMULA) {
             semanticError(ctx, "Condition of an \\ifEx-then-else term has to be a formula.");
         }
 

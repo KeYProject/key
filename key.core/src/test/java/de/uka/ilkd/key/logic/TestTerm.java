@@ -5,6 +5,7 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -31,13 +32,13 @@ public class TestTerm {
     private final Sort sort3 = new SortImpl(new Name("S3"));
 
 
-    private final Function p = new Function(new Name("p"), Sort.FORMULA, sort1);
+    private final Function p = new Function(new Name("p"), JavaDLTheory.FORMULA, sort1);
     // p(:S1):BOOL
     private final LogicVariable x = new LogicVariable(new Name("x"), sort1); // x:S1
     // q(:Whatever):BOOL
     private final LogicVariable z = new LogicVariable(new Name("z"), sort1); // z:S1
     private final LogicVariable zz = new LogicVariable(new Name("zz"), sort1); // zz:S1
-    private final Function r = new Function(new Name("r"), Sort.FORMULA, sort1, sort2);
+    private final Function r = new Function(new Name("r"), JavaDLTheory.FORMULA, sort1, sort2);
     // r(:S1, :S2):BOOL
     private final LogicVariable y = new LogicVariable(new Name("y"), sort3); // y:S3
     private final LogicVariable w = new LogicVariable(new Name("w"), sort2); // w:S2

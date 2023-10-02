@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.util;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IfThenElse;
@@ -32,8 +33,8 @@ public class TermHelper {
      * @return the maximal sort allowed at the i-th position
      */
     public static Sort getMaxSort(Term term, int i, TermServices services) {
-        if (term.sub(i).sort() == Sort.FORMULA) {
-            return Sort.FORMULA;
+        if (term.sub(i).sort() == JavaDLTheory.FORMULA) {
+            return JavaDLTheory.FORMULA;
         }
 
         if (term.op() instanceof IfThenElse && i > 0) {

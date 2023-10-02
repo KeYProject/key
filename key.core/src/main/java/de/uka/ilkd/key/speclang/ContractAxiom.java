@@ -10,6 +10,7 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -58,8 +59,8 @@ public final class ContractAxiom extends ClassAxiom {
         assert name != null;
         assert kjt != null;
         assert target != null;
-        assert originalPre.sort() == Sort.FORMULA;
-        assert originalPost.sort() == Sort.FORMULA;
+        assert originalPre.sort() == JavaDLTheory.FORMULA;
+        assert originalPost.sort() == JavaDLTheory.FORMULA;
         assert (selfVar == null) == target.isStatic();
         this.name = name;
         this.target = target;

@@ -395,7 +395,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public Object visitPredicate(JmlParser.PredicateContext ctx) {
         SLExpression expr = accept(ctx.expression());
         assert expr != null;
-        if (!expr.isTerm() && expr.getTerm().sort() == Sort.FORMULA) {
+        if (!expr.isTerm() && expr.getTerm().sort() == JavaDLTheory.FORMULA) {
             raiseError("Expected a formula: " + expr, ctx);
         }
         return expr;
@@ -643,7 +643,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             do {
                 name = new Name("subtype_" + ++x);
             } while (fns.lookup(name) != null);
-            final Function z = new Function(name, Sort.FORMULA);
+            final Function z = new Function(name, JavaDLTheory.FORMULA);
             fns.add(z);
             result = new SLExpression(tb.func(z));
         } else {
@@ -665,12 +665,12 @@ class Translator extends JmlParserBaseVisitor<Object> {
             exc.addIgnoreWarning("Lockset ordering is not supported",
                 ctx.LOCKSET_LEQ().getSymbol());
             final Sort objSort = services.getJavaInfo().getJavaLangObject().getSort();
-            f = new Function(new Name("lockset_leq"), Sort.FORMULA, objSort, objSort);
+            f = new Function(new Name("lockset_leq"), JavaDLTheory.FORMULA, objSort, objSort);
         }
         if (ctx.LOCKSET_LT() != null) {
             exc.addIgnoreWarning("Lockset ordering is not supported", ctx.LOCKSET_LT().getSymbol());
             final Sort objSort = services.getJavaInfo().getJavaLangObject().getSort();
-            f = new Function(new Name("lockset_lt"), Sort.FORMULA, objSort, objSort);
+            f = new Function(new Name("lockset_lt"), JavaDLTheory.FORMULA, objSort, objSort);
         }
         assert f != null;
         assert right != null;
@@ -821,7 +821,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 raiseError("Cannot negate type " + e.getType().getName() + ".", ctx);
             }
             Term t = e.getTerm();
-            if (t.sort() == Sort.FORMULA) {
+            if (t.sort() == JavaDLTheory.FORMULA) {
                 return new SLExpression(tb.not(t));
             } else if (t.sort() == booleanLDT.targetSort()) {
                 return new SLExpression(tb.not(tb.equals(t, tb.TRUE())));
@@ -2227,7 +2227,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 raiseError("Represents clause with unexpected rhs: " + rhs, ctx);
             }
             Term rhsTerm = rhs.getTerm();
-            if (rhsTerm.sort() == Sort.FORMULA) {
+            if (rhsTerm.sort() == JavaDLTheory.FORMULA) {
                 rhsTerm = tb.ife(rhsTerm, tb.TRUE(), tb.FALSE());
             }
             t = tb.equals(lhs.getTerm(), rhsTerm);

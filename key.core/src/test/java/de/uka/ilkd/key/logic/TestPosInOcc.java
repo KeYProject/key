@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -31,7 +32,7 @@ public class TestPosInOcc {
         Sort sort1 = new SortImpl(new Name("S1"));
         LogicVariable x = new LogicVariable(new Name("x"), sort1);
         Function f = new Function(new Name("f"), sort1, sort1);
-        Function p = new Function(new Name("p"), Sort.FORMULA, sort1);
+        Function p = new Function(new Name("p"), JavaDLTheory.FORMULA, sort1);
 
 
         Term[] terms = new Term[3];
@@ -77,7 +78,7 @@ public class TestPosInOcc {
         LogicVariable x = new LogicVariable(new Name("x"), sort1);
         Function c = new Function(new Name("c"), sort1, new Sort[] {});
         Function f = new Function(new Name("f"), sort1, sort1);
-        Function p = new Function(new Name("p"), Sort.FORMULA, sort1);
+        Function p = new Function(new Name("p"), JavaDLTheory.FORMULA, sort1);
 
         Term[] terms = new Term[3];
         terms[0] = TB.var(x);

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -32,7 +33,7 @@ public class Transformer extends Function {
     }
 
     public Transformer(Name name, Sort argSort) {
-        this(name, Sort.FORMULA, new ImmutableArray<>(argSort));
+        this(name, JavaDLTheory.FORMULA, new ImmutableArray<>(argSort));
     }
 
     /**

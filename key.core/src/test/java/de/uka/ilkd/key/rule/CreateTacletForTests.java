@@ -7,6 +7,7 @@ package de.uka.ilkd.key.rule;
 import java.io.IOException;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -107,7 +108,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
     public void createNatTaclets() {
         // decls for nat
         func_0 = new Function(new Name("zero"), nat, new Sort[] {});
-        func_eq = new Function(new Name("="), Sort.FORMULA, nat, nat);
+        func_eq = new Function(new Name("="), JavaDLTheory.FORMULA, nat, nat);
         func_plus = new Function(new Name("+"), nat, nat, nat);
         func_min1 = new Function(new Name("pred"), nat, nat);
         func_plus1 = new Function(new Name("succ"), nat, nat);
@@ -261,7 +262,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
             Semisequent.EMPTY_SEMISEQUENT.insert(0, cf2).semisequent());
 
 
-        func_p = new Function(new Name("P"), Sort.FORMULA, sort1);
+        func_p = new Function(new Name("P"), JavaDLTheory.FORMULA, sort1);
         nss.functions().add(func_p);
 
         // nat problem:

@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -367,7 +368,7 @@ public class MergeRule implements BuiltInRule {
                     && !MergeRule.RIGHT_SIDE_EQUIVALENCE_ONLY_SYNTACTICAL) {
 
                 Term predicateTerm =
-                    tb.func(new Function(new Name("P"), Sort.FORMULA, v.sort()), tb.var(v));
+                    tb.func(new Function(new Name("P"), JavaDLTheory.FORMULA, v.sort()), tb.var(v));
                 Term appl1 = tb.apply(state1.first, predicateTerm);
                 Term appl2 = tb.apply(state2.first, predicateTerm);
                 Term toProve = tb.and(tb.imp(appl1, appl2), tb.imp(appl2, appl1));

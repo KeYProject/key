@@ -10,6 +10,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -140,7 +141,7 @@ public class DeclarationBuilder extends DefaultBuilder {
                         semanticError(ctx, "Illegal sort given");
                     }
                 } else if (new Name("any").equals(sortName)) {
-                    s = Sort.ANY;
+                    s = JavaDLTheory.ANY;
                 } else {
                     if (isProxySort) {
                         var ps = new ProxySort(sortName, ext, documentation,

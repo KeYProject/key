@@ -6,6 +6,7 @@ package de.uka.ilkd.key.smt.newsmt2;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -33,8 +34,8 @@ public class CastingFunctionsHandler implements SMTHandler {
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
             String[] handlerOptions) {
-        this.seqGet = services.getTypeConverter().getSeqLDT().getSeqGet(Sort.ANY, services);
-        this.select = services.getTypeConverter().getHeapLDT().getSelect(Sort.ANY, services);
+        this.seqGet = services.getTypeConverter().getSeqLDT().getSeqGet(JavaDLTheory.ANY, services);
+        this.select = services.getTypeConverter().getHeapLDT().getSelect(JavaDLTheory.ANY, services);
         masterHandler.addDeclarationsAndAxioms(handlerSnippets);
     }
 
@@ -55,7 +56,7 @@ public class CastingFunctionsHandler implements SMTHandler {
         trans.introduceSymbol(name);
         SExpr result = trans.handleAsFunctionCall(prefixedName, term);
         Sort dep = sdf.getSortDependingOn();
-        if (dep == Sort.ANY) {
+        if (dep == JavaDLTheory.ANY) {
             return result;
         } else {
             trans.addSort(dep);

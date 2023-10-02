@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -50,7 +51,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
@@ -515,7 +515,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             TermServices services) {
         final TermBuilder tb = services.getTermBuilder();
         final ProgramElementName variantName = new ProgramElementName(tb.newName("variant"));
-        final LocationVariable variantPV = new LocationVariable(variantName, Sort.ANY);
+        final LocationVariable variantPV = new LocationVariable(variantName, JavaDLTheory.ANY);
         services.getNamespaces().programVariables().addSafely(variantPV);
 
         final boolean dia = ((Modality) inst.progPost.op()).terminationSensitive();
@@ -963,9 +963,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         public Instantiation(Term u, Term progPost, While loop, LoopSpecification inv,
                 Term selfTerm, ExecutionContext innermostExecutionContext) {
             assert u != null;
-            assert u.sort() == Sort.UPDATE;
+            assert u.sort() == JavaDLTheory.UPDATE;
             assert progPost != null;
-            assert progPost.sort() == Sort.FORMULA;
+            assert progPost.sort() == JavaDLTheory.FORMULA;
             assert loop != null;
             assert inv != null;
             this.u = u;

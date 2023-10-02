@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -43,7 +44,7 @@ public final class IfExThenElse extends AbstractOperator {
         final Sort s1 = term.sub(1).sort();
         final Sort s2 = term.sub(2).sort();
 
-        if (!(s0 == Sort.FORMULA && s1.equals(s2))) {
+        if (!(s0 == JavaDLTheory.FORMULA && s1.equals(s2))) {
             throw new TermCreationException(this, term);
         }
     }

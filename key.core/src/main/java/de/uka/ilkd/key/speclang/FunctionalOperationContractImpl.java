@@ -17,9 +17,9 @@ import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -170,7 +170,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert freePosts != null;
         assert modality != null;
         assert (selfVar == null) == pm.isStatic();
-        assert globalDefs == null || globalDefs.sort() == Sort.UPDATE;
+        assert globalDefs == null || globalDefs.sort() == JavaDLTheory.UPDATE;
         assert paramVars != null;
         assert paramVars.size() >= pm.getParameterDeclarationCount();
         // may be more parameters in specifications (ghost parameters)

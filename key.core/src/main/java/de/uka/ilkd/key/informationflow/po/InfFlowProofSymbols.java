@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -539,7 +540,7 @@ public class InfFlowProofSymbols {
                 StringBuilder res = new StringBuilder("\\extends ");
                 boolean extendsAtLeastOneSort = false;
                 for (final Sort sortParent : sort.extendsSorts()) {
-                    if (sortParent != Sort.ANY) {
+                    if (sortParent != JavaDLTheory.ANY) {
                         res.append(sortParent.name()).append(", ");
                         extendsAtLeastOneSort = true;
                     }

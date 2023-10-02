@@ -5,6 +5,7 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -38,14 +39,14 @@ public class TestTermFactory {
     private final Sort osort4 = new SortImpl(new Name("os4"),
         DefaultImmutableSet.<Sort>nil().add(osort2).add(osort3), false);
 
-    final Function p = new Function(new Name("p"), Sort.FORMULA, sort1);
+    final Function p = new Function(new Name("p"), JavaDLTheory.FORMULA, sort1);
     // p(:S1):BOOL
     final LogicVariable x = new LogicVariable(new Name("x"), sort1); // x:S1
     final Function q =
-        new Function(new Name("q"), Sort.FORMULA, new SortImpl(new Name("Whatever")));
+        new Function(new Name("q"), JavaDLTheory.FORMULA, new SortImpl(new Name("Whatever")));
     // q(:Whatever):BOOL
     final LogicVariable z = new LogicVariable(new Name("z"), sort1); // z:S1
-    final Function r = new Function(new Name("r"), Sort.FORMULA, sort1, sort2);
+    final Function r = new Function(new Name("r"), JavaDLTheory.FORMULA, sort1, sort2);
     // r(:S1, :S2):BOOL
     final LogicVariable y = new LogicVariable(new Name("y"), sort3); // y:S3
     final LogicVariable w = new LogicVariable(new Name("w"), sort2); // w:S2

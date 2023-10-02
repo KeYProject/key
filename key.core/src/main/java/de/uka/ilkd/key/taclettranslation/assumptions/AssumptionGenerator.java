@@ -6,6 +6,7 @@ package de.uka.ilkd.key.taclettranslation.assumptions;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -376,7 +377,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         TermBuilder tb = services.getTermBuilder();
 
         // translate schema variables into logical variables
-        if (term.op() instanceof SchemaVariable && !term.sort().equals(Sort.FORMULA)) {
+        if (term.op() instanceof SchemaVariable && !term.sort().equals(JavaDLTheory.FORMULA)) {
             term = tb.var(getLogicVariable(term.op().name(), term.sort()));
         }
 

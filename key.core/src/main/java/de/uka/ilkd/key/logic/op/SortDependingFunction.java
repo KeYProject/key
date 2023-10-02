@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.TermServices;
@@ -83,13 +84,13 @@ public final class SortDependingFunction extends Function {
             Sort sort, Sort[] argSorts, boolean unique) {
         SortDependingFunctionTemplate template = new SortDependingFunctionTemplate(sortDependingOn,
             kind, sort, new ImmutableArray<>(argSorts), unique);
-        return new SortDependingFunction(template, Sort.ANY);
+        return new SortDependingFunction(template, JavaDLTheory.ANY);
     }
 
 
     public static SortDependingFunction getFirstInstance(Name kind, TermServices services) {
         return (SortDependingFunction) services.getNamespaces().functions()
-                .lookup(instantiateName(kind, Sort.ANY));
+                .lookup(instantiateName(kind, JavaDLTheory.ANY));
     }
 
     /**

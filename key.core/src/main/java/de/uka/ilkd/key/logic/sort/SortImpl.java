@@ -10,7 +10,7 @@ import org.key_project.util.collection.ImmutableSet;
 /**
  * Standard implementation of the Sort interface.
  */
-public final class SortImpl extends AbstractSort {
+public final class SortImpl extends Sort {
 
     public SortImpl(Name name, ImmutableSet<Sort> ext, boolean isAbstract, String documentation,
             String origin) {

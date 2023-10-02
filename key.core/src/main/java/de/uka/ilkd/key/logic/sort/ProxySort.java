@@ -7,7 +7,7 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-public class ProxySort extends AbstractSort {
+public class ProxySort extends Sort {
 
     public ProxySort(Name name, ImmutableSet<Sort> ext, String documentation, String origin) {
         super(name, ext, false, documentation, origin);

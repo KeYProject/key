@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -105,7 +106,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     public Object visitOne_schema_modal_op_decl(KeYParser.One_schema_modal_op_declContext ctx) {
         ImmutableSet<Modality> modalities = DefaultImmutableSet.nil();
         Sort sort = accept(ctx.sort);
-        if (sort != null && sort != Sort.FORMULA) {
+        if (sort != null && sort != JavaDLTheory.FORMULA) {
             semanticError(ctx, "Modal operator SV must be a FORMULA, not " + sort);
         }
         List<String> ids = accept(ctx.simple_ident_comma_list());
@@ -610,7 +611,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         if (ctx.FORMULA() != null) {
             mods = new SchemaVariableModifierSet.FormulaSV();
             accept(ctx.schema_modifiers(), mods);
-            s = Sort.FORMULA;
+            s = JavaDLTheory.FORMULA;
         }
         if (ctx.TERMLABEL() != null) {
             makeTermLabelSV = true;
@@ -620,13 +621,13 @@ public class TacletPBuilder extends ExpressionBuilder {
         if (ctx.UPDATE() != null) {
             mods = new SchemaVariableModifierSet.FormulaSV();
             accept(ctx.schema_modifiers(), mods);
-            s = Sort.UPDATE;
+            s = JavaDLTheory.UPDATE;
         }
         if (ctx.SKOLEMFORMULA() != null) {
             makeSkolemTermSV = true;
             mods = new SchemaVariableModifierSet.FormulaSV();
             accept(ctx.schema_modifiers(), mods);
-            s = Sort.FORMULA;
+            s = JavaDLTheory.FORMULA;
         }
         if (ctx.TERM() != null) {
             mods = new SchemaVariableModifierSet.TermSV();
@@ -681,9 +682,9 @@ public class TacletPBuilder extends ExpressionBuilder {
             boolean makeVariableSV, boolean makeSkolemTermSV, boolean makeTermLabelSV,
             SchemaVariableModifierSet mods) {
         SchemaVariable v;
-        if (s == Sort.FORMULA && !makeSkolemTermSV) {
+        if (s == JavaDLTheory.FORMULA && !makeSkolemTermSV) {
             v = SchemaVariableFactory.createFormulaSV(new Name(name), mods.rigid());
-        } else if (s == Sort.UPDATE) {
+        } else if (s == JavaDLTheory.UPDATE) {
             v = SchemaVariableFactory.createUpdateSV(new Name(name));
         } else if (s instanceof ProgramSVSort) {
             v = SchemaVariableFactory.createProgramSV(new ProgramElementName(name),

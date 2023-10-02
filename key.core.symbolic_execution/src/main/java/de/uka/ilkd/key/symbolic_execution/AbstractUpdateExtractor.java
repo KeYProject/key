@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.*;
@@ -570,7 +571,7 @@ public abstract class AbstractUpdateExtractor {
         // Create predicate which will be used in formulas to store the value interested in.
         Function newPredicate =
             new Function(new Name(getServices().getTermBuilder().newName("LayoutPredicate")),
-                Sort.FORMULA, sorts);
+                JavaDLTheory.FORMULA, sorts);
         // Create formula which contains the value interested in.
         Term newTerm = getServices().getTermBuilder().func(newPredicate, arguments);
         return newTerm;
@@ -794,7 +795,7 @@ public abstract class AbstractUpdateExtractor {
                 getServices().getTypeConverter().getIntegerLDT().targetSort());
             this.arrayRangeConstant = tb.func(constantFunction);
             Function notAValueFunction = new Function(
-                new Name(tb.newName(ExecutionAllArrayIndicesVariable.NOT_A_VALUE_NAME)), Sort.ANY);
+                new Name(tb.newName(ExecutionAllArrayIndicesVariable.NOT_A_VALUE_NAME)), JavaDLTheory.ANY);
             this.notAValue = tb.func(notAValueFunction);
         }
 

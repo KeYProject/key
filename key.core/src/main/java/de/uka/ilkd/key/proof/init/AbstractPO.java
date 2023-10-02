@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -169,8 +170,8 @@ public abstract class AbstractPO implements IPersistablePO {
     protected final void register(Function f, Services services) {
         Namespace<Function> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
-            assert f.sort() != Sort.UPDATE;
-            if (f.sort() == Sort.FORMULA) {
+            assert f.sort() != JavaDLTheory.UPDATE;
+            if (f.sort() == JavaDLTheory.FORMULA) {
                 functionNames.addSafely(f);
             } else {
                 functionNames.addSafely(f);

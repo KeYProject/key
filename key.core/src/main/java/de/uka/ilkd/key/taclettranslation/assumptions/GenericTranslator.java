@@ -200,7 +200,7 @@ class GenericTranslator {
      */
     private boolean doInstantiation(GenericSort generic, Sort inst, TacletConditions conditions) {
 
-        return !((inst instanceof GenericSort) || (inst.equals(Sort.ANY))
+        return !((inst instanceof GenericSort) || (inst.equals(JavaDLTheory.ANY))
                 || (conditions.containsIsReferenceCondition(generic) > 0
                         && !AssumptionGenerator.isReferenceSort(inst, services))
                 || (conditions.containsNotAbstractInterfaceCondition(generic)

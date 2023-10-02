@@ -11,6 +11,7 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredica
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -143,7 +144,7 @@ public class MergeRuleUtils {
         try {
             @NonNull
             Term result = new KeyIO(services).parseExpression(toTranslate);
-            return result.sort() == Sort.FORMULA ? result : null;
+            return result.sort() == JavaDLTheory.FORMULA ? result : null;
         } catch (Throwable e) {
             return null;
         }
@@ -335,7 +336,7 @@ public class MergeRuleUtils {
      * @throws IllegalArgumentException if the supplied term is not a formula
      */
     public static int countAtoms(Term term) {
-        if (term.sort().equals(Sort.FORMULA)) {
+        if (term.sort().equals(JavaDLTheory.FORMULA)) {
             if (term.op() instanceof Junctor) {
                 int result = 0;
                 for (Term sub : term.subs()) {
@@ -361,7 +362,7 @@ public class MergeRuleUtils {
      * @throws IllegalArgumentException if the supplied term is not a formula
      */
     public static int countDisjunctions(Term term, boolean negated) {
-        if (term.sort().equals(Sort.FORMULA)) {
+        if (term.sort().equals(JavaDLTheory.FORMULA)) {
             if (term.op() instanceof Junctor) {
                 int result = 0;
 
@@ -1276,7 +1277,7 @@ public class MergeRuleUtils {
             ArrayList<Pair<Sort, Name>> registeredPlaceholders, NamespaceSet localNamespaces,
             Services services) throws ParserException {
         DefaultTermParser parser = new DefaultTermParser();
-        Term formula = parser.parse(new StringReader(input), Sort.FORMULA, services,
+        Term formula = parser.parse(new StringReader(input), JavaDLTheory.FORMULA, services,
             localNamespaces, services.getProof().abbreviations());
 
         ImmutableSet<LocationVariable> containedLocVars =

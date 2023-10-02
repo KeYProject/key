@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
@@ -60,8 +61,8 @@ public abstract class ProgramVariable extends AbstractSortedOperator
         assert !(isModel && isGhost) : "Program variable cannot be model and ghost";
         this.isFinal = isFinal;
 
-        assert sort() != Sort.FORMULA;
-        assert sort() != Sort.UPDATE;
+        assert sort() != JavaDLTheory.FORMULA;
+        assert sort() != JavaDLTheory.UPDATE;
     }
 
     protected ProgramVariable(ProgramElementName name, Sort s, KeYJavaType t,

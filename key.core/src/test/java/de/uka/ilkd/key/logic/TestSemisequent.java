@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
@@ -26,13 +27,13 @@ public class TestSemisequent {
     @BeforeEach
     public void setUp() {
         TermBuilder TB = TacletForTests.services().getTermBuilder();
-        Function p = new Function(new Name("p"), Sort.FORMULA, new Sort[] {});
-        Function q = new Function(new Name("q"), Sort.FORMULA, new Sort[] {});
-        Function r = new Function(new Name("r"), Sort.FORMULA, new Sort[] {});
+        Function p = new Function(new Name("p"), JavaDLTheory.FORMULA, new Sort[] {});
+        Function q = new Function(new Name("q"), JavaDLTheory.FORMULA, new Sort[] {});
+        Function r = new Function(new Name("r"), JavaDLTheory.FORMULA, new Sort[] {});
 
-        Function a = new Function(new Name("a"), Sort.FORMULA, new Sort[] {});
-        Function b = new Function(new Name("b"), Sort.FORMULA, new Sort[] {});
-        Function c = new Function(new Name("c"), Sort.FORMULA, new Sort[] {});
+        Function a = new Function(new Name("a"), JavaDLTheory.FORMULA, new Sort[] {});
+        Function b = new Function(new Name("b"), JavaDLTheory.FORMULA, new Sort[] {});
+        Function c = new Function(new Name("c"), JavaDLTheory.FORMULA, new Sort[] {});
 
 
         Term t_p = TB.func(p, new Term[] {});

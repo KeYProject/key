@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.sort.NullSort;
@@ -28,17 +29,17 @@ public final class IfThenElse extends AbstractOperator {
 
 
     private Sort getCommonSuperSort(Sort s1, Sort s2) {
-        if (s1 == Sort.FORMULA) {
-            assert s2 == Sort.FORMULA : "Sorts FORMULA and " + s2 + " are incompatible.";
-            return Sort.FORMULA;
+        if (s1 == JavaDLTheory.FORMULA) {
+            assert s2 == JavaDLTheory.FORMULA : "Sorts FORMULA and " + s2 + " are incompatible.";
+            return JavaDLTheory.FORMULA;
         } else if (s1.extendsTrans(s2)) {
             return s2;
         } else if (s2.extendsTrans(s1)) {
             return s1;
         } else if (s1 instanceof NullSort || s2 instanceof NullSort) {
-            return Sort.ANY;
+            return JavaDLTheory.ANY;
         } else {
-            Sort result = Sort.ANY;
+            Sort result = JavaDLTheory.ANY;
             final ImmutableSet<Sort> set1 = s1.extendsSorts();
             final ImmutableSet<Sort> set2 = s2.extendsSorts();
             assert set1 != null : "null for sort: " + s1;
@@ -46,11 +47,11 @@ public final class IfThenElse extends AbstractOperator {
 
             for (final Sort sort1 : set1) {
                 if (set2.contains(sort1)) {
-                    if (result == Sort.ANY) {
+                    if (result == JavaDLTheory.ANY) {
                         result = sort1;
                     } else {
                         // not uniquely determinable
-                        return Sort.ANY;
+                        return JavaDLTheory.ANY;
                     }
                 }
             }
@@ -80,8 +81,8 @@ public final class IfThenElse extends AbstractOperator {
         final Sort s1 = term.sub(1).sort();
         final Sort s2 = term.sub(2).sort();
 
-        if (!(s0 == Sort.FORMULA && (s1 == Sort.FORMULA) == (s2 == Sort.FORMULA)
-                && s1 != Sort.UPDATE && s2 != Sort.UPDATE)) {
+        if (!(s0 == JavaDLTheory.FORMULA && (s1 == JavaDLTheory.FORMULA) == (s2 == JavaDLTheory.FORMULA)
+                && s1 != JavaDLTheory.UPDATE && s2 != JavaDLTheory.UPDATE)) {
             throw new TermCreationException(this, term);
         }
     }

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -24,7 +25,6 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -71,7 +71,7 @@ public final class DLSpecFactory {
     private LocationVariable extractHeapAtPre(Term fma) throws ProofInputException {
         if (fma.sub(1).op() instanceof UpdateApplication) {
             final Term update = fma.sub(1).sub(0);
-            assert update.sort() == Sort.UPDATE;
+            assert update.sort() == JavaDLTheory.UPDATE;
             if (!(update.op() instanceof ElementaryUpdate eu)) {
                 throw new ProofInputException(
                     "Elementary update expected, " + "but found: " + update);

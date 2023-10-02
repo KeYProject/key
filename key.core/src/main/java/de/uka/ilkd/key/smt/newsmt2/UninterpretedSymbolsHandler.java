@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
@@ -61,14 +61,14 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
         String name = PREFIX + op.name().toString();
         if (!trans.isKnownSymbol(name)) {
             trans.addDeclaration(HandlerUtil.funDeclaration(op, name));
-            if (op.sort() != Sort.FORMULA && (enableQuantifiers || op.arity() == 0)) {
+            if (op.sort() != JavaDLTheory.FORMULA && (enableQuantifiers || op.arity() == 0)) {
                 trans.addAxiom(HandlerUtil.funTypeAxiom(op, name, trans));
             }
             trans.addKnownSymbol(name);
         }
 
         List<SExpr> children = trans.translate(term.subs(), Type.UNIVERSE);
-        SExpr.Type exprType = term.sort() == Sort.FORMULA ? BOOL : UNIVERSE;
+        SExpr.Type exprType = term.sort() == JavaDLTheory.FORMULA ? BOOL : UNIVERSE;
         return new SExpr(name, exprType, children);
     }
 

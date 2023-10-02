@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -27,7 +28,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.util.MiscTools;
@@ -175,9 +175,9 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
                                     ExecutionContext context) {
         public Instantiation {
             assert update != null;
-            assert update.sort() == Sort.UPDATE;
+            assert update.sort() == JavaDLTheory.UPDATE;
             assert formula != null;
-            assert formula.sort() == Sort.FORMULA;
+            assert formula.sort() == JavaDLTheory.FORMULA;
             assert modality != null;
             assert statement != null;
         }

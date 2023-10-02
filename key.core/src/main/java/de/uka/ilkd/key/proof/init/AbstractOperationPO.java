@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
@@ -771,7 +772,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         // Create non-rigid predicate with signature:
         // SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
         ImmutableList<Sort> argumentSorts = tb.getSorts(arguments);
-        Function f = new Function(new Name(tb.newName(name)), Sort.FORMULA,
+        Function f = new Function(new Name(tb.newName(name)), JavaDLTheory.FORMULA,
             argumentSorts.toArray(new Sort[argumentSorts.size()]));
         services.getNamespaces().functions().addSafely(f);
         // Create term that uses the new predicate

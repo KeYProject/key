@@ -14,11 +14,11 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
@@ -295,7 +295,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             TermServices services) {
         final TermBuilder tb = services.getTermBuilder();
         final ProgramElementName variantName = new ProgramElementName(tb.newName("variant"));
-        final LocationVariable variantPV = new LocationVariable(variantName, Sort.ANY);
+        final LocationVariable variantPV = new LocationVariable(variantName, JavaDLTheory.ANY);
         services.getNamespaces().programVariables().addSafely(variantPV);
 
         final boolean dia = ((Modality) inst.progPost.op()).terminationSensitive();
@@ -553,9 +553,9 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
                                        ExecutionContext innermostExecutionContext) {
         public Instantiation {
             assert u != null;
-            assert u.sort() == Sort.UPDATE;
+            assert u.sort() == JavaDLTheory.UPDATE;
             assert progPost != null;
-            assert progPost.sort() == Sort.FORMULA;
+            assert progPost.sort() == JavaDLTheory.FORMULA;
             assert loop != null;
             assert inv != null;
 

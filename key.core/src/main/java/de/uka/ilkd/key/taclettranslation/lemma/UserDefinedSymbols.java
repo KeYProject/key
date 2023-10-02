@@ -5,6 +5,7 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.*;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.Function;
@@ -82,7 +83,7 @@ public class UserDefinedSymbols {
     }
 
     public void addSort(Named symbol) {
-        if (symbol != Sort.FORMULA) {
+        if (symbol != JavaDLTheory.FORMULA) {
             Sort sort = (Sort) symbol;
             if (!(sort instanceof NullSort)) {
                 for (Sort parentSort : sort.extendsSorts()) {

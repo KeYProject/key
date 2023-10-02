@@ -35,6 +35,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInProgram;
@@ -55,7 +56,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
@@ -895,9 +895,9 @@ public final class UseOperationContractRule implements BuiltInRule {
                 Term actualSelf, KeYJavaType staticType, MethodOrConstructorReference mr,
                 IProgramMethod pm, ImmutableList<Term> actualParams, boolean transaction) {
             assert u != null;
-            assert u.sort() == Sort.UPDATE;
+            assert u.sort() == JavaDLTheory.UPDATE;
             assert progPost != null;
-            assert progPost.sort() == Sort.FORMULA;
+            assert progPost.sort() == JavaDLTheory.FORMULA;
             assert mod != null;
             assert mr != null;
             assert pm != null;

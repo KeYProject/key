@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.logic.Name;
@@ -20,17 +21,17 @@ public final class Equality extends AbstractSortedOperator {
     /**
      * the usual 'equality' operator '='
      */
-    public static final Equality EQUALS = new Equality(new Name("equals"), Sort.ANY);
+    public static final Equality EQUALS = new Equality(new Name("equals"), JavaDLTheory.ANY);
 
     /**
      * the usual 'equivalence' operator {@code <->} (be {@code A, B} formulae then {@code A <-> B}
      * is true
      * if and only if {@code A} and {@code B} have the same truth value
      */
-    public static final Equality EQV = new Equality(new Name("equiv"), Sort.FORMULA);
+    public static final Equality EQV = new Equality(new Name("equiv"), JavaDLTheory.FORMULA);
 
 
     private Equality(Name name, Sort targetSort) {
-        super(name, new Sort[] { targetSort, targetSort }, Sort.FORMULA, true);
+        super(name, new Sort[] { targetSort, targetSort }, JavaDLTheory.FORMULA, true);
     }
 }

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.Collection;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
@@ -113,7 +114,7 @@ public class ProofObligationCreator {
             userDefinedSymbols.addSort(sort);
 
             if (term.op() instanceof Function) {
-                if (sort == Sort.FORMULA) {
+                if (sort == JavaDLTheory.FORMULA) {
                     userDefinedSymbols.addPredicate((Function) term.op());
                 } else {
                     userDefinedSymbols.addFunction((Function) term.op());

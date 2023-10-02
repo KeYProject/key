@@ -7,6 +7,7 @@ import java.util.*;
 
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -14,7 +15,6 @@ import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -142,7 +142,7 @@ abstract class ReplaceAndRegisterMethod {
     final void register(Function f, Services services) {
         Namespace<Function> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
-            assert f.sort() != Sort.UPDATE;
+            assert f.sort() != JavaDLTheory.UPDATE;
             functionNames.addSafely(f);
         }
     }

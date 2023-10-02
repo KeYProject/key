@@ -6,6 +6,7 @@ package de.uka.ilkd.key.logic.op;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.logic.Name;
@@ -64,7 +65,7 @@ public final class Modality extends AbstractSortedOperator {
      * @param name the Name of the modality
      */
     private Modality(Name name) {
-        super(name, new Sort[] { Sort.FORMULA }, Sort.FORMULA, false);
+        super(name, new Sort[] { JavaDLTheory.FORMULA }, JavaDLTheory.FORMULA, false);
         nameMap.put(name.toString(), this);
     }
 

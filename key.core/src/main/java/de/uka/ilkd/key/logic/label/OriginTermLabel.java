@@ -9,6 +9,7 @@ import java.util.*;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -222,7 +223,7 @@ public class OriginTermLabel implements TermLabel {
         if (op.arity() == 0) {
             Sort sort = op.sort(EMPTY_SORTS);
 
-            if (sort.extendsTrans(Sort.FORMULA)) {
+            if (sort.extendsTrans(JavaDLTheory.FORMULA)) {
                 return true;
             } else if (op instanceof ProgramVariable) {
                 return !sort.extendsTrans(tc.getHeapLDT().targetSort())
@@ -234,7 +235,7 @@ public class OriginTermLabel implements TermLabel {
             }
         } else {
             return !(op instanceof Function) || (op.getClass().equals(Function.class)
-                    && ((Function) op).sort().extendsTrans(Sort.FORMULA));
+                    && ((Function) op).sort().extendsTrans(JavaDLTheory.FORMULA));
         }
     }
 

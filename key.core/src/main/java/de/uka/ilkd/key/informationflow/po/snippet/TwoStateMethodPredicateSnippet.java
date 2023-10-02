@@ -7,6 +7,7 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -79,7 +80,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         Function pred = functionNS.lookup(name);
 
         if (pred == null) {
-            pred = new Function(name, Sort.FORMULA, argSorts);
+            pred = new Function(name, JavaDLTheory.FORMULA, argSorts);
             functionNS.addSafely(pred);
         }
         return pred;

@@ -16,6 +16,7 @@ import javax.swing.text.Document;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -965,8 +966,8 @@ public class InvariantConfigurator {
                 index = inputPane.getSelectedIndex();
                 Term result =
                     parser.parseExpression(invariants.get(index)[INV_IDX].get(heap.toString()));
-                if (result.sort() != Sort.FORMULA) {
-                    throw newUnexpectedTypeException(Sort.FORMULA, result.sort());
+                if (result.sort() != JavaDLTheory.FORMULA) {
+                    throw newUnexpectedTypeException(JavaDLTheory.FORMULA, result.sort());
                 }
                 return result;
             }

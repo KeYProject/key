@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -12,7 +13,6 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
@@ -21,7 +21,7 @@ import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 class FormulaTermFeatures extends StaticFeatureCollection {
 
     public FormulaTermFeatures(ArithTermFeatures tf) {
-        forF = extendsTrans(Sort.FORMULA);
+        forF = extendsTrans(JavaDLTheory.FORMULA);
         orF = op(Junctor.OR);
         andF = op(Junctor.AND);
         impF = op(Junctor.IMP);

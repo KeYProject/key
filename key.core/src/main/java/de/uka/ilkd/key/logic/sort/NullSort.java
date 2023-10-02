@@ -7,6 +7,7 @@ import java.lang.ref.WeakReference;
 
 import de.uka.ilkd.key.java.Services;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -20,7 +21,7 @@ import org.key_project.util.collection.ImmutableSet;
  * after the NullSort object itself has to be created; and immutability prevents us from filling in
  * this information later.
  */
-public final class NullSort implements Sort {
+public final class NullSort extends Sort {
 
     public static final Name NAME = new Name("Null");
 
@@ -32,14 +33,9 @@ public final class NullSort implements Sort {
 
 
     public NullSort(Sort objectSort) {
+        super(NAME, null, false);
         assert objectSort != null;
         this.objectSort = objectSort;
-    }
-
-
-    @Override
-    public Name name() {
-        return NAME;
     }
 
 
@@ -71,20 +67,9 @@ public final class NullSort implements Sort {
         return result;
     }
 
-
     @Override
     public boolean extendsTrans(Sort sort) {
-        return sort == this || sort == Sort.ANY || sort.extendsTrans(objectSort);
-    }
-
-    @Override
-    public boolean isAbstract() {
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return NAME.toString();
+        return sort == this || sort == JavaDLTheory.ANY || sort.extendsTrans(objectSort);
     }
 
     @Override

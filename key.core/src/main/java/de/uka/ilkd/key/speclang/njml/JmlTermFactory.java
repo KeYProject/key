@@ -14,10 +14,7 @@ import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -198,7 +195,7 @@ public final class JmlTermFactory {
     public SLExpression quantifiedMin(Term _guard, Term body, KeYJavaType declsType,
             boolean nullable, ImmutableList<LogicVariable> qvs) {
         Term guard = tb.convertToFormula(_guard);
-        assert guard.sort() == Sort.FORMULA;
+        assert guard.sort() == JavaDLTheory.FORMULA;
         final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
         if (body.sort() != intSort) {
             throw exc.createException0("body of \\min expression must be integer type");
@@ -583,7 +580,7 @@ public final class JmlTermFactory {
             Sort origSort = result.getTerm().sort();
             Sort targetSort = type.getSort();
 
-            if (origSort == Sort.FORMULA) {
+            if (origSort == JavaDLTheory.FORMULA) {
                 // This case might occur since boolean expressions
                 // get converted prematurely (see bug #1121).
                 // Just check whether there is a cast to boolean.
@@ -690,11 +687,11 @@ public final class JmlTermFactory {
     private Term buildEqualityTerm(Term a, Term b) {
         Term result;
         try {
-            if (a.sort() != Sort.FORMULA && b.sort() != Sort.FORMULA) {
+            if (a.sort() != JavaDLTheory.FORMULA && b.sort() != JavaDLTheory.FORMULA) {
                 result = tb.equals(a, b);
                 // Special case so that model methods are handled better
             } else if (a.sort() == services.getTypeConverter().getBooleanLDT().targetSort()
-                    && b.sort() == Sort.FORMULA) {
+                    && b.sort() == JavaDLTheory.FORMULA) {
                 result = tb.equals(a, tb.ife(b, tb.TRUE(), tb.FALSE()));
             } else {
                 result = tb.equals(tb.convertToFormula(a), tb.convertToFormula(b));
@@ -861,7 +858,7 @@ public final class JmlTermFactory {
         }
         QuantifiableVariable qv = declVars.head();
         Term tt = t.getTerm();
-        if (tt.sort() == Sort.FORMULA) {
+        if (tt.sort() == JavaDLTheory.FORMULA) {
             // bugfix (CS): t.getTerm() delivers a formula instead of a
             // boolean term; obviously the original boolean terms are
             // converted to formulas somewhere else; however, we need
@@ -959,7 +956,7 @@ public final class JmlTermFactory {
 
     @NonNull
     public SLExpression seqGet(Term seq, Term idx) {
-        return new SLExpression(tb.seqGet(Sort.ANY, seq, idx));
+        return new SLExpression(tb.seqGet(JavaDLTheory.ANY, seq, idx));
     }
 
     public SLExpression seqConst(ImmutableList<SLExpression> exprList) {
@@ -1135,7 +1132,7 @@ public final class JmlTermFactory {
         do {
             name = new Name(shortName + "_" + ++x);
         } while (fns.lookup(name) != null);
-        final Function sk = new Function(name, Sort.FORMULA);
+        final Function sk = new Function(name, JavaDLTheory.FORMULA);
         fns.add(sk);
         final Term t = tb.func(sk);
         return new SLExpression(t);

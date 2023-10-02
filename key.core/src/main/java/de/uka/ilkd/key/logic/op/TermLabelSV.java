@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
@@ -16,7 +16,7 @@ import org.key_project.logic.Name;
 public final class TermLabelSV extends AbstractSV implements SchemaVariable, TermLabel {
 
     TermLabelSV(Name name) {
-        super(name, Sort.TERMLABEL, true, false);
+        super(name, JavaDLTheory.TERMLABEL, true, false);
     }
 
     @Override

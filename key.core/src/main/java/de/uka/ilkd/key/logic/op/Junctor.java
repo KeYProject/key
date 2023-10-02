@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.logic.Name;
@@ -52,13 +53,13 @@ public final class Junctor extends AbstractSortedOperator {
     private static Sort[] createFormulaSortArray(int arity) {
         Sort[] result = new Sort[arity];
         for (int i = 0; i < arity; i++) {
-            result[i] = Sort.FORMULA;
+            result[i] = JavaDLTheory.FORMULA;
         }
         return result;
     }
 
 
     private Junctor(Name name, int arity) {
-        super(name, createFormulaSortArray(arity), Sort.FORMULA, true);
+        super(name, createFormulaSortArray(arity), JavaDLTheory.FORMULA, true);
     }
 }

@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
@@ -525,7 +526,7 @@ public abstract class AbstractSlicer {
                         Function newPredicate = new Function(
                             new Name(sideProofEnv.getServicesForEnvironment().getTermBuilder()
                                     .newName("ResultPredicate")),
-                            Sort.FORMULA, new ImmutableArray<>(resultSorts));
+                            JavaDLTheory.FORMULA, new ImmutableArray<>(resultSorts));
                         // Create formula which contains the value interested in.
                         Term newTerm =
                             sideProofEnv.getServicesForEnvironment().getTermBuilder().func(
@@ -592,7 +593,7 @@ public abstract class AbstractSlicer {
                         Function newPredicate = new Function(
                             new Name(sideProofEnv.getServicesForEnvironment().getTermBuilder()
                                     .newName("ResultPredicate")),
-                            Sort.FORMULA, new ImmutableArray<>(resultSorts));
+                            JavaDLTheory.FORMULA, new ImmutableArray<>(resultSorts));
                         // Create formula which contains the value interested in.
                         TermBuilder tb = sideProofEnv.getServicesForEnvironment().getTermBuilder();
                         Term newTerm = tb.func(newPredicate,

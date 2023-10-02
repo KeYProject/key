@@ -12,12 +12,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.DoubleLDT;
-import de.uka.ilkd.key.ldt.FloatLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -496,7 +491,7 @@ public class TermBuilder {
      * Removes universal quantifiers from a formula.
      */
     public Term open(Term formula) {
-        assert formula.sort() == Sort.FORMULA;
+        assert formula.sort() == JavaDLTheory.FORMULA;
         if (formula.op() == Quantifier.ALL) {
             return open(formula.sub(0));
         } else {
@@ -745,7 +740,7 @@ public class TermBuilder {
      * Creates a term with the correct equality symbol for the sorts involved
      */
     public Term equals(Term t1, Term t2) {
-        if (t1.sort() == Sort.FORMULA) {
+        if (t1.sort() == JavaDLTheory.FORMULA) {
             if (t1.op() == Junctor.TRUE) {
                 return t2;
             } else if (t2.op() == Junctor.TRUE) {
@@ -858,13 +853,13 @@ public class TermBuilder {
         if (a == null) {
             throw new NullPointerException();
         }
-        if (a.sort() == Sort.FORMULA) {
+        if (a.sort() == JavaDLTheory.FORMULA) {
             return a;
         } else if (a.sort() == booleanLDT.targetSort()) {
             // special case where a is the result of convertToBoolean
             if (a.op() == IfThenElse.IF_THEN_ELSE) {
                 assert a.arity() == 3;
-                assert a.sub(0).sort() == Sort.FORMULA;
+                assert a.sub(0).sort() == JavaDLTheory.FORMULA;
                 if (a.sub(1).op() == booleanLDT.getTrueConst()
                         && a.sub(2).op() == booleanLDT.getFalseConst()) {
                     return a.sub(0);
@@ -887,7 +882,7 @@ public class TermBuilder {
         BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
         if (a.sort() == booleanLDT.targetSort()) {
             return a;
-        } else if (a.sort() == Sort.FORMULA) {
+        } else if (a.sort() == JavaDLTheory.FORMULA) {
             // special case where a is the result of convertToFormula
             if (a.op() == Equality.EQUALS && a.sub(1).op() == booleanLDT.getTrueConst()) {
                 return a.sub(0);
@@ -946,9 +941,9 @@ public class TermBuilder {
     }
 
     public Term parallel(Term u1, Term u2) {
-        if (u1.sort() != Sort.UPDATE) {
+        if (u1.sort() != JavaDLTheory.UPDATE) {
             throw new TermCreationException("Not an update: " + u1);
-        } else if (u2.sort() != Sort.UPDATE) {
+        } else if (u2.sort() != JavaDLTheory.UPDATE) {
             throw new TermCreationException("Not an update: " + u2);
         }
         if (u1.op() == UpdateJunctor.SKIP) {
@@ -1033,7 +1028,7 @@ public class TermBuilder {
     }
 
     public Term apply(Term update, Term target, ImmutableArray<TermLabel> labels) {
-        if (update.sort() != Sort.UPDATE) {
+        if (update.sort() != JavaDLTheory.UPDATE) {
             throw new TermCreationException("Not an update: " + update);
         } else if (update.op() == UpdateJunctor.SKIP) {
             return target;
@@ -1456,15 +1451,15 @@ public class TermBuilder {
     }
 
     // The template of the well-definedness transformer for terms.
-    public static final Transformer WD_ANY = new Transformer(new Name("wd"), Sort.ANY);
+    public static final Transformer WD_ANY = new Transformer(new Name("wd"), JavaDLTheory.ANY);
 
     // The template of the well-definedness transformer for formulas.
-    public static final Transformer WD_FORMULA = new Transformer(new Name("WD"), Sort.FORMULA);
+    public static final Transformer WD_FORMULA = new Transformer(new Name("WD"), JavaDLTheory.FORMULA);
 
     public Term wd(Term t) {
         if (t.op() == Junctor.FALSE || t.op() == Junctor.TRUE) {
             return tt();
-        } else if (t.sort().equals(Sort.FORMULA)) {
+        } else if (t.sort().equals(JavaDLTheory.FORMULA)) {
             return func(Transformer.getTransformer(WD_FORMULA, services), t);
         } else {
             return func(Transformer.getTransformer(WD_ANY, services), t);
@@ -1917,10 +1912,10 @@ public class TermBuilder {
             and(not(equals(objVarTerm, NULL())), not(createdAtPre)),
             equals(
                 select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort()
-                        : Sort.ANY,
+                        : JavaDLTheory.ANY,
                     heapTerm, objVarTerm, fieldVarTerm),
                 select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort()
-                        : Sort.ANY,
+                        : JavaDLTheory.ANY,
                     or.replace(heapTerm), objVarTerm, fieldVarTerm))));
     }
 
@@ -1954,10 +1949,10 @@ public class TermBuilder {
         return all(quantVars,
             equals(
                 select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort()
-                        : Sort.ANY,
+                        : JavaDLTheory.ANY,
                     heapTerm, objVarTerm, fieldVarTerm),
                 select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort()
-                        : Sort.ANY,
+                        : JavaDLTheory.ANY,
                     or.replace(heapTerm), objVarTerm, fieldVarTerm)));
     }
 

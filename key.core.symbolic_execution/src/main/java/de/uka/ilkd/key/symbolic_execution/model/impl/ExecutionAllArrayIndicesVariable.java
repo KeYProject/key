@@ -4,13 +4,13 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -70,7 +70,7 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
             additionalCondition);
         assert parentValue != null;
         TermBuilder tb = getServices().getTermBuilder();
-        Function notAValueFunction = new Function(new Name(tb.newName(NOT_A_VALUE_NAME)), Sort.ANY);
+        Function notAValueFunction = new Function(new Name(tb.newName(NOT_A_VALUE_NAME)), JavaDLTheory.ANY);
         notAValue = tb.func(notAValueFunction);
     }
 
@@ -122,7 +122,7 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
 
             // Create predicate which will be used in formulas to store the value interested in.
             Function resultPredicate = new Function(new Name(tb.newName("ResultPredicate")),
-                Sort.FORMULA, resultIf.sort());
+                JavaDLTheory.FORMULA, resultIf.sort());
             // Create formula which contains the value interested in.
             Term resultTerm = tb.func(resultPredicate, resultIf);
             // Create Sequent to prove with new succedent.

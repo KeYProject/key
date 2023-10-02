@@ -1071,7 +1071,7 @@ public class LogicPrinter {
     public void printSeqGet(Term t) {
         if (notationInfo.isPrettySyntax()) {
             layouter.startTerm(2);
-            if (!t.sort().equals(Sort.ANY)) {
+            if (!t.sort().equals(JavaDLTheory.ANY)) {
                 layouter.print("(" + t.sort().toString() + ")");
             }
             layouter.markStartSub();

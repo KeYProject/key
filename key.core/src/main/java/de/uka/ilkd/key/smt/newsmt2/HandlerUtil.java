@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
@@ -62,7 +63,7 @@ public class HandlerUtil {
      * @return an SExpr of type {@code (declare-fun ...)}
      */
     public static SExpr funDeclaration(SortedOperator op, String name) {
-        String sortString = op.sort() == Sort.FORMULA ? "Bool" : "U";
+        String sortString = op.sort() == JavaDLTheory.FORMULA ? "Bool" : "U";
         SExpr signature = new SExpr(Collections.nCopies(op.arity(), new SExpr("U")));
         return new SExpr("declare-fun", new SExpr(name), signature, new SExpr(sortString));
     }

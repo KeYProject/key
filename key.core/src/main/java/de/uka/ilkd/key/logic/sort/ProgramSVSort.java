@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
  * Special "sorts" used for schema variables matching program constructs (class ProgramSV). Not
  * really sorts in the theoretical meaning of the word.
  */
-public abstract class ProgramSVSort extends AbstractSort {
+public abstract class ProgramSVSort extends Sort {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProgramSVSort.class);
 
     // Keeps the mapping of ProgramSVSort names to

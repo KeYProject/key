@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.inst;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.TermSV;
@@ -86,7 +87,7 @@ public abstract class GenericSortCondition {
             s1 = ((ArraySort) s1).elementSort();
         }
 
-        if (!(s0 instanceof GenericSort gs) || s1 == Sort.FORMULA || s1 == Sort.UPDATE) {
+        if (!(s0 instanceof GenericSort gs) || s1 == JavaDLTheory.FORMULA || s1 == JavaDLTheory.UPDATE) {
             return null;
         }
 

@@ -5,12 +5,12 @@ package de.uka.ilkd.key.rule;
 
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
@@ -121,7 +121,7 @@ public class TestSchemaModalOperators {
         ImmutableSet<Modality> modalities = DefaultImmutableSet.nil();
         modalities = modalities.add(Modality.DIA).add(Modality.BOX);
         SchemaVariable osv = SchemaVariableFactory.createModalOperatorSV(new Name("diabox"),
-            Sort.FORMULA, modalities);
+            JavaDLTheory.FORMULA, modalities);
         Term tpost = TB.tf().createTerm(fsv);
 
         Term find = TB.tf().createTerm(osv, new Term[] { tpost }, null, JavaBlock.EMPTY_JAVABLOCK);

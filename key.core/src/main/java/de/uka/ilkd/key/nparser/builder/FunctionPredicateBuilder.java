@@ -6,6 +6,7 @@ package de.uka.ilkd.key.nparser.builder;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -66,13 +67,13 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             if (genSort instanceof GenericSort) {
                 assert argSorts != null;
                 p = SortDependingFunction.createFirstInstance((GenericSort) genSort,
-                    new Name(baseName), Sort.FORMULA, argSorts.toArray(new Sort[0]), false);
+                    new Name(baseName), JavaDLTheory.FORMULA, argSorts.toArray(new Sort[0]), false);
             }
         }
 
         if (p == null) {
             assert argSorts != null;
-            p = new Function(new Name(pred_name), Sort.FORMULA, argSorts.toArray(new Sort[0]),
+            p = new Function(new Name(pred_name), JavaDLTheory.FORMULA, argSorts.toArray(new Sort[0]),
                 whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), false);
         }
 
@@ -129,7 +130,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
     @Override
     public Object visitTransform_decl(KeYParser.Transform_declContext ctx) {
-        Sort retSort = ctx.FORMULA() != null ? Sort.FORMULA : accept(ctx.sortId());
+        Sort retSort = ctx.FORMULA() != null ? JavaDLTheory.FORMULA : accept(ctx.sortId());
         String trans_name = accept(ctx.funcpred_name());
         List<Sort> argSorts = accept(ctx.arg_sorts_or_formula());
         Transformer t =

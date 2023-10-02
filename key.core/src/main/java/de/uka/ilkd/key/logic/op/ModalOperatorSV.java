@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.pp.Layouter;
 
@@ -27,7 +28,7 @@ public final class ModalOperatorSV extends AbstractSV {
      * @param modalities modal operators matched by this SV
      */
     ModalOperatorSV(Name name, ImmutableSet<Modality> modalities) {
-        super(name, new Sort[] { Sort.FORMULA }, Sort.FORMULA, false, false);
+        super(name, new Sort[] { JavaDLTheory.FORMULA }, JavaDLTheory.FORMULA, false, false);
         this.modalities = modalities;
     }
 

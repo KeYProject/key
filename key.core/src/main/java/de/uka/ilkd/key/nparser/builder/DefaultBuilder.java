@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.VariableDeclaration;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
@@ -122,7 +123,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     @Override
     public Sort visitArg_sorts_or_formula_helper(KeYParser.Arg_sorts_or_formula_helperContext ctx) {
         if (ctx.FORMULA() != null) {
-            return Sort.FORMULA;
+            return JavaDLTheory.FORMULA;
         } else {
             return accept(ctx.sortId());
         }

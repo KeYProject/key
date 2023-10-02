@@ -5,6 +5,7 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletFindModel;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -64,8 +65,8 @@ public class TestCollisionResolving {
         // the term has to be built manually because we have to ensure
         // object equality of the LogicVariable x
         LogicVariable x = new LogicVariable(new Name("x"), s);
-        Function p = new Function(new Name("p"), Sort.FORMULA, s);
-        Function q = new Function(new Name("q"), Sort.FORMULA, s);
+        Function p = new Function(new Name("p"), JavaDLTheory.FORMULA, s);
+        Function q = new Function(new Name("q"), JavaDLTheory.FORMULA, s);
 
         Term t_x = services.getTermFactory().createTerm(x);
         Term t_p_x = services.getTermFactory().createTerm(p, new Term[] { t_x }, null, null);
@@ -101,8 +102,8 @@ public class TestCollisionResolving {
         // the term has to be built manually because we have to ensure
         // object equality of the LogicVariable x
         LogicVariable x = new LogicVariable(new Name("x"), s);
-        Function p = new Function(new Name("p"), Sort.FORMULA, s);
-        Function q = new Function(new Name("q"), Sort.FORMULA, s);
+        Function p = new Function(new Name("p"), JavaDLTheory.FORMULA, s);
+        Function q = new Function(new Name("q"), JavaDLTheory.FORMULA, s);
 
         TermBuilder tb = services.getTermBuilder();
 

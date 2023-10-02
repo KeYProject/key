@@ -6,6 +6,7 @@ package de.uka.ilkd.key.logic.op;
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.logic.Name;
@@ -26,7 +27,7 @@ public final class ElementaryUpdate extends AbstractSortedOperator {
 
 
     private ElementaryUpdate(UpdateableOperator lhs) {
-        super(new Name("elem-update(" + lhs + ")"), new Sort[] { lhs.sort() }, Sort.UPDATE, false);
+        super(new Name("elem-update(" + lhs + ")"), new Sort[] { lhs.sort() }, JavaDLTheory.UPDATE, false);
         this.lhs = lhs;
         assert lhs.arity() == 0;
     }

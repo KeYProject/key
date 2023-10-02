@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
@@ -40,12 +41,28 @@ public class JavaDLTheory extends LDT {
 
     /** Name of the JavaDL theory */
     public static final Name NAME = new Name("JavaDLTheory");
+    /**
+     * Formulas are represented as "terms" of this sort.
+     */
+    public static final Sort FORMULA = new SortImpl(new Name("Formula"));
+    /**
+     * Updates are represented as "terms" of this sort.
+     */
+    public static final Sort UPDATE = new SortImpl(new Name("Update"));
+    /**
+     * Term labels are represented as "terms" of this sort.
+     */
+    public static final Sort TERMLABEL = new SortImpl(new Name("TermLabel"));
+    /**
+     * Any is a supersort of all sorts.
+     */
+    public static final Sort ANY = new SortImpl(new Name("any"));
 
     // TODO fix wrong tests (which do not use proper services)
     // private final TermServices services;
 
     protected JavaDLTheory(TermServices services) {
-        super(NAME, Sort.FORMULA, services);
+        super(NAME, FORMULA, services);
         // this.services = services;
     }
 

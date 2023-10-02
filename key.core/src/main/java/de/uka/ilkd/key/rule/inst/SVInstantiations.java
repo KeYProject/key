@@ -8,6 +8,7 @@ import java.util.Iterator;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -17,7 +18,6 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
@@ -426,7 +426,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      */
     public SVInstantiations addUpdate(Term update,
             ImmutableArray<TermLabel> updateApplicationlabels) {
-        assert update.sort() == Sort.UPDATE;
+        assert update.sort() == JavaDLTheory.UPDATE;
         return new SVInstantiations(map, interesting(),
             updateContext.append(new UpdateLabelPair(update, updateApplicationlabels)),
             getGenericSortInstantiations(), getGenericSortConditions());

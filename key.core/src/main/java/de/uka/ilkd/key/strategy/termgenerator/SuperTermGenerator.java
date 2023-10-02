@@ -7,6 +7,7 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
@@ -90,15 +91,15 @@ public abstract class SuperTermGenerator implements TermGenerator {
                     }
 
                     public Sort sort(Sort[] sorts) {
-                        return Sort.ANY;
+                        return JavaDLTheory.ANY;
                     }
 
                     public Sort sort() {
-                        return Sort.ANY;
+                        return JavaDLTheory.ANY;
                     }
 
                     public Sort argSort(int i) {
-                        return Sort.ANY;
+                        return JavaDLTheory.ANY;
                     }
 
                     public ImmutableArray<Sort> argSorts() {

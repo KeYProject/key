@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -200,7 +201,7 @@ public class CloseAfterMerge implements BuiltInRule {
         final Name predicateSymbName = new Name(tb.newName("P"));
 
         final Function predicateSymb =
-            new Function(predicateSymbName, Sort.FORMULA, new ImmutableArray<>(argSorts));
+            new Function(predicateSymbName, JavaDLTheory.FORMULA, new ImmutableArray<>(argSorts));
 
         final Goal mergedGoal =
             services.getProof().getOpenGoal(closeApp.getMergeState().getCorrespondingNode());

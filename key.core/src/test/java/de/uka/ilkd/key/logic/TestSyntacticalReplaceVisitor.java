@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -54,7 +55,7 @@ public class TestSyntacticalReplaceVisitor {
 
         LogicVariable x = new LogicVariable(new Name("x"), s);
         LogicVariable y = new LogicVariable(new Name("y"), s);
-        Function p = new Function(new Name("p"), Sort.FORMULA, s);
+        Function p = new Function(new Name("p"), JavaDLTheory.FORMULA, s);
 
         Term t_x = TB.tf().createTerm(x);
         Term t_px = TB.tf().createTerm(p, new Term[] { t_x }, null, null);

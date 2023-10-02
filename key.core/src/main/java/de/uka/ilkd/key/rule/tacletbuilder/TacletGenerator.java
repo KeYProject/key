@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
@@ -391,7 +392,7 @@ public class TacletGenerator {
         final Term targetTerm = TB.func(target, vars.toArray(new Term[0]));
 
         final Term axiomSatisfiable;
-        if (target.sort() == Sort.FORMULA) {
+        if (target.sort() == JavaDLTheory.FORMULA) {
             axiomSatisfiable = TB.or(
                 OpReplacer.replace(targetTerm, TB.tt(), schemaRepresents.term,
                     services.getTermFactory()),
@@ -590,7 +591,7 @@ public class TacletGenerator {
         final JavaBlock findBlock = JavaBlock.createJavaBlock(new ContextStatementBlock(mbs, null));
 
         SchemaVariable modalitySV =
-            SchemaVariableFactory.createModalOperatorSV(new Name("#allModal_sv"), Sort.FORMULA,
+            SchemaVariableFactory.createModalOperatorSV(new Name("#allModal_sv"), JavaDLTheory.FORMULA,
                 DefaultImmutableSet.<Modality>nil().add(Modality.DIA).add(Modality.BOX)
                         .add(Modality.DIA_TRANSACTION).add(Modality.BOX_TRANSACTION));
         SchemaVariable postSV = SchemaVariableFactory.createFormulaSV(new Name("#post_sv"));
@@ -961,7 +962,7 @@ public class TacletGenerator {
         final Term targetTerm = TB.func(target, vars.toArray(new Term[0]));
 
         final Term axiomSatisfiable;
-        if (target.sort() == Sort.FORMULA) {
+        if (target.sort() == JavaDLTheory.FORMULA) {
             axiomSatisfiable = TB.or(
                 OpReplacer.replace(targetTerm, TB.tt(), schemaAxiom, services.getTermFactory()),
                 OpReplacer.replace(targetTerm, TB.ff(), schemaAxiom, services.getTermFactory()));

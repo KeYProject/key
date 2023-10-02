@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -96,7 +97,7 @@ public final class TruthValueTracingUtil {
                 || operator == AbstractTermTransformer.META_LESS) {
             return true; // These Meta constructs evaluate always to true or false
         } else if (operator instanceof SortedOperator) {
-            return ((SortedOperator) operator).sort() == Sort.FORMULA;
+            return ((SortedOperator) operator).sort() == JavaDLTheory.FORMULA;
         } else {
             return false;
         }
@@ -161,7 +162,7 @@ public final class TruthValueTracingUtil {
                 sorts[i] = subs.get(i).sort();
             }
             Sort sort = operator.sort(sorts);
-            return sort == Sort.FORMULA;
+            return sort == JavaDLTheory.FORMULA;
         } else {
             return false;
         }

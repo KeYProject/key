@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -164,14 +165,14 @@ public class TestTriggersSet {
         functions.add(hrstt);
 
         // Formula function
-        pp = new Function(new Name("pp"), Sort.FORMULA, Sort.FORMULA);
-        pr = new Function(new Name("pr"), Sort.FORMULA, r);
-        ps = new Function(new Name("ps"), Sort.FORMULA, s);
-        pt = new Function(new Name("pt"), Sort.FORMULA, t);
-        prs = new Function(new Name("prs"), Sort.FORMULA, r, s);
-        prt = new Function(new Name("prt"), Sort.FORMULA, r, t);
-        pst = new Function(new Name("pst"), Sort.FORMULA, s, t);
-        prst = new Function(new Name("prst"), Sort.FORMULA, r, s, t);
+        pp = new Function(new Name("pp"), JavaDLTheory.FORMULA, JavaDLTheory.FORMULA);
+        pr = new Function(new Name("pr"), JavaDLTheory.FORMULA, r);
+        ps = new Function(new Name("ps"), JavaDLTheory.FORMULA, s);
+        pt = new Function(new Name("pt"), JavaDLTheory.FORMULA, t);
+        prs = new Function(new Name("prs"), JavaDLTheory.FORMULA, r, s);
+        prt = new Function(new Name("prt"), JavaDLTheory.FORMULA, r, t);
+        pst = new Function(new Name("pst"), JavaDLTheory.FORMULA, s, t);
+        prst = new Function(new Name("prst"), JavaDLTheory.FORMULA, r, s, t);
         // pi=new Function(new Name("pi"),Sort.FORMULA,new Sort[]{});
         functions.add(pp);
         functions.add(pr);

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import org.key_project.util.Strings;
@@ -31,8 +32,8 @@ public class Function extends AbstractSortedOperator {
 
         this.unique = unique;
         skolemConstant = isSkolemConstant;
-        assert sort != Sort.UPDATE;
-        assert !(unique && sort == Sort.FORMULA);
+        assert sort != JavaDLTheory.UPDATE;
+        assert !(unique && sort == JavaDLTheory.FORMULA);
         assert !(sort instanceof NullSort) || name.toString().equals("null")
                 : "Functions with sort \"null\" are not allowed: " + this;
     }
@@ -112,7 +113,7 @@ public class Function extends AbstractSortedOperator {
      */
     public final String proofToString() {
         StringBuilder s =
-            new StringBuilder((sort() == Sort.FORMULA ? "" : sort().toString()) + " ");
+            new StringBuilder((sort() == JavaDLTheory.FORMULA ? "" : sort().toString()) + " ");
         s.append(name());
         if (arity() > 0) {
             s.append(Strings.formatAsList(argSorts(), "(", ",", ")"));

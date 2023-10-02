@@ -12,6 +12,7 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
@@ -61,7 +62,7 @@ public final class RepresentsAxiom extends ClassAxiom {
         assert name != null;
         assert kjt != null;
         assert target != null;
-        assert rep.sort() == Sort.FORMULA;
+        assert rep.sort() == JavaDLTheory.FORMULA;
         assert (selfVar == null) == target.isStatic();
         this.name = name;
         this.target = target;

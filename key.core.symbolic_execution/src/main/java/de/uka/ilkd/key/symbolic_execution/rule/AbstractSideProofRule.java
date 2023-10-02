@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -66,7 +67,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      */
     protected Function createResultFunction(Services services, Sort sort) {
         return new Function(new Name(services.getTermBuilder().newName("ResultPredicate")),
-            Sort.FORMULA, sort);
+            JavaDLTheory.FORMULA, sort);
     }
 
     /**

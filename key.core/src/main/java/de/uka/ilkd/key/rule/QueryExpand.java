@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -388,7 +389,7 @@ public class QueryExpand implements BuiltInRule {
                 findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars,
                     curPosIsPositive, nextLevel, curPosIsPositive, qeps);
             }
-        } else if (t.sort() == Sort.FORMULA) {
+        } else if (t.sort() == JavaDLTheory.FORMULA) {
             ArrayList<Term> queries = collectQueries(t);
             for (Term query : queries) {
                 QueryEvalPos qep = new QueryEvalPos(query, Arrays.copyOf(pathInTerm, qepLevel + 1),
