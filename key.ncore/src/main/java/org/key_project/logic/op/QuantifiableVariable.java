@@ -3,12 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic.op;
 
-import org.key_project.logic.Term;
 import org.key_project.logic.sort.Sort;
 
 /**
  * This interface represents the variables that can be bound (by quantifiers or other binding
  * operators).
  */
-public interface QuantifiableVariable<S extends Sort<S>, T extends Term> extends ParsableVariable<S, T> {
+public interface QuantifiableVariable<S extends Sort<S>> extends ParsableVariable<S> {
 }

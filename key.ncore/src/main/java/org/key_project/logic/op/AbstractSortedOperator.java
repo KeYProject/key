@@ -4,12 +4,11 @@
 package org.key_project.logic.op;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.Term;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
-public abstract class AbstractSortedOperator<S extends Sort<S>, T extends Term> extends AbstractOperator<S, T>
-        implements SortedOperator<S, T> {
+public abstract class AbstractSortedOperator<S extends Sort<S>> extends AbstractOperator<S>
+        implements SortedOperator<S> {
     private static final ImmutableArray EMPTY_SORT_LIST = new ImmutableArray<>();
     private static <S extends Sort<S>> ImmutableArray<S> getEmptySortList() {
         return (ImmutableArray<S>) EMPTY_SORT_LIST;

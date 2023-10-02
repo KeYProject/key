@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * Operators implementing this interface may stand for locations as well. This means e.g. occur as
  * top level operators on the left side of an assignment pair of an update.
  */
-public interface UpdateableOperator extends org.key_project.logic.op.UpdateableOperator<Sort, Term>, ParsableVariable, SortedOperator, Operator {
+public interface UpdateableOperator extends org.key_project.logic.op.UpdateableOperator<Sort>,
+        ParsableVariable, SortedOperator, Operator {
 
 }

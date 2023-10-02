@@ -4,14 +4,13 @@
 package org.key_project.logic.op;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.Term;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Abstract operator class offering some common functionality.
  */
-public abstract class AbstractOperator<S extends Sort<S>, T extends Term> implements Operator<S, T> {
+public abstract class AbstractOperator<S extends Sort<S>> implements Operator<S> {
     private final Name name;
     private final int arity;
     private final ImmutableArray<Boolean> whereToBind;

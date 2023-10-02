@@ -26,8 +26,8 @@ public final class SortImpl extends AbstractSort {
     }
 
     public boolean equals(Object o) {
-        if (o instanceof SortImpl) {
-            return ((SortImpl) o).name().equals(name());
+        if (o instanceof SortImpl sort) {
+            return sort.name().equals(name());
         } else {
             return false;
         }
