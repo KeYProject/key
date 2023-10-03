@@ -11,7 +11,7 @@ class NameTest {
     @Test
     void testToString() {
         for (var s : names) {
-            assertEquals(s, new Name(s));
+            assertEquals(s, new Name(s).toString());
         }
     }
 
