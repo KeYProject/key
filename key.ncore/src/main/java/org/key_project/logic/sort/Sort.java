@@ -6,7 +6,7 @@ package org.key_project.logic.sort;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableSet;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface Sort<S extends Sort<S>> extends Named {
     /**

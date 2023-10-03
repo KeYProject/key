@@ -1,6 +1,6 @@
 module org.key_project.ncore {
    requires org.key_project.util;
-   requires jakarta.annotation;
+   requires org.jspecify;
 
    /* requires, exports, uses */
    exports org.key_project.logic;

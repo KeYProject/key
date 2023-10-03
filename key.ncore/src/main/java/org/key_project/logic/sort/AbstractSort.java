@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic.sort;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 
-import jakarta.annotation.Nullable;
 
 /**
  * Abstract base class for implementations of the Sort interface.
