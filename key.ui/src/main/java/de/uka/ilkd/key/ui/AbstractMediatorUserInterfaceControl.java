@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.ui;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
@@ -217,7 +218,10 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         final File toSave = new File(proofFolder, filename);
         final KeYResourceManager krm = KeYResourceManager.getManager();
         final ProofSaver ps = new ProofSaver(proof, toSave.getAbsolutePath(), krm.getSHA1());
-        ps.save();
+        final String errorMsg = ps.save();
+        if (errorMsg != null) {
+            reportException(this, null, new IOException(errorMsg));
+        }
     }
 
     /**
