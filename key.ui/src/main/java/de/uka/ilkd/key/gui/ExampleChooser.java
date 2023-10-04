@@ -39,15 +39,6 @@ public final class ExampleChooser extends JDialog {
      */
     public static final String EXAMPLES_PATH = "examples";
 
-    private static final long serialVersionUID = -4405666868752394532L;
-
-    /**
-     * This constant is accessed by the eclipse based projects.
-     */
-    public static final String KEY_FILE_NAME = "project.key";
-
-    private static final String PROOF_FILE_NAME = "project.proof";
-
     /**
      * Java property name to specify a custom key example folder.
      */
@@ -77,149 +68,7 @@ public final class ExampleChooser extends JDialog {
      */
     private Example selectedExample;
 
-    /**
-     * This class wraps a {@link File} and has a special {@link #toString()} method only using the
-     * short file name w/o path.
-     * <p>
-     * Used for displaying files in the examples list w/o prefix
-     */
-    public static class Example {
-        /**
-         * The default category under which examples range if they do not have {@link #KEY_PATH}
-         * set.
-         */
-        private static final String DEFAULT_CATEGORY_PATH = "Unsorted";
 
-        /**
-         * The {@link Properties} key to specify the path in the tree.
-         */
-        private static final String KEY_PATH = "example.path";
-
-        /**
-         * The {@link Properties} key to specify the name of the example. Directory name if left
-         * open.
-         */
-        private static final String KEY_NAME = "example.name";
-
-        /**
-         * The {@link Properties} key to specify the file for the example. KEY_FILE_NAME by default
-         */
-        private static final String KEY_FILE = "example.file";
-
-        /**
-         * The {@link Properties} key to specify the proof file in the tree. May be left open
-         */
-        private static final String KEY_PROOF_FILE = "example.proofFile";
-
-        /**
-         * The {@link Properties} key to specify the path in the tree. Prefix to specify additional
-         * files to load. Append 1, 2, 3, ...
-         */
-        private static final String ADDITIONAL_FILE_PREFIX = "example.additionalFile.";
-
-        /**
-         * The {@link Properties} key to specify the path in the tree. Prefix to specify export
-         * files which are not shown as tabs in the example wizard but are extracted to Java
-         * projects in the Eclipse integration. Append 1, 2, 3, ...
-         */
-        private static final String EXPORT_FILE_PREFIX = "example.exportFile.";
-
-        private final File exampleFile;
-        private final File directory;
-        private final String description;
-        private final Properties properties;
-
-        public Example(File file) throws IOException {
-            this.exampleFile = file;
-            this.directory = file.getParentFile();
-            this.properties = new Properties();
-            StringBuilder sb = new StringBuilder();
-            extractDescription(file, sb, properties);
-            this.description = sb.toString();
-        }
-
-        public File getDirectory() {
-            return directory;
-        }
-
-        public File getProofFile() {
-            return new File(directory, properties.getProperty(KEY_PROOF_FILE, PROOF_FILE_NAME));
-        }
-
-        public File getObligationFile() {
-            return new File(directory, properties.getProperty(KEY_FILE, KEY_FILE_NAME));
-        }
-
-        public String getName() {
-            return properties.getProperty(KEY_NAME, directory.getName());
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public File getExampleFile() {
-            return exampleFile;
-        }
-
-        public List<File> getAdditionalFiles() {
-            ArrayList<File> result = new ArrayList<>();
-            int i = 1;
-            while (properties.containsKey(ADDITIONAL_FILE_PREFIX + i)) {
-                result.add(new File(directory, properties.getProperty(ADDITIONAL_FILE_PREFIX + i)));
-                i++;
-            }
-            return result;
-        }
-
-        public List<File> getExportFiles() {
-            ArrayList<File> result = new ArrayList<>();
-            int i = 1;
-            while (properties.containsKey(EXPORT_FILE_PREFIX + i)) {
-                result.add(new File(directory, properties.getProperty(EXPORT_FILE_PREFIX + i)));
-                i++;
-            }
-            return result;
-        }
-
-        public String[] getPath() {
-            return properties.getProperty(KEY_PATH, DEFAULT_CATEGORY_PATH).split("/");
-        }
-
-        @Override
-        public String toString() {
-            return getName();
-        }
-
-        public void addToTreeModel(DefaultTreeModel model) {
-            DefaultMutableTreeNode node =
-                findChild((DefaultMutableTreeNode) model.getRoot(), getPath(), 0);
-            node.add(new DefaultMutableTreeNode(this));
-        }
-
-        private DefaultMutableTreeNode findChild(DefaultMutableTreeNode root, String[] path,
-                int from) {
-            if (from == path.length) {
-                return root;
-            }
-            Enumeration<?> en = root.children();
-            while (en.hasMoreElements()) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) en.nextElement();
-                if (node.getUserObject().equals(path[from])) {
-                    return findChild(node, path, from + 1);
-                }
-            }
-            // not found ==> add new
-            DefaultMutableTreeNode node = new DefaultMutableTreeNode(path[from]);
-            root.add(node);
-            return findChild(node, path, from + 1);
-        }
-
-        public boolean hasProof() {
-            return properties.containsKey(KEY_PROOF_FILE);
-        }
-
-    }
 
     // -------------------------------------------------------------------------
     // constructors
@@ -364,34 +213,6 @@ public final class ExampleChooser extends JDialog {
         }
     }
 
-    private static StringBuilder extractDescription(File file, StringBuilder sb,
-            Properties properties) {
-        try (BufferedReader r = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
-            String line;
-            boolean emptyLineSeen = false;
-            while ((line = r.readLine()) != null) {
-                if (emptyLineSeen) {
-                    sb.append(line).append("\n");
-                } else {
-                    String trimmed = line.trim();
-                    if (trimmed.length() == 0) {
-                        emptyLineSeen = true;
-                    } else if (trimmed.startsWith("#")) {
-                        // ignore
-                    } else {
-                        String[] entry = trimmed.split(" *[:=] *", 2);
-                        if (entry.length > 1) {
-                            properties.put(entry[0], entry[1]);
-                        }
-                    }
-                }
-            }
-        } catch (IOException e) {
-            LOGGER.error("", e);
-            return sb;
-        }
-        return sb;
-    }
 
 
     private void updateDescription() {
