@@ -13,3 +13,5 @@ include 'keyext.ui.testgen'
 include 'keyext.proofmanagement'
 include 'keyext.exploration'
 include 'keyext.slicing'
+
+include 'keyext.api'
