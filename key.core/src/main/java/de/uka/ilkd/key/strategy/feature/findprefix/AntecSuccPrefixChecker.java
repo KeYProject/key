@@ -45,10 +45,10 @@ class AntecSuccPrefixChecker implements Checker {
             pol = pol * -1;
             // do not change polarity if find term is subterm of
         } else if (!((op == Junctor.AND) || // and
-                    (op == Junctor.OR) || // or
-                    (op == Junctor.IMP && child != 0) || // right hand side of implication
-                    (op == IfThenElse.IF_THEN_ELSE && child != 0))) { // then or else part of
-                                                                 // if-then-else
+                (op == Junctor.OR) || // or
+                (op == Junctor.IMP && child != 0) || // right hand side of implication
+                (op == IfThenElse.IF_THEN_ELSE && child != 0))) { // then or else part of
+            // if-then-else
             pol = 0;
         }
         return pol;

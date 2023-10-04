@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.proof;
 
 
-import java.net.MalformedURLException;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Position;

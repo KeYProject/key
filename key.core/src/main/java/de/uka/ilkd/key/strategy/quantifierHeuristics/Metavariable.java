@@ -8,7 +8,6 @@ import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-import javax.annotation.Nonnull;
 
 @Deprecated
 public final class Metavariable extends AbstractSortedOperator

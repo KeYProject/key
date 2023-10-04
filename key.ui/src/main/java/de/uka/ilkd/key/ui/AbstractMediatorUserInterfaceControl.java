@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.ui;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;

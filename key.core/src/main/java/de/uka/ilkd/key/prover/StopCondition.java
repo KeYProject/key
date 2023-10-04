@@ -71,7 +71,7 @@ public interface StopCondition {
 
     /**
      * Returns the reason why the previous check via
-     * {@link #isGoalAllowed(int, long, Proof, long, int, Goal)}  has
+     * {@link #isGoalAllowed(int, long, Proof, long, int, Goal)} has
      * stopped the apply strategy.
      *
      * @param maxApplications The defined maximal number of rules to apply. Can be different to

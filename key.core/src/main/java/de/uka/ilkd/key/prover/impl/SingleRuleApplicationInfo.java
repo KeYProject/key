@@ -8,7 +8,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 
 /**
  * Instances of this class are used to store if a rule could be applied automatically and if not to
- * store the reason why no rule applications could be performed. 
+ * store the reason why no rule applications could be performed.
  */
 public class SingleRuleApplicationInfo {
 

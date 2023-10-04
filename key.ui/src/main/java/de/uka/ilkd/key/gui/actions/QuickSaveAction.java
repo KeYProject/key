@@ -5,7 +5,6 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.IOException;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
@@ -58,8 +57,8 @@ public final class QuickSaveAction extends MainWindowAction {
             final String status = "File quicksaved: " + filename;
             if (status != null) {
                 mainWindow.popupWarning(
-                        "Quicksaving file " + filename + " failed:\n" + status,
-                        "Quicksave failed");
+                    "Quicksaving file " + filename + " failed:\n" + status,
+                    "Quicksave failed");
                 LOGGER.debug("Quicksaving file {} failed.", filename, status);
             }
             mainWindow.setStatusLine(status);

@@ -34,7 +34,8 @@ public class SVInstantiationProjection implements ProjectionToTerm {
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
         if (!(app instanceof final TacletApp tapp)) {
             Debug.fail("Projection is only applicable to taclet apps," + " but got " + app);
-            throw new IllegalArgumentException("Projections can only be applied to taclet applications, not to "+app);
+            throw new IllegalArgumentException(
+                "Projections can only be applied to taclet applications, not to " + app);
         }
         final Object instObj = tapp.instantiations().lookupValue(svName);
         if (!(instObj instanceof Term instantiation)) {

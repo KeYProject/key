@@ -94,8 +94,10 @@ public class SVInstantiationCP implements Feature {
 
         public Iterator<CPBranch> getBranches(RuleApp oldApp) {
             if (!(oldApp instanceof final TacletApp tapp)) {
-                Debug.fail("Instantiation feature is only applicable to " + "taclet apps, but got ", oldApp);
-                throw new IllegalArgumentException("Rule application must be a taclet application, but is " + oldApp);
+                Debug.fail("Instantiation feature is only applicable to " + "taclet apps, but got ",
+                    oldApp);
+                throw new IllegalArgumentException(
+                    "Rule application must be a taclet application, but is " + oldApp);
             }
 
             final SchemaVariable sv = findSVWithName(tapp);
