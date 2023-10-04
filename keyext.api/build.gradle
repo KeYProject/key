@@ -1,0 +1,6 @@
+dependencies {
+    implementation(project(":key.core"))
+    implementation(project(":key.ui"))
+
+    implementation("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc:0.21.1")
+}
