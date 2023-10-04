@@ -4,7 +4,8 @@
 package de.uka.ilkd.key.proof.reference;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Visitor;
+import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.Visitor;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 
 /**
@@ -12,7 +13,7 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
  *
  * @author Arne Keller
  */
-public class ProgramMethodFinder implements Visitor {
+public class ProgramMethodFinder implements Visitor<Sort> {
 
     /**
      * Whether a program method has been found.
@@ -20,12 +21,12 @@ public class ProgramMethodFinder implements Visitor {
     private boolean foundProgramMethod = false;
 
     @Override
-    public boolean visitSubtree(Term visited) {
+    public boolean visitSubtree(org.key_project.logic.Term<Sort> visited) {
         return false;
     }
 
     @Override
-    public void visit(Term visited) {
+    public void visit(org.key_project.logic.Term<Sort> visited) {
         if (visited.op() instanceof ProgramMethod pm) {
             if (!pm.isModel()) {
                 foundProgramMethod = true;
@@ -34,12 +35,12 @@ public class ProgramMethodFinder implements Visitor {
     }
 
     @Override
-    public void subtreeEntered(Term subtreeRoot) {
+    public void subtreeEntered(org.key_project.logic.Term<Sort> subtreeRoot) {
 
     }
 
     @Override
-    public void subtreeLeft(Term subtreeRoot) {
+    public void subtreeLeft(org.key_project.logic.Term<Sort> subtreeRoot) {
 
     }
 

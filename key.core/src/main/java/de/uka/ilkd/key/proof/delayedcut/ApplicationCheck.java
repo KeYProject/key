@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 
@@ -93,9 +94,9 @@ public interface ApplicationCheck {
 
         private String checkFormula(Term formula) {
             final List<String> newSymbols = new LinkedList<>();
-            formula.execPreOrder(new DefaultVisitor() {
+            formula.execPreOrder(new DefaultVisitor<Sort>() {
                 @Override
-                public void visit(Term visited) {
+                public void visit(org.key_project.logic.Term<Sort> visited) {
                     String name = visited.op().name().toString();
                     if (names.contains(name)) {
                         newSymbols.add(name);

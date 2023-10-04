@@ -11,8 +11,9 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.Visitor;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -20,7 +21,6 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -165,27 +165,27 @@ abstract class ReplaceAndRegisterMethod {
         return qvVisitor.getResult();
     }
 
-    private static final class QuantifiableVariableVisitor implements Visitor {
+    private static final class QuantifiableVariableVisitor implements Visitor<Sort> {
         private final HashSet<QuantifiableVariable> vars = new LinkedHashSet<>();
 
         @Override
-        public boolean visitSubtree(Term visited) {
+        public boolean visitSubtree(org.key_project.logic.Term<Sort> visited) {
             return true;
         }
 
         @Override
-        public void visit(Term visited) {
-            final ImmutableArray<QuantifiableVariable> boundVars = visited.boundVars();
-            for (QuantifiableVariable var : boundVars) {
-                vars.add(var);
+        public void visit(org.key_project.logic.Term<Sort> visited) {
+            final var boundVars = visited.boundVars();
+            for (var boundVar : boundVars) {
+                vars.add((QuantifiableVariable) boundVar);
             }
         }
 
         @Override
-        public void subtreeEntered(Term subtreeRoot) { /* nothing to do */ }
+        public void subtreeEntered(org.key_project.logic.Term<Sort> subtreeRoot) { /* nothing to do */ }
 
         @Override
-        public void subtreeLeft(Term subtreeRoot) { /* nothing to do */ }
+        public void subtreeLeft(org.key_project.logic.Term<Sort> subtreeRoot) { /* nothing to do */ }
 
         public Set<QuantifiableVariable> getResult() { return vars; }
     }

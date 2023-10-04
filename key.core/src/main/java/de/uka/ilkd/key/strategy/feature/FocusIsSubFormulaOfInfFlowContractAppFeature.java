@@ -4,7 +4,8 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.informationflow.rule.executor.InfFlowContractAppTacletExecutor;
-import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -68,7 +69,7 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
     }
 
 
-    private static class SubFormulaVisitor extends DefaultVisitor {
+    private static class SubFormulaVisitor extends DefaultVisitor<Sort> {
 
         final Term potentialSub;
 
@@ -81,8 +82,9 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
 
 
         @Override
-        public void visit(Term visited) {
-            isSubFormula |= visited.equalsModRenaming(potentialSub);
+        public void visit(org.key_project.logic.Term<Sort> visited) {
+            var term = (Term) visited;
+            isSubFormula |= term.equalsModRenaming(potentialSub);
         }
 
 

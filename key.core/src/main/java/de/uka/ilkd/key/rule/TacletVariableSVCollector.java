@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import org.key_project.logic.Visitor;
 
 /**
  * This class is used to collect all appearing SchemaVariables that are bound in a Taclet.
@@ -16,7 +17,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 public class TacletVariableSVCollector extends TacletSchemaVariableCollector {
 
     /**
-     * visits term t in post order ({@link Term#execPostOrder(de.uka.ilkd.key.logic.Visitor)}) and
+     * visits term t in post order ({@link Term#execPostOrder(Visitor)}) and
      * collects all bound schema variables
      *
      * @param t the Term to be visited (<code>t</code> must not be <code>null</code>

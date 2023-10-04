@@ -92,8 +92,8 @@ public class ProofObligationCreator {
         TacletVisitor visitor = new TacletVisitor() {
 
             @Override
-            public void visit(Term visited) {
-                collectUserDefinedSymbols(visited, userDefinedSymbols);
+            public void visit(org.key_project.logic.Term<Sort> visited) {
+                collectUserDefinedSymbols((Term) visited, userDefinedSymbols);
 
             }
         };

@@ -11,7 +11,7 @@ import java.util.Set;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.Visitor;
+import org.key_project.logic.Visitor;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
@@ -153,33 +153,33 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
                     heap1Pre, heap1Post, locset1, heap2Pre, heap2Post, locset2);
     }
 
-    static class QuantifiableVariableVisitor implements Visitor {
+    static class QuantifiableVariableVisitor implements Visitor<Sort> {
 
         private final LinkedList<QuantifiableVariable> vars =
             new LinkedList<>();
 
         @Override
-        public boolean visitSubtree(Term visited) {
+        public boolean visitSubtree(org.key_project.logic.Term<Sort> visited) {
             return true;
         }
 
         @Override
-        public void visit(Term visited) {
-            final ImmutableArray<QuantifiableVariable> boundVars = visited.boundVars();
-            for (QuantifiableVariable var : boundVars) {
-                vars.add(var);
+        public void visit(org.key_project.logic.Term<Sort> visited) {
+            final var boundVars = visited.boundVars();
+            for (var boundVar : boundVars) {
+                vars.add((QuantifiableVariable) boundVar);
             }
         }
 
 
         @Override
-        public void subtreeEntered(Term subtreeRoot) {
+        public void subtreeEntered(org.key_project.logic.Term<Sort> subtreeRoot) {
             // nothing to do
         }
 
 
         @Override
-        public void subtreeLeft(Term subtreeRoot) {
+        public void subtreeLeft(org.key_project.logic.Term<Sort> subtreeRoot) {
             // nothing to do
         }
 

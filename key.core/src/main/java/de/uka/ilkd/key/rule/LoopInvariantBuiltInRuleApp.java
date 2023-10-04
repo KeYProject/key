@@ -18,7 +18,8 @@ import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -115,13 +116,14 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         final Term valuesVar = skipValues ? null : tb.var((ProgramVariable) lhs);
 
         // set up replacement visitors
-        final class IndexTermReplacementVisitor extends DefaultVisitor {
+        final class IndexTermReplacementVisitor extends DefaultVisitor<Sort> {
 
             private Term result;
 
             @Override
-            public void visit(Term visited) {
-                result = replace(visited);
+            public void visit(org.key_project.logic.Term<Sort> visited) {
+                // TODO: Remove cast when/if term builder is moved
+                result = replace((Term) visited);
             }
 
             public Term getResult() {
@@ -146,13 +148,13 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                 }
             }
         }
-        final class ValuesTermReplacementVisitor extends DefaultVisitor {
+        final class ValuesTermReplacementVisitor extends DefaultVisitor<Sort> {
 
             private Term result;
 
             @Override
-            public void visit(Term visited) {
-                result = replace(visited);
+            public void visit(org.key_project.logic.Term<Sort> visited) {
+                result = replace((Term) visited);
             }
 
             public Term getResult() {

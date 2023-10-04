@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
@@ -38,6 +39,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.DefaultVisitor;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.ArrayUtil;
@@ -250,12 +252,13 @@ public class SymbolicExecutionTreeBuilder {
         // Find all modalities in the succedent
         final List<Term> modalityTerms = new LinkedList<>();
         for (SequentFormula sequentFormula : root.sequent().succedent()) {
-            sequentFormula.formula().execPreOrder(new DefaultVisitor() {
+            sequentFormula.formula().execPreOrder(new DefaultVisitor<Sort>() {
                 @Override
-                public void visit(Term visited) {
+                public void visit(org.key_project.logic.Term<Sort> visited) {
+                    var term = (Term) visited;
                     if (visited.op() instanceof Modality
-                            && SymbolicExecutionUtil.hasSymbolicExecutionLabel(visited)) {
-                        modalityTerms.add(visited);
+                            && SymbolicExecutionUtil.hasSymbolicExecutionLabel(term)) {
+                        modalityTerms.add(term);
                     }
                 }
             });

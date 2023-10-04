@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Visitor;
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
@@ -79,23 +80,7 @@ public interface Term
      */
     @NonNull
     JavaBlock javaBlock();
-
-    /**
-     * The visitor is handed through till the bottom of the tree, and then it walks upwards, while
-     * at each upstep the method visit of the visitor is called.
-     *
-     * @param visitor the Visitor
-     */
-    void execPostOrder(Visitor visitor);
-
-    /**
-     * The visitor walks downwards the tree, while at each downstep the method visit of the visitor
-     * is called.
-     *
-     * @param visitor the Visitor
-     */
-    void execPreOrder(Visitor visitor);
-
+    
     /**
      * Compares if two terms are equal modulo bound renaming
      *

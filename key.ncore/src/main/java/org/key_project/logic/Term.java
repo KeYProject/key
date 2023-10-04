@@ -74,4 +74,20 @@ public interface Term<S extends Sort<S>> extends LogicElement, Sorted<S> {
      * Returns a serial number for a term. The serial number is not persistent.
      */
     int serialNumber();
+
+    /**
+     * The visitor is handed through till the bottom of the tree, and then it walks upwards, while at
+     * each upstep the method visit of the visitor is called.
+     *
+     * @param visitor the Visitor
+     */
+    void execPostOrder(Visitor visitor);
+
+    /**
+     * The visitor walks downwards the tree, while at each downstep the method visit of the visitor
+     * is called.
+     *
+     * @param visitor the Visitor
+     */
+    void execPreOrder(Visitor visitor);
 }

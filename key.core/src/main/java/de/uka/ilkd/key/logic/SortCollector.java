@@ -7,12 +7,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.DefaultVisitor;
 
 /**
  * @author mihai
  *
  */
-public class SortCollector extends DefaultVisitor {
+public class SortCollector extends DefaultVisitor<Sort> {
     /** the collected sorts */
     private final Set<Sort> sorts = new HashSet<>();
 
@@ -23,10 +24,10 @@ public class SortCollector extends DefaultVisitor {
     /*
      * (non-Javadoc)
      *
-     * @see de.uka.ilkd.key.logic.DefaultVisitor#visit(de.uka.ilkd.key.logic.Term)
+     * @see org.key_project.logic.DefaultVisitor#visit(de.uka.ilkd.key.logic.Term)
      */
     @Override
-    public void visit(Term visited) {
+    public void visit(org.key_project.logic.Term<Sort> visited) {
         sorts.add(visited.sort());
     }
 

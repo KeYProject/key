@@ -13,7 +13,7 @@ import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.DefaultVisitor;
+import org.key_project.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -448,10 +448,10 @@ public final class TruthValueTracingUtil {
             final Map<String, MultiEvaluationResult> results) {
         if (parentPio != null) {
             // Check application term and all of its children and grand children
-            parentPio.subTerm().execPreOrder(new DefaultVisitor() {
+            parentPio.subTerm().execPreOrder(new DefaultVisitor<Sort>() {
                 @Override
-                public void visit(Term visited) {
-                    checkForNewMinorIdsOSS(childPio.sequentFormula(), visited, termLabelName,
+                public void visit(org.key_project.logic.Term<Sort> visited) {
+                    checkForNewMinorIdsOSS(childPio.sequentFormula(), (Term) visited, termLabelName,
                         parentPio, tb, results);
                 }
             });
@@ -535,10 +535,10 @@ public final class TruthValueTracingUtil {
             final PosInOccurrence parentPio = parentRuleApp.posInOccurrence();
             if (parentPio != null) {
                 // Check application term and all of its children and grand children
-                parentPio.subTerm().execPreOrder(new DefaultVisitor() {
+                parentPio.subTerm().execPreOrder(new DefaultVisitor<Sort>() {
                     @Override
-                    public void visit(Term visited) {
-                        checkForNewMinorIds(childNode, visited, termLabelName, parentPio, tb,
+                    public void visit(org.key_project.logic.Term<Sort> visited) {
+                        checkForNewMinorIds(childNode, (Term) visited, termLabelName, parentPio, tb,
                             results);
                     }
                 });
@@ -623,21 +623,21 @@ public final class TruthValueTracingUtil {
     private static void listLabelReplacements(
             final SequentFormula sf, final Name labelName,
             final String labelId, final List<Term> resultToFill) {
-        sf.formula().execPreOrder(new DefaultVisitor() {
+        sf.formula().execPreOrder(new DefaultVisitor<Sort>() {
             @Override
-            public boolean visitSubtree(Term visited) {
+            public boolean visitSubtree(org.key_project.logic.Term<Sort> visited) {
                 return !hasLabelOfInterest(visited);
             }
 
             @Override
-            public void visit(Term visited) {
+            public void visit(org.key_project.logic.Term<Sort> visited) {
                 if (hasLabelOfInterest(visited)) {
-                    resultToFill.add(visited);
+                    resultToFill.add((Term) visited);
                 }
             }
 
-            private boolean hasLabelOfInterest(Term visited) {
-                TermLabel visitedLabel = visited.getLabel(labelName);
+            private boolean hasLabelOfInterest(org.key_project.logic.Term<Sort> visited) {
+                TermLabel visitedLabel = ((Term) visited).getLabel(labelName);
                 if (visitedLabel instanceof FormulaTermLabel pLabel) {
                     String[] beforeIds = pLabel.getBeforeIds();
                     return ArrayUtil.contains(beforeIds, labelId);

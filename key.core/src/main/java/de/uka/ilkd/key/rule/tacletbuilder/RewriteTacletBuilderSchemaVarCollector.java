@@ -9,7 +9,8 @@ import java.util.Set;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Visitor;
+import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.Visitor;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -52,14 +53,14 @@ public class RewriteTacletBuilderSchemaVarCollector {
     private Set<SchemaVariable> collectSchemaVariables(Term t) {
         final Set<SchemaVariable> result = new LinkedHashSet<>();
 
-        t.execPreOrder(new Visitor() {
+        t.execPreOrder(new Visitor<Sort>() {
             @Override
-            public boolean visitSubtree(Term visited) {
+            public boolean visitSubtree(org.key_project.logic.Term<Sort> visited) {
                 return true;
             }
 
             @Override
-            public void visit(Term visited) {
+            public void visit(org.key_project.logic.Term<Sort> visited) {
                 if (visited.op() instanceof SchemaVariable) {
                     result.add((SchemaVariable) visited.op());
                 }
@@ -67,13 +68,13 @@ public class RewriteTacletBuilderSchemaVarCollector {
 
 
             @Override
-            public void subtreeEntered(Term subtreeRoot) {
+            public void subtreeEntered(org.key_project.logic.Term<Sort> subtreeRoot) {
                 // nothing to do
             }
 
 
             @Override
-            public void subtreeLeft(Term subtreeRoot) {
+            public void subtreeLeft(org.key_project.logic.Term<Sort> subtreeRoot) {
                 // nothing to do
             }
         });

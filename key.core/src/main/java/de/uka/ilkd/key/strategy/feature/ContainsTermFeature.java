@@ -5,7 +5,8 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Visitor;
+import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.Visitor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
@@ -65,7 +66,7 @@ public class ContainsTermFeature implements Feature {
     }
 
 
-    private static class ContainsTermVisitor implements Visitor {
+    private static class ContainsTermVisitor implements Visitor<Sort> {
         boolean found = false;
         final Term term;
 
@@ -75,22 +76,24 @@ public class ContainsTermFeature implements Feature {
         }
 
         @Override
-        public boolean visitSubtree(Term visited) {
+        public boolean visitSubtree(org.key_project.logic.Term<Sort> visited) {
             return true;
         }
 
         @Override
-        public void visit(Term visited) {
-            found = found || visited.equalsModRenaming(term);
+        public void visit(org.key_project.logic.Term<Sort> visited) {
+            // TODO: Fix with better equalsModRenaming handling
+            var t = (Term) visited;
+            found = found || t.equalsModRenaming(term);
         }
 
         @Override
-        public void subtreeEntered(Term subtreeRoot) {
+        public void subtreeEntered(org.key_project.logic.Term<Sort> subtreeRoot) {
             // nothing to do
         }
 
         @Override
-        public void subtreeLeft(Term subtreeRoot) {
+        public void subtreeLeft(org.key_project.logic.Term<Sort> subtreeRoot) {
             // nothing to do
         }
     }

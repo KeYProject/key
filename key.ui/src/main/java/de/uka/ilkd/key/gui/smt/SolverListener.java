@@ -22,7 +22,8 @@ import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.ProgressDialogListener;
-import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -661,7 +662,7 @@ public class SolverListener implements SolverLauncherListener {
      *
      * @author jschiffl
      */
-    protected static class ContainsModalityOrQueryVisitor extends DefaultVisitor {
+    protected static class ContainsModalityOrQueryVisitor extends DefaultVisitor<Sort> {
         /**
          * The result.
          */
@@ -671,7 +672,7 @@ public class SolverListener implements SolverLauncherListener {
          * {@inheritDoc}
          */
         @Override
-        public void visit(Term visited) {
+        public void visit(org.key_project.logic.Term<Sort> visited) {
             if (visited.op() instanceof Modality || visited.op() instanceof IProgramMethod) {
                 containsModQuery = true;
             }

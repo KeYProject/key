@@ -19,6 +19,7 @@ import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor;
 
+import org.key_project.logic.DefaultVisitor;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -32,7 +33,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * @author Dominic Steinhoefel
  */
-public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
+public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor<Sort> {
     private final SVInstantiations svInst;
     private final Services services;
     private final TermBuilder tb;
@@ -217,9 +218,10 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
      * performs the syntactic replacement of schemavariables with their instantiations
      */
     @Override
-    public void visit(final Term visited) {
+    public void visit(final org.key_project.logic.Term<Sort> visited) {
+        var t = (Term) visited;
         // Sort equality has to be ensured before calling this method
-        final Operator visitedOp = visited.op();
+        final Operator visitedOp = t.op();
         if (visitedOp instanceof SchemaVariable && visitedOp.arity() == 0
                 && svInst.isInstantiated((SchemaVariable) visitedOp)
                 && (!(visitedOp instanceof ProgramSV && (((ProgramSV) visitedOp).isListSV())))) {
@@ -230,29 +232,29 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
             final Operator newOp = instantiateOperator(visitedOp);
             // instantiation of java block
             boolean jblockChanged = false;
-            JavaBlock jb = visited.javaBlock();
+            JavaBlock jb = t.javaBlock();
 
             if (jb != JavaBlock.EMPTY_JAVABLOCK) {
                 jb = replacePrg(svInst, jb);
-                if (jb != visited.javaBlock()) {
+                if (jb != t.javaBlock()) {
                     jblockChanged = true;
                 }
             }
 
             // instantiate bound variables
             final ImmutableArray<QuantifiableVariable> boundVars = //
-                instantiateBoundVariables(visited);
+                instantiateBoundVariables(t);
 
             // instantiate sub terms
             final Term[] neededsubs = neededSubs(newOp.arity());
-            if (boundVars != visited.boundVars() || jblockChanged || (newOp != visitedOp)
+            if (boundVars != t.boundVars() || jblockChanged || (newOp != visitedOp)
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
                 final Term newTerm =
-                    tb.tf().createTerm(newOp, neededsubs, boundVars, jb, visited.getLabels());
+                    tb.tf().createTerm(newOp, neededsubs, boundVars, jb, t.getLabels());
                 pushNew(resolveSubst(newTerm));
             } else {
-                Term t = resolveSubst(visited);
-                if (t == visited) {
+                Term term = resolveSubst(t);
+                if (term == t) {
                     subStack.push(t);
                 } else {
                     pushNew(t);
@@ -304,8 +306,8 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
      * {@inheritDoc}
      */
     @Override
-    public void subtreeEntered(Term subtreeRoot) {
-        tacletTermStack.push(subtreeRoot);
+    public void subtreeEntered(org.key_project.logic.Term<Sort> subtreeRoot) {
+        tacletTermStack.push((Term) subtreeRoot);
         super.subtreeEntered(subtreeRoot);
     }
 
@@ -318,7 +320,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
      * @param subtreeRoot root of the subtree which the visitor leaves.
      */
     @Override
-    public void subtreeLeft(Term subtreeRoot) {
+    public void subtreeLeft(org.key_project.logic.Term<Sort> subtreeRoot) {
         tacletTermStack.pop();
         if (subtreeRoot.op() instanceof TermTransformer mop) {
             final Term newTerm = //

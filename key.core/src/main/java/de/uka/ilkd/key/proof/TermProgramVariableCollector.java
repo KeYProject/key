@@ -8,11 +8,12 @@ import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
-import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
-public class TermProgramVariableCollector extends DefaultVisitor {
+public class TermProgramVariableCollector extends DefaultVisitor<Sort> {
 
     private final HashSet<LocationVariable> result = new LinkedHashSet<>();
     private final Services services;
@@ -27,10 +28,11 @@ public class TermProgramVariableCollector extends DefaultVisitor {
     /**
      * is called by the execPostOrder-method of a term
      *
-     * @param t the Term to checked if it is a program variable and if true the variable is added to
+     * @param term the Term to checked if it is a program variable and if true the variable is added to
      *        the list of found variables
      */
-    public void visit(Term t) {
+    public void visit(org.key_project.logic.Term<Sort> term) {
+        var t = (Term) term;
         if (t.op() instanceof LocationVariable) {
             result.add((LocationVariable) t.op());
         }

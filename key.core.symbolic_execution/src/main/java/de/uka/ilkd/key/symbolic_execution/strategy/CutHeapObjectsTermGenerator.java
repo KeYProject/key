@@ -9,7 +9,8 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -97,9 +98,10 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
      */
     protected void collectStoreLocations(Term term, final Set<Term> storeLocations,
             final HeapLDT heapLDT) {
-        term.execPreOrder(new DefaultVisitor() {
+        term.execPreOrder(new DefaultVisitor<Sort>() {
             @Override
-            public void visit(Term visited) {
+            public void visit(org.key_project.logic.Term<Sort> v) {
+                var visited = (Term) v;
                 if (visited.op() == heapLDT.getStore()) {
                     storeLocations.add(visited.sub(1));
                 }

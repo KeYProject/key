@@ -6,13 +6,14 @@ package de.uka.ilkd.key.rule;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.visitor.ProgramSVCollector;
-import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Visitor;
+import org.key_project.logic.Visitor;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
@@ -39,7 +40,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * For example, {@link de.uka.ilkd.key.rule.TacletApp} uses this class to determine all
  * uninstantiated schemavariables.
  */
-public class TacletSchemaVariableCollector extends DefaultVisitor {
+public class TacletSchemaVariableCollector extends DefaultVisitor<Sort> {
 
     /** collects all found variables */
     protected ImmutableList<SchemaVariable> varList;
@@ -82,10 +83,11 @@ public class TacletSchemaVariableCollector extends DefaultVisitor {
      * visits the Term in post order {@link Term#execPostOrder(Visitor)} and collects all found
      * schema variables
      *
-     * @param t the Term whose schema variables are collected
+     * @param term the Term whose schema variables are collected
      */
     @Override
-    public void visit(Term t) {
+    public void visit(org.key_project.logic.Term<Sort> term) {
+        var t = (Term) term;
         final Operator op = t.op();
         if (op instanceof Modality || op instanceof ModalOperatorSV) {
             varList = collectSVInProgram(t.javaBlock(), varList);
