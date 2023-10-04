@@ -9,18 +9,17 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
-import org.key_project.logic.DefaultVisitor;
 
 /**
  * This {@link TermGenerator} is used by the {@link SymbolicExecutionStrategy} to add early alias
@@ -99,9 +98,9 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
      */
     protected void collectStoreLocations(Term term, final Set<Term> storeLocations,
             final HeapLDT heapLDT) {
-        term.execPreOrder(new DefaultVisitor<Sort>() {
+        term.execPreOrder(new DefaultVisitor() {
             @Override
-            public void visit(org.key_project.logic.Term<Sort> v) {
+            public void visit(Term v) {
                 var visited = (Term) v;
                 if (visited.op() == heapLDT.getStore()) {
                     storeLocations.add(visited.sub(1));

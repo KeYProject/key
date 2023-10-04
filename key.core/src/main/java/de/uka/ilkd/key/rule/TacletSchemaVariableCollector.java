@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.visitor.ProgramSVCollector;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -19,14 +20,11 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
-import org.key_project.logic.DefaultVisitor;
-import org.key_project.logic.Visitor;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -40,7 +38,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * For example, {@link de.uka.ilkd.key.rule.TacletApp} uses this class to determine all
  * uninstantiated schemavariables.
  */
-public class TacletSchemaVariableCollector extends DefaultVisitor<Sort> {
+public class TacletSchemaVariableCollector extends DefaultVisitor {
 
     /** collects all found variables */
     protected ImmutableList<SchemaVariable> varList;
@@ -80,13 +78,13 @@ public class TacletSchemaVariableCollector extends DefaultVisitor<Sort> {
 
 
     /**
-     * visits the Term in post order {@link Term#execPostOrder(Visitor)} and collects all found
+     * visits the Term in post order {@link Term#execPostOrder(org.key_project.logic.Visitor)} and collects all found
      * schema variables
      *
      * @param term the Term whose schema variables are collected
      */
     @Override
-    public void visit(org.key_project.logic.Term<Sort> term) {
+    public void visit(Term term) {
         var t = (Term) term;
         final Operator op = t.op();
         if (op instanceof Modality || op instanceof ModalOperatorSV) {

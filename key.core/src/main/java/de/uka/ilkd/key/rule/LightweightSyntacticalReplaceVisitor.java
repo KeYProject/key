@@ -19,7 +19,6 @@ import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor;
 
-import org.key_project.logic.DefaultVisitor;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -33,7 +32,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * @author Dominic Steinhoefel
  */
-public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor<Sort> {
+public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
     private final SVInstantiations svInst;
     private final Services services;
     private final TermBuilder tb;
@@ -218,7 +217,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor<Sort> {
      * performs the syntactic replacement of schemavariables with their instantiations
      */
     @Override
-    public void visit(final org.key_project.logic.Term<Sort> visited) {
+    public void visit(final Term visited) {
         var t = (Term) visited;
         // Sort equality has to be ensured before calling this method
         final Operator visitedOp = t.op();
@@ -306,7 +305,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor<Sort> {
      * {@inheritDoc}
      */
     @Override
-    public void subtreeEntered(org.key_project.logic.Term<Sort> subtreeRoot) {
+    public void subtreeEntered(Term subtreeRoot) {
         tacletTermStack.push((Term) subtreeRoot);
         super.subtreeEntered(subtreeRoot);
     }
@@ -320,7 +319,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor<Sort> {
      * @param subtreeRoot root of the subtree which the visitor leaves.
      */
     @Override
-    public void subtreeLeft(org.key_project.logic.Term<Sort> subtreeRoot) {
+    public void subtreeLeft(Term subtreeRoot) {
         tacletTermStack.pop();
         if (subtreeRoot.op() instanceof TermTransformer mop) {
             final Term newTerm = //

@@ -5,21 +5,21 @@ package org.key_project.logic;
 
 import org.key_project.logic.sort.Sort;
 
-public interface Visitor<S extends Sort<S>> {
+public interface Visitor<S extends Sort<S>, T extends Term<S>> {
     /**
      * Checks if the subtree below the visited {@link Term} should be traversed.
      *
      * @param visited The currently visited {@link Term}.
      * @return {@code true} visit sub tree, {@code false} skip sub tree.
      */
-    boolean visitSubtree(Term<S> visited);
+    boolean visitSubtree(T visited);
 
     /**
      * the entry method for the visitor pattern
      *
      * @param visited the Term to be visited
      */
-    void visit(Term<S> visited);
+    void visit(T visited);
 
     /**
      * this method is called in execPreOrder and execPostOrder in class Term when entering the
@@ -30,7 +30,7 @@ public interface Visitor<S extends Sort<S>> {
      * @param subtreeRoot root of the subtree which the visitor enters.
      */
 
-    void subtreeEntered(Term<S> subtreeRoot);
+    void subtreeEntered(T subtreeRoot);
 
     /**
      * this method is called in execPreOrder and execPostOrder in class Term when leaving the
@@ -41,5 +41,5 @@ public interface Visitor<S extends Sort<S>> {
      * @param subtreeRoot root of the subtree which the visitor leaves.
      */
 
-    void subtreeLeft(Term<S> subtreeRoot);
+    void subtreeLeft(T subtreeRoot);
 }

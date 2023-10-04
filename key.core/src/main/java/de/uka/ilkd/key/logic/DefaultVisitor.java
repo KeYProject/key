@@ -1,23 +1,24 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package org.key_project.logic;
+package de.uka.ilkd.key.logic;
+
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * This abstract Vistor class declares the interface for a common term visitor.
  */
-public abstract class DefaultVisitor<S extends org.key_project.logic.sort.Sort<S>, T extends Term<S>>
-        implements Visitor<S, T> {
+public abstract class DefaultVisitor extends org.key_project.logic.DefaultVisitor<Sort, Term> {
     @Override
-    public boolean visitSubtree(T visited) {
+    public boolean visitSubtree(Term visited) {
         return true;
     }
 
     @Override
-    public void subtreeEntered(T subtreeRoot) {
+    public void subtreeEntered(Term subtreeRoot) {
     }
 
     @Override
-    public void subtreeLeft(T subtreeRoot) {
+    public void subtreeLeft(Term subtreeRoot) {
     }
 }

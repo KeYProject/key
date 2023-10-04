@@ -737,21 +737,21 @@ public final class SourceView extends JComponent {
             // proof obligation belongs to is always loaded.
 
             node.sequent().forEach(
-                formula -> formula.formula().execPostOrder(new Visitor<Sort>() {
+                formula -> formula.formula().execPostOrder(new Visitor<Sort,Term>() {
 
                     @Override
-                    public boolean visitSubtree(org.key_project.logic.Term<Sort> visited) {
+                    public boolean visitSubtree(Term visited) {
                         return ((Term) visited).containsJavaBlockRecursive();
                     }
 
                     @Override
-                    public void visit(org.key_project.logic.Term<Sort> visited) {}
+                    public void visit(Term visited) {}
 
                     @Override
-                    public void subtreeLeft(org.key_project.logic.Term<Sort> subtreeRoot) {}
+                    public void subtreeLeft(Term subtreeRoot) {}
 
                     @Override
-                    public void subtreeEntered(org.key_project.logic.Term<Sort> sr) {
+                    public void subtreeEntered(Term sr) {
                         var subtreeRoot = (Term) sr;
                         if (subtreeRoot.javaBlock() != null) {
                             JavaASTVisitor visitor =

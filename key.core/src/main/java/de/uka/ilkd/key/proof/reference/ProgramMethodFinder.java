@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.reference;
 
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -13,7 +14,7 @@ import org.key_project.logic.Visitor;
  *
  * @author Arne Keller
  */
-public class ProgramMethodFinder implements Visitor<Sort> {
+public class ProgramMethodFinder implements Visitor<Sort, Term> {
 
     /**
      * Whether a program method has been found.
@@ -21,12 +22,12 @@ public class ProgramMethodFinder implements Visitor<Sort> {
     private boolean foundProgramMethod = false;
 
     @Override
-    public boolean visitSubtree(org.key_project.logic.Term<Sort> visited) {
+    public boolean visitSubtree(Term visited) {
         return false;
     }
 
     @Override
-    public void visit(org.key_project.logic.Term<Sort> visited) {
+    public void visit(Term visited) {
         if (visited.op() instanceof ProgramMethod pm) {
             if (!pm.isModel()) {
                 foundProgramMethod = true;
@@ -35,12 +36,12 @@ public class ProgramMethodFinder implements Visitor<Sort> {
     }
 
     @Override
-    public void subtreeEntered(org.key_project.logic.Term<Sort> subtreeRoot) {
+    public void subtreeEntered(Term subtreeRoot) {
 
     }
 
     @Override
-    public void subtreeLeft(org.key_project.logic.Term<Sort> subtreeRoot) {
+    public void subtreeLeft(Term subtreeRoot) {
 
     }
 

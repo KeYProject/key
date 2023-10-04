@@ -78,7 +78,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         TacletVisitor visitor = new TacletVisitor() {
 
             @Override
-            public void visit(org.key_project.logic.Term<Sort> visited) {
+            public void visit(Term visited) {
                 String res = checkForIllegalOps((Term) visited, taclet, true);
                 if (res != null) {
                     failureOccurred(res);

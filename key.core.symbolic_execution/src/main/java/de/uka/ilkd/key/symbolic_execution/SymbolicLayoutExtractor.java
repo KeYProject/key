@@ -10,7 +10,6 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -26,7 +25,6 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.ProofStarter;
 
-import org.key_project.logic.DefaultVisitor;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -701,9 +699,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     protected Set<Term> collectSymbolicObjectsFromTerm(Term term, final Set<Term> objectsToIgnore)
             throws ProofInputException {
         final Set<Term> result = new LinkedHashSet<>();
-        term.execPreOrder(new DefaultVisitor<Sort>() {
+        term.execPreOrder(new DefaultVisitor() {
             @Override
-            public void visit(org.key_project.logic.Term<Sort> term) {
+            public void visit(Term term) {
                 var visited = (Term) term;
                 visited = OriginTermLabel.removeOriginLabels(visited, getServices());
                 if (SymbolicExecutionUtil.hasReferenceSort(getServices(), visited)

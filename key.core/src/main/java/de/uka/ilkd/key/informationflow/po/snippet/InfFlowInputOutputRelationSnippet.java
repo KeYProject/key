@@ -6,14 +6,13 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
-import org.key_project.logic.DefaultVisitor;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -159,7 +158,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
     }
 
 
-    private static class SearchVisitor extends DefaultVisitor<Sort> {
+    private static class SearchVisitor extends DefaultVisitor {
 
         private boolean termFound = false;
         private final Term[] searchTerms;
@@ -169,7 +168,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         }
 
         @Override
-        public void visit(org.key_project.logic.Term<Sort> visited) {
+        public void visit(Term visited) {
             for (Term searchTerm : searchTerms) {
                 termFound = termFound || visited.equals(searchTerm);
             }

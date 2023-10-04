@@ -10,14 +10,11 @@ import java.util.Set;
 
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.sort.Sort;
-
-import org.key_project.logic.DefaultVisitor;
 
 /**
  * Collects all operators occurring in the traversed term.
  */
-public class OpCollector extends DefaultVisitor<Sort> {
+public class OpCollector extends DefaultVisitor {
     /** the found operators */
     protected final HashSet<Operator> ops;
 
@@ -27,8 +24,8 @@ public class OpCollector extends DefaultVisitor<Sort> {
     }
 
     @Override
-    public void visit(org.key_project.logic.Term<Sort> t) {
-        ops.add((Operator) t.op());
+    public void visit(Term t) {
+        ops.add(t.op());
         if (t.op() instanceof ElementaryUpdate) {
             ops.add(((ElementaryUpdate) t.op()).lhs());
         }

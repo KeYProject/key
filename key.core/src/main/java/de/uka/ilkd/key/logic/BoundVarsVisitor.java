@@ -4,9 +4,7 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
-import org.key_project.logic.DefaultVisitor;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -14,7 +12,7 @@ import org.key_project.util.collection.ImmutableSet;
  * Visitor traversing a term and collecting all variables that occur bound. The visitor implements
  * also a continuation on sequents, traversing all of the formulas occuring in the sequent.
  */
-public class BoundVarsVisitor extends DefaultVisitor<Sort> {
+public class BoundVarsVisitor extends DefaultVisitor {
 
     private ImmutableSet<QuantifiableVariable> bdVars =
         DefaultImmutableSet.nil();
@@ -30,7 +28,7 @@ public class BoundVarsVisitor extends DefaultVisitor<Sort> {
     /**
      * only called by execPostOrder in Term.
      */
-    public void visit(org.key_project.logic.Term<Sort> visited) {
+    public void visit(Term visited) {
         for (int i = 0, ar = visited.arity(); i < ar; i++) {
             for (int j = 0,
                     boundVarsSize = visited.varsBoundHere(i).size(); j < boundVarsSize; j++) {

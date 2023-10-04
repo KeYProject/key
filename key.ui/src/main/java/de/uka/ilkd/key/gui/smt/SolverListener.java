@@ -22,10 +22,10 @@ import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.ProgressDialogListener;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -42,8 +42,6 @@ import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
-
-import org.key_project.logic.DefaultVisitor;
 
 public class SolverListener implements SolverLauncherListener {
     private ProgressDialog progressDialog;
@@ -663,7 +661,7 @@ public class SolverListener implements SolverLauncherListener {
      *
      * @author jschiffl
      */
-    protected static class ContainsModalityOrQueryVisitor extends DefaultVisitor<Sort> {
+    protected static class ContainsModalityOrQueryVisitor extends DefaultVisitor {
         /**
          * The result.
          */
@@ -673,7 +671,7 @@ public class SolverListener implements SolverLauncherListener {
          * {@inheritDoc}
          */
         @Override
-        public void visit(org.key_project.logic.Term<Sort> visited) {
+        public void visit(Term visited) {
             if (visited.op() instanceof Modality || visited.op() instanceof IProgramMethod) {
                 containsModQuery = true;
             }

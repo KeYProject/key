@@ -12,9 +12,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-import org.key_project.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 
-public class TermProgramVariableCollector extends DefaultVisitor<Sort> {
+public class TermProgramVariableCollector extends DefaultVisitor {
 
     private final HashSet<LocationVariable> result = new LinkedHashSet<>();
     private final Services services;
@@ -24,8 +24,6 @@ public class TermProgramVariableCollector extends DefaultVisitor<Sort> {
         this.services = services;
     }
 
-
-
     /**
      * is called by the execPostOrder-method of a term
      *
@@ -33,7 +31,7 @@ public class TermProgramVariableCollector extends DefaultVisitor<Sort> {
      *        to
      *        the list of found variables
      */
-    public void visit(org.key_project.logic.Term<Sort> term) {
+    public void visit(Term term) {
         var t = (Term) term;
         if (t.op() instanceof LocationVariable) {
             result.add((LocationVariable) t.op());

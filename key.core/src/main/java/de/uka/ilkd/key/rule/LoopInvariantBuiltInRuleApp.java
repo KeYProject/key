@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -25,12 +26,10 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
-import org.key_project.logic.DefaultVisitor;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -116,12 +115,12 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         final Term valuesVar = skipValues ? null : tb.var((ProgramVariable) lhs);
 
         // set up replacement visitors
-        final class IndexTermReplacementVisitor extends DefaultVisitor<Sort> {
+        final class IndexTermReplacementVisitor extends DefaultVisitor {
 
             private Term result;
 
             @Override
-            public void visit(org.key_project.logic.Term<Sort> visited) {
+            public void visit(Term visited) {
                 // TODO: Remove cast when/if term builder is moved
                 result = replace((Term) visited);
             }
@@ -148,12 +147,12 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                 }
             }
         }
-        final class ValuesTermReplacementVisitor extends DefaultVisitor<Sort> {
+        final class ValuesTermReplacementVisitor extends DefaultVisitor {
 
             private Term result;
 
             @Override
-            public void visit(org.key_project.logic.Term<Sort> visited) {
+            public void visit(Term visited) {
                 result = replace((Term) visited);
             }
 

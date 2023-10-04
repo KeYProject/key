@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -11,12 +12,10 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SubstOp;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
-import org.key_project.logic.DefaultVisitor;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
 
@@ -26,7 +25,7 @@ import org.key_project.util.collection.ImmutableMap;
  * or skolem functions.
  */
 
-public class SVNameCorrespondenceCollector extends DefaultVisitor<Sort> {
+public class SVNameCorrespondenceCollector extends DefaultVisitor {
 
     /**
      * This map contains (a, b) if there is a substitution {b a} somewhere in the taclet
@@ -48,7 +47,7 @@ public class SVNameCorrespondenceCollector extends DefaultVisitor<Sort> {
      * @param t the Term if the toplevel operator of this term is a substitution of schema
      *        variables, then this pair is added to the map "nameCorrespondences"
      */
-    public void visit(org.key_project.logic.Term<Sort> t) {
+    public void visit(Term t) {
 
         final var top = t.op();
 

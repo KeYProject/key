@@ -152,18 +152,18 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
                     heap1Pre, heap1Post, locset1, heap2Pre, heap2Post, locset2);
     }
 
-    static class QuantifiableVariableVisitor implements Visitor<Sort> {
+    static class QuantifiableVariableVisitor implements Visitor<Sort, Term> {
 
         private final LinkedList<QuantifiableVariable> vars =
             new LinkedList<>();
 
         @Override
-        public boolean visitSubtree(org.key_project.logic.Term<Sort> visited) {
+        public boolean visitSubtree(Term visited) {
             return true;
         }
 
         @Override
-        public void visit(org.key_project.logic.Term<Sort> visited) {
+        public void visit(Term visited) {
             final var boundVars = visited.boundVars();
             for (var boundVar : boundVars) {
                 vars.add((QuantifiableVariable) boundVar);
@@ -172,13 +172,13 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
 
         @Override
-        public void subtreeEntered(org.key_project.logic.Term<Sort> subtreeRoot) {
+        public void subtreeEntered(Term subtreeRoot) {
             // nothing to do
         }
 
 
         @Override
-        public void subtreeLeft(org.key_project.logic.Term<Sort> subtreeRoot) {
+        public void subtreeLeft(Term subtreeRoot) {
             // nothing to do
         }
 

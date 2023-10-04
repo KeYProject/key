@@ -5,9 +5,7 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
-import org.key_project.logic.DefaultVisitor;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -238,7 +236,7 @@ public class ClashFreeSubst {
     /**
      * A Visitor class to collect all (not just the free) variables occurring in a term.
      */
-    public static class VariableCollectVisitor extends DefaultVisitor<Sort> {
+    public static class VariableCollectVisitor extends DefaultVisitor {
         /** the collected variables */
         private ImmutableSet<QuantifiableVariable> vars;
 
@@ -248,7 +246,7 @@ public class ClashFreeSubst {
         }
 
         @Override
-        public void visit(org.key_project.logic.Term<Sort> t) {
+        public void visit(Term t) {
             if (t.op() instanceof QuantifiableVariable) {
                 vars = vars.add((QuantifiableVariable) t.op());
             } else {

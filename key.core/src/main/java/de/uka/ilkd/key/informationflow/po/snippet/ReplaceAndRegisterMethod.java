@@ -165,16 +165,16 @@ abstract class ReplaceAndRegisterMethod {
         return qvVisitor.getResult();
     }
 
-    private static final class QuantifiableVariableVisitor implements Visitor<Sort> {
+    private static final class QuantifiableVariableVisitor implements Visitor<Sort,Term> {
         private final HashSet<QuantifiableVariable> vars = new LinkedHashSet<>();
 
         @Override
-        public boolean visitSubtree(org.key_project.logic.Term<Sort> visited) {
+        public boolean visitSubtree(Term visited) {
             return true;
         }
 
         @Override
-        public void visit(org.key_project.logic.Term<Sort> visited) {
+        public void visit(Term visited) {
             final var boundVars = visited.boundVars();
             for (var boundVar : boundVars) {
                 vars.add((QuantifiableVariable) boundVar);
@@ -182,14 +182,10 @@ abstract class ReplaceAndRegisterMethod {
         }
 
         @Override
-        public void subtreeEntered(org.key_project.logic.Term<Sort> subtreeRoot) {
-            /*
-             * nothing to do
-             */ }
+        public void subtreeEntered(Term subtreeRoot) { /* nothing to do */ }
 
         @Override
-        public void subtreeLeft(
-                org.key_project.logic.Term<Sort> subtreeRoot) { /* nothing to do */ }
+        public void subtreeLeft(Term subtreeRoot) { /* nothing to do */ }
 
         public Set<QuantifiableVariable> getResult() { return vars; }
     }

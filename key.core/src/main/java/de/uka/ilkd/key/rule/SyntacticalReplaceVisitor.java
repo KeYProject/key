@@ -27,7 +27,7 @@ import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor;
 
-import org.key_project.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -35,7 +35,7 @@ import org.key_project.util.collection.ImmutableArray;
  * on a term, the visitor builds a new term replacing SchemaVariables with their instantiations that
  * are given as a SVInstantiations object.
  */
-public class SyntacticalReplaceVisitor extends DefaultVisitor<Sort> {
+public class SyntacticalReplaceVisitor extends DefaultVisitor {
     public static final String SUBSTITUTION_WITH_LABELS_HINT = "SUBSTITUTION_WITH_LABELS";
     protected final SVInstantiations svInst;
     protected final Services services;
@@ -274,7 +274,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor<Sort> {
      * performs the syntactic replacement of schemavariables with their instantiations
      */
     @Override
-    public void visit(final org.key_project.logic.Term<Sort> term) {
+    public void visit(final Term term) {
         var visited = (Term) term;
         // Sort equality has to be ensured before calling this method
         final Operator visitedOp = visited.op();
@@ -395,7 +395,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor<Sort> {
      * {@inheritDoc}
      */
     @Override
-    public void subtreeEntered(org.key_project.logic.Term<Sort> subtreeRoot) {
+    public void subtreeEntered(Term subtreeRoot) {
         tacletTermStack.push((Term) subtreeRoot);
         super.subtreeEntered(subtreeRoot);
     }
@@ -409,7 +409,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor<Sort> {
      * @param subtreeRoot root of the subtree which the visitor leaves.
      */
     @Override
-    public void subtreeLeft(org.key_project.logic.Term<Sort> subtreeRoot) {
+    public void subtreeLeft(Term subtreeRoot) {
         tacletTermStack.pop();
         if (subtreeRoot.op() instanceof TermTransformer mop) {
             final Term newTerm = mop.transform((Term) subStack.pop(), svInst, services);

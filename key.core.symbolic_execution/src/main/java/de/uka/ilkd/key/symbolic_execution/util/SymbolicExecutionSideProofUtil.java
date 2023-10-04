@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -38,7 +37,6 @@ import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 import de.uka.ilkd.key.util.Triple;
 
-import org.key_project.logic.DefaultVisitor;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -305,9 +303,9 @@ public final class SymbolicExecutionSideProofUtil {
         final Namespace<Function> functions = services.getNamespaces().functions();
         final Namespace<IProgramVariable> progVars = services.getNamespaces().programVariables();
         // LogicVariables are always local bound
-        term.execPreOrder(new DefaultVisitor<Sort>() {
+        term.execPreOrder(new DefaultVisitor() {
             @Override
-            public void visit(org.key_project.logic.Term<Sort> visited) {
+            public void visit(Term visited) {
                 if (visited.op() instanceof Function) {
                     functions.add((Function) visited.op());
                 } else if (visited.op() instanceof IProgramVariable) {
@@ -346,7 +344,7 @@ public final class SymbolicExecutionSideProofUtil {
      *
      * @author Martin Hentschel
      */
-    protected static class ContainsModalityOrQueryVisitor extends DefaultVisitor<Sort> {
+    protected static class ContainsModalityOrQueryVisitor extends DefaultVisitor {
         /**
          * The result.
          */
@@ -356,7 +354,7 @@ public final class SymbolicExecutionSideProofUtil {
          * {@inheritDoc}
          */
         @Override
-        public void visit(org.key_project.logic.Term<Sort> visited) {
+        public void visit(Term visited) {
             if (visited.op() instanceof Modality) {
                 containsModalityOrQuery = true;
             } else if (visited.op() instanceof IProgramMethod) {
@@ -387,9 +385,9 @@ public final class SymbolicExecutionSideProofUtil {
             Sequent sequentToProve) {
         final Set<Operator> result = new HashSet<>();
         for (SequentFormula sf : sequentToProve) {
-            sf.formula().execPreOrder(new DefaultVisitor<Sort>() {
+            sf.formula().execPreOrder(new DefaultVisitor() {
                 @Override
-                public void visit(org.key_project.logic.Term<Sort> v) {
+                public void visit(Term v) {
                     var visited = (Term) v;
                     if (isRelevantThing(services, visited)) {
                         result.add(visited.op());
@@ -497,7 +495,7 @@ public final class SymbolicExecutionSideProofUtil {
      *
      * @author Martin Hentschel
      */
-    protected static class ContainsIrrelevantThingsVisitor extends DefaultVisitor<Sort> {
+    protected static class ContainsIrrelevantThingsVisitor extends DefaultVisitor {
         /**
          * The {@link Services} to use.
          */
@@ -528,7 +526,7 @@ public final class SymbolicExecutionSideProofUtil {
          * {@inheritDoc}
          */
         @Override
-        public void visit(org.key_project.logic.Term<Sort> v) {
+        public void visit(Term v) {
             var visited = (Term) v;
             if (isRelevantThing(services, visited)) {
                 if (!SymbolicExecutionUtil.isSelect(services, visited)

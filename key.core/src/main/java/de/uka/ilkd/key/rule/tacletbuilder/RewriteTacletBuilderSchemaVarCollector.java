@@ -54,14 +54,14 @@ public class RewriteTacletBuilderSchemaVarCollector {
     private Set<SchemaVariable> collectSchemaVariables(Term t) {
         final Set<SchemaVariable> result = new LinkedHashSet<>();
 
-        t.execPreOrder(new Visitor<Sort>() {
+        t.execPreOrder(new Visitor<Sort,Term>() {
             @Override
-            public boolean visitSubtree(org.key_project.logic.Term<Sort> visited) {
+            public boolean visitSubtree(Term visited) {
                 return true;
             }
 
             @Override
-            public void visit(org.key_project.logic.Term<Sort> visited) {
+            public void visit(Term visited) {
                 if (visited.op() instanceof SchemaVariable) {
                     result.add((SchemaVariable) visited.op());
                 }
@@ -69,13 +69,13 @@ public class RewriteTacletBuilderSchemaVarCollector {
 
 
             @Override
-            public void subtreeEntered(org.key_project.logic.Term<Sort> subtreeRoot) {
+            public void subtreeEntered(Term subtreeRoot) {
                 // nothing to do
             }
 
 
             @Override
-            public void subtreeLeft(org.key_project.logic.Term<Sort> subtreeRoot) {
+            public void subtreeLeft(Term subtreeRoot) {
                 // nothing to do
             }
         });

@@ -4,9 +4,9 @@
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.AbstractConditionalBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
@@ -25,7 +25,7 @@ public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions
      * {@inheritDoc}
      */
     @Override
-    public void visit(org.key_project.logic.Term<Sort> t) {
+    public void visit(Term t) {
         super.visit(t);
         if (t.op() instanceof Modality) {
             addVarsToKeep();

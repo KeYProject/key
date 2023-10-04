@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -25,7 +27,6 @@ import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
 
-import org.key_project.logic.DefaultVisitor;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -900,9 +901,9 @@ public class TermLabelManager {
             final Rule rule, final Goal goal, final Object hint, final Term tacletTerm,
             final Term newTerm, final Map<Name, ChildTermLabelPolicy> policies,
             final Set<TermLabel> newLabels) {
-        applicationTerm.execPreOrder(new DefaultVisitor<Sort>() {
+        applicationTerm.execPreOrder(new DefaultVisitor() {
             @Override
-            public void visit(org.key_project.logic.Term<Sort> visited) {
+            public void visit(Term visited) {
                 var term = (Term) visited;
                 if (term != applicationTerm) {
                     for (TermLabel label : term.getLabels()) {
