@@ -199,13 +199,12 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     protected ImmutableSet<ClassAxiom> selectClassAxioms(KeYJavaType kjt) {
         ImmutableSet<ClassAxiom> result = DefaultImmutableSet.nil();
         for (ClassAxiom axiom : specRepos.getClassAxioms(kjt)) {
-            if (axiom instanceof ClassAxiom && check instanceof ClassWellDefinedness cwd) {
-                final ClassAxiom classAxiom = axiom;
+            if (check instanceof ClassWellDefinedness cwd) {
                 final String kjtName = cwd.getKJT().getFullName();
                 final String invName = "in " + cwd.getKJT().getName();
-                if (!classAxiom.getName().endsWith(invName)
-                        && !classAxiom.getName().endsWith(kjtName)) {
-                    result = result.add(classAxiom);
+                if (!axiom.getName().endsWith(invName)
+                        && !axiom.getName().endsWith(kjtName)) {
+                    result = result.add(axiom);
                 }
             } else {
                 result = result.add(axiom);
@@ -227,7 +226,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     }
 
     @Override
-    public void readProblem() throws ProofInputException {
+    public void readProblem() {
         assert proofConfig == null;
 
         final Services proofServices = postInit();
@@ -302,8 +301,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
      * @return The instantiated proof obligation.
      * @throws IOException Occurred Exception.
      */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
-            throws IOException {
+    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) {
         String contractName = properties.getProperty("wd check");
         final Contract contract =
             initConfig.getServices().getSpecificationRepository().getContractByName(contractName);

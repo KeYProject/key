@@ -85,14 +85,14 @@ public class LDTInput implements EnvInput {
 
 
     @Override
-    public String readJavaPath() throws ProofInputException {
+    public String readJavaPath() {
         return "";
     }
 
 
     // no class path elements here
     @Override
-    public List<File> readClassPath() throws ProofInputException {
+    public List<File> readClassPath() {
         return null;
     }
 
@@ -111,7 +111,7 @@ public class LDTInput implements EnvInput {
      * declared sorts in all rules, e.g.
      */
     @Override
-    public ImmutableSet<PositionedString> read() throws ProofInputException {
+    public ImmutableSet<PositionedString> read() {
         if (initConfig == null) {
             throw new IllegalStateException("LDTInput: InitConfig not set.");
         }

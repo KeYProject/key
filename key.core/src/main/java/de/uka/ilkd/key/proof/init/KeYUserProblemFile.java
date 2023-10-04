@@ -159,7 +159,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     }
 
     @Override
-    public ProofAggregate getPO() throws ProofInputException {
+    public ProofAggregate getPO() {
         assert problem != null;
         String name = name();
         ProofSettings settings = getPreferences();
@@ -181,7 +181,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         return getParseContext().findProofScript() != null;
     }
 
-    public Triple<String, Integer, Integer> readProofScript() throws ProofInputException {
+    public Triple<String, Integer, Integer> readProofScript() {
         return getParseContext().findProofScript();
     }
 
@@ -242,7 +242,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      *         is defined by the file.
      * @throws Exception Occurred Exception.
      */
-    private Profile readProfileFromFile() throws Exception {
+    private Profile readProfileFromFile() {
         @Nonnull
         ProblemInformation pi = getProblemInformation();
         String profileName = pi.getProfile();

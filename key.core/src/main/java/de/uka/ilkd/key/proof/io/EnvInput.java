@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -71,7 +70,7 @@ public interface EnvInput {
      *
      * @throws
      */
-    File readBootClassPath() throws IOException;
+    File readBootClassPath();
 
     /**
      * Reads the input using the given modification strategy, i.e., parts of the input do not modify

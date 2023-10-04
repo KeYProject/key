@@ -19,19 +19,19 @@ import de.uka.ilkd.key.proof.io.RuleSource;
 public class MemoryFileRepo extends AbstractFileRepo {
 
     @Override
-    public InputStream getInputStream(Path path) throws IOException {
+    public InputStream getInputStream(Path path) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public InputStream getInputStream(RuleSource ruleSource) throws IOException {
+    public InputStream getInputStream(RuleSource ruleSource) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public InputStream getInputStream(URL url) throws IOException {
+    public InputStream getInputStream(URL url) {
         // TODO Auto-generated method stub
         return null;
     }

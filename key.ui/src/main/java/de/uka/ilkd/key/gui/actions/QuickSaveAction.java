@@ -54,17 +54,16 @@ public final class QuickSaveAction extends MainWindowAction {
         if (mainWindow.getMediator().ensureProofLoaded()) {
             final String filename = QUICK_SAVE_PATH;
             final Proof proof = mainWindow.getMediator().getSelectedProof();
-            try {
-                new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION).save();
-                final String status = "File quicksaved: " + filename;
-                mainWindow.setStatusLine(status);
-                LOGGER.debug(status);
-            } catch (IOException x) {
+            new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION).save();
+            final String status = "File quicksaved: " + filename;
+            if (status != null) {
                 mainWindow.popupWarning(
-                    "Quicksaving file " + filename + " failed:\n" + x.getMessage(),
-                    "Quicksave failed");
-                LOGGER.debug("Quicksaving file {} failed.", filename, x);
+                        "Quicksaving file " + filename + " failed:\n" + status,
+                        "Quicksave failed");
+                LOGGER.debug("Quicksaving file {} failed.", filename, status);
             }
+            mainWindow.setStatusLine(status);
+            LOGGER.debug(status);
         } else {
             mainWindow.popupWarning("No proof.", "Oops...");
         }

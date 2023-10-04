@@ -13,7 +13,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 /**
  * Term projection for constructing a bigger term from a sequence of direct subterms and an
  * operator.
- *
+ * <p>
  * NB: this is a rather restricted version of term construction, one can think of also allowing
  * bound variables, etc to be specified
  */

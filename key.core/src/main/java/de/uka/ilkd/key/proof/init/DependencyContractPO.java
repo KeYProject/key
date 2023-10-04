@@ -304,8 +304,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
      * @return The instantiated proof obligation.
      * @throws IOException Occurred Exception.
      */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
-            throws IOException {
+    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) {
         String contractName = properties.getProperty("contract");
         int proofNum = 0;
         String baseContractName = null;

@@ -383,8 +383,6 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             try {
                 getMediator().stopInterface(true);
                 errorMsg = saver.save();
-            } catch (IOException e) {
-                errorMsg = e.toString();
             } finally {
                 getMediator().startInterface(true);
             }
@@ -414,15 +412,10 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         Pair<File, String> f = fileName(proof, ".zproof");
         final int result = fileChooser.showSaveDialog(mainWindow, f.first, f.second);
         if (result == JFileChooser.APPROVE_OPTION) {
-            File file = fileChooser.getSelectedFile();
-            ProofSaver saver = new ProofBundleSaver(proof, file);
+            final File file = fileChooser.getSelectedFile();
+            final ProofSaver saver = new ProofBundleSaver(proof, file);
+            final String errorMsg = saver.save();
 
-            String errorMsg;
-            try {
-                errorMsg = saver.save();
-            } catch (IOException e) {
-                errorMsg = e.toString();
-            }
             if (errorMsg != null) {
                 mainWindow.notify(
                     new GeneralFailureEvent("Saving Proof failed.\n Error: " + errorMsg));
