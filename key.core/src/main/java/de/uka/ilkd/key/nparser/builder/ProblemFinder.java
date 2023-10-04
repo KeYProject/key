@@ -18,7 +18,7 @@ import de.uka.ilkd.key.nparser.ParsingFacade;
  * @author weigl
  */
 public class ProblemFinder extends ExpressionBuilder {
-    private @Nullable Sequent problemTerm;
+    private @Nullable Sequent problem;
     private @Nullable String chooseContract;
     private @Nullable String proofObligation;
 
@@ -58,7 +58,7 @@ public class ProblemFinder extends ExpressionBuilder {
             }
         }
         if (ctx.PROBLEM() != null) {
-            problemTerm = accept(ctx.termorseq());
+            problem = accept(ctx.termorseq());
         }
         return null;
     }
@@ -84,7 +84,7 @@ public class ProblemFinder extends ExpressionBuilder {
     }
 
     @Nullable
-    public Sequent getProblemTerm() {
-        return problemTerm;
+    public Sequent getProblem() {
+        return problem;
     }
 }

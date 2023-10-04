@@ -37,7 +37,7 @@ import org.antlr.v4.runtime.Token;
  * obligation.
  */
 public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
-    private Sequent problemTerm = null;
+    private Sequent problem = null;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -133,8 +133,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         readRules();
 
         try {
-            problemTerm = getProblemFinder().getProblemTerm();
-            if (problemTerm == null) {
+            problem = getProblemFinder().getProblem();
+            if (problem == null) {
                 boolean chooseDLContract = chooseContract() != null;
                 boolean proofObligation = getProofObligation() != null;
                 if (!chooseDLContract && !proofObligation) {
@@ -160,12 +160,12 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
     @Override
     public ProofAggregate getPO() throws ProofInputException {
-        assert problemTerm != null;
+        assert problem != null;
         String name = name();
         ProofSettings settings = getPreferences();
         initConfig.setSettings(settings);
         return ProofAggregate.createProofAggregate(
-            new Proof(name, problemTerm, getParseContext().getProblemHeader() + "\n", initConfig,
+            new Proof(name, problem, getParseContext().getProblemHeader() + "\n", initConfig,
                 file.file()),
             name);
     }

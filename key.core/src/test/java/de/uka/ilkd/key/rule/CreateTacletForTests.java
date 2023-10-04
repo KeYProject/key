@@ -244,7 +244,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         String test1 = "\\predicates {A; B; } (A -> B) -> (!(!(A -> B)))";
         Term t_test1 = null;
         try {
-            t_test1 = io.load(test1).loadDeclarations().loadProblem().getProblemTerm().succedent()
+            t_test1 = io.load(test1).loadDeclarations().loadProblem().getProblem().succedent()
                     .get(0).formula();
         } catch (Exception e) {
             LOGGER.error("Parser Error or Input Error", e);
