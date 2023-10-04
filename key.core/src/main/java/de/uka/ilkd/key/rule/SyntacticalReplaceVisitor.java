@@ -414,7 +414,8 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor<Sort> {
         if (subtreeRoot.op() instanceof TermTransformer mop) {
             final Term newTerm = mop.transform((Term) subStack.pop(), svInst, services);
             final Term labeledTerm = TermLabelManager.label(services, termLabelState,
-                applicationPosInOccurrence, rule, ruleApp, goal, labelHint, (Term) subtreeRoot, newTerm);
+                applicationPosInOccurrence, rule, ruleApp, goal, labelHint, (Term) subtreeRoot,
+                newTerm);
             pushNew(labeledTerm);
         }
     }

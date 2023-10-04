@@ -4,10 +4,9 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.informationflow.rule.executor.InfFlowContractAppTacletExecutor;
-import de.uka.ilkd.key.logic.sort.Sort;
-import org.key_project.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -15,6 +14,7 @@ import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
+import org.key_project.logic.DefaultVisitor;
 import org.key_project.util.collection.ImmutableList;
 
 

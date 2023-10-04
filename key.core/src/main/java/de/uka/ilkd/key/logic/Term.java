@@ -53,7 +53,7 @@ public interface Term
      */
     @Override
     ImmutableArray<Term> subs();
-
+    
     /**
      * {@inheritDoc}
      */

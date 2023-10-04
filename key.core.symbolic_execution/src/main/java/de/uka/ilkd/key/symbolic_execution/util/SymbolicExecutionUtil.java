@@ -1461,7 +1461,8 @@ public final class SymbolicExecutionUtil {
      *
      * @author Martin Hentschel
      */
-    private static final class FindModalityWithSymbolicExecutionLabelId extends DefaultVisitor<Sort> {
+    private static final class FindModalityWithSymbolicExecutionLabelId
+            extends DefaultVisitor<Sort> {
         /**
          * The modality {@link PosInTerm} with the maximal ID.
          */

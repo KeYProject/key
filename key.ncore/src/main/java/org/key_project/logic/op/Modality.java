@@ -21,7 +21,8 @@ public abstract class Modality extends AbstractSortedOperator {
      */
     private final boolean isTransaction;
 
-    protected Modality(Name name, Sort formulaSort, boolean isTerminationSensitive, boolean isTransaction) {
+    protected Modality(Name name, Sort formulaSort, boolean isTerminationSensitive,
+            boolean isTransaction) {
         super(name, new Sort[] { formulaSort }, formulaSort, false);
         this.isTerminationSensitive = isTerminationSensitive;
         this.isTransaction = isTransaction;

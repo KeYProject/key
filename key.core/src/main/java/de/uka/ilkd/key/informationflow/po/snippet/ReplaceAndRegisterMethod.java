@@ -16,11 +16,11 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import org.key_project.logic.Visitor;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.LinkedHashMap;
-
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -182,10 +182,14 @@ abstract class ReplaceAndRegisterMethod {
         }
 
         @Override
-        public void subtreeEntered(org.key_project.logic.Term<Sort> subtreeRoot) { /* nothing to do */ }
+        public void subtreeEntered(org.key_project.logic.Term<Sort> subtreeRoot) {
+            /*
+             * nothing to do
+             */ }
 
         @Override
-        public void subtreeLeft(org.key_project.logic.Term<Sort> subtreeRoot) { /* nothing to do */ }
+        public void subtreeLeft(
+                org.key_project.logic.Term<Sort> subtreeRoot) { /* nothing to do */ }
 
         public Set<QuantifiableVariable> getResult() { return vars; }
     }

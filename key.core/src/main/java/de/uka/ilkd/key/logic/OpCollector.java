@@ -11,6 +11,7 @@ import java.util.Set;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
+
 import org.key_project.logic.DefaultVisitor;
 
 /**

@@ -5,8 +5,8 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-
 import de.uka.ilkd.key.logic.sort.Sort;
+
 import org.key_project.logic.DefaultVisitor;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;

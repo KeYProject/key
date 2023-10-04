@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.reference;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
-import org.key_project.logic.Visitor;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.logic.Visitor;
 
 /**
  * Simple visitor to find instances of non-model {@link ProgramMethod} in terms.

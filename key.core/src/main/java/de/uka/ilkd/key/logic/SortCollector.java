@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.sort.Sort;
+
 import org.key_project.logic.DefaultVisitor;
 
 /**
