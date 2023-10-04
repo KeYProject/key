@@ -10,16 +10,16 @@ import org.key_project.logic.sort.Sort;
  * This class is used to represent a dynamic logic modality like diamond and box for a target
  * language.
  */
-public abstract class Modality extends AbstractSortedOperator {
+public abstract class Modality<S extends Sort<S>> extends AbstractSortedOperator<S> {
     /**
      * Whether this modality is termination sensitive, i.e., it is a "diamond-kind" modality.
      */
-    private boolean isTerminationSensitive;
+    private final boolean isTerminationSensitive;
 
     /**
      * Whether this is a transaction modality.
      */
-    private boolean isTransaction;
+    private final boolean isTransaction;
 
     protected Modality(Name name, Sort formulaSort) {
         super(name, new Sort[] { formulaSort }, formulaSort, false);
