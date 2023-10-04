@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic;
 
-import org.key_project.logic.sort.Sort;
 
-public interface Visitor<S extends Sort<S>, T extends Term<S>> {
+public interface Visitor<T extends Term<?>> {
     /**
      * Checks if the subtree below the visited {@link Term} should be traversed.
      *

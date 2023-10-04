@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class NameTest {
 
-    String[] names = new String[] { "", "a", "1a", "AB_3$3", " ghIK", ":", ":a", "#1" };
+    final String[] names = new String[] { "", "a", "1a", "AB_3$3", " ghIK", ":", ":a", "#1" };
 
     @Test
     void testToString() {
@@ -22,7 +22,7 @@ class NameTest {
     void testInternalized() {
         for (var s : names) {
             final Name n1 = new Name(s);
-            final Name n2 = new Name(new String(s));
+            final Name n2 = new Name(s);
             assertSame(n1.toString(), n2.toString());
         }
     }
@@ -44,7 +44,7 @@ class NameTest {
 
     @Test
     void testEqualsWithNull() {
-        assertFalse(new Name("a").equals(null));
+        assertNotEquals(null, new Name("a"));
     }
 
     @Test
@@ -53,8 +53,8 @@ class NameTest {
         assertTrue(new Name("A").compareTo(new Name("a")) < 0);
         assertTrue(new Name("a").compareTo(new Name("abc")) < 0);
         assertTrue(new Name("").compareTo(new Name("b")) < 0);
-        assertTrue(new Name("").compareTo(new Name("")) == 0);
-        assertTrue(new Name("a").compareTo(new Name("a")) == 0);
+        assertEquals(0, new Name("").compareTo(new Name("")));
+        assertEquals(0, new Name("a").compareTo(new Name("a")));
         assertTrue(new Name("b").compareTo(new Name("a")) > 0);
         assertTrue(new Name("a").compareTo(new Name("A")) > 0);
         assertTrue(new Name("abc").compareTo(new Name("")) > 0);
@@ -62,10 +62,10 @@ class NameTest {
 
     @Test
     void testHashCode() {
-        for (int i = 0; i < names.length; i++) {
-            for (int j = 0; j < names.length; j++) {
-                final Name n1 = new Name(names[i]);
-                final Name n2 = new Name(names[j]);
+        for (String s : names) {
+            for (String name : names) {
+                final Name n1 = new Name(s);
+                final Name n2 = new Name(name);
                 if (n1.equals(n2)) {
                     assertEquals(n1.hashCode(), n2.hashCode(),
                         "Equal names must have equal hashes.");

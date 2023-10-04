@@ -6,8 +6,8 @@ package org.key_project.logic;
 /**
  * This abstract Vistor class declares the interface for a common term visitor.
  */
-public abstract class DefaultVisitor<S extends org.key_project.logic.sort.Sort<S>, T extends Term<S>>
-        implements Visitor<S, T> {
+public abstract class DefaultVisitor<T extends Term<?>>
+        implements Visitor<T> {
     @Override
     public boolean visitSubtree(T visited) {
         return true;

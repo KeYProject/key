@@ -5,7 +5,6 @@ package de.uka.ilkd.key.proof.reference;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.logic.Visitor;
 
@@ -14,7 +13,7 @@ import org.key_project.logic.Visitor;
  *
  * @author Arne Keller
  */
-public class ProgramMethodFinder implements Visitor<Sort, Term> {
+public class ProgramMethodFinder implements Visitor<Term> {
 
     /**
      * Whether a program method has been found.

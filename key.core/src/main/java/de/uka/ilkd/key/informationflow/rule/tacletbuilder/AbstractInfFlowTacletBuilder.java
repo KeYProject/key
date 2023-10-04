@@ -152,7 +152,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
                     heap1Pre, heap1Post, locset1, heap2Pre, heap2Post, locset2);
     }
 
-    static class QuantifiableVariableVisitor implements Visitor<Sort, Term> {
+    static class QuantifiableVariableVisitor implements Visitor<Term> {
 
         private final LinkedList<QuantifiableVariable> vars = new LinkedList<>();
 

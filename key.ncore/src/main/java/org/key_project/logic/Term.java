@@ -81,7 +81,7 @@ public interface Term<S extends Sort<S>> extends LogicElement, Sorted<S> {
      *
      * @param visitor the Visitor
      */
-    void execPostOrder(Visitor visitor);
+    <T extends Term<S>> void execPostOrder(Visitor<T> visitor);
 
     /**
      * The visitor walks downwards the tree, while at each downstep the method visit of the visitor
@@ -89,5 +89,5 @@ public interface Term<S extends Sort<S>> extends LogicElement, Sorted<S> {
      *
      * @param visitor the Visitor
      */
-    void execPreOrder(Visitor visitor);
+    <T extends Term<S>> void execPreOrder(Visitor<T> visitor);
 }

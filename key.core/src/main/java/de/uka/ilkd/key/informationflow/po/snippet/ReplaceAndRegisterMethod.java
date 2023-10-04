@@ -16,7 +16,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import org.key_project.logic.Visitor;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -165,7 +164,7 @@ abstract class ReplaceAndRegisterMethod {
         return qvVisitor.getResult();
     }
 
-    private static final class QuantifiableVariableVisitor implements Visitor<Sort, Term> {
+    private static final class QuantifiableVariableVisitor implements Visitor<Term> {
         private final HashSet<QuantifiableVariable> vars = new LinkedHashSet<>();
 
         @Override
