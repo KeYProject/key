@@ -701,8 +701,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
         final Set<Term> result = new LinkedHashSet<>();
         term.execPreOrder(new DefaultVisitor() {
             @Override
-            public void visit(Term term) {
-                var visited = (Term) term;
+            public void visit(Term visited) {
                 visited = OriginTermLabel.removeOriginLabels(visited, getServices());
                 if (SymbolicExecutionUtil.hasReferenceSort(getServices(), visited)
                         && visited.freeVars().isEmpty() && !objectsToIgnore.contains(visited)

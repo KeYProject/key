@@ -14,8 +14,7 @@ import org.key_project.util.collection.ImmutableSet;
  */
 public class BoundVarsVisitor extends DefaultVisitor {
 
-    private ImmutableSet<QuantifiableVariable> bdVars =
-        DefaultImmutableSet.nil();
+    private ImmutableSet<QuantifiableVariable> bdVars = DefaultImmutableSet.nil();
 
 
     /**
@@ -32,7 +31,7 @@ public class BoundVarsVisitor extends DefaultVisitor {
         for (int i = 0, ar = visited.arity(); i < ar; i++) {
             for (int j = 0,
                     boundVarsSize = visited.varsBoundHere(i).size(); j < boundVarsSize; j++) {
-                bdVars = bdVars.add((QuantifiableVariable) visited.varsBoundHere(i).get(j));
+                bdVars = bdVars.add(visited.varsBoundHere(i).get(j));
             }
         }
     }

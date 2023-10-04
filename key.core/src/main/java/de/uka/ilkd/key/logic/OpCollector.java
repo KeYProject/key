@@ -26,8 +26,8 @@ public class OpCollector extends DefaultVisitor {
     @Override
     public void visit(Term t) {
         ops.add(t.op());
-        if (t.op() instanceof ElementaryUpdate) {
-            ops.add(((ElementaryUpdate) t.op()).lhs());
+        if (t.op() instanceof ElementaryUpdate update) {
+            ops.add(update.lhs());
         }
     }
 

@@ -93,7 +93,7 @@ public class ProofObligationCreator {
 
             @Override
             public void visit(Term visited) {
-                collectUserDefinedSymbols((Term) visited, userDefinedSymbols);
+                collectUserDefinedSymbols(visited, userDefinedSymbols);
 
             }
         };

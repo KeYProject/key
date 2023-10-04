@@ -31,15 +31,14 @@ public class TermProgramVariableCollector extends DefaultVisitor {
      *        to
      *        the list of found variables
      */
-    public void visit(Term term) {
-        var t = (Term) term;
-        if (t.op() instanceof LocationVariable) {
-            result.add((LocationVariable) t.op());
+    public void visit(Term visited) {
+        if (visited.op() instanceof LocationVariable variable) {
+            result.add(variable);
         }
 
-        if (!t.javaBlock().isEmpty()) {
+        if (!visited.javaBlock().isEmpty()) {
             ProgramVariableCollector pvc =
-                new ProgramVariableCollector(t.javaBlock().program(), services);
+                new ProgramVariableCollector(visited.javaBlock().program(), services);
             pvc.start();
             result.addAll(pvc.result());
         }

@@ -218,9 +218,8 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
      */
     @Override
     public void visit(final Term visited) {
-        var t = (Term) visited;
         // Sort equality has to be ensured before calling this method
-        final Operator visitedOp = t.op();
+        final Operator visitedOp = visited.op();
         if (visitedOp instanceof SchemaVariable && visitedOp.arity() == 0
                 && svInst.isInstantiated((SchemaVariable) visitedOp)
                 && (!(visitedOp instanceof ProgramSV && (((ProgramSV) visitedOp).isListSV())))) {
@@ -231,32 +230,32 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
             final Operator newOp = instantiateOperator(visitedOp);
             // instantiation of java block
             boolean jblockChanged = false;
-            JavaBlock jb = t.javaBlock();
+            JavaBlock jb = visited.javaBlock();
 
             if (jb != JavaBlock.EMPTY_JAVABLOCK) {
                 jb = replacePrg(svInst, jb);
-                if (jb != t.javaBlock()) {
+                if (jb != visited.javaBlock()) {
                     jblockChanged = true;
                 }
             }
 
             // instantiate bound variables
             final ImmutableArray<QuantifiableVariable> boundVars = //
-                instantiateBoundVariables(t);
+                instantiateBoundVariables(visited);
 
             // instantiate sub terms
             final Term[] neededsubs = neededSubs(newOp.arity());
-            if (boundVars != t.boundVars() || jblockChanged || (newOp != visitedOp)
+            if (boundVars != visited.boundVars() || jblockChanged || (newOp != visitedOp)
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
                 final Term newTerm =
-                    tb.tf().createTerm(newOp, neededsubs, boundVars, jb, t.getLabels());
+                    tb.tf().createTerm(newOp, neededsubs, boundVars, jb, visited.getLabels());
                 pushNew(resolveSubst(newTerm));
             } else {
-                Term term = resolveSubst(t);
-                if (term == t) {
-                    subStack.push(t);
+                Term term = resolveSubst(visited);
+                if (term == visited) {
+                    subStack.push(visited);
                 } else {
-                    pushNew(t);
+                    pushNew(visited);
                 }
             }
         }
@@ -306,7 +305,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
      */
     @Override
     public void subtreeEntered(Term subtreeRoot) {
-        tacletTermStack.push((Term) subtreeRoot);
+        tacletTermStack.push(subtreeRoot);
         super.subtreeEntered(subtreeRoot);
     }
 

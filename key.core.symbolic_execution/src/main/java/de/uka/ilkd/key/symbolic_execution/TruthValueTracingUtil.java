@@ -451,7 +451,7 @@ public final class TruthValueTracingUtil {
             parentPio.subTerm().execPreOrder(new DefaultVisitor() {
                 @Override
                 public void visit(Term visited) {
-                    checkForNewMinorIdsOSS(childPio.sequentFormula(), (Term) visited, termLabelName,
+                    checkForNewMinorIdsOSS(childPio.sequentFormula(), visited, termLabelName,
                         parentPio, tb, results);
                 }
             });
@@ -538,7 +538,7 @@ public final class TruthValueTracingUtil {
                 parentPio.subTerm().execPreOrder(new DefaultVisitor() {
                     @Override
                     public void visit(Term visited) {
-                        checkForNewMinorIds(childNode, (Term) visited, termLabelName, parentPio, tb,
+                        checkForNewMinorIds(childNode, visited, termLabelName, parentPio, tb,
                             results);
                     }
                 });
@@ -632,12 +632,12 @@ public final class TruthValueTracingUtil {
             @Override
             public void visit(Term visited) {
                 if (hasLabelOfInterest(visited)) {
-                    resultToFill.add((Term) visited);
+                    resultToFill.add(visited);
                 }
             }
 
             private boolean hasLabelOfInterest(Term visited) {
-                TermLabel visitedLabel = ((Term) visited).getLabel(labelName);
+                TermLabel visitedLabel = visited.getLabel(labelName);
                 if (visitedLabel instanceof FormulaTermLabel pLabel) {
                     String[] beforeIds = pLabel.getBeforeIds();
                     return ArrayUtil.contains(beforeIds, labelId);

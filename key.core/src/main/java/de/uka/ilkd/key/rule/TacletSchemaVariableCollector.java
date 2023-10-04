@@ -81,21 +81,20 @@ public class TacletSchemaVariableCollector extends DefaultVisitor {
      * visits the Term in post order {@link Term#execPostOrder(org.key_project.logic.Visitor)} and collects all found
      * schema variables
      *
-     * @param term the Term whose schema variables are collected
+     * @param visited the Term whose schema variables are collected
      */
     @Override
-    public void visit(Term term) {
-        var t = (Term) term;
-        final Operator op = t.op();
+    public void visit(Term visited) {
+        final Operator op = visited.op();
         if (op instanceof Modality || op instanceof ModalOperatorSV) {
-            varList = collectSVInProgram(t.javaBlock(), varList);
+            varList = collectSVInProgram(visited.javaBlock(), varList);
         } else if (op instanceof ElementaryUpdate) {
             varList = collectSVInElementaryUpdate((ElementaryUpdate) op, varList);
         }
 
-        for (int j = 0, ar = t.arity(); j < ar; j++) {
-            for (int i = 0, sz = t.varsBoundHere(j).size(); i < sz; i++) {
-                final QuantifiableVariable qVar = t.varsBoundHere(j).get(i);
+        for (int j = 0, ar = visited.arity(); j < ar; j++) {
+            for (int i = 0, sz = visited.varsBoundHere(j).size(); i < sz; i++) {
+                final QuantifiableVariable qVar = visited.varsBoundHere(j).get(i);
                 if (qVar instanceof SchemaVariable) {
                     varList = varList.prepend((SchemaVariable) qVar);
                 }
@@ -106,7 +105,7 @@ public class TacletSchemaVariableCollector extends DefaultVisitor {
             varList = varList.prepend((SchemaVariable) op);
         }
 
-        for (TermLabel label : t.getLabels()) {
+        for (TermLabel label : visited.getLabels()) {
             if (label instanceof TermLabelSV) {
                 varList = varList.prepend((SchemaVariable) label);
             }

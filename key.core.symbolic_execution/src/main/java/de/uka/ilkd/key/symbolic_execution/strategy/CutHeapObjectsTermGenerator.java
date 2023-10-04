@@ -100,8 +100,7 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
             final HeapLDT heapLDT) {
         term.execPreOrder(new DefaultVisitor() {
             @Override
-            public void visit(Term v) {
-                var visited = (Term) v;
+            public void visit(Term visited) {
                 if (visited.op() == heapLDT.getStore()) {
                     storeLocations.add(visited.sub(1));
                 }

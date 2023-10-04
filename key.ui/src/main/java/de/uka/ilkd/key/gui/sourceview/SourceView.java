@@ -571,6 +571,11 @@ public final class SourceView extends JComponent {
 
     /**
      * Adds all files relevant to the currently selected node, closing all others
+<<<<<<< HEAD
+=======
+     *
+     * @see NodeInfo
+>>>>>>> d2305be977 (removed unnecessary casts introduce by previous commit)
      */
     private void addFiles() {
         final Proof selectedProof = mainWindow.getMediator().getSelectedProof();
@@ -741,7 +746,7 @@ public final class SourceView extends JComponent {
 
                     @Override
                     public boolean visitSubtree(Term visited) {
-                        return ((Term) visited).containsJavaBlockRecursive();
+                        return visited.containsJavaBlockRecursive();
                     }
 
                     @Override
@@ -751,8 +756,7 @@ public final class SourceView extends JComponent {
                     public void subtreeLeft(Term subtreeRoot) {}
 
                     @Override
-                    public void subtreeEntered(Term sr) {
-                        var subtreeRoot = (Term) sr;
+                    public void subtreeEntered(Term subtreeRoot) {
                         if (subtreeRoot.javaBlock() != null) {
                             JavaASTVisitor visitor =
                                 new JavaASTVisitor(subtreeRoot.javaBlock().program(),

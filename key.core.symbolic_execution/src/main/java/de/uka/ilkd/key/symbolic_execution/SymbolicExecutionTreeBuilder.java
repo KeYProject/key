@@ -253,10 +253,9 @@ public class SymbolicExecutionTreeBuilder {
             sequentFormula.formula().execPreOrder(new DefaultVisitor() {
                 @Override
                 public void visit(Term visited) {
-                    var term = (Term) visited;
                     if (visited.op() instanceof Modality
-                            && SymbolicExecutionUtil.hasSymbolicExecutionLabel(term)) {
-                        modalityTerms.add(term);
+                            && SymbolicExecutionUtil.hasSymbolicExecutionLabel(visited)) {
+                        modalityTerms.add(visited);
                     }
                 }
             });

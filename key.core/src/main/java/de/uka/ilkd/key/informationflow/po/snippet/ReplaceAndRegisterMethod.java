@@ -175,9 +175,8 @@ abstract class ReplaceAndRegisterMethod {
 
         @Override
         public void visit(Term visited) {
-            final var boundVars = visited.boundVars();
-            for (var boundVar : boundVars) {
-                vars.add((QuantifiableVariable) boundVar);
+            for (var boundVar : visited.boundVars()) {
+                vars.add(boundVar);
             }
         }
 

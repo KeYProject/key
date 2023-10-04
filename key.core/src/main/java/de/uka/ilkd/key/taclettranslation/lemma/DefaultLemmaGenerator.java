@@ -79,7 +79,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
 
             @Override
             public void visit(Term visited) {
-                String res = checkForIllegalOps((Term) visited, taclet, true);
+                String res = checkForIllegalOps(visited, taclet, true);
                 if (res != null) {
                     failureOccurred(res);
                 }

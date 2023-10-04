@@ -54,8 +54,8 @@ public class SVNameCorrespondenceCollector extends DefaultVisitor {
         if (top instanceof SubstOp) {
             final var substTermOp = t.sub(0).op();
             final var substVar = t.varsBoundHere(1).get(0);
-            if (substTermOp instanceof SchemaVariable && substVar instanceof SchemaVariable) {
-                addNameCorrespondence((SchemaVariable) substTermOp, (SchemaVariable) substVar);
+            if (substTermOp instanceof SchemaVariable substTermSV && substVar instanceof SchemaVariable substVarSV) {
+                addNameCorrespondence(substTermSV, substVarSV);
             }
         }
 

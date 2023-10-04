@@ -274,8 +274,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
      * performs the syntactic replacement of schemavariables with their instantiations
      */
     @Override
-    public void visit(final Term term) {
-        var visited = (Term) term;
+    public void visit(final Term visited) {
         // Sort equality has to be ensured before calling this method
         final Operator visitedOp = visited.op();
         if (visitedOp instanceof SchemaVariable && visitedOp.arity() == 0
@@ -396,7 +395,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
      */
     @Override
     public void subtreeEntered(Term subtreeRoot) {
-        tacletTermStack.push((Term) subtreeRoot);
+        tacletTermStack.push(subtreeRoot);
         super.subtreeEntered(subtreeRoot);
     }
 
@@ -414,7 +413,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         if (subtreeRoot.op() instanceof TermTransformer mop) {
             final Term newTerm = mop.transform((Term) subStack.pop(), svInst, services);
             final Term labeledTerm = TermLabelManager.label(services, termLabelState,
-                applicationPosInOccurrence, rule, ruleApp, goal, labelHint, (Term) subtreeRoot,
+                applicationPosInOccurrence, rule, ruleApp, goal, labelHint, subtreeRoot,
                 newTerm);
             pushNew(labeledTerm);
         }
