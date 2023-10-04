@@ -64,7 +64,8 @@ class TypeManager {
             if (!(s instanceof NullSort) && !(s.equals(JavaDLTheory.ANY))) {
                 if (s.extendsSorts().isEmpty()) {
                     master.addAxiom(new SExpr("assert",
-                        new SExpr("subtype", SExprs.sortExpr(s), SExprs.sortExpr(JavaDLTheory.ANY))));
+                        new SExpr("subtype", SExprs.sortExpr(s),
+                            SExprs.sortExpr(JavaDLTheory.ANY))));
                 }
             }
         }

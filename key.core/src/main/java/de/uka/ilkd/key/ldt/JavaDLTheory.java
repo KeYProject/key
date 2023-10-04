@@ -14,13 +14,14 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
-
 import de.uka.ilkd.key.logic.sort.SortImpl;
+
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
 /**
- * The JavaDL theory class provides access to function symvols, sorts that are part of the core logic
+ * The JavaDL theory class provides access to function symvols, sorts that are part of the core
+ * logic
  * like cast or instanceof functions.
  */
 public class JavaDLTheory extends LDT {
@@ -99,6 +100,7 @@ public class JavaDLTheory extends LDT {
 
     /**
      * retrieves the cast function for the given sort
+     *
      * @param sort the Sort for which to retrieve the cast function
      * @param services the TermServices for lookup
      * @return the found cast function
@@ -116,6 +118,7 @@ public class JavaDLTheory extends LDT {
 
     /**
      * retrieves the instanceof function for the given sort
+     *
      * @param sort the Sort for which to retrieve the instanceof function
      * @param services the TermServices for lookup
      * @return the found instanceof function
@@ -131,6 +134,7 @@ public class JavaDLTheory extends LDT {
 
     /**
      * retrieves the exactInstance function for the given sort
+     *
      * @param sort the Sort for which to retrieve the exactInstance function
      * @param services the TermServices for lookup
      * @return the found exactInstance function

@@ -247,8 +247,9 @@ public class DefinedSymbolsHandler implements SMTHandler {
                 // Since the SMT machines run in parallel, this may cause
                 // ConcurrentModificationExceptions. To avoid such exceptions,
                 // a wrapper services object is used.
-                Term axiom = tp.parse(new StringReader(dl), JavaDLTheory.FORMULA, localServices, nss,
-                    new AbbrevMap());
+                Term axiom =
+                    tp.parse(new StringReader(dl), JavaDLTheory.FORMULA, localServices, nss,
+                        new AbbrevMap());
                 trans.addAxiom(SExprs.assertion(trans.translate(axiom)));
             } catch (ParserException e) {
                 throw new SMTTranslationException("Error while translating snippet " + snipName, e);

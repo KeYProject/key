@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic;
 
 import org.junit.jupiter.api.Test;
@@ -6,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class NameTest {
 
-    String[] names = new String[] {"", "a", "1a", "AB_3$3", " ghIK", ":", ":a", "#1"};
+    String[] names = new String[] { "", "a", "1a", "AB_3$3", " ghIK", ":", ":a", "#1" };
 
     @Test
     void testToString() {
@@ -26,14 +29,14 @@ class NameTest {
 
     @Test
     void testEquals() {
-        for (int i = 0; i<names.length; i++) {
-            for (int j = 0; j<names.length; j++) {
+        for (int i = 0; i < names.length; i++) {
+            for (int j = 0; j < names.length; j++) {
                 final Name n1 = new Name(names[i]);
                 final Name n2 = new Name(names[j]);
                 if (n1.equals(n2)) {
-                    assertEquals(i,j);
+                    assertEquals(i, j);
                 } else {
-                    assertNotEquals(i,j);
+                    assertNotEquals(i, j);
                 }
             }
         }
@@ -46,27 +49,29 @@ class NameTest {
 
     @Test
     void compareTo() {
-        assertTrue(new Name("a").compareTo(new Name("b"))<0);
-        assertTrue(new Name("A").compareTo(new Name("a"))<0);
-        assertTrue(new Name("a").compareTo(new Name("abc"))<0);
-        assertTrue(new Name("").compareTo(new Name("b"))<0);
-        assertTrue(new Name("").compareTo(new Name(""))==0);
-        assertTrue(new Name("a").compareTo(new Name("a"))==0);
-        assertTrue(new Name("b").compareTo(new Name("a"))>0);
-        assertTrue(new Name("a").compareTo(new Name("A"))>0);
-        assertTrue(new Name("abc").compareTo(new Name(""))>0);
+        assertTrue(new Name("a").compareTo(new Name("b")) < 0);
+        assertTrue(new Name("A").compareTo(new Name("a")) < 0);
+        assertTrue(new Name("a").compareTo(new Name("abc")) < 0);
+        assertTrue(new Name("").compareTo(new Name("b")) < 0);
+        assertTrue(new Name("").compareTo(new Name("")) == 0);
+        assertTrue(new Name("a").compareTo(new Name("a")) == 0);
+        assertTrue(new Name("b").compareTo(new Name("a")) > 0);
+        assertTrue(new Name("a").compareTo(new Name("A")) > 0);
+        assertTrue(new Name("abc").compareTo(new Name("")) > 0);
     }
 
     @Test
     void testHashCode() {
-        for (int i = 0; i<names.length; i++) {
-            for (int j = 0; j<names.length; j++) {
+        for (int i = 0; i < names.length; i++) {
+            for (int j = 0; j < names.length; j++) {
                 final Name n1 = new Name(names[i]);
                 final Name n2 = new Name(names[j]);
                 if (n1.equals(n2)) {
-                    assertEquals(n1.hashCode(),n2.hashCode(), "Equal names must have equal hashes.");
+                    assertEquals(n1.hashCode(), n2.hashCode(),
+                        "Equal names must have equal hashes.");
                 } else {
-                    assertNotEquals(n1.hashCode(),n2.hashCode(), "Hash Code function is not wrong, " +
+                    assertNotEquals(n1.hashCode(), n2.hashCode(),
+                        "Hash Code function is not wrong, " +
                             "but most likely not sufficiently good.");
                 }
             }

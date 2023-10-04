@@ -36,7 +36,8 @@ public class SequentFormula implements EqualsModProofIrrelevancy {
      * @param term a Term of sort {@link JavaDLTheory#FORMULA}
      */
     public SequentFormula(Term term) {
-        if (term.sort() != JavaDLTheory.FORMULA && term.sort() != AbstractTermTransformer.METASORT) {
+        if (term.sort() != JavaDLTheory.FORMULA
+                && term.sort() != AbstractTermTransformer.METASORT) {
             throw new RuntimeException("A Term instead of a formula: " + term);
         }
         this.term = term;

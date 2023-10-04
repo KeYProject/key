@@ -4,9 +4,9 @@
 package de.uka.ilkd.key.logic.sort;
 
 import de.uka.ilkd.key.java.Services;
-
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.rule.HasOrigin;
+
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -39,7 +39,8 @@ public abstract class Sort extends org.key_project.logic.sort.AbstractSort<Sort>
 
     @Override
     public ImmutableSet<Sort> extendsSorts() {
-        if (this == JavaDLTheory.FORMULA || this == JavaDLTheory.UPDATE || this == JavaDLTheory.ANY) {
+        if (this == JavaDLTheory.FORMULA || this == JavaDLTheory.UPDATE
+                || this == JavaDLTheory.ANY) {
             return DefaultImmutableSet.nil();
         } else {
             if (ext.isEmpty()) {

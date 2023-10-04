@@ -8,8 +8,8 @@ import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
-
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;

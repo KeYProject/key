@@ -73,7 +73,8 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
         if (p == null) {
             assert argSorts != null;
-            p = new Function(new Name(pred_name), JavaDLTheory.FORMULA, argSorts.toArray(new Sort[0]),
+            p = new Function(new Name(pred_name), JavaDLTheory.FORMULA,
+                argSorts.toArray(new Sort[0]),
                 whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), false);
         }
 

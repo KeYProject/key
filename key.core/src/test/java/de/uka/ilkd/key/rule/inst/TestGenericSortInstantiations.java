@@ -300,8 +300,9 @@ public class TestGenericSortInstantiations {
         cs = cs.prepend(GenericSortCondition.createSupersortCondition(G4, B1));
 
         gsi = GenericSortInstantiations.create(sorts(cs), cs, services);
-        assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap().put(G1, JavaDLTheory.ANY).put(G2, B4)
-                .put(G4, B1),
+        assertEquals(
+            DefaultImmutableMap.<GenericSort, Sort>nilMap().put(G1, JavaDLTheory.ANY).put(G2, B4)
+                    .put(G4, B1),
             gsi.getAllInstantiations(), "Instantiations should be equal");
     }
 
@@ -358,8 +359,9 @@ public class TestGenericSortInstantiations {
         cs = cs.prepend(GenericSortCondition.createSupersortCondition(G4, D1));
 
         gsi = GenericSortInstantiations.create(sorts(cs), cs, services);
-        assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap().put(G1, JavaDLTheory.ANY).put(G2, D4)
-                .put(G4, D1),
+        assertEquals(
+            DefaultImmutableMap.<GenericSort, Sort>nilMap().put(G1, JavaDLTheory.ANY).put(G2, D4)
+                    .put(G4, D1),
             gsi.getAllInstantiations(), "Instantiations should be equal");
     }
 
@@ -535,7 +537,8 @@ public class TestGenericSortInstantiations {
         cs = cs.prepend(GenericSortCondition.createSupersortCondition(H2, A5));
 
         gsi = GenericSortInstantiations.create(sorts(cs), cs, services);
-        assertEquals(DefaultImmutableMap.<GenericSort, Sort>nilMap().put(H1, JavaDLTheory.ANY).put(H2, A3),
+        assertEquals(
+            DefaultImmutableMap.<GenericSort, Sort>nilMap().put(H1, JavaDLTheory.ANY).put(H2, A3),
             gsi.getAllInstantiations(), "Instantiations should be equal");
 
         cs = ImmutableSLList.nil();

@@ -27,7 +27,8 @@ public final class ElementaryUpdate extends AbstractSortedOperator {
 
 
     private ElementaryUpdate(UpdateableOperator lhs) {
-        super(new Name("elem-update(" + lhs + ")"), new Sort[] { lhs.sort() }, JavaDLTheory.UPDATE, false);
+        super(new Name("elem-update(" + lhs + ")"), new Sort[] { lhs.sort() }, JavaDLTheory.UPDATE,
+            false);
         this.lhs = lhs;
         assert lhs.arity() == 0;
     }

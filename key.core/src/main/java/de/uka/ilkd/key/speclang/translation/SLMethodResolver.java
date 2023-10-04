@@ -117,7 +117,8 @@ public final class SLMethodResolver extends SLExpressionResolver {
         for (SLExpression slExpression : params) {
             // Remember: parameters.isLisOfTerm() is true!
             final Term term = slExpression.getTerm();
-            subs[i] = term.sort() == JavaDLTheory.FORMULA ? services.getTermBuilder().convertToBoolean(term)
+            subs[i] = term.sort() == JavaDLTheory.FORMULA
+                    ? services.getTermBuilder().convertToBoolean(term)
                     : term;
             i++;
         }

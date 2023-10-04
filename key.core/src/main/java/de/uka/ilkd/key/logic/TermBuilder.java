@@ -1454,7 +1454,8 @@ public class TermBuilder {
     public static final Transformer WD_ANY = new Transformer(new Name("wd"), JavaDLTheory.ANY);
 
     // The template of the well-definedness transformer for formulas.
-    public static final Transformer WD_FORMULA = new Transformer(new Name("WD"), JavaDLTheory.FORMULA);
+    public static final Transformer WD_FORMULA =
+        new Transformer(new Name("WD"), JavaDLTheory.FORMULA);
 
     public Term wd(Term t) {
         if (t.op() == Junctor.FALSE || t.op() == Junctor.TRUE) {

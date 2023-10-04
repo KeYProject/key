@@ -419,7 +419,7 @@ public class OriginTermLabel implements TermLabel {
 
     /**
      * This method transforms a term in such a way that every {@link OriginTermLabel} contains all
-     * of the correct {@link #getSubtermOrigins()}.
+     * the correct {@link #getSubtermOrigins()}.
      *
      * @param term the term to transform.
      * @param services services.

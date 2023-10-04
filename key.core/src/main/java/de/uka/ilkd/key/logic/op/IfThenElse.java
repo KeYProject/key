@@ -81,7 +81,8 @@ public final class IfThenElse extends AbstractOperator {
         final Sort s1 = term.sub(1).sort();
         final Sort s2 = term.sub(2).sort();
 
-        if (!(s0 == JavaDLTheory.FORMULA && (s1 == JavaDLTheory.FORMULA) == (s2 == JavaDLTheory.FORMULA)
+        if (!(s0 == JavaDLTheory.FORMULA
+                && (s1 == JavaDLTheory.FORMULA) == (s2 == JavaDLTheory.FORMULA)
                 && s1 != JavaDLTheory.UPDATE && s2 != JavaDLTheory.UPDATE)) {
             throw new TermCreationException(this, term);
         }

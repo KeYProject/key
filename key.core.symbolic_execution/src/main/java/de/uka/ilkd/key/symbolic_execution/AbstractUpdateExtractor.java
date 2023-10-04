@@ -795,7 +795,8 @@ public abstract class AbstractUpdateExtractor {
                 getServices().getTypeConverter().getIntegerLDT().targetSort());
             this.arrayRangeConstant = tb.func(constantFunction);
             Function notAValueFunction = new Function(
-                new Name(tb.newName(ExecutionAllArrayIndicesVariable.NOT_A_VALUE_NAME)), JavaDLTheory.ANY);
+                new Name(tb.newName(ExecutionAllArrayIndicesVariable.NOT_A_VALUE_NAME)),
+                JavaDLTheory.ANY);
             this.notAValue = tb.func(notAValueFunction);
         }
 

@@ -70,7 +70,8 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
             additionalCondition);
         assert parentValue != null;
         TermBuilder tb = getServices().getTermBuilder();
-        Function notAValueFunction = new Function(new Name(tb.newName(NOT_A_VALUE_NAME)), JavaDLTheory.ANY);
+        Function notAValueFunction =
+            new Function(new Name(tb.newName(NOT_A_VALUE_NAME)), JavaDLTheory.ANY);
         notAValue = tb.func(notAValueFunction);
     }
 

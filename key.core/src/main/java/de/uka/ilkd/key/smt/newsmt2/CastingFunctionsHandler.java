@@ -35,7 +35,8 @@ public class CastingFunctionsHandler implements SMTHandler {
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
             String[] handlerOptions) {
         this.seqGet = services.getTypeConverter().getSeqLDT().getSeqGet(JavaDLTheory.ANY, services);
-        this.select = services.getTypeConverter().getHeapLDT().getSelect(JavaDLTheory.ANY, services);
+        this.select =
+            services.getTypeConverter().getHeapLDT().getSelect(JavaDLTheory.ANY, services);
         masterHandler.addDeclarationsAndAxioms(handlerSnippets);
     }
 

@@ -266,7 +266,8 @@ public abstract class Notation {
         public void print(Term t, LogicPrinter sp) {
             QuantifiableVariable v = instQV(t, sp, 1);
             final int assTarget =
-                (t.sort() == JavaDLTheory.FORMULA ? (t.sub(1).op() == Equality.EQUALS ? 75 : 60) : 110);
+                (t.sort() == JavaDLTheory.FORMULA ? (t.sub(1).op() == Equality.EQUALS ? 75 : 60)
+                        : 110);
             sp.printSubstTerm("{\\subst ", v, t.sub(0), 0, "}", t.sub(1), assTarget);
         }
 

@@ -591,7 +591,8 @@ public class TacletGenerator {
         final JavaBlock findBlock = JavaBlock.createJavaBlock(new ContextStatementBlock(mbs, null));
 
         SchemaVariable modalitySV =
-            SchemaVariableFactory.createModalOperatorSV(new Name("#allModal_sv"), JavaDLTheory.FORMULA,
+            SchemaVariableFactory.createModalOperatorSV(new Name("#allModal_sv"),
+                JavaDLTheory.FORMULA,
                 DefaultImmutableSet.<Modality>nil().add(Modality.DIA).add(Modality.BOX)
                         .add(Modality.DIA_TRANSACTION).add(Modality.BOX_TRANSACTION));
         SchemaVariable postSV = SchemaVariableFactory.createFormulaSV(new Name("#post_sv"));

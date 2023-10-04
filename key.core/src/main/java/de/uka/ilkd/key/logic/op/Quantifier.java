@@ -33,6 +33,7 @@ public final class Quantifier extends AbstractSortedOperator {
 
 
     private Quantifier(Name name) {
-        super(name, new Sort[] { JavaDLTheory.FORMULA }, JavaDLTheory.FORMULA, new Boolean[] { true }, true);
+        super(name, new Sort[] { JavaDLTheory.FORMULA }, JavaDLTheory.FORMULA,
+            new Boolean[] { true }, true);
     }
 }
