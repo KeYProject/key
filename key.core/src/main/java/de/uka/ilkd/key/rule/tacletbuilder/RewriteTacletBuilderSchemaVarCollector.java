@@ -54,7 +54,7 @@ public class RewriteTacletBuilderSchemaVarCollector {
     private Set<SchemaVariable> collectSchemaVariables(Term t) {
         final Set<SchemaVariable> result = new LinkedHashSet<>();
 
-        t.execPreOrder(new Visitor<Sort,Term>() {
+        t.execPreOrder(new Visitor<Sort, Term>() {
             @Override
             public boolean visitSubtree(Term visited) {
                 return true;

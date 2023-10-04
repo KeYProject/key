@@ -165,7 +165,7 @@ abstract class ReplaceAndRegisterMethod {
         return qvVisitor.getResult();
     }
 
-    private static final class QuantifiableVariableVisitor implements Visitor<Sort,Term> {
+    private static final class QuantifiableVariableVisitor implements Visitor<Sort, Term> {
         private final HashSet<QuantifiableVariable> vars = new LinkedHashSet<>();
 
         @Override

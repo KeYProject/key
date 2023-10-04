@@ -8,11 +8,9 @@ import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
-
-import de.uka.ilkd.key.logic.DefaultVisitor;
 
 public class TermProgramVariableCollector extends DefaultVisitor {
 

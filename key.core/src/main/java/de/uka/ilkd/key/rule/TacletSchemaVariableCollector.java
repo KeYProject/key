@@ -78,7 +78,8 @@ public class TacletSchemaVariableCollector extends DefaultVisitor {
 
 
     /**
-     * visits the Term in post order {@link Term#execPostOrder(org.key_project.logic.Visitor)} and collects all found
+     * visits the Term in post order {@link Term#execPostOrder(org.key_project.logic.Visitor)} and
+     * collects all found
      * schema variables
      *
      * @param visited the Term whose schema variables are collected

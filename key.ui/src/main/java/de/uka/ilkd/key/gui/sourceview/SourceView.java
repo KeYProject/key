@@ -742,7 +742,7 @@ public final class SourceView extends JComponent {
             // proof obligation belongs to is always loaded.
 
             node.sequent().forEach(
-                formula -> formula.formula().execPostOrder(new Visitor<Sort,Term>() {
+                formula -> formula.formula().execPostOrder(new Visitor<Sort, Term>() {
 
                     @Override
                     public boolean visitSubtree(Term visited) {
