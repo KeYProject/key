@@ -571,11 +571,6 @@ public final class SourceView extends JComponent {
 
     /**
      * Adds all files relevant to the currently selected node, closing all others
-<<<<<<< HEAD
-=======
-     *
-     * @see NodeInfo
->>>>>>> d2305be977 (removed unnecessary casts introduce by previous commit)
      */
     private void addFiles() {
         final Proof selectedProof = mainWindow.getMediator().getSelectedProof();

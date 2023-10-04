@@ -247,13 +247,13 @@ public class ClashFreeSubst {
 
         @Override
         public void visit(Term t) {
-            if (t.op() instanceof QuantifiableVariable) {
-                vars = vars.add((QuantifiableVariable) t.op());
+            if (t.op() instanceof QuantifiableVariable qv) {
+                vars = vars.add(qv);
             } else {
                 for (int i = 0; i < t.arity(); i++) {
                     var vbh = t.varsBoundHere(i);
                     for (int j = 0; j < vbh.size(); j++) {
-                        vars = vars.add((QuantifiableVariable) vbh.get(j));
+                        vars = vars.add(vbh.get(j));
                     }
                 }
             }
