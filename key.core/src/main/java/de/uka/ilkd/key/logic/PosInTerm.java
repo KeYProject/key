@@ -39,6 +39,22 @@ public final class PosInTerm {
     }
 
     /**
+     * Remove the first index from this position.
+     *
+     * @return position of the first subterm
+     */
+    public PosInTerm sub() {
+        if (size == 1) {
+            return PosInTerm.TOP_LEVEL;
+        }
+        int[] pathMinusHead = new int[size - 1];
+        for (int i = 1; i < size; i++) {
+            pathMinusHead[i - 1] = positions[i];
+        }
+        return new PosInTerm(pathMinusHead);
+    }
+
+    /**
      * create a position from the string
      *
      * The string contains a comma separated list of integers. The position created from the string
@@ -234,6 +250,22 @@ public final class PosInTerm {
         return sub;
     }
 
+    /**
+     * @param t some term
+     * @return whether this position exists in that term
+     */
+    public boolean existsSubTerm(Term t) {
+        Term sub = t;
+        for (int i = 0; i < size; i++) {
+            if (positions[i] >= sub.subs().size()) {
+                return false;
+            }
+            sub = sub.sub(positions[i]);
+        }
+        return true;
+    }
+
+    @Override
     public int hashCode() {
         if (hash == (char) -1) {
             char localHash = 13;

@@ -50,6 +50,7 @@ public class SequentFormula implements EqualsModProofIrrelevancy {
     }
 
     /** equal if terms and constraints are equal */
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;

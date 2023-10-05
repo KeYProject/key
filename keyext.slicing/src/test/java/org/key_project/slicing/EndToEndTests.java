@@ -103,7 +103,7 @@ class EndToEndTests {
     void sliceJavaProof() throws Exception {
         sliceProof(
             "../../../../../key.ui/examples/heap/verifyThis15_2_ParallelGcd/parallelGcd.proof",
-            3238, 1336, true, false);
+            3071, 1183, true, false);
     }
 
     /**

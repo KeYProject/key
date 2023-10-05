@@ -4,10 +4,13 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
 
@@ -24,11 +27,14 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.FormulaSV;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletIndex;
@@ -57,6 +63,17 @@ public final class OneStepSimplifier implements BuiltInRule {
      * @see #apply(Goal, Services, RuleApp)
      */
     public static boolean disableOSSRestriction = false;
+    /**
+     * If true, the simplification process will stop on cycles.
+     * Note that cycles should never happen by careful selection of the rulesets.
+     */
+    private static final boolean ENABLE_CYCLE_CHECK = true;
+    /**
+     * If true, the simplifier will keep a log of rule applications.
+     * This may lead to excessive memory consumption, so it can be disabled here.
+     * TODO: add a real (user-facing) option?
+     */
+    private static final boolean ENABLE_PROTOCOL = true;
 
     private static final int APPLICABILITY_CACHE_SIZE = 1000;
     private static final int DEFAULT_CACHE_SIZE = 10000;
@@ -77,11 +94,16 @@ public final class OneStepSimplifier implements BuiltInRule {
      */
     private static final ImmutableList<String> ruleSets = ImmutableSLList.<String>nil()
             .append("concrete").append("update_elim").append("update_apply_on_update")
-            .append("update_apply").append("update_join").append("elimQuantifier");
+            .append("update_apply").append("update_join").append("elimQuantifier").append("oss");
 
-    private static final boolean[] bottomUp = { false, false, true, true, true, false };
+    private static final boolean[] bottomUp = { false, false, true, true, true, false, true };
     private final Map<SequentFormula, Boolean> applicabilityCache =
         new LRUCache<>(APPLICABILITY_CACHE_SIZE);
+    /**
+     * Whether the OSS rule is currently checked for applicability.
+     * This means that it is only necessary to prove that one single rule app is possible.
+     */
+    private boolean applicableCheck = false;
 
     private Proof lastProof;
     private ImmutableList<NoPosTacletApp> appsTakenOver;
@@ -149,7 +171,10 @@ public final class OneStepSimplifier implements BuiltInRule {
             }
 
             if (accept) {
-                appsTakenOver = appsTakenOver.prepend(app);
+                if (app.taclet().getRuleSets().stream()
+                        .noneMatch(x -> x.name().toString().equals("oss"))) {
+                    appsTakenOver = appsTakenOver.prepend(app);
+                }
                 result = result.prepend(tac);
             }
         }
@@ -239,7 +264,8 @@ public final class OneStepSimplifier implements BuiltInRule {
      * @param protocol
      */
     private SequentFormula simplifyPos(Goal goal, Services services, PosInOccurrence pos,
-            int indexNr, Protocol protocol) {
+            int indexNr, Protocol protocol, Map<TermReplacementKey, PosInOccurrence> context,
+            /* out */ Set<PosInOccurrence> ifInsts, RuleApp ruleApp) {
         final ImmutableList<NoPosTacletApp> apps =
             indices[indexNr].getRewriteTaclet(pos, TacletFilter.TRUE, services);
         for (TacletApp app : apps) {
@@ -257,8 +283,24 @@ public final class OneStepSimplifier implements BuiltInRule {
             SequentFormula result =
                 taclet.getRewriteResult(goal, new TermLabelState(), services, app);
             if (protocol != null) {
-                protocol.add(app);
+                if (ENABLE_PROTOCOL) {
+                    protocol.add(app);
+                } else {
+                    protocol.add(null); // to keep size correct
+                }
             }
+
+            // do replace-known until done
+            while (!applicableCheck && pos.posInTerm().existsSubTerm(result.formula())) {
+                Term replacedKnown = replaceKnownHelper(context, result.formula(), pos.isInAntec(),
+                    ifInsts, protocol, services, goal, ruleApp, pos.posInTerm());
+                if (replacedKnown != null && replacedKnown != result.formula()) {
+                    result = new SequentFormula(replacedKnown);
+                } else {
+                    break;
+                }
+            }
+
             return result;
             // TODO Idea: return new Pair<TacletApp, SequentFormula>(null, null);
         }
@@ -273,10 +315,18 @@ public final class OneStepSimplifier implements BuiltInRule {
      * @param protocol
      */
     private SequentFormula simplifySub(Goal goal, Services services, PosInOccurrence pos,
-            int indexNr, Protocol protocol) {
+            int indexNr, Protocol protocol, Map<TermReplacementKey, PosInOccurrence> context,
+            /* out */ Set<PosInOccurrence> ifInsts, RuleApp ruleApp) {
+        var op = pos.subTerm().op();
+        if ((op instanceof Quantifier
+                || (op instanceof Function function && function.name().toString().equals("seqDef"))
+                || op instanceof UpdateJunctor) && ruleSets.get(indexNr).equals("oss")) {
+            return null; // this ruleset does not recurse into quantifiers
+        }
         for (int i = 0, n = pos.subTerm().arity(); i < n; i++) {
             SequentFormula result =
-                simplifyPosOrSub(goal, services, pos.down(i), indexNr, protocol);
+                simplifyPosOrSub(goal, services, pos.down(i), indexNr, protocol, context, ifInsts,
+                    ruleApp);
             if (result != null) {
                 return result;
             }
@@ -292,22 +342,39 @@ public final class OneStepSimplifier implements BuiltInRule {
      * @param protocol
      */
     private SequentFormula simplifyPosOrSub(Goal goal, Services services, PosInOccurrence pos,
-            int indexNr, Protocol protocol) {
+            int indexNr, Protocol protocol, Map<TermReplacementKey, PosInOccurrence> context,
+            /* out */ Set<PosInOccurrence> ifInsts, RuleApp ruleApp) {
         final Term term = pos.subTerm();
         if (notSimplifiableCaches[indexNr].get(term) != null) {
             return null;
         }
 
+        // the core loop of the simplifier:
+        // - if the ruleset is to be applied bottom-up, first recurse into subformulas
+        // - otherwise, check for applicable rules on the current pos
+        // - simplifications are applied recursively
         SequentFormula result;
         if (bottomUp[indexNr]) {
-            result = simplifySub(goal, services, pos, indexNr, protocol);
-            if (result == null) {
-                result = simplifyPos(goal, services, pos, indexNr, protocol);
+            result = simplifySub(goal, services, pos, indexNr, protocol, context, ifInsts, ruleApp);
+            var p = result != null ? new PosInOccurrence(result, pos.posInTerm(), pos.isInAntec())
+                    : pos;
+            if (p.subTermExists()) {
+                SequentFormula resultPos =
+                    simplifyPos(goal, services, p, indexNr, protocol, context, ifInsts, ruleApp);
+                if (resultPos != null) {
+                    result = resultPos;
+                }
             }
         } else {
-            result = simplifyPos(goal, services, pos, indexNr, protocol);
-            if (result == null) {
-                result = simplifySub(goal, services, pos, indexNr, protocol);
+            result = simplifyPos(goal, services, pos, indexNr, protocol, context, ifInsts, ruleApp);
+            var p = result != null ? new PosInOccurrence(result, pos.posInTerm(), pos.isInAntec())
+                    : pos;
+            if (p.subTermExists()) {
+                SequentFormula resultSub =
+                    simplifySub(goal, services, p, indexNr, protocol, context, ifInsts, ruleApp);
+                if (resultSub != null) {
+                    result = resultSub;
+                }
             }
         }
 
@@ -326,13 +393,20 @@ public final class OneStepSimplifier implements BuiltInRule {
      * @param services TODO
      */
     private Term replaceKnownHelper(Map<TermReplacementKey, PosInOccurrence> map, Term in,
-            boolean inAntecedent, /* out */ List<PosInOccurrence> ifInsts, Protocol protocol,
-            Services services, Goal goal, RuleApp ruleApp) {
+            boolean inAntecedent, /* out */ Set<PosInOccurrence> ifInsts, Protocol protocol,
+            Services services, Goal goal, RuleApp ruleApp, PosInTerm pio) {
+        if (pio == PosInTerm.getTopLevel()) {
+            pio = null;
+        }
         final PosInOccurrence pos = map.get(new TermReplacementKey(in));
         if (pos != null) {
             ifInsts.add(pos);
             if (protocol != null) {
-                protocol.add(makeReplaceKnownTacletApp(in, inAntecedent, pos));
+                if (ENABLE_PROTOCOL) {
+                    protocol.add(makeReplaceKnownTacletApp(in, inAntecedent, pos));
+                } else {
+                    protocol.add(null); // to keep size correct
+                }
             }
             Term result =
                 pos.isInAntec() ? services.getTermBuilder().tt() : services.getTermBuilder().ff();
@@ -353,8 +427,14 @@ public final class OneStepSimplifier implements BuiltInRule {
             Term[] subs = new Term[in.arity()];
             boolean changed = false;
             for (int i = 0; i < subs.length; i++) {
+                if (pio != null && pio.getIndexAt(0) != i) {
+                    // this indicates the subformula has not changed
+                    // (meaning we can skip recursing)
+                    subs[i] = in.sub(i);
+                    continue;
+                }
                 subs[i] = replaceKnownHelper(map, in.sub(i), inAntecedent, ifInsts, protocol,
-                    services, goal, ruleApp);
+                    services, goal, ruleApp, pio != null ? pio.sub() : null);
                 if (subs[i] != in.sub(i)) {
                     changed = true;
                 }
@@ -374,19 +454,18 @@ public final class OneStepSimplifier implements BuiltInRule {
      * (hardcoded here). The context formulas available for replace-known are passed in as
      * "context". The positions of the actually used context formulas are passed out as "ifInsts".
      *
-     * @param proof
      * @param protocol
      */
     private SequentFormula replaceKnown(Services services, SequentFormula cf, boolean inAntecedent,
             Map<TermReplacementKey, PosInOccurrence> context,
-            /* out */ List<PosInOccurrence> ifInsts, Protocol protocol, Goal goal,
+            /* out */ Set<PosInOccurrence> ifInsts, Protocol protocol, Goal goal,
             RuleApp ruleApp) {
         if (context == null) {
             return null;
         }
         final Term formula = cf.formula();
         final Term simplifiedFormula = replaceKnownHelper(context, formula, inAntecedent, ifInsts,
-            protocol, services, goal, ruleApp);
+            protocol, services, goal, ruleApp, PosInTerm.getTopLevel());
         if (simplifiedFormula.equals(formula)) {
             return null;
         } else {
@@ -432,17 +511,12 @@ public final class OneStepSimplifier implements BuiltInRule {
      */
     private SequentFormula simplifyConstrainedFormula(Services services, SequentFormula cf,
             boolean inAntecedent, Map<TermReplacementKey, PosInOccurrence> context,
-            /* out */ List<PosInOccurrence> ifInsts, Protocol protocol, Goal goal,
+            /* out */ Set<PosInOccurrence> ifInsts, Protocol protocol, Goal goal,
             RuleApp ruleApp) {
-        SequentFormula result =
-            replaceKnown(services, cf, inAntecedent, context, ifInsts, protocol, goal, ruleApp);
-        if (result != null) {
-            return result;
-        }
-
         for (int i = 0; i < indices.length; i++) {
             PosInOccurrence pos = new PosInOccurrence(cf, PosInTerm.getTopLevel(), inAntecedent);
-            result = simplifyPosOrSub(goal, services, pos, i, protocol);
+            SequentFormula result =
+                simplifyPosOrSub(goal, services, pos, i, protocol, context, ifInsts, ruleApp);
             if (result != null) {
                 return result;
             }
@@ -462,7 +536,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         // collect context formulas (potential if-insts for replace-known)
         final Map<TermReplacementKey, PosInOccurrence> context =
             new LinkedHashMap<>();
-        final SequentFormula cf = ossPIO.sequentFormula();
+        SequentFormula cf = ossPIO.sequentFormula();
         for (SequentFormula ante : seq.antecedent()) {
             if (!ante.equals(cf) && ante.formula().op() != Junctor.TRUE) {
                 context.put(new TermReplacementKey(ante.formula()),
@@ -475,26 +549,48 @@ public final class OneStepSimplifier implements BuiltInRule {
                     new PosInOccurrence(succ, PosInTerm.getTopLevel(), false));
             }
         }
-        final List<PosInOccurrence> ifInsts = new ArrayList<>(seq.size());
+        final Set<PosInOccurrence> ifInsts = new HashSet<>();
+
+        // first, do replace-known applications
+        if (!applicableCheck) {
+            while (true) {
+                SequentFormula result = replaceKnown(services, cf, ossPIO.isInAntec(), context,
+                    ifInsts, protocol, goal, ruleApp);
+                if (result != null) {
+                    cf = result;
+                } else {
+                    break;
+                }
+            }
+        }
 
         // simplify as long as possible
-        ImmutableList<SequentFormula> list = ImmutableSLList.nil();
+        Collection<SequentFormula> seen = new ArrayList<>();
         SequentFormula simplifiedCf = cf;
+        SequentFormula lastCf = null;
         while (true) {
             simplifiedCf = simplifyConstrainedFormula(services, simplifiedCf, ossPIO.isInAntec(),
                 context, ifInsts, protocol, goal, ruleApp);
-            if (simplifiedCf != null && !list.contains(simplifiedCf)) {
-                list = list.prepend(simplifiedCf);
+            if (simplifiedCf != null && !seen.contains(simplifiedCf)) {
+                if (ENABLE_CYCLE_CHECK) {
+                    seen.add(simplifiedCf);
+                }
+                // optimization: use a set for more efficient contains() check
+                // (only helpful for longer OSS)
+                if (seen.size() == 30 && seen instanceof ArrayList<SequentFormula>) {
+                    seen = new HashSet<>(seen);
+                }
+                lastCf = simplifiedCf;
             } else {
                 break;
             }
         }
 
-        // return
         PosInOccurrence[] ifInstsArr = ifInsts.toArray(new PosInOccurrence[0]);
         ImmutableList<PosInOccurrence> immutableIfInsts =
             ImmutableSLList.<PosInOccurrence>nil().append(ifInstsArr);
-        return new Instantiation(list.head(), list.size(), immutableIfInsts);
+        return new Instantiation(lastCf, protocol != null ? protocol.size() : seen.size(),
+            immutableIfInsts);
     }
 
 
@@ -508,8 +604,10 @@ public final class OneStepSimplifier implements BuiltInRule {
             return b;
         } else {
             // try one simplification step without replace-known
+            applicableCheck = true;
             final SequentFormula simplifiedCf = simplifyConstrainedFormula(services, cf,
                 inAntecedent, null, null, null, goal, ruleApp);
+            applicableCheck = false;
             final boolean result = simplifiedCf != null && !simplifiedCf.equals(cf);
             applicabilityCache.put(cf, result);
             return result;
@@ -528,7 +626,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         if (active != newActive || lastProof != proof || // The setting or proof has changed.
                 (isShutdown() && !proof.closed())) { // A closed proof was pruned.
             active = newActive;
-            if (active && proof != null && !proof.closed()) {
+            if (active && !proof.closed()) {
                 initIndices(proof);
             } else {
                 shutdownIndices();
@@ -737,8 +835,8 @@ public final class OneStepSimplifier implements BuiltInRule {
          */
         @Override
         public int hashCode() {
-            return term.op().hashCode(); // Allow more conflicts to ensure that naming and term
-                                         // labels are ignored.
+            // Allow more conflicts to ensure that naming and term labels are ignored.
+            return Objects.hash(term.op(), term.depth());
         }
 
         /**
