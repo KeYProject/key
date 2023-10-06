@@ -11,7 +11,7 @@
 // import de.uka.ilkd.key.logic.sort.Sort;
 // import de.uka.ilkd.key.smt.SMTTranslationException;
 // import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
-// import de.uka.ilkd.key.util.Pair;
+// import org.key_project.util.collection.Pair;
 //
 // import java.util.HashMap;
 // import java.util.Map;

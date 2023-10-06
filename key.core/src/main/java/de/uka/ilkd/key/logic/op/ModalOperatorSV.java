@@ -18,24 +18,24 @@ public final class ModalOperatorSV extends AbstractSV {
     /**
      * the set of modalities this sv can match
      */
-    private final ImmutableSet<Modality> modalities;
+    private final ImmutableSet<Modality.JavaModalityKind> modalities;
 
 
     /**
      * creates a new SchemaVariable that is used as placeholder for modal operators.
      *
      * @param name the Name of the SchemaVariable
-     * @param modalities modal operators matched by this SV
+     * @param modalityKinds modal operators matched by this SV
      */
-    ModalOperatorSV(Name name, ImmutableSet<Modality> modalities) {
+    ModalOperatorSV(Name name, ImmutableSet<Modality.JavaModalityKind> modalityKinds) {
         super(name, new Sort[] { JavaDLTheory.FORMULA }, JavaDLTheory.FORMULA, false, false);
-        this.modalities = modalities;
+        this.modalities = modalityKinds;
     }
 
     /**
      * returns an unmodifiable set of operators this schemavariable can match
      */
-    public ImmutableSet<Modality> getModalities() {
+    public ImmutableSet<Modality.JavaModalityKind> getModalities() {
         return modalities;
     }
 
@@ -49,7 +49,7 @@ public final class ModalOperatorSV extends AbstractSV {
     public void layout(Layouter<?> l) {
         l.beginC(0).beginC().print("\\schemaVar \\formula {").brk(0);
         boolean first = true;
-        for (Modality modality : modalities) {
+        for (Modality.JavaModalityKind modality : modalities) {
             if (!first) {
                 l.print(",").brk();
             } else {

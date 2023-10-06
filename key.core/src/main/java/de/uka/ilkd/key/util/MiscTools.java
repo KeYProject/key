@@ -111,31 +111,34 @@ public final class MiscTools {
     }
 
     /**
-     * Checks whether the given {@link Modality} is a transaction modality.
+     * Checks whether the given {@link de.uka.ilkd.key.logic.op.Modality.JavaModalityKind} is a
+     * transaction modality.
      *
-     * @param modality The modality to check.
-     * @return true iff the given {@link Modality} is a transaction modality.
+     * @param modalityKind The modality to check.
+     * @return true iff the given {@link de.uka.ilkd.key.logic.op.Modality.JavaModalityKind} is a
+     *         transaction modality.
      */
-    public static boolean isTransaction(final Modality modality) {
-        return modality == Modality.BOX_TRANSACTION || modality == Modality.DIA_TRANSACTION;
+    public static boolean isTransaction(final Modality.JavaModalityKind modalityKind) {
+        return modalityKind.transaction();
     }
 
     /**
      * Returns the applicable heap contexts out of the currently available set of three contexts:
      * The normal heap, the saved heap (transaction), and the permission heap.
      *
-     * @param modality The current modality (checked for transaction).
+     * @param modalityKind The current modality (checked for transaction).
      * @param services The {@link Services} object (for {@link HeapLDT} and for checking whether
      *        we're in the permissions profile).
      * @return The list of the applicable heaps for the given scenario.
      */
-    public static List<LocationVariable> applicableHeapContexts(Modality modality,
+    public static List<LocationVariable> applicableHeapContexts(
+            Modality.JavaModalityKind modalityKind,
             Services services) {
         final List<LocationVariable> result = new ArrayList<>();
 
         result.add(services.getTypeConverter().getHeapLDT().getHeap());
 
-        if (isTransaction(modality)) {
+        if (isTransaction(modalityKind)) {
             result.add(services.getTypeConverter().getHeapLDT().getSavedHeap());
         }
 

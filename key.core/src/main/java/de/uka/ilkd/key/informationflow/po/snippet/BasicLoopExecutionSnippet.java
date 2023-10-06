@@ -18,10 +18,10 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.LoopSpecification;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 
 public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
@@ -63,8 +63,8 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
         final Pair<JavaBlock, JavaBlock> jb = buildJavaBlock(d);
 
         // create program term
-        final Modality symbExecMod;
-        if (modality == Modality.BOX) {
+        final Modality.JavaModalityKind symbExecMod;
+        if (modality.kind() == Modality.BOX) {
             symbExecMod = Modality.DIA;
         } else {
             symbExecMod = Modality.BOX;
@@ -76,7 +76,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
         final Term guardTrueBody = d.tb.imp(guardPreTrueTerm, bodyTerm);
         final Term guardFalseBody = d.tb.imp(guardPreFalseTerm, postTerm);
         final Term guardPreAndTrueTerm =
-            tb.prog(modality, jb.second, tb.and(guardPreEqTerm, guardTrueBody));
+            tb.prog(modality, tb.and(guardPreEqTerm, guardTrueBody));
         final Term programTerm = d.tb.and(guardPreAndTrueTerm, guardFalseBody);
 
         // create update

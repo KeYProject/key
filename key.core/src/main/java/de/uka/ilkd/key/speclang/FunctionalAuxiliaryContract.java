@@ -373,11 +373,10 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
     }
 
     /**
-     *
      * @return this contract's modality.
-     * @see AuxiliaryContract#getModality()
+     * @see AuxiliaryContract#getModalityKind()
      */
-    public Modality getModality() {
-        return contract.getModality();
+    public Modality.JavaModalityKind getModalityKind() {
+        return contract.getModalityKind();
     }
 }

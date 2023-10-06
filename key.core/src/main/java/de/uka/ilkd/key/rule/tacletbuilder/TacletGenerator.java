@@ -23,7 +23,6 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -31,6 +30,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 
 
@@ -593,7 +593,8 @@ public class TacletGenerator {
         SchemaVariable modalitySV =
             SchemaVariableFactory.createModalOperatorSV(new Name("#allModal_sv"),
                 JavaDLTheory.FORMULA,
-                DefaultImmutableSet.<Modality>nil().add(Modality.DIA).add(Modality.BOX)
+                DefaultImmutableSet.<Modality.JavaModalityKind>nil().add(Modality.DIA)
+                        .add(Modality.BOX)
                         .add(Modality.DIA_TRANSACTION).add(Modality.BOX_TRANSACTION));
         SchemaVariable postSV = SchemaVariableFactory.createFormulaSV(new Name("#post_sv"));
 

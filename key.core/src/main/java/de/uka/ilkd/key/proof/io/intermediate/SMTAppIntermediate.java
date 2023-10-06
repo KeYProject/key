@@ -4,7 +4,8 @@
 package de.uka.ilkd.key.proof.io.intermediate;
 
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
 
 public class SMTAppIntermediate extends BuiltInAppIntermediate {
     private final String solver;

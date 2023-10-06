@@ -27,10 +27,10 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.*;
+import org.key_project.util.collection.Pair;
 
 /**
  * <p>
@@ -415,12 +415,21 @@ public class TermBuilder {
         return tf.createTerm(f, s, boundVars, null);
     }
 
-    public Term prog(Modality mod, JavaBlock jb, Term t) {
-        return tf.createTerm(mod, new Term[] { t }, null, jb);
+    public Term prog(Modality mod, Term t) {
+        return tf.createTerm(mod, new Term[] { t }, null, t.javaBlock());
     }
 
-    public Term prog(Modality mod, JavaBlock jb, Term t, ImmutableArray<TermLabel> labels) {
-        return tf.createTerm(mod, new Term[] { t }, null, jb, labels);
+    public Term prog(Modality mod, Term t, ImmutableArray<TermLabel> labels) {
+        return tf.createTerm(mod, new Term[] { t }, null, t.javaBlock(), labels);
+    }
+
+    public Term prog(Modality.JavaModalityKind modKind, JavaBlock jb, Term t) {
+        return tf.createTerm(modality(modKind, jb), new Term[] { t }, null, jb);
+    }
+
+    public Term prog(Modality.JavaModalityKind modKind, JavaBlock jb, Term t,
+            ImmutableArray<TermLabel> labels) {
+        return tf.createTerm(modality(modKind, jb), new Term[] { t }, null, jb, labels);
     }
 
     public Term box(JavaBlock jb, Term t) {
@@ -429,6 +438,17 @@ public class TermBuilder {
 
     public Term dia(JavaBlock jb, Term t) {
         return prog(Modality.DIA, jb, t);
+    }
+
+    // TODO: move?
+    public Modality modality(Modality.JavaModalityKind kind, JavaBlock jb) {
+        var pair = new Pair<>(kind, jb.program());
+        Modality mod = services.getNamespaces().operators().get(pair);
+        if (mod == null) {
+            mod = new Modality(jb, kind);
+            services.getNamespaces().operators().put(pair, mod);
+        }
+        return mod;
     }
 
     public Term ife(Term cond, Term _then, Term _else) {

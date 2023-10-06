@@ -78,8 +78,8 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
             vs.exceptionParameter.op(LocationVariable.class));
 
         // create program term
-        final Modality symbExecMod;
-        if (modality == Modality.BOX) {
+        final Modality.JavaModalityKind symbExecMod;
+        if (modality.kind() == Modality.BOX) {
             symbExecMod = Modality.DIA;
         } else {
             symbExecMod = Modality.BOX;

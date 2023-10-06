@@ -227,30 +227,28 @@ public abstract class ElementMatcher<T extends Operator> {
         @Override
         public MatchConditions match(ModalOperatorSV op, SVSubstitute subst, MatchConditions mc,
                 Services services) {
-            if (!(subst instanceof Modality m)) {
+            if (subst instanceof Modality m) {
+                if (op.getModalities().contains(m.kind())) {
+                    Operator o = (Operator) mc.getInstantiations().getInstantiation(op);
+                    if (o == null) {
+                        return mc.setInstantiations(mc.getInstantiations().add(op, m, services));
+                    } else if (o != m) {
+                        LOGGER.debug("FAILED. Already instantiated with a different operator.");
+                        return null;
+                    } else {
+                        return mc;
+                    }
+                }
+
+                LOGGER.debug("FAILED. template is a schema operator,"
+                    + " term is an operator, but not a matching one");
+            } else {
                 LOGGER.debug(
                     "FAILED. ModalOperatorSV matches only modalities (template, orig) {} {}", op,
                     subst);
-                return null;
             }
-
-            if (op.getModalities().contains(m)) {
-                Operator o = (Operator) mc.getInstantiations().getInstantiation(op);
-                if (o == null) {
-                    return mc.setInstantiations(mc.getInstantiations().add(op, m, services));
-                } else if (o != m) {
-                    LOGGER.debug("FAILED. Already instantiated with a different operator.");
-                    return null;
-                } else {
-                    return mc;
-                }
-            }
-
-            LOGGER.debug("FAILED. template is a schema operator,"
-                + " term is an operator, but not a matching one");
             return null;
         }
-
     }
 
 

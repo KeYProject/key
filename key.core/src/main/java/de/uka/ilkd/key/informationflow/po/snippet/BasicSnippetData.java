@@ -126,7 +126,7 @@ class BasicSnippetData {
         contractContents.put(Key.POSTCONDITION, contract.getPost());
         contractContents.put(Key.MODIFIES, contract.getMod());
         contractContents.put(Key.MEASURED_BY, contract.getMby());
-        contractContents.put(Key.MODALITY, contract.getModality());
+        contractContents.put(Key.MODALITY, contract.getModalityKind());
 
         final Term heap = tb.getBaseHeap();
         origVars = new StateVars(contract.getSelf(), contract.getParams(), contract.getResult(),
@@ -189,7 +189,7 @@ class BasicSnippetData {
         contractContents.put(Key.MODIFIES, contract.getMod());
         contractContents.put(Key.DEPENDENS, contract.getDep());
         contractContents.put(Key.MEASURED_BY, contract.getMby());
-        contractContents.put(Key.MODALITY, contract.getModality());
+        contractContents.put(Key.MODALITY, contract.getModalityKind());
         contractContents.put(Key.INF_FLOW_SPECS, contract.getInfFlowSpecs());
 
         final Term heap = tb.getBaseHeap();
@@ -211,7 +211,7 @@ class BasicSnippetData {
         contractContents.put(Key.PRECONDITION, contract.getPre(services));
         contractContents.put(Key.POSTCONDITION, contract.getPost(services));
         contractContents.put(Key.MODIFIES, contract.getMod(services));
-        contractContents.put(Key.MODALITY, contract.getModality());
+        contractContents.put(Key.MODALITY, contract.getModalityKind());
         contractContents.put(Key.INF_FLOW_SPECS, contract.getInfFlowSpecs());
         List<Label> labels = contract.getLabels();
         contractContents.put(Key.LABELS, labels.toArray(new Label[0]));

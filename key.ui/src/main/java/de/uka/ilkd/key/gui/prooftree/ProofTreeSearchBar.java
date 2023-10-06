@@ -11,7 +11,8 @@ import javax.swing.text.Position;
 import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.SearchBar;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
 

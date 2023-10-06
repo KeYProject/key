@@ -262,13 +262,13 @@ public final class DLSpecFactory {
         if (excVar == null) {
             excVar = tb.excVar(pm, false);
             Term excNullTerm = tb.equals(tb.var(excVar), tb.NULL());
-            if (modality == Modality.DIA) {
+            if (modality.kind() == Modality.DIA) {
                 post = tb.and(post, excNullTerm);
-            } else if (modality == Modality.BOX) {
+            } else if (modality.kind() == Modality.BOX) {
                 post = tb.or(post, tb.not(excNullTerm));
             } else {
                 throw new ProofInputException("unknown semantics for exceptional termination: "
-                    + modality + "; please use #catchAll block");
+                    + modality.kind().name() + "; please use #catchAll block");
             }
         }
 
@@ -289,7 +289,7 @@ public final class DLSpecFactory {
 
         final boolean isLibraryClass =
             ((TypeDeclaration) pm.getContainerType().getJavaType()).isLibraryClass();
-        return cf.func(name, pm.getContainerType(), pm, modality, pres,
+        return cf.func(name, pm.getContainerType(), pm, modality.kind(), pres,
             new LinkedHashMap<>(), null, // TODO measured_by in DL contracts
                                          // not supported yet
             posts, new LinkedHashMap<>(), null, // TODO no model methods in DL

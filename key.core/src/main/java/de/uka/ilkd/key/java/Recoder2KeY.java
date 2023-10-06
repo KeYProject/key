@@ -29,6 +29,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;

@@ -98,7 +98,7 @@ public class LoopApplyHeadRule implements BuiltInRule {
 
         Goal result = goal.split(1).head();
         result.changeFormula(
-            new SequentFormula(tb.apply(update, tb.prog(modality, newJavaBlock, target.sub(0)))),
+            new SequentFormula(tb.apply(update, tb.prog(modality, target.sub(0)))),
             ruleApp.pio);
         return ImmutableSLList.<Goal>nil().append(goal);
     }

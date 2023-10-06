@@ -1253,19 +1253,19 @@ public final class AuxiliaryContractBuilders {
                 term = tb.apply(update,
                     tb.imp(pre,
                         tb.apply(remember,
-                            tb.prog(modality, unfold,
+                            tb.prog(modality,
                                 tb.and(tb.imp(tb.or(exceptionNeqNull, notCond), post),
                                     tb.imp(tb.and(exceptionEqNull, cond),
-                                        tb.prog(modality, body, postBody)))))));
+                                        tb.prog(modality, postBody)))))));
             } else {
                 Term postBody = buildFullPostBody(bodyBreakFound, tail, modality, rememberNext,
                     decreasesCheck, anonOut, post, postNext, postAfterTail, pre, brokeLoop,
                     notBrokeLoop, abrupt, notAbrupt, tb);
 
-                term = tb.apply(update, tb.imp(pre, tb.apply(remember, tb.prog(modality, unfold,
+                term = tb.apply(update, tb.imp(pre, tb.apply(remember, tb.prog(modality,
                     tb.and(tb.imp(exceptionNeqNull, post),
                         tb.imp(tb.and(exceptionEqNull, notCond), postAfterTail), tb.imp(
-                            tb.and(exceptionEqNull, cond), tb.prog(modality, body, postBody)))))));
+                            tb.and(exceptionEqNull, cond), tb.prog(modality, postBody)))))));
             }
             return term;
         }
@@ -1298,12 +1298,12 @@ public final class AuxiliaryContractBuilders {
                     tb.and(notBrokeLoop, notAbrupt),
                     tb.and(pre, decreasesCheck, tb.apply(rememberNext, tb.apply(anonOut, tb.and(
                         tb.imp(abrupt, tb.imp(postNext, post)),
-                        tb.imp(notAbrupt, tb.prog(modality, tail, tb.imp(postNext, post)))))))));
+                        tb.imp(notAbrupt, tb.prog(modality, tb.imp(postNext, post)))))))));
             } else {
                 postBody = tb.and(tb.imp(abrupt, post), tb.imp(notAbrupt,
                     tb.and(pre, decreasesCheck, tb.apply(rememberNext, tb.apply(anonOut, tb.and(
                         tb.imp(abrupt, tb.imp(postNext, post)),
-                        tb.imp(notAbrupt, tb.prog(modality, tail, tb.imp(postNext, post)))))))));
+                        tb.imp(notAbrupt, tb.prog(modality, tb.imp(postNext, post)))))))));
             }
             return postBody;
         }
@@ -1396,7 +1396,7 @@ public final class AuxiliaryContractBuilders {
                         instantiation.formula().getLabels()));
 
                 term = tb.applySequential(updates,
-                    tb.prog(instantiation.modality(), newJavaBlock, newPost, labels));
+                    tb.prog(instantiation.modality().kind(), newJavaBlock, newPost, labels));
 
                 goal.changeFormula(new SequentFormula(term), occurrence);
                 TermLabelManager.refactorGoal(termLabelState, services, occurrence,
@@ -1405,7 +1405,7 @@ public final class AuxiliaryContractBuilders {
             } else {
                 Term pre = tb.and(assumptions);
                 Term prog =
-                    tb.prog(instantiation.modality(), newJavaBlock, newPost,
+                    tb.prog(instantiation.modality().kind(), newJavaBlock, newPost,
                         new ImmutableArray<>());
                 term = tb.applySequential(updates, tb.imp(pre, prog));
             }
@@ -1483,7 +1483,7 @@ public final class AuxiliaryContractBuilders {
 
             final Term[] posts = createPosts(goal, postconditions, postconditionsNext, terms, tb);
 
-            Term postAfterTail = tb.prog(modality, javaBlocks[2], posts[0]);
+            Term postAfterTail = tb.prog(modality, posts[0]);
             Term pre = tb.and(assumptions);
             Term brokeLoop = tb.equals(tb.var(loopVariables[1]), tb.TRUE());
             Term notBrokeLoop = tb.not(brokeLoop);
@@ -1611,7 +1611,7 @@ public final class AuxiliaryContractBuilders {
 
         private Term buildUsageFormula(Goal goal) {
             return services.getTermBuilder().prog(
-                instantiation.modality(), replaceBlock(instantiation.formula().javaBlock(),
+                instantiation.modality().kind(), replaceBlock(instantiation.formula().javaBlock(),
                     instantiation.statement(), constructAbruptTerminationIfCascade()),
                 instantiation.formula().sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services, occurrence,

@@ -51,7 +51,7 @@ public final class CreateFrameCond extends AbstractTermTransformer {
         final Optional<LoopSpecification> loopSpec = //
             MiscTools.getSpecForTermWithLoopStmt(loopFormula, services);
 
-        final boolean isTransaction = MiscTools.isTransaction((Modality) loopFormula.op());
+        final boolean isTransaction = MiscTools.isTransaction(((Modality) loopFormula.op()).kind());
         final boolean isPermissions = MiscTools.isPermissions(services);
 
         final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoopMap = //

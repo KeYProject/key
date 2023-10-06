@@ -37,7 +37,7 @@ public final class CreateWellformedCond extends AbstractTermTransformer {
         final Operator op = term.sub(0).op();
         assert op instanceof Modality;
 
-        return createWellformedCond(MiscTools.isTransaction((Modality) op),
+        return createWellformedCond(MiscTools.isTransaction(((Modality) op).kind()),
             MiscTools.isPermissions(services), anonHeapTerm, anonSavedHeapTerm,
             anonPermissionsHeapTerm, services);
     }

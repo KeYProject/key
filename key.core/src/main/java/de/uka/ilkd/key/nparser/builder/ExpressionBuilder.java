@@ -1125,7 +1125,7 @@ public class ExpressionBuilder extends DefaultBuilder {
              */
             op = schemaVariables().lookup(new Name(sjb.opName));
         } else {
-            op = Modality.getModality(sjb.opName);
+            op = getServices().getTermBuilder().modality(Modality.JavaModalityKind.getKind(sjb.opName), sjb.javaBlock);
         }
         if (op == null) {
             semanticError(ctx, "Unknown modal operator: " + sjb.opName);
@@ -1637,17 +1637,17 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
 
-    protected ImmutableSet<Modality> opSVHelper(String opName, ImmutableSet<Modality> modalities) {
+    protected ImmutableSet<Modality.JavaModalityKind> opSVHelper(String opName, ImmutableSet<Modality.JavaModalityKind> modalityKinds) {
         if (opName.charAt(0) == '#') {
-            return lookupOperatorSV(opName, modalities);
+            return lookupOperatorSV(opName, modalityKinds);
         } else {
-            Modality m = Modality.getModality(opName);
+            Modality.JavaModalityKind m = Modality.JavaModalityKind.getKind(opName);
             if (m == null) {
                 semanticError(null, "Unrecognised operator: " + opName);
             }
-            modalities = modalities.add(m);
+            modalityKinds = modalityKinds.add(m);
         }
-        return modalities;
+        return modalityKinds;
     }
 
 
@@ -1696,15 +1696,15 @@ public class ExpressionBuilder extends DefaultBuilder {
         return reference.sort().name().equals(IntegerLDT.NAME);
     }
 
-    private ImmutableSet<Modality> lookupOperatorSV(String opName,
-            ImmutableSet<Modality> modalities) {
+    private ImmutableSet<Modality.JavaModalityKind> lookupOperatorSV(String opName,
+                                                                     ImmutableSet<Modality.JavaModalityKind> modalityKinds) {
         SchemaVariable sv = schemaVariables().lookup(new Name(opName));
-        if (!(sv instanceof ModalOperatorSV)) {
+        if (sv instanceof ModalOperatorSV osv) {
+            modalityKinds = modalityKinds.union(osv.getModalities());
+        } else {
             semanticError(null, "Schema variable " + opName + " not defined.");
         }
-        ModalOperatorSV osv = (ModalOperatorSV) sv;
-        modalities = modalities.union(osv.getModalities());
-        return modalities;
+        return modalityKinds;
     }
 
     private boolean isImplicitHeap(Term t) {

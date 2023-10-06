@@ -51,7 +51,8 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
         final Term anonPermissionsHeapTerm = term.sub(3);
 
         return createHeapAnonUpdate(loopSpec.get(),
-            MiscTools.isTransaction((Modality) loopTerm.op()), MiscTools.isPermissions(services),
+            MiscTools.isTransaction(((Modality) loopTerm.op()).kind()),
+            MiscTools.isPermissions(services),
             anonHeapTerm, anonSavedHeapTerm, anonPermissionsHeapTerm, services);
     }
 

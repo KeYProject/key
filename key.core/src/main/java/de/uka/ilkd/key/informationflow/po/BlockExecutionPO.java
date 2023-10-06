@@ -145,8 +145,8 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
      * {@inheritDoc}
      */
     @Override
-    protected Modality getTerminationMarker() {
-        return contract.getModality();
+    protected Modality.JavaModalityKind getTerminationMarker() {
+        return contract.getModalityKind();
     }
 
 

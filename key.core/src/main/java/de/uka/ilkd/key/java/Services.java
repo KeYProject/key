@@ -23,7 +23,7 @@ import org.key_project.logic.Name;
 import org.key_project.util.lookup.Lookup;
 
 /**
- * this is a collection of common services to the KeY prover. Services include information on the
+ * This is a collection of common services to the KeY prover. Services include information on the
  * underlying Java model and a converter to transform Java program elements to logic (where
  * possible) and back.
  */

@@ -154,8 +154,8 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
      * {@inheritDoc}
      */
     @Override
-    protected Modality getTerminationMarker() {
-        return getContract().getModality();
+    protected Modality.JavaModalityKind getTerminationMarker() {
+        return getContract().getModalityKind();
     }
 
 

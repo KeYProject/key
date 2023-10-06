@@ -65,8 +65,8 @@ public final class WhileInvariantTransformer {
     /**
      * initialises this meta operator
      *
-     * @param initialPost TODO
      * @param invariantFramingTermination TODO
+     * @param initialPost the instantiated Term passed to the TermTransformer
      * @param services the Services providing access to signature and type model
      */
     private void init(Term initialPost, Term invariantFramingTermination, Services services) {
@@ -204,17 +204,17 @@ public final class WhileInvariantTransformer {
             resSta = s;
         }
 
-        Modality loopBodyModality = modality;
-        final boolean transaction = (loopBodyModality == Modality.DIA_TRANSACTION
-                || loopBodyModality == Modality.BOX_TRANSACTION);
+        var loopBodyModalityKind = modality.kind();
+        final boolean transaction = (loopBodyModalityKind == Modality.DIA_TRANSACTION
+                || loopBodyModalityKind == Modality.BOX_TRANSACTION);
         JavaBlock mainJavaBlock = JavaBlock.createJavaBlock(transaction
                 ? new StatementBlock(resSta,
                     new TransactionStatement(
                         de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH))
                 : new StatementBlock(resSta));
-        return services.getTermBuilder().prog(loopBodyModality, mainJavaBlock, result,
+        return services.getTermBuilder().prog(modality, result,
             computeLoopBodyModalityLabels(termLabelState, services, applicationPos, rule, ruleApp,
-                goal, loopBodyModality, result, mainJavaBlock, applicationSequent,
+                goal, modality, result, mainJavaBlock, applicationSequent,
                 initialPost.getLabels()));
     }
 
@@ -323,7 +323,7 @@ public final class WhileInvariantTransformer {
             RuleApp ruleApp, Goal goal, PosInOccurrence applicationPos, Services services) {
         JavaBlock returnJavaBlock =
             addContext(root, new StatementBlock(KeYJavaASTFactory.returnClause(returnExpression)));
-        Term executeReturn = services.getTermBuilder().prog(modality, returnJavaBlock, post,
+        Term executeReturn = services.getTermBuilder().prog(modality, post,
             TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
                 ruleApp, goal, "ReturnCaseModality", null,
                 tf.createTerm(modality,
@@ -350,7 +350,7 @@ public final class WhileInvariantTransformer {
             PosInOccurrence applicationPos, Services services) {
         JavaBlock executeJavaBlock = addContext(root,
             new StatementBlock(breakIfCascade.toArray(new Statement[0])));
-        Term executeBreak = services.getTermBuilder().prog(modality, executeJavaBlock, post,
+        Term executeBreak = services.getTermBuilder().prog(modality, post,
             TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
                 ruleApp, goal, "BreakCaseModality", null,
                 tf.createTerm(modality, new ImmutableArray<>(post),
@@ -433,7 +433,7 @@ public final class WhileInvariantTransformer {
         final TermBuilder TB = services.getTermBuilder();
         JavaBlock throwJavaBlock =
             addContext(root, new StatementBlock(KeYJavaASTFactory.throwClause(thrownException)));
-        Term throwException = TB.prog(modality, throwJavaBlock, post,
+        Term throwException = TB.prog(modality, post,
             TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
                 ruleApp, goal, "ThrowCaseModality", null,
                 tf.createTerm(modality, new ImmutableArray<>(post), null, throwJavaBlock,

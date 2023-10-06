@@ -60,7 +60,6 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.LoopWellDefinedness;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
@@ -68,6 +67,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
 
@@ -518,7 +518,8 @@ public final class WhileInvariantRule implements BuiltInRule {
         final LocationVariable variantPV = new LocationVariable(variantName, JavaDLTheory.ANY);
         services.getNamespaces().programVariables().addSafely(variantPV);
 
-        final boolean dia = ((Modality) inst.progPost.op()).terminationSensitive();
+        Modality modality = ((Modality) inst.progPost.op());
+        final boolean dia = modality.<Modality.JavaModalityKind>kind().terminationSensitive();
         final Term variantUpdate = dia ? tb.elementary(variantPV, variant) : tb.skip();
         final Term variantPO = dia ? tb.prec(variant, tb.var(variantPV)) : tb.tt();
         return new Pair<>(variantUpdate, variantPO);
@@ -567,7 +568,8 @@ public final class WhileInvariantRule implements BuiltInRule {
             "UseModality", null,
             tb.tf().createTerm(inst.progPost.op(), new ImmutableArray<>(inst.progPost.sub(0)),
                 null, useJavaBlock, inst.progPost.getLabels()));
-        Term restPsi = tb.prog((Modality) inst.progPost.op(), useJavaBlock, inst.progPost.sub(0),
+        // TODO: Did I introduce an error here while re-basing?
+        Term restPsi = tb.prog((Modality) inst.progPost.op(), inst.progPost.sub(0),
             instantiateLabels);
         Term guardFalseRestPsi = tb.box(guardJb, tb.imp(guardFalseTerm, restPsi));
         return guardFalseRestPsi;

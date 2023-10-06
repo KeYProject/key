@@ -191,13 +191,13 @@ public class TestTriggersSet {
         proof.setRoot(g.node());
         proof.add(g);
 
-        proof.setNamespaces(new NamespaceSet(variables, functions, sorts, new Namespace<>(),
+        proof.setNamespaces(new NamespaceSet(variables, XXX, functions, sorts, new Namespace<>(),
             new Namespace<>(), new Namespace<>()));
 
     }
 
     private Term parseTerm(String termstr) {
-        return TacletForTests.parseTerm(termstr, new NamespaceSet(variables, functions, sorts,
+        return TacletForTests.parseTerm(termstr, new NamespaceSet(variables, XXX, functions, sorts,
             new Namespace<>(), new Namespace<>(), new Namespace<>()));
     }
 

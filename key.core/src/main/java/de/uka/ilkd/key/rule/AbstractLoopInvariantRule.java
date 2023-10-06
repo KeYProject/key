@@ -22,12 +22,12 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 /**
  * An abstract super class for loop invariant rules. Extending rules should usually call
@@ -298,7 +298,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final LocationVariable variantPV = new LocationVariable(variantName, JavaDLTheory.ANY);
         services.getNamespaces().programVariables().addSafely(variantPV);
 
-        final boolean dia = ((Modality) inst.progPost.op()).terminationSensitive();
+        Modality modality = ((Modality) inst.progPost.op());
+        final boolean dia = modality.<Modality.JavaModalityKind>kind().terminationSensitive();
         final Term variantUpdate = dia ? tb.elementary(variantPV, variant) : tb.skip();
         final Term variantPO = dia ? tb.prec(variant, tb.var(variantPV)) : tb.tt();
 

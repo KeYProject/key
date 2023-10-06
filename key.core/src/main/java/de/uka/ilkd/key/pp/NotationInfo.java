@@ -434,6 +434,13 @@ public final class NotationInfo {
             return result;
         }
 
+        if (op instanceof Modality mod) {
+            result = notationTable.get(mod.kind());
+            if (result != null) {
+                return result;
+            }
+        }
+
         if (op instanceof SchemaVariable) {
             result = notationTable.get(SchemaVariable.class);
             if (result != null) {

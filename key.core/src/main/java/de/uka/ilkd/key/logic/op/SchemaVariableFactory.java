@@ -47,11 +47,12 @@ public class SchemaVariableFactory {
      * creates a SchemaVariable representing an operator
      *
      * @param name the Name of the SchemaVariable
+     * @param modalityKinds
      * @return the SchemaVariable
      */
     public static ModalOperatorSV createModalOperatorSV(Name name, Sort sort,
-            ImmutableSet<Modality> modalities) {
-        return new ModalOperatorSV(name, modalities);
+            ImmutableSet<Modality.JavaModalityKind> modalityKinds) {
+        return new ModalOperatorSV(name, modalityKinds);
     }
 
 

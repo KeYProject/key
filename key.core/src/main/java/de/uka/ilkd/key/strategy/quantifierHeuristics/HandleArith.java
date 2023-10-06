@@ -13,9 +13,9 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.LRUCache;
+import org.key_project.util.collection.Pair;
 
 /**
  * This class is used to prove some simple arithmetic problem which are {@code a==b}, {@code a>=b},

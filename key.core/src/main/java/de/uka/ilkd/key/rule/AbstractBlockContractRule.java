@@ -76,28 +76,27 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             return DefaultImmutableSet.nil();
         }
         return getApplicableContracts(services.getSpecificationRepository(),
-            instantiation.statement(), instantiation.modality(), goal);
+            instantiation.statement(), instantiation.modality().kind(), goal);
     }
 
     /**
-     *
      * @param specifications a specification repository.
      * @param statement a block.
-     * @param modality the current goal's modality.
+     * @param modalityKind the current goal's modality.
      * @param goal the current goal.
      * @return all applicable block contracts for the block from the repository.
      */
     public static ImmutableSet<BlockContract> getApplicableContracts(
             final SpecificationRepository specifications, final JavaStatement statement,
-            final Modality modality, final Goal goal) {
+            final Modality.JavaModalityKind modalityKind, final Goal goal) {
         if (statement instanceof StatementBlock block) {
 
             ImmutableSet<BlockContract> collectedContracts =
-                specifications.getBlockContracts(block, modality);
-            if (modality == Modality.BOX) {
+                specifications.getBlockContracts(block, modalityKind);
+            if (modalityKind == Modality.BOX) {
                 collectedContracts =
                     collectedContracts.union(specifications.getBlockContracts(block, Modality.DIA));
-            } else if (modality == Modality.BOX_TRANSACTION) {
+            } else if (modalityKind == Modality.BOX_TRANSACTION) {
                 collectedContracts = collectedContracts
                         .union(specifications.getBlockContracts(block, Modality.DIA_TRANSACTION));
             }
@@ -492,9 +491,10 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
         @Override
         protected boolean hasApplicableContracts(final Services services,
-                final JavaStatement statement, final Modality modality, Goal goal) {
+                final JavaStatement statement, final Modality.JavaModalityKind modalityKind,
+                Goal goal) {
             ImmutableSet<BlockContract> contracts = getApplicableContracts(
-                services.getSpecificationRepository(), statement, modality, goal);
+                services.getSpecificationRepository(), statement, modalityKind, goal);
 
             return contracts != null && !contracts.isEmpty();
         }

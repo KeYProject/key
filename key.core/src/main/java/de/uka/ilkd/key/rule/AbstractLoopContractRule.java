@@ -54,40 +54,39 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
             return DefaultImmutableSet.nil();
         }
         return getApplicableContracts(services.getSpecificationRepository(),
-            instantiation.statement(), instantiation.modality(), goal);
+            instantiation.statement(), instantiation.modality().kind(), goal);
     }
 
     /**
-     *
      * @param specifications a specification repository.
      * @param statement a statement.
-     * @param modality the current goal's modality.
+     * @param modalityKind the current goal's modality.
      * @param goal the current goal.
      * @return all applicable loop contracts for the block from the repository.
      */
     public static ImmutableSet<LoopContract> getApplicableContracts(
             final SpecificationRepository specifications, final JavaStatement statement,
-            final Modality modality, final Goal goal) {
+            final Modality.JavaModalityKind modalityKind, final Goal goal) {
         ImmutableSet<LoopContract> collectedContracts;
 
         if (statement instanceof StatementBlock block) {
 
-            collectedContracts = specifications.getLoopContracts(block, modality);
-            if (modality == Modality.BOX) {
+            collectedContracts = specifications.getLoopContracts(block, modalityKind);
+            if (modalityKind == Modality.BOX) {
                 collectedContracts =
                     collectedContracts.union(specifications.getLoopContracts(block, Modality.DIA));
-            } else if (modality == Modality.BOX_TRANSACTION) {
+            } else if (modalityKind == Modality.BOX_TRANSACTION) {
                 collectedContracts = collectedContracts
                         .union(specifications.getLoopContracts(block, Modality.DIA_TRANSACTION));
             }
         } else {
             LoopStatement loop = (LoopStatement) statement;
 
-            collectedContracts = specifications.getLoopContracts(loop, modality);
-            if (modality == Modality.BOX) {
+            collectedContracts = specifications.getLoopContracts(loop, modalityKind);
+            if (modalityKind == Modality.BOX) {
                 collectedContracts =
                     collectedContracts.union(specifications.getLoopContracts(loop, Modality.DIA));
-            } else if (modality == Modality.BOX_TRANSACTION) {
+            } else if (modalityKind == Modality.BOX_TRANSACTION) {
                 collectedContracts = collectedContracts
                         .union(specifications.getLoopContracts(loop, Modality.DIA_TRANSACTION));
             }
@@ -244,9 +243,10 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
 
         @Override
         protected boolean hasApplicableContracts(final Services services,
-                final JavaStatement statement, final Modality modality, Goal goal) {
+                final JavaStatement statement, final Modality.JavaModalityKind modalityKind,
+                Goal goal) {
             ImmutableSet<LoopContract> contracts = getApplicableContracts(
-                services.getSpecificationRepository(), statement, modality, goal);
+                services.getSpecificationRepository(), statement, modalityKind, goal);
 
             return contracts != null && !contracts.isEmpty();
         }

@@ -16,7 +16,6 @@ import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramPrefix;
@@ -234,7 +233,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
             }
             final JavaStatement statement =
                 getFirstStatementInPrefixWithAtLeastOneApplicableContract(modality,
-                    target.javaBlock(), goal);
+                    goal);
             if (statement == null) {
                 return null;
             }
@@ -295,20 +294,18 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
         }
 
         /**
-         *
          * @param modality the contract's modality.
-         * @param java the java block.
          * @param goal the current goal.
          * @return the first block in the java block's prefix with at least one applicable contract.
          */
         private JavaStatement getFirstStatementInPrefixWithAtLeastOneApplicableContract(
-                final Modality modality, final JavaBlock java, final Goal goal) {
-            SourceElement element = java.program().getFirstElement();
+                final Modality modality, final Goal goal) {
+            SourceElement element = modality.program().program().getFirstElement();
             while ((element instanceof ProgramPrefix || element instanceof CatchAllStatement)
                     && !(element instanceof StatementBlock
                             && ((StatementBlock) element).isEmpty())) {
                 if (element instanceof StatementBlock && hasApplicableContracts(services,
-                    (StatementBlock) element, modality, goal)) {
+                    (StatementBlock) element, modality.kind(), goal)) {
                     return (StatementBlock) element;
                 } else if (element instanceof StatementContainer) {
                     element = ((StatementContainer) element).getStatementAt(0);
@@ -318,7 +315,8 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
             }
 
             if (element instanceof LoopStatement) {
-                if (hasApplicableContracts(services, (LoopStatement) element, modality, goal)) {
+                if (hasApplicableContracts(services, (LoopStatement) element, modality.kind(),
+                    goal)) {
                     return (LoopStatement) element;
                 }
             }
@@ -327,15 +325,15 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
         }
 
         /**
-         *
          * @param services services.
          * @param element a block or loop.
-         * @param modality the current goal's modality.
+         * @param modalityKind the current goal's modality kind.
          * @param goal the current goal.
          * @return {@code true} iff the block has applicable contracts.
          */
         protected abstract boolean hasApplicableContracts(final Services services,
-                final JavaStatement element, final Modality modality, Goal goal);
+                final JavaStatement element, final Modality.JavaModalityKind modalityKind,
+                Goal goal);
     }
 
 }

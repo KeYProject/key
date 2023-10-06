@@ -152,8 +152,8 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
      * {@inheritDoc}
      */
     @Override
-    protected Modality getTerminationMarker() {
-        return getContract().getModality();
+    protected Modality.JavaModalityKind getTerminationMarker() {
+        return getContract().getModalityKind();
     }
 
 
