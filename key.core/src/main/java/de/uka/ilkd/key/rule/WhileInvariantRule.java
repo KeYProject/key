@@ -568,7 +568,8 @@ public final class WhileInvariantRule implements BuiltInRule {
             "UseModality", null,
             tb.tf().createTerm(inst.progPost.op(), new ImmutableArray<>(inst.progPost.sub(0)),
                 null, useJavaBlock, inst.progPost.getLabels()));
-        Term restPsi = tb.prog((Modality) inst.progPost.op(), inst.progPost.sub(0),
+        // TODO: simplify?
+        Term restPsi = tb.prog(((Modality) inst.progPost.op()).kind(), useJavaBlock, inst.progPost.sub(0),
             instantiateLabels);
         Term guardFalseRestPsi = tb.box(guardJb, tb.imp(guardFalseTerm, restPsi));
         return guardFalseRestPsi;

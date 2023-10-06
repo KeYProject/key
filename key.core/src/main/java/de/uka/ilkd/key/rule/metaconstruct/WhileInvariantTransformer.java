@@ -212,7 +212,7 @@ public final class WhileInvariantTransformer {
                     new TransactionStatement(
                         de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH))
                 : new StatementBlock(resSta));
-        return services.getTermBuilder().prog(modality, result,
+        return services.getTermBuilder().prog(modality.kind(), mainJavaBlock, result,
             computeLoopBodyModalityLabels(termLabelState, services, applicationPos, rule, ruleApp,
                 goal, modality, result, mainJavaBlock, applicationSequent,
                 initialPost.getLabels()));
@@ -323,7 +323,7 @@ public final class WhileInvariantTransformer {
             RuleApp ruleApp, Goal goal, PosInOccurrence applicationPos, Services services) {
         JavaBlock returnJavaBlock =
             addContext(root, new StatementBlock(KeYJavaASTFactory.returnClause(returnExpression)));
-        Term executeReturn = services.getTermBuilder().prog(modality, post,
+        Term executeReturn = services.getTermBuilder().prog(modality.kind(),returnJavaBlock, post,
             TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
                 ruleApp, goal, "ReturnCaseModality", null,
                 tf.createTerm(modality,
@@ -350,7 +350,7 @@ public final class WhileInvariantTransformer {
             PosInOccurrence applicationPos, Services services) {
         JavaBlock executeJavaBlock = addContext(root,
             new StatementBlock(breakIfCascade.toArray(new Statement[0])));
-        Term executeBreak = services.getTermBuilder().prog(modality, post,
+        Term executeBreak = services.getTermBuilder().prog(modality.kind(), executeJavaBlock, post,
             TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
                 ruleApp, goal, "BreakCaseModality", null,
                 tf.createTerm(modality, new ImmutableArray<>(post),
@@ -433,7 +433,7 @@ public final class WhileInvariantTransformer {
         final TermBuilder TB = services.getTermBuilder();
         JavaBlock throwJavaBlock =
             addContext(root, new StatementBlock(KeYJavaASTFactory.throwClause(thrownException)));
-        Term throwException = TB.prog(modality, post,
+        Term throwException = TB.prog(modality.kind(), throwJavaBlock, post,
             TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
                 ruleApp, goal, "ThrowCaseModality", null,
                 tf.createTerm(modality, new ImmutableArray<>(post), null, throwJavaBlock,

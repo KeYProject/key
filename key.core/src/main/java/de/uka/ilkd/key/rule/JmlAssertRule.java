@@ -160,7 +160,7 @@ public final class JmlAssertRule implements BuiltInRule {
         goal.setBranchLabel("Usage");
         final JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
         final Term newTerm = tb.apply(update,
-            tb.imp(condition, tb.prog((Modality) target.op(), target.sub(0), null)));
+            tb.imp(condition, tb.prog(((Modality) target.op()).kind(), javaBlock, target.sub(0), null)));
 
         goal.changeFormula(new SequentFormula(newTerm), occurrence);
     }

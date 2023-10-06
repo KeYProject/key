@@ -1253,19 +1253,19 @@ public final class AuxiliaryContractBuilders {
                 term = tb.apply(update,
                     tb.imp(pre,
                         tb.apply(remember,
-                            tb.prog(modality,
+                            tb.prog(modality.kind(), unfold,
                                 tb.and(tb.imp(tb.or(exceptionNeqNull, notCond), post),
                                     tb.imp(tb.and(exceptionEqNull, cond),
-                                        tb.prog(modality, postBody)))))));
+                                        tb.prog(modality.kind(), body, postBody)))))));
             } else {
                 Term postBody = buildFullPostBody(bodyBreakFound, tail, modality, rememberNext,
                     decreasesCheck, anonOut, post, postNext, postAfterTail, pre, brokeLoop,
                     notBrokeLoop, abrupt, notAbrupt, tb);
 
-                term = tb.apply(update, tb.imp(pre, tb.apply(remember, tb.prog(modality,
+                term = tb.apply(update, tb.imp(pre, tb.apply(remember, tb.prog(modality.kind(), unfold,
                     tb.and(tb.imp(exceptionNeqNull, post),
                         tb.imp(tb.and(exceptionEqNull, notCond), postAfterTail), tb.imp(
-                            tb.and(exceptionEqNull, cond), tb.prog(modality, postBody)))))));
+                            tb.and(exceptionEqNull, cond), tb.prog(modality.kind(), body, postBody)))))));
             }
             return term;
         }
@@ -1298,12 +1298,12 @@ public final class AuxiliaryContractBuilders {
                     tb.and(notBrokeLoop, notAbrupt),
                     tb.and(pre, decreasesCheck, tb.apply(rememberNext, tb.apply(anonOut, tb.and(
                         tb.imp(abrupt, tb.imp(postNext, post)),
-                        tb.imp(notAbrupt, tb.prog(modality, tb.imp(postNext, post)))))))));
+                        tb.imp(notAbrupt, tb.prog(modality.kind(), tail, tb.imp(postNext, post)))))))));
             } else {
                 postBody = tb.and(tb.imp(abrupt, post), tb.imp(notAbrupt,
                     tb.and(pre, decreasesCheck, tb.apply(rememberNext, tb.apply(anonOut, tb.and(
                         tb.imp(abrupt, tb.imp(postNext, post)),
-                        tb.imp(notAbrupt, tb.prog(modality, tb.imp(postNext, post)))))))));
+                        tb.imp(notAbrupt, tb.prog(modality.kind(), tail, tb.imp(postNext, post)))))))));
             }
             return postBody;
         }
@@ -1483,7 +1483,7 @@ public final class AuxiliaryContractBuilders {
 
             final Term[] posts = createPosts(goal, postconditions, postconditionsNext, terms, tb);
 
-            Term postAfterTail = tb.prog(modality, posts[0]);
+            Term postAfterTail = tb.prog(modality.kind(), javaBlocks[2], posts[0]);
             Term pre = tb.and(assumptions);
             Term brokeLoop = tb.equals(tb.var(loopVariables[1]), tb.TRUE());
             Term notBrokeLoop = tb.not(brokeLoop);

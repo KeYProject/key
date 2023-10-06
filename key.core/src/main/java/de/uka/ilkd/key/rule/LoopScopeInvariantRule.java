@@ -400,7 +400,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         // in general; probably, something involving the TermLabelManager should
         // be used.
         final Term newFormula = tb.applySequential(uBeforeLoopDefAnonVariant,
-            tb.prog(modality, newPost, progPost.getLabels()));
+            tb.prog(modality.kind(), newJavaBlock, newPost, progPost.getLabels()));
         return newFormula;
     }
 
