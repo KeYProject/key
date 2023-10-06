@@ -469,12 +469,9 @@ public final class UseOperationContractRule implements BuiltInRule {
         }
 
         // focus (below update) must be modality term
-        if (progPost.op() != Modality.BOX && progPost.op() != Modality.DIA
-                && progPost.op() != Modality.BOX_TRANSACTION
-                && progPost.op() != Modality.DIA_TRANSACTION) {
+        if (!(progPost.op() instanceof Modality mod)) {
             return null;
         }
-        final Modality mod = (Modality) progPost.op();
 
         // active statement must be method call or new
         final Pair<Expression, MethodOrConstructorReference> methodCall =

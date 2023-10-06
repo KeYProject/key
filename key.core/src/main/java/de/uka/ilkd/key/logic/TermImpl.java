@@ -57,7 +57,6 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
     private final Operator op;
     private final ImmutableArray<Term> subs;
     private final ImmutableArray<QuantifiableVariable> boundVars;
-    private final JavaBlock javaBlock;
 
     // caches
     private enum ThreeValuedTruth {
@@ -111,7 +110,6 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
         this.op = op;
         this.subs = subs.isEmpty() ? EMPTY_TERM_LIST : subs;
         this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;
-        this.javaBlock = javaBlock == null ? JavaBlock.EMPTY_JAVABLOCK : javaBlock;
         this.origin = origin;
     }
 
@@ -213,7 +211,11 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
 
     @Override
     public @NonNull JavaBlock javaBlock() {
-        return javaBlock;
+        if (op instanceof Modality mod) {
+            return mod.program();
+        } else {
+            return JavaBlock.EMPTY_JAVABLOCK;
+        }
     }
 
 
@@ -498,7 +500,7 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
         final TermImpl t = (TermImpl) o;
 
         return op.equals(t.op) && t.hasLabels() == hasLabels() && subs.equals(t.subs)
-                && boundVars.equals(t.boundVars) && javaBlock.equals(t.javaBlock);
+                && boundVars.equals(t.boundVars) && javaBlock().equals(t.javaBlock());
     }
 
     @Override
@@ -511,7 +513,8 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
             return false;
         }
 
-        if (!(op.equals(t.op) && boundVars.equals(t.boundVars) && javaBlock.equals(t.javaBlock))) {
+        if (!(op.equals(t.op) && boundVars.equals(t.boundVars)
+                && javaBlock().equals(t.javaBlock()))) {
             return false;
         }
 
@@ -548,7 +551,8 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
             return false;
         }
 
-        if (!(op.equals(t.op) && boundVars.equals(t.boundVars) && javaBlock.equals(t.javaBlock))) {
+        if (!(op.equals(t.op) && boundVars.equals(t.boundVars)
+                && javaBlock().equals(t.javaBlock()))) {
             return false;
         }
 
@@ -573,7 +577,7 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
         boolean opResult = op.equalsModProofIrrelevancy(t.op);
         if (!(opResult
                 && EqualsModProofIrrelevancyUtil.compareImmutableArrays(boundVars, t.boundVars)
-                && javaBlock.equalsModProofIrrelevancy(t.javaBlock))) {
+                && javaBlock().equalsModProofIrrelevancy(t.javaBlock()))) {
             return false;
         }
 
@@ -649,13 +653,14 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        if (!javaBlock.isEmpty()) {
-            if (op() == Modality.DIA) {
-                sb.append("\\<").append(javaBlock).append("\\> ");
-            } else if (op() == Modality.BOX) {
-                sb.append("\\[").append(javaBlock).append("\\] ");
+        if (!javaBlock().isEmpty()) {
+            var op = (Modality) op();
+            if (op.kind() == Modality.DIA) {
+                sb.append("\\<").append(javaBlock()).append("\\> ");
+            } else if (op.kind() == Modality.BOX) {
+                sb.append("\\[").append(javaBlock()).append("\\] ");
             } else {
-                sb.append(op()).append("\\[").append(javaBlock).append("\\] ");
+                sb.append(op()).append("\\[").append(javaBlock()).append("\\] ");
             }
             sb.append("(").append(sub(0)).append(")");
             return sb.toString();
@@ -706,7 +711,7 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
     public boolean containsJavaBlockRecursive() {
         if (containsJavaBlockRecursive == ThreeValuedTruth.UNKNOWN) {
             ThreeValuedTruth result = ThreeValuedTruth.FALSE;
-            if (javaBlock != null && !javaBlock.isEmpty()) {
+            if (javaBlock() != null && !javaBlock().isEmpty()) {
                 result = ThreeValuedTruth.TRUE;
             } else {
                 for (int i = 0, arity = subs.size(); i < arity; i++) {

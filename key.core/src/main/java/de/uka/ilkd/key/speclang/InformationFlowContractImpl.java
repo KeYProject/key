@@ -266,6 +266,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     public boolean hasInfFlowSpec() {
+        // TODO (KIT): This is always true (except null)
         return !(origInfFlowSpecs == InfFlowSpec.EMPTY_INF_FLOW_SPEC);
     }
 

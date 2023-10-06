@@ -342,9 +342,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         }
 
         // focus (below update) must be modality term
-        if (mainFml.op() != Modality.BOX && mainFml.op() != Modality.DIA
-                && mainFml.op() != Modality.BOX_TRANSACTION
-                && mainFml.op() != Modality.DIA_TRANSACTION) {
+        if (!(mainFml.op() instanceof Modality)) {
             return null;
         }
         result.modality = mainFml;
