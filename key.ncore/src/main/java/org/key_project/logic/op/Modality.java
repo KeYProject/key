@@ -66,10 +66,3 @@ public abstract class Modality<S extends Sort<S>> extends AbstractSortedOperator
         }
     }
 }
-
-
-class Concrete extends Modality {
-    protected Concrete(Name name, Sort formulaSort, Program prg) {
-        super(name, formulaSort, prg, null);
-    }
-}
