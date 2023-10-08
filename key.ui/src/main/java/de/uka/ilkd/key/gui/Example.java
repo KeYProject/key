@@ -1,10 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -14,9 +12,15 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * This class wraps a {@link java.io.File} and has a special {@link #toString()} method only using the
+ * This class wraps a {@link java.io.File} and has a special {@link #toString()} method only using
+ * the
  * short file name w/o path.
  * <p>
  * Used for displaying files in the examples list w/o prefix
@@ -139,12 +143,12 @@ public class Example {
 
     public void addToTreeModel(DefaultTreeModel model) {
         DefaultMutableTreeNode node =
-                findChild((DefaultMutableTreeNode) model.getRoot(), getPath(), 0);
+            findChild((DefaultMutableTreeNode) model.getRoot(), getPath(), 0);
         node.add(new DefaultMutableTreeNode(this));
     }
 
     private DefaultMutableTreeNode findChild(DefaultMutableTreeNode root, String[] path,
-                                             int from) {
+            int from) {
         if (from == path.length) {
             return root;
         }
@@ -166,7 +170,7 @@ public class Example {
     }
 
     private static StringBuilder extractDescription(File file, StringBuilder sb,
-                                                    Properties properties) {
+            Properties properties) {
         try (BufferedReader r = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
             String line;
             boolean emptyLineSeen = false;
