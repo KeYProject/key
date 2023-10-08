@@ -1,4 +1,4 @@
-package org.keyproject.key;
+package org.keyproject.key.api;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;

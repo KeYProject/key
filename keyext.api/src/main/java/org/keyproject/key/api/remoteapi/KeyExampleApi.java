@@ -1,4 +1,4 @@
-package org.keyproject.key.remoteapi;
+package org.keyproject.key.api.remoteapi;
 
 import de.uka.ilkd.key.gui.Example;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
