@@ -1,11 +1,8 @@
-package org.keyproject.key.remoteapi;
+package org.keyproject.key.api.remoteapi;
 
-import de.uka.ilkd.key.gui.Example;
-import de.uka.ilkd.key.gui.ExampleChooser;
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface KeyApi extends KeyExampleApi, KeyMetaApi {
@@ -26,7 +23,7 @@ public interface KeyApi extends KeyExampleApi, KeyMetaApi {
      error: code and message set in case an exception happens during shutdown request.
      */
     @JsonRequest
-    Void shutdown();
+    CompletableFuture<Void> shutdown();
 
     /**
      * Exit Notification (:arrow_right:)

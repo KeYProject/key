@@ -1,4 +1,4 @@
-package org.keyproject.key.remoteapi;
+package org.keyproject.key.api.remoteapi;
 
 import de.uka.ilkd.key.api.KeYApi;
 import de.uka.ilkd.key.gui.Example;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @JsonSegment
-class KeyApiImpl implements KeyApi {
+public class KeyApiImpl implements KeyApi {
     @Override
     @JsonRequest
     public CompletableFuture<List<Example>> examples() {
@@ -21,8 +21,8 @@ class KeyApiImpl implements KeyApi {
     }
 
     @Override
-    public Void shutdown() {
-        return null;
+    public CompletableFuture<Void> shutdown() {
+        return CompletableFuture.completedFuture(null);
     }
 
     @Override

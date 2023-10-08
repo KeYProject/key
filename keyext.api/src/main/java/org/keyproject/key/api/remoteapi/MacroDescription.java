@@ -1,4 +1,4 @@
-package org.keyproject.key.remoteapi;
+package org.keyproject.key.api.remoteapi;
 
 import de.uka.ilkd.key.macros.ProofMacro;
 

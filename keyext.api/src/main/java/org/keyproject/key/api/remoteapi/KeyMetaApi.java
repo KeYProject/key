@@ -1,7 +1,6 @@
-package org.keyproject.key.remoteapi;
+package org.keyproject.key.api.remoteapi;
 
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
-import org.eclipse.lsp4j.jsonrpc.CompletableFutures;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 
