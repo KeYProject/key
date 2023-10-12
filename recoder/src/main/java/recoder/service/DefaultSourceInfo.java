@@ -89,7 +89,6 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     /**
      * looks for the next variable scope that is a parent of the given element
      *
-     * @param pe a program element
      * @return the outer variable scope of the program element or <tt>null</tt>
      */
     private static VariableScope findOuterVariableScope(VariableScope ts) {
@@ -160,7 +159,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     /**
      * Initializes the new service; called by the configuration.
      *
-     * @param config the configuration this services becomes part of.
+     * @param cfg the configuration this services becomes part of.
      */
     public void initialize(ServiceConfiguration cfg) {
         super.initialize(cfg);
@@ -198,8 +197,6 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
     /**
      * Change notification callback method.
-     *
-     * @param config the configuration this services becomes part of.
      */
     public void modelChanged(ChangeHistoryEvent changes) {
         List<TreeChange> changed = changes.getChanges();

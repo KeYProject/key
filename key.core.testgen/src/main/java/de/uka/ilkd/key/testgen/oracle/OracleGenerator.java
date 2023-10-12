@@ -234,18 +234,16 @@ public class OracleGenerator {
             OracleTerm left = generateOracle(term.sub(0), initialSelect);
             OracleTerm right = generateOracle(term.sub(1), initialSelect);
             String javaOp = ops.get(op);
+            return switch (javaOp) {
+            case EQUALS -> eq(left, right);
+            case AND -> and(left, right);
+            case OR -> or(left, right);
+            default ->
+                // Todo wiesler: What is this for? No field nor method of OracleBinTerm has any
+                // usages
+                new OracleBinTerm(javaOp, left, right);
+            };
 
-            switch (javaOp) {
-            case EQUALS:
-                return eq(left, right);
-            case AND:
-                return and(left, right);
-            case OR:
-                return or(left, right);
-            }
-
-            // Todo wiesler: What is this for? No field nor method of OracleBinTerm has any usages
-            return new OracleBinTerm(javaOp, left, right);
         } // negation
         else if (op == Junctor.NOT) {
             OracleTerm sub = generateOracle(term.sub(0), initialSelect);

@@ -31,7 +31,7 @@ public class ExtensionSettings extends AbstractPropertiesSettings {
     }
 
 
-    public void setForbiddenClass(Class type, boolean activated) {
+    public void setForbiddenClass(Class<?> type, boolean activated) {
         String text = type.getName();
         Collection<String> classes = getForbiddenClasses();
         if (activated) {
