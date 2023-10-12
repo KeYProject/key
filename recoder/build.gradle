@@ -3,7 +3,7 @@ description "Fork of the Recoder -- a parser/ast for Java with extensions for Ke
 def headerFile = "$rootDir/gradle/header-recoder"
 
 dependencies {
-    implementation 'org.ow2.asm:asm:9.5'
+    implementation 'org.ow2.asm:asm:9.6'
     implementation 'org.beanshell:bsh:2.0b5'
     implementation 'net.sf.retrotranslator:retrotranslator-runtime:1.2.9'
     implementation 'net.sf.retrotranslator:retrotranslator-transformer:1.2.9'

@@ -747,8 +747,8 @@ public abstract class AbstractProblemLoader {
                     : proof.root();
 
         } catch (Exception e) {
-            if (parserResult == null || parserResult.getErrors() == null
-                    || parserResult.getErrors().isEmpty() || replayer == null
+            if (parserResult == null || parserResult.errors() == null
+                    || parserResult.errors().isEmpty() || replayer == null
                     || replayResult == null || replayResult.getErrors() == null
                     || replayResult.getErrors().isEmpty()) {
                 // this exception was something unexpected
@@ -756,8 +756,8 @@ public abstract class AbstractProblemLoader {
             }
         } finally {
             if (parserResult != null) {
-                status = parserResult.getStatus();
-                errors.addAll(parserResult.getErrors());
+                status = parserResult.status();
+                errors.addAll(parserResult.errors());
             }
             status += (status.isEmpty() ? "Proof replayed successfully." : "\n\n")
                     + (replayResult != null ? replayResult.getStatus()

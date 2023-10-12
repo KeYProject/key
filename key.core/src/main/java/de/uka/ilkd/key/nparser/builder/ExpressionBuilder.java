@@ -128,9 +128,6 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     /**
      * Given a raw modality string, this method determines the operator name.
-     *
-     * @param raw
-     * @return
      */
     public static String operatorOfJavaBlock(String raw) {
         if (raw.startsWith("\\<")) {
@@ -542,7 +539,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private void bindVar() {
-        namespaces().setVariables(new Namespace(variables()));
+        namespaces().setVariables(new Namespace<>(variables()));
     }
 
     private Term toZNotation(String literal, Namespace<Function> functions) {
@@ -802,27 +799,15 @@ public class ExpressionBuilder extends DefaultBuilder {
         for (int i = 0; i < chars.length; i++) {
             if (chars[i] == '\\' && i < chars.length - 1) {
                 switch (chars[++i]) {
-                    case 'n':
-                        sb.append("\n");
-                        break;
-                    case 'f':
-                        sb.append("\f");
-                        break;
-                    case 'r':
-                        sb.append("\r");
-                        break;
-                    case 't':
-                        sb.append("\t");
-                        break;
-                    case 'b':
-                        sb.append("\b");
-                        break;
-                    case ':':
-                        sb.append("\\:");
-                        break; // this is so in KeY ...
-                    default:
-                        sb.append(chars[i]);
-                        break; // this more relaxed than before, \a becomes a ...
+                    case 'n' -> sb.append("\n");
+                    case 'f' -> sb.append("\f");
+                    case 'r' -> sb.append("\r");
+                    case 't' -> sb.append("\t");
+                    case 'b' -> sb.append("\b");
+                    case ':' -> sb.append("\\:");
+                    // this is so in KeY ...
+                    default -> sb.append(chars[i]);
+                    // this more relaxed than before, \a becomes a ...
                 }
             } else {
                 sb.append(chars[i]);
@@ -983,7 +968,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term t = accept(ctx.primitive_term());
         if (ctx.LGUILLEMETS() != null) {
             ImmutableArray<TermLabel> labels = accept(ctx.label());
-            if (labels.size() > 0) {
+            if (!labels.isEmpty()) {
                 t = getServices().getTermBuilder().addLabel(t, labels);
             }
         }
@@ -993,7 +978,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public ImmutableArray<TermLabel> visitLabel(KeYParser.LabelContext ctx) {
         List<TermLabel> labels = mapOf(ctx.single_label());
-        return new ImmutableArray(labels);
+        return new ImmutableArray<>(labels);
     }
 
     @Override
@@ -1778,11 +1763,6 @@ public class ExpressionBuilder extends DefaultBuilder {
     /**
      * Guard for {@link #replaceHeap0(Term, Term, ParserRuleContext)} to protect the double
      * application of {@code @heap}.
-     *
-     * @param term
-     * @param heap
-     * @param ctx
-     * @return
      */
     private Term replaceHeap(Term term, Term heap, ParserRuleContext ctx) {
         if (explicitHeap.contains(term)) {

@@ -155,47 +155,29 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
 
     @Override
     public Function getFunctionFor(String op, Services services) {
-        switch (op) {
-        case "gt":
-            return getGreaterThan();
-        case "geq":
-            return getGreaterOrEquals();
-        case "lt":
-            return getLessThan();
-        case "leq":
-            return getLessOrEquals();
-        case "div":
-            return getDiv();
-        case "mul":
-            return getMul();
-        case "add":
-            return getAdd();
-        case "sub":
-            return getSub();
-        case "neg":
-            return getNeg();
+        return switch (op) {
+        case "gt" -> getGreaterThan();
+        case "geq" -> getGreaterOrEquals();
+        case "lt" -> getLessThan();
+        case "leq" -> getLessOrEquals();
+        case "div" -> getDiv();
+        case "mul" -> getMul();
+        case "add" -> getAdd();
+        case "sub" -> getSub();
+        case "neg" -> getNeg();
 
         // Floating point extensions with "\fp_"
-        case "nan":
-            return getIsNaN();
-        case "zero":
-            return getIsZero();
-        case "infinite":
-            return getIsInfinite();
-        case "nice":
-            return getIsNice();
-        case "abs":
-            return getAbs();
-        case "negative":
-            return getIsNegative();
-        case "positive":
-            return getIsPositive();
-        case "subnormal":
-            return getIsSubnormal();
-        case "normal":
-            return getIsNormal();
-        }
-        return null;
+        case "nan" -> getIsNaN();
+        case "zero" -> getIsZero();
+        case "infinite" -> getIsInfinite();
+        case "nice" -> getIsNice();
+        case "abs" -> getAbs();
+        case "negative" -> getIsNegative();
+        case "positive" -> getIsPositive();
+        case "subnormal" -> getIsSubnormal();
+        case "normal" -> getIsNormal();
+        default -> null;
+        };
     }
 
     @Override

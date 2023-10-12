@@ -718,29 +718,19 @@ public final class IntegerLDT extends LDT {
     @Nullable
     @Override
     public Function getFunctionFor(String op, Services services) {
-        switch (op) {
-        case "gt":
-            return getGreaterThan();
-        case "geq":
-            return getGreaterOrEquals();
-        case "lt":
-            return getLessThan();
-        case "leq":
-            return getLessOrEquals();
-        case "div":
-            return getDiv();
-        case "mul":
-            return getMul();
-        case "add":
-            return getAdd();
-        case "sub":
-            return getSub();
-        case "mod":
-            return getMod();
-        case "neg":
-            return getNeg();
-        }
-        return null;
+        return switch (op) {
+        case "gt" -> getGreaterThan();
+        case "geq" -> getGreaterOrEquals();
+        case "lt" -> getLessThan();
+        case "leq" -> getLessOrEquals();
+        case "div" -> getDiv();
+        case "mul" -> getMul();
+        case "add" -> getAdd();
+        case "sub" -> getSub();
+        case "mod" -> getMod();
+        case "neg" -> getNeg();
+        default -> null;
+        };
     }
 
     @Override

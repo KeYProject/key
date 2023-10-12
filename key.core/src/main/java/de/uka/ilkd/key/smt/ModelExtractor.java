@@ -23,22 +23,16 @@ interface Query {
 
     /**
      * Stores the result from the z3 solver.
-     *
-     * @param s
      */
     void setResult(String s);
 
     /**
      * Returns the command that is to be handed over to the z3 solver.
-     *
-     * @return
      */
     String getQuery();
 
     /**
      * Returns the stored result.
-     *
-     * @return
      */
     String getResult();
 }
@@ -671,29 +665,15 @@ public class ModelExtractor {
 
 
     public void addFunction(SMTFunction f) {
-        if (f.getDomainSorts().size() == 0) {
+        if (f.getDomainSorts().isEmpty()) {
             switch (f.getImageSort().getId()) {
-            case SMTObjTranslator.HEAP_SORT:
-                heaps.add(f);
-                break;
-            case SMTObjTranslator.FIELD_SORT:
-                fields.add(f);
-                break;
-            case SMTObjTranslator.LOCSET_SORT:
-                locsets.add(f);
-                break;
-            case SMTObjTranslator.OBJECT_SORT:
-                objects.add(f);
-                break;
-            case SMTObjTranslator.BINT_SORT:
-                ints.add(f);
-                break;
-            case SMTObjTranslator.SEQ_SORT:
-                seqs.add(f);
-                break;
-            default:
-                bools.add(f);
-                break;
+            case SMTObjTranslator.HEAP_SORT -> heaps.add(f);
+            case SMTObjTranslator.FIELD_SORT -> fields.add(f);
+            case SMTObjTranslator.LOCSET_SORT -> locsets.add(f);
+            case SMTObjTranslator.OBJECT_SORT -> objects.add(f);
+            case SMTObjTranslator.BINT_SORT -> ints.add(f);
+            case SMTObjTranslator.SEQ_SORT -> seqs.add(f);
+            default -> bools.add(f);
             }
         } else if (f.getDomainSorts().size() == 2) {
 
