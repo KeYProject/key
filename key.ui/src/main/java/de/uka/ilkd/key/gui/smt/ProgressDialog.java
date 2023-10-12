@@ -214,7 +214,7 @@ public class ProgressDialog extends JDialog {
     public void setModus(Modus m) {
         modus = m;
         switch (modus) {
-        case SOLVERS_DONE:
+        case SOLVERS_DONE -> {
             stopButton.setText("Discard");
             if (applyButton != null) {
                 applyButton.setEnabled(true);
@@ -222,14 +222,13 @@ public class ProgressDialog extends JDialog {
             if (focusButton != null) {
                 focusButton.setEnabled(true);
             }
-            break;
-        case SOLVERS_RUNNING:
+        }
+        case SOLVERS_RUNNING -> {
             stopButton.setText("Stop");
             if (applyButton != null) {
                 applyButton.setEnabled(false);
             }
-            break;
-
+        }
         }
     }
 

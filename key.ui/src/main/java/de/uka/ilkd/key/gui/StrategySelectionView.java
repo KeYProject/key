@@ -95,8 +95,6 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
      * Observe changes on {@link #mediator}.
      */
     private final KeYSelectionListener mediatorListener = new KeYSelectionListener() {
-        public void selectedNodeChanged(KeYSelectionEvent e) {
-        }
 
         public void selectedProofChanged(KeYSelectionEvent e) {
             refresh(e.getSource().getSelectedProof());
