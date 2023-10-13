@@ -16,6 +16,7 @@ import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.UserActionListener;
 import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
@@ -566,6 +567,7 @@ public class KeYMediator {
      * @param b true iff interactive mode is to be turned on
      */
     public void setInteractive(boolean b) {
+        MainWindow.getInstance().getAutoModeAction().setEnabled(true);
         if (getSelectedProof() != null) {
             if (b) {
                 getSelectedProof().setRuleAppIndexToInteractiveMode();
