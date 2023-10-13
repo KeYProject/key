@@ -147,9 +147,15 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * This can be used to pause tree updates when many goals get their state changed at once. The
      * tree is updated automatically after this is set to false.
      */
-    public void setBatchGoalStateChange(boolean value) {
+    public void setBatchGoalStateChange(boolean value, Collection<Node> nodesToUpdate) {
         if (!value && batchGoalStateChange) {
-            updateTree((TreeNode) null);
+            if (nodesToUpdate == null || nodesToUpdate.isEmpty()) {
+                updateTree((TreeNode) null);
+            } else {
+                for (Node n : nodesToUpdate) {
+                    updateTree(n);
+                }
+            }
         }
         batchGoalStateChange = value;
     }

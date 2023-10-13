@@ -1313,4 +1313,15 @@ public class ProofTreeView extends JPanel implements TabPanel {
             return this;
         }
     }
+
+    public Node getSelectedNode() {
+        TreePath sp = delegateView.getSelectionPath();
+        if (sp == null) {
+            return null;
+        }
+        Object treeNode = sp.getLastPathComponent();
+        return (treeNode instanceof GUIAbstractTreeNode)
+                ? ((GUIAbstractTreeNode) treeNode).getNode()
+                : null;
+    }
 }
