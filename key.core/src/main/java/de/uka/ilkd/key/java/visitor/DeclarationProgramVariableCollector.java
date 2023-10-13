@@ -13,8 +13,6 @@ import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
 
 /**
  * The DeclarationProgramVariableCollector collects all top level declared program variables
@@ -64,14 +62,6 @@ public class DeclarationProgramVariableCollector extends JavaASTVisitor {
 
     public void performActionOnFieldSpecification(FieldSpecification x) {
         addVariable(x.getProgramVariable());
-    }
-
-    public void performActionOnLocationVariable(LocationVariable x) {
-        performActionOnProgramVariable(x);
-    }
-
-    public void performActionOnProgramConstant(ProgramConstant x) {
-        performActionOnProgramVariable(x);
     }
 
 }

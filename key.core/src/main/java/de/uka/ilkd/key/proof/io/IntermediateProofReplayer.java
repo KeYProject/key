@@ -130,7 +130,7 @@ public class IntermediateProofReplayer {
         this.loader = loader;
 
         queue.addFirst(
-            new Pair<>(proof.root(), parserResult.getParsedResult()));
+            new Pair<>(proof.root(), parserResult.parsedResult()));
     }
 
     /**

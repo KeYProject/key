@@ -58,9 +58,11 @@ import org.antlr.v4.runtime.TokenSource;
  */
 public final class MiscTools {
 
-    /** Pattern to parse URL scheme (capture group 1) and scheme specific part (group 2). */
+    /**
+     * Pattern to parse URL scheme (capture group 1) and scheme specific part (group 2).
+     */
     private static final Pattern URL_PATTERN =
-        Pattern.compile("(^[a-zA-Z][a-zA-Z0-9\\+\\-\\.]*):(.*)");
+        Pattern.compile("(^[a-zA-Z][a-zA-Z0-9+\\-.]*):(.*)");
 
     private MiscTools() {
     }
@@ -361,12 +363,11 @@ public final class MiscTools {
     /**
      * Join the string representations of a collection of objects into onw string. The individual
      * elements are separated by a delimiter.
-     *
+     * <p>
      * {@link Object#toString()} is used to turn the objects into strings.
      *
      * @param collection an arbitrary non-null collection
      * @param delimiter a non-null string which is put between the elements.
-     *
      * @return the concatenation of all string representations separated by the delimiter
      */
     public static String join(Iterable<?> collection, String delimiter) {
@@ -376,12 +377,11 @@ public final class MiscTools {
     /**
      * Join the string representations of an array of objects into one string. The individual
      * elements are separated by a delimiter.
-     *
+     * <p>
      * {@link Object#toString()} is used to turn the objects into strings.
      *
      * @param collection an arbitrary non-null array of objects
      * @param delimiter a non-null string which is put between the elements.
-     *
      * @return the concatenation of all string representations separated by the delimiter
      */
     public static String join(Object[] collection, String delimiter) {
@@ -391,13 +391,12 @@ public final class MiscTools {
     /**
      * Takes a string and returns a string which is potentially shorter and contains a
      * sub-collection of the original characters.
-     *
+     * <p>
      * All alphabetic characters (A-Z and a-z) are copied to the result while all other characters
      * are removed.
      *
      * @param string an arbitrary string
      * @return a string which is a sub-structure of the original character sequence
-     *
      * @author Mattias Ulbrich
      */
     public static /* @ non_null @ */ String filterAlphabetic(/* @ non_null @ */ String string) {
@@ -419,9 +418,6 @@ public final class MiscTools {
     /**
      * There are different kinds of JML markers. See Section 4.4 "Annotation markers" of the JML
      * reference manual.
-     *
-     * @param comment
-     * @return
      */
     public static boolean isJMLComment(String comment) {
         return Strings.isJMLComment(comment);
@@ -721,6 +717,47 @@ public final class MiscTools {
     }
 
     /**
+     * Tries to extract a valid URI from the given DataLocation.
+     *
+     * @param loc the given DataLocation
+     * @return an URI identifying the resource of the DataLocation
+     */
+    public static Optional<URI> extractURI(DataLocation loc) {
+        if (loc == null) {
+            throw new IllegalArgumentException("The given DataLocation is null!");
+        }
+
+        try {
+            return switch (loc.getType()) {
+                case "URL" -> // URLDataLocation
+                        Optional.of(((URLDataLocation) loc).url().toURI());
+                case "ARCHIVE" -> { // ArchiveDataLocation
+                    // format: "ARCHIVE:<filename>?<itemname>"
+                    ArchiveDataLocation adl = (ArchiveDataLocation) loc;
+
+                    // extract item name and zip file
+                    int qmindex = adl.toString().lastIndexOf('?');
+                    String itemName = adl.toString().substring(qmindex + 1);
+                    ZipFile zip = adl.getFile();
+
+                    // use special method to ensure that path separators are correct
+                    yield Optional.of(getZipEntryURI(zip, itemName));
+                }
+                case "FILE" -> // DataFileLocation
+                    // format: "FILE:<path>"
+                        Optional.of(((DataFileLocation) loc).getFile().toURI());
+                default -> // SpecDataLocation
+                    // format "<type>://<location>"
+                    // wrap into URN to ensure URI encoding is correct (no spaces!)
+                        Optional.empty();
+            };
+        } catch (URISyntaxException | IOException e) {
+            throw new IllegalArgumentException(
+                    "The given DataLocation can not be converted into a valid URI: " + loc, e);
+        }
+    }
+
+    /**
      * Creates a URI (that contains a URL) pointing to the entry with the given name inside the
      * given zip file. <br>
      * <br>
@@ -803,7 +840,7 @@ public final class MiscTools {
      * </ul>
      * </li>
      * </ul>
-     *
+     * <p>
      * A NullPointerException is thrown if null is given. If the input is "", ".", or a relative
      * path in general, the path is resolved against the current working directory (see system
      * property "user.dir") consistently to the behaviour of {@link Paths#get(String, String...)}.
@@ -826,16 +863,16 @@ public final class MiscTools {
             schemeSpecPart = m.group(2);
         }
         switch (scheme) {
-        case "URL":
+        case "URL" -> {
             // schemeSpecPart actually contains a URL again
             return new URL(schemeSpecPart);
-        case "ARCHIVE":
+        }
+        case "ARCHIVE" -> {
             // format: "ARCHIVE:<filename>?<itemname>"
             // extract item name and zip file
             int qmindex = schemeSpecPart.lastIndexOf('?');
             String zipName = schemeSpecPart.substring(0, qmindex);
             String itemName = schemeSpecPart.substring(qmindex + 1);
-
             try {
                 ZipFile zip = new ZipFile(zipName);
                 // use special method to ensure that path separators are correct
@@ -846,15 +883,18 @@ public final class MiscTools {
                 me.initCause(e);
                 throw me;
             }
-        case "FILE":
+        }
+        case "FILE" -> {
             // format: "FILE:<path>"
             Path path = Paths.get(schemeSpecPart).toAbsolutePath().normalize();
             return path.toUri().toURL();
-        case "":
+        }
+        case "" -> {
             // only file/path without protocol
             Path p = Paths.get(input).toAbsolutePath().normalize();
             return p.toUri().toURL();
-        default:
+        }
+        default -> {
             // may still be Windows path starting with <drive_letter>:
             if (scheme.length() == 1) {
                 // TODO: Theoretically, a protocol with only a single letter is allowed.
@@ -865,6 +905,7 @@ public final class MiscTools {
             // otherwise call URL constructor
             // if this also fails, there is an unknown protocol -> MalformedURLException
             return new URL(input);
+        }
         }
     }
 }

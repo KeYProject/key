@@ -9,7 +9,6 @@ import java.util.List;
 import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.TypeDeclarationContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.pp.PrettyPrinter;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -254,10 +253,4 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     }
 
 
-    /** toString */
-    public String toString() {
-        PrettyPrinter pp = PrettyPrinter.purePrinter();
-        pp.print(this);
-        return pp.result();
-    }
 }

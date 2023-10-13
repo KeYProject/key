@@ -370,11 +370,6 @@ public abstract class ProgramSVSort extends AbstractSort {
         }
 
         @Override
-        public boolean canStandFor(Term t) {
-            return t.op() instanceof ProgramVariable;
-        }
-
-        @Override
         protected boolean canStandFor(ProgramElement pe, Services services) {
             ProgramVariable accessedField = null;
             if (pe instanceof FieldReference) {
@@ -462,11 +457,6 @@ public abstract class ProgramSVSort extends AbstractSort {
 
         protected SimpleExpressionSort(Name n) {
             super(n);
-        }
-
-        @Override
-        public boolean canStandFor(Term t) {
-            return true;
         }
 
         @Override

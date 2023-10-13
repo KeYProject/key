@@ -805,9 +805,6 @@ public class KeYMediator {
     public void enableWhenProofLoaded(final Action a) {
         a.setEnabled(getSelectedProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
-            @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
-            }
 
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
@@ -824,9 +821,6 @@ public class KeYMediator {
     public void enableWhenProofLoaded(final javax.swing.AbstractButton a) {
         a.setEnabled(getSelectedProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
-            @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
-            }
 
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {

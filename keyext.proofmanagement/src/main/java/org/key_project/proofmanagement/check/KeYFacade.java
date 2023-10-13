@@ -373,8 +373,8 @@ public final class KeYFacade {
             lastTouchedNode = lastGoal != null ? lastGoal.node() : proof.root();
 
         } catch (Exception e) {
-            if (parserResult == null || parserResult.getErrors() == null
-                    || parserResult.getErrors().isEmpty() ||
+            if (parserResult == null || parserResult.errors() == null
+                    || parserResult.errors().isEmpty() ||
                     replayer == null || replayResult == null || replayResult.getErrors() == null
                     || replayResult.getErrors().isEmpty()) {
                 // this exception was something unexpected
@@ -383,8 +383,8 @@ public final class KeYFacade {
         } finally {
             String status = "";
             if (parserResult != null) {
-                status = parserResult.getStatus();
-                errors.addAll(parserResult.getErrors());
+                status = parserResult.status();
+                errors.addAll(parserResult.errors());
             }
             status +=
                 (status.isEmpty() ? "" : "\n\n") + (replayResult != null ? replayResult.getStatus()

@@ -5,7 +5,6 @@ package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -29,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * {@code generateRunAllProofs}.
  * <p>
  * The considered proof collections files are configured statically in
- * {@link #main(String[])}.
+ * {@link ProofCollections}.
  *
  * @author Alexander Weigl
  * @version 1 (6/14/20)
@@ -57,22 +56,31 @@ public class GenerateUnitTests {
 
         for (var col : collections) {
             for (RunAllProofsTestUnit unit : col.createRunAllProofsTestUnits()) {
-                createUnitClass(col, unit);
+                createUnitClass(unit);
             }
         }
     }
 
+    // "import de.uka.ilkd.key.util.NamedRunner;\n" +
+    // "import de.uka.ilkd.key.util.TestName;\n" +
+    // "@org.junit.experimental.categories.Category(org.key_project.util.testcategories.ProofTestCategory.class)\n"
+    // +
+    // "@RunWith(NamedRunner.class)\n" +
     private static final String TEMPLATE_CONTENT =
         """
+                /* This file is part of KeY - https://key-project.org
+                 * KeY is licensed under the GNU General Public License Version 2
+                 * SPDX-License-Identifier: GPL-2.0-only */
+
                 package $packageName;
 
                 import org.junit.jupiter.api.*;
+                import static org.junit.jupiter.api.Assertions.*;
 
-                @Tag("slow") public class $className extends de.uka.ilkd.key.proof.runallproofs.ProveTest {
-
+                public class $className extends de.uka.ilkd.key.proof.runallproofs.ProveTest {
                   public static final String STATISTIC_FILE = "$statisticsFile";
 
-                  {
+                  { // initialize during construction
                     this.baseDirectory = "$baseDirectory";
                     this.statisticsFile = STATISTIC_FILE;
                     this.name = "$name";
@@ -92,15 +100,16 @@ public class GenerateUnitTests {
      * Generates the test classes for the given proof collection, and writes the
      * java files.
      *
-     * @param col
-     * @param unit
+     * @param unit a group of proof collection units
      * @throws IOException if the file is not writable
      */
-    private static void createUnitClass(ProofCollection col, RunAllProofsTestUnit unit)
+    private static void createUnitClass(RunAllProofsTestUnit unit)
             throws IOException {
         String packageName = "de.uka.ilkd.key.proof.runallproofs.gen";
         String name = unit.getTestName();
-        String className = name.replaceAll("\\.java", "").replaceAll("\\.key", "")
+        String className = '_' + name // avoids name clashes, i.e., group "switch"
+                .replaceAll("\\.java", "")
+                .replaceAll("\\.key", "")
                 .replaceAll("[^a-zA-Z0-9]+", "_").toUpperCase();
 
         ProofCollectionSettings settings = unit.getSettings();
@@ -135,7 +144,9 @@ public class GenerateUnitTests {
 
         for (TestFile file : unit.getTestFiles()) {
             File keyFile = file.getKeYFile();
-            String testName = keyFile.getName().replaceAll("\\.java", "").replaceAll("\\.key", "")
+            String testName = keyFile.getName()
+                    .replaceAll("\\.java", "")
+                    .replaceAll("\\.key", "")
                     .replaceAll("[^a-zA-Z0-9]+", "_");
 
             if (usedMethodNames.contains(testName)) {
@@ -148,7 +159,7 @@ public class GenerateUnitTests {
             methods.append("\n");
             methods.append("@Test(").append(to).append(")")
                     // .append("@TestName(\"").append(keyFile.getName()).append("\")")
-                    .append("public void test").append(testName).append("() throws Exception {\n");
+                    .append("void test").append(testName).append("() throws Exception {\n");
             // "// This tests is based on").append(keyFile.getAbsolutePath()).append("\n");
 
             switch (file.getTestProperty()) {
@@ -179,7 +190,7 @@ public class GenerateUnitTests {
         m.appendTail(sb);
         File folder = new File(outputFolder, packageName.replace('.', '/'));
         folder.mkdirs();
-        Files.write(Paths.get(folder.getAbsolutePath(), className + ".java"),
-            sb.toString().getBytes(StandardCharsets.UTF_8));
+        Files.writeString(Paths.get(folder.getAbsolutePath(), className + ".java"),
+            sb.toString());
     }
 }
