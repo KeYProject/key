@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,7 +79,6 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @param initConfig The already load {@link InitConfig}.
      * @param properties The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
-     * @throws IOException Occurred Exception.
      */
     public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) {
         String contractName = properties.getProperty("contract");

@@ -67,8 +67,6 @@ public interface EnvInput {
 
     /**
      * gets the boot classpath element, null if none set.
-     *
-     * @throws
      */
     File readBootClassPath();
 

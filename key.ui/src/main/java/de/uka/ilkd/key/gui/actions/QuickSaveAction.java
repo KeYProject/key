@@ -55,12 +55,11 @@ public final class QuickSaveAction extends MainWindowAction {
             final Proof proof = mainWindow.getMediator().getSelectedProof();
             new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION).save();
             final String status = "File quicksaved: " + filename;
-            if (status != null) {
-                mainWindow.popupWarning(
-                    "Quicksaving file " + filename + " failed:\n" + status,
-                    "Quicksave failed");
-                LOGGER.debug("Quicksaving file {} failed.", filename, status);
-            }
+            mainWindow.popupWarning(
+                "Quicksaving file " + filename + " failed:\n" + status,
+                "Quicksave failed");
+            LOGGER.debug("Quicksaving file {} failed.", filename, status);
+
             mainWindow.setStatusLine(status);
             LOGGER.debug(status);
         } else {

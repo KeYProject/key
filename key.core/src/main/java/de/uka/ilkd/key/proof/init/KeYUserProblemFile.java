@@ -240,7 +240,6 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      *
      * @return The {@link Profile} defined by the file to load or {@code null} if no {@link Profile}
      *         is defined by the file.
-     * @throws Exception Occurred Exception.
      */
     private Profile readProfileFromFile() {
         @Nonnull
