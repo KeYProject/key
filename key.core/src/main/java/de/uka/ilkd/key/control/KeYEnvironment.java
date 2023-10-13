@@ -28,7 +28,7 @@ import de.uka.ilkd.key.util.Pair;
  *
  * @author Martin Hentschel
  */
-public class KeYEnvironment<U extends UserInterfaceControl> implements AutoCloseable {
+public class KeYEnvironment<U extends UserInterfaceControl> {
     /**
      * The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
      */
@@ -317,10 +317,5 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
 
     public Pair<String, Location> getProofScript() {
         return proofScript;
-    }
-
-    @Override
-    public void close() {
-        dispose();
     }
 }
