@@ -3,11 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -21,10 +17,10 @@ public class SumProdHandler implements SMTHandler {
     private Function bsumOp, bprodOp;
 
     // key is the term to identify the bsum, value is the name used for that function.
-    private final HashMap<Term, SExpr> usedBsumTerms = new LinkedHashMap();
+    private final Map<Term, SExpr> usedBsumTerms = new LinkedHashMap<>();
 
     // key is the term to identify the bprod, value is the name used for that function.
-    private final HashMap<Term, SExpr> usedBprodTerms = new LinkedHashMap();
+    private final Map<Term, SExpr> usedBprodTerms = new LinkedHashMap<>();
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,

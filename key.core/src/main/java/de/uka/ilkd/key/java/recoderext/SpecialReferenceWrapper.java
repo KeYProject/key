@@ -54,24 +54,6 @@ public class SpecialReferenceWrapper extends ThisReference
     }
 
 
-    /**
-     * Get expression container.
-     *
-     * @return the expression container.
-     */
-    public ExpressionContainer getExpressionContainer() {
-        return expressionParent;
-    }
-
-    /**
-     * Set expression container.
-     *
-     * @param c an expression container.
-     */
-    public void setExpressionContainer(ExpressionContainer c) {
-        expressionParent = c;
-    }
-
     // don't think we need it
     public void accept(SourceVisitor v) {
     }

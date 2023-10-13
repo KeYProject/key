@@ -43,8 +43,6 @@ public class ToggleExplorationAction extends KeyAction {
                         updateEnable(mainWindow);
                     }
 
-                    @Override
-                    public void selectedNodeChanged(KeYSelectionEvent e) {}
                 });
 
         updateEnable(mainWindow);

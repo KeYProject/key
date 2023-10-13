@@ -104,8 +104,6 @@ public final class SeqLDT extends LDT {
     /**
      * Placeholder for the sequence of values observed through the execution of an enhanced for
      * loop. Follows David Cok's proposal to adapt JML to Java5.
-     *
-     * @return
      */
     public Function getValues() {
         return values;
@@ -167,12 +165,10 @@ public final class SeqLDT extends LDT {
     @Nullable
     @Override
     public Function getFunctionFor(String operationName, Services services) {
-        switch (operationName) {
-        case "add":
+        if (operationName.equals("add")) {
             return getSeqConcat();
-        default:
-            return null;
         }
+        return null;
     }
 
 
