@@ -67,11 +67,6 @@ public class KeyboardTacletExtension implements KeYGuiExtension, KeYGuiExtension
             public void selectedNodeChanged(KeYSelectionEvent e) {
                 panel.setGoal(mediator.getSelectedGoal());
             }
-
-            @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
-
-            }
         });
 
         /*
@@ -192,7 +187,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
                 TacletApp tacletApp = (TacletApp) ruleApp;
                 ImmutableSet<TacletApp> seq = ImmutableSet.singleton(tacletApp);
                 pc.selectedTaclet(seq, lastGoal);
-            } catch (ClassCastException e) {
+            } catch (ClassCastException ignored) {
 
             }
         } else {
@@ -459,23 +454,23 @@ class KeyboardTacletModel {
 
     public void processChar(char c) {
         switch (c) {
-        case '\u001B': // escape
+        case '\u001B' -> // escape
             reset();
-            break;
-        case '\b':
+        case '\b' -> {
             if (currentPrefix.length() <= 1) {
                 setCurrentPrefix("");
             } else {
                 setCurrentPrefix(currentPrefix.substring(0, currentPrefix.length() - 1));
             }
-            break;
-        default:
+        }
+        default -> {
             if ('0' <= c && c <= '9') {
                 setCurrentPos(c - '0');
             }
             if (charValid(c)) {
                 setCurrentPrefix(currentPrefix + c);
             }
+        }
         }
     }
 

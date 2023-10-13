@@ -134,14 +134,11 @@ public class FormulaTermLabel implements TermLabel {
      */
     @Override
     public Object getChild(int i) {
-        switch (i) {
-        case 0:
-            return getId();
-        case 1:
-            return beforeIds;
-        default:
-            return null;
-        }
+        return switch (i) {
+        case 0 -> getId();
+        case 1 -> beforeIds;
+        default -> null;
+        };
     }
 
     /**

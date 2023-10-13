@@ -185,12 +185,6 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             (StatementBlock) callConvert(l.getBody()));
     }
 
-    public LoopScopeBlock convert(de.uka.ilkd.key.java.recoderext.LoopScopeBlock l) {
-        return new LoopScopeBlock(
-            (de.uka.ilkd.key.logic.op.IProgramVariable) callConvert(l.getIndexPV()),
-            (StatementBlock) callConvert(l.getBody()));
-    }
-
     /**
      * translate method body statements.
      */

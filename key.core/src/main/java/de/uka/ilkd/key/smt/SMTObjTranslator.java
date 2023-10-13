@@ -670,25 +670,19 @@ public class SMTObjTranslator implements SMTTranslator {
             SMTTerm selectArr = SMTTerm.call(selectFunction, h, o, arr);
             SMTTerm typeReq;
             switch (single) {
-            case "int":
-            case "char":
-            case "byte":
-                typeReq = SMTTerm.call(getIsFunction(sorts.get(BINT_SORT)), selectArr);
-                break;
-            case "java.lang.Object":
-                typeReq = SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
-                break;
-            case "boolean":
-                typeReq = SMTTerm.call(getIsFunction(SMTSort.BOOL), selectArr);
-                break;
-            default:
+            case "int", "char", "byte" -> typeReq =
+                SMTTerm.call(getIsFunction(sorts.get(BINT_SORT)), selectArr);
+            case "java.lang.Object" -> typeReq =
+                SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
+            case "boolean" -> typeReq = SMTTerm.call(getIsFunction(SMTSort.BOOL), selectArr);
+            default -> {
                 typeReq = SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
                 Sort singleSort = services.getJavaInfo().getKeYJavaType(single).getSort();
                 addTypePredicate(singleSort);
                 SMTFunction tps = getTypePredicate(singleSort.name().toString());
                 SMTTerm selectObjArr = castTermIfNecessary(selectArr, sorts.get(OBJECT_SORT));
                 typeReq = typeReq.and(SMTTerm.call(tps, selectObjArr));
-                break;
+            }
             }
             assertion4 = assertion4.and(premise.implies(typeReq));
         }

@@ -31,23 +31,16 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         super(config);
     }
 
-    // TODO move to where it belongs ?!
-    private static void removeRange(List list, int from) {
-        for (int i = list.size() - 1; i >= from; i--) {
-            list.remove(i);
+    private static <T> void removeRange(List<T> list, int from) {
+        if (list.size() > from) {
+            list.subList(from, list.size()).clear();
         }
     }
 
-    // TODO move to where it belongs ?!
-    private static void removeRange(List list, int from, int to) {
-        // TODO improve speed!
-        if (from > to) {
-            to ^= from ^= to ^= from;
-        }
-        int cnt = to - from;
-        while (cnt-- > 0) {
-            list.remove(from);
-        }
+    private static <T> void removeRange(List<T> list, int from, int to) {
+        int start = Math.min(from, to);
+        int end = Math.max(from, to);
+        list.subList(start, end).clear();
     }
 
     final ChangeHistory getChangeHistory() {
@@ -118,9 +111,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         }
         int s = ctce.subtypes.size();
         List<ClassType> result = new ArrayList<>(s);
-        for (ClassType subct : ctce.subtypes) {
-            result.add(subct);
-        }
+        result.addAll(ctce.subtypes);
         return result;
     }
 
@@ -184,13 +175,12 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             if (fl == null) {
                 continue;
             }
-            int fs = fl.size();
             add_fields: for (Field f : fl) {
                 if (isVisibleFor(f, ct)) {
                     String fname = f.getName();
                     for (int k = 0; k < result_size; k++) {
                         Field rf = result.get(k);
-                        if (rf.getName() == fname) {
+                        if (Objects.equals(rf.getName(), fname)) {
                             continue add_fields;
                         }
                     }
@@ -234,7 +224,6 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             if (ml == null) {
                 continue;
             }
-            int ms = ml.size();
             add_methods: for (Method m : ml) {
                 // if (m.isPublic() || m.isProtected() || c == ct ||
                 // (!m.isPrivate() && c.getPackage() == ct.getPackage())) {
@@ -264,7 +253,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                     String mname = m.getName();
                     for (int k = 0; k < result_size; k++) {
                         Method rm = result.get(k);
-                        if (rm.getName() == mname) {
+                        if (Objects.equals(rm.getName(), mname)) {
                             List<? extends Type> rsig = rm.getSignature();
                             if (rsig.equals(msig)) {
                                 // skip this method: we already had it
@@ -282,18 +271,11 @@ public abstract class DefaultProgramModelInfo extends AbstractService
     }
 
     private Type makeParameterizedType(TypeArgument ta) {
-        Type bt = null;
-        switch (ta.getWildcardMode()) {
-        case Super:
-        case Any:
-            bt = getNameInfo().getJavaLangObject();
-            break;
-        case None:
-        case Extends:
-            bt = getBaseType(ta);
-            break;
-        }
-        if (ta.getTypeArguments() == null || ta.getTypeArguments().size() == 0) {
+        Type bt = switch (ta.getWildcardMode()) {
+        case Super, Any -> getNameInfo().getJavaLangObject();
+        case None, Extends -> getBaseType(ta);
+        };
+        if (ta.getTypeArguments() == null || ta.getTypeArguments().isEmpty()) {
             return bt;
         }
         return new ParameterizedType((ClassType) bt, ta.getTypeArguments());
@@ -329,7 +311,6 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             if (cl == null) {
                 continue;
             }
-            int cs = cl.size();
             add_ClassTypes: for (ClassType hc : cl) {
                 // hc == ct may occur as it is admissible for a member class
                 // to extend its parent class
@@ -337,7 +318,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                     String cname = hc.getName();
                     for (int k = 0; k < result_size; k++) {
                         ClassType rc = result.get(k);
-                        if (rc.getName() == cname) {
+                        if (Objects.equals(rc.getName(), cname)) {
                             continue add_ClassTypes;
                         }
                     }
@@ -444,8 +425,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             if (to instanceof ClassType) {
                 return isWidening((ClassType) from, (ClassType) to);
             } else {
-                return (from instanceof NullType)
-                        && (to instanceof ArrayType || to instanceof TypeParameter);
+                return from instanceof NullType && to instanceof ArrayType;
             }
         } else if (from instanceof PrimitiveType) {
             if (to instanceof PrimitiveType) {
@@ -509,7 +489,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         return isSubtype(b, a);
     }
 
-    private final boolean paramMatches(Type ta, Type tb, boolean allowAutoboxing) {
+    private boolean paramMatches(Type ta, Type tb, boolean allowAutoboxing) {
         if (ta == tb) {
             return true;
         }
@@ -585,7 +565,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         return t;
     }
 
-    private final boolean internalIsCompatibleSignature(List<Type> a, List<Type> b,
+    private boolean internalIsCompatibleSignature(List<Type> a, List<Type> b,
             boolean allowAutoboxing, boolean isVarArgMethod) {
         int s = b.size();
         int n = a.size();
@@ -896,9 +876,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
     private List<Type> replaceTypeArguments(List<Type> methodSig,
             List<? extends TypeArgument> typeArguments, Method m) {
         List<Type> res = new ArrayList<>(methodSig.size());
-        for (Type type : methodSig) {
-            res.add(type);
-        }
+        res.addAll(methodSig);
         for (int l = 0; l < m.getTypeParameters().size(); l++) {
             TypeParameter tp = m.getTypeParameters().get(l);
             for (int k = 0; k < methodSig.size(); k++) {
@@ -1025,7 +1003,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             List<Type> signature, List<? extends Method> meths,
             List<? extends TypeArgument> typeArgs, ClassType context) {
         Debug.assertNonnull(ct, name, signature);
-        boolean allowJava5 = Boolean.valueOf(
+        boolean allowJava5 = Boolean.parseBoolean(
             getServiceConfiguration().getProjectSettings().getProperty(PropertyNames.JAVA_5));
 
         List<Method> result;
@@ -1059,13 +1037,13 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         // for first pass, we need to filter again, but on already reduced set only
         internalFilterApplicableMethods(result, name, signature, context, typeArgs, false);
         filterMostSpecificMethods(result);
-        if (result.size() > 0) {
+        if (!result.isEmpty()) {
             return result;
         }
 
         result.addAll(applicableMethods); // result is empty at this point
         filterMostSpecificMethodsPhase2(result);
-        if (result.size() > 0) {
+        if (!result.isEmpty()) {
             return result;
         }
         result.addAll(applicableMethods); // once again, result is empty
@@ -1084,7 +1062,6 @@ public abstract class DefaultProgramModelInfo extends AbstractService
     /**
      * Takes an (Array|Class)Type and adds type arguments to it.
      *
-     * @return
      * @throws AssertionError if t is neither a Class or Array Type
      * @throws ClassCastException if t is an array type with a primitive type as base type.
      */

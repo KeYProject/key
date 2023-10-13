@@ -24,7 +24,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2.3.3
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: --continue -D UPDATE_TEST_ORACLE=true -D ORACLE_DIRECTORY=key.core.symbolic_execution/src/test/resources/testcase :key.core.symbolic_execution:test
 
