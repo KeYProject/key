@@ -239,11 +239,7 @@ public final class ProblemInitializer {
         final String javaPath = envInput.readJavaPath();
         final List<File> classPath = envInput.readClassPath();
         final File bootClassPath;
-        try {
-            bootClassPath = envInput.readBootClassPath();
-        } catch (IOException ioe) {
-            throw new ProofInputException(ioe);
-        }
+        bootClassPath = envInput.readBootClassPath();
 
         final Includes includes = envInput.readIncludes();
 
@@ -384,8 +380,7 @@ public final class ProblemInitializer {
     }
 
     // what is the purpose of this method?
-    private InitConfig determineEnvironment(ProofOblInput po, InitConfig initConfig)
-            throws ProofInputException {
+    private InitConfig determineEnvironment(ProofOblInput po, InitConfig initConfig) {
         // TODO: what does this actually do?
         ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().updateChoices(initConfig.choiceNS(),
             false);
