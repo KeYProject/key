@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
 import javax.annotation.Nullable;
@@ -73,9 +76,9 @@ public final class CharListLDT extends LDT {
     // -------------------------------------------------------------------------
 
     private String translateCharTerm(Term t) {
-        char charVal = 0;
-        int intVal = 0;
-        String result = printlastfirst(t.sub(0)).toString();
+        char charVal;
+        int intVal;
+        String result = printLastFirst(t.sub(0)).toString();
         try {
             intVal = Integer.parseInt(result);
             charVal = (char) intVal;
@@ -90,11 +93,11 @@ public final class CharListLDT extends LDT {
     }
 
 
-    private StringBuffer printlastfirst(Term t) {
+    private StringBuffer printLastFirst(Term t) {
         if (t.op().arity() == 0) {
             return new StringBuffer();
         } else {
-            return printlastfirst(t.sub(0)).append(t.op().name().toString());
+            return printLastFirst(t.sub(0)).append(t.op().name().toString());
         }
     }
 
@@ -247,12 +250,10 @@ public final class CharListLDT extends LDT {
     @Nullable
     @Override
     public Function getFunctionFor(String operationName, Services services) {
-        switch (operationName) {
         // This is not very elegant; but seqConcat is actually in the SeqLDT.
-        case "add":
+        if (operationName.equals("add")) {
             return services.getNamespaces().functions().lookup("seqConcat");
-        default:
-            return null;
         }
+        return null;
     }
 }

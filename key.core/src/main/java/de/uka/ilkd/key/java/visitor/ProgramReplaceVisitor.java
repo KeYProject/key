@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -35,14 +38,6 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
         svinsts = svi;
     }
 
-    /**
-     * the action that is performed just before leaving the node the last time
-     */
-    @Override
-    protected void doAction(ProgramElement node) {
-        node.visit(this);
-    }
-
     /** starts the walker */
     @Override
     public void start() {
@@ -63,11 +58,6 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
      */
     public ProgramElement result() {
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return stack.peek().toString();
     }
 
     /**

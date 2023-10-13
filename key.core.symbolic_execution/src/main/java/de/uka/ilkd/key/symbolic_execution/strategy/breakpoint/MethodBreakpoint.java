@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import java.util.Objects;
@@ -96,18 +99,15 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     private boolean isMethodCallNode(Node node, RuleApp ruleApp) {
         SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
         IProgramMethod currentPm = null;
-        if (statement instanceof MethodBodyStatement) {
-            MethodBodyStatement mbs = (MethodBodyStatement) statement;
+        if (statement instanceof MethodBodyStatement mbs) {
             currentPm = mbs.getProgramMethod(getProof().getServices());
         }
         if (currentPm != null && currentPm.equals(getPm())
                 && SymbolicExecutionUtil.isMethodCallNode(node, ruleApp, statement)) {
             return true;
-        } else if (ruleApp instanceof ContractRuleApp) {
-            ContractRuleApp methodRuleApp = (ContractRuleApp) ruleApp;
+        } else if (ruleApp instanceof ContractRuleApp methodRuleApp) {
             Contract contract = methodRuleApp.getInstantiation();
-            if (contract instanceof FunctionalOperationContract) {
-                FunctionalOperationContract methodContract = (FunctionalOperationContract) contract;
+            if (contract instanceof FunctionalOperationContract methodContract) {
                 return methodContract.getTarget().equals(getPm());
             }
         }
@@ -124,11 +124,9 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
                 || SymbolicExecutionUtil.isExceptionalMethodReturnNode(node, ruleApp))
                 && isCorrectMethodReturn(node, ruleApp)) {
             return true;
-        } else if (ruleApp instanceof ContractRuleApp) {
-            ContractRuleApp methodRuleApp = (ContractRuleApp) ruleApp;
+        } else if (ruleApp instanceof ContractRuleApp methodRuleApp) {
             Contract contract = methodRuleApp.getInstantiation();
-            if (contract instanceof FunctionalOperationContract) {
-                FunctionalOperationContract methodContract = (FunctionalOperationContract) contract;
+            if (contract instanceof FunctionalOperationContract methodContract) {
                 return methodContract.getTarget().equals(getPm());
             }
         }

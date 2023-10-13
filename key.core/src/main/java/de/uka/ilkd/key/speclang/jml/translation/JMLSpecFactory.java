@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import java.util.*;
@@ -281,8 +284,7 @@ public class JMLSpecFactory {
                     result = result.prepend(lpv);
                     return result;
                 }
-            } else if (s instanceof BranchStatement) {
-                BranchStatement bs = (BranchStatement) s;
+            } else if (s instanceof BranchStatement bs) {
                 for (int j = 0, n = bs.getBranchCount(); j < n; j++) {
                     ImmutableList<ProgramVariable> lpv =
                         collectLocalVariables(bs.getBranchAt(j), loop);
@@ -1012,7 +1014,7 @@ public class JMLSpecFactory {
         Term inv = tb.convertToFormula(inv0);
         // create invariant
         String name = getDefaultInvName(null, kjt);
-        return new ClassInvariantImpl(name, name, kjt, visibility, inv, context.selfVar);
+        return new ClassInvariantImpl(name, name, kjt, visibility, inv, context.selfVar());
     }
 
     public ClassInvariant createJMLClassInvariant(KeYJavaType kjt, TextualJMLClassInv textualInv) {
@@ -1034,7 +1036,7 @@ public class JMLSpecFactory {
         String name = getDefaultInvName(null, kjt);
         String display = getDefaultInvName(textualInv.getName(), kjt);
         return new ClassInvariantImpl(name, display, kjt, getVisibility(textualInv), inv,
-            context.selfVar, textualInv.isFree());
+            context.selfVar(), textualInv.isFree());
     }
 
     public InitiallyClause createJMLInitiallyClause(@Nonnull KeYJavaType kjt,
@@ -1048,7 +1050,7 @@ public class JMLSpecFactory {
 
         // create invariant
         String name = getInicName();
-        return new InitiallyClauseImpl(name, name, kjt, new Public(), inv, context.selfVar,
+        return new InitiallyClauseImpl(name, name, kjt, new Public(), inv, context.selfVar(),
             original);
 
     }
@@ -1079,7 +1081,7 @@ public class JMLSpecFactory {
         Term repFormula = tb.convertToFormula(rep.second);
         // create class axiom
         return new RepresentsAxiom("JML represents clause for " + rep.first.name(), rep.first, kjt,
-            visibility, null, repFormula, context.selfVar, ImmutableSLList.nil(), null);
+            visibility, null, repFormula, context.selfVar(), ImmutableSLList.nil(), null);
     }
 
     public ClassAxiom createJMLRepresents(KeYJavaType kjt, TextualJMLRepresents textualRep)
@@ -1107,7 +1109,7 @@ public class JMLSpecFactory {
                 : "JML represents clause \"" + textualRep.getName() + "\" for " + rep.first.name();
         Term repFormula = tb.convertToFormula(rep.second);
         return new RepresentsAxiom(name, displayName, rep.first, kjt, getVisibility(textualRep),
-            null, repFormula, context.selfVar, ImmutableSLList.nil(), null);
+            null, repFormula, context.selfVar(), ImmutableSLList.nil(), null);
     }
 
     /**
@@ -1134,7 +1136,7 @@ public class JMLSpecFactory {
         String name = "class axiom in " + kjt.getFullName();
         String displayName = textual.getName() == null ? name
                 : "class axiom \"" + textual.getName() + "\" in " + kjt.getFullName();
-        return new ClassAxiomImpl(name, displayName, kjt, new Public(), ax, context.selfVar);
+        return new ClassAxiomImpl(name, displayName, kjt, new Public(), ax, context.selfVar());
     }
 
     public Contract createJMLDependencyContract(KeYJavaType kjt, LocationVariable targetHeap,
@@ -1151,7 +1153,7 @@ public class JMLSpecFactory {
         // translateToTerm expression
         Triple<IObserverFunction, Term, Term> dep =
             new JmlIO(services).context(context).translateDependencyContract(originalDep);
-        return cf.dep(kjt, targetHeap, dep, dep.first.isStatic() ? null : context.selfVar);
+        return cf.dep(kjt, targetHeap, dep, dep.first.isStatic() ? null : context.selfVar());
     }
 
     public Contract createJMLDependencyContract(KeYJavaType kjt, TextualJMLDepends textualDep) {
@@ -1265,13 +1267,13 @@ public class JMLSpecFactory {
                     .resultVariable(progVars.resultVar).exceptionVariable(progVars.excVar)
                     .atPres(atPres).translateMergeParams(ctx.mergeparamsspec());
 
-            final Stream<Term> stream = specs.getPredicates().stream();
+            final Stream<Term> stream = specs.predicates().stream();
             final List<AbstractionPredicate> abstractionPredicates =
-                stream.map(t -> AbstractionPredicate.create(t, specs.getPlaceholder(), services))
+                stream.map(t -> AbstractionPredicate.create(t, specs.placeholder(), services))
                         .collect(Collectors.toList());
 
             result = result.add(new PredicateAbstractionMergeContract(mps, atPres, kjt,
-                specs.getLatticeType(), abstractionPredicates));
+                specs.latticeType(), abstractionPredicates));
         } else {
             throw new IllegalStateException(
                 "MergeProcedures should either be an UnparametricMergeProcedure or a ParametricMergeProcedure");
@@ -1495,8 +1497,7 @@ public class JMLSpecFactory {
                     result = result.prepend(visibleLocalVariables);
                     return result;
                 }
-            } else if (s instanceof BranchStatement) {
-                final BranchStatement branch = (BranchStatement) s;
+            } else if (s instanceof BranchStatement branch) {
                 final int branchCount = branch.getBranchCount();
                 for (int j = 0; j < branchCount; j++) {
                     final ImmutableList<ProgramVariable> visibleLocalVariables =
@@ -1567,7 +1568,7 @@ public class JMLSpecFactory {
         ImmutableList<Term> localOuts = tb.var(MiscTools.getLocalOuts(loop, services));
 
         // create loop invariant annotation
-        Term selfTerm = context.selfVar == null ? null : tb.var(context.selfVar);
+        Term selfTerm = context.selfVar() == null ? null : tb.var(context.selfVar());
 
         return new LoopSpecImpl(loop, pm, pm.getContainerType(), invariants, freeInvariants, mods,
             freeMods, infFlowSpecs, variant, selfTerm, localIns, localOuts, atPres);

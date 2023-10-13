@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
@@ -305,7 +308,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             final boolean isConstructor =
                 target instanceof IProgramMethod && ((IProgramMethod) target).isConstructor();
             final Term pre = getPre(replaceSV(getRequires(), selfSV, paramsSV), selfSV, heapSV,
-                paramsSV, true, services).term;
+                paramsSV, true, services).term();
             final Term wdArgs = TB.and(TB.wd(getArgs(selfSV, heapSV, heapAtPreSV,
                 isStatic || isConstructor, twoState, paramsSV)));
             return createTaclet(prefix + (isStatic ? " Static " : " ") + tName + ps, TB.var(selfSV),
@@ -373,7 +376,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             return true;
         }
         final Term post =
-            getEnsures().implicit.equals(TB.tt()) ? getEnsures().explicit : getEnsures().implicit;
+            getEnsures().implicit().equals(TB.tt()) ? getEnsures().explicit()
+                    : getEnsures().implicit();
         final ProgramVariable exc = getOrigVars().exception;
         return findExcNull(post, exc);
     }
@@ -385,8 +389,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      */
     public boolean isPure() {
         IObserverFunction target = getTarget();
-        if (target instanceof IProgramMethod) {
-            IProgramMethod pm = (IProgramMethod) target;
+        if (target instanceof IProgramMethod pm) {
             return JMLInfoExtractor.isPure(pm);
         } else {
             return false;

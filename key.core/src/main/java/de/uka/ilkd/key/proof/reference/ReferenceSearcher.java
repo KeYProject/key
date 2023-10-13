@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.reference;
 
 import java.util.ArrayDeque;
@@ -55,7 +58,7 @@ public final class ReferenceSearcher {
             for (var taclet : tacletIndex.allNoPosTacletApps().stream()
                     .filter(x -> x.taclet().getOrigin() != null
                             && x.taclet().getOrigin().contains(proofFile))
-                    .collect(Collectors.toList())) {
+                    .toList()) {
                 if (newTaclets == null) {
                     newTaclets = newTacletIndex.allNoPosTacletApps();
                 }

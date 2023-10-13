@@ -1,10 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclarationContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.pp.PrettyPrinter;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -239,10 +241,4 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     }
 
 
-    /** toString */
-    public String toString() {
-        PrettyPrinter pp = PrettyPrinter.purePrinter();
-        pp.print(this);
-        return pp.result();
-    }
 }

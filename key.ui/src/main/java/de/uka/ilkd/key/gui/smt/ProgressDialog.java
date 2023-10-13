@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.*;
@@ -211,7 +214,7 @@ public class ProgressDialog extends JDialog {
     public void setModus(Modus m) {
         modus = m;
         switch (modus) {
-        case SOLVERS_DONE:
+        case SOLVERS_DONE -> {
             stopButton.setText("Discard");
             if (applyButton != null) {
                 applyButton.setEnabled(true);
@@ -219,14 +222,13 @@ public class ProgressDialog extends JDialog {
             if (focusButton != null) {
                 focusButton.setEnabled(true);
             }
-            break;
-        case SOLVERS_RUNNING:
+        }
+        case SOLVERS_RUNNING -> {
             stopButton.setText("Stop");
             if (applyButton != null) {
                 applyButton.setEnabled(false);
             }
-            break;
-
+        }
         }
     }
 

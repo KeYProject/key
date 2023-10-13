@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import java.util.HashSet;
@@ -89,12 +92,10 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
             RuleApp ruleApp = goal.getRuleAppManager().peekNext();
             SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
             Node SETParent = SymbolicExecutionUtil.findParentSetNode(node);
-            if (activeStatement instanceof Throw && isEnabled()) {
-                Throw throwStatement = (Throw) activeStatement;
+            if (activeStatement instanceof Throw throwStatement && isEnabled()) {
                 for (int i = 0; i < throwStatement.getChildCount(); i++) {
                     SourceElement childElement = throwStatement.getChildAt(i);
-                    if (childElement instanceof LocationVariable) {
-                        LocationVariable locVar = (LocationVariable) childElement;
+                    if (childElement instanceof LocationVariable locVar) {
                         if (locVar.getKeYJavaType().getSort().toString().equals(exceptionName)
                                 && !exceptionParentNodes.contains(SETParent)) {
                             exceptionNodes.add(node);

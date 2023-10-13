@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -10,7 +13,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -123,9 +125,8 @@ public final class ProofManagementDialog extends JDialog {
                 Component result = super.getListCellRendererComponent(list, value, index,
                     isSelected, cellHasFocus);
 
-                if (result instanceof JLabel) {
+                if (result instanceof JLabel label) {
                     ProofStatus ps = ((ProofWrapper) value).proof.mgt().getStatus();
-                    JLabel label = (JLabel) result;
                     if (ps.getProofClosed()) {
                         label.setIcon(KEY_CLOSED);
                     } else if (ps.getProofClosedButLemmasLeft()) {
@@ -264,7 +265,7 @@ public final class ProofManagementDialog extends JDialog {
                 // filter out library classes
                 .filter(kjtTmp -> !(kjtTmp.getJavaType() instanceof TypeDeclaration
                         && ((TypeDeclaration) kjtTmp.getJavaType()).isLibraryClass()))
-                .collect(Collectors.toList());
+                .toList();
 
         // compare: IProgramMethods by program name, otherwise prefer NOT IProgramMethod
         final Comparator<IObserverFunction> compareFunction = (o1, o2) -> {
@@ -643,50 +644,29 @@ public final class ProofManagementDialog extends JDialog {
     // -------------------------------------------------------------------------
     // inner classes
     // -------------------------------------------------------------------------
-    private static final class ProofWrapper {
-
-        public final Proof proof;
-
-        public ProofWrapper(Proof proof) {
-            this.proof = proof;
-        }
+    private record ProofWrapper(Proof proof) {
 
         @Override
-        public String toString() {
-            return proof.name().toString();
-        }
+            public String toString() {
+                return proof.name().toString();
+            }
 
-        @Override
-        public boolean equals(Object o) {
-            return o instanceof ProofWrapper && proof.equals(((ProofWrapper) o).proof);
-        }
+            @Override
+            public boolean equals(Object o) {
+                return o instanceof ProofWrapper && proof.equals(((ProofWrapper) o).proof);
+            }
 
-        @Override
-        public int hashCode() {
-            return proof.hashCode();
-        }
     }
 
 
     /**
      * Stores the identification of a {@link Contract}, i.e. type, method, contract name.
+     *
+     * @param keyJavaTypeName The key java type name.
+     * @param methodName The method name.
+     * @param contractName The contract name.
      */
-    private static final class ContractId {
-        /** The key java type name. */
-        @Nullable
-        public final String keyJavaTypeName;
-        /** The method name. */
-        @Nullable
-        public final String methodName;
-        /** The contract name. */
-        @Nullable
-        public final String contractName;
-
-        private ContractId(@Nullable String keyJavaTypeName, @Nullable String methodName,
-                @Nullable String contractName) {
-            this.keyJavaTypeName = keyJavaTypeName;
-            this.methodName = methodName;
-            this.contractName = contractName;
-        }
+    private record ContractId(@Nullable String keyJavaTypeName, @Nullable String methodName,
+            @Nullable String contractName) {
     }
 }

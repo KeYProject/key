@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.java.*;
@@ -50,24 +53,6 @@ public class SpecialReferenceWrapper extends ThisReference
         return expressionParent;
     }
 
-
-    /**
-     * Get expression container.
-     *
-     * @return the expression container.
-     */
-    public ExpressionContainer getExpressionContainer() {
-        return expressionParent;
-    }
-
-    /**
-     * Set expression container.
-     *
-     * @param c an expression container.
-     */
-    public void setExpressionContainer(ExpressionContainer c) {
-        expressionParent = c;
-    }
 
     // don't think we need it
     public void accept(SourceVisitor v) {

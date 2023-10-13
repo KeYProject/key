@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
 import java.util.Objects;
@@ -479,11 +482,9 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
             return true;
         }
 
-        if (!(o instanceof TermImpl)) {
+        if (!(o instanceof TermImpl t)) {
             return false;
         }
-
-        final TermImpl t = (TermImpl) o;
 
         if (!(op.equals(t.op) && boundVars.equals(t.boundVars) && javaBlock.equals(t.javaBlock))) {
             return false;
@@ -518,11 +519,9 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
             return true;
         }
 
-        if (!(o instanceof TermImpl)) {
+        if (!(o instanceof TermImpl t)) {
             return false;
         }
-
-        final TermImpl t = (TermImpl) o;
 
         if (!(op.equals(t.op) && boundVars.equals(t.boundVars) && javaBlock.equals(t.javaBlock))) {
             return false;
@@ -542,11 +541,9 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
             return true;
         }
 
-        if (!(o instanceof TermImpl)) {
+        if (!(o instanceof TermImpl t)) {
             return false;
         }
-
-        final TermImpl t = (TermImpl) o;
 
         boolean opResult = op.equalsModProofIrrelevancy(t.op);
         if (!(opResult

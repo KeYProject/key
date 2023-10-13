@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.reference;
 
 import java.io.File;
@@ -54,7 +57,7 @@ class TestReferenceSearcher {
             }
             if (ReferenceSearcher.suitableForCloseByReference(n)) {
                 ClosedBy c = ReferenceSearcher.findPreviousProof(previousProofs, n);
-                assertEquals(n.serialNr(), c.getNode().serialNr());
+                assertEquals(n.serialNr(), c.node().serialNr());
                 close = c;
                 foundReference = n;
             } else {
@@ -117,8 +120,8 @@ class TestReferenceSearcher {
         assertTrue(ReferenceSearcher.suitableForCloseByReference(p3.root()));
         c = ReferenceSearcher.findPreviousProof(previousProofs, p3.root());
         assertNotNull(c);
-        assertEquals(0, c.getNode().serialNr());
-        assertEquals(p, c.getProof());
+        assertEquals(0, c.node().serialNr());
+        assertEquals(p, c.proof());
 
         GeneralSettings.noPruningClosed = true;
         p.dispose();

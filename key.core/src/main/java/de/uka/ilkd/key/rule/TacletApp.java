@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.*;
@@ -1206,9 +1209,9 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             if (nvc != null) {
                 KeYJavaType kjt;
                 Object o = nvc.getTypeDefiningObject();
-                if (o instanceof SchemaVariable) {
+                JavaInfo javaInfo = services.getJavaInfo();
+                if (o instanceof SchemaVariable peerSV) {
                     final TypeConverter tc = services.getTypeConverter();
-                    final SchemaVariable peerSV = (SchemaVariable) o;
                     final Object peerInst = instantiations().getInstantiation(peerSV);
                     if (peerInst instanceof TypeReference) {
                         kjt = ((TypeReference) peerInst).getKeYJavaType();
@@ -1286,10 +1289,9 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
 
     @Override
     public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof TacletApp)) {
+        if (!(obj instanceof TacletApp that)) {
             return false;
         }
-        TacletApp that = (TacletApp) obj;
         if (!EqualsModProofIrrelevancyUtil.compareImmutableLists(ifInstantiations,
             that.ifInstantiations)) {
             return false;

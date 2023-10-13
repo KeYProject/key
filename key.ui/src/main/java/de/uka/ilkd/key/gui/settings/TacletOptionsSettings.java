@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
 import java.awt.*;
@@ -413,8 +416,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
          */
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof ChoiceEntry) {
-                ChoiceEntry other = (ChoiceEntry) obj;
+            if (obj instanceof ChoiceEntry other) {
                 return choice.equals(other.getChoice()) && incomplete == other.isIncomplete()
                         && unsound == other.isUnsound()
                         && Objects.equals(information, other.getInformation());

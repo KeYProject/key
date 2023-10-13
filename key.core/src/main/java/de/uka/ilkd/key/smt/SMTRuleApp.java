@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
 
 import java.util.ArrayList;
@@ -45,22 +48,12 @@ public class SMTRuleApp extends AbstractBuiltInRuleApp {
         return new SMTRuleApp(RULE, newPos, ifInsts, successfulSolverName);
     }
 
-    @Override
-    public boolean complete() {
-        return true;
-    }
-
     public String getTitle() {
         return title;
     }
 
     public String getSuccessfulSolverName() {
         return successfulSolverName;
-    }
-
-    @Override
-    public PosInOccurrence posInOccurrence() {
-        return pio;
     }
 
     @Override

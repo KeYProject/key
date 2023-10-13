@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.LinkedHashSet;
@@ -19,7 +22,7 @@ import org.key_project.util.collection.ImmutableArray;
  * <p>
  * This class is a specialization of {@link ProgramVariableCollector} which returns as result
  * ({@link #result()}) used {@link LocationVariable} which are undeclared, but used in the given
- * {@link ProgramElement.
+ * {@link ProgramElement}.
  * </p>
  * <p>
  * Declared {@link LocationVariable}s are:

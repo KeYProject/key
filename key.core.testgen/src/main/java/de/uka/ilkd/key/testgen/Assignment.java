@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen;
 
 /**
@@ -47,8 +50,7 @@ public class Assignment {
      */
     public String toString(boolean rfl) {
         if (rfl) {
-            if (left instanceof RefEx) {
-                final RefEx leftEx = (RefEx) left;
+            if (left instanceof RefEx leftEx) {
                 return ReflectionClassCreator.NAME_OF_CLASS + "."
                     + ReflectionClassCreator.SET_PREFIX
                     + ReflectionClassCreator.cleanTypeName(leftEx.fieldType) + "("

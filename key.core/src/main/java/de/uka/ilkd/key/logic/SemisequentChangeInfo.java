@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
 import org.key_project.util.collection.ImmutableList;
@@ -82,7 +85,7 @@ public class SemisequentChangeInfo {
     public void modifiedFormula(int idx, FormulaChangeInfo fci) {
         // This information can overwrite older records about removed
         // formulas
-        removed = removed.removeAll(fci.getPositionOfModification().sequentFormula());
+        removed = removed.removeAll(fci.positionOfModification().sequentFormula());
         modified = modified.prepend(fci);
         lastFormulaIndex = idx;
     }
@@ -168,7 +171,7 @@ public class SemisequentChangeInfo {
 
             boolean skip = false;
             for (FormulaChangeInfo fci : predecessor.modified) {
-                if (fci.getNewFormula() == sf) {
+                if (fci.newFormula() == sf) {
                     predecessor.modified = predecessor.modified.removeAll(fci);
                     if (!predecessor.removed.contains(fci.getOriginalFormula())) {
                         predecessor.removed = predecessor.removed.append(fci.getOriginalFormula());
@@ -185,7 +188,7 @@ public class SemisequentChangeInfo {
         for (FormulaChangeInfo fci : succ.modified) {
             if (predecessor.addedFormulas().contains(fci.getOriginalFormula())) {
                 predecessor.added = predecessor.added.removeAll(fci.getOriginalFormula());
-                predecessor.addedFormula(succ.lastFormulaIndex, fci.getNewFormula());
+                predecessor.addedFormula(succ.lastFormulaIndex, fci.newFormula());
             } else {
                 predecessor.modifiedFormula(succ.lastFormulaIndex, fci);
             }

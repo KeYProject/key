@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -79,10 +82,6 @@ public final class JavaTools {
     public static MethodFrame getInnermostMethodFrame(ProgramElement pe, Services services) {
         final MethodFrame result = new JavaASTVisitor(pe, services) {
             private MethodFrame res;
-
-            protected void doAction(ProgramElement node) {
-                node.visit(this);
-            }
 
             protected void doDefaultAction(SourceElement node) {
                 if (node instanceof MethodFrame && res == null) {

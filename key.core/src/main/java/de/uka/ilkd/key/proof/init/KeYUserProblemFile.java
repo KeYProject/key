@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
@@ -6,7 +9,7 @@ import java.net.URISyntaxException;
 import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nparser.ChoiceInformation;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ProblemInformation;
@@ -34,7 +37,7 @@ import org.antlr.v4.runtime.Token;
  * obligation.
  */
 public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
-    private Term problemTerm = null;
+    private Sequent problem = null;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -130,8 +133,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         readRules();
 
         try {
-            problemTerm = getProblemFinder().getProblemTerm();
-            if (problemTerm == null) {
+            problem = getProblemFinder().getProblem();
+            if (problem == null) {
                 boolean chooseDLContract = chooseContract() != null;
                 boolean proofObligation = getProofObligation() != null;
                 if (!chooseDLContract && !proofObligation) {
@@ -157,12 +160,12 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
     @Override
     public ProofAggregate getPO() throws ProofInputException {
-        assert problemTerm != null;
+        assert problem != null;
         String name = name();
         ProofSettings settings = getPreferences();
         initConfig.setSettings(settings);
         return ProofAggregate.createProofAggregate(
-            new Proof(name, problemTerm, getParseContext().getProblemHeader() + "\n", initConfig,
+            new Proof(name, problem, getParseContext().getProblemHeader() + "\n", initConfig,
                 file.file()),
             name);
     }

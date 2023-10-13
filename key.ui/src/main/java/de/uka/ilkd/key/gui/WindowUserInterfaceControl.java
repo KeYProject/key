@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.io.File;
@@ -16,6 +19,7 @@ import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.mergerule.MergeRuleCompletion;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
@@ -48,6 +52,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.misc.Signal;
 
 /**
  * Implementation of {@link UserInterfaceControl} which controls the {@link MainWindow} with the
@@ -71,6 +76,19 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         completions.add(new BlockContractInternalCompletion(mainWindow));
         completions.add(new BlockContractExternalCompletion(mainWindow));
         completions.add(MergeRuleCompletion.INSTANCE);
+        try {
+            Signal.handle(new Signal("INT"), sig -> {
+                if (getMediator().isInAutoMode()) {
+                    LOGGER.warn("Caught SIGINT, stopping automode...");
+                    getMediator().getUI().getProofControl().stopAutoMode();
+                } else {
+                    LOGGER.warn("Caught SIGINT, exiting...");
+                    new ExitMainAction(mainWindow).exitMainWithoutInteraction();
+                }
+            });
+        } catch (Exception e) {
+            // the above is optional functionality and may not work on every OS
+        }
     }
 
     @Override
@@ -248,7 +266,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @Override
     public void taskStarted(TaskStartedInfo info) {
         super.taskStarted(info);
-        mainWindow.setStatusLine(info.getMessage(), info.getSize());
+        mainWindow.setStatusLine(info.message(), info.size());
     }
 
     @Override

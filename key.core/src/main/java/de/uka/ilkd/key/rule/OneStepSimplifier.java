@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
@@ -746,8 +749,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             if (obj instanceof TermReplacementKey) {
                 obj = ((TermReplacementKey) obj).term;
             }
-            if (obj instanceof Term) {
-                Term t = (Term) obj;
+            if (obj instanceof Term t) {
                 return term.equalsModRenaming(t); // Ignore naming and term labels in the way a
                                                   // taclet rule does.
             } else {

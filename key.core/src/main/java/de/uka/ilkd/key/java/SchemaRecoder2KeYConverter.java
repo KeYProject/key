@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import java.util.List;
@@ -179,12 +182,6 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         ProgramVariableSVWrapper svw = l.getVariableSV();
         return new MethodFrame((IProgramVariable) (svw != null ? svw.getSV() : null),
             (IExecutionContext) callConvert(l.getExecutionContext()),
-            (StatementBlock) callConvert(l.getBody()));
-    }
-
-    public LoopScopeBlock convert(de.uka.ilkd.key.java.recoderext.LoopScopeBlock l) {
-        return new LoopScopeBlock(
-            (de.uka.ilkd.key.logic.op.IProgramVariable) callConvert(l.getIndexPV()),
             (StatementBlock) callConvert(l.getBody()));
     }
 
@@ -410,10 +407,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     public MethodReference convert(recoder.java.reference.MethodReference mr) {
         // convert reference prefix
         final ReferencePrefix prefix;
-        if (mr.getReferencePrefix() instanceof recoder.java.reference.UncollatedReferenceQualifier) {
+        if (mr.getReferencePrefix() instanceof recoder.java.reference.UncollatedReferenceQualifier uncoll) {
             // type references would be allowed
-            final recoder.java.reference.UncollatedReferenceQualifier uncoll =
-                (recoder.java.reference.UncollatedReferenceQualifier) mr.getReferencePrefix();
             prefix = convert(new recoder.java.reference.TypeReference(uncoll.getReferencePrefix(),
                 uncoll.getIdentifier()));
         } else {

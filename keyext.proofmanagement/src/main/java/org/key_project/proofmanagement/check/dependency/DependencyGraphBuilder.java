@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement.check.dependency;
 
 import java.util.List;
@@ -49,7 +52,7 @@ public abstract class DependencyGraphBuilder {
             // get current node and root of proof
             Proof proof = line.proof;
             DependencyNode currentNode = graph.getNodeByName(proof.name().toString());
-            BranchNodeIntermediate node = line.parseResult.getParsedResult();
+            BranchNodeIntermediate node = line.parseResult.parsedResult();
 
             // collect all contracts the current proof refers to
             Services services = proof.getServices();

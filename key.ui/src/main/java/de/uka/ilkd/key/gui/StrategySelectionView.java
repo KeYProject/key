@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -92,8 +95,6 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
      * Observe changes on {@link #mediator}.
      */
     private final KeYSelectionListener mediatorListener = new KeYSelectionListener() {
-        public void selectedNodeChanged(KeYSelectionEvent e) {
-        }
 
         public void selectedProofChanged(KeYSelectionEvent e) {
             refresh(e.getSource().getSelectedProof());
@@ -242,9 +243,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
             boolean topLevel, AbstractStrategyPropertyDefinition definition) {
 
         // Individual options
-        if (definition instanceof OneOfStrategyPropertyDefinition) {
-            OneOfStrategyPropertyDefinition oneOfDefinition =
-                (OneOfStrategyPropertyDefinition) definition;
+        if (definition instanceof OneOfStrategyPropertyDefinition oneOfDefinition) {
             ButtonGroup buttonGroup = new ButtonGroup();
             if (!oneOfDefinition.getValues().isEmpty()) {
                 data.addPropertyGroup(oneOfDefinition.getApiKey(), buttonGroup);

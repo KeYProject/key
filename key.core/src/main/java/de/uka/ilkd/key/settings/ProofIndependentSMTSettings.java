@@ -1,7 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
@@ -91,7 +93,7 @@ public final class ProofIndependentSMTSettings
         // Z3_CE solver should not be a usable solver union or part of any as it is
         // treated separately.
         for (SolverType type : nonLegacyTypes.stream().filter(t -> t != SolverTypes.Z3_CE_SOLVER)
-                .collect(Collectors.toList())) {
+                .toList()) {
             solverUnions.add(new SolverTypeCollection(type.getName(), 1, type));
         }
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.File;
@@ -83,29 +86,24 @@ public final class RunAllProofsTestUnit implements Serializable {
 
         ForkMode forkMode = settings.getForkMode();
         switch (forkMode) {
-        case PERGROUP:
-            testResults = ForkedTestFileRunner.processTestFiles(testFiles, getTempDir());
-            break;
-
-        case NOFORK:
+        case PERGROUP -> testResults =
+            ForkedTestFileRunner.processTestFiles(testFiles, getTempDir());
+        case NOFORK -> {
             testResults = new ArrayList<>();
             for (TestFile testFile : testFiles) {
                 TestResult testResult = testFile.runKey();
                 testResults.add(testResult);
             }
-            break;
-
-        case PERFILE:
+        }
+        case PERFILE -> {
             testResults = new ArrayList<>();
             for (TestFile testFile : testFiles) {
                 TestResult testResult =
                     ForkedTestFileRunner.processTestFile(testFile, getTempDir());
                 testResults.add(testResult);
             }
-            break;
-
-        default:
-            throw new RuntimeException("Unexpected value for fork mode: " + forkMode);
+        }
+        default -> throw new RuntimeException("Unexpected value for fork mode: " + forkMode);
         }
 
         if (verbose) {
@@ -129,12 +127,12 @@ public final class RunAllProofsTestUnit implements Serializable {
             var time = System.currentTimeMillis() - start;
             TestResult testResult = testResults.get(i);
             xml.addTestcase(file.getKeYFile().getName(), this.testName,
-                (testResult.success ? JunitXmlWriter.TestCaseState.SUCCESS
+                (testResult.success() ? JunitXmlWriter.TestCaseState.SUCCESS
                         : JunitXmlWriter.TestCaseState.FAILED),
                 "",
-                !testResult.success ? "error" : "", testResult.message, "", time / 1000.0);
-            success &= testResult.success;
-            message.append(testResult.message).append("\n");
+                !testResult.success() ? "error" : "", testResult.message(), "", time / 1000.0);
+            success &= testResult.success();
+            message.append(testResult.message()).append("\n");
         }
         return new TestResult(message.toString(), success);
     }

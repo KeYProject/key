@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.Iterator;
@@ -60,8 +63,7 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
             final RuleApp app = appliedRules.head();
             appliedRules = appliedRules.tail();
 
-            if (app instanceof TacletApp) {
-                final TacletApp tapp = (TacletApp) app;
+            if (app instanceof TacletApp tapp) {
                 if (!inNewSmallSymRuleSet(tapp)) {
                     continue;
                 }

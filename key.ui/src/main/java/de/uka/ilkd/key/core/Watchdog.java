@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.core;
 
 import java.awt.*;
@@ -78,19 +81,13 @@ public final class Watchdog {
                     continue;
                 }
                 switch (thread.getState()) {
-                case NEW:
-                case RUNNABLE:
-                    anyProgress = true;
-                    break;
-                case WAITING:
-                case BLOCKED:
-                case TIMED_WAITING:
-                case TERMINATED:
+                case NEW, RUNNABLE -> anyProgress = true;
+                case WAITING, BLOCKED, TIMED_WAITING, TERMINATED -> {
                     if (thread.getName().equals("AWT-EventQueue-0")
                             && EventQueue.getCurrentEvent() == null) {
                         anyProgress = true; // nothing to do
                     }
-                    break;
+                }
                 }
             }
 
