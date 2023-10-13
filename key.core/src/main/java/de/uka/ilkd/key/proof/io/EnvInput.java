@@ -58,7 +58,6 @@ public interface EnvInput {
         return null;
     }
 
-
     /**
      * gets the classpath elements to be considered here.
      */
