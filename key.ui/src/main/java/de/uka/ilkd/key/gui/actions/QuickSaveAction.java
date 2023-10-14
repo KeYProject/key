@@ -61,8 +61,8 @@ public final class QuickSaveAction extends MainWindowAction {
                 status = "File quicksaved: " + filename;
             } else {
                 mainWindow.popupWarning(
-                        "Quicksaving file " + filename + " failed:\n" + status,
-                        "Quicksave failed");
+                    "Quicksaving file " + filename + " failed:\n" + status,
+                    "Quicksave failed");
                 LOGGER.debug("Quicksaving file {} failed.", filename, status);
             }
             mainWindow.setStatusLine(status);
