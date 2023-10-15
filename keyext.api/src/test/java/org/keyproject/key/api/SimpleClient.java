@@ -21,7 +21,7 @@ class SimpleClient implements ClientApi {
     }
 
     @Override
-    public void userResponse(ShowMessageParams params) {
+    public void showMessage(ShowMessageParams params) {
 
     }
 

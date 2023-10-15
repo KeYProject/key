@@ -6,19 +6,20 @@ package org.keyproject.key.api.remoteapi;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 
 @JsonSegment("meta")
-public interface KeyMetaApi {
-    @JsonRequest
+public interface MetaApi {
+    @JsonRequest("version")
     CompletableFuture<String> getVersion();
 
-    @JsonRequest
-    CompletableFuture<List<MacroDescription>> getAvailableMacros();
+    @JsonRequest("available_macros")
+    CompletableFuture<List<ProofMacro>> getAvailableMacros();
 
-    @JsonRequest
+    @JsonRequest("available_script_commands")
     CompletableFuture<List<ProofScriptCommand<?>>> getAvailableScriptCommands();
 }
