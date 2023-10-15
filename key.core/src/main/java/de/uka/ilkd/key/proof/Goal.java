@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.AbstractExternalSolverRuleApp;
@@ -23,6 +24,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.properties.MapProperties;
 import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
@@ -753,6 +755,13 @@ public final class Goal implements ProofGoal<Goal> {
         return ruleApps;
     }
 
+    /**
+     * Return a list with available taclet application on this goal.
+     */
+    public List<TacletApp> getAllTacletApps() {
+        return getAllTacletApps(proof().getServices());
+    }
+
     public List<TacletApp> getAllTacletApps(Services services) {
         RuleAppIndex index = ruleAppIndex();
         index.autoModeStopped();
@@ -775,6 +784,39 @@ public final class Goal implements ProofGoal<Goal> {
             tacletAppAtAndBelow.forEach(allApps::add);
         }
         return allApps;
+    }
+
+    /**
+     * Returns a list with all known rule applications within this proof goal.
+     */
+    public List<RuleApp> getAllAvailableRules() {
+        var taclets = getAllTacletApps();
+        var builtin = getAllBuiltInRuleApps();
+        builtin.addAll(taclets);
+        return builtin;
+    }
+
+    public List<Rule> getAvailableRules() {
+        var s = new ArrayList<Rule>(2048);
+        for (final BuiltInRule br : ruleAppIndex().builtInRuleAppIndex()
+                .builtInRuleIndex().rules()) {
+            s.add(br);
+        }
+
+        Set<NoPosTacletApp> set = ruleAppIndex().tacletIndex().allNoPosTacletApps();
+        OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof());
+        if (simplifier != null && !simplifier.isShutdown()) {
+            set.addAll(simplifier.getCapturedTaclets());
+        }
+
+        for (final NoPosTacletApp app : set) {
+            RuleJustification just = proof().mgt().getJustification(app);
+            if (just == null) {
+                continue; // do not break system because of this
+            }
+            s.add(app.taclet()); // TODO not good
+        }
+        return s;
     }
 
 }

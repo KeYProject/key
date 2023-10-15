@@ -11,10 +11,10 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import de.uka.ilkd.key.Identifiable;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
@@ -58,7 +58,7 @@ import org.jspecify.annotations.Nullable;
  * goals, namespaces and several other information about the current state of the proof.
  */
 @NullMarked
-public class Proof implements ProofObject<Goal>, Named {
+public class Proof implements ProofObject<Goal>, Named, Identifiable {
 
     /**
      * The time when the {@link Proof} instance was created.
@@ -1379,5 +1379,13 @@ public class Proof implements ProofObject<Goal>, Named {
     /// The time when the {@link Proof} instance was created.
     public long getCreationTime() {
         return creationTime;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String identification() {
+        return getClass().getName() + "_" + name + "_" + hashCode();
     }
 }
