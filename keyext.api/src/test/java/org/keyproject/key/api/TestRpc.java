@@ -9,19 +9,25 @@ import java.io.PipedOutputStream;
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.keyproject.key.api.remoteapi.KeyApi;
 import org.keyproject.key.api.remoteclient.ClientApi;
 
-public class Client {
-    public static void main(String[] args)
-            throws IOException, ExecutionException, InterruptedException, TimeoutException {
+public class TestRpc {
+    private Future<Void> clientListening, serverListening;
+    private KeyApi keyApi;
+
+    @BeforeEach
+    void setup() throws IOException, ExecutionException, InterruptedException, TimeoutException {
         PipedInputStream inClient = new PipedInputStream();
         PipedOutputStream outClient = new PipedOutputStream();
         PipedInputStream inServer = new PipedInputStream();
@@ -45,13 +51,33 @@ public class Client {
         Logger logger = Logger.getLogger(StreamMessageProducer.class.getName());
         logger.setLevel(Level.SEVERE);
 
-        var clientListening = clientLauncher.startListening();
-        var serverListening = serverLauncher.startListening();
+        clientListening = clientLauncher.startListening();
+        serverListening = serverLauncher.startListening();
 
-        // clientLauncher.getRemoteProxy().examples();
-        serverLauncher.getRemoteProxy().sayHello("Alex");
+        keyApi = clientLauncher.getRemoteProxy();
+    }
 
-        serverListening.get(1, TimeUnit.SECONDS);
-        clientListening.get(1, TimeUnit.SECONDS);
+    @AfterEach
+    void teardown() throws ExecutionException, InterruptedException, TimeoutException {
+        serverListening.cancel(true);
+        clientListening.cancel(true);
+    }
+
+
+    @Test
+    public void hello() {
+
+    }
+
+    @Test
+    public void listMacros() throws ExecutionException, InterruptedException {
+        var examples = keyApi.getAvailableMacros().get();
+        System.out.println(examples);
+    }
+
+    @Test
+    public void listExamples() throws ExecutionException, InterruptedException {
+        var examples = keyApi.examples().get();
+        System.out.println(examples);
     }
 }

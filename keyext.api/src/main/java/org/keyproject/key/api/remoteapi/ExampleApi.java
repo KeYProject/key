@@ -12,7 +12,7 @@ import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 
 @JsonSegment("examples")
-public interface KeyExampleApi {
+public interface ExampleApi {
     @JsonRequest("list")
     CompletableFuture<List<Example>> examples();
 }

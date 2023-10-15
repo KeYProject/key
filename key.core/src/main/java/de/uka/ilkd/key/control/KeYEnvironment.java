@@ -334,6 +334,45 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     }
 
     /**
+     * Retrieve a list of all available contracts for all known Java types.
+     *
+     * @return a non-null list, possible empty
+     */
+    public List<Contract> getAvailableContracts() {
+        List<Contract> proofContracts = new ArrayList<>(512);
+        Set<KeYJavaType> kjts = getJavaInfo().getAllKeYJavaTypes();
+        for (KeYJavaType type : kjts) {
+            if (!KeYTypeUtil.isLibraryClass(type)) {
+                ImmutableSet<IObserverFunction> targets =
+                    getSpecificationRepository().getContractTargets(type);
+                for (IObserverFunction target : targets) {
+                    ImmutableSet<Contract> contracts =
+                        getSpecificationRepository().getContracts(type, target);
+                    for (Contract contract : contracts) {
+                        proofContracts.add(contract);
+                    }
+                }
+            }
+        }
+        return proofContracts;
+    }
+
+
+    /**
+     * Constructs a list containing all known rules that are registered in the current
+     * environment.
+     *
+     * @return always returns a non-null list
+     */
+    public List<Rule> getRules() {
+        var rules = new ArrayList<Rule>(4096);
+        rules.addAll(getInitConfig().activatedTaclets());
+        getInitConfig().builtInRules().forEach(rules::add);
+        return rules;
+    }
+
+
+    /**
      * constructs the possible proof contracts from the java info in the environment.
      */
     public List<Contract> getProofContracts() {
