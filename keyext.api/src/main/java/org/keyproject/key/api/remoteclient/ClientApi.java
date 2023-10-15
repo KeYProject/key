@@ -7,7 +7,7 @@ import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 
-@JsonSegment
+@JsonSegment("client")
 public interface ClientApi {
     @JsonNotification
     void sayHello(String e);

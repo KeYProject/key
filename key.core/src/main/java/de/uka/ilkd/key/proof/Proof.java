@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import javax.swing.*;
 
+import de.uka.ilkd.key.Identifiable;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -27,6 +28,7 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -54,7 +56,7 @@ import org.jspecify.annotations.Nullable;
  * information, and methods to apply rules. Furthermore, it offers services that deliver the open
  * goals, namespaces and several other information about the current state of the proof.
  */
-public class Proof implements Named {
+public class Proof implements Named, Identifiable {
 
     /**
      * The time when the {@link Proof} instance was created.
@@ -1474,5 +1476,13 @@ public class Proof implements Named {
                 callbackBranch.run();
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String identification() {
+        return getClass().getName() + "_" + name + "_" + hashCode();
     }
 }
