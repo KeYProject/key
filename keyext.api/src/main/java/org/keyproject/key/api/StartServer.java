@@ -4,7 +4,7 @@ package org.keyproject.key.api;
 import com.google.gson.GsonBuilder;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.websocket.jakarta.WebSocketLauncherBuilder;
-import org.keyproject.key.api.remoteapi.KeyApiImpl;
+import org.keyproject.key.api.adapters.KeyAdapter;
 import org.keyproject.key.api.remoteclient.ClientApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +16,6 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -28,6 +25,8 @@ import java.util.concurrent.ExecutionException;
 @CommandLine.Command
 public class StartServer implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(StartServer.class);
+
+    private static KeyAdapter adapter;
 
     //region CLI arguments
     @Option(names = "--std", description = "use stdout and stdin for communication")
@@ -55,7 +54,7 @@ public class StartServer implements Runnable {
     boolean helpRequested = false;
 
     @Option(names = "--websocket")
-    boolean websocket;
+    boolean websocket = false;
     //endregion
 
     public static void main(String[] args) {
@@ -115,27 +114,6 @@ public class StartServer implements Runnable {
             return;
         }
 
-        /*
-        var server = new Server();
-        var connector = new ServerConnector();
-        server.addConnector(connector);
-        // Setup the basic application "context" for this application at "/"
-        // This is also known as the handler tree (in jetty speak)
-        var context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/");
-        server.setHandler(context);
-
-        // Initialize javax.websocket layer
-        JavaxWebSocketServletContainerInitializer.configure(context, (servletContext, wsContainer) ->
-        {
-            // Configure defaults for container
-            wsContainer.setDefaultMaxTextMessageBufferSize(65535);
-
-            // Add WebSocket endpoint to javax.websocket layer
-            wsContainer.addEndpoint(WebSocketEndpoint.class);
-        });*/
-
-
         try {
             if (websocket) {
                 var launcherBuilder = new WebSocketLauncherBuilder<ClientApi>()
@@ -144,7 +122,7 @@ public class StartServer implements Runnable {
                         .traceMessages(new PrintWriter(System.err))
                         .validateMessages(true);
                 launcherBuilder.configureGson(StartServer::configureJson);
-                launcherBuilder.setLocalService(new KeyApiImpl());
+                launcherBuilder.setLocalService(new KeyApiImpl(adapter));
                 launcherBuilder.setRemoteInterface(ClientApi.class);
                 launcherBuilder.create().startListening().get();
             } else {
@@ -160,8 +138,9 @@ public class StartServer implements Runnable {
         }
     }
 
+
     public static void configureJson(GsonBuilder gsonBuilder) {
-        gsonBuilder.registerTypeAdapter(File.class, new FileTypeAdapter());
+        adapter = new KeyAdapter(gsonBuilder);
     }
 
     public static Launcher<ClientApi> launch(OutputStream out, InputStream in) {
@@ -174,30 +153,11 @@ public class StartServer implements Runnable {
                 .validateMessages(true);
 
         launcherBuilder.configureGson(StartServer::configureJson);
-
         //if (localServices != null && !localServices.isEmpty())
-        launcherBuilder.setLocalService(new KeyApiImpl());
+        launcherBuilder.setLocalService(new KeyApiImpl(adapter));
         //if (remoteInterfaces != null && !remoteInterfaces.isEmpty())
         launcherBuilder.setRemoteInterface(ClientApi.class);
 
         return launcherBuilder.create();
-    }
-
-
-    private static Collection<Class<? extends ClientApi>> getRemoteInterfaces() {
-        return Collections.singleton(ClientApi.class);
-      /*  return ServiceLoader.load(ClientService.class)
-                .stream()
-                .map(ServiceLoader.Provider::type)
-                .collect(Collectors.toSet());
-       */
-    }
-
-    private static List<Object> getLocalServices() {
-        return Collections.singletonList(new KeyApiImpl());
-        /*return ServiceLoader.load(KeyService.class)
-                .stream().map(ServiceLoader.Provider::get)
-                .map(it -> (Object) it)
-                .toList();*/
     }
 }
