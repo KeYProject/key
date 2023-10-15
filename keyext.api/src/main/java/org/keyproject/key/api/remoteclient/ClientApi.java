@@ -10,7 +10,7 @@ import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 
-@JsonSegment
+@JsonSegment("client")
 public interface ClientApi {
     @JsonNotification
     void sayHello(String e);
