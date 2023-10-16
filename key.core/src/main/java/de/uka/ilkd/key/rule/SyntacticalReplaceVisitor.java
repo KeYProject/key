@@ -228,13 +228,11 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         } else if (p_operatorToBeInstantiated instanceof Modality mod && mod.kind() instanceof ModalOperatorSV) {
             instantiatedOp = instantiateOperatorSV(mod.kind(), jb);
         } else if (p_operatorToBeInstantiated instanceof SchemaVariable) {
-            if (p_operatorToBeInstantiated instanceof ProgramSV
-                    && ((ProgramSV) p_operatorToBeInstantiated).isListSV()) {
-                instantiatedOp = p_operatorToBeInstantiated;
-            } else {
-                instantiatedOp =
-                    (Operator) svInst.getInstantiation((SchemaVariable) p_operatorToBeInstantiated);
-            }
+            if (!(p_operatorToBeInstantiated instanceof ProgramSV)
+                    || !((ProgramSV) p_operatorToBeInstantiated).isListSV()) {
+                        instantiatedOp =
+                            (Operator) svInst.getInstantiation((SchemaVariable) p_operatorToBeInstantiated);
+                    }
         }
         assert instantiatedOp != null;
 
