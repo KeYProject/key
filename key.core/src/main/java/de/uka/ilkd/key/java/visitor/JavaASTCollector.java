@@ -10,8 +10,8 @@ import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Walks through a java AST in depth-left-fist-order. You can set the type of nodes you want to
- * collect and then start the walker. The found nodes of the given type are returned as a
- * IList<JavaProgramElement>
+ * collect and then {@link #start()} the walker. The found nodes of the given type are returned as a
+ * list of {@link ProgramElement}.
  */
 public class JavaASTCollector extends JavaASTWalker {
 

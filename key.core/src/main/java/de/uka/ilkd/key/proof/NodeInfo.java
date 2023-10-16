@@ -31,6 +31,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
 
+import org.key_project.proof.LocationVariableTracker;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -338,15 +339,18 @@ public class NodeInfo {
                         val = TermLabel.removeIrrelevantLabels(
                             ((TermInstantiation) val).getInstantiation(),
                             node.proof().getServices());
-                    } else if (val instanceof LocationVariable) {
-                        var origin = ((LocationVariable) val).createdByRuleApp();
-                        if (origin instanceof PosTacletApp) {
-                            var tacletAppOrigin = (PosTacletApp) origin;
-                            var name = tacletAppOrigin.taclet().displayName();
-                            // TODO: make this mechanism more generic
-                            if (name.equals("ifElseUnfold") || name.equals("ifUnfold")) {
-                                val =
-                                    tacletAppOrigin.instantiations().lookupValue(new Name("#nse"));
+                    } else if (val instanceof LocationVariable locVar) {
+                        var originTracker = node.proof().lookup(LocationVariableTracker.class);
+                        if (originTracker != null) {
+                            var origin = originTracker.getCreatedBy(locVar);
+                            if (origin instanceof PosTacletApp) {
+                                var tacletAppOrigin = (PosTacletApp) origin;
+                                var name = tacletAppOrigin.taclet().displayName();
+                                // TODO: make this mechanism more generic
+                                if (name.equals("ifElseUnfold") || name.equals("ifUnfold")) {
+                                    val = tacletAppOrigin.instantiations()
+                                            .lookupValue(new Name("#nse"));
+                                }
                             }
                         }
                     }

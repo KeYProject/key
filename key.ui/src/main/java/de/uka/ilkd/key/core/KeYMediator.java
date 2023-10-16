@@ -6,6 +6,7 @@ package de.uka.ilkd.key.core;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
+import java.util.WeakHashMap;
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -55,6 +56,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
+import org.key_project.proof.LocationVariableTracker;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.lookup.Lookup;
 
@@ -102,6 +104,10 @@ public class KeYMediator {
      * Currently opened proofs.
      */
     private final DefaultListModel<Proof> currentlyOpenedProofs = new DefaultListModel<>();
+    /**
+     * Currently loaded proofs.
+     */
+    private final WeakHashMap<Proof, Object> loadedProofs = new WeakHashMap<>();
 
     /**
      * boolean flag indicating if the GUI is in auto mode
@@ -128,6 +134,8 @@ public class KeYMediator {
         keySelectionModel = new KeYSelectionModel();
 
         ui.getProofControl().addAutoModeListener(proofListener);
+
+        registerProofLoadListener(LocationVariableTracker::handleProofLoad);
     }
 
     /**
@@ -509,6 +517,10 @@ public class KeYMediator {
         if (p == null) {
             return;
         }
+        if (loadedProofs.containsKey(p)) {
+            return;
+        }
+        loadedProofs.put(p, null);
         for (Consumer<Proof> listener : proofLoadListeners) {
             listener.accept(p);
         }

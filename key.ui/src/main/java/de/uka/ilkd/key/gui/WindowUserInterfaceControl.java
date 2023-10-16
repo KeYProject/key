@@ -476,6 +476,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @Override
     public void registerProofAggregate(ProofAggregate pa) {
         super.registerProofAggregate(pa);
+        getMediator().fireProofLoaded(pa.getFirstProof());
         mainWindow.addProblem(pa);
         mainWindow.setStandardStatusLine();
     }

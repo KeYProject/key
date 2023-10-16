@@ -1229,7 +1229,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
                     kjt = (KeYJavaType) o;
                 }
                 assert kjt != null : "could not find kjt for: " + o;
-                return new LocationVariable(VariableNamer.parseName(instantiation), kjt, this);
+                return new LocationVariable(VariableNamer.parseName(instantiation), kjt);
             }
         }
         return null;
