@@ -52,12 +52,6 @@ public class FunctionalBlockContract extends FunctionalAuxiliaryContract<BlockCo
     }
 
     @Override
-    public ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
-        assert contract instanceof FunctionalBlockContract;
-        return new FunctionalBlockContractPO(initConfig, (FunctionalBlockContract) contract);
-    }
-
-    @Override
     public ProofOblInput createProofObl(InitConfig initConfig, Contract contract,
             boolean supportSymbolicExecutionAPI) {
         return createProofObl(initConfig, contract);

@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -28,10 +27,10 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandler.Capability;
 /**
  * Instances of this class are the controlling units of the translation. They control how the
  * translation is delegated to different {@link SMTHandler}s and collects the translations.
- *
+ * <p>
  * It keeps track of the actual translation of an expression but collects also the declarations and
  * axioms that occur during the translation.
- *
+ * <p>
  * It has measures to ensure that symbols are defined and axiomatized at most once. This allows us
  * to add these entries on the fly and on demand.
  *
@@ -39,9 +38,6 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandler.Capability;
  * @author Jonas Schiffl
  */
 public class MasterHandler {
-
-    /** the services object associated with this particular translation */
-    private final Services services;
 
     /** Exceptions that occur during translation */
     private final List<Throwable> exceptions = new ArrayList<>();
@@ -86,9 +82,8 @@ public class MasterHandler {
      * @param handlerOptions arbitrary String options for the handlers to process
      * @throws IOException if the handlers cannot be loaded
      */
-    public MasterHandler(Services services, SMTSettings settings, @Nullable String[] handlerNames,
+    public MasterHandler(Services services, SMTSettings settings, String[] handlerNames,
             String[] handlerOptions) throws IOException {
-        this.services = services;
         getTranslationState().putAll(settings.getNewSettings().getMap());
         handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, handlerNames,
             handlerOptions, this);
@@ -96,7 +91,7 @@ public class MasterHandler {
 
     /**
      * Copy toplevel declarations and axioms from a collection of snippets directly and make all
-     * named declarations (name.decl) and axioms (name.axioms)
+     * named declarations (name.decls), axioms (name.axioms) and deps (name.deps)
      *
      * @param snippets
      */
@@ -113,7 +108,7 @@ public class MasterHandler {
 
         for (Entry<Object, Object> en : snippets.entrySet()) {
             String key = (String) en.getKey();
-            if (key.endsWith(".decls") || key.endsWith(".axioms")) {
+            if (key.endsWith(".decls") || key.endsWith(".axioms") || key.endsWith(".deps")) {
                 translationState.put(key, en.getValue());
             }
         }
@@ -121,7 +116,7 @@ public class MasterHandler {
 
     /**
      * This interface is used for routines that can be used to flexibly introduce function symbols.
-     *
+     * <p>
      * An instance can be stored in the {@link #translationState} with a key suffixed with ".intro".
      * It is then invoked when a symbol is to be introduced.
      */
@@ -132,11 +127,11 @@ public class MasterHandler {
 
     /**
      * Translate a single term to an SMTLib S-Expression.
-     *
+     * <p>
      * This method may modify the state of the handler (by adding symbols e.g.).
-     *
+     * <p>
      * It tries to find a {@link SMTHandler} that can deal with the argument and delegates to that.
-     *
+     * <p>
      * A default translation is triggered if no handler can be found.
      *
      * @param problem the non-null term to translate
@@ -154,13 +149,15 @@ public class MasterHandler {
             for (SMTHandler smtHandler : handlers) {
                 Capability response = smtHandler.canHandle(problem);
                 switch (response) {
-                case YES_THIS_INSTANCE:
+                case YES_THIS_INSTANCE -> {
                     // handle this but do not cache.
                     return smtHandler.handle(this, problem);
-                case YES_THIS_OPERATOR:
+                }
+                case YES_THIS_OPERATOR -> {
                     // handle it and cache it for future instances of the op.
                     handlerMap.put(problem.op(), smtHandler);
                     return smtHandler.handle(this, problem);
+                }
                 }
             }
 
@@ -173,14 +170,14 @@ public class MasterHandler {
 
     /**
      * Translate a single term to an SMTLib S-Expression.
-     *
+     * <p>
      * The result is ensured to have the SExpr-Type given as argument. If the type coercion fails,
      * then the translation falls back to translating the argument as an unknown function.
-     *
+     * <p>
      * This method may modify the state of the handler (by adding symbols e.g.).
-     *
+     * <p>
      * It tries to find a {@link SMTHandler} that can deal with the argument and delegates to that.
-     *
+     * <p>
      * A default translation is triggered if no handler can be found.
      *
      * @param problem the non-null term to translate
@@ -223,7 +220,7 @@ public class MasterHandler {
 
     /**
      * Treats the given term as a function call.
-     *
+     * <p>
      * This means that an expression of the form
      *
      * <pre>
@@ -242,7 +239,7 @@ public class MasterHandler {
 
     /**
      * Treats the given term as a function call.
-     *
+     * <p>
      * This means that an expression of the form
      *
      * <pre>

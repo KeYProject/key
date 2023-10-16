@@ -54,7 +54,7 @@ public class UserDefinedSymbols {
         this.referenceNamespaces = parent.referenceNamespaces;
     }
 
-    private <T extends Named> void addUserDefiniedSymbol(T symbol, Set<T> set,
+    private <T extends Named> void addUserDefinedSymbol(T symbol, Set<T> set,
             Namespace<T> excludeNamespace) {
         if (!contains(symbol, set)) {
             if (symbol instanceof SchemaVariable
@@ -74,11 +74,11 @@ public class UserDefinedSymbols {
     }
 
     public void addFunction(Function symbol) {
-        addUserDefiniedSymbol(symbol, usedExtraFunctions, referenceNamespaces.functions());
+        addUserDefinedSymbol(symbol, usedExtraFunctions, referenceNamespaces.functions());
     }
 
     public void addPredicate(Function symbol) {
-        addUserDefiniedSymbol(symbol, usedExtraPredicates, referenceNamespaces.functions());
+        addUserDefinedSymbol(symbol, usedExtraPredicates, referenceNamespaces.functions());
     }
 
     public void addSort(Named symbol) {
@@ -89,17 +89,18 @@ public class UserDefinedSymbols {
                     addSort(parentSort);
                 }
             }
-            addUserDefiniedSymbol(sort, usedExtraSorts, referenceNamespaces.sorts());
+            addUserDefinedSymbol(sort, usedExtraSorts, referenceNamespaces.sorts());
         }
     }
 
     public void addVariable(QuantifiableVariable symbol) {
-        addUserDefiniedSymbol(symbol, usedExtraVariables, referenceNamespaces.variables());
+        addUserDefinedSymbol(symbol, usedExtraVariables, referenceNamespaces.variables());
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void addSchemaVariable(SchemaVariable symbol) {
         // FIXME: This breaks the generics of namespace
-        addUserDefiniedSymbol(symbol, usedSchemaVariables,
+        addUserDefinedSymbol(symbol, usedSchemaVariables,
             (Namespace) referenceNamespaces.variables());
     }
 

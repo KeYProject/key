@@ -59,7 +59,8 @@ public class MasterHandlerTest {
      * If this variable is set when running this test class, then those cases with expected result
      * "weak_valid" will raise an exception unless they can be proved using the solver.
      * <p>
-     * Otherwise a "timeout" or "unknown" is accepted. This can be used to deal with test cases that
+     * Otherwise, a "timeout" or "unknown" is accepted. This can be used to deal with test cases
+     * that
      * should verify but do not yet do so.
      * <p>
      * (Default false)
@@ -99,77 +100,67 @@ public class MasterHandlerTest {
                 }
             } catch (Exception e) {
                 LOGGER.error("Error reading {}", file, e);
+                // make sure faulty test cases fail
+                throw e;
             }
         }
         return result;
     }
 
-    public static class TestData {
-        public final String name;
-        public final Path path;
-        private final String translation;
-        private final LineProperties props;
-
-        public TestData(String name, Path path, LineProperties props, String translation) {
-            this.name = name;
-            this.path = path;
-            this.translation = translation;
-            this.props = props;
-        }
-
+    public record TestData(String name, Path path, LineProperties props, String translation) {
         @Nullable
-        public static TestData create(Path path) throws IOException, ProblemLoaderException {
-            var name = path.getFileName().toString();
-            var props = new LineProperties();
-            try (BufferedReader reader = Files.newBufferedReader(path)) {
-                props.read(reader);
+            public static TestData create(Path path) throws IOException, ProblemLoaderException {
+                var name = path.getFileName().toString();
+                var props = new LineProperties();
+                try (BufferedReader reader = Files.newBufferedReader(path)) {
+                    props.read(reader);
+                }
+
+                if ("ignore".equals(props.get("state"))) {
+                    LOGGER.info("Test case has been marked ignore");
+                    return null;
+                }
+
+                List<String> sources = props.getLines("sources");
+                List<String> lines = new ArrayList<>(props.getLines("KeY"));
+
+                if (!sources.isEmpty()) {
+                    Path srcDir = Files.createTempDirectory("SMT_key_" + name);
+                    Path tmpSrc = srcDir.resolve("src.java");
+                    Files.write(tmpSrc, sources);
+                    lines.add(0, "\\javaSource \"" + srcDir + "\";\n");
+                }
+
+                Path tmpKey = Files.createTempFile("SMT_key_" + name, ".key");
+                Files.write(tmpKey, lines);
+
+                KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey.toFile());
+
+                Proof proof = env.getLoadedProof();
+                Sequent sequent = proof.root().sequent();
+
+                SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
+                        ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                        proof.getSettings().getNewSMTSettings(), proof);
+
+                String updates = props.get("smt-settings");
+                if (updates != null) {
+                    Properties map = new Properties();
+                    map.load(new StringReader(updates));
+                    settings.getNewSettings().readSettings(map);
+                }
+
+                ModularSMTLib2Translator translator = new ModularSMTLib2Translator();
+                var translation =
+                        translator.translateProblem(sequent, env.getServices(), settings).toString();
+                return new TestData(name, path, props, translation);
             }
 
-            if ("ignore".equals(props.get("state"))) {
-                LOGGER.info("Test case has been marked ignore");
-                return null;
+            @Override
+            public String toString() {
+                return name;
             }
-
-            List<String> sources = props.getLines("sources");
-            List<String> lines = new ArrayList<>(props.getLines("KeY"));
-
-            if (!sources.isEmpty()) {
-                Path srcDir = Files.createTempDirectory("SMT_key_" + name);
-                Path tmpSrc = srcDir.resolve("src.java");
-                Files.write(tmpSrc, sources);
-                lines.add(0, "\\javaSource \"" + srcDir + "\";\n");
-            }
-
-            Path tmpKey = Files.createTempFile("SMT_key_" + name, ".key");
-            Files.write(tmpKey, lines);
-
-            KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey.toFile());
-
-            Proof proof = env.getLoadedProof();
-            Sequent sequent = proof.root().sequent();
-
-            SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
-                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                proof.getSettings().getNewSMTSettings(), proof);
-
-            String updates = props.get("smt-settings");
-            if (updates != null) {
-                Properties map = new Properties();
-                map.load(new StringReader(updates));
-                settings.getNewSettings().readSettings(map);
-            }
-
-            ModularSMTLib2Translator translator = new ModularSMTLib2Translator();
-            var translation =
-                translator.translateProblem(sequent, env.getServices(), settings).toString();
-            return new TestData(name, path, props, translation);
         }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
 
     @ParameterizedTest
     @MethodSource("data")
@@ -178,7 +169,7 @@ public class MasterHandlerTest {
             Path tmpSmt = Files.createTempFile("SMT_key_" + data.name, ".smt2");
             // FIXME This is beyond Java 8: add as soon as switched to Java 11:
             // Files.writeString(tmpSmt, translation);
-            Files.write(tmpSmt, data.translation.getBytes(StandardCharsets.UTF_8));
+            Files.writeString(tmpSmt, data.translation);
             LOGGER.info("SMT2 for {}  saved in: {}", data.name, tmpSmt);
         }
 
@@ -223,16 +214,11 @@ public class MasterHandlerTest {
         try {
             String lookFor = null;
             switch (expectation) {
-            case "valid":
-                lookFor = "unsat";
-                break;
-            case "fail":
-                lookFor = "(sat|timeout)";
-                break;
-            case "irrelevant":
-                break;
-            default:
-                fail("Unexpected expectation: " + expectation);
+            case "valid" -> lookFor = "unsat";
+            case "fail" -> lookFor = "(sat|timeout)";
+            case "irrelevant" -> {
+            }
+            default -> fail("Unexpected expectation: " + expectation);
             }
 
             if (lookFor != null) {

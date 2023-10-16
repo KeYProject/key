@@ -1801,50 +1801,21 @@ public class LogicPrinter {
         for (int i = 0, sz = text.length(); i < sz; i++) {
             char c = text.charAt(i);
             switch (c) {
-            case '<':
-                sb.append("&lt;");
-                break;
-            case '>':
-                sb.append("&gt;");
-                break;
-            case '&':
-                sb.append("&amp;");
-                break;
-            case '\"':
-                sb.append("&quot;");
-                break;
-            case '\'':
-                sb.append("&#039;");
-                break;
-            case '(':
-                sb.append("&#040;");
-                break;
-            case ')':
-                sb.append("&#041;");
-                break;
-            case '#':
-                sb.append("&#035;");
-                break;
-            case '+':
-                sb.append("&#043;");
-                break;
-            case '-':
-                sb.append("&#045;");
-                break;
-            case '%':
-                sb.append("&#037;");
-                break;
-            case ';':
-                sb.append("&#059;");
-                break;
-            case '\n':
-                sb.append(escapeWhitespace ? "<br>" : c);
-                break;
-            case ' ':
-                sb.append(escapeWhitespace ? "&nbsp;" : c);
-                break;
-            default:
-                sb.append(c);
+            case '<' -> sb.append("&lt;");
+            case '>' -> sb.append("&gt;");
+            case '&' -> sb.append("&amp;");
+            case '\"' -> sb.append("&quot;");
+            case '\'' -> sb.append("&#039;");
+            case '(' -> sb.append("&#040;");
+            case ')' -> sb.append("&#041;");
+            case '#' -> sb.append("&#035;");
+            case '+' -> sb.append("&#043;");
+            case '-' -> sb.append("&#045;");
+            case '%' -> sb.append("&#037;");
+            case ';' -> sb.append("&#059;");
+            case '\n' -> sb.append(escapeWhitespace ? "<br>" : c);
+            case ' ' -> sb.append(escapeWhitespace ? "&nbsp;" : c);
+            default -> sb.append(c);
             }
 
         }

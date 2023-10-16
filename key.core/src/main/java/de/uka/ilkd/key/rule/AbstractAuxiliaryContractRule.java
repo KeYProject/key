@@ -229,10 +229,9 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
         public Instantiation instantiate() {
             final Term update = extractUpdate();
             final Term target = extractUpdateTarget();
-            if (!(target.op() instanceof Modality)) {
+            if (!(target.op() instanceof Modality modality)) {
                 return null;
             }
-            final Modality modality = (Modality) target.op();
             final JavaStatement statement =
                 getFirstStatementInPrefixWithAtLeastOneApplicableContract(modality,
                     target.javaBlock(), goal);

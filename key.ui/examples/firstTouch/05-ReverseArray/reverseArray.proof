@@ -356,6 +356,11 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
          )
       )
       (branch "Invariant Preserved and Used"
+       (rule "variableDeclaration" (formula "9") (term "1") (newnames "h") (userinteraction))
+       (rule "variableDeclaration" (formula "9") (term "1") (newnames "h_1") (userinteraction))
+        (rule "variableDeclaration" (formula "9") (term "1") (newnames "h_2") (userinteraction))
+        (rule "variableDeclaration" (formula "9") (term "1") (newnames "x_1") (userinteraction))
+        (rule "emptyModality" (formula "9") (term "1") (userinteraction))
          (rule "false_to_not_true" (formula "9") (term "0,1,0,1,1,1,1"))
          (rule "concrete_and_3" (formula "9") (term "0,1,1,1"))
          (rule "expandInInt" (formula "9") (term "1,0,0,1,0,0,0,0,1,1,1"))
