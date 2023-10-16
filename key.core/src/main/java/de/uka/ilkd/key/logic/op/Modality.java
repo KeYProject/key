@@ -97,6 +97,14 @@ public class Modality extends org.key_project.logic.op.Modality<Sort> implements
         additionalValidTopLevel(term);
     }
 
+    @Override
+    public String toString() {
+        if (kind() instanceof ModalOperatorSV) {
+            return kind().toString();
+        }
+        return super.toString();
+    }
+
     public static class JavaModalityKind extends Kind implements SVSubstitute {
         private static final Map<String, JavaModalityKind> kinds = new HashMap<>();
         /**

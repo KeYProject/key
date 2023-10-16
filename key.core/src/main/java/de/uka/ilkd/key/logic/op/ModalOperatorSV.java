@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -45,7 +44,8 @@ public final class ModalOperatorSV extends Modality.JavaModalityKind implements 
 
     @Override
     public String toString() {
-        return name() + " (modal operator)";
+        // TODO: HACKS, remove new-line and re-generate taclets.old.txt
+        return name().toString() + " (\n(modal operator))";
     }
 
 
