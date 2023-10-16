@@ -62,7 +62,7 @@ import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
  */
 public class FunctionalOperationContractPO extends AbstractOperationPO implements ContractPO {
     public static final Map<Boolean, String> TRANSACTION_TAGS =
-        new LinkedHashMap<Boolean, String>();
+        new LinkedHashMap<>();
 
     private final FunctionalOperationContract contract;
 
@@ -134,7 +134,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             ImmutableList<LocationVariable> formalParVars, ProgramVariable selfVar,
             ProgramVariable resultVar, Services services) {
         final StatementBlock[] result = new StatementBlock[4];
-        final ImmutableArray<Expression> formalArray = new ImmutableArray<Expression>(
+        final ImmutableArray<Expression> formalArray = new ImmutableArray<>(
             formalParVars.toArray(new ProgramVariable[formalParVars.size()]));
 
         if (getContract().getTarget().isConstructor()) {

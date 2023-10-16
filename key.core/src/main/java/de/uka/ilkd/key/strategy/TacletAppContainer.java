@@ -195,9 +195,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         for (RuleAppCost cost : costs) {
             final TacletAppContainer container =
                 createContainer(p_app.head(), p_pio, p_goal, cost, true);
-            if (container != null) {
-                result = result.prepend(container);
-            }
+            result = result.prepend(container);
             p_app = p_app.tail();
         }
         return result;
@@ -244,13 +242,12 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
         while (it.hasNext()) {
             final IfFormulaInstantiation ifInst2 = it.next();
-            if (!(ifInst2 instanceof IfFormulaInstSeq))
+            if (!(ifInst2 instanceof final IfFormulaInstSeq ifInst))
             // faster than assertTrue
             {
-                Debug.fail("Don't know what to do with the " + "if-instantiation " + ifInst2);
-            }
-            final IfFormulaInstSeq ifInst = (IfFormulaInstSeq) ifInst2;
-            if (!(ifInst.inAntec() ? seq.antecedent() : seq.succedent())
+                Debug.fail("Don't know what to do with the " + "assumes-instantiation ", ifInst2);
+                throw new IllegalStateException("Unexpected assume-instantiation" + ifInst2);
+            } else if (!(ifInst.inAntec() ? seq.antecedent() : seq.succedent())
                     .contains(ifInst.getConstrainedFormula())) {
                 return false;
             }

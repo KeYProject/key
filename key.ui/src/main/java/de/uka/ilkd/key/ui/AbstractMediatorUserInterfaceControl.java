@@ -218,10 +218,9 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         final File toSave = new File(proofFolder, filename);
         final KeYResourceManager krm = KeYResourceManager.getManager();
         final ProofSaver ps = new ProofSaver(proof, toSave.getAbsolutePath(), krm.getSHA1());
-        try {
-            ps.save();
-        } catch (IOException e) {
-            reportException(this, null, e);
+        final String errorMsg = ps.save();
+        if (errorMsg != null) {
+            reportException(this, null, new IOException(errorMsg));
         }
     }
 

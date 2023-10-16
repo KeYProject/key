@@ -162,9 +162,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
             if (te.op() == add) {
                 collect(te.sub(0), services);
                 collect(te.sub(1), services);
-            } else if (te.op() == Z) {
-                // nothing
-            } else {
+            } else if (te.op() != Z) {
                 addTerm(stripOffLiteral(te, services));
             }
         }

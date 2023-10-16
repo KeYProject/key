@@ -43,7 +43,7 @@ public class TopRuleAppCost implements RuleAppCost {
 
     /**
      * Multiply the TOP costs with given cost. TOP times any other costs results into TOP cost.
-     *
+     * <p>
      * (weigl: Dicussable whether {@code TOP times 0 = 0}?)
      *
      * @param cost - non-null {@link RuleAppCost}
