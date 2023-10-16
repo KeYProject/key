@@ -2256,7 +2256,7 @@ public final class SymbolicExecutionUtil {
                 if (!(loopConditionModalityTerm.op() instanceof Modality mod)) {
                     throw new ProofInputException(
                         "Expected Box modality but is " + loopConditionModalityTerm);
-                } else if (mod.kind() != Modality.BOX) {
+                } else if (mod.kind() != Modality.JavaModalityKind.BOX) {
                     throw new ProofInputException(
                         "Implementation of WhileInvariantRule has changed.");
                 }
@@ -2269,7 +2269,7 @@ public final class SymbolicExecutionUtil {
                         .box(loopConditionModalityTerm.javaBlock(), sub.sub(0));
             }
             if (!(loopConditionModalityTerm.op() instanceof Modality mod) ||
-                    mod.kind() != Modality.BOX
+                    mod.kind() != Modality.JavaModalityKind.BOX
                     || loopConditionModalityTerm.sub(0).op() != Equality.EQUALS
                     || !(loopConditionModalityTerm.sub(0).sub(0).op() instanceof LocationVariable)
                     || loopConditionModalityTerm.sub(0).sub(1)

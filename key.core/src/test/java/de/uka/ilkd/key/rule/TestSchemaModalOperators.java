@@ -118,16 +118,16 @@ public class TestSchemaModalOperators {
         RewriteTacletBuilder<RewriteTaclet> rtb = new RewriteTacletBuilder<>();
 
         SchemaVariable fsv = SchemaVariableFactory.createFormulaSV(new Name("post"), true);
-        ImmutableSet<Modality> modalities = DefaultImmutableSet.nil();
-        modalities = modalities.add(Modality.DIA).add(Modality.BOX);
+        ImmutableSet<Modality.JavaModalityKind> modalities = DefaultImmutableSet.nil();
+        modalities = modalities.add(Modality.JavaModalityKind.DIA).add(Modality.JavaModalityKind.BOX);
         SchemaVariable osv = SchemaVariableFactory.createModalOperatorSV(new Name("diabox"),
             JavaDLTheory.FORMULA, modalities);
         Term tpost = TB.tf().createTerm(fsv);
 
-        Term find = TB.tf().createTerm(osv, new Term[] { tpost }, null, JavaBlock.EMPTY_JAVABLOCK);
+        Term find = TB.tf().createTerm(TB.modality((Modality.JavaModalityKind) osv, JavaBlock.EMPTY_JAVABLOCK), new Term[] { tpost }, null, JavaBlock.EMPTY_JAVABLOCK);
 
         Term replace =
-            TB.tf().createTerm(osv, new Term[] { TB.tt() }, null, JavaBlock.EMPTY_JAVABLOCK);
+            TB.tf().createTerm(TB.modality((Modality.JavaModalityKind) osv, JavaBlock.EMPTY_JAVABLOCK), new Term[] { TB.tt() }, null, JavaBlock.EMPTY_JAVABLOCK);
 
         rtb.setName(new Name("test_schema_modal1"));
         rtb.setFind(find);
@@ -136,14 +136,14 @@ public class TestSchemaModalOperators {
 
         RewriteTaclet t = rtb.getRewriteTaclet();
 
-        Term goal = TB.prog(Modality.DIA, JavaBlock.EMPTY_JAVABLOCK, TB.ff());
+        Term goal = TB.prog(Modality.JavaModalityKind.DIA, JavaBlock.EMPTY_JAVABLOCK, TB.ff());
         MatchConditions mc =
             t.getMatcher().matchFind(goal, MatchConditions.EMPTY_MATCHCONDITIONS, services);
         assertNotNull(mc);
         assertNotNull(mc.getInstantiations().getInstantiation(osv));
         assertTrue(mc.getInstantiations().isInstantiated(osv),
             "Schemamodality " + osv + " has not been instantiated");
-        assertSame(Modality.DIA, mc.getInstantiations().getInstantiation(osv));
+        assertSame(Modality.JavaModalityKind.DIA, mc.getInstantiations().getInstantiation(osv));
 
         PosInOccurrence pos =
             new PosInOccurrence(new SequentFormula(goal), PosInTerm.getTopLevel(), true);
@@ -151,7 +151,7 @@ public class TestSchemaModalOperators {
         Term instReplace =
             t.getRewriteResult(null, new TermLabelState(), services, tacletApp).formula();
         assertNotNull(instReplace);
-        assertSame(Modality.DIA, instReplace.op());
+        assertSame(Modality.JavaModalityKind.DIA, ((Modality) instReplace.op()).kind());
     }
 
     @Test
@@ -246,18 +246,18 @@ public class TestSchemaModalOperators {
         Semisequent succ2 = parseTermForSemisequent("\\[{ if(i==3) {i++;} else {i--;} }\\] i=3");
 
 
-        Assertions.assertEquals(seq0.antecedent().get(0), antec0.get(0),
+        Assertions.assertEquals(antec0.get(0), seq0.antecedent().get(0),
             "Wrong antecedent after testSchemaModal3");
-        Assertions.assertEquals(seq1.antecedent().get(0), antec0.get(0),
-            "Wrong antecedent after testSchemaModal3");
-        Assertions.assertEquals(seq2.antecedent().get(0), antec0.get(0),
-            "Wrong antecedent after testSchemaModal3");
-        Assertions.assertEquals(seq0.succedent().getFirst(), succ0.get(0),
-            "Wrong succedent after testSchemaModal3");
-        Assertions.assertEquals(seq1.succedent().getFirst(), succ1.get(0),
-            "Wrong succedent after testSchemaModal3");
-        Assertions.assertEquals(seq2.succedent().getFirst(), succ2.get(0),
-            "Wrong succedent after testSchemaModal3");
+        Assertions.assertEquals(antec0.get(0), seq1.antecedent().get(0),
+                "Wrong antecedent after testSchemaModal3");
+        Assertions.assertEquals(antec0.get(0), seq2.antecedent().get(0),
+                "Wrong antecedent after testSchemaModal3");
+        Assertions.assertEquals(succ0.get(0), seq0.succedent().getFirst(),
+                "Wrong succedent after testSchemaModal3");
+        Assertions.assertEquals(succ1.get(0), seq1.succedent().getFirst(),
+                "Wrong succedent after testSchemaModal3");
+        Assertions.assertEquals(succ2.get(0), seq2.succedent().getFirst(),
+                "Wrong succedent after testSchemaModal3");
 
         // Debug.ENABLE_DEBUG = false;
 

@@ -161,19 +161,19 @@ public final class NotationInfo {
             new Notation.Quantifier("\\forall", PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
         tbl.put(Quantifier.EX,
             new Notation.Quantifier("\\exists", PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
-        tbl.put(Modality.DIA,
+        tbl.put(Modality.JavaModalityKind.DIA,
             new Notation.ModalityNotation("\\<", "\\>", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.BOX,
+        tbl.put(Modality.JavaModalityKind.BOX,
             new Notation.ModalityNotation("\\[", "\\]", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
         tbl.put(ModalOperatorSV.class,
                 new Notation.ModalSVNotation(PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.TOUT, new Notation.ModalityNotation("\\[[", "\\]]", PRIORITY_MODALITY,
+        tbl.put(Modality.JavaModalityKind.TOUT, new Notation.ModalityNotation("\\[[", "\\]]", PRIORITY_MODALITY,
             PRIORITY_POST_MODALITY));
-        tbl.put(Modality.DIA_TRANSACTION, new Notation.ModalityNotation("\\diamond_transaction",
+        tbl.put(Modality.JavaModalityKind.DIA_TRANSACTION, new Notation.ModalityNotation("\\diamond_transaction",
             "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.BOX_TRANSACTION, new Notation.ModalityNotation("\\box_transaction",
+        tbl.put(Modality.JavaModalityKind.BOX_TRANSACTION, new Notation.ModalityNotation("\\box_transaction",
             "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.TOUT_TRANSACTION, new Notation.ModalityNotation("\\throughout_transaction",
+        tbl.put(Modality.JavaModalityKind.TOUT_TRANSACTION, new Notation.ModalityNotation("\\throughout_transaction",
             "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
         tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM, "\\if"));
         tbl.put(IfExThenElse.IF_EX_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM, "\\ifEx"));

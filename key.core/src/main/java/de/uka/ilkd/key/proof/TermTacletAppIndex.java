@@ -288,7 +288,10 @@ public class TermTacletAppIndex {
         final Term newTerm = pos.subTerm();
         final Operator newOp = newTerm.op();
 
-        if (newOp instanceof Modality && newOp == term.op() && newTerm.sub(0).equals(term.sub(0))) {
+        if (newOp instanceof Modality mod
+                && term.op() instanceof Modality termMod
+                && mod.kind() == termMod.kind()
+                && newTerm.sub(0).equals(term.sub(0))) {
             // only the program within a modal operator has changed, but not the
             // formula after the modal operator. in this case, the formula after
             // the modality does not have to be rematched. also consider

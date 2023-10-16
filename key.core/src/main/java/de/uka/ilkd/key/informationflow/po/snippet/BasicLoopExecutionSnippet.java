@@ -64,10 +64,10 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
 
         // create program term
         final Modality.JavaModalityKind symbExecMod;
-        if (modality.kind() == Modality.BOX) {
-            symbExecMod = Modality.DIA;
+        if (modality.kind() == Modality.JavaModalityKind.BOX) {
+            symbExecMod = Modality.JavaModalityKind.DIA;
         } else {
-            symbExecMod = Modality.BOX;
+            symbExecMod = Modality.JavaModalityKind.BOX;
         }
         final Term guardPreTrueTerm = d.tb.equals(vs.pre.guard, d.tb.TRUE());
         final Term guardPreFalseTerm = d.tb.equals(vs.pre.guard, d.tb.FALSE());

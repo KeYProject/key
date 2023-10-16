@@ -220,7 +220,7 @@ public final class QueryAxiom extends ClassAxiom {
         final Term replacewith = tb.var(skolemSV);
 
         // create added sequent
-        final Term addedFormula = tb.apply(update, tb.prog(Modality.BOX, jb, post), null);
+        final Term addedFormula = tb.apply(update, tb.prog(Modality.JavaModalityKind.BOX, jb, post), null);
         final SequentFormula addedCf = new SequentFormula(addedFormula);
         final Semisequent addedSemiSeq =
             Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();

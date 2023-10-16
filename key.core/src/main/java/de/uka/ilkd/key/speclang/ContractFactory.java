@@ -354,7 +354,7 @@ public class ContractFactory {
             Map<LocationVariable, Term> freeMods, Map<ProgramVariable, Term> accessibles,
             Map<LocationVariable, Boolean> hasMod, Map<LocationVariable, Boolean> hasFreeMod,
             ProgramVariableCollection pv) {
-        return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres, freePres, mby,
+        return func(baseName, pm, terminates ? Modality.JavaModalityKind.DIA : Modality.JavaModalityKind.BOX, pres, freePres, mby,
             posts, freePosts, axioms, mods, freeMods, accessibles, hasMod, hasFreeMod, pv, false,
             mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
@@ -403,13 +403,13 @@ public class ContractFactory {
             // TODO are there other modalities to appear in contracts?
             // I know that this is extremely ugly, but I don't know how to combine other kinds
             // of modalities.
-            if (kind == Modality.BOX) {
-                assert otherKind == Modality.DIA
+            if (kind == Modality.JavaModalityKind.BOX) {
+                assert otherKind == Modality.JavaModalityKind.DIA
                         : "unknown modality " + otherKind + " in contract";
                 // do nothing
             } else {
-                assert kind == Modality.DIA : "unknown modality " + kind + " in contract";
-                kind = Modality.BOX;
+                assert kind == Modality.JavaModalityKind.DIA : "unknown modality " + kind + " in contract";
+                kind = Modality.JavaModalityKind.BOX;
             }
         }
         return kind;

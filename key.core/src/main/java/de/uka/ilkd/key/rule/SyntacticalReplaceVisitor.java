@@ -213,8 +213,15 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     }
 
 
-    private Operator instantiateOperatorSV(ModalOperatorSV op, JavaBlock jb) {
-        return tb.modality((Modality.JavaModalityKind) svInst.getInstantiation(op), jb);
+    private Operator instantiateModality(Modality op, JavaBlock jb) {
+        Modality.JavaModalityKind kind = op.kind();
+        if (op.kind() instanceof ModalOperatorSV) {
+            kind = (Modality.JavaModalityKind) svInst.getInstantiation(op.kind());
+        }
+        if (jb != op.program() || kind != op.kind()) {
+            return tb.modality(kind, jb);
+        }
+        return op;
     }
 
     private Operator instantiateOperator(Operator p_operatorToBeInstantiated, JavaBlock jb) {
@@ -225,8 +232,8 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         } else if (p_operatorToBeInstantiated instanceof ElementaryUpdate) {
             instantiatedOp =
                 instantiateElementaryUpdate((ElementaryUpdate) p_operatorToBeInstantiated);
-        } else if (p_operatorToBeInstantiated instanceof Modality mod && mod.kind() instanceof ModalOperatorSV) {
-            instantiatedOp = instantiateOperatorSV(mod.kind(), jb);
+        } else if (p_operatorToBeInstantiated instanceof Modality mod) {
+            instantiatedOp = instantiateModality(mod, jb);
         } else if (p_operatorToBeInstantiated instanceof SchemaVariable) {
             if (!(p_operatorToBeInstantiated instanceof ProgramSV)
                     || !((ProgramSV) p_operatorToBeInstantiated).isListSV()) {

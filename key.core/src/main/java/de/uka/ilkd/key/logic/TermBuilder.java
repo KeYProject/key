@@ -433,11 +433,11 @@ public class TermBuilder {
     }
 
     public Term box(JavaBlock jb, Term t) {
-        return prog(Modality.BOX, jb, t);
+        return prog(Modality.JavaModalityKind.BOX, jb, t);
     }
 
     public Term dia(JavaBlock jb, Term t) {
-        return prog(Modality.DIA, jb, t);
+        return prog(Modality.JavaModalityKind.DIA, jb, t);
     }
 
     // TODO: move?

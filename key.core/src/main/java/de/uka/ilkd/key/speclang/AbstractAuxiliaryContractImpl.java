@@ -1460,12 +1460,12 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             final boolean transactionApplicable = modifiesClauses
                     .get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null;
             result = result.add(build(baseName, block, labels, method,
-                diverges.equals(ff()) ? Modality.DIA : Modality.BOX, preconditions,
+                diverges.equals(ff()) ? Modality.JavaModalityKind.DIA : Modality.JavaModalityKind.BOX, preconditions,
                 freePreconditions, measuredBy, postconditions, freePostconditions,
                 modifiesClauses, freeModifiesClauses,
                 infFlowSpecs, variables, transactionApplicable, hasMod, hasFreeMod));
             if (divergesConditionCannotBeExpressedByAModality()) {
-                result = result.add(build(baseName, block, labels, method, Modality.DIA,
+                result = result.add(build(baseName, block, labels, method, Modality.JavaModalityKind.DIA,
                     addNegatedDivergesConditionToPreconditions(preconditions), freePreconditions,
                     measuredBy, postconditions, freePostconditions,
                     modifiesClauses, freeModifiesClauses,

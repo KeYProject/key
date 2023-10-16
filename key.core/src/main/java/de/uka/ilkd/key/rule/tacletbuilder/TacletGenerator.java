@@ -593,9 +593,9 @@ public class TacletGenerator {
         SchemaVariable modalitySV =
             SchemaVariableFactory.createModalOperatorSV(new Name("#allModal_sv"),
                 JavaDLTheory.FORMULA,
-                DefaultImmutableSet.<Modality.JavaModalityKind>nil().add(Modality.DIA)
-                        .add(Modality.BOX)
-                        .add(Modality.DIA_TRANSACTION).add(Modality.BOX_TRANSACTION));
+                DefaultImmutableSet.<Modality.JavaModalityKind>nil().add(Modality.JavaModalityKind.DIA)
+                        .add(Modality.JavaModalityKind.BOX)
+                        .add(Modality.JavaModalityKind.DIA_TRANSACTION).add(Modality.JavaModalityKind.BOX_TRANSACTION));
         SchemaVariable postSV = SchemaVariableFactory.createFormulaSV(new Name("#post_sv"));
 
         final Term findTerm =

@@ -389,7 +389,15 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
 
         final Operator op1 = t1.op();
 
-        if (!(op0 instanceof ProgramVariable) && op0 != op1) {
+        if (op0 instanceof Modality mod0 && op1 instanceof Modality mod1) {
+            if (mod0.kind() != mod1.kind()) {
+                return false;
+            }
+            nat = handleJava(t0, t1, nat);
+            if (nat == FAILED) {
+                return false;
+            }
+        } else if (!(op0 instanceof ProgramVariable) && op0 != op1) {
             return false;
         }
 
@@ -397,9 +405,14 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
             return false;
         }
 
-        nat = handleJava(t0, t1, nat);
-        if (nat == FAILED) {
-            return false;
+        if (!(t0.op() instanceof SchemaVariable) && t0.op() instanceof ProgramVariable) {
+            if (!(t1.op() instanceof ProgramVariable)) {
+                return false;
+            }
+            nat = checkNat(nat);
+            if (!((ProgramVariable) t0.op()).equalsModRenaming((ProgramVariable) t1.op(), nat)) {
+                return false;
+            }
         }
 
         return descendRecursively(t0, t1, ownBoundVars, cmpBoundVars, nat);
@@ -424,16 +437,6 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
         if (!t0.javaBlock().isEmpty() || !t1.javaBlock().isEmpty()) {
             nat = checkNat(nat);
             if (!t0.javaBlock().equalsModRenaming(t1.javaBlock(), nat)) {
-                return FAILED;
-            }
-        }
-
-        if (!(t0.op() instanceof SchemaVariable) && t0.op() instanceof ProgramVariable) {
-            if (!(t1.op() instanceof ProgramVariable)) {
-                return FAILED;
-            }
-            nat = checkNat(nat);
-            if (!((ProgramVariable) t0.op()).equalsModRenaming((ProgramVariable) t1.op(), nat)) {
                 return FAILED;
             }
         }
@@ -655,9 +658,9 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
         StringBuilder sb = new StringBuilder();
         if (!javaBlock().isEmpty()) {
             var op = (Modality) op();
-            if (op.kind() == Modality.DIA) {
+            if (op.kind() == Modality.JavaModalityKind.DIA) {
                 sb.append("\\<").append(javaBlock()).append("\\> ");
-            } else if (op.kind() == Modality.BOX) {
+            } else if (op.kind() == Modality.JavaModalityKind.BOX) {
                 sb.append("\\[").append(javaBlock()).append("\\] ");
             } else {
                 sb.append(op()).append("\\[").append(javaBlock()).append("\\] ");

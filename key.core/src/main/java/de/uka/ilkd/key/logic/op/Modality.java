@@ -22,52 +22,7 @@ import org.key_project.logic.Program;
  */
 public class Modality extends org.key_project.logic.op.Modality<Sort> implements Operator {
     /**
-     * The diamond operator of dynamic logic. A formula {@code <alpha;>Phi} can be read as after
-     * processing
-     * the program alpha there exists a state such that Phi holds.
-     */
-    public static final JavaModalityKind DIA = new JavaModalityKind(new Name("diamond"));
-
-    /**
-     * The box operator of dynamic logic. A formula [alpha;]Phi can be read as 'In all states
-     * reachable processing the program alpha the formula Phi holds'.
-     */
-    public static final JavaModalityKind BOX = new JavaModalityKind(new Name("box"));
-
-
-    /**
-     * A Java Card transaction version of the diamond modality. Means that a transaction is
-     * currently underway.
-     */
-    public static final JavaModalityKind DIA_TRANSACTION =
-        new JavaModalityKind(new Name("diamond_transaction"));
-
-    /**
-     * A Java Card transaction version of the box modality. Means that a transaction is currently
-     * underway.
-     */
-    public static final JavaModalityKind BOX_TRANSACTION =
-        new JavaModalityKind(new Name("box_transaction"));
-
-    /**
-     * The throughout operator of dynamic logic. A formula [[alpha;]]Phi can be read as during
-     * processing the program alpha Phi should hold at every step of execution.
-     */
-    public static final JavaModalityKind TOUT = new JavaModalityKind(new Name("throughout"));
-
-    /**
-     * A Java Card transaction version of the throughout modality. Means that a transaction is
-     * currently underway.
-     */
-    public static final JavaModalityKind TOUT_TRANSACTION =
-        new JavaModalityKind(new Name("throughout_transaction"));
-
-    public static final JavaModalityKind MOD_SV = new JavaModalityKind(new Name("mod_sv"));
-
-    /**
      * creates a modal operator with the given name
-     *
-     *
      */
     public Modality(Program prg, JavaModalityKind kind) {
         super(kind.name(), JavaDLTheory.FORMULA, prg, kind);
@@ -144,10 +99,43 @@ public class Modality extends org.key_project.logic.op.Modality<Sort> implements
 
     public static class JavaModalityKind extends Kind implements SVSubstitute {
         private static final Map<String, JavaModalityKind> kinds = new HashMap<>();
+        /**
+         * The diamond operator of dynamic logic. A formula <alpha;>Phi can be read as after processing
+         * the program alpha there exists a state such that Phi holds.
+         */
+        public static final JavaModalityKind DIA = new JavaModalityKind(new Name("diamond"));
+        /**
+         * The box operator of dynamic logic. A formula [alpha;]Phi can be read as 'In all states
+         * reachable processing the program alpha the formula Phi holds'.
+         */
+        public static final JavaModalityKind BOX = new JavaModalityKind(new Name("box"));
+        /**
+         * A Java Card transaction version of the diamond modality. Means that a transaction is
+         * currently underway.
+         */
+        public static final JavaModalityKind DIA_TRANSACTION =
+            new JavaModalityKind(new Name("diamond_transaction"));
+        /**
+         * A Java Card transaction version of the box modality. Means that a transaction is currently
+         * underway.
+         */
+        public static final JavaModalityKind BOX_TRANSACTION =
+            new JavaModalityKind(new Name("box_transaction"));
+        /**
+         * The throughout operator of dynamic logic. A formula [[alpha;]]Phi can be read as during
+         * processing the program alpha Phi should hold at every step of execution.
+         */
+        public static final JavaModalityKind TOUT = new JavaModalityKind(new Name("throughout"));
+        /**
+         * A Java Card transaction version of the throughout modality. Means that a transaction is
+         * currently underway.
+         */
+        public static final JavaModalityKind TOUT_TRANSACTION =
+            new JavaModalityKind(new Name("throughout_transaction"));
+        public static final JavaModalityKind MOD_SV = new JavaModalityKind(new Name("mod_sv"));
 
         public JavaModalityKind(Name name) {
             super(name);
-            assert !kinds.containsKey(name.toString());
             kinds.put(name.toString(), this);
         }
 

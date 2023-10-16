@@ -157,7 +157,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
 
     @Override
     protected Modality.JavaModalityKind getTerminationMarker() {
-        return Modality.BOX;
+        return Modality.JavaModalityKind.BOX;
     }
 
     @Override

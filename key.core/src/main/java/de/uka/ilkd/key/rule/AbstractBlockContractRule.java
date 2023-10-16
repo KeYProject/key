@@ -93,12 +93,12 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
             ImmutableSet<BlockContract> collectedContracts =
                 specifications.getBlockContracts(block, modalityKind);
-            if (modalityKind == Modality.BOX) {
+            if (modalityKind == Modality.JavaModalityKind.BOX) {
                 collectedContracts =
-                    collectedContracts.union(specifications.getBlockContracts(block, Modality.DIA));
-            } else if (modalityKind == Modality.BOX_TRANSACTION) {
+                    collectedContracts.union(specifications.getBlockContracts(block, Modality.JavaModalityKind.DIA));
+            } else if (modalityKind == Modality.JavaModalityKind.BOX_TRANSACTION) {
                 collectedContracts = collectedContracts
-                        .union(specifications.getBlockContracts(block, Modality.DIA_TRANSACTION));
+                        .union(specifications.getBlockContracts(block, Modality.JavaModalityKind.DIA_TRANSACTION));
             }
             return filterAppliedContracts(collectedContracts, goal);
         } else {

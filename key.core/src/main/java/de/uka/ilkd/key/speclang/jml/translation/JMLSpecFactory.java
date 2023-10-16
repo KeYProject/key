@@ -167,27 +167,27 @@ public class JMLSpecFactory {
         if (clauses.infFlowSpecs != null && !clauses.infFlowSpecs.isEmpty()) {
             if (clauses.diverges.equals(tb.ff())) {
                 InformationFlowContract symbData = cf.createInformationFlowContract(
-                    pm.getContainerType(), pm, pm.getContainerType(), Modality.DIA,
+                    pm.getContainerType(), pm, pm.getContainerType(), Modality.JavaModalityKind.DIA,
                     clauses.requires.get(heap), clauses.requiresFree.get(heap), clauses.measuredBy,
                     clauses.assignables.get(heap), !clauses.hasMod.get(heap), progVars,
                     clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
                 symbDatas = symbDatas.add(symbData);
             } else if (clauses.diverges.equals(tb.tt())) {
                 InformationFlowContract symbData = cf.createInformationFlowContract(
-                    pm.getContainerType(), pm, pm.getContainerType(), Modality.BOX,
+                    pm.getContainerType(), pm, pm.getContainerType(), Modality.JavaModalityKind.BOX,
                     clauses.requires.get(heap), clauses.requiresFree.get(heap), clauses.measuredBy,
                     clauses.assignables.get(heap), !clauses.hasMod.get(heap), progVars,
                     clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
                 symbDatas = symbDatas.add(symbData);
             } else {
                 InformationFlowContract symbData1 = cf.createInformationFlowContract(
-                    pm.getContainerType(), pm, pm.getContainerType(), Modality.DIA,
+                    pm.getContainerType(), pm, pm.getContainerType(), Modality.JavaModalityKind.DIA,
                     tb.and(clauses.requires.get(heap), tb.not(clauses.diverges)),
                     clauses.requiresFree.get(heap), clauses.measuredBy,
                     clauses.assignables.get(heap), !clauses.hasMod.get(heap), progVars,
                     clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
                 InformationFlowContract symbData2 = cf.createInformationFlowContract(
-                    pm.getContainerType(), pm, pm.getContainerType(), Modality.BOX,
+                    pm.getContainerType(), pm, pm.getContainerType(), Modality.JavaModalityKind.BOX,
                     clauses.requires.get(heap), clauses.requiresFree.get(heap), clauses.measuredBy,
                     clauses.assignables.get(heap), !clauses.hasMod.get(heap), progVars,
                     clauses.accessibles.get(heap), clauses.infFlowSpecs, false);

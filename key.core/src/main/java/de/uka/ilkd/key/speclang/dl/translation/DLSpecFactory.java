@@ -262,9 +262,9 @@ public final class DLSpecFactory {
         if (excVar == null) {
             excVar = tb.excVar(pm, false);
             Term excNullTerm = tb.equals(tb.var(excVar), tb.NULL());
-            if (modality.kind() == Modality.DIA) {
+            if (modality.kind() == Modality.JavaModalityKind.DIA) {
                 post = tb.and(post, excNullTerm);
-            } else if (modality.kind() == Modality.BOX) {
+            } else if (modality.kind() == Modality.JavaModalityKind.BOX) {
                 post = tb.or(post, tb.not(excNullTerm));
             } else {
                 throw new ProofInputException("unknown semantics for exceptional termination: "

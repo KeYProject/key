@@ -145,7 +145,7 @@ class BasicSnippetData {
         contractContents.put(Key.LOOP_INVARIANT, invariant);
         contractContents.put(Key.LOOP_INVARIANT_TERM, invariant.getInvariant(services));
         contractContents.put(Key.MODIFIES, invariant.getModifies());
-        contractContents.put(Key.MODALITY, Modality.BOX);
+        contractContents.put(Key.MODALITY, Modality.JavaModalityKind.BOX);
         contractContents.put(Key.INF_FLOW_SPECS, invariant.getInfFlowSpecs(services));
 
         // add guard term to information flow specs (necessary for soundness)

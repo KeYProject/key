@@ -72,23 +72,23 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
         if (statement instanceof StatementBlock block) {
 
             collectedContracts = specifications.getLoopContracts(block, modalityKind);
-            if (modalityKind == Modality.BOX) {
+            if (modalityKind == Modality.JavaModalityKind.BOX) {
                 collectedContracts =
-                    collectedContracts.union(specifications.getLoopContracts(block, Modality.DIA));
-            } else if (modalityKind == Modality.BOX_TRANSACTION) {
+                    collectedContracts.union(specifications.getLoopContracts(block, Modality.JavaModalityKind.DIA));
+            } else if (modalityKind == Modality.JavaModalityKind.BOX_TRANSACTION) {
                 collectedContracts = collectedContracts
-                        .union(specifications.getLoopContracts(block, Modality.DIA_TRANSACTION));
+                        .union(specifications.getLoopContracts(block, Modality.JavaModalityKind.DIA_TRANSACTION));
             }
         } else {
             LoopStatement loop = (LoopStatement) statement;
 
             collectedContracts = specifications.getLoopContracts(loop, modalityKind);
-            if (modalityKind == Modality.BOX) {
+            if (modalityKind == Modality.JavaModalityKind.BOX) {
                 collectedContracts =
-                    collectedContracts.union(specifications.getLoopContracts(loop, Modality.DIA));
-            } else if (modalityKind == Modality.BOX_TRANSACTION) {
+                    collectedContracts.union(specifications.getLoopContracts(loop, Modality.JavaModalityKind.DIA));
+            } else if (modalityKind == Modality.JavaModalityKind.BOX_TRANSACTION) {
                 collectedContracts = collectedContracts
-                        .union(specifications.getLoopContracts(loop, Modality.DIA_TRANSACTION));
+                        .union(specifications.getLoopContracts(loop, Modality.JavaModalityKind.DIA_TRANSACTION));
             }
         }
 

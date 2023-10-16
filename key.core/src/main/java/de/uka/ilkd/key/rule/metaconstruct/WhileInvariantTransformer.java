@@ -205,8 +205,8 @@ public final class WhileInvariantTransformer {
         }
 
         var loopBodyModalityKind = modality.kind();
-        final boolean transaction = (loopBodyModalityKind == Modality.DIA_TRANSACTION
-                || loopBodyModalityKind == Modality.BOX_TRANSACTION);
+        final boolean transaction = (loopBodyModalityKind == Modality.JavaModalityKind.DIA_TRANSACTION
+                || loopBodyModalityKind == Modality.JavaModalityKind.BOX_TRANSACTION);
         JavaBlock mainJavaBlock = JavaBlock.createJavaBlock(transaction
                 ? new StatementBlock(resSta,
                     new TransactionStatement(
