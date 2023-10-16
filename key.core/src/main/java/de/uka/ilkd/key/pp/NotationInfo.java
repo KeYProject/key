@@ -165,6 +165,8 @@ public final class NotationInfo {
             new Notation.ModalityNotation("\\<", "\\>", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
         tbl.put(Modality.BOX,
             new Notation.ModalityNotation("\\[", "\\]", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+        tbl.put(ModalOperatorSV.class,
+                new Notation.ModalSVNotation(PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
         tbl.put(Modality.TOUT, new Notation.ModalityNotation("\\[[", "\\]]", PRIORITY_MODALITY,
             PRIORITY_POST_MODALITY));
         tbl.put(Modality.DIA_TRANSACTION, new Notation.ModalityNotation("\\diamond_transaction",
@@ -186,8 +188,6 @@ public final class NotationInfo {
         tbl.put(Equality.class,
             new Notation.Infix("=", PRIORITY_EQUAL, PRIORITY_COMPARISON, PRIORITY_COMPARISON));
         tbl.put(ElementaryUpdate.class, new Notation.ElementaryUpdateNotation());
-        tbl.put(ModalOperatorSV.class,
-            new Notation.ModalSVNotation(PRIORITY_MODALITY, PRIORITY_MODALITY));
         tbl.put(SchemaVariable.class, new Notation.SchemaVariableNotation());
 
         tbl.put(JavaDLTheory.CAST_NAME,
@@ -438,6 +438,11 @@ public final class NotationInfo {
             result = notationTable.get(mod.kind());
             if (result != null) {
                 return result;
+            } else {
+                result = notationTable.get(ModalOperatorSV.class);
+                if (result != null) {
+                    return result;
+                }
             }
         }
 

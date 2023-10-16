@@ -13,10 +13,7 @@ import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.util.Debug;
 
@@ -148,6 +145,12 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
         return add(sv, new TermLabelInstantiationEntry(labels), services);
     }
 
+    /**
+     * Add the given additional condition for the generic sort instantiations
+     */
+    public SVInstantiations add(SchemaVariable sv, Modality.JavaModalityKind kind, Services services) throws SortException {
+        return add(sv, new InstantiationEntry<>(kind) {}, services);
+    }
 
     public SVInstantiations addList(SchemaVariable sv, Object[] list, Services services) {
         return add(sv, new ListInstantiation(sv, ImmutableSLList.nil().prepend(list)),

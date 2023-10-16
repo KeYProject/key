@@ -1123,7 +1123,8 @@ public class ExpressionBuilder extends DefaultBuilder {
              * if (!inSchemaMode()) { semanticError(ctx,
              * "No schema elements allowed outside taclet declarations (" + sjb.opName + ")"); }
              */
-            op = schemaVariables().lookup(new Name(sjb.opName));
+            Modality.JavaModalityKind kind = (Modality.JavaModalityKind) schemaVariables().lookup(new Name(sjb.opName));
+            op = getServices().getTermBuilder().modality(kind, sjb.javaBlock);
         } else {
             op = getServices().getTermBuilder().modality(Modality.JavaModalityKind.getKind(sjb.opName), sjb.javaBlock);
         }

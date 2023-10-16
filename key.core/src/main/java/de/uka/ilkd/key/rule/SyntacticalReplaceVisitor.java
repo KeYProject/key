@@ -213,11 +213,11 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     }
 
 
-    private Operator instantiateOperatorSV(ModalOperatorSV op) {
-        return (Operator) svInst.getInstantiation(op);
+    private Operator instantiateOperatorSV(ModalOperatorSV op, JavaBlock jb) {
+        return tb.modality((Modality.JavaModalityKind) svInst.getInstantiation(op), jb);
     }
 
-    private Operator instantiateOperator(Operator p_operatorToBeInstantiated) {
+    private Operator instantiateOperator(Operator p_operatorToBeInstantiated, JavaBlock jb) {
         Operator instantiatedOp = p_operatorToBeInstantiated;
         if (p_operatorToBeInstantiated instanceof SortDependingFunction) {
             instantiatedOp =
@@ -225,8 +225,8 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         } else if (p_operatorToBeInstantiated instanceof ElementaryUpdate) {
             instantiatedOp =
                 instantiateElementaryUpdate((ElementaryUpdate) p_operatorToBeInstantiated);
-        } else if (p_operatorToBeInstantiated instanceof ModalOperatorSV) {
-            instantiatedOp = instantiateOperatorSV((ModalOperatorSV) p_operatorToBeInstantiated);
+        } else if (p_operatorToBeInstantiated instanceof Modality mod && mod.kind() instanceof ModalOperatorSV) {
+            instantiatedOp = instantiateOperatorSV(mod.kind(), jb);
         } else if (p_operatorToBeInstantiated instanceof SchemaVariable) {
             if (p_operatorToBeInstantiated instanceof ProgramSV
                     && ((ProgramSV) p_operatorToBeInstantiated).isListSV()) {
@@ -286,7 +286,6 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
                 applicationPosInOccurrence, rule, ruleApp, goal, labelHint, visited, newTerm);
             pushNew(labeledTerm);
         } else {
-            final Operator newOp = instantiateOperator(visitedOp);
             // instantiation of java block
             boolean jblockChanged = false;
             JavaBlock jb = visited.javaBlock();
@@ -297,6 +296,8 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
                     jblockChanged = true;
                 }
             }
+
+            final Operator newOp = instantiateOperator(visitedOp, jb);
 
             // instantiate bound variables
             final ImmutableArray<QuantifiableVariable> boundVars =
