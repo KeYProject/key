@@ -167,8 +167,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         ProofSettings settings = getPreferences();
         initConfig.setSettings(settings);
         return ProofAggregate.createProofAggregate(
-            new Proof(name, problem, getParseContext().getProblemHeader() + "\n", initConfig,
-                file.file()),
+            new Proof(name, problem, getParseContext().getProblemHeader() + "\n", initConfig, file.file().toFile()),
             name);
     }
 

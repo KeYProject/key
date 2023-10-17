@@ -255,7 +255,7 @@ public class Proof implements Named {
         this(name, problem, initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(),
             initConfig);
         problemHeader = header;
-        this.proofFile = proofFile;
+        this.proofFile = proofFile.toPath();
     }
 
     public Proof(String name, Term problem, String header, InitConfig initConfig) {

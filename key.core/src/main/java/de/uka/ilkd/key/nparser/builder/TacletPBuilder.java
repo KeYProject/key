@@ -351,31 +351,6 @@ public class TacletPBuilder extends ExpressionBuilder {
         return s;
     }
 
-    private Object evaluateVarcondArgument(ArgumentType expectedType, Object prevValue,
-            KeYParser.Varexp_argumentContext ctx) {
-        if (prevValue != null && expectedType.clazz.isAssignableFrom(prevValue.getClass())) {
-            return prevValue; // previous value is of suitable type, we do not re-evaluate
-        }
-
-        switch (expectedType) {
-        case TYPE_RESOLVER:
-            return buildTypeResolver(ctx);
-        case SORT:
-            return visitSortId(ctx.term().getText(), ctx.term());
-        case JAVA_TYPE:
-            return getOrCreateJavaType(ctx.term().getText(), ctx);
-        case VARIABLE:
-            return varId(ctx, ctx.getText());
-        case STRING:
-            return ctx.getText();
-        case TERM:
-            return accept(ctx.term());
-        }
-        assert false;
-        return null;
-    }
-
-
     private KeYJavaType getOrCreateJavaType(String sortId, ParserRuleContext ctx) {
         KeYJavaType t = getJavaInfo().getKeYJavaType(sortId);
         if (t != null) {
