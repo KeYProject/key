@@ -155,7 +155,7 @@ public class SettingsManager {
 
     public class ShowSettingsAction extends MainWindowAction {
         private static final long serialVersionUID = 153753479823919818L;
-      
+
         public ShowSettingsAction(MainWindow mainWindow) {
             super(mainWindow);
             setName("Show Settings");

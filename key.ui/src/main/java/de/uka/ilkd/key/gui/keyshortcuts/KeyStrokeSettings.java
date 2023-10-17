@@ -64,8 +64,8 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     /**
      * default {@link KeyStroke}s
      */
-    private static Map<String, String> DEFAULT_KEYSTROKES = new TreeMap<>(); 
-  
+    private static Map<String, String> DEFAULT_KEYSTROKES = new TreeMap<>();
+
     // define the default mappings
     static {
         // use CTRL+SHIFT+letter for macros
