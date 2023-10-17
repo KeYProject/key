@@ -95,7 +95,7 @@ public class AppliedRuleAppsNameCache {
 
     /**
      * Gets rule apps applied to any node before the given node with the given name.
-     *
+     * <p>
      * Multiple assumptions about nodes:
      * * The given node is a leaf, no children, no applied rule
      * * Only *new* nodes are appended to nodes

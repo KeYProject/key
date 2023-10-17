@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -23,7 +24,7 @@ import org.key_project.util.collection.ImmutableSet;
  * distinction, unified interfaces etc.). However, they are strictly separated by their sorts. A
  * formula (and just a formula) must have the sort {@link Sort#FORMULA}. Terms of a different sort
  * are terms in the customary logic sense. A term of sort formula is allowed exact there, where a
- * formuala in logic is allowed to appear, same for terms of different sorts. Some words about other
+ * formula in logic is allowed to appear, same for terms of different sorts. Some words about other
  * design decisions:
  * <ol>
  * <li>terms are immutable, this means after a term object is created, it cannot be changed. The
@@ -46,7 +47,7 @@ public interface Term extends SVSubstitute, Sorted, EqualsModProofIrrelevancy {
     Operator op();
 
     /**
-     * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f") casted to the passed
+     * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f") cast to the passed
      * type.
      */
     <T> T op(Class<T> opClass) throws IllegalArgumentException;
@@ -74,6 +75,7 @@ public interface Term extends SVSubstitute, Sorted, EqualsModProofIrrelevancy {
     /**
      * The Java block at top level.
      */
+    @Nonnull
     JavaBlock javaBlock();
 
     /**
@@ -103,8 +105,8 @@ public interface Term extends SVSubstitute, Sorted, EqualsModProofIrrelevancy {
     ImmutableSet<QuantifiableVariable> freeVars();
 
     /**
-     * The visitor is handed through till the bottom of the tree and then it walks upwards, while at
-     * each upstep the method visit of the visitor is called.
+     * The visitor is handed through till the bottom of the tree, and then it walks upwards, while
+     * at each upstep the method visit of the visitor is called.
      *
      * @param visitor the Visitor
      */
@@ -161,11 +163,11 @@ public interface Term extends SVSubstitute, Sorted, EqualsModProofIrrelevancy {
 
 
     /**
-     * Checks if the {@link Term} or one of its direct or indirect children contains a non empty
+     * Checks if the {@link Term} or one of its direct or indirect children contains a non-empty
      * {@link JavaBlock}.
      *
      * @return {@code true} The {@link Term} or one of its direct or indirect children contains a
-     *         non empty {@link JavaBlock}, {@code false} no {@link JavaBlock} available.
+     *         non-empty {@link JavaBlock}, {@code false} no {@link JavaBlock} available.
      */
     boolean containsJavaBlockRecursive();
 
@@ -190,7 +192,7 @@ public interface Term extends SVSubstitute, Sorted, EqualsModProofIrrelevancy {
     boolean equalsModTermLabels(Object o);
 
     /**
-     * Returns an human-readable source of this term. For example the filename with line and offset.
+     * Returns a human-readable source of this term. For example the filename with line and offset.
      */
     default @Nullable String getOrigin() { return null; }
 }

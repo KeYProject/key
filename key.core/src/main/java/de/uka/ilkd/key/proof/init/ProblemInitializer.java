@@ -358,8 +358,7 @@ public final class ProblemInitializer {
     }
 
     // what is the purpose of this method?
-    private InitConfig determineEnvironment(ProofOblInput po, InitConfig initConfig)
-            throws ProofInputException {
+    private InitConfig determineEnvironment(ProofOblInput po, InitConfig initConfig) {
         // TODO: what does this actually do?
         ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().updateChoices(initConfig.choiceNS(),
             false);

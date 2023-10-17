@@ -205,14 +205,15 @@ public class TestVariableNamer {
         PosInOccurrence pio = constructPIO(formulaWithVar_1);
         Goal goal = constructGoal(formulaWithVar_1);
 
-        proposal = vn.getNameProposalForSchemaVariable(null, variableSV, pio, null, null);
+        proposal = vn.getNameProposalForSchemaVariable(null, variableSV, pio, null, null, services);
         assertEquals("var_2", proposal.toString());
 
         proof.getNamespaces().programVariables().addSafely(var_2);
         addGlobal(goal, var_2);
 
-        proposal = vn.getNameProposalForSchemaVariable("var", variableSV, pio, null, null);
-        assertEquals("var_2", proposal.toString());
+        proposal =
+            vn.getNameProposalForSchemaVariable("var", variableSV, pio, null, null, services);
+        assertEquals("var_3", proposal.toString());
     }
 
 

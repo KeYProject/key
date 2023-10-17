@@ -27,5 +27,6 @@ public class TestOneStepSimplifier {
             KeYEnvironment.load(new File(testCaseDirectory, "ossRestriction.proof").toPath());
         Assertions.assertNotNull(env.getLoadedProof());
         Assertions.assertTrue(env.getLoadedProof().closed());
+        env.dispose();
     }
 }

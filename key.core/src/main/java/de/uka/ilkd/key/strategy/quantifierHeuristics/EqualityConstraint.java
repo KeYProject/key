@@ -533,7 +533,7 @@ public class EqualityConstraint implements Constraint {
 
     /**
      * checks for cycles and adds additional constraints if necessary
-     *
+     * <p>
      * PRECONDITION: the sorts of mv and t match; if t is also a metavariable with same sort as mv,
      * the order of mv and t is correct (using Metavariable.compareTo)
      *

@@ -41,6 +41,8 @@ public class LDTInput implements EnvInput {
      * creates a representation of the LDT files to be used as input to the KeY prover.
      *
      * @param keyFiles an array containing the LDT .key files
+     * @param listener an LDTInputListener for stsus reports while loading
+     * @param profile the Profile for which the LDTs are load
      */
     public LDTInput(KeYFile[] keyFiles, LDTInputListener listener, Profile profile) {
         assert profile != null;
@@ -113,7 +115,7 @@ public class LDTInput implements EnvInput {
      * declared sorts in all rules, e.g.
      */
     @Override
-    public ImmutableSet<PositionedString> read() throws ProofInputException {
+    public ImmutableSet<PositionedString> read() {
         if (initConfig == null) {
             throw new IllegalStateException("LDTInput: InitConfig not set.");
         }
@@ -163,7 +165,6 @@ public class LDTInput implements EnvInput {
 
         return true;
     }
-
 
     @Override
     public int hashCode() {

@@ -5,7 +5,6 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.IOException;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
@@ -54,17 +53,20 @@ public final class QuickSaveAction extends MainWindowAction {
         if (mainWindow.getMediator().ensureProofLoaded()) {
             final String filename = QUICK_SAVE_PATH;
             final Proof proof = mainWindow.getMediator().getSelectedProof();
-            try {
-                new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION).save();
-                final String status = "File quicksaved: " + filename;
-                mainWindow.setStatusLine(status);
-                LOGGER.debug(status);
-            } catch (IOException x) {
+
+            String status = new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION).save();
+
+            if (status == null) {
+                // success case
+                status = "File quicksaved: " + filename;
+            } else {
                 mainWindow.popupWarning(
-                    "Quicksaving file " + filename + " failed:\n" + x.getMessage(),
+                    "Quicksaving file " + filename + " failed:\n" + status,
                     "Quicksave failed");
-                LOGGER.debug("Quicksaving file {} failed.", filename, x);
+                LOGGER.debug("Quicksaving file {} failed.", filename, status);
             }
+            mainWindow.setStatusLine(status);
+            LOGGER.debug(status);
         } else {
             mainWindow.popupWarning("No proof.", "Oops...");
         }

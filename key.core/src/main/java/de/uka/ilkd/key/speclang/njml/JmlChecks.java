@@ -81,7 +81,7 @@ class JmlWarnDifferentRequiresSemantics extends AbstractCheck implements JmlChec
 
             if (isRequiresClause(clause) && otherClause) {
                 addWarning(clause,
-                    "Diverging Semantics form JML Reference: Requires does not initiate a new contract. "
+                    "Diverging Semantics from JML Reference: Requires does not initiate a new contract. "
                         + "See https://keyproject.github.io/key-docs/user/JMLGrammar/#TODO");
             }
         }

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.speclang.njml;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
@@ -79,7 +80,7 @@ public class NJmlTranslatorTests {
     // }
 
     @Test
-    public void testWarnRequires() throws URISyntaxException {
+    void testWarnRequires() throws URISyntaxException {
         preParser.clearWarnings();
         String contract = "/*@ requires true; ensures true; requires true;";
         ImmutableList<TextualJMLConstruct> result =
@@ -88,8 +89,9 @@ public class NJmlTranslatorTests {
         ImmutableList<PositionedString> warnings = preParser.getWarnings();
         PositionedString message = warnings.head();
         assertEquals(
-            "Diverging Semantics form JML Reference: Requires does not initiate a new contract. "
-                + "See https://keyproject.github.io/key-docs/user/JMLGrammar/#TODO (Test.java, 5/38)",
+            "Diverging Semantics from JML Reference: Requires does not initiate a new contract. "
+                + "See https://keyproject.github.io/key-docs/user/JMLGrammar/#TODO ("
+                + Path.of("Test.java").toUri() + ", 5/38)",
             message.toString());
     }
 

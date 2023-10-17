@@ -219,7 +219,7 @@ public class TriggersSet {
                 return true;
             }
 
-            return foundSubtriggers;
+            return true;
         }
 
         private Set<Term> expandIfThenElse(Term t, TermServices services) {

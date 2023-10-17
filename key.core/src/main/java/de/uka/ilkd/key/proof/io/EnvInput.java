@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.proof.io;
 
 import java.nio.file.Path;
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nonnull;
@@ -59,7 +60,6 @@ public interface EnvInput {
     default @Nullable Path getJavaFile() {
         return null;
     }
-
 
     /**
      * gets the classpath elements to be considered here.

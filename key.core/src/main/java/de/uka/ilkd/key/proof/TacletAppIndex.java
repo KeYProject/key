@@ -58,7 +58,7 @@ public class TacletAppIndex {
      */
     private RuleFilter ruleFilter;
 
-    private State state;
+    private final State state;
 
     private final Map<CacheKey, TermTacletAppIndex> cache;
 
