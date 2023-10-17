@@ -110,19 +110,25 @@ public class LDTInput implements EnvInput {
      * reads all LDTs, i.e., all associated .key files with respect to the given modification
      * strategy. Reading is done in a special order: first all sort declarations then all function
      * and predicate declarations and third the rules. This procedure makes it possible to use all
-     * declared sorts in all rules, e.g.
+     * declared sorts in all rules.
+     *
+     * @return a list of warnings during the parsing the process
      */
     @Override
     public ImmutableSet<PositionedString> read() {
+        var warnings = new ArrayList<PositionedString>();
+
         if (initConfig == null) {
             throw new IllegalStateException("LDTInput: InitConfig not set.");
         }
 
         for (KeYFile keYFile : keyFiles) {
-            keYFile.readSorts();
+            var w = keYFile.readSorts();
+            warnings.addAll(w);
         }
         for (KeYFile file : keyFiles) {
-            file.readFuncAndPred();
+            var w = file.readFuncAndPred();
+            warnings.addAll(w);
         }
         // create LDT objects to have them available for parsing
         initConfig.getServices().getTypeConverter().init();
@@ -135,7 +141,7 @@ public class LDTInput implements EnvInput {
         }
 
 
-        return DefaultImmutableSet.nil();
+        return DefaultImmutableSet.fromCollection(warnings);
     }
 
     @Override

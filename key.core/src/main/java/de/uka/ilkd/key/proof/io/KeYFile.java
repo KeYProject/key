@@ -11,6 +11,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -315,10 +316,11 @@ public class KeYFile implements EnvInput {
         ChoiceInformation ci = getParseContext().getChoices();
         initConfig.addCategory2DefaultChoices(ci.getDefaultOptions());
 
-        readSorts();
-        readFuncAndPred();
+        var warnings = new ArrayList<PositionedString>();
+        warnings.addAll(readSorts());
+        warnings.addAll(readFuncAndPred());
 
-        return DefaultImmutableSet.nil();
+        return DefaultImmutableSet.fromCollection(warnings);
     }
 
     /**
@@ -351,27 +353,32 @@ public class KeYFile implements EnvInput {
      * reads the sorts declaration of the .key file only, modifying the sort namespace of the
      * initial configuration
      */
-    public void readSorts() {
+    public Collection<PositionedString> readSorts() {
         KeyAst.File ctx = getParseContext();
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
         io.evalDeclarations(ctx);
         ChoiceInformation choice = getParseContext().getChoices();
         // we ignore the namespace of choice finder.
         initConfig.addCategory2DefaultChoices(choice.getDefaultOptions());
+
+        return io.getWarnings().stream().map(BuildingIssue::asPositionedString).toList();
     }
 
 
     /**
      * reads the functions and predicates declared in the .key file only, modifying the function
      * namespaces of the respective taclet options.
+     *
+     * @return warnings during the interpretation of the AST constructs
      */
-    public void readFuncAndPred() {
+    public List<PositionedString> readFuncAndPred() {
         if (file == null) {
-            return;
+            return null;
         }
         KeyAst.File ctx = getParseContext();
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
         io.evalFuncAndPred(ctx);
+        return io.getWarnings().stream().map(BuildingIssue::asPositionedString).toList();
     }
 
 

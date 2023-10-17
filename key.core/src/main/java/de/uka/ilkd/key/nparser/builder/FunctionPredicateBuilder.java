@@ -116,7 +116,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         if (lookup(f.name()) == null) {
             functions().add(f);
         } else {
-            addWarning("Function '" + func_name + "' is already defined!");
+            addWarning(ctx, "Function '" + func_name + "' is already defined!");
         }
         return f;
     }
