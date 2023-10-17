@@ -46,12 +46,12 @@ public class ProveTest {
 
     protected final boolean verbose = Boolean.getBoolean("prooftests.verbose");
     protected String baseDirectory = "";
-    protected final String statisticsFile = "tmp.csv";
+    protected String statisticsFile = "tmp.csv";
     protected String name = "unnamed_tests";
-    protected final boolean reloadEnabled = false;
+    protected boolean reloadEnabled = false;
     protected String tempDir = "/tmp";
-    protected final String globalSettings = "";
-    protected final String localSettings = "";
+    protected String globalSettings = "";
+    protected String localSettings = "";
     private StatisticsFile statistics;
 
     protected void assertProvability(String file) throws Exception {

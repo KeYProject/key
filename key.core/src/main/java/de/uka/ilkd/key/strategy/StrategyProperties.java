@@ -372,6 +372,7 @@ public final class StrategyProperties extends Properties {
     }
 
     public static StrategyProperties read(Configuration category) {
+        category = category.getOrCreateSection("options");
         StrategyProperties sp = new StrategyProperties();
         for (Map.Entry<Object, Object> entry : DEFAULT_MAP.entrySet()) {
             final var def = entry.getValue();
@@ -384,10 +385,12 @@ public final class StrategyProperties extends Properties {
     }
 
     public void write(Configuration category) {
+        category = category.getOrCreateSection("options");
         for (Map.Entry<Object, Object> entry : entrySet()) {
-            final var def = entry.getValue();
-            final var obj = category.get(entry.getKey().toString());
-            category.set(entry.getKey().toString(), obj);
+            final var value = entry.getValue();
+            if (value != null) {
+                category.set(entry.getKey().toString(), value);
+            }
         }
     }
 

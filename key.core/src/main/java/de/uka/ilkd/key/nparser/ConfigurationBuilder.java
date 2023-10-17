@@ -6,6 +6,7 @@ package de.uka.ilkd.key.nparser;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.util.LinkedHashMap;
@@ -24,13 +25,26 @@ class ConfigurationBuilder extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public String visitCsymbol(KeYParser.CsymbolContext ctx) {
+    public Object visitCkey(KeYParser.CkeyContext ctx) {
+        if (ctx.STRING_LITERAL() != null)
+            return sanitizeStringLiteral(ctx.STRING_LITERAL().getText());
         return ctx.IDENT().getText();
     }
 
     @Override
+    public String visitCsymbol(KeYParser.CsymbolContext ctx) {
+        return ctx.IDENT().getText();
+    }
+
+
+    @Override
     public String visitCstring(KeYParser.CstringContext ctx) {
         final var text = ctx.getText();
+        return sanitizeStringLiteral(text);
+    }
+
+    @Nonnull
+    private static String sanitizeStringLiteral(String text) {
         return text.substring(1, text.length() - 1)
                 .replace("\\\"", "\"")
                 .replace("\\\\", "\\");
@@ -75,7 +89,7 @@ class ConfigurationBuilder extends KeYParserBaseVisitor<Object> {
     public Object visitTable(KeYParser.TableContext ctx) {
         final var data = new LinkedHashMap<String, Object>();
         for (KeYParser.CkvContext context : ctx.ckv()) {
-            var name = context.ckey().getText();
+            var name = context.ckey().accept(this).toString();
             var val = context.cvalue().accept(this);
             data.put(name, val);
         }

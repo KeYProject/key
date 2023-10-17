@@ -109,7 +109,7 @@ public class ProofCollections {
         var g = c.group("simpleTests");
         g.provable("heap/simple/array_creation.key");
 
-   
+
         return c;
     }
 

@@ -48,6 +48,7 @@ public class Configuration {
         return data.containsKey(name) && clazz.isAssignableFrom(data.get(name).getClass());
     }
 
+    @Nullable
     public <T> T get(String name, Class<T> clazz) {
         if (exists(name, clazz))
             return (T) data.get(name);
@@ -69,11 +70,11 @@ public class Configuration {
     }
 
     public int getInt(String name) {
-        return get(name, Integer.class);
+        return (int) getLong(name);
     }
 
     public int getInt(String name, int defaultValue) {
-        return get(name, defaultValue);
+        return (int) getLong(name, defaultValue);
     }
 
     public long getLong(String name) {
@@ -81,7 +82,8 @@ public class Configuration {
     }
 
     public long getLong(String name, long defaultValue) {
-        return getInt(name, (int) defaultValue);
+        var value = get(name, Long.class);
+        return Objects.requireNonNullElse(value, defaultValue);
     }
 
 

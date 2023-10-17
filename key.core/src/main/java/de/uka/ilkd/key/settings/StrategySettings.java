@@ -184,7 +184,7 @@ public class StrategySettings extends AbstractSettings {
 
         try {
             setMaxSteps(props.getInt(STEPS_KEY));
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | NullPointerException e) {
             LOGGER.debug("StrategySettings: failure while converting the string "
                 + "with the allowed steps of heuristics applications to int."
                 + "Use default value 1000 instead."
@@ -193,7 +193,7 @@ public class StrategySettings extends AbstractSettings {
 
         try {
             setTimeout(props.getInt(TIMEOUT_KEY));
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | NullPointerException e) {
             LOGGER.debug("StrategySettings: failure while converting the string "
                 + "with rule application timeout. "
                 + "\nThe String that has been tried to convert was {}", props.get(TIMEOUT_KEY));
@@ -210,6 +210,7 @@ public class StrategySettings extends AbstractSettings {
 
     @Override
     public void writeSettings(Configuration props) {
+        props = props.getOrCreateSection(CATEGORY);
         if (getStrategy() == null) {
             setStrategy(JavaCardDLStrategyFactory.NAME);
         }
