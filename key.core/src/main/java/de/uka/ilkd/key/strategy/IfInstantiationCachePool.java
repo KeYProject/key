@@ -18,10 +18,10 @@ import org.key_project.util.collection.ImmutableList;
 /**
  * Direct-mapped cache of lists of formulas (potential instantiations of if-formulas of taclets)
  * that were modified after a certain point of time
- *
+ * <p>
  * Hashmaps of the particular lists of formulas; the keys of the maps is the point of time that
  * separates old from new (modified) formulas
- *
+ * <p>
  * Keys: Long Values: IList<IfFormulaInstantiation>
  */
 public class IfInstantiationCachePool {
@@ -59,7 +59,7 @@ public class IfInstantiationCachePool {
     }
 
     public void release(Node n) {
-        IfInstantiationCache cache = null;
+        IfInstantiationCache cache;
         synchronized (cacheMgr) {
             cache = cacheMgr.remove(n);
         }

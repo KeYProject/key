@@ -76,7 +76,9 @@ public class ExternalProcessLauncher {
      */
     public void stop() {
         if (process != null) {
-            process.destroy();
+            // make sure the solver process is properly killed,
+            // otherwise it may consume excessive CPU and RAM
+            process.destroyForcibly();
         }
         // TODO: where to close the pipe?
         // pipe.close();

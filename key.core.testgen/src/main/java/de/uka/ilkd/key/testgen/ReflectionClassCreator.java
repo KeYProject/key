@@ -430,24 +430,12 @@ public class ReflectionClassCreator {
         int edged = 0;
         for (int i = 0; i < buf.length(); i++) {
             switch (buf.charAt(i)) {
-            case '{':
-                curly++;
-                break;
-            case '}':
-                curly--;
-                break;
-            case '(':
-                round++;
-                break;
-            case ')':
-                round--;
-                break;
-            case '[':
-                edged++;
-                break;
-            case ']':
-                edged--;
-                break;
+            case '{' -> curly++;
+            case '}' -> curly--;
+            case '(' -> round++;
+            case ')' -> round--;
+            case '[' -> edged++;
+            case ']' -> edged--;
             }
         }
         if (curly == 0 && round == 0 && edged == 0) {

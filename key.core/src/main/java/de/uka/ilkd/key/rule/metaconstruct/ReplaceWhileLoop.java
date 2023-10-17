@@ -114,10 +114,6 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
         return theLoop;
     }
 
-    public String toString() {
-        return stack.peek().toString();
-    }
-
     public void performActionOnMethodFrame(MethodFrame x) {
         if (lastMethodFrameBeforeLoop == depth()) {
             IProgramVariable res = x.getProgramVariable();

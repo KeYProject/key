@@ -775,6 +775,14 @@ public final class MainWindow extends JFrame {
         ThreadUtilities.invokeOnEventQueue(this::setStandardStatusLineImmediately);
     }
 
+    /**
+     * Hide the progress bar if it is currently visible.
+     */
+    public void hideStatusProgress() {
+        getStatusLine().setProgress(0);
+        statusLine.setProgressPanelVisible(false);
+    }
+
     private void setStatusLineImmediately(String str, int max) {
         // statusLine.reset();
         statusLine.setStatusText(str);
