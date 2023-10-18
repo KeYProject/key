@@ -40,7 +40,7 @@ public final class ArraySort extends AbstractSort {
 
     private ArraySort(ImmutableSet<Sort> extendsSorts, SortKey sk) {
         super(new Name((sk.elemType != null ? sk.elemType.getName() : sk.elemSort.name()) + "[]"),
-            extendsSorts, false);
+            extendsSorts, false, "", "");
 
         if (extendsSorts.isEmpty()) {
             throw new IllegalArgumentException("An ArraySort extends typically three sorts"
