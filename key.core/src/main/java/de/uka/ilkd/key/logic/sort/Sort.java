@@ -35,7 +35,7 @@ public interface Sort extends Named, HasOrigin {
     /**
      * Any is a supersort of all sorts.
      */
-    Sort ANY = new SortImpl(new Name("any"),null, "", "");
+    Sort ANY = new SortImpl(new Name("any"), null, "", "");
 
     /**
      * Name of {@link #getCastSymbol(TermServices)}.

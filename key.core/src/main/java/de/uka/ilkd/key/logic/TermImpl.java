@@ -103,7 +103,7 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
      */
     public TermImpl(Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
-                    String origin) {
+            String origin) {
         assert op != null;
         assert subs != null;
         this.op = op;
@@ -114,7 +114,7 @@ class TermImpl implements Term, EqualsModProofIrrelevancy {
     }
 
     TermImpl(Operator op, ImmutableArray<Term> subs,
-                    ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock) {
+            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock) {
         this(op, subs, boundVars, javaBlock, "");
     }
 

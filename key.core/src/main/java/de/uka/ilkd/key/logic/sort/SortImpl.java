@@ -13,7 +13,8 @@ import org.key_project.util.collection.ImmutableSet;
  */
 public final class SortImpl extends AbstractSort {
 
-    public SortImpl(Name name, ImmutableSet<Sort> ext, boolean isAbstract, String documentation, String origin) {
+    public SortImpl(Name name, ImmutableSet<Sort> ext, boolean isAbstract, String documentation,
+            String origin) {
         super(name, ext, isAbstract, documentation, origin);
     }
 

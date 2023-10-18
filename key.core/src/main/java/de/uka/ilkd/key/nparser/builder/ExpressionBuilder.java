@@ -88,8 +88,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     public static Term updateOrigin(Term t, ParserRuleContext ctx, Services services) {
         try {
             t = services.getTermFactory().createTermWithOrigin(t,
-                    ctx.start.getTokenSource().getSourceName() + "@" + ctx.start.getLine()
-                + ":" + ctx.start.getCharPositionInLine() + 1);
+                ctx.start.getTokenSource().getSourceName() + "@" + ctx.start.getLine()
+                    + ":" + ctx.start.getCharPositionInLine() + 1);
         } catch (ClassCastException ignored) {
         }
         return t;

@@ -32,10 +32,10 @@ public abstract class AbstractSort implements Sort {
     private final String origin;
 
     public AbstractSort(Name name,
-                        ImmutableSet<Sort> extendedSorts,
-                        boolean isAbstract,
-                        String documentation,
-                        String origin) {
+            ImmutableSet<Sort> extendedSorts,
+            boolean isAbstract,
+            String documentation,
+            String origin) {
         this.name = name;
         this.isAbstract = isAbstract;
         if (extendedSorts != null && extendedSorts.isEmpty()) {
