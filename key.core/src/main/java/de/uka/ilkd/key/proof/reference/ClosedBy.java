@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.reference;
 
+import java.util.Set;
+
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -11,7 +13,8 @@ import de.uka.ilkd.key.proof.Proof;
  *
  * @param proof The proof referenced.
  * @param node  The node referenced.
+ * @param nodesToSkip If the referenced proof has dependency graph information: proof steps to skip.
  * @author Arne Keller
  */
-public record ClosedBy(Proof proof, Node node) {
+public record ClosedBy(Proof proof, Node node, Set<Node> nodesToSkip) {
 }

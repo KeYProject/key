@@ -28,12 +28,22 @@ public class Semisequent implements Iterable<SequentFormula> {
         seqList = ImmutableSLList.nil();
     }
 
+    /**
+     * Create a new Semisequent from an ordered collection of formulas.
+     * The provided list must be redundancy free, i.e., the created sequent must be exactly
+     * the same as when creating the sequent by subsequently inserting all formulas
+     *
+     * @param seqList list of sequent formulas
+     */
+    public Semisequent(ImmutableList<SequentFormula> seqList) {
+        assert !seqList.isEmpty();
+        this.seqList = seqList;
+    }
 
     /**
      * Create a new Semisequent from an ordered collection of formulas.
      * The provided collection must be redundancy free, i.e., the created sequent must be exactly
-     * the same as when creating the
-     * sequent by subsequently inserting all formulas
+     * the same as when creating the sequent by subsequently inserting all formulas
      *
      * @param seqList list of sequent formulas
      */

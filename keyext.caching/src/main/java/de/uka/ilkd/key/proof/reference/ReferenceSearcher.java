@@ -92,10 +92,7 @@ public final class ReferenceSearcher {
                 return n;
             }).filter(Objects::nonNull).collect(Collectors.toCollection(ArrayDeque::new));
             var depTracker = p.lookup(DependencyTracker.class);
-            AnalysisResults results = null;
-            if (depTracker != null) {
-                results = depTracker.analyze(true, false);
-            }
+            AnalysisResults results = depTracker != null ? depTracker.analyze(true, false) : null;
             while (!nodesToCheck.isEmpty()) {
                 // for each node, check that the sequent in the reference is
                 // a subset of the new sequent
@@ -123,7 +120,16 @@ public final class ReferenceSearcher {
                 if (!containedIn(anteNew, ante) || !containedIn(succNew, succ)) {
                     continue;
                 }
-                return new ClosedBy(p, n);
+                Set<Node> toSkip = new HashSet<>();
+                if (results != null) {
+                    // computed skipped nodes by iterating through all nodes
+                    n.subtreeIterator().forEachRemaining(x -> {
+                        if (!results.usefulSteps.contains(x)) {
+                            toSkip.add(x);
+                        }
+                    });
+                }
+                return new ClosedBy(p, n, toSkip);
             }
         }
         return null;

@@ -363,7 +363,8 @@ public class CachingExtension
             Goal current = node.proof().getClosedGoal(node);
             try {
                 mediator.stopInterface(true);
-                new CopyingProofReplayer(c.proof(), node.proof()).copy(c.node(), current);
+                new CopyingProofReplayer(c.proof(), node.proof()).copy(c.node(), current,
+                    c.nodesToSkip());
                 mediator.startInterface(true);
             } catch (Exception ex) {
                 LOGGER.error("failed to copy proof ", ex);

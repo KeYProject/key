@@ -1500,7 +1500,7 @@ public class Proof implements Named {
             ClosedBy c = g.node().lookup(ClosedBy.class);
             g.node().deregister(c, ClosedBy.class);
             try {
-                new CopyingProofReplayer(c.proof(), this).copy(c.node(), g);
+                new CopyingProofReplayer(c.proof(), this).copy(c.node(), g, c.nodesToSkip());
             } catch (IntermediateProofReplayer.BuiltInConstructionException e) {
                 throw new RuntimeException(e);
             }
