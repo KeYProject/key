@@ -43,11 +43,18 @@ public final class ReferenceSearcher {
         if (!suitableForCloseByReference(newNode)) {
             return null;
         }
+        Class dependencyTracker = null;
+        try {
+            dependencyTracker = Class.forName("org.key_project.slicing.DependencyTracker");
+        } catch (ClassNotFoundException e) {
+            // extension not available (not a critical error)
+        }
         for (int i = 0; i < previousProofs.size(); i++) {
             Proof p = previousProofs.get(i);
             if (p == newNode.proof()) {
                 continue; // doesn't make sense
             }
+            //p.lookup(dependencyTracker)
             // conservative check: all user-defined rules in a previous proof
             // have to also be available in the new proof
             var proofFile = p.getProofFile() != null ? p.getProofFile().toString() : "////";
