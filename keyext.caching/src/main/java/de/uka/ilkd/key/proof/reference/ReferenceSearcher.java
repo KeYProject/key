@@ -20,6 +20,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 
+import org.key_project.slicing.DependencyTracker;
+import org.key_project.slicing.analysis.AnalysisResults;
+
 /**
  * Utility class for proof caching.
  *
@@ -43,18 +46,11 @@ public final class ReferenceSearcher {
         if (!suitableForCloseByReference(newNode)) {
             return null;
         }
-        Class dependencyTracker = null;
-        try {
-            dependencyTracker = Class.forName("org.key_project.slicing.DependencyTracker");
-        } catch (ClassNotFoundException e) {
-            // extension not available (not a critical error)
-        }
         for (int i = 0; i < previousProofs.size(); i++) {
             Proof p = previousProofs.get(i);
             if (p == newNode.proof()) {
                 continue; // doesn't make sense
             }
-            //p.lookup(dependencyTracker)
             // conservative check: all user-defined rules in a previous proof
             // have to also be available in the new proof
             var proofFile = p.getProofFile() != null ? p.getProofFile().toString() : "////";
@@ -95,6 +91,11 @@ public final class ReferenceSearcher {
                 }
                 return n;
             }).filter(Objects::nonNull).collect(Collectors.toCollection(ArrayDeque::new));
+            var depTracker = p.lookup(DependencyTracker.class);
+            AnalysisResults results = null;
+            if (depTracker != null) {
+                results = depTracker.analyze(true, false);
+            }
             while (!nodesToCheck.isEmpty()) {
                 // for each node, check that the sequent in the reference is
                 // a subset of the new sequent
@@ -111,8 +112,12 @@ public final class ReferenceSearcher {
                 if (n.parent() != null) {
                     nodesToCheck.add(n.parent());
                 }
-                Semisequent ante = n.sequent().antecedent();
-                Semisequent succ = n.sequent().succedent();
+                Sequent seq = n.sequent();
+                if (results != null) {
+                    seq = results.reduceSequent(n);
+                }
+                Semisequent ante = seq.antecedent();
+                Semisequent succ = seq.succedent();
                 Semisequent anteNew = newNode.sequent().antecedent();
                 Semisequent succNew = newNode.sequent().succedent();
                 if (!containedIn(anteNew, ante) || !containedIn(succNew, succ)) {

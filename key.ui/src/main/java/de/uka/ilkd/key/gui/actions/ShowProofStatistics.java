@@ -26,8 +26,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
-import de.uka.ilkd.key.gui.plugins.caching.DefaultReferenceSearchDialogListener;
-import de.uka.ilkd.key.gui.plugins.caching.ReferenceSearchDialog;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
@@ -315,6 +313,8 @@ public class ShowProofStatistics extends MainWindowAction {
             buttonPane2.add(saveButton);
             buttonPane2.add(saveBundleButton);
 
+            // spotless:off
+            /*
             if (proof.closedGoals().stream()
                     .anyMatch(g -> g.node().lookup(ClosedBy.class) != null)) {
                 JButton copyReferences = new JButton("Realize cached branches");
@@ -332,6 +332,8 @@ public class ShowProofStatistics extends MainWindowAction {
                 });
                 buttonPane2.add(copyReferences);
             }
+             */
+            // spotless:on
 
             getRootPane().setDefaultButton(okButton);
             getRootPane().addKeyListener(new KeyAdapter() {

@@ -34,9 +34,6 @@ import org.slf4j.LoggerFactory;
  * @author Arne Keller
  */
 public class DependencyGraph {
-    /**
-     * Logger.
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(DependencyGraph.class);
 
     /**
