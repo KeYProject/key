@@ -38,7 +38,9 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
         }).collect(Collectors.joining(" "));
 
         String paramsString = methodDefinition.param_list().param_decl().stream()
-                .map(it -> it.typespec().getText() + " " + it.p.getText()
+                .map(it -> (it.NULLABLE() != null ? "/*@ nullable @*/"
+                        : it.NON_NULL() != null ? "/*@ non_null @*/" : "")
+                    + " " + it.typespec().getText() + " " + it.p.getText()
                     + StringUtil.repeat("[]", it.LBRACKET().size()))
                 .collect(Collectors.joining(","));
         return String.format("%s %s %s (%s);", m, methodDefinition.typespec().getText(),
