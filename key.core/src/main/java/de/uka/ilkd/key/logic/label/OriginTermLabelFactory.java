@@ -102,11 +102,15 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
 
                     String ruleName = tokenizer.nextToken();
 
-                    if (!ruleName.startsWith("(") || !ruleName.endsWith(")")) {
+                    if (ruleName.startsWith("(")) {
+                        ruleName = ruleName.substring(1);
+                        while (!ruleName.endsWith(")")) {
+                            ruleName += tokenizer.nextToken();
+                        }
+                        ruleName = ruleName.substring(0, ruleName.length() - 1);
+                    } else {
                         throw new IllegalArgumentException();
                     }
-
-                    ruleName = ruleName.substring(1, ruleName.length() - 1);
 
                     matchEnd(tokenizer, str);
 
