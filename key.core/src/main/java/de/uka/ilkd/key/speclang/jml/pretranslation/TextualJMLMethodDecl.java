@@ -33,7 +33,12 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
             if (JMLTransformer.javaMods.contains(it)) {
                 return it.toString();
             } else {
-                return StringUtil.repeat(" ", it.toString().length());
+                JMLModifier jmlMod = JMLModifier.valueOf(it.name());
+                if (jmlMod == JMLModifier.NON_NULL || jmlMod == JMLModifier.NULLABLE) {
+                    return "/*@ " + jmlMod.toString() + " @*/";
+                } else {
+                    return StringUtil.repeat(" ", it.toString().length());
+                }
             }
         }).collect(Collectors.joining(" "));
 
