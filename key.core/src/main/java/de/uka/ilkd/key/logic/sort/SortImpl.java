@@ -13,21 +13,30 @@ import org.key_project.util.collection.ImmutableSet;
  */
 public final class SortImpl extends AbstractSort {
 
+    public SortImpl(Name name, ImmutableSet<Sort> ext, boolean isAbstract, String documentation,
+            String origin) {
+        super(name, ext, isAbstract, documentation, origin);
+    }
+
+    public SortImpl(Name name, ImmutableSet<Sort> ext, String documentation, String origin) {
+        this(name, ext, false, documentation, origin);
+    }
+
     public SortImpl(Name name, ImmutableSet<Sort> ext, boolean isAbstract) {
-        super(name, ext, isAbstract);
+        super(name, ext, isAbstract, "", "");
     }
 
     public SortImpl(Name name, ImmutableSet<Sort> ext) {
-        this(name, ext, false);
+        this(name, ext, false, "", "");
     }
 
     public SortImpl(Name name, Sort ext) {
-        this(name, DefaultImmutableSet.<Sort>nil().add(ext), false);
+        this(name, DefaultImmutableSet.<Sort>nil().add(ext), false, "", "");
     }
 
 
     public SortImpl(Name name) {
-        this(name, DefaultImmutableSet.nil());
+        this(name, DefaultImmutableSet.nil(), "", "");
     }
 
     public boolean equals(Object o) {
