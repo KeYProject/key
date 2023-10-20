@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Stream;
 
+import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -67,13 +69,25 @@ public class MethodlevelTranslatorTest {
         }
         assertEquals(0, parser.getNumberOfSyntaxErrors());
 
+        // Test parser
         List<JmlParser.ModifierContext> modelMethodModifiers =
-            ctx.classlevel_comment(1).modifiers().modifier();
+                ctx.classlevel_comment(1).modifiers().modifier();
         assertTrue(modelMethodModifiers.stream().anyMatch(it -> it.NULLABLE() != null));
         JmlParser.Param_listContext modelMethodParameters =
-            ctx.classlevel_comment(2).classlevel_element().method_declaration().param_list();
+                ctx.classlevel_comment(2).classlevel_element().method_declaration().param_list();
         assertTrue(
-            modelMethodParameters.param_decl().stream().anyMatch(it -> it.NULLABLE() != null));
+                modelMethodParameters.param_decl().stream().anyMatch(it -> it.NULLABLE() != null));
+
+        // Test translation
+        final TextualTranslator translator = new TextualTranslator();
+        ctx.accept(translator);
+        final var translationOpt =
+                translator.constructs.stream().filter(c -> c instanceof TextualJMLMethodDecl).findFirst();
+
+        assertTrue(translationOpt.isPresent(), "No model method declaration found");
+        final var methodDecl = ((TextualJMLMethodDecl)translationOpt.get()).getParsableDeclaration();
+        assertTrue(methodDecl.contains("/*@ nullable @*/ Object"), "Return value is not nullable");
+        assertTrue(methodDecl.contains("/*@ nullable @*/ Nullable n"), "Parameter is not nullable");
     }
 
     @Test
@@ -97,9 +111,10 @@ public class MethodlevelTranslatorTest {
             }
         } catch (Exception e) {
             debugLexer(modelMethodNullable);
-            System.out.println(e.getMessage());
         }
         assertEquals(0, parser.getNumberOfSyntaxErrors());
+
+        // Test parser
 
         List<JmlParser.ModifierContext> modelMethodModifiers =
             ctx.classlevel_comment(1).modifiers().modifier();
@@ -108,6 +123,19 @@ public class MethodlevelTranslatorTest {
             ctx.classlevel_comment(2).classlevel_element().method_declaration().param_list();
         assertTrue(
             modelMethodParameters.param_decl().stream().anyMatch(it -> it.NON_NULL() != null));
+
+        // Test translation
+
+        final TextualTranslator translator = new TextualTranslator();
+        ctx.accept(translator);
+        final var translationOpt =
+                translator.constructs.stream().filter(c -> c instanceof TextualJMLMethodDecl).findFirst();
+
+        assertTrue(translationOpt.isPresent(), "No model method declaration found");
+        final var methodDecl = ((TextualJMLMethodDecl)translationOpt.get()).getParsableDeclaration();
+        assertTrue(methodDecl.contains("/*@ non_null @*/ Object"), "Return value is not non_null");
+        assertTrue(methodDecl.contains("/*@ non_null @*/ Nullable n"), "Parameter is not non_null");
+
     }
 
     private void debugLexer(String expr) {
