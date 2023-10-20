@@ -8,7 +8,6 @@ import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
 
-import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.SemisequentTacletAppIndex;
 import de.uka.ilkd.key.proof.TacletAppIndex;
@@ -39,13 +38,11 @@ public class PerfScope {
         new Pair<>("Goal setSequent", Goal.PERF_SET_SEQUENT),
         new Pair<>("Goal update tag manager", Goal.PERF_UPDATE_TAG_MANAGER),
         new Pair<>("Goal update rule app index", Goal.PERF_UPDATE_RULE_APP_INDEX),
+        new Pair<>("Taclet app index update", TacletAppIndex.PERF_UPDATE),
         new Pair<>("Semi Taclet app index update remove", SemisequentTacletAppIndex.PERF_REMOVE),
         new Pair<>("Semi Taclet app index update add", SemisequentTacletAppIndex.PERF_ADD),
         new Pair<>("Semi Taclet app index update update", SemisequentTacletAppIndex.PERF_UPDATE),
-        new Pair<>("Taclet app index update", TacletAppIndex.PERF_UPDATE),
         new Pair<>("Taclet app index create all", TacletAppIndex.PERF_CREATE_ALL),
-        new Pair<>("Builtin app index update", BuiltInRuleAppIndex.PERF_UPDATE),
-        new Pair<>("Builtin app index create all", BuiltInRuleAppIndex.PERF_CREATE_ALL),
         new Pair<>("Goal update listeners", Goal.PERF_UPDATE_LISTENERS),
         new Pair<>("TacletApp execute", TacletApp.PERF_EXECUTE),
         new Pair<>("TacletApp pre", TacletApp.PERF_PRE),
