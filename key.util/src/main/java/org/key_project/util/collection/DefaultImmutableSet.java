@@ -328,7 +328,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     @Override
     public String toString() {
-        return Strings.formatAsList(iterator(), '{', ',', '}');
+        return Strings.formatAsList(iterator(), "{", ",", "}");
     }
 
     /** represents the empty set for elements of type <T> */

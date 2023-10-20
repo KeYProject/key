@@ -4,7 +4,7 @@
 package org.key_project.util;
 
 import java.util.Arrays;
-import java.util.Iterator;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -58,13 +58,16 @@ class StringsTest {
 
     @Test
     void formatAsList() {
-        Iterator<String> it = Arrays.stream(new String[] { "a", "b", "c" }).iterator();
-        assertEquals("%a;b;c$", Strings.formatAsList(it, '%', ';', '$'));
+        List<String> testStrings = Arrays.asList("a", "b", "c");
+        assertEquals("%a;b;c$", Strings.formatAsList(testStrings, "%", ";", "$"));
 
-        it = Arrays.stream(new String[] { "a" }).iterator();
-        assertEquals("%a$", Strings.formatAsList(it, '%', ';', '$'));
+        assertEquals("%1;1;1$",
+            Strings.formatAsList(testStrings, "%", ";", "$", String::length));
 
-        it = Arrays.stream(new String[] {}).iterator();
-        assertEquals("%$", Strings.formatAsList(it, '%', ';', '$'));
+        testStrings = Arrays.asList("a");
+        assertEquals("%a$", Strings.formatAsList(testStrings, "%", ";", "$"));
+
+        testStrings = Arrays.asList(new String[] {});
+        assertEquals("%$", Strings.formatAsList(testStrings, "%", ";", "$"));
     }
 }

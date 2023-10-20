@@ -116,7 +116,7 @@ public class Function extends AbstractSortedOperator {
             new StringBuilder((sort() == Sort.FORMULA ? "" : sort().toString()) + " ");
         s.append(name());
         if (arity() > 0) {
-            s.append(Strings.formatAsList(argSorts().iterator(), '(', ',', ')'));
+            s.append(Strings.formatAsList(argSorts().iterator(), "(", ",", ")"));
         }
         s.append(";\n");
         return s.toString();

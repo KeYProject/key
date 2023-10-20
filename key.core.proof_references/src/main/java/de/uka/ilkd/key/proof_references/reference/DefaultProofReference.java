@@ -10,6 +10,8 @@ import java.util.Objects;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.key_project.util.Strings;
+
 /**
  * Default implementation of {@link IProofReference}.
  *
@@ -40,7 +42,7 @@ public class DefaultProofReference<T> implements IProofReference<T> {
      * Constructor
      *
      * @param kind The reference kind as human readable {@link String}.
-     * @param source The source {@link Proof}.
+     * @param node Node to access the source {@link Proof} (or null).
      * @param target The target source member.
      */
     public DefaultProofReference(String kind, Node node, T target) {
@@ -128,15 +130,7 @@ public class DefaultProofReference<T> implements IProofReference<T> {
         sb.append("\"");
         if (!getNodes().isEmpty()) {
             sb.append(" at node(s) ");
-            boolean afterFirst = false;
-            for (Node node : getNodes()) {
-                if (afterFirst) {
-                    sb.append(", ");
-                } else {
-                    afterFirst = true;
-                }
-                sb.append(node.serialNr());
-            }
+            sb.append(Strings.formatAsList(getNodes(), "", ", ", "", Node::serialNr));
         }
         if (getSource() != null) {
             sb.append(" of proof \"");

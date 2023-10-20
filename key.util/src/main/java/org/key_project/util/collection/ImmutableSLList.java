@@ -453,7 +453,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
         @Override
         public String toString() {
-            return Strings.formatAsList(this.iterator(), '[', ',', ']');
+            return Strings.formatAsList(this.iterator(), "[", ",", "]");
         }
     }
 

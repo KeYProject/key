@@ -147,7 +147,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 
     @Override
     public String toString() {
-        return Strings.formatAsList(iterator(), '[', ',', ']');
+        return Strings.formatAsList(iterator(), "[", ",", "]");
     }
 
     @Override
