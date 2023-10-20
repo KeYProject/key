@@ -99,7 +99,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         // <code>FocussedRuleApplicationManager</code>) the rule index
         // reports its contents to the rule manager of the goal, which is not
         // necessarily this object
-        goal.ruleAppIndex().reportAutomatedRuleApps();
+        goal.ruleAppIndex().reportAutomatedRuleApps(goal.getRuleAppManager(),
+            goal.proof().getServices());
     }
 
     /**
