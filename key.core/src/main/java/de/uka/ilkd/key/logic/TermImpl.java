@@ -31,7 +31,7 @@ import org.key_project.util.collection.ImmutableSet;
  * The currently only class implementing the Term interface. TermFactory should be the only class
  * dealing directly with the TermImpl class.
  */
-public class TermImpl implements Term, EqualsModProofIrrelevancy {
+class TermImpl implements Term, EqualsModProofIrrelevancy {
 
     /**
      * A static empty list of terms used for memory reasons.
@@ -102,16 +102,32 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
      * @param javaBlock the code block (if applicable) after which the term is evaluated
      */
     public TermImpl(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock) {
+            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
+            String origin) {
         assert op != null;
         assert subs != null;
         this.op = op;
         this.subs = subs.size() == 0 ? EMPTY_TERM_LIST : subs;
         this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;
         this.javaBlock = javaBlock == null ? JavaBlock.EMPTY_JAVABLOCK : javaBlock;
+        this.origin = origin;
     }
 
+    TermImpl(Operator op, ImmutableArray<Term> subs,
+            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock) {
+        this(op, subs, boundVars, javaBlock, "");
+    }
 
+    /**
+     * For which feature is this information needed?
+     * What is the fifference from {@link de.uka.ilkd.key.logic.label.OriginTermLabel}?
+     */
+    private final String origin;
+
+    @Override
+    public @Nullable String getOrigin() {
+        return origin;
+    }
 
     // -------------------------------------------------------------------------
     // internal methods
@@ -710,14 +726,5 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
         return containsJavaBlockRecursive == ThreeValuedTruth.TRUE;
     }
 
-    private String origin;
 
-    @Override
-    public @Nullable String getOrigin() {
-        return origin;
-    }
-
-    public void setOrigin(String origin) {
-        this.origin = origin;
-    }
 }
