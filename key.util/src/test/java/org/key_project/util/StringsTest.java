@@ -38,12 +38,14 @@ class StringsTest {
         String[] correctComments = {
             "/*@ requires ", "//@ requires",
             "/*+KeY@ requires", "//+KeY@ requires",
-            "/*-OtherTool@", "//-OtherTool@"
+            "/*-OtherTool@ requires", "//-OtherTool@ requires"
         };
         String[] inCorrectComments = {
             "/* @ requires ", "// @ requires",
+            "/* +KeY@ requires", "//+KeY requires",
             "/*+OtherTool@ requires", "//+OtherTool@ requires",
-            "/*-KeY@", "//*-KeY@"
+            "/*-OtherTool requires", "//-OtherTool requires",
+            "/*-KeY@ requires", "//*-KeY@ requires"
         };
 
         for (var comment : correctComments) {
