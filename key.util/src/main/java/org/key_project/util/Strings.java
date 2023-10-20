@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util;
 
+import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,5 +53,31 @@ public class Strings {
         } catch (IndexOutOfBoundsException e) {
             return false;
         }
+    }
+
+    /**
+     * outputs the collection represented by the iterator in the format
+     * <code> open element1 sep element2 sep element3 close</code>
+     *
+     * @param it the Iterator over the collection to be printed
+     * @param open the char used as opening character
+     * @param sep the char separating the different elements
+     * @param close the char used as closing character
+     * @return the CharSequence in the described format
+     * @param <S> the type of the elements of the iterated collection
+     */
+    public static <S> String formatAsList(Iterator<S> it, char open, char sep, char close) {
+        final StringBuilder str = new StringBuilder();
+        str.append(open);
+        var hasNext = it.hasNext();
+        while (hasNext) {
+            str.append(it.next());
+            hasNext = it.hasNext();
+            if (hasNext) {
+                str.append(sep);
+            }
+        }
+        str.append(close);
+        return str.toString();
     }
 }
