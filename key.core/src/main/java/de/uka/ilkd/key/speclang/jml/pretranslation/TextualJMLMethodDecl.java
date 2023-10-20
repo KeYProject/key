@@ -35,7 +35,7 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
             } else {
                 JMLModifier jmlMod = JMLModifier.valueOf(it.name());
                 if (jmlMod == JMLModifier.NON_NULL || jmlMod == JMLModifier.NULLABLE) {
-                    return "/*@ " + jmlMod.toString() + " @*/";
+                    return "/*@ " + jmlMod + " @*/";
                 } else {
                     return StringUtil.repeat(" ", it.toString().length());
                 }
