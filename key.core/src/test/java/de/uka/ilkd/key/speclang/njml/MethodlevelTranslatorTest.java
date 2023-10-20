@@ -5,14 +5,15 @@ package de.uka.ilkd.key.speclang.njml;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Alexander Weigl
@@ -39,6 +40,74 @@ public class MethodlevelTranslatorTest {
             debugLexer(expr);
         }
         assertEquals(0, parser.getNumberOfSyntaxErrors());
+    }
+
+    @Test
+    public void parseModelMethodsNullable() {
+        String modelMethodNullable = """
+                /*@ public model_behavior
+                    requires true;
+                    accessible n, this.a;
+                    model nullable Object foo(nullable Nullable n) {
+                                return null;
+                    }
+                @*/
+                """;
+        JmlLexer lexer = JmlFacade.createLexer(modelMethodNullable);
+        JmlParser parser = new JmlParser(new CommonTokenStream(lexer));
+        JmlParser.Classlevel_commentsContext ctx = null;
+        try {
+            ctx = parser.classlevel_comments();
+            if (parser.getNumberOfSyntaxErrors() != 0) {
+                debugLexer(modelMethodNullable);
+            }
+        } catch (Exception e) {
+            debugLexer(modelMethodNullable);
+            System.out.println(e.getMessage());
+        }
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
+
+        List<JmlParser.ModifierContext> modelMethodModifiers =
+            ctx.classlevel_comment(1).modifiers().modifier();
+        assertTrue(modelMethodModifiers.stream().anyMatch(it -> it.NULLABLE() != null));
+        JmlParser.Param_listContext modelMethodParameters =
+            ctx.classlevel_comment(2).classlevel_element().method_declaration().param_list();
+        assertTrue(
+            modelMethodParameters.param_decl().stream().anyMatch(it -> it.NULLABLE() != null));
+    }
+
+    @Test
+    public void parseModelMethodsNonNull() {
+        String modelMethodNullable = """
+                /*@ public model_behavior
+                    requires true;
+                    accessible n, this.a;
+                    model non_null Object foo(non_null Nullable n) {
+                                return null;
+                    }
+                @*/
+                """;
+        JmlLexer lexer = JmlFacade.createLexer(modelMethodNullable);
+        JmlParser parser = new JmlParser(new CommonTokenStream(lexer));
+        JmlParser.Classlevel_commentsContext ctx = null;
+        try {
+            ctx = parser.classlevel_comments();
+            if (parser.getNumberOfSyntaxErrors() != 0) {
+                debugLexer(modelMethodNullable);
+            }
+        } catch (Exception e) {
+            debugLexer(modelMethodNullable);
+            System.out.println(e.getMessage());
+        }
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
+
+        List<JmlParser.ModifierContext> modelMethodModifiers =
+            ctx.classlevel_comment(1).modifiers().modifier();
+        assertTrue(modelMethodModifiers.stream().anyMatch(it -> it.NON_NULL() != null));
+        JmlParser.Param_listContext modelMethodParameters =
+            ctx.classlevel_comment(2).classlevel_element().method_declaration().param_list();
+        assertTrue(
+            modelMethodParameters.param_decl().stream().anyMatch(it -> it.NON_NULL() != null));
     }
 
     private void debugLexer(String expr) {
