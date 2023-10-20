@@ -5,10 +5,10 @@ package org.key_project.slicing;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -65,7 +65,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * Collection of dynamically added rules.
      * For each new taclet, the dependency graph node representing that rule is stored in the map.
      */
-    private final Map<Taclet, AddedRule> dynamicRules = new IdentityHashMap<>();
+    private final Map<Taclet, AddedRule> dynamicRules = new WeakHashMap<>();
     /**
      * Cached analysis results.
      *
@@ -245,10 +245,6 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             throw new IllegalStateException(
                 "dependency tracker received rule application on wrong proof");
         }
-        // skip if disabled
-        if (!SlicingSettingsProvider.getSlicingSettings().getAlwaysTrack()) {
-            return;
-        }
         RuleAppInfo ruleAppInfo = e.getRuleAppInfo();
         RuleApp ruleApp = ruleAppInfo.getRuleApp();
         ImmutableList<Goal> goalList = e.getNewGoals();
@@ -266,6 +262,11 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                     dynamicRules.put((Taclet) newRule.rule(), ruleNode);
                 }
             }
+        }
+
+        // skip further tracking if disabled
+        if (!SlicingSettingsProvider.getSlicingSettings().getAlwaysTrack()) {
+            return;
         }
 
         // record removed (replaced) input formulas
