@@ -219,7 +219,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             kind = (Modality.JavaModalityKind) svInst.getInstantiation(op.kind());
         }
         if (jb != op.program() || kind != op.kind()) {
-            return tb.modality(kind, jb);
+            return Modality.modality(kind, jb);
         }
         return op;
     }

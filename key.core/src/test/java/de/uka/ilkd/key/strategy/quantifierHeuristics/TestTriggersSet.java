@@ -18,8 +18,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -193,13 +191,13 @@ public class TestTriggersSet {
         proof.setRoot(g.node());
         proof.add(g);
 
-        proof.setNamespaces(new NamespaceSet(variables, new HashMap<>(), functions, sorts, new Namespace<>(),
+        proof.setNamespaces(new NamespaceSet(variables, functions, sorts, new Namespace<>(),
             new Namespace<>(), new Namespace<>()));
 
     }
 
     private Term parseTerm(String termstr) {
-        return TacletForTests.parseTerm(termstr, new NamespaceSet(variables, new HashMap<>(), functions, sorts,
+        return TacletForTests.parseTerm(termstr, new NamespaceSet(variables, functions, sorts,
             new Namespace<>(), new Namespace<>(), new Namespace<>()));
     }
 

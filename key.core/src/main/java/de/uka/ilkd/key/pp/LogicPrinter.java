@@ -1667,7 +1667,8 @@ public class LogicPrinter {
                     for (int i = 0; i < phi.arity(); i++) {
                         ta[i] = phi.sub(i);
                     }
-                    Modality m = services.getTermBuilder().modality(mod.kind(), mod.program());
+                    JavaBlock jb1 = mod.program();
+                    Modality m = Modality.modality(mod.kind(), jb1);
                     Term term = services.getTermFactory().createTerm(m, ta,
                         phi.boundVars(), phi.javaBlock());
                     notationInfo.getNotation(m).print(term, this);

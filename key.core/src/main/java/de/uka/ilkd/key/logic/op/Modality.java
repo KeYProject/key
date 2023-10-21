@@ -6,6 +6,7 @@ package de.uka.ilkd.key.logic.op;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
@@ -15,12 +16,37 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Program;
+import org.key_project.util.collection.Pair;
 
 /**
  * This class is used to represent a dynamic logic modality like diamond and box (but also
  * extensions of DL like preserves and throughout are possible in the future).
  */
 public class Modality extends org.key_project.logic.op.Modality<Sort> implements Operator {
+    /*
+       keeps track of created modalities
+     */
+    private static Map<Pair<JavaModalityKind, JavaProgramElement>, Modality> operators =
+            new HashMap<>();
+
+
+    /**
+     * Returns the knownm modalities
+     */
+    public static Map<Pair<JavaModalityKind, JavaProgramElement>, Modality> operators() {
+        return operators;
+    }
+
+    public static Modality modality(Modality.JavaModalityKind kind, JavaBlock jb) {
+        var pair = new Pair<>(kind, jb.program());
+        Modality mod = Modality.operators().get(pair);
+        if (mod == null) {
+            mod = new Modality(jb, kind);
+            Modality.operators().put(pair, mod);
+        }
+        return mod;
+    }
+
     /**
      * creates a modal operator with the given name
      */
@@ -140,7 +166,6 @@ public class Modality extends org.key_project.logic.op.Modality<Sort> implements
          */
         public static final JavaModalityKind TOUT_TRANSACTION =
             new JavaModalityKind(new Name("throughout_transaction"));
-        public static final JavaModalityKind MOD_SV = new JavaModalityKind(new Name("mod_sv"));
 
         public JavaModalityKind(Name name) {
             super(name);

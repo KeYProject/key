@@ -424,12 +424,12 @@ public class TermBuilder {
 //    }
 
     public Term prog(Modality.JavaModalityKind modKind, JavaBlock jb, Term t) {
-        return tf.createTerm(modality(modKind, jb), new Term[] { t }, null, jb);
+        return tf.createTerm(Modality.modality(modKind, jb), new Term[] { t }, null, jb);
     }
 
     public Term prog(Modality.JavaModalityKind modKind, JavaBlock jb, Term t,
             ImmutableArray<TermLabel> labels) {
-        return tf.createTerm(modality(modKind, jb), new Term[] { t }, null, jb, labels);
+        return tf.createTerm(Modality.modality(modKind, jb), new Term[] { t }, null, jb, labels);
     }
 
     public Term box(JavaBlock jb, Term t) {
@@ -438,17 +438,6 @@ public class TermBuilder {
 
     public Term dia(JavaBlock jb, Term t) {
         return prog(Modality.JavaModalityKind.DIA, jb, t);
-    }
-
-    // TODO: move?
-    public Modality modality(Modality.JavaModalityKind kind, JavaBlock jb) {
-        var pair = new Pair<>(kind, jb.program());
-        Modality mod = services.getNamespaces().operators().get(pair);
-        if (mod == null) {
-            mod = new Modality(jb, kind);
-            services.getNamespaces().operators().put(pair, mod);
-        }
-        return mod;
     }
 
     public Term ife(Term cond, Term _then, Term _else) {

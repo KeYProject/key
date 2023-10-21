@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
@@ -23,8 +22,6 @@ public class NamespaceSet {
     private Namespace<QuantifiableVariable> varNS = new Namespace<>();
     private Namespace<IProgramVariable> progVarNS = new Namespace<>();
     // TODO: Operators should not be local to goals
-    private Map<Pair<Modality.JavaModalityKind, JavaProgramElement>, Modality> operators =
-        new HashMap<>();
     private Namespace<Function> funcNS = new Namespace<>();
     private Namespace<RuleSet> ruleSetNS = new Namespace<>();
     private Namespace<Sort> sortNS = new Namespace<>();
@@ -34,8 +31,7 @@ public class NamespaceSet {
     }
 
     public NamespaceSet(Namespace<QuantifiableVariable> varNS,
-            Map<Pair<Modality.JavaModalityKind, JavaProgramElement>, Modality> operators,
-            Namespace<Function> funcNS,
+                        Namespace<Function> funcNS,
             Namespace<Sort> sortNS, Namespace<RuleSet> ruleSetNS, Namespace<Choice> choiceNS,
             Namespace<IProgramVariable> programVarNS) {
         this.varNS = varNS;
@@ -47,13 +43,13 @@ public class NamespaceSet {
     }
 
     public NamespaceSet copy() {
-        return new NamespaceSet(variables().copy(), new HashMap<>(operators()), functions().copy(),
+        return new NamespaceSet(variables().copy(), functions().copy(),
             sorts().copy(),
             ruleSets().copy(), choices().copy(), programVariables().copy());
     }
 
     public NamespaceSet shallowCopy() {
-        return new NamespaceSet(variables(), operators(), functions(), sorts(), ruleSets(),
+        return new NamespaceSet(variables(), functions(), sorts(), ruleSets(),
             choices(),
             programVariables());
     }
@@ -61,7 +57,7 @@ public class NamespaceSet {
     // TODO MU: Rename into sth with wrap or similar
     public NamespaceSet copyWithParent() {
         return new NamespaceSet(new Namespace<>(variables()),
-            operators(), new Namespace<>(functions()), new Namespace<>(sorts()),
+                new Namespace<>(functions()), new Namespace<>(sorts()),
             new Namespace<>(ruleSets()), new Namespace<>(choices()),
             new Namespace<>(programVariables()));
     }
@@ -80,15 +76,6 @@ public class NamespaceSet {
 
     public void setProgramVariables(Namespace<IProgramVariable> progVarNS) {
         this.progVarNS = progVarNS;
-    }
-
-    public Map<Pair<Modality.JavaModalityKind, JavaProgramElement>, Modality> operators() {
-        return operators;
-    }
-
-    public void setOperators(
-            Map<Pair<Modality.JavaModalityKind, JavaProgramElement>, Modality> operators) {
-        this.operators = operators;
     }
 
     public Namespace<Function> functions() {
@@ -218,12 +205,12 @@ public class NamespaceSet {
 
     // create a namespace
     public NamespaceSet simplify() {
-        return new NamespaceSet(varNS.simplify(), operators, funcNS.simplify(), sortNS.simplify(),
+        return new NamespaceSet(varNS.simplify(), funcNS.simplify(), sortNS.simplify(),
             ruleSetNS.simplify(), choiceNS.simplify(), progVarNS.simplify());
     }
 
     public NamespaceSet getCompression() {
-        return new NamespaceSet(varNS.compress(), operators, funcNS.compress(), sortNS.compress(),
+        return new NamespaceSet(varNS.compress(), funcNS.compress(), sortNS.compress(),
             ruleSetNS.compress(), choiceNS.compress(), progVarNS.compress());
     }
 
@@ -234,7 +221,7 @@ public class NamespaceSet {
     }
 
     public NamespaceSet getParent() {
-        return new NamespaceSet(varNS.parent(), operators, funcNS.parent(), sortNS.parent(),
+        return new NamespaceSet(varNS.parent(), funcNS.parent(), sortNS.parent(),
             ruleSetNS.parent(), choiceNS.parent(), progVarNS.parent());
     }
 

@@ -68,10 +68,10 @@ public class LoopFreeInvariantCondition implements VariableCondition {
                 .map(methodFrame -> MiscTools.getSelfTerm(methodFrame, services)).orElse(null);
 
         // TODO: Handle exception?!
-        final Modality modality = (Modality) svInst.getInstantiation(modalitySV);
+        final Modality.JavaModalityKind modalityKind = (Modality.JavaModalityKind) svInst.getInstantiation(modalitySV);
 
         Term freeInvInst = tb.tt();
-        for (final LocationVariable heap : MiscTools.applicableHeapContexts(modality.kind(),
+        for (final LocationVariable heap : MiscTools.applicableHeapContexts(modalityKind,
             services)) {
             final Term currentFreeInvInst = freeInvInst;
 

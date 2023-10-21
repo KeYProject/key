@@ -156,11 +156,18 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
         }
     }
 
-    private Operator instantiateOperatorSV(ModalOperatorSV op) {
-        return (Operator) svInst.getInstantiation(op);
+    private Operator instantiateModality(Modality op, JavaBlock jb) {
+        Modality.JavaModalityKind kind = op.kind();
+        if (op.kind() instanceof ModalOperatorSV) {
+            kind = (Modality.JavaModalityKind) svInst.getInstantiation(op.kind());
+        }
+        if (jb != op.program() || kind != op.kind()) {
+            return Modality.modality(kind, jb);
+        }
+        return op;
     }
 
-    private Operator instantiateOperator(Operator p_operatorToBeInstantiated) {
+    protected Operator instantiateOperator(Operator p_operatorToBeInstantiated, JavaBlock jb) {
         Operator instantiatedOp = p_operatorToBeInstantiated;
         if (p_operatorToBeInstantiated instanceof SortDependingFunction) {
             instantiatedOp =
@@ -168,8 +175,8 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
         } else if (p_operatorToBeInstantiated instanceof ElementaryUpdate) {
             instantiatedOp =
                 instantiateElementaryUpdate((ElementaryUpdate) p_operatorToBeInstantiated);
-        } else if (p_operatorToBeInstantiated instanceof ModalOperatorSV) {
-            instantiatedOp = instantiateOperatorSV((ModalOperatorSV) p_operatorToBeInstantiated);
+        } else if (p_operatorToBeInstantiated instanceof Modality mod) {
+            instantiatedOp = instantiateModality(mod, jb);
         } else if (p_operatorToBeInstantiated instanceof SchemaVariable) {
             if (p_operatorToBeInstantiated instanceof ProgramSV
                     && ((ProgramSV) p_operatorToBeInstantiated).isListSV()) {
@@ -227,7 +234,6 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
                 svInst.getExecutionContext(), services));
             pushNew(newTerm);
         } else {
-            final Operator newOp = instantiateOperator(visitedOp);
             // instantiation of java block
             boolean jblockChanged = false;
             JavaBlock jb = visited.javaBlock();
@@ -238,6 +244,8 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
                     jblockChanged = true;
                 }
             }
+
+            final Operator newOp = instantiateOperator(visitedOp, jb);
 
             // instantiate bound variables
             final ImmutableArray<QuantifiableVariable> boundVars = //
