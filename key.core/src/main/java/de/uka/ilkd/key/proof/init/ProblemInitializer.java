@@ -454,6 +454,7 @@ public final class ProblemInitializer {
                 cleanupNamespaces(currentBaseConfig);
                 baseConfig = currentBaseConfig;
             }
+
             InitConfig ic = prepare(envInput, currentBaseConfig);
             if (Debug.ENABLE_DEBUG) {
                 print(ic);
@@ -518,14 +519,6 @@ public final class ProblemInitializer {
         // create initConfig
         InitConfig initConfig = referenceConfig.copy();
 
-        var settings = initConfig.getSettings();
-        if (settings == null) {
-            settings = ProofSettings.DEFAULT_SETTINGS;
-        }
-        initConfig.getServices().setOriginFactory(
-            settings.getTermLabelSettings().getUseOriginLabels() ? new OriginTermLabelFactory()
-                    : null);
-
         // read Java
         readJava(envInput, initConfig);
 
@@ -576,6 +569,12 @@ public final class ProblemInitializer {
         try {
             // determine environment
             initConfig = determineEnvironment(po, Objects.requireNonNull(initConfig));
+
+            // TODO: Why: ProofIndependentSetting and ProofSettings do not agree on termlabels
+            initConfig.getServices().setOriginFactory(
+                false && initConfig.getSettings().getTermLabelSettings().getUseOriginLabels()
+                        ? new OriginTermLabelFactory()
+                        : null);
 
             // read problem
             reportStatus("Loading problem \"" + po.name() + "\"");

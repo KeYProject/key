@@ -300,6 +300,8 @@ public class Services implements TermServices {
                 "Services are already owned by another proof:" + proof.name());
         }
         proof = p_proof;
+
+        // TODO: is the below still needed?
         if (!ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels()
                 || !proof.getSettings().getTermLabelSettings().getUseOriginLabels()) {
             profile.getTermLabelManager().disableOriginLabelRefactorings();

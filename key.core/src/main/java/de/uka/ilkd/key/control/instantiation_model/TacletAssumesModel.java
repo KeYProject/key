@@ -22,7 +22,6 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.RecognitionException;
 
 import org.key_project.util.collection.ImmutableList;
@@ -124,13 +123,9 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
             }
 
             Term term = parseFormula(manualInput);
-
-            if (ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
-                    .getUseOriginLabels()) {
-                term = services.getTermBuilder().addLabelToAllSubs(term,
-                    new NodeOrigin(SpecType.USER_INTERACTION,
-                        app.rule().displayName(), goal.node().serialNr()));
-            }
+            term = services.getTermBuilder().addLabelToAllSubs(term,
+                new NodeOrigin(SpecType.USER_INTERACTION,
+                    app.rule().displayName(), goal.node().serialNr()));
 
             return new IfFormulaInstDirect(new SequentFormula(term));
         } catch (RecognitionException e) {

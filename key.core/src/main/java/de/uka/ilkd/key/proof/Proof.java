@@ -204,11 +204,6 @@ public class Proof implements Named {
             InitConfig initConfig) {
         this(new Name(name), initConfig);
 
-        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
-                .getUseOriginLabels()) {
-            problem = OriginTermLabel.removeOriginLabels(problem, getServices()).sequent();
-        }
-
         register(new ProofJavaSourceCollection(), ProofJavaSourceCollection.class);
         var rootNode = new Node(this, problem);
         var sources = lookup(ProofJavaSourceCollection.class);

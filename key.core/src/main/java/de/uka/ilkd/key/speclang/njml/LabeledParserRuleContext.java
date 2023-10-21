@@ -40,7 +40,14 @@ public class LabeledParserRuleContext {
         second = null;
     }
 
-    public LabeledParserRuleContext(ParserRuleContext ctx, OriginTermLabel.SpecType specType) {
+    public static LabeledParserRuleContext createLabeledParserRuleContext(ParserRuleContext ctx,
+            OriginTermLabel.SpecType specType, boolean attachOriginLabel) {
+        return attachOriginLabel
+                ? new LabeledParserRuleContext(ctx, constructTermLabel(ctx, specType))
+                : new LabeledParserRuleContext(ctx);
+    }
+
+    private LabeledParserRuleContext(ParserRuleContext ctx, OriginTermLabel.SpecType specType) {
         this(ctx, constructTermLabel(ctx, specType));
     }
 

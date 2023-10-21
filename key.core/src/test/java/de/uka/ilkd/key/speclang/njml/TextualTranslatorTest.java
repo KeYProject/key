@@ -27,7 +27,7 @@ public class TextualTranslatorTest {
         JmlLexer lexer = JmlFacade.createLexer(expr);
         JmlParser p = JmlFacade.createParser(lexer);
         JmlParser.Methodlevel_commentContext ctx = p.methodlevel_comment();
-        TextualTranslator translator = new TextualTranslator();
+        TextualTranslator translator = new TextualTranslator(true);
         ctx.accept(translator);
         final ImmutableList<TextualJMLConstruct> constructs = translator.constructs;
         assertEquals(2, constructs.size());
@@ -45,7 +45,7 @@ public class TextualTranslatorTest {
         JmlLexer lexer = JmlFacade.createLexer(expr);
         JmlParser p = JmlFacade.createParser(lexer);
         JmlParser.Methodlevel_commentContext ctx = p.methodlevel_comment();
-        TextualTranslator translator = new TextualTranslator();
+        TextualTranslator translator = new TextualTranslator(true);
         ctx.accept(translator);
         final ImmutableList<TextualJMLConstruct> constructs = translator.constructs;
         assertEquals(2, constructs.size());

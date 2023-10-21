@@ -2266,6 +2266,16 @@ public class TermBuilder {
     }
 
 
+    // Origin label addition
+
+    /**
+     * add origin information to the term and all its sub terms
+     * nothing will be done if no origin term label factory is present
+     *
+     * @param term the term where to start to add the origin information
+     * @param origin the Origin information
+     * @return the labeled term or the same term, if no origin term label factory is present
+     */
     public Term addLabelToAllSubs(Term term, OriginTermLabel.Origin origin) {
         final OriginTermLabelFactory originFactory = services.getOriginFactory();
         if (originFactory != null) {
@@ -2274,6 +2284,14 @@ public class TermBuilder {
         return term;
     }
 
+    /**
+     * add origin information to the term
+     * nothing will be done if no origin term label factory is present
+     *
+     * @param term the term where to add the origin information
+     * @param origin the Origin information
+     * @return the labeled term or the same term, if no origin term label factory is present
+     */
     public Term addLabel(Term term, OriginTermLabel.Origin origin) {
         final OriginTermLabelFactory originFactory = services.getOriginFactory();
         if (originFactory != null) {
@@ -2282,7 +2300,11 @@ public class TermBuilder {
         return term;
     }
 
-
+    /**
+     * returns the origin term label factory
+     *
+     * @return the OriginTermLabelFactory
+     */
     public OriginTermLabelFactory getOriginFactory() {
         return services.getOriginFactory();
     }
