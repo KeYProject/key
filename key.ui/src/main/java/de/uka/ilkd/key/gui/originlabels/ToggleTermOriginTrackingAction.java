@@ -71,7 +71,7 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
 
             mainWindow.getMediator().getSelectionModel().fireSelectedNodeChanged();
         }*/
-        
+
     }
 
     @Override

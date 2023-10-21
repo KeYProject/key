@@ -69,10 +69,6 @@ public abstract class AbstractPO implements IPersistablePO {
     protected AbstractPO(InitConfig initConfig, String name) {
         this.environmentConfig = initConfig;
         this.environmentServices = initConfig.getServices();
-        this.environmentServices.setOriginFactory(
-                ProofSettings.DEFAULT_SETTINGS.getTermLabelSettings().getUseOriginLabels() ?
-                        new OriginTermLabelFactory() : null
-        );
         this.javaInfo = initConfig.getServices().getJavaInfo();
         this.heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
         this.specRepos = initConfig.getServices().getSpecificationRepository();

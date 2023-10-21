@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -517,6 +518,14 @@ public final class ProblemInitializer {
         // create initConfig
         InitConfig initConfig = referenceConfig.copy();
 
+        var settings = initConfig.getSettings();
+        if (settings == null) {
+            settings = ProofSettings.DEFAULT_SETTINGS;
+        }
+        initConfig.getServices().setOriginFactory(
+            settings.getTermLabelSettings().getUseOriginLabels() ?
+                        new OriginTermLabelFactory() : null
+        );
 
         // read Java
         readJava(envInput, initConfig);

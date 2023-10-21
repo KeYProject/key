@@ -282,7 +282,6 @@ public class Services implements TermServices {
         s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
         s.setJavaModel(getJavaModel());
-
         return s;
     }
 
