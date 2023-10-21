@@ -19,6 +19,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
@@ -2262,5 +2263,27 @@ public class TermBuilder {
             DoubleLDT doubleLDT = services.getTypeConverter().getDoubleLDT();
             return func(doubleLDT.getEquals(), t1, t2);
         }
+    }
+
+
+    public Term addLabelToAllSubs(Term term, OriginTermLabel.Origin origin) {
+        final OriginTermLabelFactory originFactory = services.getOriginFactory();
+        if (originFactory != null) {
+            return addLabelToAllSubs(term, originFactory.createOriginTermLabel(origin));
+        }
+        return term;
+    }
+
+    public Term addLabel(Term term, OriginTermLabel.Origin origin) {
+        final OriginTermLabelFactory originFactory = services.getOriginFactory();
+        if (originFactory != null) {
+            return addLabel(term, originFactory.createOriginTermLabel(origin));
+        }
+        return term;
+    }
+
+
+    public OriginTermLabelFactory getOriginFactory() {
+        return services.getOriginFactory();
     }
 }

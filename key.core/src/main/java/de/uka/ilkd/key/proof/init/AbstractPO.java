@@ -12,6 +12,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.JavaModel;
@@ -22,6 +23,7 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.Pair;
 
@@ -67,6 +69,10 @@ public abstract class AbstractPO implements IPersistablePO {
     protected AbstractPO(InitConfig initConfig, String name) {
         this.environmentConfig = initConfig;
         this.environmentServices = initConfig.getServices();
+        this.environmentServices.setOriginFactory(
+                ProofSettings.DEFAULT_SETTINGS.getTermLabelSettings().getUseOriginLabels() ?
+                        new OriginTermLabelFactory() : null
+        );
         this.javaInfo = initConfig.getServices().getJavaInfo();
         this.heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
         this.specRepos = initConfig.getServices().getSpecificationRepository();

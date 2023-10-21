@@ -8,6 +8,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -48,6 +49,6 @@ public class LabeledParserRuleContext {
         URI filename = MiscTools.getURIFromTokenSource(ctx.start.getTokenSource());
         int line = ctx.start.getLine();
         OriginTermLabel.Origin origin = new OriginTermLabel.FileOrigin(specType, filename, line);
-        return new OriginTermLabel(origin);
+        return new OriginTermLabelFactory().createOriginTermLabel(origin);
     }
 }

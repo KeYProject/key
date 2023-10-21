@@ -839,7 +839,7 @@ public class JMLSpecFactory {
                     Term excNull = tb.addLabelToAllSubs(
                         (tb.label(tb.equals(tb.var(progVars.excVar), tb.NULL()),
                             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)),
-                        new OriginTermLabel(new Origin(SpecType.ENSURES)));
+                        new Origin(SpecType.ENSURES));
                     Term post1 = (originalBehavior == Behavior.NORMAL_BEHAVIOR
                             ? tb.convertToFormula(clauses.ensures.get(heap))
                             : tb.imp(excNull, tb.convertToFormula(clauses.ensures.get(heap))));

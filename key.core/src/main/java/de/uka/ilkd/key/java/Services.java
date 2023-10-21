@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -138,6 +139,7 @@ public class Services implements TermServices {
         this.caches = s.caches;
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
+        this.originFactory = s.originFactory;
     }
 
     public Services getOverlay(NamespaceSet namespaces) {
@@ -354,6 +356,16 @@ public class Services implements TermServices {
      */
     public Proof getProof() {
         return proof;
+    }
+
+    private OriginTermLabelFactory originFactory;
+
+    public void setOriginFactory(OriginTermLabelFactory originFactory) {
+        this.originFactory = originFactory;
+    }
+
+    public OriginTermLabelFactory getOriginFactory() {
+        return  originFactory;
     }
 
     public interface ITermProgramVariableCollectorFactory {

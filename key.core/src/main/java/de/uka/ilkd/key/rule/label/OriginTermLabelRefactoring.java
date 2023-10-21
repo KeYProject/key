@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.FormulaTag;
@@ -89,15 +90,16 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
         }
 
         Set<Origin> subtermOrigins = collectSubtermOrigins(term.subs(), new LinkedHashSet<>());
-
+        OriginTermLabelFactory factory = services.getTermBuilder().getOriginFactory();
         OriginTermLabel newLabel = null;
         if (oldLabel != null) {
             labels.remove(oldLabel);
             final Origin oldOrigin = oldLabel.getOrigin();
-            newLabel = new OriginTermLabel(oldOrigin, subtermOrigins);
+            newLabel = factory.createOriginTermLabel(oldOrigin, subtermOrigins);
         } else if (!subtermOrigins.isEmpty()) {
             final Origin commonOrigin = OriginTermLabel.computeCommonOrigin(subtermOrigins);
-            newLabel = new OriginTermLabel(commonOrigin, subtermOrigins);
+
+            newLabel = factory.createOriginTermLabel(commonOrigin, subtermOrigins);
         }
 
         if (newLabel != null) {

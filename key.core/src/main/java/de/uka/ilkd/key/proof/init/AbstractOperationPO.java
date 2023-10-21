@@ -618,7 +618,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         Term result = tb.and(wellFormed != null ? wellFormed : tb.tt(), selfNotNull, selfCreated,
             selfExactType, paramsOK, mbyAtPreDef);
 
-        return tb.addLabelToAllSubs(result, new OriginTermLabel(new Origin(SpecType.REQUIRES)));
+        return tb.addLabelToAllSubs(result, new Origin(SpecType.REQUIRES));
     }
 
     /**

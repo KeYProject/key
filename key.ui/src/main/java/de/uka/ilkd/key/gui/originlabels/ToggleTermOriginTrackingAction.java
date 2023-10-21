@@ -55,7 +55,7 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
         TermLabelSettings settings =
             ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings();
 
-        if (proof != null) {
+        /* if (proof != null) {
             Services services = proof.getServices();
 
             if (!settings.getUseOriginLabels()) {
@@ -70,7 +70,8 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
             }
 
             mainWindow.getMediator().getSelectionModel().fireSelectedNodeChanged();
-        }
+        }*/
+        
     }
 
     @Override
