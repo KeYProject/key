@@ -138,7 +138,7 @@ public class JmlIO {
     }
 
     private Term attachTermLabel(Term term, OriginTermLabel.SpecType type) {
-        return services.getTermBuilder().addLabel(term,  new OriginTermLabel.Origin(type));
+        return services.getTermBuilder().addLabel(term, new OriginTermLabel.Origin(type));
     }
 
 

@@ -364,7 +364,7 @@ public class Services implements TermServices {
     }
 
     public OriginTermLabelFactory getOriginFactory() {
-        return  originFactory;
+        return originFactory;
     }
 
     public interface ITermProgramVariableCollectorFactory {

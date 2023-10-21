@@ -13,9 +13,6 @@ import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.actions.QuickLoadAction;
 import de.uka.ilkd.key.gui.actions.QuickSaveAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.TermLabelSettings;
@@ -55,22 +52,24 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
         TermLabelSettings settings =
             ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings();
 
-        /* if (proof != null) {
-            Services services = proof.getServices();
-
-            if (!settings.getUseOriginLabels()) {
-                for (Proof p : services.getSpecificationRepository().getAllProofs()) {
-                    for (Goal g : p.openGoals()) {
-                        g.setSequent(OriginTermLabel.removeOriginLabels(g.sequent(), services));
-                    }
-                }
-
-                services.getSpecificationRepository()
-                        .map(term -> OriginTermLabel.removeOriginLabels(term, services), services);
-            }
-
-            mainWindow.getMediator().getSelectionModel().fireSelectedNodeChanged();
-        }*/
+        /*
+         * if (proof != null) {
+         * Services services = proof.getServices();
+         *
+         * if (!settings.getUseOriginLabels()) {
+         * for (Proof p : services.getSpecificationRepository().getAllProofs()) {
+         * for (Goal g : p.openGoals()) {
+         * g.setSequent(OriginTermLabel.removeOriginLabels(g.sequent(), services));
+         * }
+         * }
+         *
+         * services.getSpecificationRepository()
+         * .map(term -> OriginTermLabel.removeOriginLabels(term, services), services);
+         * }
+         *
+         * mainWindow.getMediator().getSelectionModel().fireSelectedNodeChanged();
+         * }
+         */
 
     }
 

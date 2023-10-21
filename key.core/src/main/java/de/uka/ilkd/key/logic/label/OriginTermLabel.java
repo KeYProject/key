@@ -137,7 +137,7 @@ public class OriginTermLabel implements TermLabel {
      * @param origin the term's origin.
      * @param subtermOrigins the origins of the term's (former) subterms.
      */
-     OriginTermLabel(Origin origin, Set<Origin> subtermOrigins) {
+    OriginTermLabel(Origin origin, Set<Origin> subtermOrigins) {
         this(origin);
         this.subtermOrigins.addAll(subtermOrigins);
         this.subtermOrigins.removeIf(o -> o.specType == SpecType.NONE);
@@ -150,7 +150,7 @@ public class OriginTermLabel implements TermLabel {
      *
      * @param subtermOrigins the origins of the term's (former) subterms.
      */
-     OriginTermLabel(Set<Origin> subtermOrigins) {
+    OriginTermLabel(Set<Origin> subtermOrigins) {
         this.origin = new Origin(SpecType.NONE);
         this.subtermOrigins = new LinkedHashSet<>(subtermOrigins);
         this.subtermOrigins.removeIf(o -> o.specType == SpecType.NONE);

@@ -523,9 +523,8 @@ public final class ProblemInitializer {
             settings = ProofSettings.DEFAULT_SETTINGS;
         }
         initConfig.getServices().setOriginFactory(
-            settings.getTermLabelSettings().getUseOriginLabels() ?
-                        new OriginTermLabelFactory() : null
-        );
+            settings.getTermLabelSettings().getUseOriginLabels() ? new OriginTermLabelFactory()
+                    : null);
 
         // read Java
         readJava(envInput, initConfig);
