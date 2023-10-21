@@ -572,7 +572,7 @@ public final class ProblemInitializer {
 
             // TODO: Why: ProofIndependentSetting and ProofSettings do not agree on termlabels
             initConfig.getServices().setOriginFactory(
-                false && initConfig.getSettings().getTermLabelSettings().getUseOriginLabels()
+                initConfig.getSettings().getTermLabelSettings().getUseOriginLabels()
                         ? new OriginTermLabelFactory()
                         : null);
 
