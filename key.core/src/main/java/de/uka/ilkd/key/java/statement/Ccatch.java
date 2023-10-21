@@ -22,7 +22,7 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
      */
     protected final Optional<ParameterDeclaration> parameter;
 
-    private Optional<CcatchNonstandardParameterDeclaration> nonStdParameter;
+    private final Optional<CcatchNonstandardParameterDeclaration> nonStdParameter;
 
     /**
      * Body.
@@ -36,6 +36,7 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
         super();
         parameter = Optional.empty();
         body = null;
+        nonStdParameter = Optional.empty();
     }
 
     /**
