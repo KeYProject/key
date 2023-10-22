@@ -228,7 +228,7 @@ public final class SourceView extends JComponent {
     }
 
     private void ensureProofJavaSourceCollectionExists(Proof proof) {
-        if (proof.lookup(ProofJavaSourceCollection.class) == null) {
+        if (proof != null && proof.lookup(ProofJavaSourceCollection.class) == null) {
             final var sources = new ProofJavaSourceCollection();
             proof.register(sources, ProofJavaSourceCollection.class);
             proof.root().sequent().forEach(formula -> {
