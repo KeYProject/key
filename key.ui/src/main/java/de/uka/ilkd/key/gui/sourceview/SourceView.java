@@ -1369,7 +1369,7 @@ public final class SourceView extends JComponent {
                 Node n = null;
                 for (Pair<Node, PositionInfo> p : lines) {
                     if (p.second.getStartPosition().line() == line + 1
-                            && p.second.getURI().equals(fileURI)) {
+                            && fileURI.equals(p.second.getURI().orElse(null))) {
                         n = p.first;
                         break;
                     }
