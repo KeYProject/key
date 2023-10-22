@@ -110,7 +110,7 @@ public class PathList {
             result = split_paths.length;
             for (int i = 0; i < result; i++) {
                 String path = split_paths[i].trim();
-                if (!path.equals("")) {
+                if (!path.isEmpty()) {
                     addPath(path);
                 }
             }

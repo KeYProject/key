@@ -432,15 +432,20 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
     public record UpdateLabelPair(Term update, ImmutableArray<TermLabel> updateApplicationlabels) {
         @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof UpdateLabelPair) {
-                    return update.equals(((UpdateLabelPair) obj).update()) && updateApplicationlabels
-                            .equals(((UpdateLabelPair) obj).updateApplicationlabels());
-                } else {
-                    return false;
-                }
+        public boolean equals(Object obj) {
+            if (obj instanceof UpdateLabelPair) {
+                return update.equals(((UpdateLabelPair) obj).update()) && updateApplicationlabels
+                        .equals(((UpdateLabelPair) obj).updateApplicationlabels());
+            } else {
+                return false;
             }
         }
+
+        @Override
+        public int hashCode() {
+            return update.hashCode() + 13*updateApplicationlabels.hashCode();
+        }
+    }
 
     public SVInstantiations addUpdateList(ImmutableList<UpdateLabelPair> updates) {
         if (updates.isEmpty() && updateContext.isEmpty()) {

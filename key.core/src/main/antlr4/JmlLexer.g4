@@ -1,11 +1,7 @@
 
 lexer grammar JmlLexer;
 
-@header {
-import java.util.Collection;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-}
+@header {}
 
 @members{
    // needed for double literals and ".."

@@ -495,8 +495,7 @@ public final class ProblemInitializer {
             ic.getActivatedChoices().forEach(i -> out.format("\t%s%n", i));
 
             out.format("Activated Taclets: %n");
-            final List<Taclet> taclets = new ArrayList<>();
-            taclets.addAll(ic.activatedTaclets());
+            final List<Taclet> taclets = new ArrayList<>(ic.activatedTaclets());
             taclets.sort(Comparator.comparing(a -> a.name().toString()));
             for (Taclet taclet : taclets) {
                 out.format("== %s (%s) =========================================%n", taclet.name(),
