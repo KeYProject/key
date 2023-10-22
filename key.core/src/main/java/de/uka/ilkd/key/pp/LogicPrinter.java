@@ -47,7 +47,7 @@ import static de.uka.ilkd.key.pp.PosTableLayouter.DEFAULT_LINE_WIDTH;
  * PositionTable, which is needed for highlighting.
  *
  * <p>
- * The actual layouting/formatting is done using the {@link de.uka.ilkd.key.util.pp.Layouter} class.
+ * The actual layout/formatting is done using the {@link de.uka.ilkd.key.util.pp.Layouter} class.
  * The concrete syntax for operators is given by an instance of {@link NotationInfo}. The
  * LogicPrinter is responsible for the concrete <em>layout</em>, e.g. how terms with infix operators
  * are indented, and it binds the various needed components together.
@@ -519,7 +519,7 @@ public class LogicPrinter {
     protected void printGoalTemplate(TacletGoalTemplate tgt) {
         // layouter.beginC(0);
         if (tgt.name() != null) {
-            if (tgt.name().length() > 0) {
+            if (!tgt.name().isEmpty()) {
                 layouter.nl().beginC().print("\"" + tgt.name() + "\"").print(":");
             }
 
@@ -537,13 +537,13 @@ public class LogicPrinter {
         if (!tgt.rules().isEmpty()) {
             printRules(tgt.rules());
         }
-        if (tgt.addedProgVars().size() > 0) {
+        if (!tgt.addedProgVars().isEmpty()) {
             layouter.nl();
             printAddProgVars(tgt.addedProgVars());
         }
 
         if (tgt.name() != null) {
-            if (tgt.name().length() > 0) {
+            if (!tgt.name().isEmpty()) {
                 layouter.end();
             }
         }
@@ -1517,7 +1517,7 @@ public class LogicPrinter {
 
         layouter.beginC(0);
         layouter.keyWord(keyword);
-        if (t.varsBoundHere(0).size() > 0) {
+        if (!t.varsBoundHere(0).isEmpty()) {
             layouter.print(" ");
             printVariables(t.varsBoundHere(0), quantifiableVariablePrintMode);
         }
