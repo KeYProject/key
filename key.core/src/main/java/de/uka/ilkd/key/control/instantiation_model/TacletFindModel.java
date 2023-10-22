@@ -236,7 +236,7 @@ public class TacletFindModel extends AbstractTableModel {
 
         String instantiation = (String) getValueAt(irow, 1);
 
-        if (instantiation == null || "".equals(instantiation)) {
+        if (instantiation == null || instantiation.isEmpty()) {
             throw new MissingInstantiationException("", createPosition(irow), false);
         }
 
@@ -266,7 +266,7 @@ public class TacletFindModel extends AbstractTableModel {
 
         String instantiation = (String) getValueAt(irow, 1);
 
-        if (instantiation == null || "".equals(instantiation)) {
+        if (instantiation == null || instantiation.isEmpty()) {
             throw new MissingInstantiationException("", createPosition(irow), false);
         }
 
