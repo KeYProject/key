@@ -1272,7 +1272,7 @@ public class TermLabelManager {
      *         specified {@link PosInOccurrence}.
      */
     protected Term replaceTerm(TermLabelState state, PosInOccurrence pio, Term newTerm,
-            TermFactory tf, ImmutableList<TermLabelRefactoring> parentRefactorings,
+            TermFactory tf, Set<TermLabelRefactoring> parentRefactorings,
             Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm,
             Rule rule, Goal goal, Object hint, Term tacletTerm) {
         do {
@@ -1319,22 +1319,13 @@ public class TermLabelManager {
      * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
      * @param tacletTerm The optional taclet {@link Term}.
-     * @param refactorings The already accumulated refactorings
-     * @return The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s to consider.
+     * @param refactorings The already accumulated refactorings to be expanded with rule specific
+     *        refactorings
      */
-    private RefactoringsContainer computeRuleSpecificRefactorings(TermLabelState state,
+    private void computeRuleSpecificRefactorings(TermLabelState state,
             Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm,
             Rule rule, Goal goal, Object hint, Term tacletTerm,
             RefactoringsContainer refactorings) {
-        ImmutableList<TermLabelRefactoring> sequentRefactorings = refactorings.sequentRefactorings;
-        ImmutableList<TermLabelRefactoring> belowUpdatesRefactorings =
-            refactorings.belowUpdatesRefactorings;
-        ImmutableList<TermLabelRefactoring> childAndGrandchildRefactorings =
-            refactorings.childAndGrandchildRefactorings;
-        ImmutableList<TermLabelRefactoring> directChildRefactorings =
-            refactorings.directChildRefactorings;
-        ImmutableList<TermLabelRefactoring> childAndGrandchildRefactoringsAndParents =
-            refactorings.childAndGrandchildRefactorings;
         if (rule != null) {
             ImmutableList<TermLabelRefactoring> ruleRefactorings =
                 ruleSpecificRefactorings.get(rule.name());
@@ -1343,30 +1334,21 @@ public class TermLabelManager {
                     RefactoringScope scope = refactoring.defineRefactoringScope(state, services,
                         applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm);
                     if (RefactoringScope.SEQUENT.equals(scope)) {
-                        sequentRefactorings = sequentRefactorings.prepend(refactoring);
+                        refactorings.sequentRefactorings.add(refactoring);
                     } else if (RefactoringScope.APPLICATION_BELOW_UPDATES.equals(scope)) {
-                        belowUpdatesRefactorings = belowUpdatesRefactorings.prepend(refactoring);
+                        refactorings.belowUpdatesRefactorings.add(refactoring);
                     } else if (RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE
                             .equals(scope)) {
-                        childAndGrandchildRefactorings =
-                            childAndGrandchildRefactorings.prepend(refactoring);
+                        refactorings.childAndGrandchildRefactorings.add(refactoring);
                     } else if (RefactoringScope.APPLICATION_DIRECT_CHILDREN.equals(scope)) {
-                        directChildRefactorings = directChildRefactorings.prepend(refactoring);
+                        refactorings.directChildRefactorings.add(refactoring);
                     } else if (RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS
                             .equals(scope)) {
-                        childAndGrandchildRefactoringsAndParents =
-                            childAndGrandchildRefactoringsAndParents.prepend(refactoring);
+                        refactorings.childAndGrandchildRefactoringsAndParents.add(refactoring);
                     }
                 }
             }
         }
-        return new RefactoringsContainer(
-            refactorings.sequentRefactorings.prepend(sequentRefactorings),
-            refactorings.belowUpdatesRefactorings.prepend(belowUpdatesRefactorings),
-            refactorings.childAndGrandchildRefactorings.prepend(childAndGrandchildRefactorings),
-            refactorings.childAndGrandchildRefactoringsAndParents
-                    .prepend(childAndGrandchildRefactoringsAndParents),
-            refactorings.directChildRefactorings.prepend(directChildRefactorings));
     }
 
     /**
@@ -1384,44 +1366,30 @@ public class TermLabelManager {
      * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
      * @param tacletTerm The optional taclet {@link Term}.
-     * @param refactorings The already accumulated refactorings
-     * @return The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s to consider.
+     * @param refactorings The already accumulated refactorings to be expanded with rule independent
+     *        refactorings
      */
-    private RefactoringsContainer computeRuleIndependentRefactorings(TermLabelState state,
+    private void computeRuleIndependentRefactorings(TermLabelState state,
             Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm,
             Rule rule, Goal goal, Object hint, Term tacletTerm,
             RefactoringsContainer refactorings) {
-        ImmutableList<TermLabelRefactoring> sequentRefactorings2 = refactorings.sequentRefactorings;
-        ImmutableList<TermLabelRefactoring> belowUpdatesRefactorings2 =
-            refactorings.belowUpdatesRefactorings;
-        ImmutableList<TermLabelRefactoring> childAndGrandchildRefactorings2 =
-            refactorings.childAndGrandchildRefactorings;
-        ImmutableList<TermLabelRefactoring> directChildRefactorings2 =
-            refactorings.directChildRefactorings;
-        ImmutableList<TermLabelRefactoring> childAndGrandchildRefactoringsAndParents2 =
-            refactorings.childAndGrandchildRefactorings;
         for (TermLabelRefactoring refactoring : allRulesRefactorings) {
             RefactoringScope scope = refactoring.defineRefactoringScope(state, services,
                 applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm);
             if (RefactoringScope.SEQUENT.equals(scope)) {
-                sequentRefactorings2 = sequentRefactorings2.prepend(refactoring);
+                refactorings.sequentRefactorings.add(refactoring);
             } else if (RefactoringScope.APPLICATION_BELOW_UPDATES.equals(scope)) {
-                belowUpdatesRefactorings2 = belowUpdatesRefactorings2.prepend(refactoring);
+                refactorings.belowUpdatesRefactorings.add(refactoring);
             } else if (RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE
                     .equals(scope)) {
-                childAndGrandchildRefactorings2 =
-                    childAndGrandchildRefactorings2.prepend(refactoring);
+                refactorings.childAndGrandchildRefactorings.add(refactoring);
             } else if (RefactoringScope.APPLICATION_DIRECT_CHILDREN.equals(scope)) {
-                directChildRefactorings2 = directChildRefactorings2.prepend(refactoring);
+                refactorings.directChildRefactorings.add(refactoring);
             } else if (RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS
                     .equals(scope)) {
-                childAndGrandchildRefactoringsAndParents2 =
-                    childAndGrandchildRefactoringsAndParents2.prepend(refactoring);
+                refactorings.childAndGrandchildRefactoringsAndParents.add(refactoring);
             }
         }
-        return new RefactoringsContainer(sequentRefactorings2, belowUpdatesRefactorings2,
-            childAndGrandchildRefactorings2, childAndGrandchildRefactoringsAndParents2,
-            directChildRefactorings2);
     }
 
     /**
@@ -1444,15 +1412,11 @@ public class TermLabelManager {
     protected RefactoringsContainer computeRefactorings(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm) {
-        RefactoringsContainer refactorings =
-            new RefactoringsContainer(ImmutableSLList.nil(), ImmutableSLList.nil(),
-                ImmutableSLList.nil(), ImmutableSLList.nil(), ImmutableSLList.nil());
-
-        refactorings = computeRuleSpecificRefactorings(state, services, applicationPosInOccurrence,
+        final RefactoringsContainer refactorings = new RefactoringsContainer();
+        computeRuleSpecificRefactorings(state, services, applicationPosInOccurrence,
             applicationTerm, rule, goal, hint, tacletTerm, refactorings);
-        refactorings =
-            computeRuleIndependentRefactorings(state, services, applicationPosInOccurrence,
-                applicationTerm, rule, goal, hint, tacletTerm, refactorings);
+        computeRuleIndependentRefactorings(state, services, applicationPosInOccurrence,
+            applicationTerm, rule, goal, hint, tacletTerm, refactorings);
         return refactorings;
     }
 
@@ -1470,19 +1434,22 @@ public class TermLabelManager {
      *                                                 {@link RefactoringScope#APPLICATION_DIRECT_CHILDREN}.
      * @author Martin Hentschel
      */
-    protected record RefactoringsContainer(ImmutableList<TermLabelRefactoring> sequentRefactorings,
-                                           ImmutableList<TermLabelRefactoring> belowUpdatesRefactorings,
-                                           ImmutableList<TermLabelRefactoring> childAndGrandchildRefactorings,
-                                           ImmutableList<TermLabelRefactoring> childAndGrandchildRefactoringsAndParents,
-                                           ImmutableList<TermLabelRefactoring> directChildRefactorings) {
+    protected record RefactoringsContainer(Set<TermLabelRefactoring> sequentRefactorings,
+                                           Set<TermLabelRefactoring> belowUpdatesRefactorings,
+                                           Set<TermLabelRefactoring> childAndGrandchildRefactorings,
+                                           Set<TermLabelRefactoring> childAndGrandchildRefactoringsAndParents,
+                                           Set<TermLabelRefactoring> directChildRefactorings) {
+        public RefactoringsContainer() {
+            this(new LinkedHashSet<>(), new LinkedHashSet<>(), new LinkedHashSet<>(), new LinkedHashSet<>(), new LinkedHashSet<>());
+        }
+
         /**
          * Returns the {@link TermLabelRefactoring} for {@link RefactoringScope#SEQUENT}.
          *
          * @return The {@link TermLabelRefactoring} for {@link RefactoringScope#SEQUENT}.
          */
-        @Override
-        public ImmutableList<TermLabelRefactoring> sequentRefactorings() {
-            return sequentRefactorings;
+        public Set<TermLabelRefactoring> sequentRefactorings() {
+            return Collections.unmodifiableSet(sequentRefactorings);
         }
 
         /**
@@ -1493,8 +1460,8 @@ public class TermLabelManager {
          * {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE}.
          */
         @Override
-        public ImmutableList<TermLabelRefactoring> childAndGrandchildRefactorings() {
-            return childAndGrandchildRefactorings;
+        public Set<TermLabelRefactoring> childAndGrandchildRefactorings() {
+            return Collections.unmodifiableSet(childAndGrandchildRefactorings);
         }
 
         /**
@@ -1505,8 +1472,8 @@ public class TermLabelManager {
          * {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS}.
          */
         @Override
-        public ImmutableList<TermLabelRefactoring> childAndGrandchildRefactoringsAndParents() {
-            return childAndGrandchildRefactoringsAndParents;
+        public Set<TermLabelRefactoring> childAndGrandchildRefactoringsAndParents() {
+            return Collections.unmodifiableSet(childAndGrandchildRefactoringsAndParents);
         }
 
         /**
@@ -1517,8 +1484,8 @@ public class TermLabelManager {
          * {@link RefactoringScope#APPLICATION_DIRECT_CHILDREN}.
          */
         @Override
-        public ImmutableList<TermLabelRefactoring> directChildRefactorings() {
-            return directChildRefactorings;
+        public Set<TermLabelRefactoring> directChildRefactorings() {
+            return Collections.unmodifiableSet(directChildRefactorings);
         }
 
         /**
@@ -1528,8 +1495,10 @@ public class TermLabelManager {
          *
          * @return The combined {@link ImmutableList}.
          */
-        public ImmutableList<TermLabelRefactoring> getAllApplicationChildAndGrandchildRefactorings() {
-            return childAndGrandchildRefactorings.prepend(childAndGrandchildRefactoringsAndParents);
+        public Set<TermLabelRefactoring> getAllApplicationChildAndGrandchildRefactorings() {
+            final LinkedHashSet result = new LinkedHashSet<>(childAndGrandchildRefactoringsAndParents);
+            result.addAll(childAndGrandchildRefactoringsAndParents);
+            return result;
         }
 
         /**
@@ -1540,7 +1509,7 @@ public class TermLabelManager {
          * {@link RefactoringScope#APPLICATION_BELOW_UPDATES}.
          */
         @Override
-        public ImmutableList<TermLabelRefactoring> belowUpdatesRefactorings() {
+        public Set<TermLabelRefactoring> belowUpdatesRefactorings() {
             return belowUpdatesRefactorings;
         }
     }
@@ -1661,7 +1630,7 @@ public class TermLabelManager {
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, RefactoringsContainer refactorings, TermFactory tf,
             Term newApplicationTerm) {
-        ImmutableList<TermLabelRefactoring> allChildAndGrandchildRefactorings =
+        final Set<TermLabelRefactoring> allChildAndGrandchildRefactorings =
             refactorings.getAllApplicationChildAndGrandchildRefactorings();
         if (!allChildAndGrandchildRefactorings.isEmpty()) {
             boolean changed = false;
@@ -1749,7 +1718,7 @@ public class TermLabelManager {
     protected void refactorSemisequent(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Semisequent semisequent, boolean inAntec,
-            ImmutableList<TermLabelRefactoring> activeRefactorings) {
+            Set<TermLabelRefactoring> activeRefactorings) {
         for (SequentFormula sfa : semisequent) {
             Term updatedTerm = refactorLabelsRecursive(state, services, applicationPosInOccurrence,
                 applicationTerm, rule, goal, hint, tacletTerm, sfa.formula(), activeRefactorings);
@@ -1780,7 +1749,7 @@ public class TermLabelManager {
     protected Term refactorLabelsRecursive(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Term term,
-            ImmutableList<TermLabelRefactoring> activeRefactorings) {
+            Set<TermLabelRefactoring> activeRefactorings) {
         boolean subsChanged = false;
         Term[] newSubs = new Term[term.arity()];
         for (int i = 0; i < newSubs.length; i++) {
@@ -1821,7 +1790,7 @@ public class TermLabelManager {
     protected ImmutableArray<TermLabel> performRefactoring(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Term term,
-            ImmutableList<TermLabelRefactoring> activeRefactorings) {
+            Set<TermLabelRefactoring> activeRefactorings) {
         // Create list with all old labels
         List<TermLabel> newLabels = new LinkedList<>();
         for (TermLabel oldLabel : term.getLabels()) {
