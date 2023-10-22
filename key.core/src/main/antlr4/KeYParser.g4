@@ -837,9 +837,9 @@ cvalue:
   | BIN_LITERAL #cintb
   | HEX_LITERAL #cinth
   | MINUS? INT_LITERAL #cintd
-  | FLOAT_LITERAL #cfpf
-  | DOUBLE_LITERAL #cfpd
-  | REAL_LITERAL #cfpr
+  | MINUS? FLOAT_LITERAL #cfpf
+  | MINUS? DOUBLE_LITERAL #cfpd
+  | MINUS? REAL_LITERAL #cfpr
   | (TRUE|FALSE) #cbool
   | LBRACE
      (ckv (COMMA ckv)*)? COMMA?

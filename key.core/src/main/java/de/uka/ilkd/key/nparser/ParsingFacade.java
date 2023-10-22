@@ -19,6 +19,7 @@ import javax.annotation.Nullable;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.settings.Configuration;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.PredictionMode;
@@ -196,14 +197,33 @@ public final class ParsingFacade {
 
 
     // region configuration
+    /**
+     * Parses a the configuration determined by the given {@code file}.
+     * A configuration corresponds to the grammar rule {@code cfile} in the {@code KeYParser.g4}.  
+     * @param file non-null {@link Path} object
+     * @return monad that encapsluate the ParserRuleContext
+     * @throws IOException if the file is not found or not readable. 
+     * @throws BuildingException if the file is syntactical broken.
+     */
     public static KeyAst.ConfigurationFile parseConfigurationFile(Path file) throws IOException {
         return parseConfigurationFile(CharStreams.fromPath(file));
     }
 
+    /**
+     * @see #parseConfigurationFile(Path)
+     */
     public static KeyAst.ConfigurationFile parseConfigurationFile(File file) throws IOException {
         return parseConfigurationFile(file.toPath());
     }
 
+    /**
+     * Parses a the configuration determined by the given {@code stream}.
+     * A configuration corresponds to the grammar rule {@code cfile} in the {@code KeYParser.g4}.  
+     * @param file non-null {@link CharStream} object
+     * @return monad that encapsluate the ParserRuleContext
+     * @throws IOException if the file is not found or not readable. 
+     * @throws BuildingException if the file is syntactical broken.
+     */
     public static KeyAst.ConfigurationFile parseConfigurationFile(CharStream stream) {
         KeYParser p = createParser(stream);
         var ctx = p.cfile();
@@ -211,14 +231,28 @@ public final class ParsingFacade {
         return new KeyAst.ConfigurationFile(ctx);
     }
 
+     /**
+     * Parses a the configuration determined by the given {@code stream}.
+     * A configuration corresponds to the grammar rule {@code cfile} in the {@code KeYParser.g4}.  
+     * @param file non-null {@link CharStream} object
+     * @return a configration object with the data deserialize from the given file
+     * @throws IOException if the file is not found or not readable. 
+     * @throws BuildingException if the file is syntactical broken.
+     */
     public static Configuration readConfigurationFile(CharStream input) throws IOException {
         return parseConfigurationFile(input).asConfiguration();
     }
 
+    /**
+     * @see #readConfigurationFile(CharStream)
+     */
     public static Configuration readConfigurationFile(Path file) throws IOException {
         return readConfigurationFile(CharStreams.fromPath(file));
     }
 
+    /**
+     * @see #readConfigurationFile(CharStream)
+     */
     public static Configuration readConfigurationFile(File file) throws IOException {
         return readConfigurationFile(file.toPath());
     }

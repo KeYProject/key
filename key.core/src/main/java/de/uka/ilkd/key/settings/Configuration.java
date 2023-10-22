@@ -17,6 +17,12 @@ import de.uka.ilkd.key.util.Position;
 import org.antlr.v4.runtime.CharStream;
 
 /**
+ * A container to hold parsed configurations. Configurations are a mapping between a property name 
+ * and a value plus additional meta information (line number, documentation etc.).
+ * <p>
+ * Helper functions allow to accesss the values in a type safe fashion. 
+ * Note that configuration are also nested, use {@link #getTable(String)}  to receive a sub configuration.
+ * 
  * @author Alexander Weigl
  * @version 1 (03.04.23)
  */
@@ -32,22 +38,53 @@ public class Configuration {
         this.data = data;
     }
 
+    /**
+     * Loads a configuration using the given file. 
+     * @param file existsing file path
+     * @return a configuration based on the file contents
+     * @throws IOException if file does not exists or i/o error
+     */
     public static Configuration load(File file) throws IOException {
         return ParsingFacade.readConfigurationFile(file);
     }
 
+    /**
+     * Loads a configuration using the given char stream.  
+     * @param file existsing file path
+     * @return a configuration based on the file contents
+     * @throws IOException i/o error on the steram
+     */    
     public static Configuration load(CharStream input) throws IOException {
         return ParsingFacade.readConfigurationFile(input);
     }
 
+    /**
+     * Returns true if an entry for the given name exists.
+     */
     public boolean exists(String name) {
         return data.containsKey(name);
     }
 
+    /**
+     * Returns true if an entry for the given name exists and is also compatible 
+     * with the given class. 
+     * @see #getBool(String)
+     * @see #getInt(String)
+     * @see #getLong(String)
+     * @see #getDouble(String)
+     * @see #getTable(String)
+     */
     public <T> boolean exists(String name, Class<T> clazz) {
         return data.containsKey(name) && clazz.isAssignableFrom(data.get(name).getClass());
     }
 
+    /**
+     * Returns the stored value for the given name casted to the given clazz if possible. 
+     * If no value exists, or value is not compatible to {@code clazz}, {@code null} is returned.
+     * @param <T> an arbitrary class, exptected return type
+     * @param name property name 
+     * @param clazz data type because of missing reified generics. 
+     */
     @Nullable
     public <T> T get(String name, Class<T> clazz) {
         if (exists(name, clazz))
@@ -56,6 +93,13 @@ public class Configuration {
             return null;
     }
 
+    /**
+     * The same as {@link #get(String, Class)} but returns the {@code defaultValue} instead
+     * of a {@code null} reference. 
+     * @param <T> the expected return type compatible to the {@code defaultValue}
+     * @param name property name
+     * @param defaultValue the returned instead of {@code null}.
+     */
     @Nonnull
     public <T> T get(String name, @Nonnull T defaultValue) {
         if (exists(name, defaultValue.getClass()))
@@ -64,66 +108,142 @@ public class Configuration {
             return defaultValue;
     }
 
+    /**
+     * Get the value for the entry named {@code name}. Null if no such entry exists.
+     * @see #exists(String)
+     */
     @Nullable
     public Object get(String name) {
         return data.get(name);
     }
 
+    /**
+     * Returns an integer or {@code null} if not such entry exists.
+     * @param name property name
+     * @throw ClassCastException    if the entry is not an {@link #Long}
+     * @throw NullPointerException  if no such value entry exists 
+     */
     public int getInt(String name) {
         return (int) getLong(name);
     }
 
+    /**
+     * Returns an integer value for the given name. {@code defaultValue} if no such value is present.
+     * @param name property name
+     * @throw ClassCastException    if the entry is not an {@link #Long}
+     * @throw NullPointerException  if no such value entry exists 
+     */
     public int getInt(String name, int defaultValue) {
         return (int) getLong(name, defaultValue);
     }
 
+    /**
+     * Returns a long value for the given name. {@code null} if no such value is present.
+     * @param name property name
+     * @throw ClassCastException    if the entry is not an {@link #Long}
+     * @throw NullPointerException  if no such value entry exists 
+     */
     public long getLong(String name) {
         return get(name, Integer.class);
     }
 
+    /**
+     * Returns a long value for the given name. {@code defaultValue} if no such value is present.
+     * @param name property name
+     * @throw ClassCastException    if the entry is not an {@link #Long}
+     * @throw NullPointerException  if no such value entry exists 
+     */
     public long getLong(String name, long defaultValue) {
         var value = get(name, Long.class);
         return Objects.requireNonNullElse(value, defaultValue);
     }
 
-
+    /**
+     * Returns a boolean value for the given name.
+     * @param name property name
+     * @throw ClassCastException    if the entry is not an {@link #Long}
+     * @throw NullPointerException  if no such value entry exists 
+     */
     public boolean getBool(String name) {
         return get(name, Boolean.class);
     }
 
+    /**
+     * Returns a boolean value for the given name. {@code defaultValue} if no such value is present.
+     * @param name property name
+     * @throw ClassCastException    if the entry is not an {@link #Long}
+     * @throw NullPointerException  if no such value entry exists 
+     */
     public boolean getBool(String name, boolean defaultValue) {
         return get(name, defaultValue);
     }
 
+    /**
+     * Returns an integer value for the given name. {@code defaultValue} if no such value is present.
+     * @param name property name
+     * @throw ClassCastException    if the entry is not an {@link #Long}
+     * @throw NullPointerException  if no such value entry exists 
+     */
     public double getDouble(String name) {
         return get(name, Double.class);
     }
 
+    /**
+     * Returns an string value for the given name. {@code null} if no such value is present.
+     * @param name property name
+     */
+    @Nullable
     public String getString(String name) {
         return get(name, String.class);
     }
 
+    /**
+     * Returns an string value for the given name. {@code defaultValue} if no such value is present.
+     * @param name property name
+     */    
     public String getString(String name, String defaultValue) {
         return get(name, defaultValue);
     }
 
+    /**
+     * Returns an sub configuration for the given name. {@code null} if no such value is present.
+     * @param name property name
+     */
+    @Nullable
     public Configuration getTable(String name) {
         return get(name, Configuration.class);
     }
 
+    /**
+     * Returns a list of objects for the given name. {@code null} if no such value is present.
+     * @param name property name
+     */
+    @Nullable
     public List<Object> getList(String name) {
         return get(name, List.class);
     }
 
+    /**
+     * Returns a list of strings for the given name.
+     * @param name property name
+     * @throws ClassCastException if the list contains non-strings 
+     */
+    @Nonnull
     public List<String> getStringList(String name) {
         var seq = get(name, List.class);
         if (seq == null)
             return Collections.emptyList();
         if (!seq.stream().allMatch(it -> it instanceof String))
-            throw new AssertionError();
+            throw new ClassCastException();
         return seq;
     }
 
+    /**
+     * Returns string array for the requested entry. {@code defaultValue} is returned if no such entry exists.
+     * @param name a string identifying the entry
+     * @param defaultValue a default value
+     * @throws ClassCastException if the given entry has non-string elements
+     */
     @Nonnull
     public String[] getStringArray(String name, @Nonnull String[] defaultValue) {
         if (exists(name)) {
@@ -132,18 +252,25 @@ public class Configuration {
             return defaultValue;
     }
 
-
+    /**
+     * Returns the meta data corresponding to the given entry.
+     */
     @Nullable
     public ConfigurationMeta getMeta(String name) {
         return meta.get(name);
     }
 
+    /**
+     * Returns the meta data corresponding to the given entry, creates the entry if not existing.
+     */
     @Nonnull
     private ConfigurationMeta getOrCreateMeta(String name) {
         return Objects.requireNonNull(meta.putIfAbsent(name, new ConfigurationMeta()));
     }
 
-
+    /**
+     * @see #getTable(String)
+     */
     public Configuration getSection(String name) {
         return get(name, Configuration.class);
     }
@@ -199,6 +326,12 @@ public class Configuration {
         return data.entrySet();
     }
 
+    /**
+     * Interprets the given entry as an enum value. 
+     * @param <T> the enum 
+     * @param name a name identifying an entry
+     * @param defaultValue the default value to be returned 
+     */
     public <T extends Enum<T>> T getEnum(String name, T defaultValue) {
         var idx = getString(name);
         try {
@@ -208,14 +341,23 @@ public class Configuration {
         }
     }
 
+    /**
+     * Serializes this configuration instance into the given writer.
+     * @param writer a writer
+     * @param comment a comment
+     */
     public void save(Writer writer, String comment) {
         new ConfigurationWriter(writer).printComment(comment).printMap(this.data);
     }
 
-
+    /**
+     * POJO for metadata of configuration entries.
+     */
     public static class ConfigurationMeta {
+        /** Position of declaration within a file */
         private Position position;
 
+        /** documentation given in the file */
         private String documentation;
 
         public Position getPosition() {
@@ -235,6 +377,9 @@ public class Configuration {
         }
     }
 
+    /**
+     * Writer for configurations. Mainly manages the identation levels and escapings.
+     */
     public static class ConfigurationWriter {
         private final PrintWriter out;
         private int indent;
