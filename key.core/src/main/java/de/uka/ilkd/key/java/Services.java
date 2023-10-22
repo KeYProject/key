@@ -305,23 +305,6 @@ public class Services implements TermServices {
         }
     }
 
-
-    public Services copyProofSpecific(Proof p_proof, boolean shareCaches) {
-        ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-        final Services s =
-            new Services(getProfile(), getJavaInfo().getKeYProgModelInfo().getServConf(),
-                getJavaInfo().getKeYProgModelInfo().rec2key(), copyCounters(), newCaches);
-        s.proof = p_proof;
-        s.specRepos = specRepos;
-        s.setTypeConverter(getTypeConverter().copy(s));
-        s.setNamespaces(namespaces.copy());
-        nameRecorder = nameRecorder.copy();
-        s.setJavaModel(getJavaModel());
-
-        return s;
-    }
-
-
     /*
      * returns an existing named counter, creates a new one otherwise
      */
@@ -365,7 +348,6 @@ public class Services implements TermServices {
     public void setNamespaces(NamespaceSet namespaces) {
         this.namespaces = namespaces;
     }
-
 
     /**
      * Returns the proof to which this object belongs, or null if it does not belong to any proof.
