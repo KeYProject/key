@@ -130,8 +130,8 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
     void refactorLabels(TermLabelState state, Services services,
-                        PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-                        Object hint, Term tacletTerm, Term term, LabelCollection labels);
+            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+            Object hint, Term tacletTerm, Term term, LabelCollection labels);
 
     /**
      * Possible refactoring scopes.

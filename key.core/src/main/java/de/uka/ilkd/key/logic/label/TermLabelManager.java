@@ -1451,7 +1451,8 @@ public class TermLabelManager {
          * @return The combined {@link ImmutableList}.
          */
         public Set<TermLabelRefactoring> getAllApplicationChildAndGrandchildRefactorings() {
-            final LinkedHashSet result = new LinkedHashSet<>(childAndGrandchildRefactoringsAndParents);
+            final LinkedHashSet<TermLabelRefactoring> result =
+                    new LinkedHashSet<>(childAndGrandchildRefactoringsAndParents);
             result.addAll(childAndGrandchildRefactoringsAndParents);
             return result;
         }
@@ -1491,11 +1492,11 @@ public class TermLabelManager {
                     refactorings.directChildRefactorings());
 
                 if (newLabels != sub.getLabels()) {
-                    newSubs[i] = tf.createTerm(sub.op(), sub.subs(), sub.boundVars(), sub.javaBlock(),
+                    newSubs[i] =
+                        tf.createTerm(sub.op(), sub.subs(), sub.boundVars(), sub.javaBlock(),
                             newLabels);
                     changed = true;
                 } else {
-                    System.out.println("HAHAHAHA");
                     newSubs[i] = sub;
                 }
             }
@@ -1670,7 +1671,7 @@ public class TermLabelManager {
                         activeRefactorings);
                 if (!sfa.formula().equals(updatedTerm)) {
                     goal.changeFormula(new SequentFormula(updatedTerm),
-                            new PosInOccurrence(sfa, PosInTerm.getTopLevel(), inAntec));
+                        new PosInOccurrence(sfa, PosInTerm.getTopLevel(), inAntec));
                 }
             }
         }
@@ -1938,7 +1939,7 @@ public class TermLabelManager {
     }
 
     /**
-     * Searches the inner most {@link TermLabel} wit the given {@link Name} in the parent hierarchy
+     * Searches the innermost {@link TermLabel} wit the given {@link Name} in the parent hierarchy
      * of the {@link PosInOccurrence}.
      *
      * @param pio The {@link PosInOccurrence} to search in.

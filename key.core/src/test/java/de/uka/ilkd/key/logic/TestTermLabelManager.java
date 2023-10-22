@@ -722,8 +722,8 @@ public class TestTermLabelManager {
 
         @Override
         public void refactorLabels(TermLabelState state, Services services,
-                                   PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule,
-                                   Goal goal, Object hint, Term tacletTerm, Term term, LabelCollection labels) {
+                PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule,
+                Goal goal, Object hint, Term tacletTerm, Term term, LabelCollection labels) {
             List<TermLabel> changedLabels = new LinkedList<>();
             boolean changed = labels.hasChanged();
             for (TermLabel label : labels.getLabels()) {
