@@ -405,7 +405,7 @@ public class LogicPrinter {
         printSchemaVariable(sv.getSchemaVariable());
         layouter.print(",").brk();
         if (sv.isDefinedByType()) {
-            if (sv.getType() instanceof ArrayType) {
+            if (sv.getType().getJavaType() instanceof ArrayType) {
                 layouter.print(((ArrayType) sv.getType()).getAlternativeNameRepresentation());
             } else {
                 layouter.print(sv.getType().getFullName());
@@ -785,7 +785,7 @@ public class LogicPrinter {
     /**
      * Determine the Set of labels that will be printed out for a specific {@link Term}. The class
      * {@link SequentViewLogicPrinter} overrides this method. {@link TermLabel} visibility can be
-     * configured via GUI, see {@link de.uka.ilkd.key.gui.actions.TermLabelMenu}. Default is to
+     * configured via GUI, see de.uka.ilkd.key.gui.actions.TermLabelMenu. Default is to
      * print all TermLabels.
      *
      * @param t {@link Term} whose visible {@link TermLabel}s will be determined.
