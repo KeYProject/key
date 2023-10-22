@@ -302,12 +302,6 @@ public class Services implements TermServices {
                 "Services are already owned by another proof:" + proof.name());
         }
         proof = p_proof;
-
-        // TODO: is the below still needed?
-        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels()
-                || !proof.getSettings().getTermLabelSettings().getUseOriginLabels()) {
-            profile.getTermLabelManager().disableOriginLabelRefactorings();
-        }
     }
 
     /*
@@ -409,7 +403,7 @@ public class Services implements TermServices {
 
     /**
      * Returns the {@link TermBuilder} used to create {@link Term}s. Same as
-     * {@link #getTermBuilder(true).
+     * <code>getTermBuilder(true)</code>>.
      *
      * @return The {@link TermBuilder} used to create {@link Term}s.
      */

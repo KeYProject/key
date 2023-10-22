@@ -19,7 +19,6 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.label.*;
 import de.uka.ilkd.key.rule.label.ChildTermLabelPolicy;
-import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelMerger;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
@@ -2208,7 +2207,7 @@ public class TermLabelManager {
      * @param term the term to transform.
      * @param services services.
      * @return the transformed term.
-     * @see #isProofRelevant()
+     * @see TermLabel#isProofRelevant()
      */
     public static Term removeIrrelevantLabels(Term term, Services services) {
         if (services.getTermBuilder().getOriginFactory() == null) {
@@ -2224,7 +2223,7 @@ public class TermLabelManager {
      * @param term the term to transform.
      * @param tf a term factory.
      * @return the transformed term.
-     * @see #isProofRelevant()
+     * @see TermLabel#isProofRelevant()
      */
     public static Term removeIrrelevantLabels(Term term, TermFactory tf) {
         return tf.createTerm(term.op(),
@@ -2232,15 +2231,5 @@ public class TermLabelManager {
                     .collect(Collectors.toList())),
             term.boundVars(), term.javaBlock(), new ImmutableArray<>(term.getLabels().stream()
                     .filter(TermLabel::isProofRelevant).collect(Collectors.toList())));
-    }
-
-    /**
-     * Fully disable origin tracking. This will remove the {@link OriginTermLabelRefactoring} from
-     * the manager.
-     */
-    public void disableOriginLabelRefactorings() {
-        allRulesRefactorings = ImmutableList.fromList(
-            allRulesRefactorings.stream().filter(x -> !(x instanceof OriginTermLabelRefactoring))
-                    .collect(Collectors.toList()));
     }
 }
