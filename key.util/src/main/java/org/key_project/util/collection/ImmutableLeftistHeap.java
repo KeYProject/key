@@ -333,7 +333,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 
 
     public String toString() {
-        return Strings.formatAsList(iterator(), "[", ",", "]");
+        return Strings.formatAsList(this, "[", ",", "]");
     }
 
 

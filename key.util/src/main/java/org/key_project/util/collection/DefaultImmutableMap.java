@@ -224,7 +224,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
     }
 
     public String toString() {
-        return Strings.formatAsList(iterator(), "[", ",", "]");
+        return Strings.formatAsList(this, "[", ",", "]");
     }
 
     @SuppressWarnings("unchecked")

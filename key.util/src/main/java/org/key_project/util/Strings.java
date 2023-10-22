@@ -4,10 +4,11 @@
 package org.key_project.util;
 
 
-import java.util.Iterator;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Helper functions for {@link String}s
@@ -61,51 +62,6 @@ public class Strings {
      * outputs the collection represented by the iterator in the format
      * <code> open element1 sep element2 sep element3 close</code>
      *
-     * @param it the Iterator over the collection to be printed
-     * @param open the String used to open the list
-     * @param sep the String separating the different elements
-     * @param close the String used to close the list
-     * @param mapper a Function that maps the elements of type S to their String representation
-     * @return the CharSequence in the described format
-     * @param <S> the type of the elements of the iterated collection
-     */
-    public static <S, T> String formatAsList(Iterator<S> it,
-            CharSequence open, CharSequence sep, CharSequence close,
-            Function<S, T> mapper) {
-        final StringBuilder str = new StringBuilder();
-        str.append(open);
-        var hasNext = it.hasNext();
-        while (hasNext) {
-            str.append(mapper.apply(it.next()));
-            hasNext = it.hasNext();
-            if (hasNext) {
-                str.append(sep);
-            }
-        }
-        str.append(close);
-        return str.toString();
-    }
-
-    /**
-     * outputs the collection represented by the iterator in the format
-     * <code> open element1 sep element2 sep element3 close</code>
-     *
-     * @param it the Iterator over the collection to be printed
-     * @param open the String used to open the list
-     * @param sep the String separating the different elements
-     * @param close the String used to close the list
-     * @return the CharSequence in the described format
-     * @param <S> the type of the elements of the iterated collection
-     */
-    public static <S> String formatAsList(Iterator<S> it,
-            CharSequence open, CharSequence sep, CharSequence close) {
-        return formatAsList(it, open, sep, close, Function.identity());
-    }
-
-    /**
-     * outputs the collection represented by the iterator in the format
-     * <code> open element1 sep element2 sep element3 close</code>
-     *
      * @param it the Iterable to be printed
      * @param open the String used to open the list
      * @param sep the String separating the different elements
@@ -117,7 +73,9 @@ public class Strings {
     public static <S, T> String formatAsList(Iterable<S> it,
             CharSequence open, CharSequence sep, CharSequence close,
             Function<S, T> mapper) {
-        return formatAsList(it.iterator(), open, sep, close, mapper);
+        return StreamSupport.stream(it.spliterator(), false)
+                .map(a -> mapper.apply(a).toString())
+                .collect(Collectors.joining(sep, open, close));
     }
 
     /**
