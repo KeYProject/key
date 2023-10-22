@@ -1444,51 +1444,6 @@ public class TermLabelManager {
         }
 
         /**
-         * Returns the {@link TermLabelRefactoring} for {@link RefactoringScope#SEQUENT}.
-         *
-         * @return The {@link TermLabelRefactoring} for {@link RefactoringScope#SEQUENT}.
-         */
-        public Set<TermLabelRefactoring> sequentRefactorings() {
-            return Collections.unmodifiableSet(sequentRefactorings);
-        }
-
-        /**
-         * Returns the {@link TermLabelRefactoring} for
-         * {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE}.
-         *
-         * @return The {@link TermLabelRefactoring} for
-         * {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE}.
-         */
-        @Override
-        public Set<TermLabelRefactoring> childAndGrandchildRefactorings() {
-            return Collections.unmodifiableSet(childAndGrandchildRefactorings);
-        }
-
-        /**
-         * Returns the {@link TermLabelRefactoring} for
-         * {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS}.
-         *
-         * @return The {@link TermLabelRefactoring} for
-         * {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS}.
-         */
-        @Override
-        public Set<TermLabelRefactoring> childAndGrandchildRefactoringsAndParents() {
-            return Collections.unmodifiableSet(childAndGrandchildRefactoringsAndParents);
-        }
-
-        /**
-         * Returns the {@link TermLabelRefactoring} for
-         * {@link RefactoringScope#APPLICATION_DIRECT_CHILDREN}.
-         *
-         * @return The {@link TermLabelRefactoring} for
-         * {@link RefactoringScope#APPLICATION_DIRECT_CHILDREN}.
-         */
-        @Override
-        public Set<TermLabelRefactoring> directChildRefactorings() {
-            return Collections.unmodifiableSet(directChildRefactorings);
-        }
-
-        /**
          * Returns all {@link TermLabelRefactoring}s which operate on application child and grand
          * children, which are {@link #childAndGrandchildRefactorings ()} and
          * {@link #childAndGrandchildRefactoringsAndParents ()}.
@@ -1499,18 +1454,6 @@ public class TermLabelManager {
             final LinkedHashSet result = new LinkedHashSet<>(childAndGrandchildRefactoringsAndParents);
             result.addAll(childAndGrandchildRefactoringsAndParents);
             return result;
-        }
-
-        /**
-         * Returns the {@link TermLabelRefactoring} for
-         * {@link RefactoringScope#APPLICATION_BELOW_UPDATES}.
-         *
-         * @return The {@link TermLabelRefactoring} for
-         * {@link RefactoringScope#APPLICATION_BELOW_UPDATES}.
-         */
-        @Override
-        public Set<TermLabelRefactoring> belowUpdatesRefactorings() {
-            return belowUpdatesRefactorings;
         }
     }
 
