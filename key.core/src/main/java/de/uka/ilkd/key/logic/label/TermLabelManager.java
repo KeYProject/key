@@ -393,7 +393,7 @@ public class TermLabelManager {
      * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
      * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
-     *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
+     *        the new {@link Term} for the new proof node or {@code null} in case of built-in rules.
      * @param newTerm The new {@link Term} to update its labels.
      * @return The {@link Term} with updates labels.
      */
@@ -425,7 +425,7 @@ public class TermLabelManager {
      * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
      * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
-     *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
+     *        the new {@link Term} for the new proof node or {@code null} in case of built-in rules.
      * @param newTerm The new {@link Term} to update its labels.
      * @return The {@link Term} with updates labels.
      */
@@ -460,7 +460,7 @@ public class TermLabelManager {
      * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
      * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
-     *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
+     *        the new {@link Term} for the new proof node or {@code null} in case of built-in rules.
      * @param newTerm The new {@link Term} to update its labels.
      * @return The {@link Term} with updates labels.
      */
@@ -680,7 +680,7 @@ public class TermLabelManager {
      * </p>
      *
      * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
-     *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
+     *        the new {@link Term} for the new proof node or {@code null} in case of built-in rules.
      * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
      */
     protected void performTacletTerm(Term tacletTerm, Set<TermLabel> newLabels) {
@@ -1508,7 +1508,7 @@ public class TermLabelManager {
 
 
     /**
-     * Do below updates refactoring if required.
+     * Perform below-updates refactoring if required.
      *
      * @param state The {@link TermLabelState} of the current rule application.
      * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
@@ -1541,7 +1541,8 @@ public class TermLabelManager {
                 Term newModality = tf.createTerm(pair.second.op(), pair.second.subs(),
                     pair.second.boundVars(), pair.second.javaBlock(), newLabels);
                 newApplicationTerm =
-                    services.getTermBuilder().applyParallel(pair.first, newModality,  newApplicationTerm.getLabels());
+                    services.getTermBuilder().applyParallel(pair.first, newModality,
+                        newApplicationTerm.getLabels());
             }
         }
         return newApplicationTerm;
@@ -1624,7 +1625,7 @@ public class TermLabelManager {
             // Do direct child refactoring if required
             newApplicationTerm = refactorChildTerms(state, services, applicationPosInOccurrence,
                 applicationTerm, rule, goal, hint, tacletTerm, refactorings, tf);
-            // Do below updates refactoring
+            // Perform below-updates refactoring
             newApplicationTerm =
                 refactorBelowUpdates(state, services, applicationPosInOccurrence, applicationTerm,
                     rule, goal, hint, tacletTerm, refactorings, tf, newApplicationTerm);
@@ -1663,8 +1664,10 @@ public class TermLabelManager {
             Set<TermLabelRefactoring> activeRefactorings) {
         if (!activeRefactorings.isEmpty()) {
             for (SequentFormula sfa : semisequent) {
-                Term updatedTerm = refactorLabelsRecursive(state, services, applicationPosInOccurrence,
-                        applicationTerm, rule, goal, hint, tacletTerm, sfa.formula(), activeRefactorings);
+                Term updatedTerm =
+                    refactorLabelsRecursive(state, services, applicationPosInOccurrence,
+                        applicationTerm, rule, goal, hint, tacletTerm, sfa.formula(),
+                        activeRefactorings);
                 if (!sfa.formula().equals(updatedTerm)) {
                     goal.changeFormula(new SequentFormula(updatedTerm),
                             new PosInOccurrence(sfa, PosInTerm.getTopLevel(), inAntec));
