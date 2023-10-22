@@ -78,38 +78,21 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
         TermLabelSettings settings =
             ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings();
 
-        if (!settings.getUseOriginLabels()) {
-            Object[] options = { "Reload", "Continue without reloading", "Cancel" };
+        Object[] options = { "Reload", "Continue without reloading", "Cancel" };
 
-            int selection = JOptionPane.showOptionDialog(mainWindow,
-                "Origin information will be added to all newly loaded proofs.\n"
-                    + "To see origin information in your current proof, "
-                    + "you need to reload it.",
-                "Origin", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
-                options, options[2]);
+        int selection = JOptionPane.showOptionDialog(mainWindow,
+            "For the change to take effect, you need to reload the proof.",
+            "Origin", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
+            options, options[2]);
 
-            switch (selection) {
-            case 0:
-                QuickSaveAction.quickSave(mainWindow);
-                QuickLoadAction.quickLoad(mainWindow);
-                // fallthrough
-            case 1:
-                settings.setUseOriginLabels(!settings.getUseOriginLabels());
-                handleAction();
-            }
-        } else {
-            Object[] options = { "Remove", "Cancel" };
-
-            int selection = JOptionPane.showOptionDialog(mainWindow,
-                "All origin information will be removed from "
-                    + "every open goal and every proof obligation.",
-                "Origin", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
-                options, options[1]);
-
-            if (selection == 0) {
-                settings.setUseOriginLabels(!settings.getUseOriginLabels());
-                handleAction();
-            }
+        switch (selection) {
+        case 0:
+            QuickSaveAction.quickSave(mainWindow);
+            QuickLoadAction.quickLoad(mainWindow);
+            // fallthrough
+        case 1:
+            settings.setUseOriginLabels(!settings.getUseOriginLabels());
+            handleAction();
         }
 
         setSelected(

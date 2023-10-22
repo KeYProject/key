@@ -573,9 +573,10 @@ public final class ProblemInitializer {
 
             // TODO: Why: ProofIndependentSetting and ProofSettings do not agree on termlabels
             initConfig.getServices().setOriginFactory(
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels()
-                        ? new OriginTermLabelFactory()
-                        : null);
+                ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                        .getUseOriginLabels()
+                                ? new OriginTermLabelFactory()
+                                : null);
 
             // read problem
             reportStatus("Loading problem \"" + po.name() + "\"");
