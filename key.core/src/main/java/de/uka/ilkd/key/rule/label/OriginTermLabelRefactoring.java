@@ -4,13 +4,13 @@
 package de.uka.ilkd.key.rule.label;
 
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.LabelCollection;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
@@ -56,8 +56,8 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
     @Override
     public void refactorLabels(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-            Object hint, Term tacletTerm, Term term, List<TermLabel> labels) {
+                               PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+                               Object hint, Term tacletTerm, Term term, LabelCollection labels) {
         if (services.getProof() == null) {
             return;
         }
@@ -71,14 +71,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             return;
         }
 
-        OriginTermLabel oldLabel = null;
-
-        for (TermLabel label : labels) {
-            if (label instanceof OriginTermLabel) {
-                oldLabel = (OriginTermLabel) label;
-                break;
-            }
-        }
+        final OriginTermLabel oldLabel = labels.getFirst(OriginTermLabel.class);
 
         if (services.getTermBuilder().getOriginFactory() == null) {
             if (oldLabel != null) {

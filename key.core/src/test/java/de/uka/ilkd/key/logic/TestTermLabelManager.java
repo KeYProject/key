@@ -722,19 +722,19 @@ public class TestTermLabelManager {
 
         @Override
         public void refactorLabels(TermLabelState state, Services services,
-                PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule,
-                Goal goal, Object hint, Term tacletTerm, Term term, List<TermLabel> labels) {
+                                   PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule,
+                                   Goal goal, Object hint, Term tacletTerm, Term term, LabelCollection labels) {
             List<TermLabel> changedLabels = new LinkedList<>();
-            for (TermLabel label : labels) {
+            boolean changed = labels.hasChanged();
+            for (TermLabel label : labels.getLabels()) {
                 if (label.name().toString().endsWith("-CHANGED")) {
                     changedLabels.add(label);
                 } else {
-                    changedLabels.add(
+                    changed |= changedLabels.add(
                         new ParameterlessTermLabel(new Name(label.name().toString() + "-CHANGED")));
                 }
             }
-            labels.clear();
-            labels.addAll(changedLabels);
+            labels.replaceWith(changedLabels, changed);
         }
 
     }

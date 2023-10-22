@@ -1066,6 +1066,10 @@ public class TermBuilder {
         return apply(parallel(updates), target, null);
     }
 
+    public Term applyParallel(ImmutableList<Term> updates, Term target, ImmutableArray<TermLabel> labels) {
+        return apply(parallel(updates), target, labels);
+    }
+
     public Term applyParallel(Term[] lhss, Term[] values, Term target) {
         return apply(parallel(lhss, values), target, null);
     }

@@ -8,6 +8,7 @@ import java.util.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
+import de.uka.ilkd.key.logic.label.LabelCollection;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
@@ -38,7 +39,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * Key used in {@link TermLabelState} by the {@link StayOnOperatorTermLabelPolicy} to indicate
      * that a refactoring below an update ({@link RefactoringScope#APPLICATION_BELOW_UPDATES}) is
      * required, which will be performed by
-     * {@link #refactorBelowUpdates(PosInOccurrence, Term, List)}.
+     * {@link #refactorBelowUpdates(PosInOccurrence, Term, LabelCollection)}.
      * <p>
      * This is for instance required for the following rules:
      * <ul>
@@ -69,7 +70,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * refactoring of parents
      * ({@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS}) is
      * required, which will be performed by
-     * {@link #refactorInCaseOfNewIdRequired(TermLabelState, Goal, Term, Services, List)}.
+     * {@link #refactorInCaseOfNewIdRequired(TermLabelState, Goal, Term, Services, LabelCollection)}.
      * <p>
      * This is for instance required if a rule is applied on a sub term without a
      * {@link FormulaTermLabel} of a parent which has a {@link FormulaTermLabel}. Example rules are:
@@ -84,7 +85,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * Key used in {@link TermLabelState} by the {@link FormulaTermLabelUpdate} to indicate that a
      * refactoring of specified {@link SequentFormula}s ({@link RefactoringScope#SEQUENT}) is
      * required, which will be performed by
-     * {@link #refactorSequentFormulas(TermLabelState, Services, Term, List)}.
+     * {@link #refactorSequentFormulas(TermLabelState, Services, Term, LabelCollection)}.
      * <p>
      * This is for instance required if the assumes clause of a rule has a {@link FormulaTermLabel}
      * but the application does not have it. Example rules are:
@@ -142,8 +143,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      */
     @Override
     public void refactorLabels(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-            Object hint, Term tacletTerm, Term term, List<TermLabel> labels) {
+                               PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+                               Object hint, Term tacletTerm, Term term, LabelCollection labels) {
         if (shouldRefactorSpecificationApplication(rule, goal, hint)) {
             refactorSpecificationApplication(term, services, labels, hint);
         } else if (isParentRefactoringRequired(state)) {
@@ -166,7 +167,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
     private void refactorSpecificationApplication(Term term, Services services,
-            List<TermLabel> labels, Object hint) {
+                                                  LabelCollection labels, Object hint) {
         if (TruthValueTracingUtil.isPredicate(term)
                 || (CloseAfterMerge.FINAL_WEAKENING_TERM_HINT.equals(hint)
                         && TruthValueTracingUtil.isLogicOperator(term))) {
@@ -191,7 +192,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
     private void refactorInCaseOfNewIdRequired(TermLabelState state, Goal goal, Term term,
-            Services services, List<TermLabel> labels) {
+            Services services, LabelCollection labels) {
         if (goal != null && !isInnerMostParentRefactored(state, goal)) {
             TermLabel existingLabel = term.getLabel(FormulaTermLabel.NAME);
             if (existingLabel instanceof FormulaTermLabel pLabel) {
@@ -214,7 +215,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
     private void refactorBelowUpdates(PosInOccurrence applicationPosInOccurrence, Term term,
-            List<TermLabel> labels) {
+                                      LabelCollection labels) {
         Term applicationTerm =
             applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
         FormulaTermLabel applicationLabel = applicationTerm != null
@@ -245,7 +246,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
     private void refactorSequentFormulas(TermLabelState state, Services services, final Term term,
-            List<TermLabel> labels) {
+                                         LabelCollection labels) {
         Set<SequentFormula> sequentFormulas = getSequentFormulasToRefactor(state);
         if (CollectionUtil.search(sequentFormulas, element -> element.formula() == term) != null) {
             FormulaTermLabel termLabel = (FormulaTermLabel) term.getLabel(FormulaTermLabel.NAME);
@@ -267,7 +268,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      *        the other {@link Term}.
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
-    private void refactorSubstitution(Term term, Term tacletTerm, List<TermLabel> labels) {
+    private void refactorSubstitution(Term term, Term tacletTerm, LabelCollection labels) {
         FormulaTermLabel tacletLabel =
             (FormulaTermLabel) tacletTerm.getLabel(FormulaTermLabel.NAME);
         if (tacletLabel != null) {

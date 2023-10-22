@@ -1542,14 +1542,18 @@ public class TermLabelManager {
             boolean changed = false;
             Term[] newSubs = new Term[newApplicationTerm.arity()];
             for (int i = 0; i < newSubs.length; i++) {
-                Term sub = newApplicationTerm.sub(i);
+                final Term sub = newApplicationTerm.sub(i);
                 ImmutableArray<TermLabel> newLabels = performRefactoring(state, services,
                     applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, sub,
                     refactorings.directChildRefactorings());
-                newSubs[i] = tf.createTerm(sub.op(), sub.subs(), sub.boundVars(), sub.javaBlock(),
-                    newLabels);
-                if (!newSubs[i].equals(sub)) {
+
+                if (newLabels != sub.getLabels()) {
+                    newSubs[i] = tf.createTerm(sub.op(), sub.subs(), sub.boundVars(), sub.javaBlock(),
+                            newLabels);
                     changed = true;
+                } else {
+                    System.out.println("HAHAHAHA");
+                    newSubs[i] = sub;
                 }
             }
             newApplicationTerm = changed ? tf.createTerm(newApplicationTerm.op(), newSubs,
@@ -1590,16 +1594,11 @@ public class TermLabelManager {
             ImmutableArray<TermLabel> newLabels = performRefactoring(state, services,
                 applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm,
                 pair.second, refactorings.belowUpdatesRefactorings());
-            if (!newLabels.equals(pair.second.getLabels())) {
+            if (newLabels != pair.second.getLabels()) {
                 Term newModality = tf.createTerm(pair.second.op(), pair.second.subs(),
                     pair.second.boundVars(), pair.second.javaBlock(), newLabels);
-                ImmutableArray<TermLabel> applicationLabels = newApplicationTerm.getLabels();
                 newApplicationTerm =
-                    services.getTermBuilder().applyParallel(pair.first, newModality);
-                if (!applicationLabels.isEmpty()) {
-                    newApplicationTerm =
-                        services.getTermBuilder().addLabel(newApplicationTerm, applicationLabels);
-                }
+                    services.getTermBuilder().applyParallel(pair.first, newModality,  newApplicationTerm.getLabels());
             }
         }
         return newApplicationTerm;
@@ -1763,7 +1762,7 @@ public class TermLabelManager {
         ImmutableArray<TermLabel> newLabels =
             performRefactoring(state, services, applicationPosInOccurrence, applicationTerm, rule,
                 goal, hint, tacletTerm, term, activeRefactorings);
-        return subsChanged || !newLabels.equals(term.getLabels()) ? services.getTermFactory()
+        return subsChanged || newLabels != term.getLabels() ? services.getTermFactory()
                 .createTerm(term.op(), newSubs, term.boundVars(), term.javaBlock(), newLabels)
                 : term;
     }
@@ -1792,17 +1791,18 @@ public class TermLabelManager {
             Object hint, Term tacletTerm, Term term,
             Set<TermLabelRefactoring> activeRefactorings) {
         // Create list with all old labels
-        List<TermLabel> newLabels = new LinkedList<>();
-        for (TermLabel oldLabel : term.getLabels()) {
-            newLabels.add(oldLabel);
-        }
+        LabelCollection newLabels = new LabelCollection(term.getLabels());
         // Give all TermLabelInstantiator instances the chance to remove or to
         // add labels from/to the list
         for (TermLabelRefactoring refactoring : activeRefactorings) {
             refactoring.refactorLabels(state, services, applicationPosInOccurrence, applicationTerm,
                 rule, goal, hint, tacletTerm, term, newLabels);
         }
-        return new ImmutableArray<>(newLabels);
+        if (newLabels.hasChanged()) {
+            return new ImmutableArray<>(newLabels.getLabels());
+        } else {
+            return term.getLabels();
+        }
     }
 
     /**
