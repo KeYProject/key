@@ -44,7 +44,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofJavaSourceCollection;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
@@ -59,14 +58,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * <p>
  * This class is responsible for showing the source code and visualizing the symbolic execution path
  * of the currently selected node. This is done by adding tabs containing the source code and
  * highlighting the lines which were symbolically executed in the path from the root node down to
  * the current node. In addition, by clicking on such a highlighted line the user can jump to the
  * first node in the proof tree where a statement from this line is symbolically executed.
- *
+ * </p>
+ * <p>
  * Editing the source code in the tabs is currently not implemented (not supported by
  * {@link JavaDocument}).
+ * </p>
  *
  * @author Wolfram Pfeifer, lanzinger
  */
@@ -437,11 +439,16 @@ public final class SourceView extends JComponent {
     public void openFiles(Iterable<URI> fileURIs) throws IOException {
         boolean updateNecessary = false;
 
+        final Proof selectedProof = mainWindow.getMediator().getSelectedProof();
+        final ProofJavaSourceCollection sources =
+            selectedProof != null ? selectedProof.lookup(ProofJavaSourceCollection.class) : null;
+
         for (URI fileURI : fileURIs) {
             if (addFile(fileURI)) {
                 updateNecessary = true;
-                mainWindow.getMediator().getSelectedProof().lookup(ProofJavaSourceCollection.class)
-                        .addRelevantFile(fileURI);
+                if (sources != null) {
+                    sources.addRelevantFile(fileURI);
+                }
             }
         }
 
@@ -511,7 +518,7 @@ public final class SourceView extends JComponent {
      */
     private boolean isHighlighted(Point point) {
         Tab tab = tabs.get(selectedFile);
-        int pos = tab.textPane.viewToModel(point);
+        int pos = tab.textPane.viewToModel2D(point);
         int line = tab.posToLine(pos);
 
         for (Highlight h : symbExHighlights) {
@@ -531,18 +538,21 @@ public final class SourceView extends JComponent {
 
     /**
      * Adds all files relevant to the currently selected node, closing all others
-     *
-     * @see NodeInfo#getRelevantFiles()
      */
     private void addFiles() {
-        ImmutableSet<URI> fileURIs = mainWindow.getMediator().getSelectedProof()
-                .lookup(ProofJavaSourceCollection.class).getRelevantFiles();
+        final Proof selectedProof = mainWindow.getMediator().getSelectedProof();
+        final ProofJavaSourceCollection sources =
+            selectedProof == null ? null : selectedProof.lookup(ProofJavaSourceCollection.class);
 
-        Iterator<URI> it = tabs.keySet().iterator();
+        if (sources == null) {
+            return;
+        }
 
+        final ImmutableSet<URI> fileURIs = sources.getRelevantFiles();
+
+        final Iterator<URI> it = tabs.keySet().iterator();
         while (it.hasNext()) {
-            URI fileURI = it.next();
-
+            final URI fileURI = it.next();
             if (!fileURIs.contains(fileURI)) {
                 Tab tab = tabs.get(fileURI);
                 it.remove();
@@ -567,14 +577,13 @@ public final class SourceView extends JComponent {
      * @throws IOException if the file cannot be opened.
      */
     private boolean addFile(URI fileURI) throws IOException {
+        final Proof proof = mainWindow.getMediator().getSelectedProof();
         // quick fix: fileName could be null (see bug #1520)
-        if (fileURI == null || tabs.containsKey(fileURI)) {
+        if (proof == null || fileURI == null || tabs.containsKey(fileURI)) {
             return false;
         } else {
             // try to load the file via the FileRepo
-            Proof proof = mainWindow.getMediator().getSelectedProof();
             FileRepo repo = proof.getInitConfig().getFileRepo();
-
             try (InputStream is = repo.getInputStream(fileURI.toURL())) {
                 if (is != null) {
                     Tab tab = new Tab(fileURI, is);
@@ -1133,7 +1142,7 @@ public final class SourceView extends JComponent {
          */
         private void paintSelectionHighlight(Point p, Highlight highlight) {
             try {
-                int line = posToLine(textPane.viewToModel(p));
+                int line = posToLine(textPane.viewToModel2D(p));
                 changeHighlight(highlight, line);
             } catch (BadLocationException e) {
                 LOGGER.debug("Caught exception!", e);
@@ -1355,7 +1364,7 @@ public final class SourceView extends JComponent {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            int pos = textPane.viewToModel(e.getPoint());
+            final int pos = textPane.viewToModel2D(e.getPoint());
             if (isHighlighted(e.getPoint())) {
                 int line = 0;
                 // calculate the line number
