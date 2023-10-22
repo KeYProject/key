@@ -243,6 +243,7 @@ public class Services implements TermServices {
         s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
         s.setJavaModel(getJavaModel());
+        s.originFactory = originFactory;
         return s;
     }
 
@@ -282,6 +283,7 @@ public class Services implements TermServices {
         s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
         s.setJavaModel(getJavaModel());
+        s.originFactory = originFactory;
         return s;
     }
 

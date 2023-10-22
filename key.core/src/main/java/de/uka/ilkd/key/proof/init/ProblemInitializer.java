@@ -34,6 +34,7 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.Debug;
@@ -572,7 +573,7 @@ public final class ProblemInitializer {
 
             // TODO: Why: ProofIndependentSetting and ProofSettings do not agree on termlabels
             initConfig.getServices().setOriginFactory(
-                initConfig.getSettings().getTermLabelSettings().getUseOriginLabels()
+                    ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels()
                         ? new OriginTermLabelFactory()
                         : null);
 
