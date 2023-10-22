@@ -1718,11 +1718,15 @@ public class TermLabelManager {
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Semisequent semisequent, boolean inAntec,
             Set<TermLabelRefactoring> activeRefactorings) {
-        for (SequentFormula sfa : semisequent) {
-            Term updatedTerm = refactorLabelsRecursive(state, services, applicationPosInOccurrence,
-                applicationTerm, rule, goal, hint, tacletTerm, sfa.formula(), activeRefactorings);
-            goal.changeFormula(new SequentFormula(updatedTerm),
-                new PosInOccurrence(sfa, PosInTerm.getTopLevel(), inAntec));
+        if (!activeRefactorings.isEmpty()) {
+            for (SequentFormula sfa : semisequent) {
+                Term updatedTerm = refactorLabelsRecursive(state, services, applicationPosInOccurrence,
+                        applicationTerm, rule, goal, hint, tacletTerm, sfa.formula(), activeRefactorings);
+                if (!sfa.formula().equals(updatedTerm)) {
+                    goal.changeFormula(new SequentFormula(updatedTerm),
+                            new PosInOccurrence(sfa, PosInTerm.getTopLevel(), inAntec));
+                }
+            }
         }
     }
 
