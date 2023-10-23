@@ -291,10 +291,12 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * See {@link DotExporter}.
      *
      * @param abbreviateFormulas whether to shorten formula labels
+     * @param abbreviateChains whether to reduce long chains to one link
      * @return DOT string
      */
-    public String exportDot(boolean abbreviateFormulas) {
-        return DotExporter.exportDot(proof, graph, analysisResults, abbreviateFormulas);
+    public String exportDot(boolean abbreviateFormulas, boolean abbreviateChains) {
+        return DotExporter.exportDot(proof, abbreviateChains ? graph.removeChains() : graph,
+            analysisResults, abbreviateFormulas);
     }
 
     /**

@@ -5,6 +5,7 @@ package org.key_project.slicing.graph;
 
 import java.util.*;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.BranchLocation;
@@ -39,13 +40,22 @@ public class DependencyGraph {
     /**
      * Main storage container of graph nodes and edges.
      */
-    private final EquivalenceDirectedGraph graph = new EquivalenceDirectedGraph();
+    private final EquivalenceDirectedGraph graph;
     /**
      * Mapping of rule applications to graph edges.
      * Stores the edges introduced by a proof step.
      */
     private final Map<Node, Collection<AnnotatedEdge>> edgeDataReversed = new IdentityHashMap<>();
 
+    public DependencyGraph() {
+        graph = new EquivalenceDirectedGraph();
+    }
+
+    private DependencyGraph(DependencyGraph copyFrom) {
+        graph = copyFrom.graph.copy();
+        graph.edgeSet().forEach(x -> edgeDataReversed
+                .computeIfAbsent(x.getProofStep(), _node -> new ArrayList<>()).add(x));
+    }
 
     /**
      * Add a rule application to the dependency graph.
@@ -200,7 +210,7 @@ public class DependencyGraph {
      * @return the edges representing this step
      */
     public Collection<AnnotatedEdge> edgesOf(Node proofStep) {
-        return edgeDataReversed.get(proofStep);
+        return edgeDataReversed.getOrDefault(proofStep, Collections.emptyList());
     }
 
     /**
@@ -331,5 +341,59 @@ public class DependencyGraph {
             locationGuess = locationGuess.removeLast();
         }
         return null;
+    }
+
+    /**
+     * Remove all nodes B with degree 2:
+     * A → B → C
+     *
+     * @return modified copy
+     */
+    public DependencyGraph removeChains() {
+        var nGraph = new DependencyGraph(this);
+        var allNodes = proof().root().subtreeIterator();
+        var toCheck = StreamSupport.stream(Spliterators.spliteratorUnknownSize(allNodes, 0), false)
+                .flatMap(this::outputsOf).toList();
+        int removed = 0;
+        for (var node : toCheck) {
+            var incoming = nGraph.incomingGraphEdgesOf(node).toList();
+            var outgoing = nGraph.outgoingGraphEdgesOf(node).toList();
+            if (incoming.size() != 1 || outgoing.size() != 1) {
+                continue;
+            }
+            // rewrite edge
+            var node1 = incoming.get(0).first;
+            if (edgesOf(node1).size() != 1) {
+                continue;
+            }
+            GraphNode startGraphNode = incoming.get(0).second;
+            AnnotatedEdge edge = incoming.get(0).third;
+
+            Node endNode = outgoing.get(0).first;
+            GraphNode endGraphNode = outgoing.get(0).second;
+            var edge2 = outgoing.get(0).third;
+            if (edgesOf(endNode).size() != 1) {
+                continue;
+            }
+
+            nGraph.graph.removeVertex(node);
+            var edge3 = new AnnotatedEdge(endNode, edge.replacesInputNode());
+            nGraph.graph.addEdge(startGraphNode, endGraphNode, edge3);
+            nGraph.edgeDataReversed.remove(node1);
+            nGraph.edgeDataReversed.get(endNode).remove(edge2);
+            nGraph.edgeDataReversed.get(endNode).add(edge3);
+            removed++;
+        }
+        LOGGER.debug("removeChains: {} nodes deleted", removed);
+        return nGraph;
+    }
+
+    /**
+     * The proof associated with this graph. May be null if the graph is empty.
+     *
+     * @return the proof
+     */
+    public Proof proof() {
+        return this.edgeDataReversed.keySet().stream().map(Node::proof).findFirst().orElse(null);
     }
 }
