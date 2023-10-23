@@ -61,7 +61,7 @@ public class TacletAppIndex {
     /**
      * The sequent with the formulas for which taclet indices are hold by this object. Invariant:
      * <code>seq != null</code> implies that the indices <code>antecIndex</code>,
-     * <code>succIndex</code> are up to date for the sequent <code>seq</code>
+     * <code>succIndex</code> are up-to-date for the sequent <code>seq</code>
      */
     private Sequent seq;
 
@@ -74,7 +74,11 @@ public class TacletAppIndex {
     }
 
     private TacletAppIndex(TacletIndex tacletIndex, SemisequentTacletAppIndex antecIndex,
+<<<<<<< HEAD
             SemisequentTacletAppIndex succIndex, @NonNull Goal goal, Sequent seq,
+=======
+            SemisequentTacletAppIndex succIndex, @Nonnull Goal goal, Sequent seq,
+>>>>>>> 64e3d0a7e3 (Revert "TacletAppIndex lazy delta updates")
             RuleFilter ruleFilter,
             TermTacletAppIndexCacheSet indexCaches, Map<CacheKey, TermTacletAppIndex> cache) {
         this.tacletIndex = tacletIndex;

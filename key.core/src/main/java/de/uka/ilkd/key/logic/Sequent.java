@@ -280,7 +280,6 @@ public class Sequent implements Iterable<SequentFormula> {
         if (!(o instanceof Sequent o1)) {
             return false;
         }
-
         return antecedent.equals(o1.antecedent) && succedent.equals(o1.succedent);
     }
 
