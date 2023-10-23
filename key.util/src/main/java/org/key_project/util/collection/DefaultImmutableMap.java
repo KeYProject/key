@@ -5,6 +5,8 @@ package org.key_project.util.collection;
 
 import java.util.Iterator;
 
+import org.key_project.util.Strings;
+
 /**
  * This class implements ImmMap<S,T> and provides a persistent Map. It is a simple implementation
  * like lists
@@ -222,16 +224,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
     }
 
     public String toString() {
-        final StringBuilder sb = new StringBuilder("[");
-        final Iterator<ImmutableMapEntry<S, T>> it = iterator();
-        while (it.hasNext()) {
-            sb.append(it.next());
-            if (it.hasNext()) {
-                sb.append(",");
-            }
-        }
-        sb.append("]");
-        return sb.toString();
+        return Strings.formatAsList(this, "[", ",", "]");
     }
 
     @SuppressWarnings("unchecked")
