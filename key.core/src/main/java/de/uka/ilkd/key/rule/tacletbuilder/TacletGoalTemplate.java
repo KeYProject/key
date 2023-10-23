@@ -31,6 +31,7 @@ public class TacletGoalTemplate {
     private ImmutableSet<SchemaVariable> addedProgVars = DefaultImmutableSet.nil();
 
     private String name = null;
+    private String tag = null;
 
 
     /**
@@ -126,11 +127,18 @@ public class TacletGoalTemplate {
         name = s;
     }
 
+    public void setTag(String s) {
+        tag = s;
+    }
+
 
     public String name() {
         return name;
     }
 
+    public String getTag() {
+        return tag;
+    }
 
     @Override
     public boolean equals(Object o) {

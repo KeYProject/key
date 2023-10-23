@@ -4,10 +4,12 @@
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.List;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.rule.Taclet;
 
 /**
  * Branch node indicating the start of a new proof branch.
@@ -64,8 +66,11 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
             if (nextN.size() > 1) {
                 // linearized mode: the main branch will be continued without a new BranchNode
                 if (getProofTreeModel().linearizedModeActive()
-                        && nextN.get(0).getNodeInfo().getBranchLabel() != null
-                        && nextN.get(0).getNodeInfo().getBranchLabel().startsWith(MAIN_LABEL)) {
+                        && (nextN.get(0).getNodeInfo().getBranchLabel() != null
+                                && nextN.get(0).getNodeInfo().getBranchLabel()
+                                        .startsWith(MAIN_LABEL)
+                                || n.getAppliedRuleApp().rule() instanceof Taclet taclet && Objects
+                                        .equals(taclet.goalTemplates().last().getTag(), "main"))) {
                     n = nextN.get(0);
                     nextN.remove(0);
                     for (var node : nextN) {
@@ -125,8 +130,11 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
             }
             if (nextN.size() > 1) {
                 if (getProofTreeModel().linearizedModeActive()
-                        && nextN.get(0).getNodeInfo().getBranchLabel() != null
-                        && nextN.get(0).getNodeInfo().getBranchLabel().startsWith(MAIN_LABEL)) {
+                        && (nextN.get(0).getNodeInfo().getBranchLabel() != null
+                                && nextN.get(0).getNodeInfo().getBranchLabel()
+                                        .startsWith(MAIN_LABEL)
+                                || n.getAppliedRuleApp().rule() instanceof Taclet taclet && Objects
+                                        .equals(taclet.goalTemplates().last().getTag(), "main"))) {
                     n = nextN.get(0);
                     count += nextN.size() - 1;
                     continue;
