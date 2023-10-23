@@ -11,7 +11,7 @@ import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-
+import org.key_project.util.ExtList;
 
 
 public class FieldReference extends VariableReference
@@ -32,16 +32,6 @@ public class FieldReference extends VariableReference
             ReferencePrefix prefix) {
         super(pi, c, variable);
         this.prefix = constructPrefix(prefix, getProgramVariable());
-    }
-
-    public FieldReference(ExtList children, ReferencePrefix prefix) {
-        super(children);
-        final ProgramVariable pv = getProgramVariable();
-        if (prefix == null && !pv.isStatic() && pv.isMember()) {
-            return new ThisReference();
-        } else {
-            return prefix;
-        }
     }
 
     public FieldReference(ProgramVariable pv, ReferencePrefix prefix, PositionInfo pi) {
