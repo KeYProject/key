@@ -1,5 +1,14 @@
 package de.uka.ilkd.key.settings;
 
+import org.antlr.v4.runtime.CharStreams;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 class SettingsTest {
     enum ABC {
         A, B, C;
@@ -25,28 +34,34 @@ class SettingsTest {
             """;
 
     @Test
-    void read() {
+    void read() throws IOException {
         var input = CharStreams.fromString(ALL_DATA);
         var config = Configuration.load(input);
         assertEquals(1241, config.getInt("integer"));
-        assertEquals(145122343214L, config.getInt("long"));
-        assertEquals("this is a string", config.getInt("string"));
-        assertEquals("this is a multi\n            linestring\n              string", config.getInt("mlstring"));
+        assertEquals(145122343214L, config.getLong("long"));
+        assertEquals("this is a string", config.getString("string"));
+        assertEquals("this is a multi\n        linestring\n        string", config.getString("mlstring"));
         assertEquals(List.of("a", "b", "c"), config.getStringList("stringlist"));
         var s = config.getTable("subconfig");
-        assertNonNull(s);
+        assertNotNull(s);
         assertEquals("A", s.getString("a"));
         assertEquals("B", s.getString("b"));
         assertEquals("C", s.getString("c"));
-        assertEquals(false, config.getInt("booleans are important"));
+
+        assertEquals(ABC.A, s.getEnum("a", ABC.C));
+        assertEquals(ABC.B, s.getEnum("b", ABC.A));
+        assertEquals(ABC.C, s.getEnum("c", ABC.B));
+
+        assertFalse(config.getBool("booleans are important"));
     }
 
-    @Test void reread() {
+    @Test
+    void reread() throws IOException {
         var input = CharStreams.fromString(ALL_DATA);
         var config = Configuration.load(input);
 
         var out = new StringWriter();
-        config.save(out,"");
+        config.save(out, "");
         var input2 = CharStreams.fromString(out.toString());
         var config2 = Configuration.load(input2);
 

@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
+import de.uka.ilkd.key.settings.Configuration;
+import de.uka.ilkd.key.util.LinkedHashMap;
+
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-
-import de.uka.ilkd.key.settings.Configuration;
-import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
  * Translates the configuration grammar (something like JSON) into a {@link Configuration} object.
@@ -62,7 +62,12 @@ class ConfigurationBuilder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public Object visitCintd(KeYParser.CintdContext ctx) {
-        return Long.parseLong(ctx.getText(), 10);
+        final var text = ctx.getText();
+        if (text.endsWith("L") || text.endsWith("l")) {
+            return Long.parseLong(text.substring(0, text.length() - 1), 10);
+        } else {
+            return Long.parseLong(text, 10);
+        }
     }
 
     @Override

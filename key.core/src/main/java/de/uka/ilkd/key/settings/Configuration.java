@@ -144,7 +144,7 @@ public class Configuration {
      * @throw NullPointerException  if no such value entry exists 
      */
     public long getLong(String name) {
-        return get(name, Integer.class);
+        return get(name, Long.class);
     }
 
     /**
@@ -493,5 +493,17 @@ public class Configuration {
             out.format(" : ");
             return this;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Configuration that)) return false;
+        return Objects.equals(data, that.data);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(data);
     }
 }
