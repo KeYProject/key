@@ -4,8 +4,7 @@
 package de.uka.ilkd.key.gui.originlabels;
 
 import java.awt.event.ActionEvent;
-import javax.swing.Action;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
@@ -13,7 +12,6 @@ import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.actions.QuickLoadAction;
 import de.uka.ilkd.key.gui.actions.QuickSaveAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.TermLabelSettings;
 
@@ -23,8 +21,6 @@ import de.uka.ilkd.key.settings.TermLabelSettings;
  * @author lanzinger
  */
 public class ToggleTermOriginTrackingAction extends MainWindowAction {
-    private static final long serialVersionUID = -2092724865788720558L;
-
     /**
      * Create a new action.
      *
@@ -47,32 +43,6 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
         lookupAcceleratorKey();
     }
 
-    private void handleAction() {
-        Proof proof = mainWindow.getMediator().getSelectedProof();
-        TermLabelSettings settings =
-            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings();
-
-        /*
-         * if (proof != null) {
-         * Services services = proof.getServices();
-         *
-         * if (!settings.getUseOriginLabels()) {
-         * for (Proof p : services.getSpecificationRepository().getAllProofs()) {
-         * for (Goal g : p.openGoals()) {
-         * g.setSequent(OriginTermLabel.removeOriginLabels(g.sequent(), services));
-         * }
-         * }
-         *
-         * services.getSpecificationRepository()
-         * .map(term -> OriginTermLabel.removeOriginLabels(term, services), services);
-         * }
-         *
-         * mainWindow.getMediator().getSelectionModel().fireSelectedNodeChanged();
-         * }
-         */
-
-    }
-
     @Override
     public void actionPerformed(ActionEvent event) {
         TermLabelSettings settings =
@@ -85,15 +55,11 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
             "Origin", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
             options, options[2]);
 
-        switch (selection) {
-        case 0:
+        if (selection == JOptionPane.OK_OPTION) {
             QuickSaveAction.quickSave(mainWindow);
             QuickLoadAction.quickLoad(mainWindow);
-            // fallthrough
-        case 1:
-            settings.setUseOriginLabels(!settings.getUseOriginLabels());
-            handleAction();
         }
+        settings.setUseOriginLabels(!settings.getUseOriginLabels());
 
         setSelected(
             ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
