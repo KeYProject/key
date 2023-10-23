@@ -272,7 +272,7 @@ public class ProofCollectionSettings implements Serializable {
      */
     public boolean reloadEnabled() {
         String reloadEnabled = get(RELOAD_ENABLED);
-        if (reloadEnabled == null || reloadEnabled.equals("true") || reloadEnabled.equals("")) {
+        if (reloadEnabled == null || reloadEnabled.equals("true") || reloadEnabled.isEmpty()) {
             return true;
         } else if (reloadEnabled.equals("false")) {
             return false;

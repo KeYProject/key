@@ -333,8 +333,6 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                 neededInstances = neededInstances.add(gsc, services);
             }
 
-            tacletToAdd.setAddedBy(goal.node().parent());
-
             goal.addTaclet(tacletToAdd, neededInstances, true);
         }
     }

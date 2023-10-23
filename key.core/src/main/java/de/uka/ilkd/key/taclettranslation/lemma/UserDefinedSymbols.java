@@ -122,7 +122,8 @@ public class UserDefinedSymbols {
         Set<Sort> result = new HashSet<>();
         for (Sort sort : usedExtraSorts) {
             if (sort instanceof GenericSort genSort) {
-                ProxySort proxySort = new ProxySort(genSort.name(), genSort.extendsSorts());
+                ProxySort proxySort = new ProxySort(genSort.name(), genSort.extendsSorts(),
+                    "", "");
                 result.add(proxySort);
             } else {
                 result.add(sort);

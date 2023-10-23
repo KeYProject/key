@@ -59,7 +59,7 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
     }
 
     private synchronized boolean search(String searchString, Position.Bias direction) {
-        if (searchString.equals("")) {
+        if (searchString.isEmpty()) {
             startRow = 0;
         }
         currentRow = getNextMatch(searchString, startRow, direction);

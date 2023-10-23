@@ -20,12 +20,12 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.RuleAppListener;
+import de.uka.ilkd.key.proof.mgt.RuleJustificationByAddRules;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeAddFormula;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeRemoveFormula;
 import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleAppUtil;
 import de.uka.ilkd.key.rule.Taclet;
@@ -116,9 +116,11 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
 
         // check whether the rule of this proof step was added by another proof step
         // -> if so, add that dynamically added taclet as a dependency
-        Rule rule = n.getAppliedRuleApp().rule();
-        if (rule instanceof Taclet taclet) {
-            if (taclet.getAddedBy() != null) {
+        if (n.getAppliedRuleApp() instanceof TacletApp tacletApp) {
+            final var taclet = tacletApp.taclet();
+            final var justification =
+                n.proof().getInitConfig().getJustifInfo().getJustification(taclet);
+            if (justification instanceof RuleJustificationByAddRules) {
                 input.add(new Pair<>(dynamicRules.get(taclet), false));
             }
         }
@@ -218,11 +220,16 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         // record any rules added by this rule application
         for (NodeReplacement newNode : ruleAppInfo.getReplacementNodes()) {
             for (NoPosTacletApp newRule : newNode.getNode().getLocalIntroducedRules()) {
-                if (newRule.rule() instanceof Taclet
-                        && ((Taclet) newRule.rule()).getAddedBy() == n) {
-                    AddedRule ruleNode = new AddedRule(newRule.rule().name().toString());
-                    output.add(ruleNode);
-                    dynamicRules.put((Taclet) newRule.rule(), ruleNode);
+                if (newRule.rule() instanceof Taclet taclet) {
+                    final var justification =
+                        newNode.getNode().proof().getInitConfig().getJustifInfo()
+                                .getJustification(taclet);
+                    if (justification instanceof RuleJustificationByAddRules justAddRule &&
+                            justAddRule.node() == n) {
+                        AddedRule ruleNode = new AddedRule(newRule.rule().name().toString());
+                        output.add(ruleNode);
+                        dynamicRules.put((Taclet) newRule.rule(), ruleNode);
+                    }
                 }
             }
         }
