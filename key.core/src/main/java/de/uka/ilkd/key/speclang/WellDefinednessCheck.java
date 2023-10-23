@@ -1160,7 +1160,7 @@ public abstract class WellDefinednessCheck implements Contract {
         if (!modelField() && !type().equals(Type.CLASS_INVARIANT)) {
             displayName = displayName + " " + id;
         }
-        if (!getBehaviour().equals("")) {
+        if (!getBehaviour().isEmpty()) {
             displayName = displayName + " (" + getBehaviour() + ")";
         }
         return displayName;

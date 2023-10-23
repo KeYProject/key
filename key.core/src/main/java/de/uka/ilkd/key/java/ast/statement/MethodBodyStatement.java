@@ -38,7 +38,6 @@ import org.key_project.util.collection.ImmutableArray;
 public class MethodBodyStatement extends JavaNonTerminalProgramElement
         implements Statement, NonTerminalProgramElement {
 
-
     /**
      * the variable the result of the method execution is assigned to if the method is declared void
      * or the result not assigned to a variable or field, this value is null.
@@ -61,7 +60,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     /**
      * indicates whether this stands for the specification of a method rather than the concrete body
      */
-    private boolean useSpecification;
+    private final boolean useSpecification;
 
     /**
      * Construct a method body shortcut
@@ -75,6 +74,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         this.bodySource = bodySource;
         this.resultVar = resultVar;
         this.methodReference = methodReference;
+        this.useSpecification = false;
 
         assert methodReference != null : "Missing methodreference";
         assert methodReference.getReferencePrefix() != null
@@ -94,6 +94,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
                 : "Method reference of a method body statement needs an "
                     + "explicit reference prefix.";
         checkOnlyProgramVarsAsArguments(methodReference.getArguments());
+        this.useSpecification = false;
     }
 
     public MethodBodyStatement(IProgramMethod method, ReferencePrefix newContext,

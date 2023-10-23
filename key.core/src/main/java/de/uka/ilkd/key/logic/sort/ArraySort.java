@@ -40,7 +40,7 @@ public final class ArraySort extends AbstractSort {
 
     private ArraySort(ImmutableSet<Sort> extendsSorts, SortKey sk) {
         super(new Name((sk.elemType != null ? sk.elemType.getName() : sk.elemSort.name()) + "[]"),
-            extendsSorts, false);
+            extendsSorts, false, "", "");
 
         if (extendsSorts.isEmpty()) {
             throw new IllegalArgumentException("An ArraySort extends typically three sorts"
@@ -151,13 +151,13 @@ public final class ArraySort extends AbstractSort {
     private record SortKey(Sort elemSort, Type elemType, Sort javaLangObjectSort, Sort javaLangCloneable,
                            Sort javaLangSerializable) {
         public boolean equals(Object o) {
-                if (!(o instanceof SortKey sk)) {
-                    return false;
-                }
-                return elemSort == sk.elemSort && elemType == sk.elemType
-                        && javaLangObjectSort == sk.javaLangObjectSort
-                        && javaLangSerializable == sk.javaLangSerializable
-                        && javaLangCloneable == sk.javaLangCloneable;
+            if (!(o instanceof SortKey sk)) {
+                return false;
             }
+            return elemSort == sk.elemSort && elemType == sk.elemType
+                    && javaLangObjectSort == sk.javaLangObjectSort
+                    && javaLangSerializable == sk.javaLangSerializable
+                    && javaLangCloneable == sk.javaLangCloneable;
+        }
     }
 }

@@ -34,7 +34,9 @@ public class FieldReference extends VariableReference
         this.prefix = constructPrefix(prefix, getProgramVariable());
     }
 
-    private ReferencePrefix constructPrefix(ReferencePrefix prefix, ProgramVariable pv) {
+    public FieldReference(ExtList children, ReferencePrefix prefix) {
+        super(children);
+        final ProgramVariable pv = getProgramVariable();
         if (prefix == null && !pv.isStatic() && pv.isMember()) {
             return new ThisReference();
         } else {
@@ -42,10 +44,17 @@ public class FieldReference extends VariableReference
         }
     }
 
-
     public FieldReference(ProgramVariable pv, ReferencePrefix prefix, PositionInfo pi) {
         super(pv, pi);
         this.prefix = constructPrefix(prefix, getProgramVariable());
+    }
+
+    private ReferencePrefix constructPrefix(ReferencePrefix prefix, ProgramVariable pv) {
+        if (prefix == null && !pv.isStatic() && pv.isMember()) {
+            return new ThisReference();
+        } else {
+            return prefix;
+        }
     }
 
     /**

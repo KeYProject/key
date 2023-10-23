@@ -343,7 +343,6 @@ public class Services implements TermServices {
         this.namespaces = namespaces;
     }
 
-
     /**
      * Returns the proof to which this object belongs, or null if it does not belong to any proof.
      */

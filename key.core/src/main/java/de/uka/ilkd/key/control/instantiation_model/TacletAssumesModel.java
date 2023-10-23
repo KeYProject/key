@@ -117,7 +117,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
             return (IfFormulaInstantiation) getSelectedItem();
         }
         try {
-            if (manualInput == null || "".equals(manualInput)) {
+            if (manualInput == null || manualInput.isEmpty()) {
                 throw new MissingInstantiationException(
                     "'\\assumes'-formula: " + ProofSaver.printAnything(ifFma, services),
                     Position.newOneBased(pos, 1),

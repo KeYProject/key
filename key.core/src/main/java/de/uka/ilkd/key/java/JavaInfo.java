@@ -1328,7 +1328,7 @@ public final class JavaInfo {
      * the free class
      * invariant of an object.
      *
-     * @see #getFreeInv()
+     * @see #getInvFree()
      */
     public ProgramVariable getFreeInvProgramVar() {
         if (invFreeProgVar == null) {
