@@ -158,22 +158,21 @@ public final class AnalysisResults {
      * @return sequent with only useful formulas
      */
     public Sequent reduceSequent(Node node) {
-        Sequent seq = node.sequent();
-        var ante = new ArrayList<SequentFormula>();
-        var succ = new ArrayList<SequentFormula>();
-        for (int i = 1; i <= seq.size(); i++) {
-            // lookup graph node
+        final Sequent seq = node.sequent();
+        return Sequent.createSequent(reduce(seq.antecedent(), node, true),
+            reduce(seq.succedent(), node, false));
+    }
+
+    private Semisequent reduce(Semisequent semi, Node node, boolean antec) {
+        var semiList = new ArrayList<SequentFormula>();
+        for (SequentFormula sf : semi) {
             var graphNode = dependencyGraph.getGraphNode(node.proof(), node.getBranchLocation(),
-                PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel()));
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), antec));
             if (usefulNodes.contains(graphNode)) {
-                if (seq.numberInAntec(i)) {
-                    ante.add(seq.getFormulabyNr(i));
-                } else {
-                    succ.add(seq.getFormulabyNr(i));
-                }
+                semiList.add(sf);
             }
         }
-        return Sequent.createSequent(Semisequent.create(ante), Semisequent.create(succ));
+        return Semisequent.create(semiList);
     }
 
     @Override
