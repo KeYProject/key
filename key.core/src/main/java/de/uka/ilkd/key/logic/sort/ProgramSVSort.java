@@ -280,7 +280,7 @@ public abstract class ProgramSVSort extends AbstractSort {
     // --------------------------------------------------------------------------
 
     public ProgramSVSort(Name name) {
-        super(name, DefaultImmutableSet.nil(), false);
+        super(name, DefaultImmutableSet.nil(), false, "", "");
         NAME2SORT.put(name, this);
     }
 
@@ -367,11 +367,6 @@ public abstract class ProgramSVSort extends AbstractSort {
 
         public ProgramVariableSort() {
             super(new Name("Variable"));
-        }
-
-        @Override
-        public boolean canStandFor(Term t) {
-            return t.op() instanceof ProgramVariable;
         }
 
         @Override
@@ -462,11 +457,6 @@ public abstract class ProgramSVSort extends AbstractSort {
 
         protected SimpleExpressionSort(Name n) {
             super(n);
-        }
-
-        @Override
-        public boolean canStandFor(Term t) {
-            return true;
         }
 
         @Override

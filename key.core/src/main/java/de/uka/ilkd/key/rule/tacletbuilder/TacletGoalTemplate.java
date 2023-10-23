@@ -142,7 +142,7 @@ public class TacletGoalTemplate {
             return true;
         }
 
-        if (getClass() != this.getClass()) {
+        if (getClass() != o.getClass()) {
             return false;
         }
 

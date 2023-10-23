@@ -76,14 +76,11 @@ class ReferenceSearchTable extends JTable implements TableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch (column) {
-        case 0:
-            return "Goal";
-        case 1:
-            return "Reference";
-        default:
-            return "??";
-        }
+        return switch (column) {
+        case 0 -> "Goal";
+        case 1 -> "Reference";
+        default -> "??";
+        };
     }
 
     @Override

@@ -45,7 +45,6 @@ import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.*;
-import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
@@ -130,7 +129,7 @@ public class IntermediateProofReplayer {
         this.loader = loader;
 
         queue.addFirst(
-            new Pair<>(proof.root(), parserResult.getParsedResult()));
+            new Pair<>(proof.root(), parserResult.parsedResult()));
     }
 
     /**

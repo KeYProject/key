@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
@@ -298,24 +299,11 @@ public class Services implements TermServices {
                 "Services are already owned by another proof:" + proof.name());
         }
         proof = p_proof;
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels()
+                || !proof.getSettings().getTermLabelSettings().getUseOriginLabels()) {
+            profile.getTermLabelManager().disableOriginLabelRefactorings();
+        }
     }
-
-
-    public Services copyProofSpecific(Proof p_proof, boolean shareCaches) {
-        ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-        final Services s =
-            new Services(getProfile(), getJavaInfo().getKeYProgModelInfo().getServConf(),
-                getJavaInfo().getKeYProgModelInfo().rec2key(), copyCounters(), newCaches);
-        s.proof = p_proof;
-        s.specRepos = specRepos;
-        s.setTypeConverter(getTypeConverter().copy(s));
-        s.setNamespaces(namespaces.copy());
-        nameRecorder = nameRecorder.copy();
-        s.setJavaModel(getJavaModel());
-
-        return s;
-    }
-
 
     /*
      * returns an existing named counter, creates a new one otherwise
@@ -360,7 +348,6 @@ public class Services implements TermServices {
     public void setNamespaces(NamespaceSet namespaces) {
         this.namespaces = namespaces;
     }
-
 
     /**
      * Returns the proof to which this object belongs, or null if it does not belong to any proof.

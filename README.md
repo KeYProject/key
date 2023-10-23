@@ -2,14 +2,25 @@
 
 [![Tests](https://github.com/KeYProject/key/actions/workflows/tests.yml/badge.svg)](https://github.com/KeYProject/key/actions/workflows/tests.yml) [![CodeQL](https://github.com/KeYProject/key/actions/workflows/codeql.yml/badge.svg)](https://github.com/KeYProject/key/actions/workflows/codeql.yml) [![CodeQuality](https://github.com/KeYProject/key/actions/workflows/code_quality.yml/badge.svg)](https://github.com/KeYProject/key/actions/workflows/code_quality.yml) 
 
-This repository contains the interactive theorem prover "KeY" for the verification of Java programs.
+This repository is the home of the interactive theorem prover KeY for formal verification and analysis of Java programs. KeY comes as a standalone GUI application, which allows you to verify the functional correctness of Java programs with respect to formal specifications formulated in the Java Modeling Language JML. Moreover, KeY can also be used as a library e.g. for symbolic program execution, first order reasoning, or test case generation.
 
-You can find more information about KeY on https://key-project.org or use the
-documentation in the companion repository [key-docs](https://github.com/KeYProject/key-docs).
-The content of the latter is also available as HTML version under https://keyproject.github.io/key-docs/.
+For more information, refer to
 
-The current version of KeY is 2.10.0, licensed under GPL v2.
+* [The KeY homepage](https://key-project.org) 
+* [The KeY book](https://www.key-project.org/thebook2/)
+* [The KeY developer documentation](https://keyproject.github.io/key-docs/)
+* KeY's success stories:
+  * [Severe bug discovered in JDK sorting routine (TimSort)](http://www.envisage-project.eu/proving-android-java-and-python-sorting-algorithm-is-broken-and-how-to-fix-it/),  
+  * [Verification of `java.util.IdentityHashMap`](https://doi.org/10.1007/978-3-031-07727-2_4),
+  * [Google Award for analysing a bug in `LinkedList`](https://www.key-project.org/2023/07/23/cwi-researchers-win-google-award-for-finding-a-bug-in-javas-linkedlist-using-key/)
 
+The current version of KeY is 2.12.0, licensed under GPL v2.
+
+
+Feel free to use the project templates to get started using KeY:
+* [For Verification Projects](https://github.com/KeYProject/verification-project-template)
+* [Using as a Library](https://github.com/KeYProject/key-java-example)
+* [Using as a Symbolic Execution Backend](https://github.com/KeYProject/key-symbex-example)
 
 ## Requirements
 
@@ -85,7 +96,13 @@ Assuming you are in the directory of this README file, you can create a runnable
 
 # Issues and Bug Reports
 
-If you encounter problems, please send a message to support@key-project.org
+* For bug reports, please use the [issue tracker](https://github.com/KeYProject/key/issues) or send a mail to support@key-project.org. 
+
+* For discussions, you may want to subscribe and use the mailing list <key-all@lists.informatik.kit.edu> or use [GitHub discussions](https://github.com/KeYProject/key/discussions).
+
+# Contributing to KeY
+
+Feel free to submit [pull requests](https://github.com/KeYProject/key/pulls) via GitHub. Pull requests are assessed using automatic tests, formatting and static source checkers, as well as a manual review by one of the developers. More guidelines and documentation for the KeY development can be found under [key-docs](https://keyproject.github.io/key-docs/devel/).
 
 
 

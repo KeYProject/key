@@ -39,12 +39,6 @@ public class Intersect extends ADTPrefixConstruct {
 
 
     @Override
-    public int getPrecedence() {
-        return 0;
-    }
-
-
-    @Override
     public int getNotation() {
         return PREFIX;
     }

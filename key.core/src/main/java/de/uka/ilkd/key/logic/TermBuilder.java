@@ -1686,14 +1686,16 @@ public class TermBuilder {
         } else {
             List<TermLabel> newLabelList = term.getLabels().toList();
 
-            for (TermLabel newLabel : labels) {
-                for (TermLabel oldLabel : newLabelList) {
-                    if (oldLabel.getClass().equals(newLabel.getClass())) {
-                        newLabelList.remove(oldLabel);
-                        break;
+            if (labels != null || !labels.isEmpty()) {
+                for (TermLabel newLabel : labels) {
+                    for (TermLabel oldLabel : newLabelList) {
+                        if (oldLabel.getClass().equals(newLabel.getClass())) {
+                            newLabelList.remove(oldLabel);
+                            break;
+                        }
                     }
+                    newLabelList.add(newLabel);
                 }
-                newLabelList.add(newLabel);
             }
 
             return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(),
