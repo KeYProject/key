@@ -50,7 +50,7 @@ public class Modality extends org.key_project.logic.op.Modality<Sort> implements
     /**
      * creates a modal operator with the given name
      */
-    public Modality(Program prg, JavaModalityKind kind) {
+    private Modality(Program prg, JavaModalityKind kind) {
         super(kind.name(), JavaDLTheory.FORMULA, prg, kind);
     }
 
