@@ -13,19 +13,7 @@ import de.uka.ilkd.key.rule.Rule;
  */
 public class SetRuleFilter implements RuleFilter {
 
-    private final HashSet<Rule> set;
-
-    public SetRuleFilter() {
-        this.set = new LinkedHashSet<>();
-    }
-
-    private SetRuleFilter(HashSet<Rule> set) {
-        this.set = set;
-    }
-
-    public SetRuleFilter copy() {
-        return new SetRuleFilter(new LinkedHashSet<>(this.set));
-    }
+    private final HashSet<Rule> set = new LinkedHashSet<>();
 
     public void addRuleToSet(Rule rule) {
         set.add(rule);
