@@ -35,9 +35,6 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @return an ImmutableList containing the same elements as the specified list.
      */
     static <T> ImmutableList<T> fromList(Collection<T> list) {
-        if (list instanceof ImmutableList<?> iList) {
-            return (ImmutableList<T>) iList;
-        }
         ImmutableList<T> result = ImmutableSLList.nil();
 
         for (T el : list) {
