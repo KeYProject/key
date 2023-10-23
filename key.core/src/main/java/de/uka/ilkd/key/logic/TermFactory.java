@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
@@ -128,7 +129,12 @@ public final class TermFactory {
     private Term doCreateTerm(Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
             ImmutableArray<TermLabel> labels, String origin) {
-        final TermImpl newTerm =
+
+        //TODO: For testing only, remove before merge
+        if (op instanceof Modality mod && !mod.program().equals(javaBlock)) {
+            throw new RuntimeException("Inconsistent term creation");
+        }
+        final Term newTerm =
             (labels == null || labels.isEmpty()
                     ? new TermImpl(op, subs, boundVars, javaBlock, origin)
                     : new LabeledTermImpl(op, subs, boundVars, javaBlock, labels, origin));

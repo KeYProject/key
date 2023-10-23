@@ -134,10 +134,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
     /**
      * {@inheritDoc}
      */
-<<<<<<< HEAD
     @NonNull
-=======
->>>>>>> 64e3d0a7e3 (Revert "TacletAppIndex lazy delta updates")
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException {

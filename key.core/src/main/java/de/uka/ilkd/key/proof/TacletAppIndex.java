@@ -74,11 +74,7 @@ public class TacletAppIndex {
     }
 
     private TacletAppIndex(TacletIndex tacletIndex, SemisequentTacletAppIndex antecIndex,
-<<<<<<< HEAD
             SemisequentTacletAppIndex succIndex, @NonNull Goal goal, Sequent seq,
-=======
-            SemisequentTacletAppIndex succIndex, @Nonnull Goal goal, Sequent seq,
->>>>>>> 64e3d0a7e3 (Revert "TacletAppIndex lazy delta updates")
             RuleFilter ruleFilter,
             TermTacletAppIndexCacheSet indexCaches, Map<CacheKey, TermTacletAppIndex> cache) {
         this.tacletIndex = tacletIndex;
