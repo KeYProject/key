@@ -44,6 +44,7 @@ import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.graph.PseudoInput;
 import org.key_project.slicing.graph.PseudoOutput;
 import org.key_project.slicing.graph.TrackedFormula;
+import org.key_project.util.collection.IdentityHashSet;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -195,12 +196,14 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             return removed;
         }
         Sequent seqParent = parent.sequent();
-        Sequent seqNew = node.sequent();
-        for (int i = 1; i <= seqParent.size(); i++) {
-            var f = seqParent.getFormulabyNr(i);
-            if (!seqNew.contains(f)) {
-                removed.add(PosInOccurrence.findInSequent(seqParent, i, PosInTerm.getTopLevel()));
+        var seqNew = new IdentityHashSet<>(node.sequent().asList());
+        int i = 1;
+        for (final var parentFormula : seqParent) {
+            if (!seqNew.contains(parentFormula)) {
+                removed.add(new PosInOccurrence(parentFormula, PosInTerm.getTopLevel(),
+                    seqParent.numberInAntec(i)));
             }
+            i++;
         }
         return removed;
     }
@@ -232,13 +235,16 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         int sibling = 0;
         for (Node b : node.children()) {
             // compare sequents
-            Sequent oldSeq = node.sequent();
+            var oldSeq = new IdentityHashSet<>(node.sequent().asList());
             Sequent newSeq = b.sequent();
-            for (int i = 1; i <= newSeq.size(); i++) {
-                var pio = PosInOccurrence.findInSequent(newSeq, i, PosInTerm.getTopLevel());
-                if (!oldSeq.contains(pio.sequentFormula())) {
+            int index = 1;
+            for (var f : newSeq) {
+                if (!oldSeq.contains(f)) {
+                    var pio = new PosInOccurrence(f, PosInTerm.getTopLevel(),
+                        newSeq.numberInAntec(index));
                     outputs.add(new Pair<>(pio, node.childrenCount() > 1 ? sibling : -1));
                 }
+                index++;
             }
             sibling++;
         }
