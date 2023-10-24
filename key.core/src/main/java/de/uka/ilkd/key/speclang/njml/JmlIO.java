@@ -138,8 +138,7 @@ public class JmlIO {
     }
 
     private Term attachTermLabel(Term term, OriginTermLabel.SpecType type) {
-        return services.getTermBuilder().addLabel(term,
-            new OriginTermLabel(new OriginTermLabel.Origin(type)));
+        return services.getTermBuilder().addLabel(term, new OriginTermLabel.Origin(type));
     }
 
 
@@ -215,7 +214,7 @@ public class JmlIO {
      */
     public Term translateTerm(LabeledParserRuleContext expr, OriginTermLabel.SpecType type) {
         Term term = translateTerm(expr.first);
-        OriginTermLabel origin = new OriginTermLabel(new OriginTermLabel.Origin(type));
+        OriginTermLabel.Origin origin = new OriginTermLabel.Origin(type);
         if (expr.second != null) {
             return services.getTermBuilder().addLabel(term, expr.second);
         } else {

@@ -501,7 +501,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 de.uka.ilkd.key.java.Position.fromSEPosition(recoderPos);
 
             // call preparser
-            var parser = new PreParser();
+            var parser = new PreParser(ProofIndependentSettings.DEFAULT_INSTANCE
+                    .getTermLabelSettings().getUseOriginLabels());
             ImmutableList<TextualJMLConstruct> constructs =
                 parser.parseClassLevel(concatenatedComment, fileName, pos);
             warnings = warnings.append(parser.getWarnings());
@@ -557,7 +558,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
             de.uka.ilkd.key.java.Position.fromSEPosition(recoderPos);
 
         // call preparser
-        var parser = new PreParser();
+        var parser = new PreParser(
+            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
         ImmutableList<TextualJMLConstruct> constructs =
             parser.parseMethodLevel(concatenatedComment, fileName, pos);
         warnings = warnings.append(parser.getWarnings());
