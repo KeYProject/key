@@ -1322,7 +1322,7 @@ public class TermLabelManager {
      * @param refactorings The already accumulated refactorings to be expanded with rule specific
      *        refactorings
      */
-    private void computeRuleSpecificRefactorings(TermLabelState state,
+    private void determineAndCollectRuleSpecificRefactorings(TermLabelState state,
             Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm,
             Rule rule, Goal goal, Object hint, Term tacletTerm,
             RefactoringsContainer refactorings) {
@@ -1369,8 +1369,9 @@ public class TermLabelManager {
      * @param refactorings The already accumulated refactorings to be expanded with rule independent
      *        refactorings
      */
-    private void computeRuleIndependentRefactorings(TermLabelState state,
-            Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm,
+    private void determineAndRuleIndependentRefactorings(TermLabelState state,
+            Services services, PosInOccurrence applicationPosInOccurrence,
+            Term applicationTerm,
             Rule rule, Goal goal, Object hint, Term tacletTerm,
             RefactoringsContainer refactorings) {
         for (TermLabelRefactoring refactoring : allRulesRefactorings) {
@@ -1413,9 +1414,9 @@ public class TermLabelManager {
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm) {
         final RefactoringsContainer refactorings = new RefactoringsContainer();
-        computeRuleSpecificRefactorings(state, services, applicationPosInOccurrence,
+        determineAndCollectRuleSpecificRefactorings(state, services, applicationPosInOccurrence,
             applicationTerm, rule, goal, hint, tacletTerm, refactorings);
-        computeRuleIndependentRefactorings(state, services, applicationPosInOccurrence,
+        determineAndRuleIndependentRefactorings(state, services, applicationPosInOccurrence,
             applicationTerm, rule, goal, hint, tacletTerm, refactorings);
         return refactorings;
     }
@@ -1440,7 +1441,8 @@ public class TermLabelManager {
                                            Set<TermLabelRefactoring> childAndGrandchildRefactoringsAndParents,
                                            Set<TermLabelRefactoring> directChildRefactorings) {
         public RefactoringsContainer() {
-            this(new LinkedHashSet<>(), new LinkedHashSet<>(), new LinkedHashSet<>(), new LinkedHashSet<>(), new LinkedHashSet<>());
+            this(new LinkedHashSet<>(), new LinkedHashSet<>(), new LinkedHashSet<>(),
+                    new LinkedHashSet<>(), new LinkedHashSet<>());
         }
 
         /**
