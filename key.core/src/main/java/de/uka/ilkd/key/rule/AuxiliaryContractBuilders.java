@@ -1391,9 +1391,8 @@ public final class AuxiliaryContractBuilders {
                     termLabelState, services, occurrence, application.rule(), application, goal,
                     BlockContractHint.createValidityBranchHint(variables.exception), null,
                     tb.tf().createTerm(instantiation.modality(),
-                            new ImmutableArray<>(newPost), null, newJavaBlock,
-                        instantiation.formula().getLabels())
-                );
+                        new ImmutableArray<>(newPost), null, newJavaBlock,
+                        instantiation.formula().getLabels()));
 
                 term = tb.applySequential(updates,
                     tb.prog(instantiation.modality(), newJavaBlock, newPost, labels));
@@ -1617,10 +1616,10 @@ public final class AuxiliaryContractBuilders {
                 TermLabelManager.instantiateLabels(termLabelState, services, occurrence,
                     application.rule(), application, goal, BlockContractHint.USAGE_BRANCH, null,
                     services.getTermBuilder().tf().createTerm(
-                            instantiation.modality(),new ImmutableArray<>(instantiation.formula().sub(0)),
+                        instantiation.modality(),
+                        new ImmutableArray<>(instantiation.formula().sub(0)),
                         null, instantiation.formula().javaBlock(),
-                        instantiation.formula().getLabels())
-                ));
+                        instantiation.formula().getLabels())));
         }
 
         private JavaBlock replaceBlock(final JavaBlock java, final JavaStatement oldBlock,

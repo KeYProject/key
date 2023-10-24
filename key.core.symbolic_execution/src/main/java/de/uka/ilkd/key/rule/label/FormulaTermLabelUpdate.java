@@ -45,14 +45,15 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
      * {@inheritDoc}
      */
     public void updateLabels(TermLabelState state, Services services,
-                             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
-                             Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
-                             Set<TermLabel> labels) {
+            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
+            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
+            Set<TermLabel> labels) {
         if (hint instanceof TacletLabelHint tacletHint) {
             if ((TacletOperation.ADD_ANTECEDENT.equals(tacletHint.getTacletOperation())
                     || TacletOperation.ADD_SUCCEDENT.equals(tacletHint.getTacletOperation()))
                     && (TruthValueTracingUtil.isPredicate(newTerm)
-                            || TruthValueTracingUtil.isLogicOperator(newTerm.op(), newTerm.subs()))) {
+                            || TruthValueTracingUtil.isLogicOperator(newTerm.op(),
+                                newTerm.subs()))) {
                 if (getTermLabel(labels, FormulaTermLabel.NAME) == null) {
                     TermLabel label = TermLabelManager.findInnerMostParentLabel(
                         applicationPosInOccurrence, FormulaTermLabel.NAME);
@@ -63,7 +64,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
                         labels.add(newLabel);
                         // Let the PredicateTermLabelRefactoring perform the refactoring, see also
                         // PredicateTermLabelRefactoring#PARENT_REFACTORING_REQUIRED
-                        FormulaTermLabelRefactoring.setParentRefactroingRequired(state, true);
+                        FormulaTermLabelRefactoring.setParentRefactoringRequired(state, true);
                     }
                 }
             }

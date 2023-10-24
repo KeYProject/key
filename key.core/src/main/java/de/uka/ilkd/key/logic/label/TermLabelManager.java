@@ -484,24 +484,24 @@ public class TermLabelManager {
      * {@link Services} if possible. Otherwise no labels are returned.
      * </p>
      *
-     * @param state                      The {@link TermLabelState} of the current rule application.
-     * @param services                   The {@link Services} used by the {@link Proof} on which a {@link Rule} is
-     *                                   applied right now.
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     *        applied right now.
      * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
-     *                                   which defines the {@link Term} that is rewritten.
-     * @param rule                       The {@link Rule} which is applied.
-     * @param ruleApp                    The {@link RuleApp} which is currently performed.
-     * @param goal                       The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint                       An optional hint passed from the active rule to describe the term which should be
-     *                                   created.
-     * @param tacletTerm                 The optional {@link Term} in the taclet which is responsible to instantiate
-     *                                   the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTerm                    the template for the new {@link Term} to create
+     *        which defines the {@link Term} that is rewritten.
+     * @param rule The {@link Rule} which is applied.
+     * @param ruleApp The {@link RuleApp} which is currently performed.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
+     *        created.
+     * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
+     *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
+     * @param newTerm the template for the new {@link Term} to create
      * @return The {@link TermLabel}s to add to the new {@link Term} which should be created.
      */
     public static ImmutableArray<TermLabel> instantiateLabels(TermLabelState state,
-                                                              Services services, PosInOccurrence applicationPosInOccurrence, Rule rule,
-                                                              RuleApp ruleApp, Goal goal, Object hint, Term tacletTerm, Term newTerm) {
+            Services services, PosInOccurrence applicationPosInOccurrence, Rule rule,
+            RuleApp ruleApp, Goal goal, Object hint, Term tacletTerm, Term newTerm) {
         Term applicationTerm =
             applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
         return instantiateLabels(state, services, applicationTerm, applicationPosInOccurrence, rule,
@@ -532,7 +532,7 @@ public class TermLabelManager {
      *        created.
      * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTerm  the template for the new {@link Term} to create
+     * @param newTerm the template for the new {@link Term} to create
      * @return The {@link TermLabel}s to add to the new {@link Term} which should be created.
      */
     public static ImmutableArray<TermLabel> instantiateLabels(TermLabelState state,
@@ -564,7 +564,7 @@ public class TermLabelManager {
      *        created.
      * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTerm  the template for the new {@link Term} to create
+     * @param newTerm the template for the new {@link Term} to create
      * @param newLabels The set accumulating the {@link TermLabel}s to add to the new {@link Term}
      *        which should be created.
      */
@@ -581,7 +581,7 @@ public class TermLabelManager {
         Map<Name, ChildTermLabelPolicy> activeDirectChildPolicies =
             computeActiveChildPolicies(services, applicationPosInOccurrence, applicationTerm, rule,
                 goal, hint, tacletTerm, newTerm, ruleSpecificDirectChildTermLabelPolicies,
-                    allRulesDirectChildTermLabelPolicies);
+                allRulesDirectChildTermLabelPolicies);
         if (!activeDirectChildPolicies.isEmpty()) {
             performDirectChildPolicies(services, applicationPosInOccurrence, applicationTerm, rule,
                 goal, hint, tacletTerm, newTerm, activeDirectChildPolicies, newLabels);
@@ -628,7 +628,7 @@ public class TermLabelManager {
      *        created.
      * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTerm  the template for the new {@link Term} to create
+     * @param newTerm the template for the new {@link Term} to create
      * @return The {@link TermLabel}s to add to the new {@link Term} which should be created.
      */
     public ImmutableArray<TermLabel> instantiateLabels(TermLabelState state, Services services,
@@ -658,7 +658,8 @@ public class TermLabelManager {
         // Allow rule specific updater to remove and add labels
         if (currentRuleSpecificUpdates != null) {
             performUpdater(state, services, applicationPosInOccurrence, applicationTerm,
-                modalityTerm, rule, ruleApp, hint, tacletTerm, newTerm, currentRuleSpecificUpdates, newLabels);
+                modalityTerm, rule, ruleApp, hint, tacletTerm, newTerm, currentRuleSpecificUpdates,
+                newLabels);
         }
         // Allow all rule updater to remove and add labels
         if (!allRulesUpdates.isEmpty()) {
@@ -710,7 +711,7 @@ public class TermLabelManager {
      *        created.
      * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTerm  the template for the new {@link Term} to create
+     * @param newTerm the template for the new {@link Term} to create
      * @param policies The {@link TermLabelPolicy} instances to perform.
      * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
      */
@@ -749,7 +750,7 @@ public class TermLabelManager {
      *        created.
      * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTerm  the template for the new {@link Term} to create
+     * @param newTerm the template for the new {@link Term} to create
      * @param policies The {@link TermLabelPolicy} instances to perform.
      * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
      * @param label The current {@link TermLabel} to ask its {@link TermLabelPolicy}.
@@ -790,14 +791,15 @@ public class TermLabelManager {
      *        created.
      * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTerm  the template for the new {@link Term} to create
+     * @param newTerm the template for the new {@link Term} to create
      * @param ruleSpecificPolicies Rule specific {@link ChildTermLabelPolicy} instances.
      * @param ruleIndependentPolicies All rules {@link ChildTermLabelPolicy} instances.
      * @return The active {@link ChildTermLabelPolicy} which have to be performed.
      */
     protected Map<Name, ChildTermLabelPolicy> computeActiveChildPolicies(TermServices services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-            Object hint, Term tacletTerm, Term newTerm, Map<Name, Map<Name, ChildTermLabelPolicy>> ruleSpecificPolicies,
+            Object hint, Term tacletTerm, Term newTerm,
+            Map<Name, Map<Name, ChildTermLabelPolicy>> ruleSpecificPolicies,
             Map<Name, ChildTermLabelPolicy> ruleIndependentPolicies) {
         Map<Name, ChildTermLabelPolicy> activeDirectChildPolicies =
             new LinkedHashMap<>();
@@ -806,7 +808,8 @@ public class TermLabelManager {
             if (rulePolicies != null) {
                 for (Entry<Name, ChildTermLabelPolicy> entry : rulePolicies.entrySet()) {
                     if (entry.getValue().isRuleApplicationSupported(services,
-                        applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, newTerm)) {
+                        applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm,
+                        newTerm)) {
                         activeDirectChildPolicies.put(entry.getKey(), entry.getValue());
                     }
                 }
@@ -815,7 +818,8 @@ public class TermLabelManager {
         if (!ruleIndependentPolicies.isEmpty()) {
             for (Entry<Name, ChildTermLabelPolicy> entry : ruleIndependentPolicies.entrySet()) {
                 if (entry.getValue().isRuleApplicationSupported(services,
-                    applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, newTerm)) {
+                    applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm,
+                    newTerm)) {
                     activeDirectChildPolicies.put(entry.getKey(), entry.getValue());
                 }
             }
@@ -844,7 +848,7 @@ public class TermLabelManager {
      *        created.
      * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTerm  the template for the new {@link Term} to create
+     * @param newTerm the template for the new {@link Term} to create
      * @param policies The {@link ChildTermLabelPolicy} instances to perform.
      * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
      */
@@ -884,7 +888,7 @@ public class TermLabelManager {
      *        created.
      * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTerm  the template for the new {@link Term} to create
+     * @param newTerm the template for the new {@link Term} to create
      * @param policies The {@link ChildTermLabelPolicy} instances to perform.
      * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
      */
@@ -900,7 +904,8 @@ public class TermLabelManager {
                     for (TermLabel label : visited.getLabels()) {
                         ChildTermLabelPolicy policy = policies.get(label.name());
                         if (policy != null && policy.addLabel(services, applicationPosInOccurrence,
-                            applicationTerm, rule, goal, hint, tacletTerm, newTerm, visited, label)) {
+                            applicationTerm, rule, goal, hint, tacletTerm, newTerm, visited,
+                            label)) {
                             newLabels.add(label);
                         }
                     }
@@ -932,14 +937,14 @@ public class TermLabelManager {
      *        created.
      * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTerm  the template for the new {@link Term} to create
+     * @param newTerm the template for the new {@link Term} to create
      * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
      */
     protected void performUpdater(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
             Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
-                                  ImmutableList<TermLabelUpdate> updater,
-                                  Set<TermLabel> newLabels) {
+            ImmutableList<TermLabelUpdate> updater,
+            Set<TermLabel> newLabels) {
         for (TermLabelUpdate update : updater) {
             update.updateLabels(state, services, applicationPosInOccurrence, applicationTerm,
                 modalityTerm, rule, ruleApp, hint, tacletTerm, newTerm, newLabels);

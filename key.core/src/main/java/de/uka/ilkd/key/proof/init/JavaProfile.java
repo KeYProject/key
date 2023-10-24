@@ -124,8 +124,8 @@ public class JavaProfile extends AbstractProfile {
                 new SingletonLabelFactory<>(ParameterlessTermLabel.POST_CONDITION_LABEL)));
         result = result.prepend(new TermLabelConfiguration(OriginTermLabel.NAME,
             new OriginTermLabelFactory(), originTermLabelPolicyList,
-                null, null,
-                null, null,
+            null, null,
+            null, null,
             originTermLabelRefactorings, null));
 
         result =

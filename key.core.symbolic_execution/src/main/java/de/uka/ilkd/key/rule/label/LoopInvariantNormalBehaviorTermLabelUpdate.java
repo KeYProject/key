@@ -39,9 +39,9 @@ public class LoopInvariantNormalBehaviorTermLabelUpdate implements TermLabelUpda
      */
     @Override
     public void updateLabels(TermLabelState state, Services services,
-                             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
-                             Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
-                             Set<TermLabel> labels) {
+            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
+            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
+            Set<TermLabel> labels) {
         if (rule instanceof WhileInvariantRule && "LoopBodyImplication".equals(hint)
                 && SymbolicExecutionUtil.hasSymbolicExecutionLabel(modalityTerm)) {
             labels.add(SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL);

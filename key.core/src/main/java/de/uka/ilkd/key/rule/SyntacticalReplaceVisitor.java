@@ -343,9 +343,8 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             JavaBlock newTermJavaBlock, ImmutableArray<TermLabel> newTermOriginalLabels) {
         return TermLabelManager.instantiateLabels(termLabelState, services,
             applicationPosInOccurrence, rule, ruleApp, goal, labelHint, tacletTerm,
-                tb.tf().createTerm(newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock,
-                        newTermOriginalLabels)
-        );
+            tb.tf().createTerm(newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock,
+                newTermOriginalLabels));
     }
 
     private Operator handleSortDependingSymbol(SortDependingFunction depOp) {

@@ -34,9 +34,9 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
      */
     @Override
     public TermLabel keepLabel(TermLabelState state, Services services,
-                               PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-                               Object hint, Term tacletTerm,
-                               Term newTerm, TermLabel label) {
+            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+            Object hint, Term tacletTerm,
+            Term newTerm, TermLabel label) {
         // Maintain label if new Term is a predicate
         if (TruthValueTracingUtil.isPredicate(newTerm.op())
                 || TruthValueTracingUtil.isLogicOperator(newTerm.op(), newTerm.subs())) {
@@ -116,13 +116,13 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
                     if (applicationLabel instanceof FormulaTermLabel) {
                         // Let the PredicateTermLabelRefactoring perform the refactoring, see also
                         // PredicateTermLabelRefactoring#UPDATE_REFACTORING_REQUIRED
-                        FormulaTermLabelRefactoring.setUpdateRefactroingRequired(state, true);
+                        FormulaTermLabelRefactoring.setUpdateRefactoringRequired(state, true);
                     }
                 }
             }
             return null;
         } else if (newTerm.op() instanceof SubstOp) { // Such operations perform for instance
-                                                   // skolemization (e.g. rule allRight)
+                                                      // skolemization (e.g. rule allRight)
             return label;
         } else {
             return null;
