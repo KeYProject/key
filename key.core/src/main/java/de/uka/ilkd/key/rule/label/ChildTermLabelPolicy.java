@@ -4,25 +4,22 @@
 package de.uka.ilkd.key.rule.label;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
-
-import org.key_project.util.collection.ImmutableArray;
+import de.uka.ilkd.key.rule.RuleApp;
 
 /**
  * <p>
  * A {@link ChildTermLabelPolicy} is used by
- * {@link TermLabelManager#instantiateLabels( TermLabelState, Services, PosInOccurrence, Term, Term, Rule, Goal, Object, Term, Operator, ImmutableArray, ImmutableArray, JavaBlock)}
+ * {@link TermLabelManager#instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
  * to decide for each {@link TermLabel} on a child or grandchild of the application {@link Term} if
  * it should be re-added to the new {@link Term} or not.
  * </p>
@@ -39,8 +36,8 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
     /**
      * Decides if the currently active {@link Rule} application is supported or not. If it is not
      * supported no iteration over children will be executed. Only if it returns {@code true}
-     * {@link #addLabel( TermServices, PosInOccurrence, Term, Rule, Goal, Object, Term, Operator,
-     * ImmutableArray<Term>, ImmutableArray<QuantifiableVariable>, JavaBlock, Term, TermLabel)} will
+     * {@link #addLabel( TermServices, PosInOccurrence, Term, Rule, Goal, Object, Term, Term, Term, TermLabel)}
+     * will
      * be called if a child {@link Term} contains a managed label.
      *
      * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
@@ -55,19 +52,13 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
      *        created.
      * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTermOp The new {@link Operator} of the {@link Term} to create.
-     * @param newTermSubs The optional children of the {@link Term} to create.
-     * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to
-     *        create.
-     * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create. param
-     *        label The {@link TermLabel} to decide if it should be kept or dropped.
+     * @param newTerm the template for the new {@link Term} to create
      * @return {@code true} keep {@link TermLabel} and add it to the new {@link Term}. {@code false}
      *         drop {@link TermLabel} and do not need it to the new {@link Term}.
      */
     boolean isRuleApplicationSupported(TermServices services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-            Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs,
-            ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock);
+            Object hint, Term tacletTerm, Term newTerm);
 
     /**
      * <p>
@@ -92,11 +83,7 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
      *        created.
      * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTermOp The new {@link Operator} of the {@link Term} to create.
-     * @param newTermSubs The optional children of the {@link Term} to create.
-     * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to
-     *        create.
-     * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
+     * @param newTerm the template for the new {@link Term} to create
      * @param childTerm The {@link Term} which is a child or grandchild of the application
      *        {@link Term} that provides the {@link TermLabel}.
      * @param label The {@link TermLabel} to decide if it should be kept or dropped.
@@ -105,7 +92,5 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
      */
     boolean addLabel(TermServices services, PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm,
-            Operator newTermOp, ImmutableArray<Term> newTermSubs,
-            ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock,
-            Term childTerm, TermLabel label);
+            Term newTerm, Term childTerm, TermLabel label);
 }

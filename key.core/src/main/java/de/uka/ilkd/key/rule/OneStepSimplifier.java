@@ -340,8 +340,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             // missing)
             ImmutableArray<TermLabel> labels =
                 TermLabelManager.instantiateLabels(new TermLabelState(), services, in, pos, this,
-                    ruleApp, goal, null, null, result.op(), result.subs(), result.boundVars(),
-                    result.javaBlock(), result.getLabels());
+                    ruleApp, goal, null, null, result);
             if (labels != null && !labels.isEmpty()) {
                 result = services.getTermBuilder().label(result, labels);
             }

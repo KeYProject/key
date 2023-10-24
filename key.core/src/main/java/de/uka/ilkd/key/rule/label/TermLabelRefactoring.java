@@ -28,7 +28,7 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 /**
  * <p>
  * A {@link TermLabelRefactoring} is used by
- * {@link TermLabelManager#refactorGoal(TermLabelState, Services, PosInOccurrence, Term, Rule, Goal, Term)}
+ * {@link TermLabelManager#refactorGoal(TermLabelState, Services, PosInOccurrence, Rule, Goal, Object, Term)}
  * to refactor the labels of each visited {@link Term}.
  * </p>
  * <p>
@@ -43,12 +43,15 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 public interface TermLabelRefactoring extends RuleSpecificTask {
 
     /**
-     * Determines whether any refatorings should be applied on an application of the given
+     * <p>
+     * Determines whether any refactorings should be applied on an application of the given
+     * </p>
      * {@link BuiltInRule}.
-     *
+     * <p>
      * If you perform refactorings despite this method returning false, KeY will throw an exception
      * because the formula that contains the modality in which the contract was applied does not
      * have a FormulaTag.
+     * </p>
      *
      * @param rule the rule being applied.
      * @param goal the goal on which the rule is being applied.

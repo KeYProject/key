@@ -63,8 +63,8 @@ public class SimplifyTermProfile extends JavaProfile {
         ImmutableList<TermLabelPolicy> symExcPolicies =
             ImmutableSLList.<TermLabelPolicy>nil()
                     .prepend((state, services, applicationPosInOccurrence, applicationTerm, rule,
-                            goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars,
-                            newTermJavaBlock, newTermOriginalLabels, label) -> label);
+                            goal, hint, tacletTerm,
+                            newTerm, label) -> label);
         result = result.prepend(new TermLabelConfiguration(SymbolicExecutionUtil.RESULT_LABEL_NAME,
             new SingletonLabelFactory<>(SymbolicExecutionUtil.RESULT_LABEL), null,
             symExcPolicies, null, null, null, null, null));

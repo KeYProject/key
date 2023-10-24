@@ -766,8 +766,9 @@ public final class UseOperationContractRule implements BuiltInRule {
             tb.prog(inst.mod, postJavaBlock, inst.progPost.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, postGoal, "PostModality", null,
-                    inst.mod, new ImmutableArray<>(inst.progPost.sub(0)), null, postJavaBlock,
-                    inst.progPost.getLabels())),
+                    tb.tf().createTerm(inst.mod,
+                        new ImmutableArray<>(inst.progPost.sub(0)), null, postJavaBlock,
+                        inst.progPost.getLabels()))),
             null);
         postGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
         postGoal.changeFormula(new SequentFormula(tb.apply(inst.u, normalPost, null)),
@@ -784,9 +785,10 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Term originalExcPost = tb.apply(anonUpdate, tb.prog(inst.mod, excJavaBlock,
             inst.progPost.sub(0),
             TermLabelManager.instantiateLabels(termLabelState, services, ruleApp.posInOccurrence(),
-                this, ruleApp, excPostGoal, "ExceptionalPostModality", null, inst.mod,
-                new ImmutableArray<>(inst.progPost.sub(0)), null, excJavaBlock,
-                inst.progPost.getLabels())),
+                this, ruleApp, excPostGoal, "ExceptionalPostModality", null,
+                tb.tf().createTerm(inst.mod,
+                    new ImmutableArray<>(inst.progPost.sub(0)), null, excJavaBlock,
+                    inst.progPost.getLabels()))),
             null);
         final Term excPost =
             globalDefs == null ? originalExcPost : tb.apply(globalDefs, originalExcPost);
